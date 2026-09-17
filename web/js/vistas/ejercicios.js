@@ -1,52 +1,89 @@
-import { formatearNumero, generarEscalera, lecturaDesdeCarga } from '../calculos.js';
+import {
+  cicloActual, formatearNumero, generarEscalera, lecturaDesdeCarga, registrosDelCiclo, usaTramos,
+} from '../calculos.js';
 import * as estado from '../estado.js';
-import { TIPOS_CARGA, TIPOS_ESFUERZO, TIPOS_PROGRESION } from '../esquema.js';
+import {
+  DIAS_CICLO_POR_DEFECTO, TECNICAS, TIPOS_CARGA, TIPOS_ESFUERZO, TIPOS_PROGRESION, TIPOS_SERIE,
+  progresionPorDefecto, serieNuevaPlantilla, sobrePorDefecto,
+} from '../esquema.js';
 import { anadir, aviso, confirmar, h, leerNumero, nuevoId } from '../ui.js';
 
 // ---------------------------------------------------------------------------
-// Lista
+// Lista, con buscador
 // ---------------------------------------------------------------------------
 
 let verArchivados = false;
+let busqueda = '';
 
 export function vistaEjercicios(contenedor) {
   const d = estado.datos();
-  const lista = d.ejercicios
-    .filter((e) => verArchivados || !e.archivado)
-    .sort((a, b) => (a.grupo || '~').localeCompare(b.grupo || '~') || a.nombre.localeCompare(b.nombre));
-
-  const grupos = new Map();
-  for (const e of lista) {
-    const g = e.grupo || 'Sin grupo';
-    if (!grupos.has(g)) grupos.set(g, []);
-    grupos.get(g).push(e);
-  }
   const hayArchivados = d.ejercicios.some((e) => e.archivado);
+  const zona = h('div', { id: 'lista-ejercicios' });
 
   anadir(contenedor,
     h('div', { class: 'cabecera-vista' },
       h('h1', {}, 'Ejercicios'),
       h('a', { class: 'boton', href: '#/ejercicio/nuevo' }, '+ Nuevo')),
-    !lista.length && h('p', { class: 'suave' },
-      'Crea un ejercicio y elige cómo quieres que progrese: con ciclos Bilbo, subiendo carga, haciendo más repeticiones o libre.'),
-    [...grupos].map(([grupo, ejercicios]) => h('section', {},
-      h('h2', {}, grupo.charAt(0).toUpperCase() + grupo.slice(1)),
-      ejercicios.map((e) => h('a', { class: `tarjeta fila-enlace ${e.archivado ? 'archivado' : ''}`, href: `#/ejercicio/${e.id}` },
-        h('div', {},
-          h('strong', {}, e.nombre),
-          h('div', { class: 'suave' },
-            `${TIPOS_PROGRESION[e.progresion.tipo]?.etiqueta ?? ''} · ${TIPOS_CARGA[e.carga.tipo]?.etiqueta ?? ''} · ${TIPOS_ESFUERZO[e.esfuerzo.tipo]?.etiqueta ?? ''}`)),
-        e.archivado && h('span', { class: 'etiqueta' }, 'Archivado'))))),
+
+    d.ejercicios.length > 5 && h('input', {
+      type: 'search', class: 'buscador', placeholder: 'Buscar ejercicio', value: busqueda,
+      oninput: (e) => { busqueda = e.target.value; pintarLista(); },
+    }),
+
+    zona,
+
     hayArchivados && h('button', { class: 'boton enlace', onclick: () => { verArchivados = !verArchivados; estado.emitir('vista'); } },
       verArchivados ? 'Ocultar archivados' : 'Ver archivados'));
+
+  function pintarLista() {
+    const texto = busqueda.trim().toLowerCase();
+    const lista = d.ejercicios
+      .filter((e) => (verArchivados || !e.archivado)
+        && (!texto || `${e.nombre} ${e.grupo || ''}`.toLowerCase().includes(texto)))
+      .sort((a, b) => (a.grupo || '~').localeCompare(b.grupo || '~') || a.nombre.localeCompare(b.nombre));
+
+    const grupos = new Map();
+    for (const e of lista) {
+      const g = e.grupo || 'Sin grupo';
+      if (!grupos.has(g)) grupos.set(g, []);
+      grupos.get(g).push(e);
+    }
+
+    zona.replaceChildren();
+    if (!lista.length) {
+      anadir(zona, h('p', { class: 'suave' }, d.ejercicios.length
+        ? 'Ningún ejercicio coincide con la búsqueda.'
+        : 'Crea tu primer ejercicio: eliges qué mide y cómo progresa cada una de sus series.'));
+      return;
+    }
+    anadir(zona, [...grupos].map(([grupo, ejercicios]) => h('section', {},
+      h('h2', {}, grupo.charAt(0).toUpperCase() + grupo.slice(1)),
+      ejercicios.map((e) => tarjetaEjercicio(d, e)))));
+  }
+  pintarLista();
+}
+
+function tarjetaEjercicio(datos, ej) {
+  const partes = (ej.series || []).map((plan) => {
+    const prog = TIPOS_PROGRESION[plan.progresion?.tipo]?.etiqueta ?? 'Libre';
+    const ciclo = plan.progresion?.tipo === 'bilbo' ? cicloActual(plan) : null;
+    if (!ciclo?.escalera?.length) return `${TIPOS_SERIE[plan.tipo]}: ${prog}`;
+    const hechos = registrosDelCiclo(datos, ej, plan, ciclo.n).length;
+    return `${TIPOS_SERIE[plan.tipo]}: ciclo ${ciclo.n}, día ${Math.min(hechos + 1, ciclo.escalera.length)} de ${ciclo.escalera.length}`;
+  });
+  return h('a', { class: `tarjeta fila-enlace ${ej.archivado ? 'archivado' : ''}`, href: `#/ejercicio/${ej.id}` },
+    h('div', {},
+      h('strong', {}, ej.nombre),
+      h('div', { class: 'suave' }, partes.join(' · ') || 'Sin series configuradas')),
+    ej.archivado && h('span', { class: 'etiqueta' }, 'Archivado'));
 }
 
 // ---------------------------------------------------------------------------
-// Formulario de crear o editar
+// Ficha: crear o editar
 // ---------------------------------------------------------------------------
 
 function ejercicioVacio() {
-  return {
+  const base = {
     id: nuevoId('ej'),
     nombre: '',
     sedeId: null,
@@ -56,22 +93,11 @@ function ejercicioVacio() {
     esfuerzo: { tipo: 'repeticiones' },
     esfuerzoExtra: null,
     formula1RM: 'epley',
-    progresion: progresionPorDefecto('bilbo'),
+    series: [],
     notas: '',
   };
-}
-
-function progresionPorDefecto(tipo) {
-  switch (tipo) {
-    case 'bilbo': {
-      const generador = { inicial: 20, incremento: 2.5, cada: 1 };
-      return { tipo, diasPorCiclo: 17, cicloActual: 1,
-        ciclos: [{ n: 1, inicio: null, fin: null, generador, escalera: generarEscalera({ ...generador, dias: 17 }) }] };
-    }
-    case 'carga': return { tipo, objetivoEsfuerzo: [8, 12], incremento: 2.5 };
-    case 'esfuerzo': return { tipo, incremento: 1 };
-    default: return { tipo: 'libre' };
-  }
+  base.series = [serieNuevaPlantilla(base, { tipo: 'bilbo', progresion: 'bilbo' })];
+  return base;
 }
 
 export function vistaFormularioEjercicio(contenedor, { id }) {
@@ -83,13 +109,12 @@ export function vistaFormularioEjercicio(contenedor, { id }) {
   }
   // Se edita un borrador: nada se guarda hasta pulsar «Guardar».
   const borrador = existente ? structuredClone(existente) : ejercicioVacio();
+  borrador.series ??= [];
   const grupos = [...new Set(d.ejercicios.map((e) => e.grupo).filter(Boolean))];
   const peso = d.perfil.pesoCorporalKg;
 
   const zona = h('div');
-  anadir(contenedor,
-    h('h1', {}, existente ? 'Editar ejercicio' : 'Nuevo ejercicio'),
-    zona);
+  anadir(contenedor, h('h1', {}, existente ? borrador.nombre || 'Editar ejercicio' : 'Nuevo ejercicio'), zona);
 
   function repintar() {
     const scroll = window.scrollY;
@@ -97,13 +122,7 @@ export function vistaFormularioEjercicio(contenedor, { id }) {
     window.scrollTo(0, scroll);
   }
 
-  function cicloActual() {
-    const p = borrador.progresion;
-    return p.ciclos.find((c) => c.n === p.cicloActual);
-  }
-
   function formulario() {
-    const p = borrador.progresion;
     return h('form', { class: 'formulario', onsubmit: (e) => { e.preventDefault(); guardar(); } },
       campo('Nombre', h('input', { type: 'text', required: true, value: borrador.nombre, autocomplete: 'off',
         placeholder: 'Press banca', oninput: (e) => { borrador.nombre = e.target.value; } })),
@@ -114,7 +133,12 @@ export function vistaFormularioEjercicio(contenedor, { id }) {
 
       h('fieldset', {},
         h('legend', {}, '¿Qué carga usa?'),
-        opciones(TIPOS_CARGA, borrador.carga.tipo, (tipo) => { borrador.carga = { tipo }; repintar(); }),
+        opciones(TIPOS_CARGA, borrador.carga.tipo, (tipo) => {
+          borrador.carga = { tipo };
+          // Sin carga, la progresión pasa a actuar sobre lo que se mide.
+          for (const plan of borrador.series) plan.progresion.sobre = sobrePorDefecto(borrador);
+          repintar();
+        }),
         borrador.carga.tipo === 'asistida' && h('p', { class: 'nota' },
           peso ? `Apuntarás los kilos que marca la máquina; la carga real es tu peso (${formatearNumero(peso)} kg) menos esa ayuda.`
             : 'Indica tu peso corporal en Ajustes para calcular la carga real.')),
@@ -128,18 +152,15 @@ export function vistaFormularioEjercicio(contenedor, { id }) {
           'Apuntar también la distancia (opcional en cada serie)')),
 
       h('fieldset', {},
-        h('legend', {}, '¿Cómo progresa?'),
-        opciones(TIPOS_PROGRESION, p.tipo, (tipo) => {
-          if (tipo !== p.tipo) borrador.progresion = progresionPorDefecto(tipo);
+        h('legend', {}, 'Series de este ejercicio'),
+        h('p', { class: 'nota' },
+          'Son las series que aparecerán al añadirlo a un entrenamiento. Cada una progresa a su manera: '
+          + 'por ejemplo, una Bilbo con su ciclo y una de intensidad con drop set.'),
+        borrador.series.map((plan, i) => tarjetaPlan(plan, i)),
+        h('button', { type: 'button', class: 'boton secundario', onclick: () => {
+          borrador.series.push(serieNuevaPlantilla(borrador, { tipo: 'libre' }));
           repintar();
-        }),
-        p.tipo === 'bilbo' && seccionBilbo(),
-        p.tipo === 'carga' && h('div', { class: 'fila-campos' },
-          campo('Reps mínimas', numeroInput(p.objetivoEsfuerzo[0], (v) => { p.objetivoEsfuerzo[0] = v; })),
-          campo('Reps máximas', numeroInput(p.objetivoEsfuerzo[1], (v) => { p.objetivoEsfuerzo[1] = v; })),
-          campo('Sube (kg)', numeroInput(p.incremento, (v) => { p.incremento = v; }))),
-        p.tipo === 'esfuerzo' && campo(`Aumento cada vez (${TIPOS_ESFUERZO[borrador.esfuerzo.tipo].unidad})`,
-          numeroInput(p.incremento, (v) => { p.incremento = v; }))),
+        } }, '+ Añadir serie')),
 
       campo('Notas', h('textarea', { rows: 3, value: borrador.notas || '',
         oninput: (e) => { borrador.notas = e.target.value; } })),
@@ -152,41 +173,127 @@ export function vistaFormularioEjercicio(contenedor, { id }) {
         borrador.archivado ? 'Recuperar ejercicio' : 'Archivar ejercicio'));
   }
 
-  function seccionBilbo() {
-    const p = borrador.progresion;
-    const ciclo = cicloActual();
-    const gen = ciclo.generador ??= { inicial: ciclo.escalera[0] ?? 0, incremento: 2.5, cada: 1 };
-    const asistida = borrador.carga.tipo === 'asistida';
+  function tarjetaPlan(plan, i) {
+    const conTramos = usaTramos(plan.tecnica);
+    return h('article', { class: 'tarjeta plan-serie' },
+      h('div', { class: 'cabecera-tarjeta' },
+        h('strong', {}, `Serie ${i + 1}`),
+        borrador.series.length > 1 && h('button', { type: 'button', class: 'boton-icono', 'aria-label': 'Quitar serie',
+          onclick: () => { borrador.series.splice(i, 1); repintar(); } }, '🗑')),
 
-    const regenerar = () => {
-      ciclo.escalera = generarEscalera({ ...gen, dias: p.diasPorCiclo });
-      repintar();
-    };
+      h('div', { class: 'fila-campos' },
+        campo('Tipo', h('select', { onchange: (e) => { plan.tipo = e.target.value; repintar(); } },
+          Object.entries(TIPOS_SERIE).map(([k, v]) => h('option', { value: k, selected: k === plan.tipo }, v)))),
+        campo('Técnica', h('select', { onchange: (e) => {
+          plan.tecnica = e.target.value || null;
+          plan.tramosPrevistos = usaTramos(plan.tecnica) ? (plan.tramosPrevistos || 3) : null;
+          repintar();
+        } },
+        h('option', { value: '' }, 'Ninguna'),
+        Object.entries(TECNICAS).map(([k, v]) => h('option', { value: k, selected: k === plan.tecnica }, v.etiqueta))))),
+
+      conTramos && campo('Bajadas o miniseries previstas',
+        numeroInput(plan.tramosPrevistos, (v) => { plan.tramosPrevistos = Math.max(1, Math.round(v ?? 3)); })),
+
+      h('div', { class: 'campo' },
+        h('span', { class: 'etiqueta-campo' }, 'Progresión'),
+        opciones(TIPOS_PROGRESION, plan.progresion.tipo, (tipo) => {
+          if (tipo !== plan.progresion.tipo) plan.progresion = progresionPorDefecto(tipo, borrador);
+          repintar();
+        }, { compacto: true }),
+        h('small', { class: 'nota' }, TIPOS_PROGRESION[plan.progresion.tipo].descripcion)),
+
+      detalleProgresion(plan));
+  }
+
+  function detalleProgresion(plan) {
+    const p = plan.progresion;
+    const sobre = p.sobre || sobrePorDefecto(borrador);
+    const unidad = sobre === 'carga'
+      ? (TIPOS_CARGA[borrador.carga.tipo]?.unidad || '')
+      : (TIPOS_ESFUERZO[borrador.esfuerzo.tipo]?.unidad || '');
+    const queSube = sobre === 'carga' ? 'la carga' : TIPOS_ESFUERZO[borrador.esfuerzo.tipo].etiqueta.toLowerCase();
+
+    if (p.tipo === 'bilbo') return seccionBilbo(plan, sobre, unidad);
+    if (p.tipo === 'carga') {
+      p.objetivoEsfuerzo ??= [8, 12];
+      return h('div', {},
+        h('div', { class: 'fila-campos' },
+          campo('Mínimo', numeroInput(p.objetivoEsfuerzo[0], (v) => { p.objetivoEsfuerzo[0] = v; })),
+          campo('Máximo', numeroInput(p.objetivoEsfuerzo[1], (v) => { p.objetivoEsfuerzo[1] = v; })),
+          campo(`Sube (${unidad})`, numeroInput(p.incremento, (v) => { p.incremento = v; }))),
+        h('small', { class: 'nota' }, `Al llegar al máximo sube ${queSube}.`));
+    }
+    if (p.tipo === 'esfuerzo') {
+      return campo(`Aumento cada vez (${TIPOS_ESFUERZO[borrador.esfuerzo.tipo].unidad})`,
+        numeroInput(p.incremento, (v) => { p.incremento = v; }));
+    }
+    return null;
+  }
+
+  function seccionBilbo(plan, sobre, unidad) {
+    const p = plan.progresion;
+    p.diasPorCiclo ??= DIAS_CICLO_POR_DEFECTO;
+    p.ciclos ??= [];
+    if (!p.ciclos.length) {
+      p.ciclos.push({ n: 1, inicio: null, fin: null,
+        generador: { inicial: sobre === 'carga' ? 20 : 10, incremento: sobre === 'carga' ? 2.5 : 1, cada: 1 },
+        escalera: [] });
+      p.cicloActual = 1;
+    }
+    const ciclo = cicloActual(plan) || p.ciclos.at(-1);
+    const gen = ciclo.generador ??= { inicial: ciclo.escalera[0] ?? 0, incremento: 2.5, cada: 1 };
+    if (!ciclo.escalera?.length) ciclo.escalera = generarEscalera({ ...gen, dias: p.diasPorCiclo });
+    const asistida = borrador.carga.tipo === 'asistida' && sobre === 'carga';
+    const hechos = existente
+      ? new Map(registrosDelCiclo(d, existente, plan, ciclo.n).map((r) => [r.dia, r]))
+      : new Map();
+
+    const regenerar = () => { ciclo.escalera = generarEscalera({ ...gen, dias: p.diasPorCiclo }); repintar(); };
 
     return h('div', { class: 'bilbo' },
       h('p', { class: 'nota' },
-        `Ciclo ${ciclo.n}. Cada día tiene su carga fijada. Rellena los datos y se calcula la escalera; luego puedes cambiar cualquier casilla.`),
+        `Ciclo ${ciclo.n} de ${p.ciclos.length}. ${hechos.size} días hechos de ${ciclo.escalera.length}. `
+        + `Cada día tiene su ${sobre === 'carga' ? 'carga fijada' : 'objetivo fijado'}; puedes cambiar cualquier casilla.`),
+
+      h('div', { class: 'barra-progreso', role: 'img',
+        'aria-label': `${hechos.size} de ${ciclo.escalera.length} días hechos` },
+      h('span', { style: `width:${(hechos.size / ciclo.escalera.length) * 100}%` })),
+
       h('div', { class: 'fila-campos' },
-        campo(asistida ? 'Carga real inicial (kg)' : 'Carga inicial', numeroInput(gen.inicial, (v) => { gen.inicial = v ?? 0; }, { onchange: regenerar })),
+        campo(`Inicio (${unidad})`, numeroInput(gen.inicial, (v) => { gen.inicial = v ?? 0; }, { onchange: regenerar })),
         campo('Incremento', numeroInput(gen.incremento, (v) => { gen.incremento = v ?? 0; }, { onchange: regenerar })),
         campo('Sube cada (días)', numeroInput(gen.cada, (v) => { gen.cada = Math.max(1, Math.round(v ?? 1)); }, { onchange: regenerar })),
         campo('Días del ciclo', numeroInput(p.diasPorCiclo, (v) => { p.diasPorCiclo = Math.max(1, Math.round(v ?? 17)); }, { onchange: regenerar }))),
+
       h('div', { class: 'escalera' },
-        ciclo.escalera.map((carga, i) => h('label', { class: 'peldano' },
-          h('span', {}, `Día ${i + 1}`),
-          numeroInput(carga, (v) => { ciclo.escalera[i] = v; }, { etiqueta: `Carga del día ${i + 1}` }),
-          asistida && peso != null && h('small', { class: 'suave' }, `máq ${formatearNumero(lecturaDesdeCarga(carga, peso))}`)))),
-      existente && h('button', { type: 'button', class: 'boton secundario', onclick: nuevoCiclo }, 'Empezar un ciclo nuevo'));
+        ciclo.escalera.map((valor, i) => {
+          const hecho = hechos.get(i + 1);
+          const esActual = !hecho && hechos.size === i;
+          return h('label', { class: `peldano ${hecho ? 'hecho' : ''} ${esActual ? 'actual' : ''}` },
+            h('span', {}, `Día ${i + 1}`),
+            numeroInput(valor, (v) => { ciclo.escalera[i] = v; }, { etiqueta: `Valor del día ${i + 1}` }),
+            hecho
+              ? h('small', { class: 'suave' }, `✓ ${formatearNumero(hecho.serie.esfuerzo)}`)
+              : asistida && peso != null && h('small', { class: 'suave' }, `máq ${formatearNumero(lecturaDesdeCarga(valor, peso))}`));
+        })),
+
+      h('div', { class: 'fila-botones' },
+        p.ciclos.length > 1 && h('select', { 'aria-label': 'Ciclo mostrado',
+          onchange: (e) => { p.cicloActual = Number(e.target.value); repintar(); } },
+        p.ciclos.map((c) => h('option', { value: c.n, selected: c.n === p.cicloActual }, `Ciclo ${c.n}`))),
+        h('button', { type: 'button', class: 'boton secundario', onclick: () => nuevoCiclo(plan) }, 'Empezar un ciclo nuevo')));
   }
 
-  function nuevoCiclo() {
-    const p = borrador.progresion;
-    const anterior = cicloActual();
-    const n = Math.max(...p.ciclos.map((c) => c.n)) + 1;
-    const generador = { ...(anterior.generador || { inicial: anterior.escalera[0] ?? 0, incremento: 2.5, cada: 1 }) };
-    p.ciclos.push({ n, inicio: null, fin: null, generador, escalera: generarEscalera({ ...generador, dias: p.diasPorCiclo }) });
+  function nuevoCiclo(plan) {
+    const p = plan.progresion;
+    const anterior = cicloActual(plan) || p.ciclos.at(-1);
+    const n = Math.max(0, ...p.ciclos.map((c) => c.n)) + 1;
+    const generador = { ...(anterior?.generador || { inicial: 20, incremento: 2.5, cada: 1 }) };
+    p.ciclos.push({ n, inicio: null, fin: null, generador,
+      escalera: generarEscalera({ ...generador, dias: p.diasPorCiclo }) });
     p.cicloActual = n;
-    aviso(`Ciclo ${n} preparado. Ajusta la carga inicial y guarda.`);
+    aviso(`Ciclo ${n} preparado. Ajusta el valor inicial y guarda.`);
     repintar();
   }
 
@@ -207,11 +314,11 @@ export function vistaFormularioEjercicio(contenedor, { id }) {
   }
 
   async function archivar() {
-    const archivar = !borrador.archivado;
-    if (archivar && !await confirmar('¿Archivar este ejercicio? Su historial se conserva y puedes recuperarlo cuando quieras.', { si: 'Archivar' })) return;
+    const archivarlo = !borrador.archivado;
+    if (archivarlo && !await confirmar('¿Archivar este ejercicio? Su historial se conserva y puedes recuperarlo cuando quieras.', { si: 'Archivar' })) return;
     estado.cambiar((datos) => {
       const e = datos.ejercicios.find((x) => x.id === borrador.id);
-      if (e) e.archivado = archivar;
+      if (e) e.archivado = archivarlo;
     });
     location.hash = '#/ejercicios';
   }
@@ -220,14 +327,14 @@ export function vistaFormularioEjercicio(contenedor, { id }) {
 }
 
 // ---------------------------------------------------------------------------
-// Piezas de formulario
+// Piezas de formulario, reutilizadas por otras pantallas
 // ---------------------------------------------------------------------------
 
-function campo(etiqueta, ...control) {
+export function campo(etiqueta, ...control) {
   return h('label', { class: 'campo' }, h('span', { class: 'etiqueta-campo' }, etiqueta), ...control);
 }
 
-function numeroInput(valor, alCambiar, { onchange, etiqueta } = {}) {
+export function numeroInput(valor, alCambiar, { onchange, etiqueta } = {}) {
   return h('input', {
     type: 'text', inputmode: 'decimal', value: valor ?? '', 'aria-label': etiqueta,
     oninput: (e) => alCambiar(leerNumero(e.target.value)),
@@ -235,7 +342,7 @@ function numeroInput(valor, alCambiar, { onchange, etiqueta } = {}) {
   });
 }
 
-function opciones(catalogo, actual, alElegir, { compacto = false } = {}) {
+export function opciones(catalogo, actual, alElegir, { compacto = false } = {}) {
   return h('div', { class: `opciones ${compacto ? 'compacto' : ''}`, role: 'radiogroup' },
     Object.entries(catalogo).map(([clave, info]) => h('button', {
       type: 'button', role: 'radio', 'aria-checked': String(clave === actual),

@@ -1,6 +1,8 @@
 import * as estado from '../estado.js';
-import { anadir, fechaLarga, h, hoyISO, nuevoId } from '../ui.js';
+import { crearSerieDesdePlan } from '../series.js';
+import { anadir, fechaLarga, h, hoyISO, modal, nuevoId } from '../ui.js';
 import { masRecienteAntes, resumenSesion } from './historial.js';
+import { empezarDia, proximoDia, rutinaActiva } from './rutinas.js';
 
 export function vistaInicio(contenedor) {
   const d = estado.datos();
@@ -10,16 +12,32 @@ export function vistaInicio(contenedor) {
     .sort(masRecienteAntes).slice(0, 3);
   const necesitaPeso = d.perfil.pesoCorporalKg == null
     && activos.some((e) => ['asistida', 'pesoCorporal'].includes(e.carga.tipo));
+  const rutina = rutinaActiva(d);
+  const dia = rutina ? proximoDia(d, rutina) : null;
 
-  function empezar() {
+  function empezarSuelto() {
     const id = nuevoId('ses');
     estado.cambiar((datos) => {
       datos.sesiones.push({
         id, fecha: hoyISO(), sedeId: datos.perfil.sedePorDefecto, rutinaId: null, diaRutinaId: null,
-        estado: 'en-curso', inicio: new Date().toISOString(), fin: null, ejercicios: [], notas: '',
+        estado: 'en-curso', inicio: new Date().toISOString(), fin: null, ejercicios: [], notas: '', borrada: null,
       });
     });
     location.hash = `#/sesion/${id}`;
+  }
+
+  function empezarConRutina(elegido) {
+    const id = empezarDia(rutina, elegido, (datos, ej, plan) => crearSerieDesdePlan(datos, ej, plan));
+    location.hash = `#/sesion/${id}`;
+  }
+
+  function elegirDia() {
+    const cerrar = modal('Elegir día', h('div', { class: 'lista-eleccion' },
+      rutina.dias.map((x) => h('button', { class: 'tarjeta fila-enlace', onclick: () => { cerrar(); empezarConRutina(x); } },
+        h('div', {},
+          h('strong', {}, x.nombre),
+          h('div', { class: 'suave' }, `${x.ejercicios.length} ejercicios`)),
+        x.id === dia.id && h('span', { class: 'etiqueta' }, 'Toca hoy')))));
   }
 
   anadir(contenedor,
@@ -31,11 +49,26 @@ export function vistaInicio(contenedor) {
 
     enCurso
       ? h('a', { class: 'boton grande', href: `#/sesion/${enCurso.id}` }, 'Continuar entrenamiento')
-      : h('button', { class: 'boton grande', onclick: empezar }, 'Empezar entrenamiento'),
+      : dia
+        ? h('section', { class: 'tarjeta' },
+          h('p', { class: 'suave' }, `${rutina.nombre} · hoy toca`),
+          h('h2', {}, dia.nombre),
+          h('p', { class: 'suave' }, dia.ejercicios.length
+            ? dia.ejercicios.map((x) => d.ejercicios.find((e) => e.id === x.ejercicioId)?.nombre ?? '—').join(', ')
+            : 'Este día no tiene ejercicios todavía'),
+          h('button', { class: 'boton grande', onclick: () => empezarConRutina(dia) }, 'Empezar'),
+          h('div', { class: 'fila-botones' },
+            h('button', { class: 'boton secundario', onclick: elegirDia }, 'Otro día'),
+            h('button', { class: 'boton secundario', onclick: empezarSuelto }, 'Sin rutina')))
+        : h('button', { class: 'boton grande', onclick: empezarSuelto }, 'Empezar entrenamiento'),
 
     !activos.length && h('div', { class: 'tarjeta' },
       h('p', {}, 'Aún no tienes ejercicios. Crea el primero para poder registrar series con su progresión.'),
       h('a', { class: 'boton secundario', href: '#/ejercicio/nuevo' }, 'Crear ejercicio')),
+
+    activos.length > 0 && !rutina && h('a', { class: 'boton enlace', href: '#/rutinas' },
+      'Crear una rutina para que te diga qué toca cada día'),
+    rutina && h('a', { class: 'boton enlace', href: '#/rutinas' }, 'Ver mis rutinas'),
 
     recientes.length > 0 && h('section', {},
       h('h2', {}, 'Últimos entrenamientos'),

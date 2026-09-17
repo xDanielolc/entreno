@@ -466,3 +466,77 @@ input.fecha { width: auto; }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
 }
+
+/* --------------------------------------------------------------------------
+   Ciclos, series planificadas y drop sets
+   -------------------------------------------------------------------------- */
+
+.barra-progreso {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--superficie-2);
+  overflow: hidden;
+  margin: 8px 0 12px;
+}
+
+.barra-progreso span { display: block; height: 100%; background: var(--acento); }
+
+.peldano.hecho input { background: var(--acento-suave); border-color: var(--acento); }
+.peldano.actual input { border: 2px solid var(--acento); font-weight: 700; }
+
+.plan-serie { background: var(--superficie-2); }
+.plan-serie .fila-campos { gap: 0 12px; }
+
+.tramos { display: grid; gap: 8px; margin: 6px 0; }
+
+.tramo { display: flex; align-items: center; gap: 8px; }
+.tramo .valor { flex: 1 1 100px; }
+.tramo .valor input { font-size: 1.05rem; }
+
+.tramo-n {
+  flex: 0 0 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--superficie-2);
+  color: var(--texto-suave);
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.guiado-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: var(--texto-suave);
+}
+
+.fila-ejercicio { display: flex; align-items: center; gap: 4px; padding: 4px 0; }
+.fila-ejercicio span { flex: 1; }
+.fila-ejercicio .boton-icono { min-width: 40px; min-height: 40px; }
+
+/* --------------------------------------------------------------------------
+   Descanso
+   -------------------------------------------------------------------------- */
+
+.descanso {
+  position: sticky;
+  top: 52px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px;
+  margin-bottom: 12px;
+  border: 1px solid var(--acento);
+  border-radius: var(--radio);
+  background: var(--acento-suave);
+}
+
+.descanso .boton.enlace { width: auto; min-height: 40px; padding: 4px 10px; }
+.descanso-tiempo { font-size: 1.4rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.descanso.acabado { border-color: var(--peligro); }
+.descanso.acabado .descanso-tiempo { color: var(--peligro); }

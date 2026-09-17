@@ -1,4 +1,4 @@
-# Esquema de datos — versión 1
+# Esquema de datos — versión 2
 
 Este documento describe **cómo se guardan tus datos**. Es la pieza más
 importante del proyecto: el código se puede reescribir entero mañana, pero el
@@ -20,7 +20,7 @@ historial no se puede recuperar si el formato se estropea.
    > propietario ni comprimido: si mañana esta app desaparece, tus datos
    > siguen siendo legibles.
 
-2. **Número de versión desde el primer día** (`version: 1`). Cuando el formato
+2. **Número de versión desde el primer día** (`version: 2`). Cuando el formato
    cambie, la app detecta que tu archivo es de una versión anterior y lo
    convierte sola al abrirlo. Nunca tendrás que hacer nada.
 
@@ -52,7 +52,7 @@ archivo
 
 ```json
 {
-  "version": 1,
+  "version": 2,
   "creado": "2026-09-04T10:00:00Z",
   "actualizado": "2026-09-04T18:32:11Z",
   "revision": 47,
@@ -193,59 +193,53 @@ en datos importados de hojas de cálculo que tenían ese peso fijo.
 Tú apuntas lo que ves en la máquina; la app calcula y guarda la carga real,
 que es la que sirve para comparar y para el 1RM.
 
-### 6.4 `progresion` — cómo se decide qué toca hoy
+### 6.4 `series`: las series del ejercicio, cada una con su progresión
 
-Este es el campo que hace la app flexible de verdad.
-
-**a) Bilbo** (tu método actual)
+Un mismo ejercicio se hace con varias series que **no progresan igual**: la
+Bilbo sigue la escalera del ciclo y la Heavy Duty es un drop set que sube
+cuando toca. Por eso la progresión vive en cada serie, no en el ejercicio.
 
 ```json
-"progresion": {
-  "tipo": "bilbo",
-  "diasPorCiclo": 17,
-  "cicloActual": 3,
-  "ciclos": [
-    {
-      "n": 1,
-      "inicio": "2023-07-17",
-      "fin": "2023-08-21",
-      "escalera": [40,45,45,50,50,55,55,60,60,65,65,70,70,75,75,80,80]
-    }
-  ]
-}
+"series": [
+  {
+    "id": "pl_a1b2c3",
+    "tipo": "bilbo",
+    "tecnica": null,
+    "objetivoEsfuerzo": null,
+    "tramosPrevistos": null,
+    "progresion": { "tipo": "bilbo", "sobre": "carga", "diasPorCiclo": 17, "cicloActual": 3, "ciclos": [ … ] }
+  },
+  {
+    "id": "pl_d4e5f6",
+    "tipo": "intensidad",
+    "tecnica": "drop-set",
+    "tramosPrevistos": 3,
+    "progresion": { "tipo": "carga", "sobre": "carga", "objetivoEsfuerzo": [6, 8], "incremento": 2.5 }
+  }
+]
 ```
 
-La `escalera` es la lista explícita de los pesos de cada día. La app te
-propone rellenarla sola a partir de un peso inicial y un incremento, pero
-puedes editar cualquier casilla a mano, exactamente como haces ahora en el
-Excel.
+Al añadir el ejercicio a un entrenamiento aparecen estas series ya rellenas.
+El botón «+ Serie» mete la siguiente que falte.
 
-**b) Carga** — subes peso cuando cumples el objetivo de repeticiones
+**`sobre`** dice a qué se aplica la progresión:
 
-```json
-"progresion": {
-  "tipo": "carga",
-  "objetivoEsfuerzo": [8, 12],
-  "incremento": 2.5
-}
-```
+| Valor | Cuándo | Qué sube |
+|---|---|---|
+| `carga` | El ejercicio lleva peso | Los kilos |
+| `esfuerzo` | Cardio, estiramientos, abdominales sin peso | Los minutos, segundos o repeticiones |
 
-**c) Esfuerzo** — el peso no cambia; intentas hacer más cada vez
+Los tipos de progresión son `bilbo` (escalera de días), `carga` (doble
+progresión: subes repeticiones en un rango y luego carga), `esfuerzo` (a más
+cada vez) y `libre`.
 
-```json
-"progresion": { "tipo": "esfuerzo", "incremento": 1 }
-```
-
-**d) Series** — progresas añadiendo series
+En Bilbo, cada ciclo guarda su `escalera` (la lista explícita de valores de
+cada día) y el `generador` con el que se rellenó, para poder repetirlo:
 
 ```json
-"progresion": { "tipo": "series", "seriesObjetivo": 5 }
-```
-
-**e) Libre** — la app no te sugiere nada, solo registra
-
-```json
-"progresion": { "tipo": "libre" }
+{ "n": 3, "inicio": "2026-01-10", "fin": null,
+  "generador": { "inicial": 40, "incremento": 5, "cada": 2 },
+  "escalera": [40,45,45,50,50,55,55,60,60,65,65,70,70,75,75,80,80] }
 ```
 
 ### 6.5 `formula1RM`
@@ -361,6 +355,11 @@ Campos que merecen explicación:
 - **`objetivo`** guarda el número que la app te enseñó *antes* de la serie
   («supera 19,4»). Se guarda el valor, no la fórmula, para que dentro de dos
   años sigas viendo qué te pidió aquel día aunque el cálculo haya cambiado.
+- **`planId`** enlaza la serie con su plantilla en el ejercicio. Es lo que
+  permite saber por qué ciclo vas y comparar con las veces anteriores.
+- **`tramos`** guarda las bajadas de un drop set, un rest-pause o unas
+  miorrepeticiones: `[{ "carga": 75, "esfuerzo": 8 }, { "carga": 60, "esfuerzo": 6 }]`.
+  El trabajo de la serie es la suma de todos los tramos.
 - **`anadidaEnSesion: true`** marca lo que improvisaste. Al terminar, la app
   te pregunta: *«has añadido una serie de fondos, ¿la dejo solo para hoy o la
   meto en tu rutina para siempre?»*. Si dices que sí, se añade a la rutina y
