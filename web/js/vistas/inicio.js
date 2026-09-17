@@ -71,7 +71,7 @@ export function vistaInicio(contenedor) {
       'Crear una rutina para que te diga qué toca cada día'),
     rutina && h('a', { class: 'boton enlace', href: '#/rutinas' }, 'Ver mis rutinas'),
 
-    d.ejercicios.some((e) => e.musculos?.principales?.length) && tarjetaRecuperacion(d, { compacta: true }),
+    activos.length > 0 && tarjetaRecuperacion(d, { compacta: true }),
 
     recientes.length > 0 && h('section', {},
       h('h2', {}, 'Últimos entrenamientos'),

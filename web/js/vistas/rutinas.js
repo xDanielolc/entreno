@@ -4,7 +4,9 @@
 // sus series. No dice en qué fecha cae: el día siguiente se deduce del último
 // entrenamiento hecho, y siempre puedes elegir otro.
 
+import { CATALOGO } from '../catalogo.js';
 import * as estado from '../estado.js';
+import { progresionPorDefecto, serieNuevaPlantilla } from '../esquema.js';
 import { anadir, aviso, confirmar, h, hoyISO, modal, nuevoId } from '../ui.js';
 import { campo } from './ejercicios.js';
 
@@ -134,23 +136,66 @@ export function vistaFormularioRutina(contenedor, { id }) {
       h('button', { type: 'button', class: 'boton secundario', onclick: () => elegirEjercicio(dia) }, '+ Ejercicio'));
   }
 
+  // Al montar la rutina se puede coger cualquier ejercicio tuyo o de la lista
+  // general. Si es de la lista, se pregunta antes de añadirlo a los tuyos.
   function elegirEjercicio(dia) {
-    const disponibles = d.ejercicios.filter((e) => !e.archivado).sort((a, b) => a.nombre.localeCompare(b.nombre));
+    const mios = d.ejercicios.filter((e) => !e.archivado).sort((a, b) => a.nombre.localeCompare(b.nombre));
+    const nombresMios = new Set(mios.map((e) => e.nombre.toLowerCase()));
+    const deLista = CATALOGO.filter((x) => !nombresMios.has(x.nombre.toLowerCase()));
     const lista = h('div', { class: 'lista-eleccion' });
+
     const pintar = (filtro = '') => {
       const f = filtro.trim().toLowerCase();
-      lista.replaceChildren(...disponibles
-        .filter((e) => !f || `${e.nombre} ${e.grupo || ''}`.toLowerCase().includes(f))
-        .map((e) => h('button', { type: 'button', class: 'tarjeta fila-enlace', onclick: () => {
-          cerrar();
-          dia.ejercicios.push({ ejercicioId: e.id, opcional: false, series: null });
-          repintar();
-        } }, h('strong', {}, e.nombre), h('span', { class: 'suave' }, e.grupo || ''))));
+      const coincide = (texto) => !f || texto.toLowerCase().includes(f);
+      lista.replaceChildren(
+        ...mios.filter((e) => coincide(`${e.nombre} ${e.grupo || ''}`))
+          .map((e) => h('button', { type: 'button', class: 'tarjeta fila-enlace', onclick: () => { cerrar(); anadirAlDia(dia, e.id); } },
+            h('div', {}, h('strong', {}, e.nombre), h('div', { class: 'suave' }, e.grupo || '')))),
+        deLista.filter((x) => coincide(`${x.nombre} ${x.grupo} ${x.material}`)).length > 0
+          && h('p', { class: 'nota' }, 'De la lista general (aún no son tuyos)'),
+        ...deLista.filter((x) => coincide(`${x.nombre} ${x.grupo} ${x.material}`))
+          .map((x) => h('button', { type: 'button', class: 'tarjeta fila-enlace', onclick: () => { cerrar(); desdeCatalogo(dia, x); } },
+            h('div', {}, h('strong', {}, x.nombre), h('div', { class: 'suave' }, `${x.grupo} · ${x.material}`)),
+            h('span', { class: 'etiqueta' }, '+ Añadir'))));
     };
     pintar();
     const cerrar = modal('Añadir ejercicio al día', h('div', {},
-      h('input', { type: 'search', class: 'buscador', placeholder: 'Buscar', oninput: (e) => pintar(e.target.value) }),
+      h('input', { type: 'search', class: 'buscador', placeholder: 'Buscar entre los tuyos y la lista general',
+        oninput: (e) => pintar(e.target.value) }),
       lista));
+  }
+
+  function anadirAlDia(dia, ejercicioId) {
+    dia.ejercicios.push({ ejercicioId, opcional: false, series: null });
+    repintar();
+  }
+
+  async function desdeCatalogo(dia, x) {
+    const si = await confirmar(
+      `«${x.nombre}» no está en tus ejercicios. ¿Lo añado tal y como viene en la lista? `
+      + 'Luego puedes cambiarle la progresión y las series.',
+      { si: 'Añadir a mis ejercicios' });
+    if (!si) return;
+    const id = nuevoId('ej');
+    estado.cambiar((datos) => {
+      const nuevo = {
+        id, nombre: x.nombre, sedeId: null, grupo: x.grupo, archivado: false,
+        carga: { tipo: x.carga || 'peso' },
+        esfuerzo: { tipo: x.esfuerzo || 'repeticiones' },
+        esfuerzoExtra: x.distancia ? { tipo: 'distancia', opcional: true } : null,
+        formula1RM: 'epley',
+        musculos: {
+          principales: [...(x.musculos?.principales ?? [])],
+          secundarios: [...(x.musculos?.secundarios ?? [])],
+        },
+        series: [], notas: '',
+      };
+      nuevo.series = [serieNuevaPlantilla(nuevo, { tipo: 'libre', progresion: 'libre' })];
+      nuevo.series[0].progresion = progresionPorDefecto('libre', nuevo);
+      datos.ejercicios.push(nuevo);
+    });
+    aviso(`${x.nombre} añadido a tus ejercicios`);
+    anadirAlDia(dia, id);
   }
 
   function guardar() {

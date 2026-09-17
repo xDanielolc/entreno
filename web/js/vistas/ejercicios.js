@@ -6,7 +6,7 @@ import {
   DIAS_CICLO_POR_DEFECTO, TIPOS_CARGA, TIPOS_ESFUERZO, TIPOS_PROGRESION, TIPOS_SERIE,
   progresionPorDefecto, serieNuevaPlantilla, sobrePorDefecto, tramosDe,
 } from '../esquema.js';
-import { buscarEnCatalogo } from '../catalogo.js';
+import { CATALOGO, buscarEnCatalogo } from '../catalogo.js';
 import { MUSCULOS, ORDEN_MUSCULOS } from '../musculos.js';
 import { seccionProgreso } from './graficas.js';
 import { anadir, aviso, confirmar, h, leerNumero, modal, nuevoId } from '../ui.js';
@@ -194,6 +194,7 @@ export function vistaFormularioEjercicio(contenedor, { id }) {
         h('legend', {}, '¿Qué músculos trabaja?'),
         h('p', { class: 'nota' }, 'Sirve para el mapa de recuperación y para los avisos de volumen. '
           + 'Los secundarios cuentan la mitad.'),
+        sugerenciaDelCatalogo(),
         selectorMusculos('Principales', borrador.musculos.principales, borrador.musculos.secundarios),
         selectorMusculos('Secundarios', borrador.musculos.secundarios, borrador.musculos.principales)),
 
@@ -220,6 +221,26 @@ export function vistaFormularioEjercicio(contenedor, { id }) {
 
       existente && h('button', { type: 'button', class: 'boton enlace', onclick: archivar },
         borrador.archivado ? 'Recuperar ejercicio' : 'Archivar ejercicio'));
+  }
+
+  // Si el ejercicio se llama como uno del catálogo, se ofrecen sus músculos.
+  function sugerenciaDelCatalogo() {
+    if (borrador.musculos.principales.length) return null;
+    const nombre = (borrador.nombre || '').trim().toLowerCase();
+    if (!nombre) return null;
+    const enCatalogo = CATALOGO.find((x) => x.nombre.toLowerCase() === nombre)
+      ?? CATALOGO.find((x) => nombre.includes(x.nombre.toLowerCase()) || x.nombre.toLowerCase().includes(nombre));
+    if (!enCatalogo?.musculos?.principales?.length) return null;
+    return h('div', { class: 'tarjeta aviso-tarjeta' },
+      h('p', {}, `En la lista, «${enCatalogo.nombre}» trabaja `
+        + `${enCatalogo.musculos.principales.map((m) => MUSCULOS[m].nombre).join(', ')}.`),
+      h('button', { type: 'button', class: 'boton secundario', onclick: () => {
+        borrador.musculos = {
+          principales: [...enCatalogo.musculos.principales],
+          secundarios: [...(enCatalogo.musculos.secundarios ?? [])],
+        };
+        repintar();
+      } }, 'Usar los del catálogo'));
   }
 
   // Chips de músculos: al tocar uno se añade o se quita. Un músculo no puede
@@ -377,9 +398,11 @@ export function vistaFormularioEjercicio(contenedor, { id }) {
   function guardar() {
     borrador.nombre = borrador.nombre.trim();
     if (!borrador.nombre) { aviso('Ponle un nombre al ejercicio', { tipo: 'error' }); return; }
+    // Se permiten nombres repetidos a propósito: «Flexiones» de repeticiones y
+    // «Flexiones» isométricas son dos ejercicios distintos para la app.
     const repetido = d.ejercicios.some((e) => e.id !== borrador.id && !e.archivado
       && e.nombre.toLowerCase() === borrador.nombre.toLowerCase());
-    if (repetido) { aviso('Ya tienes un ejercicio con ese nombre', { tipo: 'error' }); return; }
+    if (repetido) aviso('Ojo: ya tenías otro ejercicio con ese nombre', { ms: 5000 });
 
     estado.cambiar((datos) => {
       const i = datos.ejercicios.findIndex((e) => e.id === borrador.id);

@@ -13,6 +13,7 @@ const SERIES_MINIMAS = 10;
 const SERIES_MAXIMAS = 20;
 
 export function tarjetaRecuperacion(datos, { compacta = false } = {}) {
+  const sinMusculos = datos.ejercicios.filter((e) => !e.archivado && !e.musculos?.principales?.length);
   const rec = recuperacionPorMusculo(datos);
   const estados = {};
   for (const m of ORDEN_MUSCULOS) {
@@ -33,6 +34,10 @@ export function tarjetaRecuperacion(datos, { compacta = false } = {}) {
     h('div', { class: 'cuerpos' },
       siluetaSVG({ vista: 'delante', estadoPorMusculo: estados }),
       siluetaSVG({ vista: 'detras', estadoPorMusculo: estados })),
+
+    sinMusculos.length > 0 && h('p', { class: 'aviso-texto' },
+      `${sinMusculos.length} ejercicio${sinMusculos.length > 1 ? 's' : ''} sin músculos asignados: `
+      + 'hasta que los pongas, no cuentan para el mapa. Ábrelos y pulsa «Usar los del catálogo».'),
 
     tocados.length
       ? h('ul', { class: 'lista-musculos' },

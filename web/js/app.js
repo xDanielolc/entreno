@@ -19,7 +19,7 @@ const RUTAS = [
   { patron: /^#\/ejercicios$/, vista: vistaEjercicios, pestana: 'ejercicios' },
   { patron: /^#\/ejercicio\/([\w-]+)$/, vista: vistaFormularioEjercicio, pestana: 'ejercicios', params: ['id'] },
   { patron: /^#\/sesion\/([\w-]+)$/, vista: vistaSesion, pestana: 'inicio', params: ['id'] },
-  { patron: /^#\/cuerpo$/, vista: vistaCuerpo, pestana: 'inicio' },
+  { patron: /^#\/cuerpo$/, vista: vistaCuerpo, pestana: 'cuerpo' },
   { patron: /^#\/rutinas$/, vista: vistaRutinas, pestana: 'inicio' },
   { patron: /^#\/rutina\/([\w-]+)$/, vista: vistaFormularioRutina, pestana: 'inicio', params: ['id'] },
   { patron: /^#\/historial$/, vista: vistaHistorial, pestana: 'historial' },
@@ -28,6 +28,7 @@ const RUTAS = [
 
 const PESTANAS = [
   { id: 'inicio', texto: 'Hoy', icono: '🏠', href: '#/' },
+  { id: 'cuerpo', texto: 'Cuerpo', icono: '🧍', href: '#/cuerpo' },
   { id: 'ejercicios', texto: 'Ejercicios', icono: '🏋️', href: '#/ejercicios' },
   { id: 'historial', texto: 'Historial', icono: '📅', href: '#/historial' },
   { id: 'ajustes', texto: 'Ajustes', icono: '⚙️', href: '#/ajustes' },
