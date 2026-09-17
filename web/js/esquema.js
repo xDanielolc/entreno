@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 3;
+export const VERSION_ACTUAL = 4;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -43,17 +43,24 @@ export const TIPOS_SERIE = {
 //   campos  casillas propias de esa técnica (segundos, repeticiones lentas…)
 //   recamara  fija las repeticiones que dejas sin hacer (0 = hasta el fallo)
 export const TECNICAS = {
-  'drop-set':           { etiqueta: 'Drop set',           tramos: { nombre: 'Bajada', bajada: 0.2 } },
-  'rest-pause':         { etiqueta: 'Rest-pause',         tramos: { nombre: 'Miniserie', bajada: 0 }, recamara: 0 },
-  'miorepeticiones':    { etiqueta: 'Miorrepeticiones',   tramos: { nombre: 'Miniserie', bajada: 0 } },
+  'drop-set':           { etiqueta: 'Drop set',           tramos: { nombre: 'Bajada', salto: 10 } },
+  'rest-pause':         { etiqueta: 'Rest-pause',         tramos: { nombre: 'Miniserie', salto: 0 }, recamara: 0 },
+  'miorepeticiones':    { etiqueta: 'Miorrepeticiones',   tramos: { nombre: 'Miniserie', salto: 0 } },
   'isometrico-final':   { etiqueta: 'Isométrico final',   campos: [{ clave: 'segundos', etiqueta: 'Isométrico', unidad: 's' }] },
   'excentricas-lentas': { etiqueta: 'Excéntricas lentas', campos: [
     { clave: 'reps', etiqueta: 'Excéntricas', unidad: 'reps' },
     { clave: 'segundos', etiqueta: 'Bajada', unidad: 's' }] },
   'unilateral':         { etiqueta: 'Unilateral',         porLado: true },
-  'fallo-tecnico':      { etiqueta: 'Fallo técnico',      recamara: 0 },
-  'fallo-absoluto':     { etiqueta: 'Fallo absoluto',     recamara: 0 },
 };
+
+// El tipo de fallo no es una técnica: se deduce de las repeticiones que dejas
+// en recámara. Con 0 has llegado al fallo; con 1 o más lo has dejado antes.
+export function tipoDeFallo(recamara) {
+  if (recamara == null) return null;
+  if (recamara <= 0) return 'Fallo absoluto';
+  if (recamara <= 1) return 'Casi al fallo';
+  return 'Lejos del fallo';
+}
 
 // Devuelve la configuración de tramos si alguna de las técnicas la pide.
 export function tramosDe(tecnicas = []) {
@@ -103,7 +110,8 @@ export function serieNuevaPlantilla(ejercicio, { tipo = 'libre', tecnicas = [], 
     tipo,
     tecnicas,
     objetivoEsfuerzo: null,
-    tramosPrevistos: tramosDe(tecnicas) ? 3 : null,
+    tramosPrevistos: tramosDe(tecnicas) ? 4 : null,
+    tramoSalto: null,
     progresion: progresionPorDefecto(progresion, ejercicio),
   };
 }
@@ -191,6 +199,30 @@ const MIGRACIONES = {
     }
     datos.perfil.recamaraPorDefecto ??= 1;
     datos.version = 3;
+    return datos;
+  },
+
+  // v4: el fallo deja de ser técnica y pasa a la recámara; las bajadas de un
+  // drop set se guardan en kilos fijos (lo que se quita de la barra).
+  3: (datos) => {
+    const limpiar = (x) => {
+      if (!x.tecnicas) return;
+      const fallo = x.tecnicas.filter((t) => t === 'fallo-tecnico' || t === 'fallo-absoluto');
+      if (fallo.length) {
+        x.tecnicas = x.tecnicas.filter((t) => !fallo.includes(t));
+        if (x.recamara == null || fallo.includes('fallo-absoluto')) x.recamara = 0;
+      }
+    };
+    for (const ej of datos.ejercicios) {
+      for (const plan of ej.series || []) {
+        limpiar(plan);
+        plan.tramoSalto ??= null;
+      }
+    }
+    for (const sesion of datos.sesiones) {
+      for (const entrada of sesion.ejercicios) for (const serie of entrada.series) limpiar(serie);
+    }
+    datos.version = 4;
     return datos;
   },
 };

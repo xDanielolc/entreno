@@ -4,7 +4,7 @@
 // Es una cuenta atrás por hora de fin, no por sumar segundos: así sigue
 // siendo correcta aunque el móvil bloquee la pantalla.
 
-import { h } from '../ui.js';
+import { aviso as avisoPulla, h } from '../ui.js';
 
 let finMs = null;
 let intervalo = null;
@@ -67,12 +67,26 @@ function avisar() {
   } catch { /* si el navegador no deja sonar, no pasa nada */ }
 }
 
+// Saltarse el descanso tiene respuesta, pero nunca bloquea nada.
+const PULLAS = [
+  'Descanso saltado. Tus fibras musculares han tomado nota.',
+  'Saltado. Seguro que esta serie sale igual de bien. Seguro.',
+  'Sin descanso. El ácido láctico te lo agradecerá luego, con intereses.',
+  'Prisa registrada. La barra no se va a ir a ningún lado, pero tú sí.',
+  'Saltado otra vez. Vamos a llamarlo «entrenamiento metabólico» y quedamos bien.',
+];
+
+function saltar() {
+  pararDescanso();
+  avisoPulla(PULLAS[Math.floor(Math.random() * PULLAS.length)]);
+}
+
 export function barraDescanso() {
   const caja = h('div', { class: 'descanso', hidden: !finMs },
     h('span', { class: 'descanso-tiempo' }, formatear(restante())),
     h('span', { class: 'suave' }, 'de descanso'),
     h('button', { class: 'boton enlace', onclick: () => arrancarDescanso(60) }, '+1 min'),
-    h('button', { class: 'boton enlace', onclick: pararDescanso }, 'Saltar'));
+    h('button', { class: 'boton enlace', onclick: saltar }, 'Saltar'));
   cajas.add(caja);
   return caja;
 }

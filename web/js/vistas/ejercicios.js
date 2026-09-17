@@ -232,8 +232,11 @@ export function vistaFormularioEjercicio(contenedor, { id }) {
         }),
         h('small', { class: 'nota' }, 'Se pueden combinar: unilateral, rest-pause y un isométrico final en la misma serie.')),
 
-      tramos && campo(`${tramos.nombre}s previstas`,
-        numeroInput(plan.tramosPrevistos, (v) => { plan.tramosPrevistos = Math.max(1, Math.round(v ?? 3)); })),
+      tramos && h('div', { class: 'fila-campos' },
+        campo(`${tramos.nombre}s previstas`,
+          numeroInput(plan.tramosPrevistos, (v) => { plan.tramosPrevistos = Math.max(1, Math.round(v ?? 4)); })),
+        tramos.salto != null && campo('Se baja cada vez (kg)',
+          numeroInput(plan.tramoSalto ?? tramos.salto, (v) => { plan.tramoSalto = v; }))),
 
       h('div', { class: 'campo' },
         h('span', { class: 'etiqueta-campo' }, 'Progresión'),

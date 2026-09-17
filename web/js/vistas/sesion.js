@@ -1,9 +1,11 @@
 import {
-  cargaDesdeLectura, esfuerzoTotal, formatearNumero, records, sugerenciaSerie,
-  trabajoSerie, tramosPropuestos, usaTramos,
+  aPasoDeDisco, cargaDesdeLectura, epley, esfuerzoTotal, formatearNumero, records,
+  registrosDelCiclo, sugerenciaSerie, trabajoSerie, tramosPropuestos, usaTramos,
 } from '../calculos.js';
 import * as estado from '../estado.js';
-import { TIPOS_CARGA, TIPOS_ESFUERZO, TIPOS_SERIE, camposDe, recamaraDe, tramosDe } from '../esquema.js';
+import {
+  TIPOS_CARGA, TIPOS_ESFUERZO, TIPOS_SERIE, camposDe, recamaraDe, tipoDeFallo, tramosDe,
+} from '../esquema.js';
 import { crearSerieDesdePlan, serieSuelta } from '../series.js';
 import { anadir, aviso, confirmar, h, leerNumero, modal, nuevoId } from '../ui.js';
 import { arrancarDescanso, barraDescanso } from './descanso.js';
@@ -94,9 +96,27 @@ export function vistaSesion(contenedor, { id }) {
 
       ej.notas && h('p', { class: 'nota' }, ej.notas),
 
+      referencia1RM(ej, entrada),
+
       entrada.series.map((serie, j) => bloqueSerie(ej, entrada, indice, j, serie)),
 
       h('button', { class: 'boton secundario', onclick: () => anadirSerie(indice, ej, entrada) }, '+ Serie'));
+  }
+
+  // El mejor 1RM estimado del ciclo en curso, con sus porcentajes: sirve para
+  // saber con cuánto empezar un drop set («al 80 %»).
+  function referencia1RM(ej, entrada) {
+    if (ej.carga?.tipo === 'ninguna' || entrada.cicloN == null) return null;
+    const plan = (ej.series || []).find((p) => p.progresion?.tipo === 'bilbo');
+    if (!plan) return null;
+    const registros = registrosDelCiclo(d, ej, plan, entrada.cicloN, { excluirSesion: null });
+    const rms = registros.map((r) => epley(r.serie.carga, esfuerzoTotal(r.serie))).filter(Boolean);
+    if (!rms.length) return null;
+    const rm = Math.max(...rms);
+    return h('p', { class: 'nota' },
+      `1RM estimado del ciclo: ${formatearNumero(Math.round(rm))} kg · `
+      + `80 % = ${formatearNumero(aPasoDeDisco(rm * 0.8))} · 70 % = ${formatearNumero(aPasoDeDisco(rm * 0.7))} · `
+      + `60 % = ${formatearNumero(aPasoDeDisco(rm * 0.6))}`);
   }
 
   // Cabecera de cada serie: qué toca y cómo fue la última vez.
@@ -116,7 +136,7 @@ export function vistaSesion(contenedor, { id }) {
         if (serie.carga != null && s.sobre === 'carga') partes.push(`${formatearNumero(serie.carga)} ${uCarga}`);
         if (serie.objetivo != null) {
           partes.push(s.sobre === 'carga'
-            ? `supera ${formatearNumero(serie.objetivo)} ${uEsf}`
+            ? `llega a ${formatearNumero(serie.objetivo)} ${uEsf}`
             : `objetivo ${formatearNumero(serie.objetivo)} ${uEsf}`);
         }
       }
@@ -195,7 +215,7 @@ export function vistaSesion(contenedor, { id }) {
     const marca = h('span', { class: 'marca' });
     const esfuerzo = esfuerzoTotal(serie);
     if (serie.objetivo != null && esfuerzo != null) {
-      const superado = esfuerzo > serie.objetivo;
+      const superado = esfuerzo >= serie.objetivo;
       marca.textContent = superado ? '✓ superado' : '✗ no superado';
       marca.className = `marca ${superado ? 'bien' : 'mal'}`;
     }
@@ -238,7 +258,7 @@ export function vistaSesion(contenedor, { id }) {
         h('span', {}, '+'),
         h('input', { type: 'text', inputmode: 'decimal', value: serie.recamara ?? '', 'aria-label': 'Repeticiones en recámara',
           oninput: (e) => actualizar((x) => { x.recamara = leerNumero(e.target.value); }) }),
-        h('span', {}, 'recámara')),
+        h('span', {}, serie.recamara != null ? (tipoDeFallo(serie.recamara) || 'recámara') : 'recámara')),
 
       ej.esfuerzoExtra && h('label', { class: 'valor' },
         h('input', { type: 'text', inputmode: 'decimal', value: serie.esfuerzoExtra ?? '', 'aria-label': 'Distancia',
@@ -293,7 +313,7 @@ export function vistaSesion(contenedor, { id }) {
     const marca = caja?.querySelector('.marca');
     if (marca && serie.objetivo != null) {
       const esfuerzo = esfuerzoTotal(serie);
-      const superado = esfuerzo != null && esfuerzo > serie.objetivo;
+      const superado = esfuerzo != null && esfuerzo >= serie.objetivo;
       marca.textContent = esfuerzo == null ? '' : (superado ? '✓ superado' : '✗ no superado');
       marca.className = `marca ${superado ? 'bien' : 'mal'}`;
     }

@@ -255,14 +255,19 @@ export function maximoTrabajo(datos, ejercicio, { excluirSesion, tope = 50 } = {
 // Pesos propuestos para las bajadas de un drop set, a partir de la carga de
 // la serie y de la última vez que se hizo.
 export function tramosPropuestos(serie, plan, ultima) {
-  const previstos = plan?.tramosPrevistos || ultima?.tramos?.length || 3;
-  const bajada = tramosDe(serie.tecnicas)?.bajada ?? 0;
+  const config = tramosDe(serie.tecnicas);
+  const previstos = plan?.tramosPrevistos || ultima?.tramos?.length || 4;
+  // Se baja siempre lo mismo (por defecto 10 kg, o lo que tenga el ejercicio):
+  // una escalera lineal es más fácil de seguir en el gimnasio que un porcentaje.
+  const salto = plan?.tramoSalto ?? config?.salto ?? 0;
   const tramos = [];
   for (let i = 0; i < previstos; i++) {
     const deUltima = ultima?.tramos?.[i];
-    const carga = deUltima?.carga
-      ?? (serie.carga != null ? aPasoDeDisco(serie.carga * (1 - bajada) ** i) : null);
-    tramos.push({ carga, esfuerzo: null });
+    let carga = deUltima?.carga;
+    if (carga == null && serie.carga != null) {
+      carga = Math.max(0, redondear(serie.carga - salto * i, 2));
+    }
+    tramos.push({ carga: carga ?? null, esfuerzo: null });
   }
   return tramos;
 }
