@@ -1,0 +1,452 @@
+/* ==========================================================================
+   Estilos de la app.
+
+   Todos los colores están en variables (tokens) al principio. Para añadir un
+   tema nuevo basta con copiar un bloque y ponerle un nombre:
+     :root[data-tema="bosque"] { --fondo: …; --acento: …; }
+   El diseño definitivo se hará aparte; esto es una base sobria y legible.
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+  --fondo: #f6f5f2;
+  --superficie: #ffffff;
+  --superficie-2: #efede8;
+  --borde: #dcd9d2;
+  --texto: #1d1f23;
+  --texto-suave: #62656c;
+  --acento: #2f6f4f;
+  --acento-texto: #ffffff;
+  --acento-suave: #e1eee6;
+  --peligro: #b3261e;
+  --bien: #2f6f4f;
+  --mal: #b3261e;
+  --aviso: #8a5a00;
+  --aviso-fondo: #fff4d6;
+
+  --radio: 14px;
+  --radio-pequeno: 10px;
+  --sombra: 0 1px 2px rgb(0 0 0 / 6%), 0 2px 8px rgb(0 0 0 / 5%);
+  --alto-toque: 48px;
+  --fuente: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+:root[data-tema="oscuro"] {
+  color-scheme: dark;
+  --fondo: #16181c;
+  --superficie: #20232a;
+  --superficie-2: #2a2e36;
+  --borde: #373c46;
+  --texto: #eceef2;
+  --texto-suave: #a2a7b1;
+  --acento: #6fcf97;
+  --acento-texto: #10281a;
+  --acento-suave: #213a2c;
+  --peligro: #ff8a80;
+  --bien: #6fcf97;
+  --mal: #ff8a80;
+  --aviso: #ffd27a;
+  --aviso-fondo: #3a3020;
+  --sombra: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema]) {
+    color-scheme: dark;
+    --fondo: #16181c;
+    --superficie: #20232a;
+    --superficie-2: #2a2e36;
+    --borde: #373c46;
+    --texto: #eceef2;
+    --texto-suave: #a2a7b1;
+    --acento: #6fcf97;
+    --acento-texto: #10281a;
+    --acento-suave: #213a2c;
+    --peligro: #ff8a80;
+    --bien: #6fcf97;
+    --mal: #ff8a80;
+    --aviso: #ffd27a;
+    --aviso-fondo: #3a3020;
+    --sombra: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Base
+   -------------------------------------------------------------------------- */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: var(--fuente);
+  font-size: 16px;
+  line-height: 1.45;
+  min-height: 100dvh;
+}
+
+h1 { font-size: 1.6rem; margin: 0.2em 0 0.6em; line-height: 1.2; }
+h2 { font-size: 1.1rem; margin: 1.2em 0 0.5em; }
+a { color: var(--acento); }
+[hidden] { display: none !important; }
+
+.suave { color: var(--texto-suave); }
+.nota { color: var(--texto-suave); font-size: 0.9rem; }
+.centrado { text-align: center; }
+
+/* --------------------------------------------------------------------------
+   Estructura: barra superior, contenido, navegación inferior
+   -------------------------------------------------------------------------- */
+
+.barra-superior {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: calc(8px + env(safe-area-inset-top)) 16px 8px;
+  background: var(--fondo);
+  border-bottom: 1px solid var(--borde);
+}
+
+.marca-app { font-weight: 700; letter-spacing: 0.02em; }
+
+.contenido {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 16px 16px calc(96px + env(safe-area-inset-bottom));
+}
+
+.navegacion {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding-bottom: env(safe-area-inset-bottom);
+  background: var(--superficie);
+  border-top: 1px solid var(--borde);
+}
+
+.navegacion a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-height: 60px;
+  justify-content: center;
+  color: var(--texto-suave);
+  text-decoration: none;
+  font-size: 0.78rem;
+}
+
+.navegacion a span:first-child { font-size: 1.3rem; }
+.navegacion a.activa { color: var(--acento); font-weight: 600; }
+
+/* --------------------------------------------------------------------------
+   Indicador de guardado
+   -------------------------------------------------------------------------- */
+
+.indicador {
+  font: inherit;
+  font-size: 0.8rem;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--borde);
+  background: var(--superficie);
+  color: var(--texto-suave);
+  cursor: pointer;
+  max-width: 65%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.indicador:disabled { cursor: default; }
+.indicador.al-dia { color: var(--bien); }
+.indicador.desconectada, .indicador.pendiente { color: var(--aviso); border-color: var(--aviso); }
+.indicador.error { color: var(--peligro); border-color: var(--peligro); }
+
+/* --------------------------------------------------------------------------
+   Botones
+   -------------------------------------------------------------------------- */
+
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--alto-toque);
+  padding: 10px 18px;
+  border: 1px solid transparent;
+  border-radius: var(--radio-pequeno);
+  background: var(--acento);
+  color: var(--acento-texto);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.boton:disabled { opacity: 0.6; cursor: wait; }
+.boton.grande { width: 100%; min-height: 60px; font-size: 1.1rem; margin: 12px 0; }
+.boton.secundario { background: var(--superficie); color: var(--texto); border-color: var(--borde); }
+.boton.peligro { background: var(--peligro); color: #fff; }
+.boton.enlace {
+  background: none;
+  color: var(--acento);
+  min-height: var(--alto-toque);
+  width: 100%;
+  font-weight: 500;
+}
+.peligro-texto { color: var(--peligro) !important; }
+
+.boton-icono {
+  min-width: 44px;
+  min-height: 44px;
+  border: none;
+  border-radius: var(--radio-pequeno);
+  background: none;
+  color: var(--texto-suave);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.fila-botones { display: flex; gap: 12px; margin-top: 16px; }
+.fila-botones > * { flex: 1; }
+
+/* --------------------------------------------------------------------------
+   Tarjetas y listas
+   -------------------------------------------------------------------------- */
+
+.tarjeta {
+  display: block;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  box-shadow: var(--sombra);
+  color: inherit;
+}
+
+.tarjeta > :first-child { margin-top: 0; }
+.tarjeta .boton + .boton { margin-top: 8px; }
+.tarjeta > .boton { width: 100%; margin-top: 8px; }
+
+.fila-enlace {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  text-decoration: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+.archivado { opacity: 0.6; }
+
+.aviso-tarjeta {
+  background: var(--aviso-fondo);
+  border-color: var(--aviso);
+  color: var(--texto);
+  text-decoration: none;
+}
+
+.etiqueta {
+  display: inline-block;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  margin-left: 8px;
+  border-radius: 999px;
+  background: var(--superficie-2);
+  color: var(--texto-suave);
+  white-space: nowrap;
+}
+
+.contador { color: var(--texto-suave); font-size: 0.9rem; white-space: nowrap; }
+
+.cabecera-vista {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.cabecera-vista h1 { margin: 0.2em 0; }
+.fecha-hoy { margin: 0; color: var(--texto-suave); }
+
+/* --------------------------------------------------------------------------
+   Formularios
+   -------------------------------------------------------------------------- */
+
+input, select, textarea {
+  font: inherit;
+  font-size: 16px; /* evita que el móvil haga zoom al tocar */
+  color: var(--texto);
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-pequeno);
+  padding: 10px 12px;
+  min-height: var(--alto-toque);
+  width: 100%;
+}
+
+textarea { resize: vertical; }
+input:focus-visible, select:focus-visible, textarea:focus-visible, .boton:focus-visible, .opcion:focus-visible {
+  outline: 3px solid var(--acento);
+  outline-offset: 1px;
+}
+
+.campo { display: block; margin-bottom: 14px; }
+.etiqueta-campo { display: block; font-weight: 600; margin-bottom: 6px; }
+
+fieldset { border: none; padding: 0; margin: 0 0 18px; min-width: 0; }
+legend { font-weight: 700; margin-bottom: 8px; padding: 0; }
+
+.fila-campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0 12px; }
+
+.opciones { display: grid; gap: 8px; }
+.opciones.compacto { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); }
+
+.opcion {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-pequeno);
+  padding: 10px 14px;
+  min-height: var(--alto-toque);
+  cursor: pointer;
+}
+
+.opcion small { color: var(--texto-suave); }
+.opcion.elegida { border: 2px solid var(--acento); background: var(--acento-suave); padding: 9px 13px; }
+
+.casilla { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+.casilla input { width: 22px; min-height: 22px; }
+
+.bilbo { margin-top: 12px; padding: 12px; border-radius: var(--radio); background: var(--superficie-2); }
+
+.escalera { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; margin: 8px 0 12px; }
+.peldano { display: flex; flex-direction: column; gap: 2px; font-size: 0.8rem; color: var(--texto-suave); }
+.peldano input { padding: 8px; text-align: center; }
+
+.buscador { margin-bottom: 10px; }
+
+/* --------------------------------------------------------------------------
+   Entrenamiento
+   -------------------------------------------------------------------------- */
+
+input.fecha { width: auto; }
+
+.ejercicio-sesion .cabecera-tarjeta { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.ejercicio-sesion h2 { margin: 0; }
+
+.sugerencia {
+  margin: 6px 0 10px;
+  padding: 8px 12px;
+  border-radius: var(--radio-pequeno);
+  background: var(--acento-suave);
+  font-weight: 600;
+}
+
+.serie {
+  border-top: 1px solid var(--borde);
+  padding: 10px 0;
+}
+
+.serie-cabecera { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.serie-cabecera select { width: auto; flex: 0 1 auto; min-height: 40px; padding: 6px 10px; }
+.serie-cabecera .boton-icono { margin-left: auto; }
+
+.serie-valores { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.valor { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; flex: 1 1 130px; }
+.valor input { font-size: 1.25rem; font-weight: 600; text-align: center; max-width: 110px; }
+.valor span { color: var(--texto-suave); }
+.valor small { flex-basis: 100%; }
+
+.serie.hecha .valor input { border-color: var(--acento); }
+
+.marca { font-size: 0.85rem; font-weight: 600; }
+.marca.bien { color: var(--bien); }
+.marca.mal { color: var(--mal); }
+
+/* --------------------------------------------------------------------------
+   Bienvenida
+   -------------------------------------------------------------------------- */
+
+.bienvenida { text-align: center; padding-top: 10vh; }
+.bienvenida .logo { font-size: 3.5rem; }
+.bienvenida .nota { margin: 16px auto; max-width: 34em; }
+
+/* --------------------------------------------------------------------------
+   Avisos y ventanas
+   -------------------------------------------------------------------------- */
+
+.aviso {
+  position: fixed;
+  left: 50%;
+  bottom: calc(80px + env(safe-area-inset-bottom));
+  z-index: 30;
+  transform: translate(-50%, 20px);
+  max-width: min(92vw, 520px);
+  padding: 12px 18px;
+  border-radius: var(--radio-pequeno);
+  background: var(--texto);
+  color: var(--fondo);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.aviso.visible { opacity: 1; transform: translate(-50%, 0); }
+.aviso-error { background: var(--peligro); color: #fff; }
+
+.modal-fondo {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgb(0 0 0 / 45%);
+}
+
+.modal {
+  width: 100%;
+  max-width: 640px;
+  max-height: 85dvh;
+  overflow-y: auto;
+  padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+  border-radius: var(--radio) var(--radio) 0 0;
+  background: var(--fondo);
+}
+
+.modal-cabecera { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.modal-cabecera h2 { margin: 0; }
+.lista-eleccion { margin: 12px 0; }
+
+@media (min-width: 700px) {
+  .modal-fondo { align-items: center; }
+  .modal { border-radius: var(--radio); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}

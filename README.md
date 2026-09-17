@@ -1,0 +1,30 @@
+# Entreno
+
+App web instalable (PWA) para registrar entrenamientos con progresión
+configurable: ciclos Bilbo, por carga, por esfuerzo o libre.
+
+- **Dirección:** https://xdanielolc.github.io/entreno/
+- **Datos:** cada persona entra con su cuenta de Google y sus datos se guardan
+  en su propio Google Drive (permiso `drive.file`: la app solo ve los archivos
+  que crea). También queda una copia en el dispositivo para usarla sin cobertura.
+- **Sin compilación:** JavaScript, HTML y CSS tal cual, en `web/`.
+
+## Carpetas
+
+| Carpeta | Contenido |
+|---|---|
+| `web/` | La app. Es lo único que se publica |
+| `docs/` | Esquema de datos y configuración de Google Cloud |
+| `herramientas/` | Utilidades locales (convertidor de hojas de cálculo, iconos) |
+| `datos-privados/` | Datos personales. No se sube nunca (está en `.gitignore`) |
+
+## Probar en el ordenador
+
+Doble clic en `Probar la app en el ordenador.bat` (necesita Python). Abre
+http://localhost:8000.
+
+## Publicar una versión nueva
+
+1. Subir el número en `web/js/version.js` y en `VERSION` de `web/sw.js`.
+2. Guardar en Git y subir a GitHub. La publicación es automática y los móviles
+   reciben la versión nueva la siguiente vez que abren la app.
