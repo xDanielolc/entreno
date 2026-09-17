@@ -3,10 +3,11 @@ import {
   trabajoSerie, tramosPropuestos, usaTramos,
 } from '../calculos.js';
 import * as estado from '../estado.js';
-import { TECNICAS, TIPOS_CARGA, TIPOS_ESFUERZO, TIPOS_SERIE } from '../esquema.js';
+import { TIPOS_CARGA, TIPOS_ESFUERZO, TIPOS_SERIE, camposDe, recamaraDe, tramosDe } from '../esquema.js';
 import { crearSerieDesdePlan, serieSuelta } from '../series.js';
 import { anadir, aviso, confirmar, h, leerNumero, modal, nuevoId } from '../ui.js';
 import { arrancarDescanso, barraDescanso } from './descanso.js';
+import { selectorTecnicas, textoTecnicas } from './tecnicas.js';
 
 // En modo guiado se ve un ejercicio cada vez. Se recuerda por sesión.
 const guiado = new Map();
@@ -119,6 +120,14 @@ export function vistaSesion(contenedor, { id }) {
             : `objetivo ${formatearNumero(serie.objetivo)} ${uEsf}`);
         }
       }
+    } else if (s.modo === 'maximo-trabajo') {
+      if (s.pocosDatos && !s.carga) partes.push('Máximo trabajo: aún faltan datos, entrena con el peso que quieras');
+      else {
+        partes.push(`Máximo trabajo: ${formatearNumero(s.carga)} ${uCarga}`);
+        if (s.esfuerzoObjetivo) partes.push(`unas ${formatearNumero(s.esfuerzoObjetivo)} ${uEsf}`);
+        if (s.aviso) partes.push(s.aviso.toLowerCase());
+        if (s.mejorReal) partes.push(`tu récord: ${formatearNumero(s.mejorReal.trabajo)} (${formatearNumero(s.mejorReal.carga)} ${uCarga} × ${formatearNumero(s.mejorReal.esfuerzo)})`);
+      }
     } else if (s.primeraVez) {
       partes.push('Primera vez con esta serie');
     } else {
@@ -132,32 +141,50 @@ export function vistaSesion(contenedor, { id }) {
   }
 
   function bloqueSerie(ej, entrada, i, j, serie) {
-    const conTramos = usaTramos(serie.tecnica);
+    serie.tecnicas ??= [];
+    serie.detalle ??= {};
+    const tramos = tramosDe(serie.tecnicas);
     return h('div', { class: `serie ${serie.hecha ? 'hecha' : ''}` },
       lineaSugerencia(ej, serie),
       cabeceraSerie(ej, i, j, serie),
-      conTramos ? tramosSerie(ej, i, j, serie) : valoresSerie(ej, i, j, serie));
+      tramos ? tramosSerie(ej, i, j, serie, tramos) : valoresSerie(ej, i, j, serie),
+      camposTecnicas(ej, i, j, serie));
+  }
+
+  // Casillas propias de cada técnica: los segundos del isométrico final, las
+  // excéntricas lentas y sus segundos de bajada.
+  function camposTecnicas(ej, i, j, serie) {
+    const campos = camposDe(serie.tecnicas);
+    if (!campos.length) return null;
+    const actualizar = (fn) => cambiarSesion((s) => fn(s.ejercicios[i].series[j]), { tecleo: true });
+    return h('div', { class: 'serie-valores extras' },
+      campos.map((c) => h('label', { class: 'valor' },
+        h('input', { type: 'text', inputmode: 'decimal', value: serie.detalle?.[c.tecnica]?.[c.clave] ?? '',
+          'aria-label': `${c.etiqueta} (${c.unidad})`,
+          oninput: (e) => actualizar((x) => {
+            x.detalle ??= {};
+            x.detalle[c.tecnica] ??= {};
+            x.detalle[c.tecnica][c.clave] = leerNumero(e.target.value);
+          }) }),
+        h('span', {}, `${c.etiqueta} (${c.unidad})`))));
   }
 
   function cabeceraSerie(ej, i, j, serie) {
-    const actualizar = (fn) => cambiarSesion((s) => fn(s.ejercicios[i].series[j]), { tecleo: true });
     return h('div', { class: 'serie-cabecera' },
       h('select', { class: 'tipo-serie', 'aria-label': 'Tipo de serie',
         onchange: (e) => cambiarSesion((s) => {
           const x = s.ejercicios[i].series[j];
           x.tipo = e.target.value;
-          if (x.tipo !== 'intensidad') { x.tecnica = null; x.tramos = null; }
+          if (x.tipo !== 'intensidad') { x.tecnicas = []; x.tramos = null; }
         }) },
       Object.entries(TIPOS_SERIE).map(([k, v]) => h('option', { value: k, selected: k === serie.tipo }, v))),
 
-      serie.tipo === 'intensidad' && h('select', { 'aria-label': 'Técnica',
-        onchange: (e) => cambiarSesion((s) => {
-          const x = s.ejercicios[i].series[j];
-          x.tecnica = e.target.value || null;
-          x.tramos = usaTramos(x.tecnica) ? tramosPropuestos(x, null, null) : null;
-        }) },
-      h('option', { value: '' }, 'Técnica…'),
-      Object.entries(TECNICAS).map(([k, v]) => h('option', { value: k, selected: k === serie.tecnica }, v.etiqueta))),
+      serie.tipo === 'intensidad' && selectorTecnicas(serie.tecnicas, (nuevas) => cambiarSesion((s) => {
+        const x = s.ejercicios[i].series[j];
+        x.tecnicas = nuevas;
+        x.recamara = recamaraDe(nuevas, d.perfil.recamaraPorDefecto ?? 1);
+        x.tramos = tramosDe(nuevas) ? (x.tramos ?? tramosPropuestos(x, null, null)) : null;
+      })),
 
       marcaObjetivo(serie),
 
@@ -206,6 +233,13 @@ export function vistaSesion(contenedor, { id }) {
           }) }),
         h('span', {}, unidadEsfuerzo(ej))),
 
+      // «En recámara»: las repeticiones que podrías haber hecho y no hiciste.
+      ej.esfuerzo.tipo === 'repeticiones' && h('label', { class: 'valor recamara' },
+        h('span', {}, '+'),
+        h('input', { type: 'text', inputmode: 'decimal', value: serie.recamara ?? '', 'aria-label': 'Repeticiones en recámara',
+          oninput: (e) => actualizar((x) => { x.recamara = leerNumero(e.target.value); }) }),
+        h('span', {}, 'recámara')),
+
       ej.esfuerzoExtra && h('label', { class: 'valor' },
         h('input', { type: 'text', inputmode: 'decimal', value: serie.esfuerzoExtra ?? '', 'aria-label': 'Distancia',
           oninput: (e) => actualizar((x) => { x.esfuerzoExtra = leerNumero(e.target.value); }) }),
@@ -213,13 +247,13 @@ export function vistaSesion(contenedor, { id }) {
   }
 
   // Drop set, rest-pause y miorrepeticiones: una línea por bajada.
-  function tramosSerie(ej, i, j, serie) {
+  function tramosSerie(ej, i, j, serie, tramos) {
     serie.tramos ??= tramosPropuestos(serie, null, null);
     const total = h('p', { class: 'nota' });
     const pintarTotal = () => {
       const t = trabajoSerie(serie);
       const reps = esfuerzoTotal(serie);
-      total.textContent = reps ? `${serie.tramos.length} tramos · ${formatearNumero(reps)} ${unidadEsfuerzo(ej)} en total`
+      total.textContent = reps ? `${serie.tramos.length} ${tramos.nombre.toLowerCase()}s · ${formatearNumero(reps)} ${unidadEsfuerzo(ej)} en total`
         + (t ? ` · ${formatearNumero(t)} kg de trabajo` : '') : '';
     };
     pintarTotal();
@@ -227,7 +261,7 @@ export function vistaSesion(contenedor, { id }) {
 
     return h('div', { class: 'tramos' },
       serie.tramos.map((tramo, k) => h('div', { class: 'tramo' },
-        h('span', { class: 'tramo-n' }, k + 1),
+        h('span', { class: 'tramo-n', title: `${tramos.nombre} ${k + 1}` }, k + 1),
         ej.carga.tipo !== 'ninguna' && h('label', { class: 'valor' },
           h('input', { type: 'text', inputmode: 'decimal', value: tramo.carga ?? '', 'aria-label': `Carga de la bajada ${k + 1}`,
             oninput: (e) => actualizar((x) => { x.tramos[k].carga = leerNumero(e.target.value); pintarTotal(); }) }),
@@ -241,15 +275,14 @@ export function vistaSesion(contenedor, { id }) {
               marcarHecha(e.target, x);
             }) }),
           h('span', {}, unidadEsfuerzo(ej))),
-        serie.tramos.length > 1 && h('button', { class: 'boton-icono', 'aria-label': `Quitar bajada ${k + 1}`,
+        serie.tramos.length > 1 && h('button', { class: 'boton-icono', 'aria-label': `Quitar ${tramos.nombre.toLowerCase()} ${k + 1}`,
           onclick: () => cambiarSesion((s) => { s.ejercicios[i].series[j].tramos.splice(k, 1); }) }, '✕'))),
 
       h('button', { class: 'boton enlace', onclick: () => cambiarSesion((s) => {
         const x = s.ejercicios[i].series[j];
         const ultimo = x.tramos.at(-1);
-        const bajada = TECNICAS[x.tecnica]?.bajada ?? 0;
-        x.tramos.push({ carga: ultimo?.carga != null ? Math.round(ultimo.carga * (1 - bajada)) : null, esfuerzo: null });
-      }) }, '+ Bajada'),
+        x.tramos.push({ carga: ultimo?.carga != null ? Math.round(ultimo.carga * (1 - tramos.bajada)) : null, esfuerzo: null });
+      }) }, `+ ${tramos.nombre}`),
       total);
   }
 
@@ -298,11 +331,11 @@ export function vistaSesion(contenedor, { id }) {
         return;
       }
       const anterior = s.ejercicios[i].series.at(-1);
-      const copia = serieSuelta({ tipo: anterior?.tipo ?? 'libre', tecnica: anterior?.tecnica ?? null,
-        carga: anterior?.carga ?? null });
+      const copia = serieSuelta({ tipo: anterior?.tipo ?? 'libre', tecnicas: anterior?.tecnicas ?? [],
+        carga: anterior?.carga ?? null, recamara: anterior?.recamara ?? null });
       copia.planId = anterior?.planId ?? null;
       copia.lectura = anterior?.lectura ?? null;
-      if (usaTramos(copia.tecnica)) copia.tramos = tramosPropuestos(copia, null, anterior);
+      if (usaTramos(copia.tecnicas)) copia.tramos = tramosPropuestos(copia, null, anterior);
       s.ejercicios[i].series.push(copia);
     });
   }
@@ -393,8 +426,11 @@ export function textoSerie(ej, serie) {
     return serie.tramos.map((t) => `${formatearNumero(t.carga)}×${formatearNumero(t.esfuerzo)}`).join(' → ');
   }
   if (serie.carga != null) partes.push(`${formatearNumero(serie.carga)} ${unidadCarga(ej)}`);
-  if (serie.esfuerzo != null) partes.push(`${formatearNumero(serie.esfuerzo)} ${unidadEsfuerzo(ej)}`);
-  return partes.join(' × ');
+  if (serie.esfuerzo != null) {
+    partes.push(`${formatearNumero(serie.esfuerzo)}${serie.recamara ? ` + ${serie.recamara}` : ''} ${unidadEsfuerzo(ej)}`);
+  }
+  const tec = textoTecnicas(serie.tecnicas);
+  return partes.join(' × ') + (tec ? ` (${tec})` : '');
 }
 
 export function unidadCarga(ej) {

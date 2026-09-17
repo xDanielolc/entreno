@@ -40,6 +40,20 @@ export function vistaAjustes(contenedor) {
         h('input', { type: 'text', value: d.perfil.nombre || '',
           oninput: (e) => estado.cambiar((x) => { x.perfil.nombre = e.target.value.trim(); }, { tecleo: true }) })),
       h('label', { class: 'campo' },
+        h('span', { class: 'etiqueta-campo' }, 'Repeticiones en recámara por defecto'),
+        h('input', { type: 'text', inputmode: 'decimal', value: d.perfil.recamaraPorDefecto ?? '',
+          oninput: (e) => estado.cambiar((x) => { x.perfil.recamaraPorDefecto = leerNumero(e.target.value); }, { tecleo: true }) }),
+        h('small', { class: 'nota' },
+          'Las que sueles dejarte sin hacer al acabar una serie. Aparecen ya puestas en cada serie, '
+          + 'y se apuntan aparte: «45 kg × 12 + 1».')),
+
+      h('label', { class: 'campo' },
+        h('span', { class: 'etiqueta-campo' }, 'Descanso entre series (segundos)'),
+        h('input', { type: 'text', inputmode: 'decimal', value: d.perfil.descansoSegundos ?? '',
+          oninput: (e) => estado.cambiar((x) => { x.perfil.descansoSegundos = leerNumero(e.target.value); }, { tecleo: true }) }),
+        h('small', { class: 'nota' }, 'El cronómetro arranca solo al apuntar una serie. Ponlo a 0 para desactivarlo.')),
+
+      h('label', { class: 'campo' },
         h('span', { class: 'etiqueta-campo' }, 'Peso corporal (kg)'),
         h('input', { type: 'text', inputmode: 'decimal', value: d.perfil.pesoCorporalKg ?? '',
           oninput: (e) => estado.cambiar((x) => { x.perfil.pesoCorporalKg = leerNumero(e.target.value); }, { tecleo: true }) }),

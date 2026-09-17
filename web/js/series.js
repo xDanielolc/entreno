@@ -3,6 +3,7 @@
 // drop set, las bajadas propuestas.
 
 import { lecturaDesdeCarga, sugerenciaSerie, tramosPropuestos, usaTramos } from './calculos.js';
+import { recamaraDe } from './esquema.js';
 import { nuevoId } from './ui.js';
 
 export function crearSerieDesdePlan(datos, ejercicio, plan, { excluirSesion } = {}) {
@@ -12,7 +13,9 @@ export function crearSerieDesdePlan(datos, ejercicio, plan, { excluirSesion } = 
     id: nuevoId('s'),
     planId: plan.id,
     tipo: plan.tipo,
-    tecnica: plan.tecnica,
+    tecnicas: [...(plan.tecnicas || [])],
+    detalle: {},
+    recamara: recamaraDe(plan.tecnicas, datos.perfil.recamaraPorDefecto ?? 1),
     carga,
     lectura: ejercicio.carga.tipo === 'asistida' ? lecturaDesdeCarga(carga, datos.perfil.pesoCorporalKg) : null,
     esfuerzo: null,
@@ -23,14 +26,14 @@ export function crearSerieDesdePlan(datos, ejercicio, plan, { excluirSesion } = 
     cicloN: s.cicloN ?? null,
     diaCiclo: s.dia ?? null,
   };
-  if (usaTramos(plan.tecnica)) serie.tramos = tramosPropuestos(serie, plan, s.ultima?.serie ?? null);
+  if (usaTramos(plan.tecnicas)) serie.tramos = tramosPropuestos(serie, plan, s.ultima?.serie ?? null);
   return serie;
 }
 
-export function serieSuelta({ tipo = 'libre', carga = null, tecnica = null } = {}) {
+export function serieSuelta({ tipo = 'libre', carga = null, tecnicas = [], recamara = null } = {}) {
   return {
-    id: nuevoId('s'), planId: null, tipo, tecnica, carga, lectura: null,
-    esfuerzo: null, esfuerzoExtra: null, objetivo: null, hecha: false, tramos: null,
-    cicloN: null, diaCiclo: null,
+    id: nuevoId('s'), planId: null, tipo, tecnicas: [...tecnicas], detalle: {}, recamara,
+    carga, lectura: null, esfuerzo: null, esfuerzoExtra: null, objetivo: null,
+    hecha: false, tramos: null, cicloN: null, diaCiclo: null,
   };
 }

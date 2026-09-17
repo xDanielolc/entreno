@@ -540,3 +540,36 @@ input.fecha { width: auto; }
 .descanso-tiempo { font-size: 1.4rem; font-weight: 700; font-variant-numeric: tabular-nums; }
 .descanso.acabado { border-color: var(--peligro); }
 .descanso.acabado .descanso-tiempo { color: var(--peligro); }
+
+/* Técnicas combinables y recámara */
+.tecnicas { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px 4px 10px;
+  border-radius: 999px;
+  background: var(--acento-suave);
+  color: var(--texto);
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.chip-quitar {
+  border: none;
+  background: none;
+  color: var(--texto-suave);
+  font: inherit;
+  cursor: pointer;
+  min-width: 28px;
+  min-height: 28px;
+}
+
+.anadir-tecnica { width: auto; min-height: 40px; padding: 6px 10px; font-size: 0.9rem; }
+
+.serie-valores.extras { margin-top: 8px; }
+.serie-valores.extras .valor input { font-size: 1rem; }
+
+.valor.recamara { flex: 0 1 auto; }
+.valor.recamara input { max-width: 64px; font-size: 1rem; }

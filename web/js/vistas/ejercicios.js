@@ -1,12 +1,14 @@
 import {
-  cicloActual, formatearNumero, generarEscalera, lecturaDesdeCarga, registrosDelCiclo, usaTramos,
+  cicloActual, formatearNumero, generarEscalera, lecturaDesdeCarga, registrosDelCiclo,
 } from '../calculos.js';
 import * as estado from '../estado.js';
 import {
-  DIAS_CICLO_POR_DEFECTO, TECNICAS, TIPOS_CARGA, TIPOS_ESFUERZO, TIPOS_PROGRESION, TIPOS_SERIE,
-  progresionPorDefecto, serieNuevaPlantilla, sobrePorDefecto,
+  DIAS_CICLO_POR_DEFECTO, TIPOS_CARGA, TIPOS_ESFUERZO, TIPOS_PROGRESION, TIPOS_SERIE,
+  progresionPorDefecto, serieNuevaPlantilla, sobrePorDefecto, tramosDe,
 } from '../esquema.js';
-import { anadir, aviso, confirmar, h, leerNumero, nuevoId } from '../ui.js';
+import { buscarEnCatalogo } from '../catalogo.js';
+import { anadir, aviso, confirmar, h, leerNumero, modal, nuevoId } from '../ui.js';
+import { selectorTecnicas } from './tecnicas.js';
 
 // ---------------------------------------------------------------------------
 // Lista, con buscador
@@ -122,8 +124,37 @@ export function vistaFormularioEjercicio(contenedor, { id }) {
     window.scrollTo(0, scroll);
   }
 
+  // Lista de ejercicios habituales, para no escribirlo todo a mano.
+  function elegirDelCatalogo() {
+    const lista = h('div', { class: 'lista-eleccion' });
+    const pintar = (filtro = '') => {
+      lista.replaceChildren(...buscarEnCatalogo(filtro).map((x) => h('button', {
+        type: 'button', class: 'tarjeta fila-enlace', onclick: () => { cerrar(); aplicar(x); },
+      },
+      h('div', {},
+        h('strong', {}, x.nombre),
+        h('div', { class: 'suave' }, `${x.grupo} · ${x.material} · ${x.musculos}`)))));
+    };
+    pintar();
+    const cerrar = modal('Ejercicios habituales', h('div', {},
+      h('input', { type: 'search', class: 'buscador', placeholder: 'Buscar', oninput: (e) => pintar(e.target.value) }),
+      lista));
+  }
+
+  function aplicar(x) {
+    borrador.nombre = x.nombre;
+    borrador.grupo = x.grupo;
+    borrador.carga = { tipo: x.carga || 'peso' };
+    borrador.esfuerzo = { tipo: x.esfuerzo || 'repeticiones' };
+    borrador.esfuerzoExtra = x.distancia ? { tipo: 'distancia', opcional: true } : null;
+    for (const plan of borrador.series) plan.progresion.sobre = sobrePorDefecto(borrador);
+    repintar();
+  }
+
   function formulario() {
     return h('form', { class: 'formulario', onsubmit: (e) => { e.preventDefault(); guardar(); } },
+      !existente && h('button', { type: 'button', class: 'boton secundario', onclick: elegirDelCatalogo },
+        'Elegir de la lista de ejercicios'),
       campo('Nombre', h('input', { type: 'text', required: true, value: borrador.nombre, autocomplete: 'off',
         placeholder: 'Press banca', oninput: (e) => { borrador.nombre = e.target.value; } })),
 
@@ -160,7 +191,10 @@ export function vistaFormularioEjercicio(contenedor, { id }) {
         h('button', { type: 'button', class: 'boton secundario', onclick: () => {
           borrador.series.push(serieNuevaPlantilla(borrador, { tipo: 'libre' }));
           repintar();
-        } }, '+ Añadir serie')),
+        } }, '+ Añadir serie'),
+        h('small', { class: 'nota' },
+          'Solo hacen falta varias si el ejercicio lleva de verdad más de una serie: '
+          + 'una Bilbo y una de intensidad, por ejemplo.')),
 
       campo('Notas', h('textarea', { rows: 3, value: borrador.notas || '',
         oninput: (e) => { borrador.notas = e.target.value; } })),
@@ -174,25 +208,27 @@ export function vistaFormularioEjercicio(contenedor, { id }) {
   }
 
   function tarjetaPlan(plan, i) {
-    const conTramos = usaTramos(plan.tecnica);
+    plan.tecnicas ??= [];
+    const tramos = tramosDe(plan.tecnicas);
     return h('article', { class: 'tarjeta plan-serie' },
       h('div', { class: 'cabecera-tarjeta' },
         h('strong', {}, `Serie ${i + 1}`),
         borrador.series.length > 1 && h('button', { type: 'button', class: 'boton-icono', 'aria-label': 'Quitar serie',
           onclick: () => { borrador.series.splice(i, 1); repintar(); } }, '🗑')),
 
-      h('div', { class: 'fila-campos' },
-        campo('Tipo', h('select', { onchange: (e) => { plan.tipo = e.target.value; repintar(); } },
-          Object.entries(TIPOS_SERIE).map(([k, v]) => h('option', { value: k, selected: k === plan.tipo }, v)))),
-        campo('Técnica', h('select', { onchange: (e) => {
-          plan.tecnica = e.target.value || null;
-          plan.tramosPrevistos = usaTramos(plan.tecnica) ? (plan.tramosPrevistos || 3) : null;
-          repintar();
-        } },
-        h('option', { value: '' }, 'Ninguna'),
-        Object.entries(TECNICAS).map(([k, v]) => h('option', { value: k, selected: k === plan.tecnica }, v.etiqueta))))),
+      campo('Tipo', h('select', { onchange: (e) => { plan.tipo = e.target.value; repintar(); } },
+        Object.entries(TIPOS_SERIE).map(([k, v]) => h('option', { value: k, selected: k === plan.tipo }, v)))),
 
-      conTramos && campo('Bajadas o miniseries previstas',
+      h('div', { class: 'campo' },
+        h('span', { class: 'etiqueta-campo' }, 'Técnicas'),
+        selectorTecnicas(plan.tecnicas, (nuevas) => {
+          plan.tecnicas = nuevas;
+          plan.tramosPrevistos = tramosDe(nuevas) ? (plan.tramosPrevistos || 3) : null;
+          repintar();
+        }),
+        h('small', { class: 'nota' }, 'Se pueden combinar: unilateral, rest-pause y un isométrico final en la misma serie.')),
+
+      tramos && campo(`${tramos.nombre}s previstas`,
         numeroInput(plan.tramosPrevistos, (v) => { plan.tramosPrevistos = Math.max(1, Math.round(v ?? 3)); })),
 
       h('div', { class: 'campo' },

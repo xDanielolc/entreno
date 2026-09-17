@@ -1,6 +1,6 @@
 // Cálculos de entrenamiento. Funciones puras: no leen ni guardan nada.
 
-import { TECNICAS } from './esquema.js';
+import { TECNICAS, tramosDe } from './esquema.js';
 
 // Fórmula de Epley, la misma de tus Excel: 1RM = carga × reps × 0,03 + carga.
 export function epley(carga, repeticiones) {
@@ -52,8 +52,8 @@ export function esfuerzoTotal(serie) {
   return serie.esfuerzo;
 }
 
-export function usaTramos(tecnica) {
-  return Boolean(tecnica && TECNICAS[tecnica]?.tramos);
+export function usaTramos(tecnicas) {
+  return Boolean(tramosDe(tecnicas));
 }
 
 // ---------------------------------------------------------------------------
@@ -111,6 +111,10 @@ export function sugerenciaSerie(datos, ejercicio, plan, { excluirSesion } = {}) 
   const base = { modo: prog.tipo, sobre, ultima, referencia, primeraVez: !ultima };
 
   if (prog.tipo === 'bilbo') return { ...base, ...sugerenciaBilbo(datos, ejercicio, plan, { excluirSesion, sobre }) };
+
+  if (prog.tipo === 'maximo-trabajo') {
+    return { ...base, ...maximoTrabajo(datos, ejercicio, { excluirSesion, tope: prog.topeEsfuerzo ?? 50 }) };
+  }
 
   if (prog.tipo === 'carga') {
     const [, max] = prog.objetivoEsfuerzo || [];
@@ -171,11 +175,88 @@ export function aPasoDeDisco(kg, paso = 2.5) {
   return redondear(Math.round(kg / paso) * paso, 2);
 }
 
+// ---------------------------------------------------------------------------
+// Máximo trabajo
+// ---------------------------------------------------------------------------
+//
+// Idea: el trabajo de una serie es peso × repeticiones. Con poco peso haces
+// muchas repeticiones y con mucho peso pocas, así que en medio hay un punto
+// donde el trabajo es máximo. Las fórmulas del 1RM no sirven para encontrarlo
+// (dicen que el máximo está en 0 kg), así que se busca en TU historial:
+// se ajusta una parábola a tus pares peso-trabajo y se coge su cima.
+
+// Resuelve un sistema 3×3 por eliminación de Gauss.
+function resolver3(m) {
+  for (let i = 0; i < 3; i++) {
+    let piv = i;
+    for (let r = i + 1; r < 3; r++) if (Math.abs(m[r][i]) > Math.abs(m[piv][i])) piv = r;
+    if (Math.abs(m[piv][i]) < 1e-12) return null;
+    [m[i], m[piv]] = [m[piv], m[i]];
+    for (let r = 0; r < 3; r++) {
+      if (r === i) continue;
+      const f = m[r][i] / m[i][i];
+      for (let c = i; c < 4; c++) m[r][c] -= f * m[i][c];
+    }
+  }
+  return [m[0][3] / m[0][0], m[1][3] / m[1][1], m[2][3] / m[2][2]];
+}
+
+// Ajusta trabajo = a·carga² + b·carga + c a los puntos del historial.
+export function ajusteTrabajo(puntos) {
+  if (puntos.length < 4) return null;
+  const s = (f) => puntos.reduce((t, p) => t + f(p), 0);
+  const m = [
+    [s((p) => p.x ** 4), s((p) => p.x ** 3), s((p) => p.x ** 2), s((p) => p.y * p.x ** 2)],
+    [s((p) => p.x ** 3), s((p) => p.x ** 2), s((p) => p.x), s((p) => p.y * p.x)],
+    [s((p) => p.x ** 2), s((p) => p.x), puntos.length, s((p) => p.y)],
+  ];
+  const sol = resolver3(m);
+  if (!sol) return null;
+  const [a, b, c] = sol;
+  return { a, b, c, trabajoEn: (x) => a * x * x + b * x + c };
+}
+
+export function maximoTrabajo(datos, ejercicio, { excluirSesion, tope = 50 } = {}) {
+  const series = seriesDeEjercicio(datos, ejercicio.id, { excluirSesion })
+    .filter((x) => x.serie.carga > 0 && esfuerzoTotal(x.serie) > 0);
+  if (!series.length) return { pocosDatos: true };
+
+  const puntos = series.map((x) => ({ x: x.serie.carga, y: trabajoSerie(x.serie) }));
+  const mejorReal = series.reduce((a, b) => (trabajoSerie(b.serie) > trabajoSerie(a.serie) ? b : a));
+  const resultado = {
+    mejorReal: { carga: mejorReal.serie.carga, esfuerzo: esfuerzoTotal(mejorReal.serie),
+      trabajo: trabajoSerie(mejorReal.serie), fecha: mejorReal.sesion.fecha },
+  };
+
+  const cargas = new Set(puntos.map((p) => p.x));
+  const ajuste = cargas.size >= 4 ? ajusteTrabajo(puntos) : null;
+  if (!ajuste || ajuste.a >= 0) {
+    // Sin suficientes pesos distintos, o el trabajo no hace cima: se repite
+    // el mejor día conocido.
+    return { ...resultado, pocosDatos: !ajuste, carga: mejorReal.serie.carga,
+      esfuerzoObjetivo: esfuerzoTotal(mejorReal.serie) };
+  }
+
+  const cima = -ajuste.b / (2 * ajuste.a);
+  const repsEn = (x) => (x > 0 ? ajuste.trabajoEn(x) / x : null);
+  let carga = aPasoDeDisco(cima);
+  let aviso = null;
+  if (repsEn(carga) > tope) {
+    // Buscar el peso más ligero que deja la serie dentro del tope.
+    let x = carga;
+    while (x < cima * 3 && repsEn(x) > tope) x += 2.5;
+    aviso = `El máximo teórico pediría ${Math.round(repsEn(carga))} ${'repeticiones'}; con el tope de ${tope} sale ${aPasoDeDisco(x)}`;
+    carga = aPasoDeDisco(x);
+  }
+  return { ...resultado, carga, esfuerzoObjetivo: redondear(repsEn(carga), 0),
+    trabajoEsperado: redondear(ajuste.trabajoEn(carga), 0), cima: aPasoDeDisco(cima), aviso };
+}
+
 // Pesos propuestos para las bajadas de un drop set, a partir de la carga de
 // la serie y de la última vez que se hizo.
 export function tramosPropuestos(serie, plan, ultima) {
   const previstos = plan?.tramosPrevistos || ultima?.tramos?.length || 3;
-  const bajada = TECNICAS[serie.tecnica]?.bajada ?? 0;
+  const bajada = tramosDe(serie.tecnicas)?.bajada ?? 0;
   const tramos = [];
   for (let i = 0; i < previstos; i++) {
     const deUltima = ultima?.tramos?.[i];

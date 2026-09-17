@@ -1,4 +1,4 @@
-# Esquema de datos — versión 2
+# Esquema de datos — versión 3
 
 Este documento describe **cómo se guardan tus datos**. Es la pieza más
 importante del proyecto: el código se puede reescribir entero mañana, pero el
@@ -20,7 +20,7 @@ historial no se puede recuperar si el formato se estropea.
    > propietario ni comprimido: si mañana esta app desaparece, tus datos
    > siguen siendo legibles.
 
-2. **Número de versión desde el primer día** (`version: 2`). Cuando el formato
+2. **Número de versión desde el primer día** (`version: 3`). Cuando el formato
    cambie, la app detecta que tu archivo es de una versión anterior y lo
    convierte sola al abrirlo. Nunca tendrás que hacer nada.
 
@@ -52,7 +52,7 @@ archivo
 
 ```json
 {
-  "version": 2,
+  "version": 3,
   "creado": "2026-09-04T10:00:00Z",
   "actualizado": "2026-09-04T18:32:11Z",
   "revision": 47,
@@ -222,6 +222,22 @@ cuando toca. Por eso la progresión vive en cada serie, no en el ejercicio.
 Al añadir el ejercicio a un entrenamiento aparecen estas series ya rellenas.
 El botón «+ Serie» mete la siguiente que falte.
 
+Cada serie puede combinar **varias técnicas** (`tecnicas: ["unilateral",
+"rest-pause", "isometrico-final"]`), y cada técnica decide qué se apunta:
+
+| Técnica | Qué añade |
+|---|---|
+| Drop set | Bajadas: cada una con su peso y sus repeticiones |
+| Rest-pause, miorrepeticiones | Miniseries con el mismo peso |
+| Isométrico final | Una casilla de segundos |
+| Excéntricas lentas | Repeticiones y segundos de bajada |
+| Unilateral | Marca que va por lado |
+| Fallo técnico, fallo absoluto | Ponen la recámara a 0 |
+
+Además, toda serie de repeticiones guarda **`recamara`**: las que podrías
+haber hecho y dejaste («45 kg × 12 + 1»). El valor por defecto está en
+Ajustes.
+
 **`sobre`** dice a qué se aplica la progresión:
 
 | Valor | Cuándo | Qué sube |
@@ -231,7 +247,14 @@ El botón «+ Serie» mete la siguiente que falte.
 
 Los tipos de progresión son `bilbo` (escalera de días), `carga` (doble
 progresión: subes repeticiones en un rango y luego carga), `esfuerzo` (a más
-cada vez) y `libre`.
+cada vez), `maximo-trabajo` y `libre`.
+
+**`maximo-trabajo`** es experimental: busca en tu historial el peso con el que
+más trabajo (peso × repeticiones) haces y te mantiene ahí. No usa fórmulas de
+1RM, porque todas dicen que el máximo estaría en 0 kg; ajusta una parábola a
+tus pares peso-trabajo y coge su cima. Con `topeEsfuerzo` (50 por defecto) se
+limita la serie: si la cima pidiese más repeticiones, propone el peso que se
+queda en el tope y lo avisa.
 
 En Bilbo, cada ciclo guarda su `escalera` (la lista explícita de valores de
 cada día) y el `generador` con el que se rellenó, para poder repetirlo:
