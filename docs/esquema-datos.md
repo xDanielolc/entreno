@@ -365,6 +365,9 @@ Campos que merecen explicación:
   te pregunta: *«has añadido una serie de fondos, ¿la dejo solo para hoy o la
   meto en tu rutina para siempre?»*. Si dices que sí, se añade a la rutina y
   esta marca desaparece.
+- **`borrada`** (fecha o `null`): el entrenamiento está en la papelera. No
+  cuenta para la progresión ni aparece en el historial, pero se puede
+  recuperar. Un entrenamiento nunca se elimina del archivo.
 - **`hecha: false`** es una serie que la rutina proponía y te saltaste. Se
   guarda igualmente, porque saber lo que no hiciste también es información.
 

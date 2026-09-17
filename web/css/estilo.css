@@ -415,7 +415,23 @@ input.fecha { width: auto; }
   transition: opacity 0.2s, transform 0.2s;
 }
 
-.aviso.visible { opacity: 1; transform: translate(-50%, 0); }
+.aviso.visible { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.aviso { display: flex; align-items: center; gap: 16px; }
+.aviso-accion {
+  font: inherit;
+  font-weight: 700;
+  color: inherit;
+  background: none;
+  border: 1px solid currentColor;
+  border-radius: var(--radio-pequeno);
+  min-height: 40px;
+  padding: 4px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.papelera { margin-top: 24px; }
+.papelera summary { min-height: var(--alto-toque); display: flex; align-items: center; color: var(--texto-suave); cursor: pointer; }
 .aviso-error { background: var(--peligro); color: #fff; }
 
 .modal-fondo {

@@ -19,10 +19,15 @@ export function masRecienteAntes(a, b) {
 
 export function vistaHistorial(contenedor) {
   const d = estado.datos();
-  const sesiones = [...d.sesiones].sort(masRecienteAntes);
+  const sesiones = d.sesiones.filter((s) => !s.borrada).sort(masRecienteAntes);
+  const papelera = d.sesiones.filter((s) => s.borrada).sort(masRecienteAntes);
   anadir(contenedor,
     h('h1', {}, 'Historial'),
     sesiones.length
       ? sesiones.map((s) => resumenSesion(d, s))
-      : h('p', { class: 'suave' }, 'Todavía no hay entrenamientos registrados.'));
+      : h('p', { class: 'suave' }, 'Todavía no hay entrenamientos registrados.'),
+    papelera.length > 0 && h('details', { class: 'papelera' },
+      h('summary', {}, `Papelera (${papelera.length})`),
+      h('p', { class: 'nota' }, 'Los entrenamientos borrados se quedan aquí. Ábrelos para recuperarlos.'),
+      papelera.map((s) => resumenSesion(d, s))));
 }

@@ -4,9 +4,9 @@ import { masRecienteAntes, resumenSesion } from './historial.js';
 
 export function vistaInicio(contenedor) {
   const d = estado.datos();
-  const enCurso = d.sesiones.find((s) => s.estado === 'en-curso');
+  const enCurso = d.sesiones.find((s) => s.estado === 'en-curso' && !s.borrada);
   const activos = d.ejercicios.filter((e) => !e.archivado);
-  const recientes = d.sesiones.filter((s) => s.estado === 'terminada')
+  const recientes = d.sesiones.filter((s) => s.estado === 'terminada' && !s.borrada)
     .sort(masRecienteAntes).slice(0, 3);
   const necesitaPeso = d.perfil.pesoCorporalKg == null
     && activos.some((e) => ['asistida', 'pesoCorporal'].includes(e.carga.tipo));

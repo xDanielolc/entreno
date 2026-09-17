@@ -42,7 +42,7 @@ export function seriesDeEjercicio(datos, ejercicioId, { excluirSesion } = {}) {
   const sesiones = [...datos.sesiones].sort((a, b) =>
     (a.fecha + (a.inicio || '')).localeCompare(b.fecha + (b.inicio || '')));
   for (const sesion of sesiones) {
-    if (sesion.id === excluirSesion) continue;
+    if (sesion.id === excluirSesion || sesion.borrada) continue;
     for (const entrada of sesion.ejercicios) {
       if (entrada.ejercicioId !== ejercicioId) continue;
       for (const serie of entrada.series) {

@@ -3,7 +3,7 @@ import {
 } from '../calculos.js';
 import * as estado from '../estado.js';
 import { TECNICAS, TIPOS_CARGA, TIPOS_ESFUERZO, TIPOS_SERIE } from '../esquema.js';
-import { anadir, confirmar, h, leerNumero, modal, nuevoId } from '../ui.js';
+import { anadir, aviso, confirmar, h, leerNumero, modal, nuevoId } from '../ui.js';
 
 export function vistaSesion(contenedor, { id }) {
   const d = estado.datos();
@@ -22,6 +22,10 @@ export function vistaSesion(contenedor, { id }) {
   }, opciones);
 
   anadir(contenedor,
+    sesion.borrada && h('div', { class: 'tarjeta aviso-tarjeta' },
+      h('p', {}, 'Este entrenamiento está en la papelera: no cuenta para tu progresión.'),
+      h('button', { class: 'boton', onclick: recuperar }, 'Recuperar entrenamiento')),
+
     h('div', { class: 'cabecera-vista' },
       h('h1', {}, sesion.estado === 'en-curso' ? 'Entrenando' : 'Entrenamiento'),
       h('input', { type: 'date', class: 'fecha', value: sesion.fecha, 'aria-label': 'Fecha',
@@ -40,7 +44,7 @@ export function vistaSesion(contenedor, { id }) {
       ? h('button', { class: 'boton grande', onclick: terminar }, 'Terminar entrenamiento')
       : h('a', { class: 'boton secundario', href: '#/historial' }, 'Volver al historial'),
 
-    h('button', { class: 'boton enlace peligro-texto', onclick: borrar }, 'Borrar este entrenamiento'));
+    !sesion.borrada && h('button', { class: 'boton enlace peligro-texto', onclick: borrar }, 'Mover este entrenamiento a la papelera'));
 
   // -------------------------------------------------------------------------
 
@@ -128,9 +132,7 @@ export function vistaSesion(contenedor, { id }) {
         h('option', { value: '' }, 'Técnica…'),
         Object.entries(TECNICAS).map(([k, v]) => h('option', { value: k, selected: k === serie.tecnica }, v))),
         marcaObjetivo,
-        h('button', { class: 'boton-icono', 'aria-label': 'Borrar serie', onclick: () => cambiarSesion((s) => {
-          s.ejercicios[i].series.splice(j, 1);
-        }) }, '🗑')),
+        h('button', { class: 'boton-icono', 'aria-label': 'Borrar serie', onclick: () => borrarSerie(i, j) }, '🗑')),
 
       h('div', { class: 'serie-valores' },
         conCarga && (asistida
@@ -207,10 +209,20 @@ export function vistaSesion(contenedor, { id }) {
     });
   }
 
-  async function quitarEjercicio(i, ej) {
-    const conDatos = sesion.ejercicios[i].series.some((x) => x.hecha);
-    if (conDatos && !await confirmar(`¿Quitar ${ej.nombre} de este entrenamiento? Se borran sus series.`, { si: 'Quitar', peligro: true })) return;
-    cambiarSesion((s) => { s.ejercicios.splice(i, 1); });
+  // Borrar series y ejercicios no pide confirmación (sería lento en pleno
+  // entrenamiento), pero se puede deshacer durante unos segundos.
+  function borrarSerie(i, j) {
+    let quitada;
+    cambiarSesion((s) => { [quitada] = s.ejercicios[i].series.splice(j, 1); });
+    aviso('Serie borrada', { accion: { texto: 'Deshacer',
+      fn: () => cambiarSesion((s) => { s.ejercicios[i]?.series.splice(j, 0, quitada); }) } });
+  }
+
+  function quitarEjercicio(i, ej) {
+    let quitada;
+    cambiarSesion((s) => { [quitada] = s.ejercicios.splice(i, 1); });
+    aviso(`${ej.nombre} quitado`, { accion: { texto: 'Deshacer',
+      fn: () => cambiarSesion((s) => { s.ejercicios.splice(i, 0, quitada); }) } });
   }
 
   function elegirEjercicio() {
@@ -243,10 +255,17 @@ export function vistaSesion(contenedor, { id }) {
     location.hash = '#/';
   }
 
+  // Un entrenamiento nunca se borra del todo: va a la papelera del historial.
   async function borrar() {
-    if (!await confirmar('¿Borrar este entrenamiento entero? No se puede deshacer.', { si: 'Borrar', peligro: true })) return;
-    estado.cambiar((datos) => { datos.sesiones = datos.sesiones.filter((s) => s.id !== id); });
-    location.hash = '#/';
+    if (!await confirmar('¿Mover este entrenamiento a la papelera? Dejará de contar para tu progresión, pero podrás recuperarlo desde el historial.', { si: 'Mover a la papelera', peligro: true })) return;
+    cambiarSesion((s) => { s.borrada = new Date().toISOString(); });
+    location.hash = '#/historial';
+    aviso('Entrenamiento en la papelera', { accion: { texto: 'Deshacer', fn: recuperar } });
+  }
+
+  function recuperar() {
+    cambiarSesion((s) => { s.borrada = null; });
+    aviso('Entrenamiento recuperado');
   }
 }
 

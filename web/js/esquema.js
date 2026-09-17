@@ -23,7 +23,7 @@ export const TIPOS_ESFUERZO = {
 
 export const TIPOS_PROGRESION = {
   bilbo:    { etiqueta: 'Bilbo',     descripcion: 'Ciclo de días con el peso de cada día fijado de antemano. Cada día intentas superar tu 1RM anterior.' },
-  carga:    { etiqueta: 'Por carga', descripcion: 'Cuando llegas al máximo de repeticiones, subes peso.' },
+  carga:    { etiqueta: 'Doble progresión', descripcion: 'Trabajas en un rango de repeticiones, por ejemplo de 8 a 12. Primero subes repeticiones con el mismo peso; al llegar a 12, subes peso y vuelves a empezar por 8.' },
   esfuerzo: { etiqueta: 'Por esfuerzo', descripcion: 'El peso no cambia; intentas hacer algo más cada vez.' },
   libre:    { etiqueta: 'Libre',     descripcion: 'La app solo registra y te recuerda lo último que hiciste.' },
 };
