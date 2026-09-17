@@ -46,8 +46,11 @@ https://xdanielolc.github.io/entreno/.
 
 ## Pendiente
 
-- Imágenes de los ejercicios: elegir biblioteca libre (wger, CC-BY-SA, es la
-  favorita) y meterla con su atribución. Las de Strength Level NO se pueden usar.
+- Temas visuales (al final, con Claude Design): Fallout años 50, pixel art,
+  arcano, heavy metal, terminal con toque Matrix y gimnasio ochentero. El
+  encargo ya está escrito en `docs/encargo-para-design.md`.
+- Dibujo propio del cuerpo: el actual es de wger y funciona; mejorarlo con
+  Design usando el segundo encargo de ese mismo archivo.
 - Al terminar un entrenamiento, preguntar si los cambios sobre la rutina son
   solo para hoy o permanentes (el esquema ya lo contempla).
 - Calibrar el 1RM por ejercicio con series de prueba de pocas repeticiones:
