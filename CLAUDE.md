@@ -46,10 +46,21 @@ https://xdanielolc.github.io/entreno/.
 
 ## Pendiente
 
-- Rutinas: guiar qué toca hoy y preguntar al terminar si los cambios son solo
-  para hoy o permanentes (el esquema ya lo contempla).
+- Imágenes de los ejercicios: elegir biblioteca libre (wger, CC-BY-SA, es la
+  favorita) y meterla con su atribución. Las de Strength Level NO se pueden usar.
+- Al terminar un entrenamiento, preguntar si los cambios sobre la rutina son
+  solo para hoy o permanentes (el esquema ya lo contempla).
+- Calibrar el 1RM por ejercicio con series de prueba de pocas repeticiones:
+  las fórmulas fallan un 10-25 % por encima de 15 repeticiones, y en hombros más.
 - Sedes (gimnasios) en la interfaz.
 - Importar el historial de las hojas de cálculo (`herramientas/importar_excel.py`
   ya genera el JSON; falta la pantalla para cargarlo). Aparcado a petición suya.
 - Publicar la pantalla de consentimiento de Google (ahora en «Prueba») cuando
   la usen familiares y amigos.
+
+## Hecho (no rehacer)
+
+Rutinas con día automático y modo de uno en uno; series con progresión propia
+por ejercicio; técnicas de intensidad combinables con sus medidas; recámara;
+progresión «máximo trabajo»; gráficas de 1RM y trabajo por ciclos; cronómetro
+de descanso; catálogo de ejercicios predefinidos; papelera y deshacer.
