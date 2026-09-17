@@ -7,6 +7,7 @@ import {
   progresionPorDefecto, serieNuevaPlantilla, sobrePorDefecto, tramosDe,
 } from '../esquema.js';
 import { buscarEnCatalogo } from '../catalogo.js';
+import { MUSCULOS, ORDEN_MUSCULOS } from '../musculos.js';
 import { seccionProgreso } from './graficas.js';
 import { anadir, aviso, confirmar, h, leerNumero, modal, nuevoId } from '../ui.js';
 import { selectorTecnicas } from './tecnicas.js';
@@ -96,6 +97,7 @@ function ejercicioVacio() {
     esfuerzo: { tipo: 'repeticiones' },
     esfuerzoExtra: null,
     formula1RM: 'epley',
+    musculos: { principales: [], secundarios: [] },
     series: [],
     notas: '',
   };
@@ -113,6 +115,7 @@ export function vistaFormularioEjercicio(contenedor, { id }) {
   // Se edita un borrador: nada se guarda hasta pulsar «Guardar».
   const borrador = existente ? structuredClone(existente) : ejercicioVacio();
   borrador.series ??= [];
+  borrador.musculos ??= { principales: [], secundarios: [] };
   const grupos = [...new Set(d.ejercicios.map((e) => e.grupo).filter(Boolean))];
   const peso = d.perfil.pesoCorporalKg;
 
@@ -151,6 +154,7 @@ export function vistaFormularioEjercicio(contenedor, { id }) {
     borrador.carga = { tipo: x.carga || 'peso' };
     borrador.esfuerzo = { tipo: x.esfuerzo || 'repeticiones' };
     borrador.esfuerzoExtra = x.distancia ? { tipo: 'distancia', opcional: true } : null;
+    borrador.musculos = { principales: [...(x.musculos?.principales ?? [])], secundarios: [...(x.musculos?.secundarios ?? [])] };
     for (const plan of borrador.series) plan.progresion.sobre = sobrePorDefecto(borrador);
     repintar();
   }
@@ -187,6 +191,13 @@ export function vistaFormularioEjercicio(contenedor, { id }) {
           'Apuntar también la distancia (opcional en cada serie)')),
 
       h('fieldset', {},
+        h('legend', {}, '¿Qué músculos trabaja?'),
+        h('p', { class: 'nota' }, 'Sirve para el mapa de recuperación y para los avisos de volumen. '
+          + 'Los secundarios cuentan la mitad.'),
+        selectorMusculos('Principales', borrador.musculos.principales, borrador.musculos.secundarios),
+        selectorMusculos('Secundarios', borrador.musculos.secundarios, borrador.musculos.principales)),
+
+      h('fieldset', {},
         h('legend', {}, 'Series de este ejercicio'),
         h('p', { class: 'nota' },
           'Son las series que aparecerán al añadirlo a un entrenamiento. Cada una progresa a su manera: '
@@ -209,6 +220,29 @@ export function vistaFormularioEjercicio(contenedor, { id }) {
 
       existente && h('button', { type: 'button', class: 'boton enlace', onclick: archivar },
         borrador.archivado ? 'Recuperar ejercicio' : 'Archivar ejercicio'));
+  }
+
+  // Chips de músculos: al tocar uno se añade o se quita. Un músculo no puede
+  // ser principal y secundario a la vez.
+  function selectorMusculos(etiqueta, lista, otraLista) {
+    return h('div', { class: 'campo' },
+      h('span', { class: 'etiqueta-campo' }, etiqueta),
+      h('div', { class: 'tecnicas' },
+        ORDEN_MUSCULOS.map((m) => h('button', {
+          type: 'button',
+          class: `chip seleccionable ${lista.includes(m) ? 'activo' : ''}`,
+          'aria-pressed': String(lista.includes(m)),
+          onclick: () => {
+            const i = lista.indexOf(m);
+            if (i >= 0) lista.splice(i, 1);
+            else {
+              lista.push(m);
+              const j = otraLista.indexOf(m);
+              if (j >= 0) otraLista.splice(j, 1);
+            }
+            repintar();
+          },
+        }, MUSCULOS[m].nombre))));
   }
 
   function tarjetaPlan(plan, i) {

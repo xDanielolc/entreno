@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 5;
+export const VERSION_ACTUAL = 6;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -232,6 +232,14 @@ const MIGRACIONES = {
   4: (datos) => {
     datos.perfil.dropSet ??= { bajadas: 4, salto: 10, inicioPorcentaje: 80 };
     datos.version = 5;
+    return datos;
+  },
+
+  // v6: cada ejercicio guarda qué músculos trabaja, para el mapa del cuerpo
+  // y los avisos de volumen.
+  5: (datos) => {
+    for (const ej of datos.ejercicios) ej.musculos ??= { principales: [], secundarios: [] };
+    datos.version = 6;
     return datos;
   },
 };

@@ -615,3 +615,49 @@ input.fecha { width: auto; }
 .fuente summary { min-height: var(--alto-toque); display: flex; align-items: center; font-weight: 600; cursor: pointer; }
 .fuente ul { padding-left: 18px; font-size: 0.85rem; }
 .fuente li { margin-bottom: 6px; }
+
+/* --------------------------------------------------------------------------
+   Mapa del cuerpo y volumen
+   -------------------------------------------------------------------------- */
+
+.recuperacion .cabecera-tarjeta { align-items: center; }
+
+.anillo {
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 2px solid currentColor;
+}
+
+.anillo.listo, .punto.listo { color: var(--bien); }
+.anillo.medio, .punto.medio { color: var(--aviso); }
+.anillo.cansado, .punto.cansado { color: var(--peligro); }
+
+.cuerpos { display: flex; justify-content: center; gap: 12px; margin: 8px 0; }
+
+.cuerpo { width: 45%; max-width: 170px; height: auto; }
+.cuerpo .silueta { fill: var(--superficie-2); stroke: var(--borde); stroke-width: 0.8; }
+.cuerpo .musculo path { stroke: var(--superficie); stroke-width: 0.4; }
+.cuerpo .musculo.listo path { fill: var(--bien); }
+.cuerpo .musculo.medio path { fill: var(--aviso); }
+.cuerpo .musculo.cansado path { fill: var(--peligro); }
+.cuerpo .musculo.sin-datos path { fill: var(--borde); }
+
+.lista-musculos { list-style: none; margin: 8px 0 0; padding: 0; font-size: 0.9rem; }
+.lista-musculos li { display: flex; align-items: center; gap: 8px; padding: 3px 0; }
+
+.punto { width: 10px; height: 10px; border-radius: 50%; background: currentColor; flex: 0 0 auto; }
+
+.barras-musculo { display: grid; gap: 6px; margin-bottom: 10px; }
+.barra-musculo { display: grid; grid-template-columns: 90px 1fr 34px; align-items: center; gap: 8px; font-size: 0.85rem; }
+.barra-musculo .nombre { color: var(--texto-suave); }
+.barra-musculo .valor { text-align: right; font-variant-numeric: tabular-nums; }
+.barra-musculo .barra { display: block; height: 10px; border-radius: 999px; background: var(--superficie-2); overflow: hidden; }
+.barra-musculo .barra span { display: block; height: 100%; background: var(--acento); }
+.barra-musculo .barra.poco span { background: var(--aviso); }
+.barra-musculo .barra.mucho span { background: var(--peligro); }
+
+.aviso-texto { color: var(--aviso); font-size: 0.9rem; }
+
+.chip.seleccionable { background: var(--superficie-2); cursor: pointer; border: 1px solid var(--borde); font: inherit; font-size: 0.85rem; min-height: 36px; }
+.chip.seleccionable.activo { background: var(--acento-suave); border-color: var(--acento); font-weight: 600; }
