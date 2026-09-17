@@ -1,0 +1,233 @@
+{
+ "fuente": "wger.de",
+ "licencia": "Creative Commons Atribución-CompartirIgual (CC-BY-SA)",
+ "musculos": {
+  "trapecio": {
+   "archivo": "imagenes/musculos/trapecio.svg",
+   "wger": "Trapezius",
+   "delante": false
+  },
+  "hombro": {
+   "archivo": "imagenes/musculos/hombro.svg",
+   "wger": "Anterior deltoid",
+   "delante": true
+  },
+  "pecho": {
+   "archivo": "imagenes/musculos/pecho.svg",
+   "wger": "Pectoralis major",
+   "delante": true
+  },
+  "biceps": {
+   "archivo": "imagenes/musculos/biceps.svg",
+   "wger": "Biceps brachii",
+   "delante": true
+  },
+  "triceps": {
+   "archivo": "imagenes/musculos/triceps.svg",
+   "wger": "Triceps brachii",
+   "delante": false
+  },
+  "abdomen": {
+   "archivo": "imagenes/musculos/abdomen.svg",
+   "wger": "Rectus abdominis",
+   "delante": true
+  },
+  "oblicuos": {
+   "archivo": "imagenes/musculos/oblicuos.svg",
+   "wger": "Obliquus externus abdominis",
+   "delante": true
+  },
+  "dorsal": {
+   "archivo": "imagenes/musculos/dorsal.svg",
+   "wger": "Latissimus dorsi",
+   "delante": false
+  },
+  "gluteo": {
+   "archivo": "imagenes/musculos/gluteo.svg",
+   "wger": "Gluteus maximus",
+   "delante": false
+  },
+  "cuadriceps": {
+   "archivo": "imagenes/musculos/cuadriceps.svg",
+   "wger": "Quadriceps femoris",
+   "delante": true
+  },
+  "isquios": {
+   "archivo": "imagenes/musculos/isquios.svg",
+   "wger": "Biceps femoris",
+   "delante": false
+  },
+  "gemelo": {
+   "archivo": "imagenes/musculos/gemelo.svg",
+   "wger": "Gastrocnemius",
+   "delante": false
+  }
+ },
+ "ejercicios": {
+  "Press de banca": {
+   "archivo": "imagenes/ejercicios/press-de-banca.png",
+   "autor": "Everkinetic",
+   "nombreEnWger": "Press de Banca"
+  },
+  "Press de banca con mancuernas": {
+   "archivo": "imagenes/ejercicios/press-de-banca-con-mancuernas.png",
+   "autor": "Everkinetic",
+   "nombreEnWger": "Press de banca con mancuernas"
+  },
+  "Press inclinado": {
+   "archivo": "imagenes/ejercicios/press-inclinado.png",
+   "autor": "Everkinetic",
+   "nombreEnWger": "Press inclinado con mancuernas"
+  },
+  "Aperturas de pecho": {
+   "archivo": "imagenes/ejercicios/aperturas-de-pecho.png",
+   "autor": "wger",
+   "nombreEnWger": "Aperturas en Máquina para Pecho"
+  },
+  "Fondos de tríceps": {
+   "archivo": "imagenes/ejercicios/fondos-de-triceps.png",
+   "autor": "Franpol",
+   "nombreEnWger": "Fondos"
+  },
+  "Fondos asistidos": {
+   "archivo": "imagenes/ejercicios/fondos-asistidos.png",
+   "autor": "Franpol",
+   "nombreEnWger": "Fondos"
+  },
+  "Press militar": {
+   "archivo": "imagenes/ejercicios/press-militar.png",
+   "autor": "Franpol",
+   "nombreEnWger": "Press militar"
+  },
+  "Press de hombro en máquina": {
+   "archivo": "imagenes/ejercicios/press-de-hombro-en-maquina.png",
+   "autor": "wger.de",
+   "nombreEnWger": "Press de hombro con maquina"
+  },
+  "Extensión de tríceps en polea": {
+   "archivo": "imagenes/ejercicios/extension-de-triceps-en-polea.png",
+   "autor": "Franpol",
+   "nombreEnWger": "Extension de triceps polea"
+  },
+  "Extensión de tríceps en máquina": {
+   "archivo": "imagenes/ejercicios/extension-de-triceps-en-maquina.png",
+   "autor": "Franpol",
+   "nombreEnWger": "Barbell Triceps Extension"
+  },
+  "Flexiones": {
+   "archivo": "imagenes/ejercicios/flexiones.png",
+   "autor": "wger",
+   "nombreEnWger": "Flexiones en pino"
+  },
+  "Dominadas": {
+   "archivo": "imagenes/ejercicios/dominadas.jpg",
+   "autor": "Imobard",
+   "nombreEnWger": "Dominadas"
+  },
+  "Dominadas asistidas": {
+   "archivo": "imagenes/ejercicios/dominadas-asistidas.jpg",
+   "autor": "Imobard",
+   "nombreEnWger": "Dominadas"
+  },
+  "Jalón al pecho": {
+   "archivo": "imagenes/ejercicios/jalon-al-pecho.png",
+   "autor": "Franpol",
+   "nombreEnWger": "Jalón al Pecho con Agarre Cerrado"
+  },
+  "Remo en polea": {
+   "archivo": "imagenes/ejercicios/remo-en-polea.jpg",
+   "autor": "technofer",
+   "nombreEnWger": "Remo unilateral en polea"
+  },
+  "Remo en máquina": {
+   "archivo": "imagenes/ejercicios/remo-en-maquina.png",
+   "autor": "barry",
+   "nombreEnWger": "Remo sentado (máquina)"
+  },
+  "Face pull": {
+   "archivo": "imagenes/ejercicios/face-pull.webp",
+   "autor": "AlucardEvil40",
+   "nombreEnWger": "Dumbbell Bent Over Face Pull"
+  },
+  "Curl de bíceps con barra": {
+   "archivo": "imagenes/ejercicios/curl-de-biceps-con-barra.png",
+   "autor": "Franpol",
+   "nombreEnWger": "Curl de biceps con barra Z"
+  },
+  "Curl martillo": {
+   "archivo": "imagenes/ejercicios/curl-martillo.png",
+   "autor": "Everkinetic",
+   "nombreEnWger": "Curl Martillo"
+  },
+  "Curl de bíceps en máquina": {
+   "archivo": "imagenes/ejercicios/curl-de-biceps-en-maquina.png",
+   "autor": "Everkinetic",
+   "nombreEnWger": "Curl biceps à la barre"
+  },
+  "Sentadilla": {
+   "archivo": "imagenes/ejercicios/sentadilla.jpeg",
+   "autor": "philip",
+   "nombreEnWger": "Sentadilla con disco"
+  },
+  "Prensa de piernas": {
+   "archivo": "imagenes/ejercicios/prensa-de-piernas.webp",
+   "autor": "wger",
+   "nombreEnWger": "Prensa de piernas"
+  },
+  "Peso muerto": {
+   "archivo": "imagenes/ejercicios/peso-muerto.jpeg",
+   "autor": "philip",
+   "nombreEnWger": "Peso Muerto Convencional"
+  },
+  "Peso muerto rumano": {
+   "archivo": "imagenes/ejercicios/peso-muerto-rumano.png",
+   "autor": "wger",
+   "nombreEnWger": "Peso muerto rumano con barra"
+  },
+  "Zancadas": {
+   "archivo": "imagenes/ejercicios/zancadas.png",
+   "autor": "Franpol",
+   "nombreEnWger": "Zancadas con peso"
+  },
+  "Curl femoral tumbado": {
+   "archivo": "imagenes/ejercicios/curl-femoral-tumbado.png",
+   "autor": "Franpol",
+   "nombreEnWger": "Curl femoral"
+  },
+  "Curl femoral sentado": {
+   "archivo": "imagenes/ejercicios/curl-femoral-sentado.png",
+   "autor": "Everkinetic",
+   "nombreEnWger": "Curl femoral sentado"
+  },
+  "Elevación de gemelos": {
+   "archivo": "imagenes/ejercicios/elevacion-de-gemelos.jpeg",
+   "autor": "AlucardEvil40",
+   "nombreEnWger": "Elevación de gemelos sentado con mancuerna"
+  },
+  "Crunch abdominal": {
+   "archivo": "imagenes/ejercicios/crunch-abdominal.png",
+   "autor": "wger",
+   "nombreEnWger": "Abdominal"
+  },
+  "Plancha": {
+   "archivo": "imagenes/ejercicios/plancha.png",
+   "autor": "utkb",
+   "nombreEnWger": "Plancha de antebrazo"
+  },
+  "Rueda abdominal": {
+   "archivo": "imagenes/ejercicios/rueda-abdominal.jpg",
+   "autor": "wger",
+   "nombreEnWger": "Rueda abdominal"
+  },
+  "Press pallof": {
+   "archivo": "imagenes/ejercicios/press-pallof.png",
+   "autor": "wger",
+   "nombreEnWger": "Pallof Press"
+  },
+  "Elevaciones de piernas": {
+   "archivo": "imagenes/ejercicios/elevaciones-de-piernas.png",
+   "autor": "Everkinetic",
+   "nombreEnWger": "Elevaciones de piernas tumbado"
+  }
+ }
+}

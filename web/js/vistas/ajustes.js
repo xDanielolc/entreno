@@ -1,4 +1,5 @@
 import { BIBLIOGRAFIA } from '../bibliografia.js';
+import { creditosCargados } from '../imagenes.js';
 import { formatearNumero } from '../calculos.js';
 import * as estado from '../estado.js';
 import { desconectar, sincronizar, situacionActual } from '../sincronizacion.js';
@@ -101,6 +102,17 @@ export function vistaAjustes(contenedor) {
         ],
       h('button', { class: 'boton secundario', onclick: descargarCopia }, 'Descargar una copia de mis datos'),
       h('button', { class: 'boton enlace', onclick: salir }, sinCuenta ? 'Salir del modo de prueba' : 'Salir de la cuenta')),
+
+    h('section', { class: 'tarjeta' },
+      h('h2', {}, 'Créditos de las imágenes'),
+      h('p', { class: 'nota' },
+        'Los dibujos del cuerpo y de los ejercicios vienen de ',
+        h('a', { href: 'https://wger.de', target: '_blank', rel: 'noopener' }, 'wger.de'),
+        ', con licencia Creative Commons Atribución-CompartirIgual (CC-BY-SA). '
+        + 'Se usan citando a sus autores y manteniendo esa licencia.'),
+      h('p', { class: 'nota' },
+        `Imágenes incluidas: ${Object.keys(creditosCargados()?.ejercicios ?? {}).length} de ejercicios `
+        + `y ${Object.keys(creditosCargados()?.musculos ?? {}).length} capas de músculo.`)),
 
     h('p', { class: 'nota centrado' },
       `Versión ${VERSION_APP} · formato de datos v${d.version} · revisión ${formatearNumero(d.revision)}`));

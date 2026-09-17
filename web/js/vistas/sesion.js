@@ -6,6 +6,7 @@ import * as estado from '../estado.js';
 import {
   TIPOS_CARGA, TIPOS_ESFUERZO, TIPOS_SERIE, camposDe, recamaraDe, tipoDeFallo, tramosDe,
 } from '../esquema.js';
+import { imagenDe } from '../imagenes.js';
 import { crearSerieDesdePlan, serieSuelta } from '../series.js';
 import { anadir, aviso, confirmar, h, leerNumero, modal, nuevoId } from '../ui.js';
 import { arrancarDescanso, barraDescanso } from './descanso.js';
@@ -90,7 +91,8 @@ export function vistaSesion(contenedor, { id }) {
     if (!ej) return h('div', { class: 'tarjeta' }, 'Ejercicio borrado');
     return h('article', { class: 'tarjeta ejercicio-sesion' },
       h('div', { class: 'cabecera-tarjeta' },
-        h('h2', {}, ej.nombre),
+        imagenDe(ej.nombre) && h('img', { class: 'miniatura', src: imagenDe(ej.nombre).archivo, alt: '', loading: 'lazy' }),
+        h('h2', { class: 'crece' }, ej.nombre),
         h('button', { class: 'boton-icono', 'aria-label': `Quitar ${ej.nombre}`,
           onclick: () => quitarEjercicio(indice, ej) }, '✕')),
 

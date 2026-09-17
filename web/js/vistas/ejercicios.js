@@ -9,6 +9,7 @@ import {
 import { CATALOGO, buscarEnCatalogo } from '../catalogo.js';
 import { MUSCULOS, ORDEN_MUSCULOS } from '../musculos.js';
 import { seccionProgreso } from './graficas.js';
+import { imagenDe } from '../imagenes.js';
 import { anadir, aviso, confirmar, h, leerNumero, modal, nuevoId } from '../ui.js';
 import { selectorTecnicas } from './tecnicas.js';
 
@@ -75,8 +76,10 @@ function tarjetaEjercicio(datos, ej) {
     const hechos = registrosDelCiclo(datos, ej, plan, ciclo.n).length;
     return `${TIPOS_SERIE[plan.tipo]}: ciclo ${ciclo.n}, día ${Math.min(hechos + 1, ciclo.escalera.length)} de ${ciclo.escalera.length}`;
   });
+  const imagen = imagenDe(ej.nombre);
   return h('a', { class: `tarjeta fila-enlace ${ej.archivado ? 'archivado' : ''}`, href: `#/ejercicio/${ej.id}` },
-    h('div', {},
+    imagen && h('img', { class: 'miniatura', src: imagen.archivo, alt: '', loading: 'lazy' }),
+    h('div', { class: 'crece' },
       h('strong', {}, ej.nombre),
       h('div', { class: 'suave' }, partes.join(' · ') || 'Sin series configuradas')),
     ej.archivado && h('span', { class: 'etiqueta' }, 'Archivado'));
@@ -120,8 +123,12 @@ export function vistaFormularioEjercicio(contenedor, { id }) {
   const peso = d.perfil.pesoCorporalKg;
 
   const zona = h('div');
+  const imagenFicha = existente ? imagenDe(existente.nombre) : null;
   anadir(contenedor,
     h('h1', {}, existente ? borrador.nombre || 'Editar ejercicio' : 'Nuevo ejercicio'),
+    imagenFicha && h('figure', { class: 'imagen-ejercicio' },
+      h('img', { src: imagenFicha.archivo, alt: `Ilustración de ${existente.nombre}`, loading: 'lazy' }),
+      h('figcaption', { class: 'nota' }, `Imagen: ${imagenFicha.autor} · wger, CC-BY-SA`)),
     existente && seccionProgreso(d, existente),
     zona);
 

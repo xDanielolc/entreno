@@ -2,7 +2,7 @@
 // más el volumen de la semana con sus avisos.
 
 import * as estado from '../estado.js';
-import { MUSCULOS, ORDEN_MUSCULOS, siluetaSVG } from '../musculos.js';
+import { MUSCULOS, ORDEN_MUSCULOS, siluetaCuerpo } from '../musculos.js';
 import {
   claseDeRecuperacion, recuperacionPorMusculo, seriesSemanales, textoDeRecuperacion,
 } from '../recuperacion.js';
@@ -32,8 +32,8 @@ export function tarjetaRecuperacion(datos, { compacta = false } = {}) {
       h('span', { class: `anillo ${claseDeRecuperacion(media)}` }, `${media} %`)),
 
     h('div', { class: 'cuerpos' },
-      siluetaSVG({ vista: 'delante', estadoPorMusculo: estados }),
-      siluetaSVG({ vista: 'detras', estadoPorMusculo: estados })),
+      siluetaCuerpo({ vista: 'delante', estadoPorMusculo: estados }),
+      siluetaCuerpo({ vista: 'detras', estadoPorMusculo: estados })),
 
     sinMusculos.length > 0 && h('p', { class: 'aviso-texto' },
       `${sinMusculos.length} ejercicio${sinMusculos.length > 1 ? 's' : ''} sin músculos asignados: `

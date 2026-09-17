@@ -2,6 +2,7 @@
 
 import * as local from './almacen-local.js';
 import * as estado from './estado.js';
+import { cargarCreditos } from './imagenes.js';
 import { sincronizar, situacionActual } from './sincronizacion.js';
 import { aviso, h } from './ui.js';
 import { textoSituacion, vistaAjustes } from './vistas/ajustes.js';
@@ -99,6 +100,7 @@ window.addEventListener('hashchange', renderizar);
 
 async function arrancar() {
   registrarServiceWorker();
+  cargarCreditos().then(() => estado.emitir('vista'));
   const ultimo = local.ultimoUsuario();
   if (ultimo) {
     try {

@@ -28,3 +28,11 @@ http://localhost:8000.
 1. Subir el número en `web/js/version.js` y en `VERSION` de `web/sw.js`.
 2. Guardar en Git y subir a GitHub. La publicación es automática y los móviles
    reciben la versión nueva la siguiente vez que abren la app.
+
+## Créditos
+
+Las imágenes de los ejercicios y del mapa muscular proceden de
+[wger](https://wger.de), con licencia Creative Commons
+Atribución-CompartirIgual (CC-BY-SA). Cada imagen conserva a su autor en
+`web/imagenes/creditos.json` y la app los muestra en Ajustes. Se descargan con
+`herramientas/descargar_imagenes.py`.
