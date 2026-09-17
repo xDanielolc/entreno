@@ -175,6 +175,17 @@ export function aPasoDeDisco(kg, paso = 2.5) {
   return redondear(Math.round(kg / paso) * paso, 2);
 }
 
+// 1RM de referencia para los porcentajes: el mejor del ciclo en curso y, si
+// no hay, el mejor de todo el historial del ejercicio.
+export function rmDeReferencia(datos, ejercicio, { cicloN, excluirSesion } = {}) {
+  const series = seriesDeEjercicio(datos, ejercicio.id, { excluirSesion });
+  const delCiclo = cicloN != null ? series.filter((x) => x.entrada.cicloN === cicloN) : [];
+  const candidatas = delCiclo.length ? delCiclo : series;
+  const rms = candidatas.map((x) => epley(x.serie.carga, esfuerzoTotal(x.serie))).filter(Boolean);
+  if (!rms.length) return null;
+  return { valor: redondear(Math.max(...rms), 1), delCiclo: Boolean(delCiclo.length) };
+}
+
 // ---------------------------------------------------------------------------
 // Máximo trabajo
 // ---------------------------------------------------------------------------
@@ -256,10 +267,10 @@ export function maximoTrabajo(datos, ejercicio, { excluirSesion, tope = 50 } = {
 // la serie y de la última vez que se hizo.
 export function tramosPropuestos(serie, plan, ultima) {
   const config = tramosDe(serie.tecnicas);
-  const previstos = plan?.tramosPrevistos || ultima?.tramos?.length || 4;
+  const previstos = plan?.tramosPrevistos || plan?.dropSet?.bajadas || ultima?.tramos?.length || 4;
   // Se baja siempre lo mismo (por defecto 10 kg, o lo que tenga el ejercicio):
   // una escalera lineal es más fácil de seguir en el gimnasio que un porcentaje.
-  const salto = plan?.tramoSalto ?? config?.salto ?? 0;
+  const salto = plan?.tramoSalto ?? plan?.dropSet?.salto ?? config?.salto ?? 0;
   const tramos = [];
   for (let i = 0; i < previstos; i++) {
     const deUltima = ultima?.tramos?.[i];

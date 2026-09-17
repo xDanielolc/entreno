@@ -605,3 +605,13 @@ input.fecha { width: auto; }
 .tabla-datos th, .tabla-datos td { padding: 4px 6px; text-align: right; border-bottom: 1px solid var(--borde); }
 .tabla-datos thead th { color: var(--texto-suave); font-weight: 600; }
 .tabla-datos tbody th { text-align: left; color: var(--texto-suave); font-weight: 400; }
+
+/* Kilos y porcentaje enlazados */
+.carga-con-porcentaje { display: flex; gap: 8px; flex: 1 1 200px; }
+.carga-con-porcentaje .valor { flex: 1 1 90px; }
+.carga-con-porcentaje input.porcentaje { font-size: 1rem; max-width: 70px; }
+
+.fuente { border-bottom: 1px solid var(--borde); }
+.fuente summary { min-height: var(--alto-toque); display: flex; align-items: center; font-weight: 600; cursor: pointer; }
+.fuente ul { padding-left: 18px; font-size: 0.85rem; }
+.fuente li { margin-bottom: 6px; }

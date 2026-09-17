@@ -1,6 +1,6 @@
 import {
-  aPasoDeDisco, cargaDesdeLectura, epley, esfuerzoTotal, formatearNumero, records,
-  registrosDelCiclo, sugerenciaSerie, trabajoSerie, tramosPropuestos, usaTramos,
+  aPasoDeDisco, cargaDesdeLectura, esfuerzoTotal, formatearNumero, records,
+  rmDeReferencia, sugerenciaSerie, trabajoSerie, tramosPropuestos, usaTramos,
 } from '../calculos.js';
 import * as estado from '../estado.js';
 import {
@@ -106,17 +106,13 @@ export function vistaSesion(contenedor, { id }) {
   // El mejor 1RM estimado del ciclo en curso, con sus porcentajes: sirve para
   // saber con cuánto empezar un drop set («al 80 %»).
   function referencia1RM(ej, entrada) {
-    if (ej.carga?.tipo === 'ninguna' || entrada.cicloN == null) return null;
-    const plan = (ej.series || []).find((p) => p.progresion?.tipo === 'bilbo');
-    if (!plan) return null;
-    const registros = registrosDelCiclo(d, ej, plan, entrada.cicloN, { excluirSesion: null });
-    const rms = registros.map((r) => epley(r.serie.carga, esfuerzoTotal(r.serie))).filter(Boolean);
-    if (!rms.length) return null;
-    const rm = Math.max(...rms);
+    if (ej.carga?.tipo === 'ninguna') return null;
+    const rm = rmDeReferencia(d, ej, { cicloN: entrada.cicloN });
+    if (!rm) return null;
     return h('p', { class: 'nota' },
-      `1RM estimado del ciclo: ${formatearNumero(Math.round(rm))} kg · `
-      + `80 % = ${formatearNumero(aPasoDeDisco(rm * 0.8))} · 70 % = ${formatearNumero(aPasoDeDisco(rm * 0.7))} · `
-      + `60 % = ${formatearNumero(aPasoDeDisco(rm * 0.6))}`);
+      `1RM estimado ${rm.delCiclo ? 'del ciclo' : '(histórico)'}: ${formatearNumero(Math.round(rm.valor))} kg · `
+      + `80 % = ${formatearNumero(aPasoDeDisco(rm.valor * 0.8))} · 70 % = ${formatearNumero(aPasoDeDisco(rm.valor * 0.7))} · `
+      + `60 % = ${formatearNumero(aPasoDeDisco(rm.valor * 0.6))}`);
   }
 
   // Cabecera de cada serie: qué toca y cómo fue la última vez.
@@ -240,10 +236,7 @@ export function vistaSesion(contenedor, { id }) {
               cargaReal.textContent = x.carga != null ? `= ${formatearNumero(x.carga)} kg reales` : '';
             }) }),
           h('span', {}, 'kg máq'), cargaReal)
-        : h('label', { class: 'valor' },
-          h('input', { type: 'text', inputmode: 'decimal', value: serie.carga ?? '', 'aria-label': TIPOS_CARGA[tipoCarga].etiqueta,
-            oninput: (e) => actualizar((x) => { x.carga = leerNumero(e.target.value); }) }),
-          h('span', {}, unidadCarga(ej)))),
+        : campoCargaConPorcentaje(ej, i, j, serie)),
 
       h('label', { class: 'valor' },
         h('input', { type: 'text', inputmode: 'decimal', value: serie.esfuerzo ?? '', 'aria-label': TIPOS_ESFUERZO[ej.esfuerzo.tipo].etiqueta,
@@ -266,6 +259,43 @@ export function vistaSesion(contenedor, { id }) {
         h('span', {}, TIPOS_ESFUERZO[ej.esfuerzoExtra.tipo].unidad)));
   }
 
+  // Kilos y porcentaje del 1RM, enlazados: escribes en uno y se rellena el
+  // otro. Manda lo último que hayas escrito.
+  function campoCargaConPorcentaje(ej, i, j, serie, tramo = null) {
+    const destino = () => (tramo == null ? serie : serie.tramos[tramo]);
+    const rm = rmDeReferencia(d, ej, { cicloN: serie.cicloN })?.valor ?? null;
+    const kilos = h('input', { type: 'text', inputmode: 'decimal', value: destino().carga ?? '',
+      'aria-label': tramo == null ? TIPOS_CARGA[ej.carga.tipo].etiqueta : `Carga de la bajada ${tramo + 1}` });
+    const porcentaje = rm
+      ? h('input', { type: 'text', inputmode: 'decimal', class: 'porcentaje',
+        value: destino().carga != null ? Math.round((destino().carga / rm) * 100) : '',
+        'aria-label': 'Porcentaje del 1RM' })
+      : null;
+
+    const guardar = (fn) => cambiarSesion((s) => {
+      const x = s.ejercicios[i].series[j];
+      fn(tramo == null ? x : x.tramos[tramo]);
+    }, { tecleo: true });
+
+    kilos.addEventListener('input', () => {
+      const v = leerNumero(kilos.value);
+      guardar((x) => { x.carga = v; });
+      destino().carga = v;
+      if (porcentaje) porcentaje.value = v != null && rm ? Math.round((v / rm) * 100) : '';
+    });
+    porcentaje?.addEventListener('input', () => {
+      const p = leerNumero(porcentaje.value);
+      const v = p != null && rm ? aPasoDeDisco((rm * p) / 100) : null;
+      guardar((x) => { x.carga = v; });
+      destino().carga = v;
+      kilos.value = v ?? '';
+    });
+
+    return h('div', { class: 'carga-con-porcentaje' },
+      h('label', { class: 'valor' }, kilos, h('span', {}, unidadCarga(ej))),
+      porcentaje && h('label', { class: 'valor' }, porcentaje, h('span', {}, '% 1RM')));
+  }
+
   // Drop set, rest-pause y miorrepeticiones: una línea por bajada.
   function tramosSerie(ej, i, j, serie, tramos) {
     serie.tramos ??= tramosPropuestos(serie, null, null);
@@ -282,10 +312,7 @@ export function vistaSesion(contenedor, { id }) {
     return h('div', { class: 'tramos' },
       serie.tramos.map((tramo, k) => h('div', { class: 'tramo' },
         h('span', { class: 'tramo-n', title: `${tramos.nombre} ${k + 1}` }, k + 1),
-        ej.carga.tipo !== 'ninguna' && h('label', { class: 'valor' },
-          h('input', { type: 'text', inputmode: 'decimal', value: tramo.carga ?? '', 'aria-label': `Carga de la bajada ${k + 1}`,
-            oninput: (e) => actualizar((x) => { x.tramos[k].carga = leerNumero(e.target.value); pintarTotal(); }) }),
-          h('span', {}, unidadCarga(ej))),
+        ej.carga.tipo !== 'ninguna' && campoCargaConPorcentaje(ej, i, j, serie, k),
         h('label', { class: 'valor' },
           h('input', { type: 'text', inputmode: 'decimal', value: tramo.esfuerzo ?? '', 'aria-label': `Repeticiones de la bajada ${k + 1}`,
             oninput: (e) => actualizar((x) => {

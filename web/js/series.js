@@ -2,7 +2,9 @@
 // que toca hoy: la carga del día del ciclo, el objetivo a superar y, en un
 // drop set, las bajadas propuestas.
 
-import { lecturaDesdeCarga, sugerenciaSerie, tramosPropuestos, usaTramos } from './calculos.js';
+import {
+  aPasoDeDisco, lecturaDesdeCarga, rmDeReferencia, sugerenciaSerie, tramosPropuestos, usaTramos,
+} from './calculos.js';
 import { recamaraDe } from './esquema.js';
 import { nuevoId } from './ui.js';
 
@@ -26,7 +28,15 @@ export function crearSerieDesdePlan(datos, ejercicio, plan, { excluirSesion } = 
     cicloN: s.cicloN ?? null,
     diaCiclo: s.dia ?? null,
   };
-  if (usaTramos(plan.tecnicas)) serie.tramos = tramosPropuestos(serie, plan, s.ultima?.serie ?? null);
+  if (usaTramos(plan.tecnicas)) {
+    // Un drop set suele arrancar a un porcentaje del 1RM (80 % por defecto).
+    const inicio = plan.tramoInicio ?? datos.perfil.dropSet?.inicioPorcentaje ?? null;
+    if (serie.carga == null && inicio) {
+      const rm = rmDeReferencia(datos, ejercicio, { cicloN: serie.cicloN, excluirSesion });
+      if (rm) serie.carga = aPasoDeDisco((rm.valor * inicio) / 100);
+    }
+    serie.tramos = tramosPropuestos(serie, { ...plan, dropSet: datos.perfil.dropSet }, s.ultima?.serie ?? null);
+  }
   return serie;
 }
 

@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 4;
+export const VERSION_ACTUAL = 5;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -133,6 +133,7 @@ export function archivoNuevo({ nombre = '', correo = null } = {}) {
       tema: 'sistema',
       descansoSegundos: 120,
       recamaraPorDefecto: 1,
+      dropSet: { bajadas: 4, salto: 10, inicioPorcentaje: 80 },
     },
     sedes: [],
     ejercicios: [],
@@ -223,6 +224,14 @@ const MIGRACIONES = {
       for (const entrada of sesion.ejercicios) for (const serie of entrada.series) limpiar(serie);
     }
     datos.version = 4;
+    return datos;
+  },
+
+  // v5: ajustes generales del drop set (cuántas bajadas, cuántos kilos por
+  // bajada y con qué porcentaje del 1RM se arranca).
+  4: (datos) => {
+    datos.perfil.dropSet ??= { bajadas: 4, salto: 10, inicioPorcentaje: 80 };
+    datos.version = 5;
     return datos;
   },
 };

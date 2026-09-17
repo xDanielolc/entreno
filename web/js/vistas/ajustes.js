@@ -1,3 +1,4 @@
+import { BIBLIOGRAFIA } from '../bibliografia.js';
 import { formatearNumero } from '../calculos.js';
 import * as estado from '../estado.js';
 import { desconectar, sincronizar, situacionActual } from '../sincronizacion.js';
@@ -60,6 +61,34 @@ export function vistaAjustes(contenedor) {
         h('small', { class: 'nota' },
           'Se usa en las máquinas asistidas (dominadas, fondos): la carga real es tu peso menos la ayuda de la máquina. ',
           'Cambiarlo no altera las series ya guardadas.'))),
+
+    h('section', { class: 'tarjeta formulario' },
+      h('h2', {}, 'Drop sets por defecto'),
+      h('p', { class: 'nota' }, 'Lo que propone la app al crear un drop set. Se puede cambiar en cada ejercicio.'),
+      h('div', { class: 'fila-campos' },
+        h('label', { class: 'campo' },
+          h('span', { class: 'etiqueta-campo' }, 'Bajadas'),
+          h('input', { type: 'text', inputmode: 'decimal', value: d.perfil.dropSet?.bajadas ?? 4,
+            oninput: (e) => estado.cambiar((x) => { x.perfil.dropSet = { ...x.perfil.dropSet, bajadas: leerNumero(e.target.value) }; }, { tecleo: true }) })),
+        h('label', { class: 'campo' },
+          h('span', { class: 'etiqueta-campo' }, 'Kilos por bajada'),
+          h('input', { type: 'text', inputmode: 'decimal', value: d.perfil.dropSet?.salto ?? 10,
+            oninput: (e) => estado.cambiar((x) => { x.perfil.dropSet = { ...x.perfil.dropSet, salto: leerNumero(e.target.value) }; }, { tecleo: true }) })),
+        h('label', { class: 'campo' },
+          h('span', { class: 'etiqueta-campo' }, 'Arranca al (% del 1RM)'),
+          h('input', { type: 'text', inputmode: 'decimal', value: d.perfil.dropSet?.inicioPorcentaje ?? 80,
+            oninput: (e) => estado.cambiar((x) => { x.perfil.dropSet = { ...x.perfil.dropSet, inicioPorcentaje: leerNumero(e.target.value) }; }, { tecleo: true }) })))),
+
+    h('section', { class: 'tarjeta' },
+      h('h2', {}, 'De dónde sale cada cosa'),
+      h('p', { class: 'nota' }, 'Qué recomienda la app, con qué respaldo y dónde falla.'),
+      BIBLIOGRAFIA.map((x) => h('details', { class: 'fuente' },
+        h('summary', {}, x.tema),
+        h('p', {}, x.dice),
+        h('p', { class: 'nota' }, x.matiz),
+        x.fuentes.length
+          ? h('ul', {}, x.fuentes.map((f) => h('li', {}, h('a', { href: f.url, target: '_blank', rel: 'noopener' }, f.texto))))
+          : h('p', { class: 'nota' }, 'Sin respaldo científico directo: es una decisión práctica.')))),
 
     h('section', { class: 'tarjeta' },
       h('h2', {}, 'Cuenta y copia de seguridad'),
