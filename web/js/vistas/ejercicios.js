@@ -7,6 +7,7 @@ import {
   progresionPorDefecto, serieNuevaPlantilla, sobrePorDefecto, tramosDe,
 } from '../esquema.js';
 import { buscarEnCatalogo } from '../catalogo.js';
+import { seccionProgreso } from './graficas.js';
 import { anadir, aviso, confirmar, h, leerNumero, modal, nuevoId } from '../ui.js';
 import { selectorTecnicas } from './tecnicas.js';
 
@@ -116,7 +117,10 @@ export function vistaFormularioEjercicio(contenedor, { id }) {
   const peso = d.perfil.pesoCorporalKg;
 
   const zona = h('div');
-  anadir(contenedor, h('h1', {}, existente ? borrador.nombre || 'Editar ejercicio' : 'Nuevo ejercicio'), zona);
+  anadir(contenedor,
+    h('h1', {}, existente ? borrador.nombre || 'Editar ejercicio' : 'Nuevo ejercicio'),
+    existente && seccionProgreso(d, existente),
+    zona);
 
   function repintar() {
     const scroll = window.scrollY;
