@@ -176,6 +176,84 @@ def mejor_coincidencia(nombre, indice):
     return mejor if puntos_mejor >= 0.45 else None
 
 
+# ---------------------------------------------------------------------------
+# Everkinetic: los mismos muñecos de línea que usa wger, con ejercicios que
+# wger no tiene. Licencia CC-BY-SA 4.0 (github.com/everkinetic/data).
+# ---------------------------------------------------------------------------
+
+EVERKINETIC_DATOS = "https://raw.githubusercontent.com/everkinetic/data/master/exercises.json"
+EVERKINETIC_PNG = "https://raw.githubusercontent.com/everkinetic/data/master/dist/png/{id}-tension.png"
+
+# Nuestro nombre → nombre en Everkinetic. Solo para los que wger no cubre.
+EVERKINETIC = {
+    "Cruces en polea": "cable-crossover",
+    "Fondos en banco": "bench-dips",
+    "Press Arnold": "arnold-press",
+    "Extensión de tríceps en máquina": "triceps-extensions-using-machine",
+    "Patada de tríceps": "triceps-kickback-with-dumbbell",
+    "Flexiones diamante": "close-triceps-pushup",
+    "Flexiones a una mano": "one-armed-biased-push-up",
+    "Pullover en polea": "straight-arm-push-down",
+    "Remo con barra": "bent-over-row-with-barbell",
+    "Remo con mancuerna": "rear-deltoid-row-dumbbell",
+    "Pájaros con mancuernas": "bent-over-rear-deltoid-raise-with-head-on-bench",
+    "Pájaros en máquina": "seated-rear-lateral-cable-raise",
+    "Curl de bíceps con mancuernas": "biceps-curl-with-dumbbell",
+    "Curl concentrado": "concentration-curls-with-dumbbell",
+    "Curl predicador": "preacher-curl-with-barbell",
+    "Curl de bíceps en máquina": "biceps-curl-with-machine",
+    "Curl invertido": "biceps-curl-reverse-with-dumbbells",
+    "Sentadilla goblet": "squats-using-dumbbells",
+    "Sentadilla hack": "hack-squat-machine",
+    "Sentadilla sissy": "weighted-sissy-squat-with-weight-plate",
+    "Buenos días": "barbell-good-mornings",
+    "Zancadas hacia atrás": "rear-lunges-with-dumbbell",
+    "Subida al cajón": "step-ups-with-dumbbells",
+    "Patada de glúteo en polea": "one-legged-cable-kickback",
+    "Máquina de glúteo": "one-legged-cable-kickback",
+    "Abductores en máquina": "thigh-abductor",
+    "Abducción en polea": "thigh-abductor",
+    "Aductores en máquina": "thigh-adductor",
+    "Hiperextensiones": "hyperextensions",
+    "Crunch en polea": "seated-ab-crunch-with-cable",
+    "Crunch inverso": "bent-knee-hip-raise",
+    "Plancha lateral": "side-plank",
+    "Superman": "supermans",
+    "Flexión de cuello con disco": "static-neck-flexion-extension",
+    "Extensión de cuello con arnés": "static-neck-flexion-extension",
+    "Isométricos de cuello": "static-neck-flexion-extension",
+    "Flexión lateral de cuello": "static-neck-side-flexion",
+    "Bicicleta de aire": "air-bike",
+}
+
+
+def descargar_everkinetic(sin_imagen, destino):
+    datos = {e["name"]: e["id_num"] for e in pedir(EVERKINETIC_DATOS)}
+    creditos, siguen = {}, []
+    for nombre in sin_imagen:
+        clave = EVERKINETIC.get(nombre)
+        if not clave or clave not in datos:
+            siguen.append(nombre)
+            continue
+        archivo = re.sub(r"[^a-z0-9]+", "-", normalizar(nombre)).strip("-") + ".png"
+        ruta = destino / archivo
+        if not ruta.exists():
+            # Casi todos tienen dos fases (relajación y tensión); alguno, solo una.
+            for fase in ("tension", "relaxation"):
+                try:
+                    ruta.write_bytes(bajar(EVERKINETIC_PNG.format(id=datos[clave]).replace("tension", fase)))
+                    break
+                except Exception:  # noqa: BLE001
+                    continue
+        if not ruta.exists():
+            siguen.append(nombre)
+            continue
+        creditos[nombre] = {"archivo": f"imagenes/ejercicios/{archivo}", "autor": "Everkinetic",
+                            "fuente": "everkinetic", "nombreEnFuente": clave}
+        print(f"  {nombre:<34} ← Everkinetic {clave}")
+    return creditos, siguen
+
+
 def descargar_ejercicios():
     destino = IMAGENES / "ejercicios"
     destino.mkdir(parents=True, exist_ok=True)
@@ -202,6 +280,8 @@ def descargar_ejercicios():
         creditos[nombre] = {"archivo": f"imagenes/ejercicios/{archivo}",
                             "autor": datos["autor"], "nombreEnWger": coincide}
         print(f"  {nombre:<34} ← {coincide}")
+    de_everkinetic, sin_imagen = descargar_everkinetic(sin_imagen, destino)
+    creditos.update(de_everkinetic)
     return creditos, sin_imagen
 
 

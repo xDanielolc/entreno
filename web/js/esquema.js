@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 7;
+export const VERSION_ACTUAL = 8;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -79,6 +79,46 @@ export function recamaraDe(tecnicas = [], porDefecto = 1) {
   return fijadas.length ? Math.min(...fijadas) : porDefecto;
 }
 
+// Estiramientos, movilidad y yoga: cómo se hacen y con qué ayuda. Se eligen
+// en la ficha (lo habitual) y se pueden cambiar en cada serie.
+export const TECNICAS_ESTIRAMIENTO = {
+  'estatico-pasivo': { etiqueta: 'Estático pasivo', descripcion: 'Llegas a la postura y la mantienes relajado, sin hacer fuerza.' },
+  'estatico-activo': { etiqueta: 'Estático activo', descripcion: 'Mantienes la postura con tu propia fuerza, sin ayuda externa.' },
+  dinamico: { etiqueta: 'Dinámico', descripcion: 'Movimientos controlados hasta el final del recorrido, sin rebotes.' },
+  'fnp-cr': { etiqueta: 'FNP: contracción-relajación', descripcion: 'Empujas contra la resistencia 5-10 s, sueltas y ganas recorrido.' },
+  'fnp-crac': { etiqueta: 'FNP: CRAC', descripcion: 'Como contracción-relajación, y al soltar contraes el músculo contrario para llegar más lejos.' },
+  pir: { etiqueta: 'Relajación postisométrica (PIR)', descripcion: 'Contracción muy suave (10-20 %) unos segundos; al soltar y espirar, avanzas.' },
+  'inhibicion-reciproca': { etiqueta: 'Inhibición recíproca', descripcion: 'Contraes el músculo contrario para que el estirado se relaje.' },
+  cars: { etiqueta: 'CARs', descripcion: 'Rotaciones articulares controladas: el círculo más grande posible, despacio y sin compensar.' },
+  neurodinamica: { etiqueta: 'Neurodinámica', descripcion: 'Deslizamientos o tensores del nervio: movimientos suaves que no deben doler.' },
+  miofascial: { etiqueta: 'Liberación miofascial', descripcion: 'Presión con rodillo o pelota sobre el músculo.' },
+};
+
+export const ASISTENCIAS = {
+  ninguna: 'Sin ayuda',
+  pared: 'Pared',
+  ladrillo: 'Ladrillo o bloque',
+  mano: 'Apoyo con la mano (escala)',
+  cinta: 'Cinta',
+  goma: 'Goma elástica',
+  peso: 'Peso',
+  silla: 'Silla o banco',
+  companero: 'Compañero',
+  maquina: 'Máquina',
+};
+
+// Escala de apoyo con la mano, de más ayuda a ninguna.
+export const ESCALA_MANO = {
+  puno: '1 · Puño',
+  surf: '2 · Surf',
+  pulgar: '3 · Pulgar',
+  'mano-abierta': '4 · Mano abierta',
+  'tres-dedos': '5 · Tres dedos',
+  'dos-dedos': '6 · Dos dedos',
+  'un-dedo': '7 · Un dedo',
+  'sin-mano': '8 · Sin mano',
+};
+
 export const DIAS_CICLO_POR_DEFECTO = 17;
 
 // ¿La progresión actúa sobre la carga o sobre lo que se mide?
@@ -110,7 +150,7 @@ export function serieNuevaPlantilla(ejercicio, { tipo = 'libre', tecnicas = [], 
     tipo,
     tecnicas,
     objetivoEsfuerzo: null,
-    tramosPrevistos: tramosDe(tecnicas) ? 4 : null,
+    tramosPrevistos: null,
     tramoSalto: null,
     progresion: progresionPorDefecto(progresion, ejercicio),
   };
@@ -135,6 +175,9 @@ export function archivoNuevo({ nombre = '', correo = null } = {}) {
       recamaraPorDefecto: 1,
       dropSet: { bajadas: 4, salto: 10, inicioPorcentaje: 80, autoRellenar: true },
       descansoTramos: { 'drop-set': 30, 'rest-pause': 20, miorepeticiones: 20 },
+      tramosPorDefecto: { 'rest-pause': { tramos: 3, reps: null }, miorepeticiones: { tramos: 5, reps: 5 } },
+      respiracion: { veces: 3, inspirar: 4, espirar: 4 },
+      recuperacion: { factores: {}, desde: {} },
     },
     sedes: [],
     ejercicios: [],
@@ -259,6 +302,24 @@ const MIGRACIONES = {
       }
     }
     datos.version = 7;
+    return datos;
+  },
+
+  // v8: recuperación personal por músculo (factor y sensaciones al empezar),
+  // valores por defecto de rest-pause y miorrepeticiones, guía de respiración,
+  // y en cada plantilla de serie de dónde salen los tramos (tramosModo) y los
+  // pesos fijos de las máquinas de placas (tramosFijos).
+  7: (datos) => {
+    datos.perfil.tramosPorDefecto ??= { 'rest-pause': { tramos: 3, reps: null }, miorepeticiones: { tramos: 5, reps: 5 } };
+    datos.perfil.respiracion ??= { veces: 3, inspirar: 4, espirar: 4 };
+    datos.perfil.recuperacion ??= { factores: {}, desde: {} };
+    for (const ej of datos.ejercicios) {
+      for (const plan of ej.series || []) {
+        plan.tramosModo ??= 'ultima';
+        plan.tramosFijos ??= null;
+      }
+    }
+    datos.version = 8;
     return datos;
   },
 };

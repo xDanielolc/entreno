@@ -51,14 +51,8 @@ https://xdanielolc.github.io/entreno/.
   encargo ya está escrito en `docs/encargo-para-design.md`.
 - Dibujo propio del cuerpo: el actual es de wger y funciona; mejorarlo con
   Design usando el segundo encargo de ese mismo archivo.
-- Movilidad y estiramientos con opciones propias al elegirlos: técnica (FNP
-  contracción-relajación, PIR, inhibición recíproca, estático, dinámico,
-  activo, pasivo, CARs, neurodinámica, liberación miofascial), asistencia
-  (pared, ladrillo con su escala por mano, cinta, goma, compañero…).
-- Bloquear la secuencia de pesos de un drop set por ejercicio (máquinas de
-  placas).
-- Imágenes para los ejercicios sin ella (64 de 126 más el yoga): wger no las
-  tiene. Solo fuentes libres o dibujos propios, nunca imágenes con derechos.
+- Pulir con Design los 122 muñecos propios (`web/imagenes/munecos`, generados
+  con `herramientas/dibujar_munecos.py`) para igualarlos al estilo de wger.
 - Calibrar el 1RM por ejercicio con series de prueba de pocas repeticiones:
   las fórmulas fallan un 10-25 % por encima de 15 repeticiones, y en hombros más.
 - Sedes (gimnasios) en la interfaz.
@@ -79,3 +73,8 @@ buscador con filtros y tres vistas, drop set rellenado con el 1RM de la serie
 de arriba, descansos cortos entre bajadas, resumen al terminar con récords,
 mejoras, volumen y «¿solo hoy o para siempre?», explicación del cálculo de
 recuperación.
+0.10.0: recuperación según cercanía al fallo con curva de volumen y factor
+personal por músculo (con «¿Cómo llegas?» y sugerencias), guía de respiración
+en miorrepeticiones, tramos «como la última vez / por defecto / lo de aquí»,
+pesos fijos de drop set, técnica y ayuda en estiramientos, imagen para todo
+(wger, Everkinetic y muñecos propios).

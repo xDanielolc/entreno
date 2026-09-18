@@ -11,7 +11,11 @@ import {
   crearSerieDesdePlan, entradaDeEjercicio, rellenarDropSets, saltoDeTramo, serieSuelta,
 } from '../series.js';
 import { anadir, aviso, confirmar, h, leerNumero } from '../ui.js';
-import { arrancarDescanso, barraDescanso, descansoDeTramo } from './descanso.js';
+import { arrancarDescanso, arrancarRespiracion, barraDescanso, descansoDeTramo } from './descanso.js';
+import { cuentaParaFatiga, tipoDeEjercicio } from '../catalogo.js';
+import { ASISTENCIAS, ESCALA_MANO, TECNICAS_ESTIRAMIENTO } from '../esquema.js';
+import { ORDEN_MUSCULOS, nombreMusculo } from '../musculos.js';
+import { SENSACIONES, recuperacionPorMusculo } from '../recuperacion.js';
 import { comparacionSerie, mostrarResumen } from './resumen-sesion.js';
 import { ejercicioDesdeCatalogo, elegirEjercicio as abrirSelector } from './selector-ejercicios.js';
 import { selectorTecnicas, textoTecnicas } from './tecnicas.js';
@@ -53,6 +57,8 @@ export function vistaSesion(contenedor, { id }) {
 
     sesion.diaRutinaId && h('p', { class: 'suave' }, nombreDelDia(d, sesion)),
 
+    enCurso && posicion == null && tarjetaComoLlegas(),
+
     barraDescanso(),
 
     posicion != null && h('div', { class: 'guiado-cabecera' },
@@ -81,6 +87,38 @@ export function vistaSesion(contenedor, { id }) {
 
     !sesion.borrada && posicion == null
       && h('button', { class: 'boton enlace peligro-texto', onclick: borrar }, 'Mover este entrenamiento a la papelera'));
+
+  // «¿Cómo llegas?»: tu sensación de cada músculo que vas a entrenar, junto a
+  // lo que calcula la app. Con varias respuestas, la app te dirá si te
+  // recuperas antes o después de lo normal (pestaña Cuerpo).
+  function tarjetaComoLlegas() {
+    if (sesion.sensacionesCerrada) return null;
+    const musculos = new Set();
+    for (const entrada of sesion.ejercicios) {
+      const ej = ejercicioDe(entrada.ejercicioId);
+      if (ej && cuentaParaFatiga(ej)) for (const m of ej.musculos?.principales ?? []) musculos.add(m);
+    }
+    if (!musculos.size) return null;
+    const previsto = recuperacionPorMusculo(d, sesion.inicio ? new Date(sesion.inicio) : new Date());
+    const respuestas = sesion.sensaciones ?? {};
+    const lista = ORDEN_MUSCULOS.filter((m) => musculos.has(m));
+    const todas = lista.every((m) => respuestas[m]);
+    return h('details', { class: 'tarjeta como-llegas', open: !todas },
+      h('summary', {}, todas ? 'Cómo llegas: apuntado' : '¿Cómo llegas hoy? (opcional)'),
+      h('p', { class: 'nota' }, 'Toca cómo notas cada músculo. Sirve para ajustar el mapa de recuperación a tu ritmo.'),
+      lista.map((m) => h('div', { class: 'fila-sensacion' },
+        h('span', {}, nombreMusculo(m, { corto: true }), h('small', { class: 'suave bloque' }, `la app calcula ${previsto[m].porcentaje} %`)),
+        h('div', { class: 'botones-sensacion' }, Object.entries(SENSACIONES).map(([clave, s]) => h('button', {
+          class: `chip seleccionable ${respuestas[m]?.sentida === clave ? 'activo' : ''}`,
+          'aria-pressed': String(respuestas[m]?.sentida === clave),
+          onclick: () => cambiarSesion((x) => {
+            x.sensaciones ??= {};
+            x.sensaciones[m] = { sentida: clave, prevista: previsto[m].porcentaje };
+          }),
+        }, `${s.icono} ${s.texto}`))))),
+      h('button', { class: 'boton enlace', onclick: () => cambiarSesion((x) => { x.sensacionesCerrada = true; }) },
+        'Hoy no'));
+  }
 
   function irA(nueva) {
     if (nueva == null) guiado.delete(id);
@@ -171,6 +209,7 @@ export function vistaSesion(contenedor, { id }) {
       cabeceraSerie(ej, i, j, serie),
       tramos ? tramosSerie(ej, i, j, serie, tramos) : valoresSerie(ej, i, j, serie),
       camposTecnicas(ej, i, j, serie),
+      camposEstiramiento(ej, i, j, serie),
       h('p', { class: 'comparacion' }, comparacionSerie(d, ej, serie, { excluirSesion: id })));
   }
 
@@ -192,6 +231,25 @@ export function vistaSesion(contenedor, { id }) {
         h('span', {}, `${c.etiqueta} (${c.unidad})`))));
   }
 
+  // Estiramientos, movilidad y yoga: con qué técnica, con qué ayuda y, si
+  // te apoyas con la mano, en qué punto de la escala (del puño a sin mano).
+  function camposEstiramiento(ej, i, j, serie) {
+    if (!['estiramiento', 'movilidad', 'yoga'].includes(tipoDeEjercicio(ej))) return null;
+    const actual = { ...ej.estiramiento, ...serie.estiramiento };
+    const guardar = (clave, valor) => cambiarSesion((s) => {
+      const x = s.ejercicios[i].series[j];
+      x.estiramiento = { ...ej.estiramiento, ...x.estiramiento, [clave]: valor || null };
+    });
+    const desplegable = (clave, catalogo, vacio) => h('select', { 'aria-label': vacio, onchange: (e) => guardar(clave, e.target.value) },
+      h('option', { value: '' }, vacio),
+      Object.entries(catalogo).map(([k, v]) => h('option', { value: k, selected: k === actual[clave] }, v.etiqueta ?? v)));
+    return h('div', { class: 'serie-estiramiento' },
+      desplegable('tecnica', TECNICAS_ESTIRAMIENTO, 'Técnica'),
+      desplegable('asistencia', ASISTENCIAS, 'Ayuda'),
+      actual.asistencia === 'mano' && desplegable('nivel', ESCALA_MANO, 'Apoyo de la mano'),
+      actual.tecnica && h('small', { class: 'nota bloque' }, TECNICAS_ESTIRAMIENTO[actual.tecnica]?.descripcion));
+  }
+
   function cabeceraSerie(ej, i, j, serie) {
     return h('div', { class: 'serie-cabecera' },
       h('select', { class: 'tipo-serie', 'aria-label': 'Tipo de serie',
@@ -206,7 +264,7 @@ export function vistaSesion(contenedor, { id }) {
         const x = s.ejercicios[i].series[j];
         x.tecnicas = nuevas;
         x.recamara = recamaraDe(nuevas, d.perfil.recamaraPorDefecto ?? 1);
-        x.tramos = tramosDe(nuevas) ? (x.tramos ?? tramosPropuestos(x, { dropSet: d.perfil.dropSet }, null)) : null;
+        x.tramos = tramosDe(nuevas) ? (x.tramos ?? tramosPropuestos(x, planDe(ej, x), null, d.perfil)) : null;
         if (x.tramos) x.cargaAutomatica = true;
       })),
 
@@ -316,7 +374,7 @@ export function vistaSesion(contenedor, { id }) {
 
   // Drop set, rest-pause y miorrepeticiones: una línea por bajada.
   function tramosSerie(ej, i, j, serie, tramos) {
-    serie.tramos ??= tramosPropuestos(serie, { dropSet: d.perfil.dropSet }, null);
+    serie.tramos ??= tramosPropuestos(serie, planDe(ej, serie), null, d.perfil);
     const total = h('p', { class: 'nota' });
     const pintarTotal = () => {
       const t = trabajoSerie(serie);
@@ -334,6 +392,7 @@ export function vistaSesion(contenedor, { id }) {
         ej.carga.tipo !== 'ninguna' && campoCargaConPorcentaje(ej, i, j, serie, k),
         h('label', { class: 'valor' },
           h('input', { type: 'text', inputmode: 'decimal', value: tramo.esfuerzo ?? '', 'aria-label': `Repeticiones de la bajada ${k + 1}`,
+            placeholder: tramo.objetivo ?? '',
             oninput: (e) => actualizar((x) => {
               const antes = x.tramos[k].esfuerzo;
               x.tramos[k].esfuerzo = leerNumero(e.target.value);
@@ -344,8 +403,11 @@ export function vistaSesion(contenedor, { id }) {
               // apuntar el último, el descanso normal entre series.
               if (antes == null && x.tramos[k].esfuerzo != null) {
                 if (k < x.tramos.length - 1) {
-                  arrancarDescanso(descansoDeTramo(d.perfil, tramos.tecnica), {
-                    texto: tramos.tecnica === 'drop-set' ? 'para cambiar el peso' : 'para respirar' });
+                  if (tramos.tecnica === 'miorepeticiones') arrancarRespiracion(d.perfil);
+                  else {
+                    arrancarDescanso(descansoDeTramo(d.perfil, tramos.tecnica), {
+                      texto: tramos.tecnica === 'drop-set' ? 'para cambiar el peso' : 'para recuperar el aliento' });
+                  }
                 } else descansoEntreSeries();
               }
             }) }),
@@ -362,7 +424,22 @@ export function vistaSesion(contenedor, { id }) {
           esfuerzo: null,
         });
       }) }, `+ ${tramos.nombre}`),
+      tramos.tecnica === 'drop-set' && serie.planId && ej.carga.tipo !== 'ninguna'
+        && h('button', { class: 'boton enlace', onclick: () => fijarPesos(ej, serie) },
+          planDe(ej, serie)?.tramosFijos?.length ? 'Cambiar los pesos fijos por estos' : 'Fijar estos pesos para siempre (máquina de placas)'),
       total);
+  }
+
+  // Máquinas de placas: la secuencia de pesos siempre es la misma. Se guarda
+  // en el ejercicio y la próxima vez sale tal cual.
+  function fijarPesos(ej, serie) {
+    const pesos = serie.tramos.map((t) => t.carga).filter((c) => Number.isFinite(c));
+    if (!pesos.length) { aviso('Pon primero los pesos de las bajadas'); return; }
+    estado.cambiar((datos) => {
+      const plan = datos.ejercicios.find((e) => e.id === ej.id)?.series.find((p) => p.id === serie.planId);
+      if (plan) plan.tramosFijos = pesos;
+    });
+    aviso(`Pesos fijos guardados: ${pesos.map((p) => formatearNumero(p)).join(' → ')} kg. Se quitan en la ficha del ejercicio.`);
   }
 
   // Texto que explica de dónde salen los pesos del drop set.
@@ -443,7 +520,7 @@ export function vistaSesion(contenedor, { id }) {
         carga: anterior?.carga ?? null, recamara: anterior?.recamara ?? null });
       copia.planId = anterior?.planId ?? null;
       copia.lectura = anterior?.lectura ?? null;
-      if (usaTramos(copia.tecnicas)) copia.tramos = tramosPropuestos(copia, { dropSet: datos.perfil.dropSet }, anterior);
+      if (usaTramos(copia.tecnicas)) copia.tramos = tramosPropuestos(copia, planDe(ej, copia), anterior, datos.perfil);
       s.ejercicios[i].series.push(copia);
     });
   }
@@ -512,6 +589,10 @@ export function vistaSesion(contenedor, { id }) {
     cambiarSesion((s) => { s.borrada = null; });
     aviso('Entrenamiento recuperado');
   }
+}
+
+function planDe(ej, serie) {
+  return (ej.series || []).find((p) => p.id === serie.planId) ?? null;
 }
 
 function nombreDelDia(datos, sesion) {

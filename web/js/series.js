@@ -36,7 +36,7 @@ export function crearSerieDesdePlan(datos, ejercicio, plan, { excluirSesion } = 
       const rm = rmDeReferencia(datos, ejercicio, { cicloN: serie.cicloN, excluirSesion });
       if (rm) serie.carga = aPasoDeDisco((rm.valor * inicio) / 100);
     }
-    serie.tramos = tramosPropuestos(serie, { ...plan, dropSet: datos.perfil.dropSet }, s.ultima?.serie ?? null);
+    serie.tramos = tramosPropuestos(serie, plan, s.ultima?.serie ?? null, datos.perfil);
     // Mientras no toques sus pesos, la app puede recalcularlos con lo que
     // hagas hoy en las series de arriba.
     serie.cargaAutomatica = true;
@@ -83,6 +83,9 @@ export function rellenarDropSets(datos, ejercicio, entrada) {
   const tocadas = [];
   entrada.series.forEach((serie, j) => {
     if (!serie.tramos?.length || !serie.cargaAutomatica) return;
+    if (tramosDe(serie.tecnicas)?.tecnica !== 'drop-set') return;
+    const planFijo = (ejercicio.series || []).find((p) => p.id === serie.planId);
+    if (planFijo?.tramosFijos?.length) return;
     if (serie.tramos.some((t) => t.esfuerzo != null)) return;
     const arriba = entrada.series.slice(0, j).filter((x) => !x.tramos?.length && x.tipo !== 'calentamiento');
     const rms = arriba.map((x) => epley(x.carga, esfuerzoTotal(x))).filter(Boolean);

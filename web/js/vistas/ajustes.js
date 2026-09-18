@@ -5,7 +5,8 @@ import * as estado from '../estado.js';
 import { desconectar, sincronizar, situacionActual } from '../sincronizacion.js';
 import { VERSION_APP } from '../version.js';
 import { anadir, confirmar, h, hoyISO, leerNumero } from '../ui.js';
-import { DESCANSO_TRAMOS_POR_DEFECTO } from './descanso.js';
+import { DESCANSO_TRAMOS_POR_DEFECTO, RESPIRACION_POR_DEFECTO } from './descanso.js';
+import { tramosPorDefecto } from '../calculos.js';
 
 export function vistaAjustes(contenedor) {
   const d = estado.datos();
@@ -57,10 +58,18 @@ export function vistaAjustes(contenedor) {
         h('small', { class: 'nota' }, 'El cronómetro arranca solo al apuntar una serie, y al apuntar la última bajada de un drop set. '
           + 'Ponlo a 0 para desactivarlo.')),
 
+      h('label', { class: 'campo' },
+        h('span', { class: 'etiqueta-campo' }, 'Peso corporal (kg)'),
+        h('input', { type: 'text', inputmode: 'decimal', value: d.perfil.pesoCorporalKg ?? '',
+          oninput: (e) => estado.cambiar((x) => { x.perfil.pesoCorporalKg = leerNumero(e.target.value); }, { tecleo: true }) }),
+        h('small', { class: 'nota' },
+          'Se usa en las máquinas asistidas (dominadas, fondos): la carga real es tu peso menos la ayuda de la máquina. ',
+          'Cambiarlo no altera las series ya guardadas.')),
+
       h('div', { class: 'campo' },
         h('span', { class: 'etiqueta-campo' }, 'Descanso dentro de una serie (segundos)'),
         h('div', { class: 'fila-campos' },
-          [['drop-set', 'Entre bajadas'], ['rest-pause', 'Rest-pause'], ['miorepeticiones', 'Miorrepeticiones']]
+          [['drop-set', 'Entre bajadas'], ['rest-pause', 'Rest-pause']]
             .map(([clave, texto]) => h('label', { class: 'campo' },
               h('span', { class: 'etiqueta-campo' }, texto),
               h('input', { type: 'text', inputmode: 'decimal',
@@ -69,15 +78,28 @@ export function vistaAjustes(contenedor) {
                   x.perfil.descansoTramos = { ...DESCANSO_TRAMOS_POR_DEFECTO, ...x.perfil.descansoTramos, [clave]: leerNumero(e.target.value) };
                 }, { tecleo: true }) })))),
         h('small', { class: 'nota' }, 'Al apuntar una bajada arranca esta cuenta corta: lo justo para cambiar el disco '
-          + 'o para respirar entre miniseries. Al apuntar la última, el descanso normal.')),
+          + 'o recuperar el aliento entre miniseries. Al apuntar la última, el descanso normal.'))),
 
-      h('label', { class: 'campo' },
-        h('span', { class: 'etiqueta-campo' }, 'Peso corporal (kg)'),
-        h('input', { type: 'text', inputmode: 'decimal', value: d.perfil.pesoCorporalKg ?? '',
-          oninput: (e) => estado.cambiar((x) => { x.perfil.pesoCorporalKg = leerNumero(e.target.value); }, { tecleo: true }) }),
-        h('small', { class: 'nota' },
-          'Se usa en las máquinas asistidas (dominadas, fondos): la carga real es tu peso menos la ayuda de la máquina. ',
-          'Cambiarlo no altera las series ya guardadas.'))),
+    h('section', { class: 'tarjeta formulario' },
+      h('h2', {}, 'Rest-pause y miorrepeticiones por defecto'),
+      h('p', { class: 'nota' }, 'Lo que propone la app al crear estas series. Cada ejercicio puede usar esto, '
+        + 'repetir lo de la última vez o tener sus propios valores (en su ficha).'),
+      h('div', { class: 'fila-campos' },
+        numeroAjuste('Miniseries de rest-pause', tramosPorDefecto(d.perfil, 'rest-pause').tramos,
+          (x, v) => { x.perfil.tramosPorDefecto = { ...x.perfil.tramosPorDefecto, 'rest-pause': { ...x.perfil.tramosPorDefecto?.['rest-pause'], tramos: v } }; }),
+        numeroAjuste('Tramos de miorrepeticiones (activación + miniseries)', tramosPorDefecto(d.perfil, 'miorepeticiones').tramos,
+          (x, v) => { x.perfil.tramosPorDefecto = { ...x.perfil.tramosPorDefecto, miorepeticiones: { ...x.perfil.tramosPorDefecto?.miorepeticiones, tramos: v } }; }),
+        numeroAjuste('Repeticiones por miniserie', tramosPorDefecto(d.perfil, 'miorepeticiones').reps,
+          (x, v) => { x.perfil.tramosPorDefecto = { ...x.perfil.tramosPorDefecto, miorepeticiones: { ...x.perfil.tramosPorDefecto?.miorepeticiones, reps: v } }; })),
+      h('p', { class: 'nota' }, 'Entre miniseries de miorrepeticiones no sale un reloj, sino una guía de respiración: '
+        + 'un círculo que crece al coger aire y mengua al soltarlo.'),
+      h('div', { class: 'fila-campos' },
+        numeroAjuste('Respiraciones', d.perfil.respiracion?.veces ?? RESPIRACION_POR_DEFECTO.veces,
+          (x, v) => { x.perfil.respiracion = { ...RESPIRACION_POR_DEFECTO, ...x.perfil.respiracion, veces: v }; }),
+        numeroAjuste('Coger aire (s)', d.perfil.respiracion?.inspirar ?? RESPIRACION_POR_DEFECTO.inspirar,
+          (x, v) => { x.perfil.respiracion = { ...RESPIRACION_POR_DEFECTO, ...x.perfil.respiracion, inspirar: v }; }),
+        numeroAjuste('Soltarlo (s)', d.perfil.respiracion?.espirar ?? RESPIRACION_POR_DEFECTO.espirar,
+          (x, v) => { x.perfil.respiracion = { ...RESPIRACION_POR_DEFECTO, ...x.perfil.respiracion, espirar: v }; }))),
 
     h('section', { class: 'tarjeta formulario' },
       h('h2', {}, 'Drop sets por defecto'),
@@ -130,15 +152,25 @@ export function vistaAjustes(contenedor) {
       h('p', { class: 'nota' },
         'Los dibujos del cuerpo y de los ejercicios vienen de ',
         h('a', { href: 'https://wger.de', target: '_blank', rel: 'noopener' }, 'wger.de'),
+        ' y de ',
+        h('a', { href: 'https://github.com/everkinetic/data', target: '_blank', rel: 'noopener' }, 'Everkinetic'),
         ', con licencia Creative Commons Atribución-CompartirIgual (CC-BY-SA). '
         + 'Se usan citando a sus autores y manteniendo esa licencia. Las capas de antebrazo, hombro posterior, '
-        + 'lumbares, aductores, abductores, cuello y tibial son dibujos propios de la app sobre esa silueta.'),
+        + 'lumbares, aductores, abductores, cuello y tibial, y los muñecos de yoga, estiramientos, movilidad y cardio, son dibujos propios de la app.'),
       h('p', { class: 'nota' },
         `Imágenes incluidas: ${Object.keys(creditosCargados()?.ejercicios ?? {}).length} de ejercicios `
         + `y ${Object.keys(creditosCargados()?.musculos ?? {}).length} capas de músculo.`)),
 
     h('p', { class: 'nota centrado' },
       `Versión ${VERSION_APP} · formato de datos v${d.version} · revisión ${formatearNumero(d.revision)}`));
+}
+
+// Casilla numérica de Ajustes que guarda al teclear.
+function numeroAjuste(etiqueta, valor, guardar) {
+  return h('label', { class: 'campo' },
+    h('span', { class: 'etiqueta-campo' }, etiqueta),
+    h('input', { type: 'text', inputmode: 'decimal', value: valor ?? '',
+      oninput: (e) => estado.cambiar((x) => guardar(x, leerNumero(e.target.value)), { tecleo: true }) }));
 }
 
 export function textoSituacion(situacion) {

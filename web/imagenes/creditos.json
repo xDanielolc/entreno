@@ -373,6 +373,832 @@
    "archivo": "imagenes/ejercicios/elevaciones-de-rodillas-en-paralelas.png",
    "autor": "wger",
    "nombreEnWger": "Elevaciones de Rodillas en Barra"
+  },
+  "Cruces en polea": {
+   "archivo": "imagenes/ejercicios/cruces-en-polea.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "cable-crossover"
+  },
+  "Fondos en banco": {
+   "archivo": "imagenes/ejercicios/fondos-en-banco.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "bench-dips"
+  },
+  "Extensión de tríceps en máquina": {
+   "archivo": "imagenes/ejercicios/extension-de-triceps-en-maquina.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "triceps-extensions-using-machine"
+  },
+  "Patada de tríceps": {
+   "archivo": "imagenes/ejercicios/patada-de-triceps.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "triceps-kickback-with-dumbbell"
+  },
+  "Flexiones diamante": {
+   "archivo": "imagenes/ejercicios/flexiones-diamante.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "close-triceps-pushup"
+  },
+  "Flexiones a una mano": {
+   "archivo": "imagenes/ejercicios/flexiones-a-una-mano.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "one-armed-biased-push-up"
+  },
+  "Pullover en polea": {
+   "archivo": "imagenes/ejercicios/pullover-en-polea.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "straight-arm-push-down"
+  },
+  "Remo con mancuerna": {
+   "archivo": "imagenes/ejercicios/remo-con-mancuerna.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "rear-deltoid-row-dumbbell"
+  },
+  "Pájaros con mancuernas": {
+   "archivo": "imagenes/ejercicios/pajaros-con-mancuernas.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "bent-over-rear-deltoid-raise-with-head-on-bench"
+  },
+  "Pájaros en máquina": {
+   "archivo": "imagenes/ejercicios/pajaros-en-maquina.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "seated-rear-lateral-cable-raise"
+  },
+  "Curl de bíceps con mancuernas": {
+   "archivo": "imagenes/ejercicios/curl-de-biceps-con-mancuernas.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "biceps-curl-with-dumbbell"
+  },
+  "Curl concentrado": {
+   "archivo": "imagenes/ejercicios/curl-concentrado.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "concentration-curls-with-dumbbell"
+  },
+  "Curl predicador": {
+   "archivo": "imagenes/ejercicios/curl-predicador.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "preacher-curl-with-barbell"
+  },
+  "Curl de bíceps en máquina": {
+   "archivo": "imagenes/ejercicios/curl-de-biceps-en-maquina.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "biceps-curl-with-machine"
+  },
+  "Curl invertido": {
+   "archivo": "imagenes/ejercicios/curl-invertido.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "biceps-curl-reverse-with-dumbbells"
+  },
+  "Sentadilla goblet": {
+   "archivo": "imagenes/ejercicios/sentadilla-goblet.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "squats-using-dumbbells"
+  },
+  "Sentadilla hack": {
+   "archivo": "imagenes/ejercicios/sentadilla-hack.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "hack-squat-machine"
+  },
+  "Sentadilla sissy": {
+   "archivo": "imagenes/ejercicios/sentadilla-sissy.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "weighted-sissy-squat-with-weight-plate"
+  },
+  "Buenos días": {
+   "archivo": "imagenes/ejercicios/buenos-dias.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "barbell-good-mornings"
+  },
+  "Zancadas hacia atrás": {
+   "archivo": "imagenes/ejercicios/zancadas-hacia-atras.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "rear-lunges-with-dumbbell"
+  },
+  "Subida al cajón": {
+   "archivo": "imagenes/ejercicios/subida-al-cajon.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "step-ups-with-dumbbells"
+  },
+  "Patada de glúteo en polea": {
+   "archivo": "imagenes/ejercicios/patada-de-gluteo-en-polea.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "one-legged-cable-kickback"
+  },
+  "Máquina de glúteo": {
+   "archivo": "imagenes/ejercicios/maquina-de-gluteo.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "one-legged-cable-kickback"
+  },
+  "Abductores en máquina": {
+   "archivo": "imagenes/ejercicios/abductores-en-maquina.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "thigh-abductor"
+  },
+  "Abducción en polea": {
+   "archivo": "imagenes/ejercicios/abduccion-en-polea.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "thigh-abductor"
+  },
+  "Aductores en máquina": {
+   "archivo": "imagenes/ejercicios/aductores-en-maquina.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "thigh-adductor"
+  },
+  "Hiperextensiones": {
+   "archivo": "imagenes/ejercicios/hiperextensiones.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "hyperextensions"
+  },
+  "Crunch en polea": {
+   "archivo": "imagenes/ejercicios/crunch-en-polea.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "seated-ab-crunch-with-cable"
+  },
+  "Crunch inverso": {
+   "archivo": "imagenes/ejercicios/crunch-inverso.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "bent-knee-hip-raise"
+  },
+  "Plancha lateral": {
+   "archivo": "imagenes/ejercicios/plancha-lateral.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "side-plank"
+  },
+  "Superman": {
+   "archivo": "imagenes/ejercicios/superman.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "supermans"
+  },
+  "Flexión de cuello con disco": {
+   "archivo": "imagenes/ejercicios/flexion-de-cuello-con-disco.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "static-neck-flexion-extension"
+  },
+  "Extensión de cuello con arnés": {
+   "archivo": "imagenes/ejercicios/extension-de-cuello-con-arnes.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "static-neck-flexion-extension"
+  },
+  "Flexión lateral de cuello": {
+   "archivo": "imagenes/ejercicios/flexion-lateral-de-cuello.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "static-neck-side-flexion"
+  },
+  "Isométricos de cuello": {
+   "archivo": "imagenes/ejercicios/isometricos-de-cuello.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "static-neck-flexion-extension"
+  },
+  "Bicicleta de aire": {
+   "archivo": "imagenes/ejercicios/bicicleta-de-aire.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "air-bike"
+  },
+  "Press Arnold": {
+   "archivo": "imagenes/munecos/press-arnold.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Remo con barra": {
+   "archivo": "imagenes/munecos/remo-con-barra.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Extensión de muñeca": {
+   "archivo": "imagenes/munecos/extension-de-muneca.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Colgarse de la barra": {
+   "archivo": "imagenes/munecos/colgarse-de-la-barra.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Paseo del granjero": {
+   "archivo": "imagenes/munecos/paseo-del-granjero.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Sentadilla a una pierna": {
+   "archivo": "imagenes/munecos/sentadilla-a-una-pierna.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Curl nórdico": {
+   "archivo": "imagenes/munecos/curl-nordico.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Elevación de tibiales": {
+   "archivo": "imagenes/munecos/elevacion-de-tibiales.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Tibial con disco": {
+   "archivo": "imagenes/munecos/tibial-con-disco.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Plancha Copenhague": {
+   "archivo": "imagenes/munecos/plancha-copenhague.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Posición hueca": {
+   "archivo": "imagenes/munecos/posicion-hueca.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Bicho muerto": {
+   "archivo": "imagenes/munecos/bicho-muerto.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Pájaro-perro": {
+   "archivo": "imagenes/munecos/pajaro-perro.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Leñador en polea": {
+   "archivo": "imagenes/munecos/lenador-en-polea.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Giros rusos": {
+   "archivo": "imagenes/munecos/giros-rusos.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Bandera del dragón": {
+   "archivo": "imagenes/munecos/bandera-del-dragon.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Comba": {
+   "archivo": "imagenes/munecos/comba.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Boxeo": {
+   "archivo": "imagenes/munecos/boxeo.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Escaleras": {
+   "archivo": "imagenes/munecos/escaleras.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Carrera": {
+   "archivo": "imagenes/munecos/carrera.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Bicicleta": {
+   "archivo": "imagenes/munecos/bicicleta.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Elíptica": {
+   "archivo": "imagenes/munecos/eliptica.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Remo de cardio": {
+   "archivo": "imagenes/munecos/remo-de-cardio.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Natación": {
+   "archivo": "imagenes/munecos/natacion.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Caminar": {
+   "archivo": "imagenes/munecos/caminar.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Senderismo": {
+   "archivo": "imagenes/munecos/senderismo.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Burpees": {
+   "archivo": "imagenes/munecos/burpees.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Saltos al cajón": {
+   "archivo": "imagenes/munecos/saltos-al-cajon.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Estiramiento": {
+   "archivo": "imagenes/munecos/estiramiento.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Estiramiento de isquios": {
+   "archivo": "imagenes/munecos/estiramiento-de-isquios.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Estiramiento de cuádriceps": {
+   "archivo": "imagenes/munecos/estiramiento-de-cuadriceps.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Estiramiento de psoas en zancada": {
+   "archivo": "imagenes/munecos/estiramiento-de-psoas-en-zancada.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Estiramiento de gemelo en pared": {
+   "archivo": "imagenes/munecos/estiramiento-de-gemelo-en-pared.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Estiramiento de glúteo en figura de 4": {
+   "archivo": "imagenes/munecos/estiramiento-de-gluteo-en-figura-de-4.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Estiramiento de aductores en mariposa": {
+   "archivo": "imagenes/munecos/estiramiento-de-aductores-en-mariposa.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Estiramiento de pectoral en el marco de la puerta": {
+   "archivo": "imagenes/munecos/estiramiento-de-pectoral-en-el-marco-de-la-puerta.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Estiramiento de dorsal": {
+   "archivo": "imagenes/munecos/estiramiento-de-dorsal.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Estiramiento de tríceps": {
+   "archivo": "imagenes/munecos/estiramiento-de-triceps.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Estiramiento de hombro cruzado": {
+   "archivo": "imagenes/munecos/estiramiento-de-hombro-cruzado.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Estiramiento lateral de cuello": {
+   "archivo": "imagenes/munecos/estiramiento-lateral-de-cuello.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Estiramiento de antebrazo": {
+   "archivo": "imagenes/munecos/estiramiento-de-antebrazo.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Estiramiento de lumbares con rodillas al pecho": {
+   "archivo": "imagenes/munecos/estiramiento-de-lumbares-con-rodillas-al-pecho.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "CARs de hombro": {
+   "archivo": "imagenes/munecos/cars-de-hombro.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "CARs de cadera": {
+   "archivo": "imagenes/munecos/cars-de-cadera.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Dislocaciones con pica": {
+   "archivo": "imagenes/munecos/dislocaciones-con-pica.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Tobillo con rodilla a la pared": {
+   "archivo": "imagenes/munecos/tobillo-con-rodilla-a-la-pared.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Rotación torácica en libro abierto": {
+   "archivo": "imagenes/munecos/rotacion-toracica-en-libro-abierto.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Sentadilla profunda mantenida": {
+   "archivo": "imagenes/munecos/sentadilla-profunda-mantenida.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Sentadilla cosaca": {
+   "archivo": "imagenes/munecos/sentadilla-cosaca.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Movilidad de muñeca": {
+   "archivo": "imagenes/munecos/movilidad-de-muneca.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Rotación 90/90": {
+   "archivo": "imagenes/munecos/rotacion-90-90.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Gato-camello": {
+   "archivo": "imagenes/munecos/gato-camello.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Deslizamiento neural (nerve floss)": {
+   "archivo": "imagenes/munecos/deslizamiento-neural-nerve-floss.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Liberación con rodillo": {
+   "archivo": "imagenes/munecos/liberacion-con-rodillo.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Guerrero I (Virabhadrasana I)": {
+   "archivo": "imagenes/munecos/guerrero-i-virabhadrasana-i.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Guerrero II (Virabhadrasana II)": {
+   "archivo": "imagenes/munecos/guerrero-ii-virabhadrasana-ii.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Guerrero III (Virabhadrasana III)": {
+   "archivo": "imagenes/munecos/guerrero-iii-virabhadrasana-iii.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Flexión de tronco de pie (Uttanasana)": {
+   "archivo": "imagenes/munecos/flexion-de-tronco-de-pie-uttanasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Flexión de tronco en postura amplia (Prasarita Padottanasana)": {
+   "archivo": "imagenes/munecos/flexion-de-tronco-en-postura-amplia-prasarita-padottanasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Estiramiento lateral intenso (Parsvottanasana)": {
+   "archivo": "imagenes/munecos/estiramiento-lateral-intenso-parsvottanasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Montaña (Tadasana)": {
+   "archivo": "imagenes/munecos/montana-tadasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Silla (Utkatasana)": {
+   "archivo": "imagenes/munecos/silla-utkatasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Águila (Garudasana)": {
+   "archivo": "imagenes/munecos/aguila-garudasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Árbol (Vrksasana)": {
+   "archivo": "imagenes/munecos/arbol-vrksasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Rey de los bailarines (Natarajasana)": {
+   "archivo": "imagenes/munecos/rey-de-los-bailarines-natarajasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Triángulo (Trikonasana)": {
+   "archivo": "imagenes/munecos/triangulo-trikonasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Mano al dedo gordo del pie (Utthita Hasta Padangusthasana)": {
+   "archivo": "imagenes/munecos/mano-al-dedo-gordo-del-pie-utthita-hasta-padangusthasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Ángulo lateral extendido (Utthita Parsvakonasana)": {
+   "archivo": "imagenes/munecos/angulo-lateral-extendido-utthita-parsvakonasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Ángulo lateral girado (Parivritta Baddha Parsvakonasana)": {
+   "archivo": "imagenes/munecos/angulo-lateral-girado-parivritta-baddha-parsvakonasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Triángulo girado (Parivritta Trikonasana)": {
+   "archivo": "imagenes/munecos/triangulo-girado-parivritta-trikonasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Sentada en cuclillas (Upavesasana)": {
+   "archivo": "imagenes/munecos/sentada-en-cuclillas-upavesasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Medio señor de los peces (Ardha Matsyendrasana)": {
+   "archivo": "imagenes/munecos/medio-senor-de-los-peces-ardha-matsyendrasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Ángulo ligado (Baddha Konasana)": {
+   "archivo": "imagenes/munecos/angulo-ligado-baddha-konasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Ángulo ligado tumbado (Supta Baddha Konasana)": {
+   "archivo": "imagenes/munecos/angulo-ligado-tumbado-supta-baddha-konasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Bastón (Dandasana)": {
+   "archivo": "imagenes/munecos/baston-dandasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Cara de vaca (Gomukhasana)": {
+   "archivo": "imagenes/munecos/cara-de-vaca-gomukhasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Mono (Hanumanasana)": {
+   "archivo": "imagenes/munecos/mono-hanumanasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Cabeza a la rodilla (Janu Sirsasana)": {
+   "archivo": "imagenes/munecos/cabeza-a-la-rodilla-janu-sirsasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Cabeza a la rodilla girada (Parivritta Janu Sirsasana)": {
+   "archivo": "imagenes/munecos/cabeza-a-la-rodilla-girada-parivritta-janu-sirsasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Tortuga (Kurmasana)": {
+   "archivo": "imagenes/munecos/tortuga-kurmasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Tortuga tumbada (Supta Kurmasana)": {
+   "archivo": "imagenes/munecos/tortuga-tumbada-supta-kurmasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Gran sello (Mahamudra)": {
+   "archivo": "imagenes/munecos/gran-sello-mahamudra.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Barca (Navasana)": {
+   "archivo": "imagenes/munecos/barca-navasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Estiramiento del oeste (Paschimottanasana)": {
+   "archivo": "imagenes/munecos/estiramiento-del-oeste-paschimottanasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Sentada en ángulo amplio (Upavistha Konasana)": {
+   "archivo": "imagenes/munecos/sentada-en-angulo-amplio-upavistha-konasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Paloma real con una pierna (Eka Pada Rajakapotasana)": {
+   "archivo": "imagenes/munecos/paloma-real-con-una-pierna-eka-pada-rajakapotasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Camello (Ustrasana)": {
+   "archivo": "imagenes/munecos/camello-ustrasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Niño o embrión (Balasana)": {
+   "archivo": "imagenes/munecos/nino-o-embrion-balasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "León (Simhasana)": {
+   "archivo": "imagenes/munecos/leon-simhasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Pasador de puerta (Parighasana)": {
+   "archivo": "imagenes/munecos/pasador-de-puerta-parighasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Héroe tendido (Supta Virasana)": {
+   "archivo": "imagenes/munecos/heroe-tendido-supta-virasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Banco sobre dos apoyos (Dwi Pada Pitham)": {
+   "archivo": "imagenes/munecos/banco-sobre-dos-apoyos-dwi-pada-pitham.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Oreja a la rodilla (Karnapidasana)": {
+   "archivo": "imagenes/munecos/oreja-a-la-rodilla-karnapidasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Vishnu en el diván (Anantasana)": {
+   "archivo": "imagenes/munecos/vishnu-en-el-divan-anantasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Apana (Apanasana)": {
+   "archivo": "imagenes/munecos/apana-apanasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Arado (Halasana)": {
+   "archivo": "imagenes/munecos/arado-halasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Cadáver (Savasana)": {
+   "archivo": "imagenes/munecos/cadaver-savasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Pez (Matsyasana)": {
+   "archivo": "imagenes/munecos/pez-matsyasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Puente (Setu Bandhasana)": {
+   "archivo": "imagenes/munecos/puente-setu-bandhasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Piernas en la pared (Viparita Karani)": {
+   "archivo": "imagenes/munecos/piernas-en-la-pared-viparita-karani.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Sobre los hombros con apoyo (Salamba Sarvangasana)": {
+   "archivo": "imagenes/munecos/sobre-los-hombros-con-apoyo-salamba-sarvangasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Sobre los hombros sin apoyo de brazos (Niralamba Sarvangasana)": {
+   "archivo": "imagenes/munecos/sobre-los-hombros-sin-apoyo-de-brazos-niralamba-sarvangasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Torsión abdominal (Jathara Parivritti)": {
+   "archivo": "imagenes/munecos/torsion-abdominal-jathara-parivritti.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Langosta completa (Viparita Salabhasana)": {
+   "archivo": "imagenes/munecos/langosta-completa-viparita-salabhasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Cobra (Bhujangasana)": {
+   "archivo": "imagenes/munecos/cobra-bhujangasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Langosta (Salabhasana)": {
+   "archivo": "imagenes/munecos/langosta-salabhasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Arco (Dhanurasana)": {
+   "archivo": "imagenes/munecos/arco-dhanurasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Banco sobre cuatro apoyos (Catush Pada Pitham)": {
+   "archivo": "imagenes/munecos/banco-sobre-cuatro-apoyos-catush-pada-pitham.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Grulla (Bakasana)": {
+   "archivo": "imagenes/munecos/grulla-bakasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Grulla lateral (Parsva Bakasana)": {
+   "archivo": "imagenes/munecos/grulla-lateral-parsva-bakasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Plancha hacia arriba (Purvottanasana)": {
+   "archivo": "imagenes/munecos/plancha-hacia-arriba-purvottanasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Plancha lateral del sabio (Vasisthasana)": {
+   "archivo": "imagenes/munecos/plancha-lateral-del-sabio-vasisthasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Ángulo en ocho (Astavakrasana)": {
+   "archivo": "imagenes/munecos/angulo-en-ocho-astavakrasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Árbol boca abajo (Adho Mukha Vrksasana)": {
+   "archivo": "imagenes/munecos/arbol-boca-abajo-adho-mukha-vrksasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Rueda o arco hacia arriba (Urdhva Dhanurasana)": {
+   "archivo": "imagenes/munecos/rueda-o-arco-hacia-arriba-urdhva-dhanurasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Báculo sobre cuatro miembros (Chaturanga Dandasana)": {
+   "archivo": "imagenes/munecos/baculo-sobre-cuatro-miembros-chaturanga-dandasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Escorpión (Vrschikasana)": {
+   "archivo": "imagenes/munecos/escorpion-vrschikasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Pavo real con la cola desplegada (Pincha Mayurasana)": {
+   "archivo": "imagenes/munecos/pavo-real-con-la-cola-desplegada-pincha-mayurasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Pavo real (Mayurasana)": {
+   "archivo": "imagenes/munecos/pavo-real-mayurasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Perro boca abajo (Adho Mukha Svanasana)": {
+   "archivo": "imagenes/munecos/perro-boca-abajo-adho-mukha-svanasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Perro boca arriba (Urdhva Mukha Svanasana)": {
+   "archivo": "imagenes/munecos/perro-boca-arriba-urdhva-mukha-svanasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Sobre la cabeza con apoyo (Salamba Sirsasana)": {
+   "archivo": "imagenes/munecos/sobre-la-cabeza-con-apoyo-salamba-sirsasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
   }
  }
 }

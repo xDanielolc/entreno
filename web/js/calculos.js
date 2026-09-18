@@ -265,20 +265,49 @@ export function maximoTrabajo(datos, ejercicio, { excluirSesion, tope = 50 } = {
 
 // Pesos propuestos para las bajadas de un drop set, a partir de la carga de
 // la serie y de la última vez que se hizo.
-export function tramosPropuestos(serie, plan, ultima) {
+// Valores por defecto de cada técnica con tramos, según Ajustes.
+export function tramosPorDefecto(perfil, tecnica) {
+  if (tecnica === 'drop-set') {
+    return { tramos: perfil?.dropSet?.bajadas ?? 4, salto: perfil?.dropSet?.salto ?? 10, reps: null };
+  }
+  const propios = perfil?.tramosPorDefecto?.[tecnica] ?? {};
+  const base = tecnica === 'miorepeticiones' ? { tramos: 5, reps: 5 } : { tramos: 3, reps: null };
+  return { ...base, ...propios, salto: 0 };
+}
+
+// Tramos que se proponen al crear la serie. Cada ejercicio elige de dónde
+// salen (plan.tramosModo):
+//   · 'ultima'    como la última vez (cuántos tramos y con qué pesos);
+//   · 'ajustes'   con los valores generales de Ajustes;
+//   · 'plantilla' con lo guardado en el propio ejercicio.
+// Si el ejercicio tiene pesos fijos (máquina de placas), mandan esos.
+export function tramosPropuestos(serie, plan, ultima, perfil) {
   const config = tramosDe(serie.tecnicas);
-  const previstos = plan?.tramosPrevistos || plan?.dropSet?.bajadas || ultima?.tramos?.length || 4;
-  // Se baja siempre lo mismo (por defecto 10 kg, o lo que tenga el ejercicio):
-  // una escalera lineal es más fácil de seguir en el gimnasio que un porcentaje.
-  const salto = plan?.tramoSalto ?? plan?.dropSet?.salto ?? config?.salto ?? 0;
+  if (!config) return null;
+  const defecto = tramosPorDefecto(perfil, config.tecnica);
+  const modo = plan?.tramosModo ?? 'ultima';
+  let n = defecto.tramos;
+  let salto = plan?.tramoSalto ?? defecto.salto;
+  let reps = defecto.reps;
+  if (modo === 'plantilla') {
+    n = plan?.tramosPrevistos ?? n;
+    reps = plan?.tramoReps ?? reps;
+  } else if (modo === 'ultima') {
+    n = ultima?.tramos?.length || plan?.tramosPrevistos || n;
+  } else {
+    salto = defecto.salto;
+  }
+  if (!config.salto) salto = 0;
+  const fijos = plan?.tramosFijos?.length ? plan.tramosFijos : null;
+  if (fijos && modo !== 'ultima') n = Math.max(n, fijos.length);
+
   const tramos = [];
-  for (let i = 0; i < previstos; i++) {
-    const deUltima = ultima?.tramos?.[i];
-    let carga = deUltima?.carga;
-    if (carga == null && serie.carga != null) {
-      carga = Math.max(0, redondear(serie.carga - salto * i, 2));
-    }
-    tramos.push({ carga: carga ?? null, esfuerzo: null });
+  for (let i = 0; i < n; i++) {
+    let carga = fijos?.[i] ?? (modo === 'ultima' ? ultima?.tramos?.[i]?.carga : null);
+    if (carga == null && serie.carga != null) carga = Math.max(0, redondear(serie.carga - salto * i, 2));
+    // En miorrepeticiones, el primer tramo es la serie de activación (sin objetivo).
+    const objetivo = config.tecnica === 'miorepeticiones' && i === 0 ? null : reps;
+    tramos.push({ carga: Number.isFinite(carga) ? carga : null, esfuerzo: null, objetivo: objetivo ?? null });
   }
   return tramos;
 }

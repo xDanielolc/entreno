@@ -1,5 +1,8 @@
-// Imágenes de los ejercicios, descargadas de wger con licencia Creative
-// Commons BY-SA (ver herramientas/descargar_imagenes.py).
+// Imágenes de los ejercicios. Vienen de tres sitios:
+//   · wger y Everkinetic, con licencia Creative Commons BY-SA
+//     (herramientas/descargar_imagenes.py);
+//   · muñecos propios para lo que ninguno dibuja: yoga, estiramientos,
+//     movilidad, cardio… (herramientas/dibujar_munecos.py).
 //
 // El archivo de créditos se lee una vez y se guarda en memoria. Si no está
 // (por ejemplo, sin conexión la primera vez), la app sigue funcionando sin
@@ -33,4 +36,11 @@ export function imagenDe(nombre) {
 
 function normalizar(texto) {
   return texto.normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+}
+
+// Pie de foto con el autor y la licencia de cada imagen.
+export function textoCredito(imagen) {
+  if (imagen.fuente === 'propia') return 'Dibujo propio de la app, provisional hasta que lo pulamos con Design';
+  if (imagen.fuente === 'everkinetic') return 'Imagen: Everkinetic · CC-BY-SA';
+  return `Imagen: ${imagen.autor} · wger, CC-BY-SA`;
 }

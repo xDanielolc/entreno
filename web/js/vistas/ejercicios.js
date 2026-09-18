@@ -3,14 +3,15 @@ import {
 } from '../calculos.js';
 import * as estado from '../estado.js';
 import {
-  DIAS_CICLO_POR_DEFECTO, TIPOS_CARGA, TIPOS_ESFUERZO, TIPOS_PROGRESION, TIPOS_SERIE,
+  ASISTENCIAS, DIAS_CICLO_POR_DEFECTO, TECNICAS_ESTIRAMIENTO, TIPOS_CARGA, TIPOS_ESFUERZO, TIPOS_PROGRESION, TIPOS_SERIE,
   progresionPorDefecto, serieNuevaPlantilla, sobrePorDefecto, tramosDe,
 } from '../esquema.js';
-import { CATALOGO, normalizar } from '../catalogo.js';
+import { tramosPorDefecto } from '../calculos.js';
+import { CATALOGO, normalizar, tipoDeEjercicio } from '../catalogo.js';
 import { ORDEN_MUSCULOS, nombreMusculo } from '../musculos.js';
 import { entradaDeEjercicio } from '../series.js';
 import { seccionProgreso } from './graficas.js';
-import { imagenDe } from '../imagenes.js';
+import { imagenDe, textoCredito } from '../imagenes.js';
 import { anadir, aviso, confirmar, h, leerNumero, nuevoId } from '../ui.js';
 import { barraFiltros, cajaLista, elegirEjercicio, filtrar, tarjetaItem } from './selector-ejercicios.js';
 import { selectorTecnicas } from './tecnicas.js';
@@ -124,7 +125,7 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
     h('h1', {}, existente ? borrador.nombre || 'Editar ejercicio' : 'Nuevo ejercicio'),
     imagenFicha && h('figure', { class: 'imagen-ejercicio' },
       h('img', { src: imagenFicha.archivo, alt: `Ilustración de ${existente.nombre}`, loading: 'lazy' }),
-      h('figcaption', { class: 'nota' }, `Imagen: ${imagenFicha.autor} · wger, CC-BY-SA`)),
+      h('figcaption', { class: 'nota' }, textoCredito(imagenFicha))),
     existente && seccionProgreso(d, existente),
     zona);
 
@@ -190,6 +191,19 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         sugerenciaDelCatalogo(),
         selectorMusculos('Principales', borrador.musculos.principales, borrador.musculos.secundarios),
         selectorMusculos('Secundarios', borrador.musculos.secundarios, borrador.musculos.principales)),
+
+      ['estiramiento', 'movilidad', 'yoga'].includes(tipoDeEjercicio(borrador)) && h('fieldset', {},
+        h('legend', {}, '¿Cómo lo haces normalmente?'),
+        h('p', { class: 'nota' }, 'Sale así en cada serie; en el entrenamiento puedes cambiarlo ese día.'),
+        campo('Técnica', h('select', { onchange: (e) => { borrador.estiramiento = { ...borrador.estiramiento, tecnica: e.target.value || null }; repintar(); } },
+          h('option', { value: '' }, 'Sin indicar'),
+          Object.entries(TECNICAS_ESTIRAMIENTO).map(([k, v]) => h('option', { value: k, selected: k === borrador.estiramiento?.tecnica }, v.etiqueta)))),
+        borrador.estiramiento?.tecnica && h('small', { class: 'nota' }, TECNICAS_ESTIRAMIENTO[borrador.estiramiento.tecnica].descripcion),
+        campo('Ayuda', h('select', { onchange: (e) => { borrador.estiramiento = { ...borrador.estiramiento, asistencia: e.target.value || null }; } },
+          h('option', { value: '' }, 'Sin indicar'),
+          Object.entries(ASISTENCIAS).map(([k, v]) => h('option', { value: k, selected: k === borrador.estiramiento?.asistencia }, v)))),
+        h('small', { class: 'nota' }, 'Para la altura del ladrillo, elige «Altura» en la carga. Con «Apoyo con la mano» '
+          + 'apuntas en cada serie en qué punto de la escala estás: puño, surf, pulgar, mano abierta, tres, dos y un dedo, y sin mano.')),
 
       h('fieldset', {},
         h('legend', {}, 'Series de este ejercicio'),
@@ -282,16 +296,12 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         h('span', { class: 'etiqueta-campo' }, 'Técnicas'),
         selectorTecnicas(plan.tecnicas, (nuevas) => {
           plan.tecnicas = nuevas;
-          plan.tramosPrevistos = tramosDe(nuevas) ? (plan.tramosPrevistos || 3) : null;
+          if (!tramosDe(nuevas)) plan.tramosPrevistos = null;
           repintar();
         }),
         h('small', { class: 'nota' }, 'Se pueden combinar: unilateral, rest-pause y un isométrico final en la misma serie.')),
 
-      tramos && h('div', { class: 'fila-campos' },
-        campo(`${tramos.nombre}s previstas`,
-          numeroInput(plan.tramosPrevistos, (v) => { plan.tramosPrevistos = Math.max(1, Math.round(v ?? 4)); })),
-        tramos.salto != null && campo('Se baja cada vez (kg)',
-          numeroInput(plan.tramoSalto ?? tramos.salto, (v) => { plan.tramoSalto = v; }))),
+      tramos && seccionTramos(plan, tramos),
 
       h('div', { class: 'campo' },
         h('span', { class: 'etiqueta-campo' }, 'Progresión'),
@@ -302,6 +312,39 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         h('small', { class: 'nota' }, TIPOS_PROGRESION[plan.progresion.tipo].descripcion)),
 
       detalleProgresion(plan));
+  }
+
+  // Cómo se rellenan los tramos cada vez que el ejercicio entra en un
+  // entrenamiento: como la última vez, con los ajustes generales o con lo
+  // que se guarde aquí. Y, en máquinas de placas, una secuencia de pesos fija.
+  function seccionTramos(plan, tramos) {
+    const defecto = tramosPorDefecto(d.perfil, tramos.tecnica);
+    plan.tramosModo ??= 'ultima';
+    const modos = {
+      ultima: { etiqueta: 'Como la última vez', descripcion: 'Mismos tramos y pesos que la última vez que lo hiciste.' },
+      ajustes: { etiqueta: 'Por defecto', descripcion: `Lo de Ajustes: ${defecto.tramos} ${tramos.nombre.toLowerCase()}s`
+        + (defecto.reps ? ` de ${defecto.reps} repeticiones` : '') + (defecto.salto ? `, bajando ${defecto.salto} kg` : '') + '.' },
+      plantilla: { etiqueta: 'Lo de aquí', descripcion: 'Los valores que pongas debajo, siempre.' },
+    };
+    return h('div', { class: 'campo' },
+      h('span', { class: 'etiqueta-campo' }, `${tramos.nombre}s: de dónde salen cada vez`),
+      opciones(modos, plan.tramosModo, (modo) => { plan.tramosModo = modo; repintar(); }),
+      plan.tramosModo === 'plantilla' && h('div', { class: 'fila-campos' },
+        campo(`${tramos.nombre}s`, numeroInput(plan.tramosPrevistos ?? defecto.tramos,
+          (v) => { plan.tramosPrevistos = v == null ? null : Math.max(1, Math.round(v)); })),
+        tramos.tecnica !== 'drop-set' && campo('Repeticiones por miniserie',
+          numeroInput(plan.tramoReps ?? defecto.reps, (v) => { plan.tramoReps = v; }))),
+      tramos.salto > 0 && h('div', { class: 'fila-campos' },
+        campo('Se baja cada vez (kg)', numeroInput(plan.tramoSalto ?? defecto.salto, (v) => { plan.tramoSalto = v; }))),
+      tramos.tecnica === 'drop-set' && campo('Pesos fijos (máquina de placas)',
+        h('input', { type: 'text', inputmode: 'decimal', placeholder: 'Por ejemplo: 50; 42,5; 35; 27,5',
+          value: (plan.tramosFijos || []).map((p) => formatearNumero(p)).join('; '),
+          oninput: (e) => {
+            const pesos = e.target.value.split(';').map((x) => leerNumero(x)).filter((x) => x != null);
+            plan.tramosFijos = pesos.length ? pesos : null;
+          } }),
+        h('small', { class: 'nota' }, 'Separados por punto y coma. Si los pones, cada drop set sale con estos pesos '
+          + 'y no se recalcula con el 1RM. También se pueden fijar desde el entrenamiento.')));
   }
 
   function detalleProgresion(plan) {

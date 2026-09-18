@@ -1,53 +1,84 @@
 // Recuperación por músculo.
 //
-// Cómo se calcula, y qué respalda cada parte:
-//   · La síntesis de proteínas sube tras entrenar y vuelve a su sitio hacia
-//     las 36 horas (MacDougall 1995).
-//   · Entrenar al fallo, y sobre todo con muchas repeticiones, deja la función
-//     muscular tocada hasta 48 horas (Pareja-Blanco 2020).
-//   · NO hay evidencia de que cada músculo tenga su propio tiempo fijo de
-//     recuperación: lo que manda es cuánto y cómo de duro entrenaste. El
-//     tamaño del músculo solo ajusta un poco el resultado.
+// Qué respalda cada parte (y qué no):
+//   · Lo que más alarga la recuperación es lo cerca del fallo que acabas las
+//     series, más que el número de series. Con 3 o más repeticiones en
+//     recámara, la fuerza vuelve en unas 24 h; al fallo, tarda hasta 48 h, y
+//     más si el fallo llega con muchas repeticiones (Morán-Navarro 2017,
+//     Pareja-Blanco 2019 y 2020). De ahí salen las 24, 36, 48 y 60 horas.
+//   · El volumen total apenas cambia ese tiempo (Pareja-Blanco 2019): cada
+//     serie de más añade cada vez menos. Eso se modela con una curva que se
+//     aplana (la primera serie cuenta el 70 %, a partir de 6 casi el 100 %).
+//     La forma exacta de la curva es una aproximación nuestra.
+//   · No hay evidencia de un tiempo fijo por músculo. Sí la hay de que cada
+//     persona se recupera a su ritmo y de que la sensación de recuperación es
+//     un buen indicador (escala de Laurent 2011). Por eso cada músculo tiene
+//     un factor personal que tú ajustas, y la app te propone cambiarlo según
+//     cómo dices llegar a cada entrenamiento.
 //
 // Todo esto es una estimación para orientar, no una medida.
 
 import { cuentaParaFatiga } from './catalogo.js';
 import { MUSCULOS, ORDEN_MUSCULOS } from './musculos.js';
 
-const HORAS_BASE = 36;
-const HORAS_MAXIMAS = 72;
+const HORAS_MAXIMAS = 96;
 
-// Series efectivas de una sesión, por músculo. Con `dureza`, cada serie pesa
-// según lo cerca del fallo que la dejaste (para la recuperación); sin ella,
-// cada serie cuenta una (para el volumen semanal).
-function fatigaDeSesion(datos, sesion, { dureza = true } = {}) {
+// Horas que pide una serie según lo cerca del fallo que la dejaste.
+function horasDeSerie(serie) {
+  const rir = serie.recamara;
+  const conTramos = (serie.tramos || []).filter((t) => t.esfuerzo != null).length > 1;
+  if (rir == null) return 36;
+  if (rir >= 3) return 24;
+  if (rir >= 1) return conTramos ? 42 : 36;
+  const muchas = (serie.esfuerzo ?? 0) > 15;
+  return conTramos || muchas ? 60 : 48;
+}
+
+// Cuánto pesa el volumen: 1 serie = 70 %, 3 = 87 %, 6 = 96 %, 10 o más ≈ 100 %.
+function factorVolumen(series) {
+  return 0.55 + 0.45 * (1 - Math.exp(-series / 2.5));
+}
+
+// Series de una sesión por músculo, con las horas que pide cada una. En un
+// drop set o rest-pause, cada tramo de más cuenta media serie; un músculo
+// secundario recibe la mitad.
+function cargaDeSesion(datos, sesion) {
   const porMusculo = new Map();
+  const sumar = (m, series, horas) => {
+    const x = porMusculo.get(m) ?? { series: 0, sumaHoras: 0, maxHoras: 0 };
+    x.series += series;
+    x.sumaHoras += horas * series;
+    x.maxHoras = Math.max(x.maxHoras, horas);
+    porMusculo.set(m, x);
+  };
   for (const entrada of sesion.ejercicios) {
     const ej = datos.ejercicios.find((e) => e.id === entrada.ejercicioId);
     if (!ej || !cuentaParaFatiga(ej)) continue;
     const principales = ej.musculos?.principales ?? [];
     const secundarios = ej.musculos?.secundarios ?? [];
-    if (!principales.length && !secundarios.length) continue;
-
     for (const serie of entrada.series) {
       if (!serie.hecha || serie.tipo === 'calentamiento') continue;
-      // Cuanto más cerca del fallo, más fatiga deja.
-      const cerca = !dureza || serie.recamara == null ? 1 : serie.recamara <= 0 ? 1.3 : serie.recamara >= 3 ? 0.7 : 1;
       const hechos = (serie.tramos || []).filter((t) => t.esfuerzo != null).length;
-      const tramos = hechos > 1 ? 1 + (hechos - 1) * 0.5 : 1;
-      const peso = cerca * tramos;
-      for (const m of principales) porMusculo.set(m, (porMusculo.get(m) ?? 0) + peso);
-      for (const m of secundarios) porMusculo.set(m, (porMusculo.get(m) ?? 0) + peso * 0.5);
+      const series = hechos > 1 ? 1 + (hechos - 1) * 0.5 : 1;
+      const horas = horasDeSerie(serie);
+      for (const m of principales) sumar(m, series, horas);
+      for (const m of secundarios) sumar(m, series * 0.5, horas);
     }
   }
   return porMusculo;
 }
 
-function horasNecesarias(series, musculo) {
-  const tamano = MUSCULOS[musculo]?.tamano ?? 'medio';
-  const ajusteTamano = tamano === 'grande' ? 6 : tamano === 'pequeno' ? -6 : 0;
-  const porVolumen = Math.min(24, Math.max(0, series - 3) * 4);
-  return Math.min(HORAS_MAXIMAS, HORAS_BASE + ajusteTamano + porVolumen);
+export function factorPersonal(datos, musculo) {
+  return datos.perfil.recuperacion?.factores?.[musculo] ?? 1;
+}
+
+// Horas que necesita un músculo tras una sesión: la dureza media y la de la
+// serie más dura, a partes iguales; por el volumen; y por tu factor.
+function horasNecesarias(datos, musculo, carga) {
+  const media = carga.sumaHoras / carga.series;
+  const base = (media + carga.maxHoras) / 2;
+  const horas = base * factorVolumen(carga.series) * factorPersonal(datos, musculo);
+  return { horas: Math.min(HORAS_MAXIMAS, horas), base, volumen: factorVolumen(carga.series) };
 }
 
 // Estado de cada músculo: 0 % recién entrenado, 100 % recuperado.
@@ -57,17 +88,20 @@ export function recuperacionPorMusculo(datos, ahora = new Date()) {
 
   const recientes = datos.sesiones
     .filter((s) => !s.borrada && s.estado === 'terminada')
-    .filter((s) => horasDesde(s, ahora) != null && horasDesde(s, ahora) <= HORAS_MAXIMAS * 1.5);
+    .filter((s) => horasDesde(s, ahora) != null && horasDesde(s, ahora) >= 0 && horasDesde(s, ahora) <= HORAS_MAXIMAS * 1.5);
 
   for (const sesion of recientes) {
-    const horas = horasDesde(sesion, ahora);
-    for (const [musculo, series] of fatigaDeSesion(datos, sesion)) {
+    const pasadas = horasDesde(sesion, ahora);
+    for (const [musculo, carga] of cargaDeSesion(datos, sesion)) {
       if (!estado[musculo]) continue;
-      const necesarias = horasNecesarias(series, musculo);
-      const porcentaje = Math.max(0, Math.min(100, Math.round((horas / necesarias) * 100)));
+      const n = horasNecesarias(datos, musculo, carga);
+      const porcentaje = Math.max(0, Math.min(100, Math.round((pasadas / n.horas) * 100)));
       if (porcentaje < estado[musculo].porcentaje) {
-        estado[musculo] = { musculo, porcentaje, ultima: sesion.fecha, series: Math.round(series * 10) / 10,
-          horasNecesarias: Math.round(necesarias), horasRestantes: Math.max(0, Math.round(necesarias - horas)) };
+        estado[musculo] = {
+          musculo, porcentaje, ultima: sesion.fecha, series: Math.round(carga.series * 10) / 10,
+          horasBase: Math.round(n.base), factorVolumen: n.volumen, factor: factorPersonal(datos, musculo),
+          horasNecesarias: Math.round(n.horas), horasRestantes: Math.max(0, Math.round(n.horas - pasadas)),
+        };
       }
     }
   }
@@ -88,15 +122,15 @@ export function claseDeRecuperacion(porcentaje) {
   return 'cansado';
 }
 
+const coma = (n) => String(n).replace('.', ',');
+
 // Para explicar un músculo concreto: de dónde salen sus horas.
 export function detalleDeRecuperacion(e) {
   if (!e.ultima) return '';
-  const tamano = MUSCULOS[e.musculo]?.tamano ?? 'medio';
-  const ajuste = tamano === 'grande' ? '+6 h por ser grande' : tamano === 'pequeno' ? '−6 h por ser pequeño' : 'tamaño medio';
-  const extra = Math.max(0, e.series - 3) * 4;
-  return `${String(e.series).replace('.', ',')} series efectivas → 36 h de base, ${ajuste}`
-    + (extra ? `, +${Math.round(Math.min(24, extra))} h por las series de más` : '')
-    + ` = ${e.horasNecesarias} h en total.`;
+  return `${coma(e.series)} series; por lo cerca del fallo, ${e.horasBase} h; `
+    + `por el volumen, ×${coma(Math.round(e.factorVolumen * 100) / 100)}`
+    + (e.factor !== 1 ? `; tu ajuste personal, ×${coma(e.factor)}` : '')
+    + ` = ${e.horasNecesarias} h.`;
 }
 
 export function textoDeRecuperacion(e) {
@@ -113,9 +147,62 @@ export function seriesSemanales(datos, ahora = new Date()) {
     if (sesion.borrada || sesion.estado !== 'terminada') continue;
     const horas = horasDesde(sesion, ahora);
     if (horas == null || horas > 24 * 7) continue;
-    for (const [musculo, series] of fatigaDeSesion(datos, sesion, { dureza: false })) {
-      if (total[musculo] != null) total[musculo] += series;
+    for (const [musculo, carga] of cargaDeSesion(datos, sesion)) {
+      if (total[musculo] != null) total[musculo] += carga.series;
     }
   }
   return total;
+}
+
+// ---------------------------------------------------------------------------
+// Cómo llegas: tu sensación frente a lo que calcula la app
+// ---------------------------------------------------------------------------
+//
+// Al empezar un entrenamiento puedes decir cómo notas cada músculo (cargado,
+// normal o fresco). Si varias veces te notas fresco cuando la app te daba por
+// cansado, te recuperas más rápido de lo que calcula; si te notas cargado
+// cuando te daba por recuperado, más despacio. Con eso se propone cambiar
+// tu factor personal.
+
+export const SENSACIONES = {
+  cargado: { texto: 'Cargado', icono: '😣' },
+  normal: { texto: 'Normal', icono: '🙂' },
+  fresco: { texto: 'Fresco', icono: '💪' },
+};
+
+export const FACTORES = [
+  { valor: 0.7, texto: 'Mucho más rápido' },
+  { valor: 0.85, texto: 'Más rápido' },
+  { valor: 1, texto: 'Normal' },
+  { valor: 1.2, texto: 'Más lento' },
+  { valor: 1.4, texto: 'Mucho más lento' },
+];
+
+const MINIMO_RESPUESTAS = 3;
+
+export function sugerenciasDeAjuste(datos) {
+  const desde = datos.perfil.recuperacion?.desde ?? {};
+  const porMusculo = new Map();
+  for (const sesion of datos.sesiones) {
+    if (sesion.borrada || !sesion.sensaciones) continue;
+    for (const [m, s] of Object.entries(sesion.sensaciones)) {
+      if (desde[m] && sesion.fecha < desde[m]) continue;
+      if (!porMusculo.has(m)) porMusculo.set(m, []);
+      porMusculo.get(m).push(s);
+    }
+  }
+  const sugerencias = [];
+  for (const [m, lista] of porMusculo) {
+    if (lista.length < MINIMO_RESPUESTAS || !MUSCULOS[m]) continue;
+    const lento = lista.filter((s) => s.prevista >= 90 && s.sentida === 'cargado').length;
+    const rapido = lista.filter((s) => s.prevista <= 70 && s.sentida === 'fresco').length;
+    const actual = factorPersonal(datos, m);
+    const i = FACTORES.findIndex((f) => f.valor === actual);
+    if (lento >= 2 && lento > rapido && i < FACTORES.length - 1) {
+      sugerencias.push({ musculo: m, nuevo: FACTORES[i + 1].valor, sentido: 'lento', veces: lento, total: lista.length });
+    } else if (rapido >= 2 && rapido > lento && i > 0) {
+      sugerencias.push({ musculo: m, nuevo: FACTORES[i - 1].valor, sentido: 'rapido', veces: rapido, total: lista.length });
+    }
+  }
+  return sugerencias;
 }

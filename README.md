@@ -36,3 +36,10 @@ Las imágenes de los ejercicios y del mapa muscular proceden de
 Atribución-CompartirIgual (CC-BY-SA). Cada imagen conserva a su autor en
 `web/imagenes/creditos.json` y la app los muestra en Ajustes. Se descargan con
 `herramientas/descargar_imagenes.py`.
+
+Los ejercicios que wger no tiene usan los dibujos de
+[Everkinetic](https://github.com/everkinetic/data) (CC-BY-SA 4.0). Los que
+ninguno de los dos tiene (yoga, estiramientos, movilidad, cardio) llevan
+muñecos propios generados con `herramientas/dibujar_munecos.py`, que se ejecuta
+después del de descarga. También son propias siete capas del mapa muscular
+(`herramientas/dibujar_capas_extra.py`).

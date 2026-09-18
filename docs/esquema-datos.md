@@ -1,4 +1,4 @@
-# Esquema de datos — versión 7
+# Esquema de datos — versión 8
 
 > Las secciones de abajo describen la versión 3. Los cambios posteriores están
 > resumidos en «Cambios desde la versión 3», al final del apartado 9, y en
@@ -428,6 +428,15 @@ El paso 3 no es opcional. Es la red de seguridad.
   series con tramos: `cargaAutomatica` (la app puede recalcular sus pesos
   mientras no los toques) y `rellenoDesde = { rm, porcentaje }`. Se limpian
   los pesos no numéricos que dejaba «+ Bajada».
+- **v8.** `perfil.tramosPorDefecto` (rest-pause y miorrepeticiones),
+  `perfil.respiracion = { veces, inspirar, espirar }`,
+  `perfil.recuperacion = { factores: { musculo: 0.7…1.4 }, desde: { musculo: fecha } }`.
+  En cada plantilla de serie, `tramosModo` ('ultima' | 'ajustes' |
+  'plantilla'), `tramoReps` y `tramosFijos` (kilos fijos de un drop set). En
+  cada sesión, `sensaciones = { musculo: { sentida, prevista } }` y
+  `sensacionesCerrada`. En ejercicios de estiramiento, movilidad o yoga,
+  `estiramiento = { tecnica, asistencia }`, y en sus series además `nivel`
+  (escala de apoyo con la mano).
 
 ---
 
