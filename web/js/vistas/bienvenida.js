@@ -3,6 +3,7 @@ import * as estado from '../estado.js';
 import { pedirToken } from '../google-auth.js';
 import { sincronizar } from '../sincronizacion.js';
 import { anadir, aviso, h } from '../ui.js';
+import { avisarModoPrueba } from '../modo-prueba.js';
 
 export function vistaBienvenida(contenedor) {
   let ocupado = false;
@@ -31,6 +32,7 @@ export function vistaBienvenida(contenedor) {
   async function probarSinCuenta() {
     await estado.abrirUsuario(estado.USUARIO_SIN_CUENTA);
     location.hash = '#/';
+    avisarModoPrueba();
   }
 
   const botonGoogle = h('button', { class: 'boton grande', onclick: () => entrarConGoogle(botonGoogle) },
@@ -46,5 +48,5 @@ export function vistaBienvenida(contenedor) {
       h('p', { class: 'nota' },
         'Tus datos se guardan en tu propio Google Drive, en una carpeta que crea la app. ',
         'La app no puede ver nada más de tu Drive.'),
-      h('button', { class: 'boton enlace', onclick: probarSinCuenta }, 'Probar sin cuenta (solo en este dispositivo)')));
+      h('button', { class: 'boton enlace', onclick: probarSinCuenta }, 'Probar sin cuenta (no se guarda en ninguna cuenta)')));
 }

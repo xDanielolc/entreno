@@ -20,7 +20,7 @@
 //      estudio).
 //   3. Con pocos datos no se fía del todo: el factor final se acerca a 1 (la
 //      fórmula del estudio) en proporción a los datos que faltan. Con 1
-//      quincena se aplica un 25 % del ajuste; con 3, la mitad; con 9, el 75 %.
+//      quincena se aplica la mitad del ajuste; con 3, el 75 %; con 9, el 90 %.
 //
 // Un factor por encima de 1 quiere decir que en ese ejercicio aguantas más
 // repeticiones de las que predice el estudio con el mismo porcentaje; por
@@ -72,7 +72,7 @@ export function repsParaIgualar(modelo, rm, peso, recamara = 0) {
 
 const DIAS_VENTANA = 14;
 // Cuántas quincenas hacen falta para fiarse a medias del ajuste.
-const PRUDENCIA = 3;
+const PRUDENCIA = 1;
 
 // Series útiles para calibrar: hechas, sin tramos, con peso, cerca del fallo
 // (2 o menos en recámara) y de 30 repeticiones o menos.
@@ -176,8 +176,12 @@ export const EXPLICACIONES_1RM = [
     + 'Se queda con el que hace que series distintas de la misma quincena (60 kg × 20 y 80 kg × 8, por ejemplo) den el mismo 1RM. '
     + 'Es el mismo criterio que usó el estudio, aplicado solo a tus datos. No hay IA: es una búsqueda del mejor número.' },
   { titulo: 'Qué pasa con pocos datos', texto: 'Empieza a ajustar desde la primera quincena, pero sin fiarse del todo: el factor final se '
-    + 'queda a medio camino entre 1 (la fórmula del estudio) y el que dicen tus datos. Con 1 quincena aplica el 25 % del ajuste, con 3 '
-    + 'la mitad, con 9 el 75 %. Así una semana rara no te descoloca los objetivos.' },
+    + 'queda a medio camino entre 1 (la fórmula del estudio) y el que dicen tus datos. Con 1 quincena aplica la mitad del ajuste, con 3 '
+    + 'el 75 %, con 9 el 90 %. Así una semana rara no te descoloca los objetivos.' },
+  { titulo: 'Dentro de cada entrenamiento', texto: 'Tu 1RM de hoy sale de la primera serie (la Bilbo, normalmente). El drop set '
+    + 'de debajo no parte de ese 1RM tal cual: la app aprende de tus drop sets anteriores cuánto rindes tras la primera serie '
+    + '(por el cansancio) y lo corrige. Si la primera bajada sale muy lejos de lo esperado (menos del 60 % o más del 150 % de las '
+    + 'repeticiones previstas), te avisa: puede ser la fórmula, el cansancio de la serie anterior o que no estés recuperado.' },
   { titulo: 'Qué significa el factor', texto: 'Por encima de 1: en ese ejercicio aguantas más repeticiones de las que predice el estudio '
     + 'con el mismo porcentaje de tu 1RM (pasa, por ejemplo, en prensa). Por debajo de 1: menos. Los ciclos Bilbo ya dan los datos que '
     + 'hacen falta; una serie corta de 3 a 5 repeticiones de vez en cuando ayuda a afinar.' },

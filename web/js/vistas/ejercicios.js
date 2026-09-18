@@ -1,5 +1,5 @@
 import {
-  cicloActual, formatearNumero, generarEscalera, lecturaDesdeCarga, registrosDelCiclo,
+  aPasoDeDisco, cicloActual, formatearNumero, generarEscalera, lecturaDesdeCarga, registrosDelCiclo, rmDeReferencia,
 } from '../calculos.js';
 import * as estado from '../estado.js';
 import {
@@ -432,7 +432,7 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
     p.ciclos ??= [];
     if (!p.ciclos.length) {
       p.ciclos.push({ n: 1, inicio: null, fin: null,
-        generador: { inicial: sobre === 'carga' ? 20 : 10, incremento: sobre === 'carga' ? 2.5 : 1, cada: 1 },
+        generador: { inicial: sobre === 'carga' ? inicioBilbo() ?? 20 : 10, incremento: sobre === 'carga' ? 2.5 : 1, cada: 1 },
         escalera: [] });
       p.cicloActual = 1;
     }
@@ -480,15 +480,27 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         h('button', { type: 'button', class: 'boton secundario', onclick: () => nuevoCiclo(plan) }, 'Empezar un ciclo nuevo')));
   }
 
+  // Peso de arranque de un ciclo Bilbo: un porcentaje de tu mejor 1RM
+  // estimado en este ejercicio (el de Ajustes; 50 % por defecto).
+  function inicioBilbo() {
+    const rm = existente ? rmDeReferencia(d, existente)?.valor : null;
+    return rm ? aPasoDeDisco((rm * (d.perfil.bilboInicioPorcentaje ?? 50)) / 100) : null;
+  }
+
   function nuevoCiclo(plan) {
     const p = plan.progresion;
     const anterior = cicloActual(plan) || p.ciclos.at(-1);
     const n = Math.max(0, ...p.ciclos.map((c) => c.n)) + 1;
     const generador = { ...(anterior?.generador || { inicial: 20, incremento: 2.5, cada: 1 }) };
+    // Un ciclo nuevo arranca a un porcentaje de tu 1RM de ahora (50 % por defecto).
+    const inicio = (p.sobre || sobrePorDefecto(borrador)) === 'carga' ? inicioBilbo() : null;
+    if (inicio != null) generador.inicial = inicio;
     p.ciclos.push({ n, inicio: null, fin: null, generador,
       escalera: generarEscalera({ ...generador, dias: p.diasPorCiclo }) });
     p.cicloActual = n;
-    aviso(`Ciclo ${n} preparado. Ajusta el valor inicial y guarda.`);
+    aviso(inicio != null
+      ? `Ciclo ${n} preparado, empezando en ${formatearNumero(inicio)} kg (el ${d.perfil.bilboInicioPorcentaje ?? 50} % de tu 1RM). Revísalo y guarda.`
+      : `Ciclo ${n} preparado. Ajusta el valor inicial y guarda.`);
     repintar();
   }
 

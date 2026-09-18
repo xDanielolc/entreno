@@ -802,3 +802,9 @@ input.fecha { width: auto; }
 .plantilla ul { margin: 4px 0 8px; padding-left: 20px; }
 .explicaciones .explicacion { margin-top: 6px; }
 .lista-factores { padding-left: 18px; font-size: 0.9rem; }
+
+/* Modo prueba y avisos de la primera bajada */
+.aviso-prueba .grande { font-size: 1.15rem; font-weight: 700; color: var(--aviso); }
+.aviso-prueba p { margin: 6px 0; }
+.aviso-bajada:empty { display: none; }
+.aviso-bajada { margin: 6px 0; }

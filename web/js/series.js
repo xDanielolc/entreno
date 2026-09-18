@@ -7,7 +7,7 @@ import {
   tramosPropuestos, usaTramos,
 } from './calculos.js';
 import { recamaraDe, tramosDe } from './esquema.js';
-import { rmDeSerie } from './formula1rm.js';
+import { modeloDe, repsParaIgualar, rmDeSerie } from './formula1rm.js';
 import { nuevoId } from './ui.js';
 
 export function crearSerieDesdePlan(datos, ejercicio, plan, { excluirSesion } = {}) {
@@ -77,12 +77,66 @@ export function saltoDeTramo(datos, ejercicio, serie) {
   return plan?.tramoSalto ?? datos.perfil.dropSet?.salto ?? config.salto;
 }
 
+// Cuánto rindes en la primera bajada respecto al 1RM que acabas de hacer en
+// la serie de arriba: no es lo mismo tu 1RM en la primera serie que tras
+// ella. Se aprende de tus drop sets anteriores de esta serie (el 1RM que
+// «dice» su primera bajada, entre el de la serie de arriba) y se aplica con
+// prudencia: con un drop set, la mitad del ajuste; con tres, el 75 %.
+export function fatigaTrasSerie(datos, ejercicio, planId, { excluirSesion } = {}) {
+  const ratios = [];
+  const sesiones = datos.sesiones.filter((s) => !s.borrada && s.id !== excluirSesion)
+    .sort((a, b) => (b.fecha + (b.inicio || '')).localeCompare(a.fecha + (a.inicio || '')));
+  for (const sesion of sesiones) {
+    for (const entrada of sesion.ejercicios) {
+      if (entrada.ejercicioId !== ejercicio.id) continue;
+      for (const s of entrada.series) {
+        const primera = s.tramos?.[0];
+        const base = s.rmUsado?.base ?? s.rmUsado?.valor;
+        if (s.planId !== planId || !s.rmUsado?.deHoy || !base || !(primera?.carga > 0) || !(primera?.esfuerzo > 0)) continue;
+        const rm = rmDeSerie(datos, ejercicio, { carga: primera.carga, esfuerzo: primera.esfuerzo, recamara: 0 }, primera.esfuerzo);
+        if (rm) ratios.push(rm / base);
+      }
+    }
+    if (ratios.length >= 5) break;
+  }
+  if (!ratios.length) return { factor: 1, veces: 0 };
+  const media = ratios.reduce((a, b) => a + b, 0) / ratios.length;
+  const factor = Math.min(1.05, Math.max(0.7, 1 + (media - 1) * (ratios.length / (ratios.length + 1))));
+  return { factor: redondear(factor, 2), veces: ratios.length };
+}
+
+// ¿La primera bajada ha salido muy lejos de lo que esperaba la fórmula?
+// Devuelve un aviso (o null) para enseñarlo bajo la serie.
+export function avisoPrimeraBajada(datos, ejercicio, serie) {
+  const primera = serie.tramos?.[0];
+  if (!serie.rmUsado?.valor || !(primera?.carga > 0) || primera.esfuerzo == null) return null;
+  const esperadas = repsParaIgualar(modeloDe(datos, ejercicio), serie.rmUsado.valor, primera.carga, 0);
+  if (!(esperadas >= 4)) return null;
+  const hechas = primera.esfuerzo;
+  const redondo = Math.round(esperadas);
+  if (hechas < esperadas * 0.6) {
+    return `Con ${primera.carga} kg la fórmula esperaba unas ${redondo} repeticiones y han salido ${hechas}. Puede que la fórmula esté `
+      + 'desajustada en este ejercicio, que vengas cansado de la serie anterior o que no estés bien recuperado. '
+      + 'La app lo tendrá en cuenta: la próxima vez propondrá algo menos de peso en la primera bajada.';
+  }
+  if (hechas > esperadas * 1.5) {
+    return `Con ${primera.carga} kg la fórmula esperaba unas ${redondo} repeticiones y han salido ${hechas}: has rendido bastante más. `
+      + 'La próxima vez la primera bajada irá con algo más de peso.';
+  }
+  return null;
+}
+
 // 1RM de referencia para una serie con tramos: el mejor de las series de
-// arriba que ya has hecho hoy; si aún no hay, el de tu historial.
+// arriba que ya has hecho hoy, corregido por lo que sueles rendir tras
+// ellas; si aún no hay, el de tu historial.
 export function rmParaTramos(datos, ejercicio, entrada, j, { excluirSesion } = {}) {
   const arriba = entrada.series.slice(0, j).filter((x) => x.hecha && !x.tramos?.length && x.tipo !== 'calentamiento');
   const rms = arriba.map((x) => rmDeSerie(datos, ejercicio, x, esfuerzoTotal(x))).filter(Boolean);
-  if (rms.length) return { valor: redondear(Math.max(...rms), 1), deHoy: true };
+  if (rms.length) {
+    const base = Math.max(...rms);
+    const fatiga = fatigaTrasSerie(datos, ejercicio, entrada.series[j]?.planId, { excluirSesion });
+    return { valor: redondear(base * fatiga.factor, 1), base: redondear(base, 1), fatiga: fatiga.factor, deHoy: true };
+  }
   const historial = rmDeReferencia(datos, ejercicio, { cicloN: entrada.cicloN, excluirSesion });
   return historial ? { valor: historial.valor, deHoy: false } : null;
 }

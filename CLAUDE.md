@@ -86,3 +86,9 @@ consistencia en quincenas y encogido hacia 1 (confianza n/(n+3)).
 Explicaciones plegables en Ajustes y en la ficha. Rutinas prehechas
 (`web/js/plantillas.js`): la suya y cinco de Heavy Duty resumidas con
 palabras propias. Traer pesos fijos de otro ejercicio.
+0.13.0: ciclo Bilbo nuevo al 50 % del 1RM (ajustable), factor 1RM con
+confianza n/(n+1), corrección de fatiga del drop set (`fatigaTrasSerie`) y aviso
+si la primera bajada se aleja de lo esperado, modo prueba con cartel y paso a
+la cuenta (`modo-prueba.js`, fusiona sin duplicar), cinco rutinas prehechas más
+(PPL 3 días suya de 11-2025, torso/pierna con pautas de Ángel7Real, sin máquinas,
+principiantes, calistenia).

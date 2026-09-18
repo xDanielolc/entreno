@@ -19,6 +19,10 @@ const excentricas = (min, max) => ({ tipo: 'intensidad', tecnicas: ['excentricas
 const alFallo = (min = 6, max = 10) => ({ tipo: 'libre', progresion: 'carga', objetivo: [min, max], alFallo: true });
 const sinFallo = (min = 15, max = 20) => ({ tipo: 'libre', progresion: 'carga', objetivo: [min, max] });
 const libre = { tipo: 'libre' };
+const restPause = (min, max) => ({ tipo: 'intensidad', tecnicas: ['rest-pause'], objetivo: [min, max] });
+const unilateral = (forma) => ({ ...forma, tecnicas: [...forma.tecnicas, 'unilateral'] });
+// Varias series iguales con doble progresión en un rango de repeticiones.
+const series = (n, min, max) => Array.from({ length: n }, () => ({ tipo: 'libre', progresion: 'carga', objetivo: [min, max] }));
 
 const e = (nombre, series, extra = {}) => ({ nombre, series, ...extra });
 
@@ -171,6 +175,140 @@ export const PLANTILLAS = [
       { nombre: 'Espalda y bíceps', ejercicios: [
         e('Pullover en polea', [alFallo()]), e('Jalón con agarre estrecho', [alFallo()]), e('Remo con barra', [alFallo()]),
         e('Curl predicador', [alFallo()]),
+      ] },
+    ],
+  },
+  {
+    id: 'ppl-bilbo-heavy-duty-3',
+    nombre: 'PPL Bilbo + Heavy Duty (3 días)',
+    autor: 'Dan (versión anterior, noviembre de 2025)',
+    resumen: 'Tres días: empuje, tirón y pierna. Cada ejercicio con una serie Bilbo y una de intensidad; unos 30-40 minutos por día.',
+    porQue: 'La misma idea que la PLPL, en tres días en lugar de cuatro: la serie Bilbo (20-30 repeticiones sin llegar al fallo) '
+      + 'construye la base, y la serie Heavy Duty (6-12 repeticiones con rest-pause, drop set, isométrico o excéntricas) da el estímulo '
+      + 'intenso. En peso muerto, press, sentadilla, dominadas y fondos se para en el fallo técnico, antes de perder la postura; '
+      + 'en máquinas se puede ir al fallo total.',
+    comoSeHace: 'Rota empuje, tirón y pierna. En cada ejercicio, primero la serie Bilbo y después la de intensidad. Subida explosiva '
+      + 'y bajada lenta en todo. El día de pierna empieza con unos saltos para calentar. Correr 10-20 minutos al final es opcional.',
+    dias: [
+      { nombre: 'Día 1: empuje', ejercicios: [
+        e('Press de banca', [bilbo, restPause(6, 8)], { nota: 'Heavy Duty con rest-pause; fallo técnico' }),
+        e('Elevaciones laterales en polea', [bilbo, dropSet(8, 10)], { nota: 'En máquina si la hay' }),
+        e('Fondos de tríceps', [bilbo, alFallo(6, 8)], { nota: 'Fallo técnico, sin arriesgar' }),
+        e('Extensión de tríceps en máquina', [dropSet(8, 10)], { opcional: true }),
+        e('Crunch abdominal', [bilbo, excentricas(12, 15)]),
+        e('Carrera', [libre], { opcional: true }),
+      ] },
+      { nombre: 'Día 2: tirón', ejercicios: [
+        e('Peso muerto', [bilbo, alFallo(6, 8)], { nota: 'Bilbo de 15-20; fallo técnico' }),
+        e('Hiperextensiones', [bilbo, isometrico(10, 12)]),
+        e('Jalón al pecho', [bilbo, dropSet(6, 8)]),
+        e('Remo en máquina', [bilbo, unilateral(dropSet(6, 8))]),
+        e('Curl de bíceps en máquina', [bilbo, isometrico(8, 12)]),
+        e('Pájaros con mancuernas', [bilbo, isometrico(10, 12)]),
+        e('Carrera', [libre], { opcional: true }),
+      ] },
+      { nombre: 'Día 3: pierna', ejercicios: [
+        e('Saltos al cajón', [libre], { opcional: true, nota: 'Calentamiento' }),
+        e('Sentadilla', [bilbo, alFallo(6, 8)], { nota: 'Fallo técnico' }),
+        e('Extensión de cuádriceps', [alFallo(12, 20)], { nota: 'A una pierna y luego a dos, peso medio' }),
+        e('Curl femoral tumbado', [bilbo, unilateral(dropSet(8, 10))]),
+        e('Abductores en máquina', [bilbo, excentricas(8, 10)]),
+        e('Aductores en máquina', [bilbo, dropSet(8, 10)]),
+        e('Elevación de gemelos', [bilbo, unilateral(isometrico(10, 12))]),
+        e('Carrera', [libre], { opcional: true }),
+      ] },
+    ],
+  },
+  {
+    id: 'angel7real-torso-pierna',
+    nombre: 'Torso / pierna (pautas de Ángel7Real)',
+    autor: 'Montada con las pautas de volumen y ejercicios de la guía de Ángel7Real (2023)',
+    resumen: 'Cuatro días (torso, pierna, torso, pierna): cada músculo dos veces por semana, de 9 a 16 series semanales.',
+    porQue: 'La guía no trae una rutina cerrada, sino cuánto y cómo trabajar cada músculo: dos sesiones por semana para casi todos, '
+      + 'de 5 a 15 repeticiones (más altas en brazos, gemelo y abdomen) y sus ejercicios preferidos. Esta rutina reparte esas pautas '
+      + 'en un torso-pierna para nivel intermedio.',
+    comoSeHace: 'Cuatro días por semana, por ejemplo lunes, martes, jueves y viernes. Cada serie con doble progresión: cuando llegues '
+      + 'al máximo del rango en todas, sube el peso. Acaba cada serie a 1-3 repeticiones del fallo.',
+    dias: [
+      { nombre: 'Torso A', ejercicios: [
+        e('Press de banca', series(3, 6, 8)), e('Dominadas', series(3, 6, 10)), e('Press de hombro con mancuernas', series(3, 6, 8)),
+        e('Remo en polea', series(3, 8, 12)), e('Elevaciones laterales en polea', series(3, 10, 12)),
+        e('Curl de bíceps con barra', series(2, 8, 12)), e('Press francés', series(2, 8, 12)),
+      ] },
+      { nombre: 'Pierna A', ejercicios: [
+        e('Sentadilla', series(3, 5, 8)), e('Peso muerto rumano', series(3, 6, 10)), e('Prensa de piernas', series(2, 10, 15)),
+        e('Curl femoral tumbado', series(2, 10, 15)), e('Elevación de gemelos', series(3, 8, 12)), e('Crunch en polea', series(3, 10, 15)),
+      ] },
+      { nombre: 'Torso B', ejercicios: [
+        e('Press inclinado con mancuernas', series(3, 8, 10)), e('Jalón al pecho', series(3, 8, 12)), e('Press militar', series(3, 6, 8)),
+        e('Remo con mancuerna', series(3, 8, 12)), e('Pájaros con mancuernas', series(3, 12, 15)),
+        e('Curl martillo', series(2, 10, 12)), e('Extensión de tríceps sobre la cabeza', series(2, 10, 15)),
+      ] },
+      { nombre: 'Pierna B', ejercicios: [
+        e('Sentadilla hack', series(3, 8, 12)), e('Hip thrust', series(3, 6, 10)), e('Sentadilla búlgara', series(2, 8, 12)),
+        e('Curl femoral sentado', series(3, 10, 15)), e('Elevación de gemelos sentado', series(3, 10, 15)), e('Rueda abdominal', series(3, 10, 15)),
+      ] },
+    ],
+  },
+  {
+    id: 'pesos-libres-cualquier-gimnasio',
+    nombre: 'Sin máquinas: igual en cualquier gimnasio',
+    autor: 'Propuesta de la app',
+    resumen: 'Cuerpo entero en dos días alternos (A y B), solo con barra, mancuernas y tu peso: los kilos valen en cualquier gimnasio.',
+    porQue: 'Una barra olímpica y unas mancuernas pesan lo mismo en todas partes; una máquina, no. Si cambias de gimnasio o viajas, '
+      + 'esta rutina no pierde el hilo de tu progresión. Los básicos con barra además trabajan mucho músculo a la vez.',
+    comoSeHace: 'Tres días por semana alternando A y B (A-B-A una semana, B-A-B la siguiente). Tres series por ejercicio con doble '
+      + 'progresión, acabando a 1-3 del fallo. Estos ejercicios quedan como «igual en todos los sitios».',
+    dias: [
+      { nombre: 'A', ejercicios: [
+        e('Sentadilla', series(3, 5, 8)), e('Press de banca', series(3, 6, 10)), e('Remo con barra', series(3, 8, 10)),
+        e('Press militar', series(3, 6, 10)), e('Curl de bíceps con barra', series(2, 8, 12)), e('Plancha', series(2, 30, 60)),
+      ] },
+      { nombre: 'B', ejercicios: [
+        e('Peso muerto', series(3, 4, 6)), e('Press inclinado con mancuernas', series(3, 8, 12)), e('Dominadas', series(3, 5, 10)),
+        e('Zancadas', series(3, 8, 12)), e('Elevaciones laterales', series(3, 12, 15)), e('Press francés', series(2, 10, 12)),
+      ] },
+    ],
+  },
+  {
+    id: 'cuerpo-entero-principiantes',
+    nombre: 'Cuerpo entero para principiantes',
+    autor: 'Propuesta de la app',
+    resumen: 'Tres días por semana, dos sesiones alternas (A y B), ejercicios sencillos y seguros para aprender la técnica.',
+    porQue: 'Al empezar, entrenar cada músculo tres veces por semana con poco volumen es lo que más rápido hace progresar, y repetir '
+      + 'los mismos movimientos ayuda a aprenderlos. Las máquinas y las mancuernas son más fáciles de controlar que la barra libre.',
+    comoSeHace: 'Alterna A y B en días no seguidos. Dos o tres series de 8 a 12 repeticiones, dejando 2 en recámara: no hace falta '
+      + 'llegar al fallo. Cuando hagas 12 en todas las series, sube un poco el peso. Tras unos meses, pasa a una rutina de 4 días.',
+    dias: [
+      { nombre: 'A', ejercicios: [
+        e('Sentadilla goblet', series(3, 8, 12)), e('Press de banca con mancuernas', series(3, 8, 12)), e('Jalón al pecho', series(3, 8, 12)),
+        e('Peso muerto rumano', series(2, 8, 12)), e('Press de hombro con mancuernas', series(2, 8, 12)), e('Plancha', series(2, 20, 45)),
+      ] },
+      { nombre: 'B', ejercicios: [
+        e('Prensa de piernas', series(3, 10, 12)), e('Flexiones', series(3, 5, 15)), e('Remo en polea', series(3, 8, 12)),
+        e('Puente de glúteo', series(2, 10, 15)), e('Curl femoral tumbado', series(2, 10, 12)), e('Bicho muerto', series(2, 8, 12)),
+      ] },
+    ],
+  },
+  {
+    id: 'calistenia-cuerpo-entero',
+    nombre: 'Calistenia: cuerpo entero',
+    autor: 'Propuesta de la app',
+    resumen: 'Solo con tu peso, una barra y unas paralelas (o un parque). Tres días por semana.',
+    porQue: 'Para entrenar en casa o en la calle sin material. Se progresa haciendo más repeticiones y pasando a variantes más '
+      + 'difíciles: de flexiones con rodillas a flexiones, de remo invertido a dominadas, de sentadilla a sentadilla a una pierna.',
+    comoSeHace: 'Tres días no seguidos, la misma sesión. Tres series por ejercicio a 1-2 del fallo. Si una variante te sale con más de '
+      + '15 repeticiones, pasa a la siguiente; si no llegas a 5, usa la anterior (con rodillas, con goma, con apoyo).',
+    dias: [
+      { nombre: 'Cuerpo entero', ejercicios: [
+        e('Flexiones', series(3, 5, 15), { nota: 'Con rodillas si no llegas a 5' }),
+        e('Dominadas', series(3, 3, 10), { nota: 'O remo invertido si aún no salen' }),
+        e('Sentadilla a una pierna', series(3, 5, 12), { nota: 'Empieza con sentadilla normal o con apoyo' }),
+        e('Fondos de tríceps', series(3, 5, 12), { nota: 'En paralelas o en banco' }),
+        e('Remo invertido', series(3, 8, 15)),
+        e('Puente de glúteo', series(3, 10, 20)),
+        e('Elevaciones de piernas', series(3, 6, 15)),
+        e('Plancha', series(2, 30, 60)),
       ] },
     ],
   },

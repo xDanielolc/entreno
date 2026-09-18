@@ -1,5 +1,6 @@
 import * as estado from '../estado.js';
 import { sedeInicial } from '../sedes.js';
+import { barraModoPrueba } from '../modo-prueba.js';
 import { crearSerieDesdePlan } from '../series.js';
 import { anadir, fechaLarga, h, hoyISO, modal, nuevoId } from '../ui.js';
 import { tarjetaRecuperacion } from './cuerpo.js';
@@ -43,6 +44,7 @@ export function vistaInicio(contenedor) {
   }
 
   anadir(contenedor,
+    estado.esSinCuenta() && barraModoPrueba(),
     h('p', { class: 'fecha-hoy' }, fechaLarga(hoyISO())),
     h('h1', {}, d.perfil.nombre ? `Hola, ${d.perfil.nombre}` : 'Hola'),
 

@@ -8,7 +8,7 @@ import {
 } from '../esquema.js';
 import { imagenDe } from '../imagenes.js';
 import {
-  crearSerieDesdePlan, entradaDeEjercicio, modoCargaDe, recalcularTramos, saltoDeTramo, serieSuelta,
+  avisoPrimeraBajada, crearSerieDesdePlan, entradaDeEjercicio, modoCargaDe, recalcularTramos, saltoDeTramo, serieSuelta,
 } from '../series.js';
 import { anadir, aviso, confirmar, h, leerNumero } from '../ui.js';
 import { arrancarDescanso, arrancarRespiracion, barraDescanso, descansoDeTramo } from './descanso.js';
@@ -424,6 +424,7 @@ export function vistaSesion(contenedor, { id }) {
           },
         }, texto))),
       conCarga && h('p', { class: 'nota nota-relleno' }, textoRelleno(ej, serie)),
+      h('p', { class: 'aviso-texto aviso-bajada' }, avisoPrimeraBajada(d, ej, serie) ?? ''),
       anterior?.tramos?.length && h('p', { class: 'nota' }, `La otra vez: ${textoSerie(ej, anterior)}`
         + ` (${formatearNumero(esfuerzoTotal(anterior))} ${unidadEsfuerzo(ej)}`
         + `${trabajoSerie(anterior) ? `, ${formatearNumero(trabajoSerie(anterior))} kg de trabajo` : ''}).`),
@@ -439,6 +440,10 @@ export function vistaSesion(contenedor, { id }) {
               x.hecha = x.tramos.some((t) => t.esfuerzo != null);
               pintarTotal();
               marcarHecha(e.target, x, ej);
+              if (k === 0) {
+                const caja = e.target.closest('.serie')?.querySelector('.aviso-bajada');
+                if (caja) caja.textContent = avisoPrimeraBajada(d, ej, x) ?? '';
+              }
               // Al apuntar un tramo, descanso corto hasta el siguiente; al
               // apuntar el último, el descanso normal entre series.
               if (antes == null && x.tramos[k].esfuerzo != null) {
@@ -486,8 +491,12 @@ export function vistaSesion(contenedor, { id }) {
     if (planDe(ej, serie)?.tramosFijos?.length) return 'Pesos fijos de la máquina (se cambian en la ficha del ejercicio).';
     if (modoCargaDe(d, ej, serie) === 'kg') return 'Pesos a mano: no cambian aunque cambie tu 1RM.';
     if (!serie.rmUsado) return 'Los kilos saldrán del 1RM en cuanto hagas la serie de arriba.';
+    const fatiga = serie.rmUsado.deHoy && serie.rmUsado.fatiga && serie.rmUsado.fatiga !== 1
+      ? `, ajustado a lo que sueles rendir tras la primera serie (×${String(serie.rmUsado.fatiga).replace('.', ',')} → `
+        + `${formatearNumero(serie.rmUsado.valor)} kg)`
+      : '';
     return `Kilos según el ${serie.rmUsado.deHoy ? '1RM que acabas de hacer arriba' : '1RM de tu historial'} `
-      + `(${formatearNumero(serie.rmUsado.valor)} kg). Si cambias la serie de arriba, se recalculan.`;
+      + `(${formatearNumero(serie.rmUsado.base ?? serie.rmUsado.valor)} kg)${fatiga}. Si cambias la serie de arriba, se recalculan.`;
   }
 
   function descansoEntreSeries() {

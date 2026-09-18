@@ -8,6 +8,7 @@ import { anadir, confirmar, h, hoyISO, leerNumero } from '../ui.js';
 import { DESCANSO_TRAMOS_POR_DEFECTO, RESPIRACION_POR_DEFECTO } from './descanso.js';
 import { TIPOS_SEDE, nuevaSede, sedesActivas } from '../sedes.js';
 import { calibrar, textoCalibracion } from '../formula1rm.js';
+import { TEXTO_AVISO, guardarPruebaEnCuenta } from '../modo-prueba.js';
 import { explicaciones1RM } from './ejercicios.js';
 import { tramosPorDefecto } from '../calculos.js';
 
@@ -84,6 +85,14 @@ export function vistaAjustes(contenedor) {
           + 'o recuperar el aliento entre miniseries. Al apuntar la última, el descanso normal.'))),
 
     h('section', { class: 'tarjeta formulario' },
+      h('h2', {}, 'Ciclos Bilbo'),
+      numeroAjuste('Un ciclo nuevo empieza al (% de tu 1RM)', d.perfil.bilboInicioPorcentaje ?? 50,
+        (x, v) => { x.perfil.bilboInicioPorcentaje = v; }),
+      h('details', { class: 'explicacion' }, h('summary', {}, 'Por qué'),
+        h('p', {}, 'Al empezar un ciclo, el primer día va a este porcentaje de tu mejor 1RM estimado en ese ejercicio y cada día '
+          + 'sube un poco. Empezar bajo (50 %) deja margen para superarte muchos días seguidos con series largas.'))),
+
+    h('section', { class: 'tarjeta formulario' },
       h('h2', {}, 'Rest-pause y miorrepeticiones por defecto'),
       h('p', { class: 'nota' }, 'Lo que propone la app al crear estas series. Cada ejercicio puede usar esto, '
         + 'repetir lo de la última vez o tener sus propios valores (en su ficha).'),
@@ -156,7 +165,8 @@ export function vistaAjustes(contenedor) {
     h('section', { class: 'tarjeta' },
       h('h2', {}, 'Cuenta y copia de seguridad'),
       sinCuenta
-        ? h('p', {}, 'Estás probando sin cuenta: los datos solo están en este dispositivo y se pierden si borras los datos del navegador.')
+        ? [h('p', {}, TEXTO_AVISO),
+          h('button', { class: 'boton', onclick: guardarPruebaEnCuenta }, 'Entrar con Google y guardar lo hecho')]
         : [
           h('p', {}, 'Conectado como ', h('strong', {}, estado.usuario())),
           h('p', { class: 'suave' }, textoSituacion(situacion), detalle && ` ${detalle}`),
