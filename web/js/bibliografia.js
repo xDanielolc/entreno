@@ -6,10 +6,16 @@
 export const BIBLIOGRAFIA = [
   {
     tema: '1RM estimado',
-    dice: 'La app estima tu 1RM con la fórmula de Epley (carga × reps × 0,03 + carga), la misma de tus hojas de cálculo.',
-    matiz: 'Las fórmulas son fiables hasta unas 10 repeticiones; por encima el error crece mucho, y además cada ejercicio se comporta distinto. '
-      + 'En tus propios datos, a 20-40 repeticiones la estimación varía entre un 10 % y un 25 %.',
+    dice: 'Por defecto, cada ejercicio calibra su propia fórmula con tus series: busca el divisor y la curvatura con los que '
+      + 'series distintas de la misma quincena dan el mismo 1RM. Mientras no hay datos, usa la de Marzagao (2026), cuyo divisor '
+      + 'cambia con el peso. Epley (la de tus hojas de cálculo) sigue disponible en cada ejercicio.',
+    matiz: 'Las fórmulas clásicas (Epley, Brzycki, Mayhew, Wathan) salen de pocas personas haciendo press de banca y fallan por encima '
+      + 'de unas 10 repeticiones y entre ejercicios. La de Marzagao es un preprint (aún sin revisión por pares) de un investigador de '
+      + 'una app de entrenamiento, pero con 303 494 series de 388 ejercicios, y mejora a las clásicas en todos ellos. La calibración '
+      + 'personal usa su mismo criterio; su exactitud depende de que marques bien la recámara.',
     fuentes: [
+      { texto: 'Marzagao (2026), preprint: fórmula con divisor dependiente del peso, 303 494 series de 388 ejercicios.', url: 'https://arxiv.org/abs/2603.17495' },
+      { texto: 'Hoeger et al. (1990): las repeticiones a un mismo % del 1RM cambian mucho entre ejercicios (prensa frente a press de banca).', url: 'https://journals.lww.com/nsca-jscr/abstract/1990/05000/relationship_between_repetitions_and_selected.4.aspx' },
       { texto: 'LeSuer et al. (1997), J Strength Cond Res: exactitud de 7 ecuaciones en press banca, sentadilla y peso muerto.', url: 'https://consensus.app/papers/details/d3b112df359c5e75aa39ba1d70f29c9c/' },
       { texto: 'Wood et al. (2002): la exactitud mejora claramente por debajo de 10 repeticiones y varía según el ejercicio.', url: 'https://consensus.app/papers/details/8f36cbe0910a597889bd1166837d9592/' },
       { texto: 'Nuzzo et al. (2023), Sports Medicine: metarregresión de repeticiones por porcentaje del 1RM; cambia entre ejercicios.', url: 'https://consensus.app/papers/details/dfd84b06ab2e576db05dc4b84bf7bb72/' },

@@ -777,3 +777,22 @@ input.fecha { width: auto; }
 }
 .paso-escala.activo { background: var(--acento); border-color: var(--acento); color: var(--acento-texto); }
 .extremos-escala { display: flex; justify-content: space-between; font-size: 0.75rem; margin-top: 2px; }
+
+/* Recomendaciones */
+.recomendaciones { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 8px; }
+.recomendaciones li { display: grid; grid-template-columns: 22px 1fr; gap: 6px; font-size: 0.92rem; line-height: 1.4; }
+.recomendaciones a { color: inherit; }
+.recomendaciones .icono-rec { font-weight: 700; text-align: center; }
+.recomendaciones .aviso .icono-rec { color: var(--peligro); }
+.recomendaciones .consejo .icono-rec { color: var(--aviso); }
+.recomendaciones .bien .icono-rec { color: var(--bien); }
+
+/* Elegir carga por kg o % del 1RM */
+.modo-carga { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 6px; font-size: 0.9rem; }
+
+/* Sitios de entrenamiento */
+.fila-sede { display: grid; grid-template-columns: 1fr auto auto auto; gap: 6px; align-items: center; margin-bottom: 6px; }
+.fila-sede input[type=text], .fila-sede select { font-size: 16px; min-height: 40px; }
+.fila-sede-sesion { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; }
+.fila-sede-sesion select { font-size: 16px; min-height: 40px; }
+@media (max-width: 480px) { .fila-sede { grid-template-columns: 1fr 1fr; } }

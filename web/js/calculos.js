@@ -1,8 +1,10 @@
 // Cálculos de entrenamiento. Funciones puras: no leen ni guardan nada.
 
-import { TECNICAS, tramosDe } from './esquema.js';
+import { TECNICAS, recamaraDe, tramosDe } from './esquema.js';
+import { modeloDe, repsParaIgualar, rmDeSerie } from './formula1rm.js';
 
 // Fórmula de Epley, la misma de tus Excel: 1RM = carga × reps × 0,03 + carga.
+// Las demás fórmulas están en formula1rm.js; cada ejercicio elige la suya.
 export function epley(carga, repeticiones) {
   if (!(carga > 0) || !(repeticiones > 0)) return null;
   return carga * repeticiones * 0.03 + carga;
@@ -160,12 +162,14 @@ function sugerenciaBilbo(datos, ejercicio, plan, { excluirSesion, sobre }) {
     // Sin carga: la escalera son minutos, segundos o repeticiones.
     return { ...resultado, carga: null, esfuerzoObjetivo: valor };
   }
+  // Objetivo: las repeticiones que igualan el 1RM del día anterior, con la
+  // fórmula del ejercicio y descontando la recámara que sueles dejar.
   const rmAnterior = ultimaDelCiclo
-    ? epley(ultimaDelCiclo.serie.carga, esfuerzoTotal(ultimaDelCiclo.serie))
+    ? rmDeSerie(datos, ejercicio, ultimaDelCiclo.serie, esfuerzoTotal(ultimaDelCiclo.serie))
     : null;
-  const objetivoSuperar = rmAnterior && valor > 0
-    ? redondear((rmAnterior - valor) / (valor * 0.03), 1)
-    : null;
+  const recamara = recamaraDe(plan.tecnicas, datos.perfil.recamaraPorDefecto ?? 1);
+  const reps = rmAnterior && valor > 0 ? repsParaIgualar(modeloDe(datos, ejercicio), rmAnterior, valor, recamara) : null;
+  const objetivoSuperar = reps != null ? redondear(Math.max(0, reps), 1) : null;
   return { ...resultado, carga: valor, objetivoSuperar };
 }
 
@@ -181,7 +185,7 @@ export function rmDeReferencia(datos, ejercicio, { cicloN, excluirSesion } = {})
   const series = seriesDeEjercicio(datos, ejercicio.id, { excluirSesion });
   const delCiclo = cicloN != null ? series.filter((x) => x.entrada.cicloN === cicloN) : [];
   const candidatas = delCiclo.length ? delCiclo : series;
-  const rms = candidatas.map((x) => epley(x.serie.carga, esfuerzoTotal(x.serie))).filter(Boolean);
+  const rms = candidatas.map((x) => rmDeSerie(datos, ejercicio, x.serie, esfuerzoTotal(x.serie))).filter(Boolean);
   if (!rms.length) return null;
   return { valor: redondear(Math.max(...rms), 1), delCiclo: Boolean(delCiclo.length) };
 }
@@ -317,6 +321,7 @@ export function tramosPropuestos(serie, plan, ultima, perfil) {
 // ---------------------------------------------------------------------------
 
 export function records(datos, ejercicioId) {
+  const ejercicio = datos.ejercicios.find((e) => e.id === ejercicioId);
   const series = seriesDeEjercicio(datos, ejercicioId);
   let mejorTrabajo = null;
   let mejor1RM = null;
@@ -325,7 +330,7 @@ export function records(datos, ejercicioId) {
     if (trabajo != null && (!mejorTrabajo || trabajo > mejorTrabajo.valor)) {
       mejorTrabajo = { valor: trabajo, fecha: x.sesion.fecha, serie: x.serie };
     }
-    const rm = epley(x.serie.carga, esfuerzoTotal(x.serie));
+    const rm = x.serie.tramos?.length ? null : rmDeSerie(datos, ejercicio, x.serie, esfuerzoTotal(x.serie));
     if (rm != null && (!mejor1RM || rm > mejor1RM.valor)) {
       mejor1RM = { valor: redondear(rm, 1), fecha: x.sesion.fecha, serie: x.serie };
     }

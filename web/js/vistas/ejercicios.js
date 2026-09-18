@@ -7,9 +7,11 @@ import {
   progresionPorDefecto, serieNuevaPlantilla, sobrePorDefecto, tramosDe,
 } from '../esquema.js';
 import { tramosPorDefecto } from '../calculos.js';
-import { CATALOGO, normalizar, tipoDeEjercicio } from '../catalogo.js';
+import { FORMULAS, calibrar, estimar1RM, modeloDe } from '../formula1rm.js';
+import { CATALOGO, esMaquinaDePlacas, normalizar, tipoDeEjercicio } from '../catalogo.js';
 import { ORDEN_MUSCULOS, nombreMusculo } from '../musculos.js';
 import { entradaDeEjercicio } from '../series.js';
+import { nombreSede, sedesActivas, separarPorSede } from '../sedes.js';
 import { seccionProgreso } from './graficas.js';
 import { imagenDe, textoCredito } from '../imagenes.js';
 import { anadir, aviso, confirmar, h, leerNumero, nuevoId } from '../ui.js';
@@ -76,7 +78,7 @@ function tarjetaEjercicio(datos, ej) {
   return tarjetaItem(ej, {
     href: `#/ejercicio/${ej.id}`,
     clase: ej.archivado ? 'archivado' : '',
-    pie: partes.join(' · ') || 'Sin series configuradas',
+    pie: [ej.sedeId && nombreSede(datos, ej.sedeId), partes.join(' · ') || 'Sin series configuradas'].filter(Boolean).join(' · '),
     extra: ej.archivado ? h('span', { class: 'etiqueta' }, 'Archivado')
       : sinMusculos && h('span', { class: 'etiqueta aviso-etiqueta' }, 'Sin músculos'),
   });
@@ -96,7 +98,7 @@ function ejercicioVacio() {
     carga: { tipo: 'peso' },
     esfuerzo: { tipo: 'repeticiones' },
     esfuerzoExtra: null,
-    formula1RM: 'epley',
+    formula1RM: 'personal',
     musculos: { principales: [], secundarios: [] },
     series: [],
     notas: '',
@@ -146,6 +148,7 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
     borrador.carga = { tipo: x.carga || 'peso' };
     borrador.esfuerzo = { tipo: x.esfuerzo || 'repeticiones' };
     borrador.esfuerzoExtra = x.distancia ? { tipo: 'distancia', opcional: true } : null;
+    borrador.maquinaPlacas = esMaquinaDePlacas(x);
     borrador.musculos = { principales: [...(x.musculos?.principales ?? [])], secundarios: [...(x.musculos?.secundarios ?? [])] };
     for (const plan of borrador.series) plan.progresion.sobre = sobrePorDefecto(borrador);
     repintar();
@@ -157,6 +160,14 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         'Elegir de la lista de ejercicios'),
       campo('Nombre', h('input', { type: 'text', required: true, value: borrador.nombre, autocomplete: 'off',
         placeholder: 'Press banca', oninput: (e) => { borrador.nombre = e.target.value; } })),
+
+      sedesActivas(d).length > 0 && campo('Dónde se hace', h('select', {
+        onchange: (e) => { borrador.sedeId = e.target.value || null; repintar(); } },
+      h('option', { value: '' }, 'Igual en todos los sitios'),
+      sedesActivas(d).map((s) => h('option', { value: s.id, selected: s.id === borrador.sedeId }, `Solo en ${nombreSede(d, s.id)}`))),
+      h('small', { class: 'nota' }, 'Si una máquina no pesa igual en dos gimnasios, cada uno debe llevar su propio ejercicio.'),
+      existente && !existente.sedeId && sedesActivas(d).length > 1 && h('button', { type: 'button', class: 'boton enlace',
+        onclick: separar }, 'Separar en un ejercicio por sitio (reparte su historial)')),
 
       campo('Grupo', h('input', { type: 'text', value: borrador.grupo || '', list: 'grupos', placeholder: 'empuje, pierna, tirón…',
         oninput: (e) => { borrador.grupo = e.target.value.trim(); } }),
@@ -170,6 +181,10 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
           for (const plan of borrador.series) plan.progresion.sobre = sobrePorDefecto(borrador);
           repintar();
         }),
+        ['peso', 'asistida'].includes(borrador.carga.tipo) && h('label', { class: 'casilla' },
+          h('input', { type: 'checkbox', checked: Boolean(borrador.maquinaPlacas),
+            onchange: (e) => { borrador.maquinaPlacas = e.target.checked; } }),
+          'Máquina de placas o polea: los pesos van de placa en placa y se pueden fijar en los drop sets'),
         borrador.carga.tipo === 'asistida' && h('p', { class: 'nota' },
           peso ? `Apuntarás los kilos que marca la máquina; la carga real es tu peso (${formatearNumero(peso)} kg) menos esa ayuda.`
             : 'Indica tu peso corporal en Ajustes para calcular la carga real.')),
@@ -181,6 +196,8 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
           h('input', { type: 'checkbox', checked: Boolean(borrador.esfuerzoExtra),
             onchange: (e) => { borrador.esfuerzoExtra = e.target.checked ? { tipo: 'distancia', opcional: true } : null; } }),
           'Apuntar también la distancia (opcional en cada serie)')),
+
+      borrador.carga.tipo !== 'ninguna' && seccionFormula(),
 
       h('fieldset', {},
         h('legend', {}, '¿Qué músculos trabaja?'),
@@ -228,6 +245,31 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
 
       existente && h('button', { type: 'button', class: 'boton enlace', onclick: archivar },
         borrador.archivado ? 'Recuperar ejercicio' : 'Archivar ejercicio'));
+  }
+
+  // Qué fórmula estima el 1RM y, si es la personal, cómo va su calibración.
+  function seccionFormula() {
+    borrador.formula1RM ??= 'personal';
+    const estadoCalibracion = existente && borrador.formula1RM === 'personal' ? calibrar(d, existente) : null;
+    const modelo = existente ? modeloDe(d, { ...existente, formula1RM: borrador.formula1RM }) : null;
+    let explicacion = null;
+    if (estadoCalibracion?.calibrada) {
+      explicacion = `Calibrada con ${estadoCalibracion.ventanas} quincenas de tus series: acierta un ${estadoCalibracion.mejora} % más `
+        + `que la del estudio. Tu divisor en este ejercicio es ${String(estadoCalibracion.modelo.divisor).replace('.', ',')} `
+        + '(Epley usa 30): cuanto más bajo, más te cuesta cada repetición extra.';
+    } else if (estadoCalibracion?.sinMejora) {
+      explicacion = `Con ${estadoCalibracion.ventanas} quincenas de datos, la fórmula del estudio ya te encaja bien: se sigue usando esa.`;
+    } else if (estadoCalibracion) {
+      explicacion = `Aún usa la fórmula del estudio. Para calibrarse necesita ${estadoCalibracion.faltan} quincena`
+        + `${estadoCalibracion.faltan === 1 ? '' : 's'} más con series cerca del fallo (2 o menos en recámara) `
+        + 'de pesos y repeticiones distintos. Un ciclo Bilbo ya las da; una serie corta de 3 a 5 repeticiones de vez en cuando ayuda mucho.';
+    }
+    const ejemplo = modelo && [[60, 20], [80, 8]].map(([p, r]) => `${p} kg × ${r} ≈ ${Math.round(estimar1RM(modelo, p, r, 1))} kg`).join(' · ');
+    return h('fieldset', {},
+      h('legend', {}, '¿Cómo se calcula el 1RM?'),
+      opciones(FORMULAS, borrador.formula1RM, (f) => { borrador.formula1RM = f; repintar(); }),
+      explicacion && h('p', { class: 'nota' }, explicacion),
+      ejemplo && h('p', { class: 'nota' }, `Ejemplo con 1 en recámara: ${ejemplo}.`));
   }
 
   // Si el ejercicio se llama como uno del catálogo, se ofrecen sus músculos.
@@ -464,6 +506,18 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
       return;
     }
     aviso('Ejercicio guardado');
+    location.hash = '#/ejercicios';
+  }
+
+  async function separar() {
+    const sedes = sedesActivas(d);
+    const si = await confirmar(`¿Separar «${existente.nombre}» en ${sedes.length} ejercicios, uno por sitio? `
+      + 'Cada entrenamiento pasado se queda con el del sitio donde se hizo, y las rutinas de un sitio usarán el suyo.',
+    { si: 'Separar' });
+    if (!si) return;
+    let n = 0;
+    estado.cambiar((datos) => { n = separarPorSede(datos, existente.id); });
+    aviso(`Separado en ${n} ejercicios, uno por sitio.`);
     location.hash = '#/ejercicios';
   }
 

@@ -295,6 +295,12 @@ export function tipoDeEjercicio(ej) {
   return 'fuerza';
 }
 
+// Máquinas de placas y poleas: sus pesos van de placa en placa y la
+// secuencia de un drop set se puede dejar fija.
+export function esMaquinaDePlacas(x) {
+  return ['máquina', 'polea'].includes(x?.material);
+}
+
 // Estiramientos, movilidad y yoga no dejan fatiga en el mapa de recuperación.
 export function cuentaParaFatiga(ej) {
   return !['estiramiento', 'movilidad', 'yoga'].includes(ej?.grupo);

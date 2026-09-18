@@ -1,4 +1,5 @@
 import * as estado from '../estado.js';
+import { sedeInicial } from '../sedes.js';
 import { crearSerieDesdePlan } from '../series.js';
 import { anadir, fechaLarga, h, hoyISO, modal, nuevoId } from '../ui.js';
 import { tarjetaRecuperacion } from './cuerpo.js';
@@ -20,7 +21,7 @@ export function vistaInicio(contenedor) {
     const id = nuevoId('ses');
     estado.cambiar((datos) => {
       datos.sesiones.push({
-        id, fecha: hoyISO(), sedeId: datos.perfil.sedePorDefecto, rutinaId: null, diaRutinaId: null,
+        id, fecha: hoyISO(), sedeId: sedeInicial(datos, null), rutinaId: null, diaRutinaId: null,
         estado: 'en-curso', inicio: new Date().toISOString(), fin: null, ejercicios: [], notas: '', borrada: null,
       });
     });

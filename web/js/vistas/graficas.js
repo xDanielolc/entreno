@@ -8,8 +8,9 @@
 // nunca hay que distinguirlos solo por el color.
 
 import {
-  epley, esfuerzoTotal, formatearNumero, records, registrosDelCiclo, trabajoSerie,
+  esfuerzoTotal, formatearNumero, records, registrosDelCiclo, trabajoSerie,
 } from '../calculos.js';
+import { rmDeSerie } from '../formula1rm.js';
 import { h } from '../ui.js';
 
 const CICLOS_A_MOSTRAR = 4;
@@ -156,7 +157,7 @@ export function seccionProgreso(datos, ejercicio) {
       graficas.push(graficaLineas({
         titulo: 'Evolución del 1RM estimado',
         series: serie((s) => {
-          const v = epley(s.carga, esfuerzoTotal(s));
+          const v = rmDeSerie(datos, ejercicio, s, esfuerzoTotal(s));
           return v == null ? null : Math.round(v * 10) / 10;
         }),
         unidad: 'kg',

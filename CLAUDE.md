@@ -53,9 +53,6 @@ https://xdanielolc.github.io/entreno/.
   Design usando el segundo encargo de ese mismo archivo.
 - Pulir con Design los 122 muñecos propios (`web/imagenes/munecos`, generados
   con `herramientas/dibujar_munecos.py`) para igualarlos al estilo de wger.
-- Calibrar el 1RM por ejercicio con series de prueba de pocas repeticiones:
-  las fórmulas fallan un 10-25 % por encima de 15 repeticiones, y en hombros más.
-- Sedes (gimnasios) en la interfaz.
 - Importar el historial de las hojas de cálculo (`herramientas/importar_excel.py`
   ya genera el JSON; falta la pantalla para cargarlo). Aparcado a petición suya.
 - Publicar la pantalla de consentimiento de Google (ahora en «Prueba») cuando
@@ -78,3 +75,8 @@ personal por músculo (con «¿Cómo llegas?» y sugerencias), guía de respirac
 en miorrepeticiones, tramos «como la última vez / por defecto / lo de aquí»,
 pesos fijos de drop set, técnica y ayuda en estiramientos, imagen para todo
 (wger, Everkinetic y muñecos propios).
+0.11.0: 1RM con fórmula por ejercicio (personal calibrada / Marzagao 2026 / Epley),
+recomendaciones con ~20 situaciones, «elegir carga por kg o % 1RM» en tramos,
+lo de la última vez en los tramos, máquina de placas, sitios (gimnasio, casa,
+calle) con «separar por sitio», entrenamientos de otro día. OJO: los objetivos
+Bilbo solo coinciden con los Excel si el ejercicio usa Epley.

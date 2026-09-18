@@ -3,10 +3,11 @@
 // drop set, las bajadas propuestas.
 
 import {
-  aPasoDeDisco, epley, esfuerzoTotal, lecturaDesdeCarga, redondear, rmDeReferencia, sugerenciaSerie,
+  aPasoDeDisco, esfuerzoTotal, lecturaDesdeCarga, redondear, rmDeReferencia, sugerenciaSerie,
   tramosPropuestos, usaTramos,
 } from './calculos.js';
 import { recamaraDe, tramosDe } from './esquema.js';
+import { rmDeSerie } from './formula1rm.js';
 import { nuevoId } from './ui.js';
 
 export function crearSerieDesdePlan(datos, ejercicio, plan, { excluirSesion } = {}) {
@@ -37,9 +38,10 @@ export function crearSerieDesdePlan(datos, ejercicio, plan, { excluirSesion } = 
       if (rm) serie.carga = aPasoDeDisco((rm.valor * inicio) / 100);
     }
     serie.tramos = tramosPropuestos(serie, plan, s.ultima?.serie ?? null, datos.perfil);
-    // Mientras no toques sus pesos, la app puede recalcularlos con lo que
-    // hagas hoy en las series de arriba.
-    serie.cargaAutomatica = true;
+    // Cada tramo guarda su porcentaje del 1RM: así, cuando hoy hagas la serie
+    // de arriba, los kilos se ajustan a tu 1RM de hoy.
+    const rm = rmDeReferencia(datos, ejercicio, { cicloN: serie.cicloN, excluirSesion });
+    if (rm) for (const tramo of serie.tramos) if (tramo.carga != null) tramo.pct = redondear((tramo.carga / rm.valor) * 100, 1);
   }
   return serie;
 }
@@ -75,29 +77,50 @@ export function saltoDeTramo(datos, ejercicio, serie) {
   return plan?.tramoSalto ?? datos.perfil.dropSet?.salto ?? config.salto;
 }
 
-// Drop sets de un ejercicio que aún no has empezado: se rellenan al
-// porcentaje del 1RM que acabas de demostrar en las series de arriba (la
-// Bilbo, normalmente). Devuelve qué series ha tocado, para avisar.
-export function rellenarDropSets(datos, ejercicio, entrada) {
-  if (datos.perfil.dropSet?.autoRellenar === false) return [];
+// 1RM de referencia para una serie con tramos: el mejor de las series de
+// arriba que ya has hecho hoy; si aún no hay, el de tu historial.
+export function rmParaTramos(datos, ejercicio, entrada, j, { excluirSesion } = {}) {
+  const arriba = entrada.series.slice(0, j).filter((x) => x.hecha && !x.tramos?.length && x.tipo !== 'calentamiento');
+  const rms = arriba.map((x) => rmDeSerie(datos, ejercicio, x, esfuerzoTotal(x))).filter(Boolean);
+  if (rms.length) return { valor: redondear(Math.max(...rms), 1), deHoy: true };
+  const historial = rmDeReferencia(datos, ejercicio, { cicloN: entrada.cicloN, excluirSesion });
+  return historial ? { valor: historial.valor, deHoy: false } : null;
+}
+
+// «Elegir carga por»: en 'rm' cada tramo guarda su porcentaje del 1RM y los
+// kilos se recalculan cuando cambia el 1RM; en 'kg' los kilos son fijos.
+// Con pesos fijos de máquina de placas, siempre kilos.
+export function modoCargaDe(datos, ejercicio, serie) {
+  const plan = (ejercicio.series || []).find((p) => p.id === serie.planId);
+  if (plan?.tramosFijos?.length) return 'kg';
+  return serie.modoCarga ?? (datos.perfil.dropSet?.autoRellenar === false ? 'kg' : 'rm');
+}
+
+// Recalcula los kilos de los tramos en modo 'rm' de las series que aún no
+// has empezado. Da igual en qué orden hayas tocado las casillas: los kilos
+// siempre salen de porcentaje × 1RM. Devuelve las series que ha tocado.
+export function recalcularTramos(datos, ejercicio, entrada, { excluirSesion } = {}) {
   const tocadas = [];
   entrada.series.forEach((serie, j) => {
-    if (!serie.tramos?.length || !serie.cargaAutomatica) return;
-    if (tramosDe(serie.tecnicas)?.tecnica !== 'drop-set') return;
-    const planFijo = (ejercicio.series || []).find((p) => p.id === serie.planId);
-    if (planFijo?.tramosFijos?.length) return;
+    if (!serie.tramos?.length || modoCargaDe(datos, ejercicio, serie) !== 'rm') return;
     if (serie.tramos.some((t) => t.esfuerzo != null)) return;
-    const arriba = entrada.series.slice(0, j).filter((x) => !x.tramos?.length && x.tipo !== 'calentamiento');
-    const rms = arriba.map((x) => epley(x.carga, esfuerzoTotal(x))).filter(Boolean);
-    if (!rms.length) return;
-    const rm = Math.max(...rms);
+    const rm = rmParaTramos(datos, ejercicio, entrada, j, { excluirSesion });
+    if (!rm) return;
     const plan = (ejercicio.series || []).find((p) => p.id === serie.planId);
-    const porcentaje = plan?.tramoInicio ?? datos.perfil.dropSet?.inicioPorcentaje ?? 80;
+    const inicio = plan?.tramoInicio ?? datos.perfil.dropSet?.inicioPorcentaje ?? 80;
     const salto = saltoDeTramo(datos, ejercicio, serie);
-    const inicio = aPasoDeDisco((rm * porcentaje) / 100);
-    serie.carga = inicio;
-    serie.tramos = serie.tramos.map((t, k) => ({ ...t, carga: Math.max(0, redondear(inicio - salto * k, 2)) }));
-    serie.rellenoDesde = { rm: redondear(rm, 1), porcentaje };
+    // Los tramos sin porcentaje bajan desde el primero, de salto en salto.
+    const primero = serie.tramos[0]?.pct ?? inicio;
+    const base = aPasoDeDisco((rm.valor * primero) / 100);
+    serie.tramos.forEach((tramo, k) => {
+      if (tramo.pct == null) {
+        const kilos = tramo.carga ?? Math.max(0, base - salto * k);
+        tramo.pct = redondear((kilos / rm.valor) * 100, 1);
+      }
+      tramo.carga = aPasoDeDisco((rm.valor * tramo.pct) / 100);
+    });
+    serie.carga = serie.tramos[0]?.carga ?? serie.carga;
+    serie.rmUsado = rm;
     tocadas.push(j);
   });
   return tocadas;

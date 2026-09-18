@@ -8,7 +8,7 @@ import {
 } from '../esquema.js';
 import { imagenDe } from '../imagenes.js';
 import {
-  crearSerieDesdePlan, entradaDeEjercicio, rellenarDropSets, saltoDeTramo, serieSuelta,
+  crearSerieDesdePlan, entradaDeEjercicio, modoCargaDe, recalcularTramos, saltoDeTramo, serieSuelta,
 } from '../series.js';
 import { anadir, aviso, confirmar, h, leerNumero } from '../ui.js';
 import { arrancarDescanso, arrancarRespiracion, barraDescanso, descansoDeTramo } from './descanso.js';
@@ -17,6 +17,8 @@ import { ASISTENCIAS, ESCALA_MANO, TECNICAS_ESTIRAMIENTO } from '../esquema.js';
 import { ORDEN_MUSCULOS, nombreMusculo } from '../musculos.js';
 import { ESCALA_RECUPERACION, puntuacionSentida, recuperacionPorMusculo } from '../recuperacion.js';
 import { comparacionSerie, mostrarResumen } from './resumen-sesion.js';
+import { ejercicioEnSede, nombreSede, sedesActivas } from '../sedes.js';
+import { hoyISO } from '../ui.js';
 import { ejercicioDesdeCatalogo, elegirEjercicio as abrirSelector } from './selector-ejercicios.js';
 import { selectorTecnicas, textoTecnicas } from './tecnicas.js';
 
@@ -53,7 +55,13 @@ export function vistaSesion(contenedor, { id }) {
     h('div', { class: 'cabecera-vista' },
       h('h1', {}, enCurso ? 'Entrenando' : 'Entrenamiento'),
       h('input', { type: 'date', class: 'fecha', value: sesion.fecha, 'aria-label': 'Fecha',
-        onchange: (e) => e.target.value && cambiarSesion((s) => { s.fecha = e.target.value; }) })),
+        onchange: (e) => e.target.value && cambiarSesion((s) => moverFecha(s, e.target.value)) })),
+
+    sedesActivas(d).length > 0 && h('label', { class: 'fila-sede-sesion' },
+      h('span', { class: 'suave' }, 'Dónde:'),
+      h('select', { onchange: (e) => cambiarSesion((s) => { s.sedeId = e.target.value || null; }) },
+        h('option', { value: '' }, 'Sin indicar'),
+        sedesActivas(d).map((s) => h('option', { value: s.id, selected: s.id === sesion.sedeId }, nombreSede(d, s.id))))),
 
     sesion.diaRutinaId && h('p', { class: 'suave' }, nombreDelDia(d, sesion)),
 
@@ -273,7 +281,6 @@ export function vistaSesion(contenedor, { id }) {
         x.tecnicas = nuevas;
         x.recamara = recamaraDe(nuevas, d.perfil.recamaraPorDefecto ?? 1);
         x.tramos = tramosDe(nuevas) ? (x.tramos ?? tramosPropuestos(x, planDe(ej, x), null, d.perfil)) : null;
-        if (x.tramos) x.cargaAutomatica = true;
       })),
 
       marcaObjetivo(serie),
@@ -304,11 +311,14 @@ export function vistaSesion(contenedor, { id }) {
       tipoCarga !== 'ninguna' && (asistida
         ? h('label', { class: 'valor' },
           h('input', { type: 'text', inputmode: 'decimal', value: serie.lectura ?? '', 'aria-label': 'Kilos que marca la máquina',
-            oninput: (e) => actualizar((x) => {
-              x.lectura = leerNumero(e.target.value);
-              x.carga = cargaDesdeLectura(x.lectura, peso);
-              cargaReal.textContent = x.carga != null ? `= ${formatearNumero(x.carga)} kg reales` : '';
-            }) }),
+            oninput: (e) => {
+              actualizar((x) => {
+                x.lectura = leerNumero(e.target.value);
+                x.carga = cargaDesdeLectura(x.lectura, peso);
+                cargaReal.textContent = x.carga != null ? `= ${formatearNumero(x.carga)} kg reales` : '';
+              });
+              recalcularAbajo(ej, i);
+            } }),
           h('span', {}, 'kg máq'), cargaReal)
         : campoCargaConPorcentaje(ej, i, j, serie)),
 
@@ -321,7 +331,7 @@ export function vistaSesion(contenedor, { id }) {
               marcarHecha(e.target, x, ej);
               if (antes == null && x.esfuerzo != null) descansoEntreSeries();
             });
-            rellenarDeAbajo(ej, i);
+            recalcularAbajo(ej, i);
           } }),
         h('span', {}, unidadEsfuerzo(ej))),
 
@@ -329,7 +339,7 @@ export function vistaSesion(contenedor, { id }) {
       ej.esfuerzo.tipo === 'repeticiones' && h('label', { class: 'valor recamara' },
         h('span', {}, '+'),
         h('input', { type: 'text', inputmode: 'decimal', value: serie.recamara ?? '', 'aria-label': 'Repeticiones en recámara',
-          oninput: (e) => actualizar((x) => { x.recamara = leerNumero(e.target.value); }) }),
+          oninput: (e) => { actualizar((x) => { x.recamara = leerNumero(e.target.value); }); recalcularAbajo(ej, i); } }),
         h('span', {}, serie.recamara != null ? (tipoDeFallo(serie.recamara) || 'recámara') : 'recámara')),
 
       ej.esfuerzoExtra && h('label', { class: 'valor' },
@@ -339,68 +349,90 @@ export function vistaSesion(contenedor, { id }) {
   }
 
   // Kilos y porcentaje del 1RM, enlazados: escribes en uno y se rellena el
-  // otro. Manda lo último que hayas escrito.
+  // otro. En un tramo se guarda el porcentaje, para poder recalcular los
+  // kilos si cambia el 1RM (modo «% del 1RM»).
   function campoCargaConPorcentaje(ej, i, j, serie, tramo = null) {
     const destino = () => (tramo == null ? serie : serie.tramos[tramo]);
-    const rm = rmDeReferencia(d, ej, { cicloN: serie.cicloN })?.valor ?? null;
+    const rm = (tramo != null ? serie.rmUsado?.valor : null) ?? rmDeReferencia(d, ej, { cicloN: serie.cicloN })?.valor ?? null;
     const valido = (v) => (Number.isFinite(v) ? v : null);
     const kilos = h('input', { type: 'text', inputmode: 'decimal', value: valido(destino().carga) ?? '',
       'data-campo': 'kilos',
       'aria-label': tramo == null ? TIPOS_CARGA[ej.carga.tipo].etiqueta : `Carga de la bajada ${tramo + 1}` });
-    const porcentaje = rm
-      ? h('input', { type: 'text', inputmode: 'decimal', class: 'porcentaje', 'data-campo': 'porcentaje', 'data-rm': rm,
-        value: valido(destino().carga) != null ? Math.round((destino().carga / rm) * 100) : '',
-        'aria-label': 'Porcentaje del 1RM' })
-      : null;
+    const porcentaje = h('input', { type: 'text', inputmode: 'decimal', class: 'porcentaje', 'data-campo': 'porcentaje',
+      value: valido(destino().carga) != null && rm ? Math.round((destino().carga / rm) * 100) : '',
+      placeholder: rm ? '' : '—', 'aria-label': 'Porcentaje del 1RM' });
+    const rmActual = () => Number(porcentaje.dataset.rm) || rm;
+    if (rm) porcentaje.dataset.rm = rm;
 
-    // Si tocas a mano el peso de un tramo, la app deja de recalcularlo.
     const guardar = (fn) => cambiarSesion((s) => {
       const x = s.ejercicios[i].series[j];
-      if (tramo != null) x.cargaAutomatica = false;
       fn(tramo == null ? x : x.tramos[tramo]);
     }, { tecleo: true });
 
     kilos.addEventListener('input', () => {
       const v = leerNumero(kilos.value);
-      guardar((x) => { x.carga = v; });
-      destino().carga = v;
-      if (porcentaje) porcentaje.value = v != null && rm ? Math.round((v / rm) * 100) : '';
-      if (tramo == null) rellenarDeAbajo(ej, i);
+      const r = rmActual();
+      guardar((x) => { x.carga = v; if (tramo != null) x.pct = v != null && r ? redondear((v / r) * 100, 1) : null; });
+      if (porcentaje) porcentaje.value = v != null && r ? Math.round((v / r) * 100) : '';
+      if (tramo == null) recalcularAbajo(ej, i);
     });
-    porcentaje?.addEventListener('input', () => {
+    porcentaje.addEventListener('input', () => {
       const p = leerNumero(porcentaje.value);
-      const v = p != null && rm ? aPasoDeDisco((rm * p) / 100) : null;
-      guardar((x) => { x.carga = v; });
-      destino().carga = v;
+      const r = rmActual();
+      const v = p != null && r ? aPasoDeDisco((r * p) / 100) : null;
+      guardar((x) => { x.carga = v; if (tramo != null) x.pct = p; });
       kilos.value = v ?? '';
+      if (tramo == null) recalcularAbajo(ej, i);
     });
 
     return h('div', { class: 'carga-con-porcentaje' },
       h('label', { class: 'valor' }, kilos, h('span', {}, unidadCarga(ej))),
-      porcentaje && h('label', { class: 'valor' }, porcentaje, h('span', {}, '% 1RM')));
+      h('label', { class: 'valor' }, porcentaje, h('span', {}, '% 1RM')));
   }
 
-  // Drop set, rest-pause y miorrepeticiones: una línea por bajada.
+  // Drop set, rest-pause y miorrepeticiones: una línea por bajada, con lo que
+  // hiciste la última vez en gris dentro de cada casilla de repeticiones.
   function tramosSerie(ej, i, j, serie, tramos) {
     serie.tramos ??= tramosPropuestos(serie, planDe(ej, serie), null, d.perfil);
+    const plan = planDe(ej, serie);
+    const anterior = plan ? sugerenciaSerie(d, ej, plan, { excluirSesion: id }).ultima?.serie : null;
+    const modo = modoCargaDe(d, ej, serie);
     const total = h('p', { class: 'nota' });
     const pintarTotal = () => {
       const t = trabajoSerie(serie);
       const reps = esfuerzoTotal(serie);
-      total.textContent = reps ? `${serie.tramos.length} ${tramos.nombre.toLowerCase()}s · ${formatearNumero(reps)} ${unidadEsfuerzo(ej)} en total`
+      total.textContent = reps ? `Hoy: ${serie.tramos.length} ${tramos.nombre.toLowerCase()}s · ${formatearNumero(reps)} ${unidadEsfuerzo(ej)}`
         + (t ? ` · ${formatearNumero(t)} kg de trabajo` : '') : '';
     };
     pintarTotal();
     const actualizar = (fn) => cambiarSesion((s) => fn(s.ejercicios[i].series[j]), { tecleo: true });
+    const conCarga = ej.carga.tipo !== 'ninguna';
 
     return h('div', { class: 'tramos' },
-      h('p', { class: 'nota nota-relleno' }, textoRelleno(serie)),
+      conCarga && h('div', { class: 'modo-carga' },
+        h('span', { class: 'suave' }, 'Elegir carga por:'),
+        [['kg', 'kg'], ['rm', '% del 1RM (automático)']].map(([clave, texto]) => h('button', {
+          class: `chip seleccionable ${modo === clave ? 'activo' : ''}`, 'aria-pressed': String(modo === clave),
+          disabled: clave === 'rm' && Boolean(plan?.tramosFijos?.length),
+          onclick: () => {
+            cambiarSesion((s) => {
+              const x = s.ejercicios[i].series[j];
+              x.modoCarga = clave;
+              if (clave === 'rm') for (const tr of x.tramos) tr.pct = null;
+            });
+            if (clave === 'rm') recalcularAbajo(ej, i, { repintar: true });
+          },
+        }, texto))),
+      conCarga && h('p', { class: 'nota nota-relleno' }, textoRelleno(ej, serie)),
+      anterior?.tramos?.length && h('p', { class: 'nota' }, `La otra vez: ${textoSerie(ej, anterior)}`
+        + ` (${formatearNumero(esfuerzoTotal(anterior))} ${unidadEsfuerzo(ej)}`
+        + `${trabajoSerie(anterior) ? `, ${formatearNumero(trabajoSerie(anterior))} kg de trabajo` : ''}).`),
       serie.tramos.map((tramo, k) => h('div', { class: 'tramo', 'data-tramo': k },
         h('span', { class: 'tramo-n', title: `${tramos.nombre} ${k + 1}` }, k + 1),
-        ej.carga.tipo !== 'ninguna' && campoCargaConPorcentaje(ej, i, j, serie, k),
+        conCarga && campoCargaConPorcentaje(ej, i, j, serie, k),
         h('label', { class: 'valor' },
           h('input', { type: 'text', inputmode: 'decimal', value: tramo.esfuerzo ?? '', 'aria-label': `Repeticiones de la bajada ${k + 1}`,
-            placeholder: tramo.objetivo ?? '',
+            placeholder: anterior?.tramos?.[k]?.esfuerzo ?? tramo.objetivo ?? '',
             oninput: (e) => actualizar((x) => {
               const antes = x.tramos[k].esfuerzo;
               x.tramos[k].esfuerzo = leerNumero(e.target.value);
@@ -427,14 +459,13 @@ export function vistaSesion(contenedor, { id }) {
         const x = s.ejercicios[i].series[j];
         const ultimo = x.tramos.at(-1);
         const salto = saltoDeTramo(d, ej, x);
-        x.tramos.push({
-          carga: Number.isFinite(ultimo?.carga) ? Math.max(0, redondear(ultimo.carga - salto, 2)) : null,
-          esfuerzo: null,
-        });
+        const carga = Number.isFinite(ultimo?.carga) ? Math.max(0, redondear(ultimo.carga - salto, 2)) : null;
+        const rm = x.rmUsado?.valor;
+        x.tramos.push({ carga, esfuerzo: null, pct: carga != null && rm ? redondear((carga / rm) * 100, 1) : null });
       }) }, `+ ${tramos.nombre}`),
-      tramos.tecnica === 'drop-set' && serie.planId && ej.carga.tipo !== 'ninguna'
+      tramos.tecnica === 'drop-set' && serie.planId && ej.maquinaPlacas
         && h('button', { class: 'boton enlace', onclick: () => fijarPesos(ej, serie) },
-          planDe(ej, serie)?.tramosFijos?.length ? 'Cambiar los pesos fijos por estos' : 'Fijar estos pesos para siempre (máquina de placas)'),
+          plan?.tramosFijos?.length ? 'Cambiar los pesos fijos por estos' : 'Fijar estos pesos para siempre (máquina de placas)'),
       total);
   }
 
@@ -450,27 +481,31 @@ export function vistaSesion(contenedor, { id }) {
     aviso(`Pesos fijos guardados: ${pesos.map((p) => formatearNumero(p)).join(' → ')} kg. Se quitan en la ficha del ejercicio.`);
   }
 
-  // Texto que explica de dónde salen los pesos del drop set.
-  function textoRelleno(serie) {
-    if (!serie.rellenoDesde || !serie.cargaAutomatica) return '';
-    return `Pesos al ${serie.rellenoDesde.porcentaje} % del 1RM que acabas de hacer arriba `
-      + `(${formatearNumero(serie.rellenoDesde.rm)} kg). Si tocas un peso, se queda como lo pongas.`;
+  // Texto que explica de dónde salen los pesos de los tramos.
+  function textoRelleno(ej, serie) {
+    if (planDe(ej, serie)?.tramosFijos?.length) return 'Pesos fijos de la máquina (se cambian en la ficha del ejercicio).';
+    if (modoCargaDe(d, ej, serie) === 'kg') return 'Pesos a mano: no cambian aunque cambie tu 1RM.';
+    if (!serie.rmUsado) return 'Los kilos saldrán del 1RM en cuanto hagas la serie de arriba.';
+    return `Kilos según el ${serie.rmUsado.deHoy ? '1RM que acabas de hacer arriba' : '1RM de tu historial'} `
+      + `(${formatearNumero(serie.rmUsado.valor)} kg). Si cambias la serie de arriba, se recalculan.`;
   }
 
   function descansoEntreSeries() {
     if (d.perfil.descansoSegundos) arrancarDescanso(d.perfil.descansoSegundos);
   }
 
-  // Tras apuntar una serie normal, los drop sets de abajo que aún no has
-  // empezado se recalculan con el 1RM que acabas de demostrar.
-  function rellenarDeAbajo(ej, i) {
+  // Tras tocar una serie normal (peso, porcentaje, repeticiones o recámara),
+  // las series con tramos de abajo que aún no has empezado recalculan sus
+  // kilos con el 1RM de hoy.
+  function recalcularAbajo(ej, i, { repintar = false } = {}) {
     const datos = estado.datos();
     const s = datos.sesiones.find((x) => x.id === id);
     const entrada = s?.ejercicios[i];
     if (!entrada) return;
-    const tocadas = rellenarDropSets(datos, ej, entrada);
+    const tocadas = recalcularTramos(datos, ej, entrada, { excluirSesion: id });
     if (!tocadas.length) return;
-    cambiarSesion(() => {}, { tecleo: true });
+    cambiarSesion(() => {}, { tecleo: !repintar });
+    if (repintar) return;
     const tarjeta = document.querySelector(`[data-entrada="${i}"]`);
     for (const j of tocadas) {
       const serie = entrada.series[j];
@@ -481,11 +516,13 @@ export function vistaSesion(contenedor, { id }) {
         const kilos = fila?.querySelector('[data-campo="kilos"]');
         const pct = fila?.querySelector('[data-campo="porcentaje"]');
         if (kilos) kilos.value = t.carga ?? '';
-        const rm = Number(pct?.dataset.rm);
-        if (pct && rm) pct.value = t.carga != null ? Math.round((t.carga / rm) * 100) : '';
+        if (pct) {
+          pct.dataset.rm = serie.rmUsado.valor;
+          pct.value = t.carga != null ? Math.round((t.carga / serie.rmUsado.valor) * 100) : '';
+        }
       });
       const nota = caja.querySelector('.nota-relleno');
-      if (nota) nota.textContent = textoRelleno(serie);
+      if (nota) nota.textContent = textoRelleno(ej, serie);
     }
   }
 
@@ -556,8 +593,11 @@ export function vistaSesion(contenedor, { id }) {
     const disponibles = d.ejercicios.filter((e) => !e.archivado).sort((a, b) => a.nombre.localeCompare(b.nombre));
     const cerrar = abrirSelector({
       titulo: 'Añadir ejercicio',
-      mios: disponibles,
-      marcarMio: (e) => sesion.ejercicios.some((x) => x.ejercicioId === e.id) && 'Ya añadido',
+      // Primero los de este sitio (o de cualquier sitio); los de otros, al final.
+      mios: [...disponibles.filter((e) => ejercicioEnSede(e, sesion.sedeId)),
+        ...disponibles.filter((e) => !ejercicioEnSede(e, sesion.sedeId))],
+      marcarMio: (e) => (sesion.ejercicios.some((x) => x.ejercicioId === e.id) && 'Ya añadido')
+        || (!ejercicioEnSede(e, sesion.sedeId) && `Es de ${nombreSede(d, e.sedeId)}`),
       alElegirMio: anadirEjercicio,
       alElegirCatalogo: async (x) => {
         const si = await confirmar(`«${x.nombre}» no está en tus ejercicios. ¿Lo añado a los tuyos tal y como viene en la lista?`,
@@ -578,7 +618,8 @@ export function vistaSesion(contenedor, { id }) {
   function terminar() {
     cambiarSesion((s) => {
       s.estado = 'terminada';
-      s.fin = new Date().toISOString();
+      // Un entrenamiento de otro día (pasado a mano) acaba ese día, no hoy.
+      s.fin = s.fecha === hoyISO() ? new Date().toISOString() : horaEnFecha(s.inicio, s.fecha, 60);
     });
     guiado.delete(id);
     location.hash = '#/';
@@ -597,6 +638,21 @@ export function vistaSesion(contenedor, { id }) {
     cambiarSesion((s) => { s.borrada = null; });
     aviso('Entrenamiento recuperado');
   }
+}
+
+// Cambiar la fecha de un entrenamiento mueve también sus horas de inicio y
+// fin a ese día, para que la recuperación y el volumen cuenten bien.
+function moverFecha(sesion, fecha) {
+  sesion.fecha = fecha;
+  if (sesion.inicio) sesion.inicio = horaEnFecha(sesion.inicio, fecha);
+  if (sesion.fin) sesion.fin = horaEnFecha(sesion.fin, fecha);
+}
+
+function horaEnFecha(iso, fecha, minutosMas = 0) {
+  const base = iso ? new Date(iso) : new Date(`${fecha}T19:00:00`);
+  const [a, m, d] = fecha.split('-').map(Number);
+  const nueva = new Date(a, m - 1, d, base.getHours(), base.getMinutes() + minutosMas);
+  return nueva.toISOString();
 }
 
 function planDe(ej, serie) {

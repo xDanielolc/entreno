@@ -1,4 +1,4 @@
-# Esquema de datos — versión 8
+# Esquema de datos — versión 9
 
 > Las secciones de abajo describen la versión 3. Los cambios posteriores están
 > resumidos en «Cambios desde la versión 3», al final del apartado 9, y en
@@ -437,6 +437,11 @@ El paso 3 no es opcional. Es la red de seguridad.
   `sensacionesCerrada`. En ejercicios de estiramiento, movilidad o yoga,
   `estiramiento = { tecnica, asistencia }`, y en sus series además `nivel`
   (escala de apoyo con la mano).
+- **v9.** `formula1RM`: 'personal' (por defecto; calibrada con tus series),
+  'peso' (Marzagao 2026) o 'epley'. `maquinaPlacas` en cada ejercicio. Cada
+  sede lleva `tipo` (gimnasio, casa, calle, otro) y las rutinas `sedeId`. En
+  las series con tramos, `modoCarga` ('rm' o 'kg'), `rmUsado` y en cada tramo
+  `pct` (porcentaje del 1RM); desaparecen `cargaAutomatica` y `rellenoDesde`.
 
 ---
 

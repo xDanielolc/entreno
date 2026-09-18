@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 8;
+export const VERSION_ACTUAL = 9;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -320,6 +320,34 @@ const MIGRACIONES = {
       }
     }
     datos.version = 8;
+    return datos;
+  },
+
+  // v9: la fórmula del 1RM pasa a ser la ajustada a cada persona (Epley sigue
+  // disponible en cada ejercicio); cada ejercicio sabe si es máquina de
+  // placas; los sitios tienen tipo (gimnasio, casa, calle…); los tramos de
+  // las series pasan de «carga automática» a «elegir carga por kg o % 1RM».
+  8: (datos) => {
+    const placas = new Set(['máquina', 'polea']);
+    for (const ej of datos.ejercicios) {
+      if (!ej.formula1RM || ej.formula1RM === 'epley') ej.formula1RM = 'personal';
+      if (ej.maquinaPlacas == null) {
+        const nombre = (ej.nombre || '').toLowerCase();
+        ej.maquinaPlacas = /máquina|maquina|polea|jalón|jalon|prensa|pec deck|aperturas de pecho/.test(nombre);
+      }
+    }
+    for (const sede of datos.sedes) sede.tipo ??= 'gimnasio';
+    for (const sesion of datos.sesiones) {
+      for (const entrada of sesion.ejercicios) {
+        for (const serie of entrada.series) {
+          if (!serie.tramos?.length) continue;
+          if (serie.cargaAutomatica === false) serie.modoCarga = 'kg';
+          delete serie.cargaAutomatica;
+          delete serie.rellenoDesde;
+        }
+      }
+    }
+    datos.version = 9;
     return datos;
   },
 };

@@ -9,6 +9,7 @@ import {
   FACTORES, claseDeRecuperacion, detalleDeRecuperacion, factorPersonal, recuperacionPorMusculo, seriesSemanales,
   sugerenciasDeAjuste, textoDeRecuperacion,
 } from '../recuperacion.js';
+import { recomendacionesGenerales } from '../recomendaciones.js';
 import { anadir, aviso, h, hoyISO } from '../ui.js';
 
 // Referencias de volumen semanal por músculo (ver Ajustes → De dónde sale cada cosa).
@@ -87,6 +88,7 @@ export function vistaCuerpo(contenedor) {
   anadir(contenedor,
     h('h1', {}, 'Tu cuerpo'),
     tarjetaRecuperacion(d),
+    tarjetaRecomendaciones(d),
     tarjetaAjustePersonal(d),
 
     h('section', { class: 'tarjeta' },
@@ -148,10 +150,11 @@ function tarjetaAjustePersonal(d) {
     h('h2', {}, 'Tu ritmo de recuperación'),
     sugerencias.map((s) => h('div', { class: 'tarjeta aviso-tarjeta' },
       h('p', {}, s.sentido === 'lento'
-        ? `${nombreMusculo(s.musculo)}: ${s.veces} de ${s.total} veces te pusiste al menos 3 puntos por debajo de lo que calculaba la app. `
-          + 'Parece que te recuperas más despacio de lo normal.'
-        : `${nombreMusculo(s.musculo)}: ${s.veces} de ${s.total} veces te pusiste al menos 3 puntos por encima de lo que calculaba la app. `
-          + 'Parece que te recuperas antes de lo normal.'),
+        ? `No estás recuperando ${nombreMusculo(s.musculo)} al ritmo esperado: ${s.veces} de ${s.total} veces te pusiste al menos `
+          + '3 puntos por debajo de lo que calculaba la app. Revisa sueño, comida (sobre todo proteína) y la distancia entre '
+          + 'entrenamientos. Si es tu ritmo normal, ajústalo para que el mapa te dé más horas.'
+        : `Recuperas ${nombreMusculo(s.musculo)} muy por encima de lo esperado: ${s.veces} de ${s.total} veces te pusiste al menos `
+          + '3 puntos por encima de lo que calculaba la app. Quizá puedas entrenarlo más a menudo o con más series y exprimir más tus límites.'),
       h('div', { class: 'fila-botones' },
         h('button', { class: 'boton secundario', onclick: () => descartar(s.musculo) }, 'No, déjalo'),
         h('button', { class: 'boton', onclick: () => aplicar(s.musculo, s.nuevo) },
@@ -167,4 +170,20 @@ function tarjetaAjustePersonal(d) {
         h('select', { onchange: (e) => aplicar(m, Number(e.target.value)) },
           FACTORES.map((f) => h('option', { value: f.valor, selected: f.valor === factorPersonal(d, m) },
             `${f.texto} (×${String(f.valor).replace('.', ',')})`))))))));
+}
+
+// Qué conviene cambiar, según tus últimos entrenamientos.
+export function listaRecomendaciones(lista) {
+  const icono = { aviso: '⚠', consejo: '→', bien: '✓' };
+  return h('ul', { class: 'recomendaciones' }, lista.map((x) => h('li', { class: x.nivel },
+    h('span', { class: 'icono-rec', 'aria-hidden': 'true' }, icono[x.nivel]),
+    x.enlace ? h('a', { href: x.enlace }, x.texto) : h('span', {}, x.texto))));
+}
+
+function tarjetaRecomendaciones(d) {
+  const lista = recomendacionesGenerales(d);
+  return h('section', { class: 'tarjeta' },
+    h('h2', {}, 'Recomendaciones'),
+    lista.length ? listaRecomendaciones(lista)
+      : h('p', { class: 'suave' }, 'Nada que corregir por ahora: volumen, frecuencia y esfuerzo están en rango.'));
 }

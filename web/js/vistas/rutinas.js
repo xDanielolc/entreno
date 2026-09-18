@@ -5,6 +5,7 @@
 // entrenamiento hecho, y siempre puedes elegir otro.
 
 import * as estado from '../estado.js';
+import { nombreSede, sedeInicial, sedesActivas } from '../sedes.js';
 import { anadir, aviso, confirmar, h, hoyISO, nuevoId } from '../ui.js';
 import { campo } from './ejercicios.js';
 import { ejercicioDesdeCatalogo, elegirEjercicio as abrirSelector } from './selector-ejercicios.js';
@@ -28,7 +29,7 @@ export function empezarDia(rutina, dia, crearSerie) {
   const id = nuevoId('ses');
   estado.cambiar((datos) => {
     const sesion = {
-      id, fecha: hoyISO(), sedeId: datos.perfil.sedePorDefecto,
+      id, fecha: hoyISO(), sedeId: sedeInicial(datos, rutina),
       rutinaId: rutina.id, diaRutinaId: dia.id, estado: 'en-curso',
       inicio: new Date().toISOString(), fin: null, ejercicios: [], notas: '', borrada: null,
     };
@@ -100,6 +101,11 @@ export function vistaFormularioRutina(contenedor, { id }) {
         h('input', { type: 'checkbox', checked: borrador.activa,
           onchange: (e) => { borrador.activa = e.target.checked; } }),
         'Rutina activa: es la que propone la app al empezar'),
+
+      sedesActivas(d).length > 0 && campo('Dónde se hace', h('select', {
+        onchange: (e) => { borrador.sedeId = e.target.value || null; } },
+      h('option', { value: '' }, 'En cualquier sitio'),
+      sedesActivas(d).map((s) => h('option', { value: s.id, selected: s.id === borrador.sedeId }, nombreSede(d, s.id))))),
 
       borrador.dias.map((dia, i) => tarjetaDia(dia, i)),
 

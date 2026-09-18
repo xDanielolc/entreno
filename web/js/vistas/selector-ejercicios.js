@@ -5,7 +5,7 @@
 // igual para tus ejercicios que para los del catálogo: los dos tienen nombre,
 // grupo y músculos.
 
-import { CATALOGO, TIPOS_EJERCICIO, normalizar, tipoDeEjercicio } from '../catalogo.js';
+import { CATALOGO, TIPOS_EJERCICIO, esMaquinaDePlacas, normalizar, tipoDeEjercicio } from '../catalogo.js';
 import { progresionPorDefecto, serieNuevaPlantilla } from '../esquema.js';
 import { imagenDe } from '../imagenes.js';
 import { MUSCULOS, ORDEN_MUSCULOS, TREN_INFERIOR, TREN_SUPERIOR, nombreMusculo } from '../musculos.js';
@@ -138,7 +138,8 @@ export function ejercicioDesdeCatalogo(x) {
     carga: { tipo: x.carga || 'peso' },
     esfuerzo: { tipo: x.esfuerzo || 'repeticiones' },
     esfuerzoExtra: x.distancia ? { tipo: 'distancia', opcional: true } : null,
-    formula1RM: 'epley',
+    formula1RM: 'personal',
+    maquinaPlacas: esMaquinaDePlacas(x),
     musculos: {
       principales: [...(x.musculos?.principales ?? [])],
       secundarios: [...(x.musculos?.secundarios ?? [])],

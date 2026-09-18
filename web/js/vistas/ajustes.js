@@ -6,6 +6,7 @@ import { desconectar, sincronizar, situacionActual } from '../sincronizacion.js'
 import { VERSION_APP } from '../version.js';
 import { anadir, confirmar, h, hoyISO, leerNumero } from '../ui.js';
 import { DESCANSO_TRAMOS_POR_DEFECTO, RESPIRACION_POR_DEFECTO } from './descanso.js';
+import { TIPOS_SEDE, nuevaSede, sedesActivas } from '../sedes.js';
 import { tramosPorDefecto } from '../calculos.js';
 
 export function vistaAjustes(contenedor) {
@@ -101,6 +102,8 @@ export function vistaAjustes(contenedor) {
         numeroAjuste('Soltarlo (s)', d.perfil.respiracion?.espirar ?? RESPIRACION_POR_DEFECTO.espirar,
           (x, v) => { x.perfil.respiracion = { ...RESPIRACION_POR_DEFECTO, ...x.perfil.respiracion, espirar: v }; }))),
 
+    seccionSedes(d),
+
     h('section', { class: 'tarjeta formulario' },
       h('h2', {}, 'Drop sets por defecto'),
       h('p', { class: 'nota' }, 'Lo que propone la app al crear un drop set. Se puede cambiar en cada ejercicio.'),
@@ -163,6 +166,37 @@ export function vistaAjustes(contenedor) {
 
     h('p', { class: 'nota centrado' },
       `Versión ${VERSION_APP} · formato de datos v${d.version} · revisión ${formatearNumero(d.revision)}`));
+}
+
+// Sitios donde entrenas. El de por defecto es el que se pone al empezar un
+// entrenamiento sin rutina (las rutinas pueden tener el suyo).
+function seccionSedes(d) {
+  const sedes = sedesActivas(d);
+  const cambiarSede = (id, fn, opciones) => estado.cambiar((x) => {
+    const s = x.sedes.find((y) => y.id === id);
+    if (s) fn(s, x);
+  }, opciones);
+  return h('section', { class: 'tarjeta formulario' },
+    h('h2', {}, 'Dónde entrenas'),
+    h('p', { class: 'nota' }, 'Gimnasios, casa, la calle… Cada entrenamiento apunta dónde se hizo, y cada ejercicio puede ser '
+      + 'igual en todos los sitios o de uno solo (en su ficha).'),
+    sedes.map((s) => h('div', { class: 'fila-sede' },
+      h('input', { type: 'text', value: s.nombre, 'aria-label': 'Nombre del sitio',
+        oninput: (e) => cambiarSede(s.id, (y) => { y.nombre = e.target.value; }, { tecleo: true }) }),
+      h('select', { 'aria-label': 'Tipo de sitio', onchange: (e) => cambiarSede(s.id, (y) => { y.tipo = e.target.value; }) },
+        Object.entries(TIPOS_SEDE).map(([k, v]) => h('option', { value: k, selected: k === s.tipo }, `${v.icono} ${v.etiqueta}`))),
+      h('label', { class: 'casilla' },
+        h('input', { type: 'radio', name: 'sede-defecto', checked: d.perfil.sedePorDefecto === s.id,
+          onchange: () => estado.cambiar((x) => { x.perfil.sedePorDefecto = s.id; }) }),
+        'Por defecto'),
+      h('button', { class: 'boton-icono', 'aria-label': `Quitar ${s.nombre}`,
+        onclick: () => cambiarSede(s.id, (y, x) => {
+          y.archivado = true;
+          if (x.perfil.sedePorDefecto === y.id) x.perfil.sedePorDefecto = null;
+        }) }, '🗑'))),
+    h('button', { class: 'boton secundario', onclick: () => estado.cambiar((x) => {
+      x.sedes.push(nuevaSede(sedes.length ? `Sitio ${sedes.length + 1}` : 'Mi gimnasio'));
+    }) }, '+ Añadir sitio'));
 }
 
 // Casilla numérica de Ajustes que guarda al teclear.

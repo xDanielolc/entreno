@@ -68,6 +68,15 @@ function cargaDeSesion(datos, sesion) {
   return porMusculo;
 }
 
+// Series por músculo de una sesión (para las recomendaciones).
+export function seriesPorMusculoDeSesion(datos, sesion) {
+  return new Map([...cargaDeSesion(datos, sesion)].map(([m, c]) => [m, c.series]));
+}
+
+export function horasDesdeSesion(sesion, ahora = new Date()) {
+  return horasDesde(sesion, ahora);
+}
+
 export function factorPersonal(datos, musculo) {
   return datos.perfil.recuperacion?.factores?.[musculo] ?? 1;
 }
