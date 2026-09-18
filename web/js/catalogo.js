@@ -156,6 +156,7 @@ export const CATALOGO = [
   ej('Isométricos de cuello', 'core', 'mano o goma', ['cuello'], [], sinCarga),
 
   // --- Cardio -------------------------------------------------------------
+  ej('Cardio', 'cardio', 'libre', [], [], { ...sinCarga, distancia: true }),
   ej('Comba', 'cardio', 'comba', ['gemelo'], [], sinCarga),
   ej('Boxeo', 'cardio', 'saco o sombra', [], ['hombro'], sinCarga),
   ej('Escaleras', 'cardio', 'libre', ['cuadriceps'], ['gemelo'], { ...sinCarga, distancia: true }),

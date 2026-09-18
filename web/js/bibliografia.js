@@ -8,7 +8,7 @@ export const BIBLIOGRAFIA = [
     tema: '1RM estimado',
     dice: 'Por defecto, cada ejercicio calibra su propia fórmula con tus series: busca el divisor y la curvatura con los que '
       + 'series distintas de la misma quincena dan el mismo 1RM. Mientras no hay datos, usa la de Marzagao (2026), cuyo divisor '
-      + 'cambia con el peso. Epley (la de tus hojas de cálculo) sigue disponible en cada ejercicio.',
+      + 'cambia con el peso. El ajuste personal es un factor sobre ese divisor, que se acerca a 1 mientras haya pocos datos.',
     matiz: 'Las fórmulas clásicas (Epley, Brzycki, Mayhew, Wathan) salen de pocas personas haciendo press de banca y fallan por encima '
       + 'de unas 10 repeticiones y entre ejercicios. La de Marzagao es un preprint (aún sin revisión por pares) de un investigador de '
       + 'una app de entrenamiento, pero con 303 494 series de 388 ejercicios, y mejora a las clásicas en todos ellos. La calibración '

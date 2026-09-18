@@ -1,37 +1,36 @@
 // Estimación del 1RM (el peso máximo para una repetición) a partir de una
-// serie: peso × repeticiones.
+// serie: peso × repeticiones hasta el fallo (las hechas más las que dejaste
+// en recámara).
 //
-// Tres fórmulas, a elegir en cada ejercicio:
+// La fórmula es la de Marzagao (2026), ajustada con 303 494 series cerca del
+// fallo de 388 ejercicios:
 //
-//   · epley     1RM = peso × (1 + reps × 0,03). La de tus Excel. Es una
-//               recta: cada repetición vale siempre lo mismo, y por encima de
-//               15 repeticiones se desvía bastante.
+//     1RM = peso × (1 + (reps − 1)^0,85 / k)      con  k = 4,58 × ln(peso) − 2,55
 //
-//   · peso      1RM = peso × (1 + (reps − 1)^0,85 / k), con k = 4,58 × ln(peso) − 2,55.
-//               Marzagao (2026), ajustada con 303 494 series cerca del fallo
-//               de 388 ejercicios. El divisor (el «30» de Epley) cambia con el
-//               peso: con poco peso (elevaciones laterales) cada repetición
-//               vale más que con mucho (sentadilla). Es una curva, no una
-//               recta: con 1 repetición da justo el peso, y hacen falta
-//               infinitas repeticiones para llegar a peso cero.
+// El divisor k (el «30» de Epley) cambia con el peso: con poco peso cada
+// repetición vale más que con mucho. Es una curva: con 1 repetición da justo
+// el peso, y harían falta infinitas repeticiones para llegar a peso cero.
 //
-//   · personal  La misma forma, pero con el divisor y la curvatura ajustados
-//               a TUS series de ese ejercicio. Se usa el mismo criterio que
-//               en ese estudio: dentro de dos semanas tu 1RM real apenas
-//               cambia, así que la mejor fórmula es la que da el mismo 1RM
-//               con series distintas (60 kg × 20 y 80 kg × 8, por ejemplo).
-//               Mientras no haya datos suficientes, se usa la de «peso».
+// Ajuste personal: cada ejercicio multiplica ese divisor por un factor suyo
+// (k × factor). El factor se calcula solo con tu historial, sin IA:
+//   1. Se juntan tus series cerca del fallo (2 o menos en recámara) de cada
+//      quincena: en dos semanas tu 1RM real apenas cambia.
+//   2. Se prueban factores del 0,40 al 2,50 y se elige el que hace que las
+//      series de una misma quincena den el mismo 1RM (el mismo criterio del
+//      estudio).
+//   3. Con pocos datos no se fía del todo: el factor final se acerca a 1 (la
+//      fórmula del estudio) en proporción a los datos que faltan. Con 1
+//      quincena se aplica un 25 % del ajuste; con 3, la mitad; con 9, el 75 %.
 //
-// En «peso» y «personal» se cuentan las repeticiones hasta el fallo: las que
-// hiciste más las que dejaste en recámara. Epley usa solo las hechas, como
-// en tus Excel.
+// Un factor por encima de 1 quiere decir que en ese ejercicio aguantas más
+// repeticiones de las que predice el estudio con el mismo porcentaje; por
+// debajo de 1, menos.
 
 const redondear = (n, d = 2) => Math.round(n * 10 ** d) / 10 ** d;
 
 export const FORMULAS = {
-  personal: { etiqueta: 'Ajustada a ti', descripcion: 'Se calibra sola con tus series de este ejercicio. Mientras le falten datos, usa la de Marzagao.' },
-  peso: { etiqueta: 'Según el peso (Marzagao 2026)', descripcion: 'Curva ajustada con 300 000 series de 388 ejercicios; el divisor cambia con el peso levantado.' },
-  epley: { etiqueta: 'Epley (la de tus Excel)', descripcion: 'Recta: cada repetición vale un 3 % del peso. Se desvía por encima de 15 repeticiones.' },
+  personal: { etiqueta: 'Ajustada a ti', descripcion: 'La fórmula del estudio con un factor propio de este ejercicio que se calcula solo con tus series.' },
+  peso: { etiqueta: 'La del estudio, sin ajustar', descripcion: 'Marzagao (2026) tal cual, igual para todo el mundo.' },
 };
 
 const EXPONENTE_ESTUDIO = 0.85;
@@ -50,7 +49,7 @@ export function estimar1RM(modelo, peso, reps, recamara = 0) {
   if (!(peso > 0) || !(reps > 0)) return null;
   const r = repsDeSerie(modelo, reps, recamara);
   if (modelo.tipo === 'epley') return peso * (1 + r * 0.03);
-  const k = modelo.divisor ?? divisorSegunPeso(peso);
+  const k = modelo.divisor ?? divisorSegunPeso(peso) * (modelo.factor ?? 1);
   const g = modelo.exponente ?? EXPONENTE_ESTUDIO;
   return peso * (1 + (r - 1) ** g / k);
 }
@@ -61,7 +60,7 @@ export function repsParaIgualar(modelo, rm, peso, recamara = 0) {
   if (!(rm > 0) || !(peso > 0)) return null;
   if (modelo.tipo === 'epley') return (rm - peso) / (peso * 0.03);
   if (rm <= peso) return Math.max(0, 1 - (recamara ?? 0));
-  const k = modelo.divisor ?? divisorSegunPeso(peso);
+  const k = modelo.divisor ?? divisorSegunPeso(peso) * (modelo.factor ?? 1);
   const g = modelo.exponente ?? EXPONENTE_ESTUDIO;
   const hastaFallo = 1 + (k * (rm / peso - 1)) ** (1 / g);
   return hastaFallo - Math.max(0, recamara ?? 0);
@@ -72,7 +71,8 @@ export function repsParaIgualar(modelo, rm, peso, recamara = 0) {
 // ---------------------------------------------------------------------------
 
 const DIAS_VENTANA = 14;
-const MINIMO_VENTANAS = 3;
+// Cuántas quincenas hacen falta para fiarse a medias del ajuste.
+const PRUDENCIA = 3;
 
 // Series útiles para calibrar: hechas, sin tramos, con peso, cerca del fallo
 // (2 o menos en recámara) y de 30 repeticiones o menos.
@@ -121,35 +121,26 @@ function inconsistencia(modelo, grupos) {
 
 const memoria = new Map();
 
-// Calibra la fórmula personal de un ejercicio. Devuelve el modelo y un
-// informe para enseñarlo en la ficha.
+// Calibra el factor personal de un ejercicio. Devuelve el modelo y un
+// informe para enseñarlo en la ficha y en Ajustes.
 export function calibrar(datos, ejercicio) {
   const clave = `${ejercicio.id}:${datos.revision}`;
   if (memoria.has(clave)) return memoria.get(clave);
 
   const grupos = ventanas(seriesParaCalibrar(datos, ejercicio));
-  const referencia = { tipo: 'peso' };
-  let resultado = { modelo: referencia, calibrada: false, ventanas: grupos.length, faltan: Math.max(0, MINIMO_VENTANAS - grupos.length) };
-
-  if (grupos.length >= MINIMO_VENTANAS) {
-    const base = inconsistencia(referencia, grupos);
-    let mejor = { divisor: null, exponente: null, error: Infinity };
-    for (let divisor = 4; divisor <= 60; divisor += 0.5) {
-      for (let exponente = 0.6; exponente <= 1.2001; exponente += 0.05) {
-        const error = inconsistencia({ tipo: 'personal', divisor, exponente }, grupos);
-        if (error < mejor.error) mejor = { divisor, exponente: redondear(exponente, 2), error };
-      }
+  let resultado = { modelo: { tipo: 'personal', factor: 1 }, factor: 1, factorDatos: null, ventanas: 0, confianza: 0 };
+  if (grupos.length) {
+    let mejor = { factor: 1, error: inconsistencia({ tipo: 'personal', factor: 1 }, grupos) };
+    for (let f = 0.4; f <= 2.5001; f += 0.01) {
+      const error = inconsistencia({ tipo: 'personal', factor: f }, grupos);
+      if (error < mejor.error - 1e-9) mejor = { factor: f, error };
     }
-    // Solo se cambia si mejora de verdad a la del estudio (un 5 % o más).
-    const mejora = base > 0 ? 1 - mejor.error / base : 0;
-    if (mejora >= 0.05) {
-      resultado = {
-        modelo: { tipo: 'personal', divisor: mejor.divisor, exponente: mejor.exponente },
-        calibrada: true, ventanas: grupos.length, mejora: Math.round(mejora * 100), faltan: 0,
-      };
-    } else {
-      resultado = { modelo: referencia, calibrada: false, ventanas: grupos.length, sinMejora: true, faltan: 0 };
-    }
+    const confianza = grupos.length / (grupos.length + PRUDENCIA);
+    const factor = redondear(1 + (mejor.factor - 1) * confianza, 2);
+    resultado = {
+      modelo: { tipo: 'personal', factor }, factor, factorDatos: redondear(mejor.factor, 2),
+      ventanas: grupos.length, confianza: Math.round(confianza * 100),
+    };
   }
   memoria.set(clave, resultado);
   if (memoria.size > 200) memoria.delete(memoria.keys().next().value);
@@ -159,7 +150,6 @@ export function calibrar(datos, ejercicio) {
 // El modelo que usa un ejercicio según la fórmula elegida en su ficha.
 export function modeloDe(datos, ejercicio) {
   const formula = ejercicio?.formula1RM ?? 'personal';
-  if (formula === 'epley') return { tipo: 'epley' };
   if (formula === 'peso') return { tipo: 'peso' };
   return calibrar(datos, ejercicio).modelo;
 }
@@ -167,4 +157,35 @@ export function modeloDe(datos, ejercicio) {
 // 1RM estimado de una serie ya hecha, con la fórmula de su ejercicio.
 export function rmDeSerie(datos, ejercicio, serie, esfuerzo) {
   return estimar1RM(modeloDe(datos, ejercicio), serie.carga, esfuerzo ?? serie.esfuerzo, serie.recamara);
+}
+
+// ---------------------------------------------------------------------------
+// Explicaciones (se enseñan plegadas en la ficha y en Ajustes)
+// ---------------------------------------------------------------------------
+
+export const EXPLICACIONES_1RM = [
+  { titulo: 'Qué fórmula usa', texto: 'La de Marzagao (2026): 1RM = peso × (1 + (repeticiones − 1)^0,85 / k), con k = 4,58 × ln(peso) − 2,55. '
+    + 'Salió de 303 494 series cerca del fallo de 388 ejercicios y acierta más que Epley, Brzycki, Mayhew o Wathan en todos ellos. '
+    + 'A diferencia de Epley (una recta), es una curva: con una repetición da justo el peso, y para llegar a peso cero harían falta '
+    + 'infinitas repeticiones. Además, el divisor k cambia con el peso: con poco peso cada repetición vale más. '
+    + 'Aviso: es un preprint, todavía sin revisión por pares.' },
+  { titulo: 'Qué repeticiones cuenta', texto: 'Las hechas más las que dejaste en recámara: 60 kg × 20 con 1 en recámara cuenta como 21 '
+    + 'hasta el fallo. Por eso importa apuntar bien la recámara.' },
+  { titulo: 'Cómo se ajusta a ti', texto: 'Cada ejercicio tiene un factor que multiplica el divisor k. La app junta tus series de cada '
+    + 'quincena que acabaste a 2 o menos del fallo (en dos semanas tu 1RM real apenas cambia) y prueba factores del 0,40 al 2,50. '
+    + 'Se queda con el que hace que series distintas de la misma quincena (60 kg × 20 y 80 kg × 8, por ejemplo) den el mismo 1RM. '
+    + 'Es el mismo criterio que usó el estudio, aplicado solo a tus datos. No hay IA: es una búsqueda del mejor número.' },
+  { titulo: 'Qué pasa con pocos datos', texto: 'Empieza a ajustar desde la primera quincena, pero sin fiarse del todo: el factor final se '
+    + 'queda a medio camino entre 1 (la fórmula del estudio) y el que dicen tus datos. Con 1 quincena aplica el 25 % del ajuste, con 3 '
+    + 'la mitad, con 9 el 75 %. Así una semana rara no te descoloca los objetivos.' },
+  { titulo: 'Qué significa el factor', texto: 'Por encima de 1: en ese ejercicio aguantas más repeticiones de las que predice el estudio '
+    + 'con el mismo porcentaje de tu 1RM (pasa, por ejemplo, en prensa). Por debajo de 1: menos. Los ciclos Bilbo ya dan los datos que '
+    + 'hacen falta; una serie corta de 3 a 5 repeticiones de vez en cuando ayuda a afinar.' },
+];
+
+export function textoCalibracion(c) {
+  if (!c.ventanas) return 'Aún sin datos para ajustar: usa la fórmula del estudio tal cual (factor 1).';
+  const coma = (n) => String(n).replace('.', ',');
+  return `Factor ${coma(c.factor)}, con ${c.ventanas} ${c.ventanas === 1 ? 'quincena' : 'quincenas'} de datos `
+    + `(tus datos dicen ${coma(c.factorDatos)}; se aplica el ${c.confianza} % del ajuste mientras haya pocos).`;
 }

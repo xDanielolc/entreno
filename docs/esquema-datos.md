@@ -442,6 +442,10 @@ El paso 3 no es opcional. Es la red de seguridad.
   sede lleva `tipo` (gimnasio, casa, calle, otro) y las rutinas `sedeId`. En
   las series con tramos, `modoCarga` ('rm' o 'kg'), `rmUsado` y en cada tramo
   `pct` (porcentaje del 1RM); desaparecen `cargaAutomatica` y `rellenoDesde`.
+- **Sin cambio de versión (0.12.0).** `formula1RM` acepta 'personal' y 'peso'
+  ('epley' se lee como 'personal'). Las rutinas pueden llevar `descripcion` y
+  `plantilla` (id de la rutina prehecha de la que salen), y cada ejercicio de
+  un día, `nota` (superseries, alternancias).
 
 ---
 

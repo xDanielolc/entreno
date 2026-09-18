@@ -796,3 +796,9 @@ input.fecha { width: auto; }
 .fila-sede-sesion { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; }
 .fila-sede-sesion select { font-size: 16px; min-height: 40px; }
 @media (max-width: 480px) { .fila-sede { grid-template-columns: 1fr 1fr; } }
+
+/* Rutinas prehechas y explicaciones plegables */
+.plantilla p { margin: 6px 0; }
+.plantilla ul { margin: 4px 0 8px; padding-left: 20px; }
+.explicaciones .explicacion { margin-top: 6px; }
+.lista-factores { padding-left: 18px; font-size: 0.9rem; }

@@ -80,3 +80,9 @@ recomendaciones con ~20 situaciones, «elegir carga por kg o % 1RM» en tramos,
 lo de la última vez en los tramos, máquina de placas, sitios (gimnasio, casa,
 calle) con «separar por sitio», entrenamientos de otro día. OJO: los objetivos
 Bilbo solo coinciden con los Excel si el ejercicio usa Epley.
+0.12.0: se quita Epley (decisión suya: mejor la fórmula buena más ajuste). El
+ajuste personal es UN factor sobre el divisor de Marzagao, buscado por
+consistencia en quincenas y encogido hacia 1 (confianza n/(n+3)).
+Explicaciones plegables en Ajustes y en la ficha. Rutinas prehechas
+(`web/js/plantillas.js`): la suya y cinco de Heavy Duty resumidas con
+palabras propias. Traer pesos fijos de otro ejercicio.

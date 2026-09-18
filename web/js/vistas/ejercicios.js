@@ -7,7 +7,7 @@ import {
   progresionPorDefecto, serieNuevaPlantilla, sobrePorDefecto, tramosDe,
 } from '../esquema.js';
 import { tramosPorDefecto } from '../calculos.js';
-import { FORMULAS, calibrar, estimar1RM, modeloDe } from '../formula1rm.js';
+import { EXPLICACIONES_1RM, FORMULAS, calibrar, estimar1RM, modeloDe, textoCalibracion } from '../formula1rm.js';
 import { CATALOGO, esMaquinaDePlacas, normalizar, tipoDeEjercicio } from '../catalogo.js';
 import { ORDEN_MUSCULOS, nombreMusculo } from '../musculos.js';
 import { entradaDeEjercicio } from '../series.js';
@@ -252,24 +252,15 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
     borrador.formula1RM ??= 'personal';
     const estadoCalibracion = existente && borrador.formula1RM === 'personal' ? calibrar(d, existente) : null;
     const modelo = existente ? modeloDe(d, { ...existente, formula1RM: borrador.formula1RM }) : null;
-    let explicacion = null;
-    if (estadoCalibracion?.calibrada) {
-      explicacion = `Calibrada con ${estadoCalibracion.ventanas} quincenas de tus series: acierta un ${estadoCalibracion.mejora} % más `
-        + `que la del estudio. Tu divisor en este ejercicio es ${String(estadoCalibracion.modelo.divisor).replace('.', ',')} `
-        + '(Epley usa 30): cuanto más bajo, más te cuesta cada repetición extra.';
-    } else if (estadoCalibracion?.sinMejora) {
-      explicacion = `Con ${estadoCalibracion.ventanas} quincenas de datos, la fórmula del estudio ya te encaja bien: se sigue usando esa.`;
-    } else if (estadoCalibracion) {
-      explicacion = `Aún usa la fórmula del estudio. Para calibrarse necesita ${estadoCalibracion.faltan} quincena`
-        + `${estadoCalibracion.faltan === 1 ? '' : 's'} más con series cerca del fallo (2 o menos en recámara) `
-        + 'de pesos y repeticiones distintos. Un ciclo Bilbo ya las da; una serie corta de 3 a 5 repeticiones de vez en cuando ayuda mucho.';
-    }
+    if (borrador.formula1RM === 'epley') borrador.formula1RM = 'personal';
+    const explicacion = estadoCalibracion ? textoCalibracion(estadoCalibracion) : null;
     const ejemplo = modelo && [[60, 20], [80, 8]].map(([p, r]) => `${p} kg × ${r} ≈ ${Math.round(estimar1RM(modelo, p, r, 1))} kg`).join(' · ');
     return h('fieldset', {},
       h('legend', {}, '¿Cómo se calcula el 1RM?'),
       opciones(FORMULAS, borrador.formula1RM, (f) => { borrador.formula1RM = f; repintar(); }),
       explicacion && h('p', { class: 'nota' }, explicacion),
-      ejemplo && h('p', { class: 'nota' }, `Ejemplo con 1 en recámara: ${ejemplo}.`));
+      ejemplo && h('p', { class: 'nota' }, `Ejemplo con 1 en recámara: ${ejemplo}.`),
+      explicaciones1RM());
   }
 
   // Si el ejercicio se llama como uno del catálogo, se ofrecen sus músculos.
@@ -386,7 +377,28 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
             plan.tramosFijos = pesos.length ? pesos : null;
           } }),
         h('small', { class: 'nota' }, 'Separados por punto y coma. Si los pones, cada drop set sale con estos pesos '
-          + 'y no se recalcula con el 1RM. También se pueden fijar desde el entrenamiento.')));
+          + 'y no se recalcula con el 1RM. También se pueden fijar desde el entrenamiento.'),
+        pesosDeOtros(plan)));
+  }
+
+  // Máquinas compartidas (abductores y aductores en la misma, por ejemplo):
+  // traer la secuencia de pesos fijos que ya tenga otro ejercicio.
+  function pesosDeOtros(plan) {
+    const otros = d.ejercicios.flatMap((e) => (e.id === borrador.id || e.archivado ? [] : (e.series || [])
+      .filter((p) => p.tramosFijos?.length)
+      .map((p) => ({ nombre: e.nombre, pesos: p.tramosFijos }))));
+    if (!otros.length) return null;
+    return h('select', { 'aria-label': 'Traer pesos fijos de otro ejercicio',
+      onchange: (e) => {
+        const elegido = otros[Number(e.target.value)];
+        if (!elegido) return;
+        plan.tramosFijos = [...elegido.pesos];
+        plan.tramosPrevistos = elegido.pesos.length;
+        repintar();
+        aviso(`Pesos de ${elegido.nombre} copiados. Pulsa «Guardar» para quedártelos.`);
+      } },
+    h('option', { value: '' }, 'Traer los pesos fijos de otro ejercicio…'),
+    otros.map((o, i) => h('option', { value: i }, `${o.nombre}: ${o.pesos.map((x) => formatearNumero(x)).join(' → ')} kg`)));
   }
 
   function detalleProgresion(plan) {
@@ -559,4 +571,11 @@ export function opciones(catalogo, actual, alElegir, { compacto = false } = {}) 
     },
     h('strong', {}, info.etiqueta),
     !compacto && info.descripcion && h('small', {}, info.descripcion))));
+}
+
+// Las explicaciones de la fórmula, cada una en su desplegable.
+export function explicaciones1RM() {
+  return h('div', { class: 'explicaciones' }, EXPLICACIONES_1RM.map((x) => h('details', { class: 'explicacion' },
+    h('summary', {}, x.titulo),
+    h('p', {}, x.texto))));
 }

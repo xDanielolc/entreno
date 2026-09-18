@@ -9,6 +9,7 @@ import { nombreSede, sedeInicial, sedesActivas } from '../sedes.js';
 import { anadir, aviso, confirmar, h, hoyISO, nuevoId } from '../ui.js';
 import { campo } from './ejercicios.js';
 import { ejercicioDesdeCatalogo, elegirEjercicio as abrirSelector } from './selector-ejercicios.js';
+import { PLANTILLAS, anadirPlantilla, ejerciciosNuevos } from '../plantillas.js';
 
 export function rutinaActiva(datos) {
   return datos.rutinas.find((r) => r.activa && r.dias.length) ?? null;
@@ -64,7 +65,37 @@ export function vistaRutinas(contenedor) {
       h('div', {},
         h('strong', {}, r.nombre),
         h('div', { class: 'suave' }, r.dias.map((x) => x.nombre).join(' · ') || 'Sin días')),
-      r.activa && h('span', { class: 'etiqueta' }, 'Activa'))));
+      r.activa && h('span', { class: 'etiqueta' }, 'Activa'))),
+
+    h('h2', {}, 'Rutinas prehechas'),
+    h('p', { class: 'nota' }, 'Añádelas a tus rutinas si te encajan; si no, ignóralas. Sus ejercicios se crean solo si no los tienes ya.'),
+    PLANTILLAS.map((p) => tarjetaPlantilla(d, p)));
+}
+
+function tarjetaPlantilla(d, plantilla) {
+  const yaEsta = d.rutinas.some((r) => r.plantilla === plantilla.id);
+  async function anadir() {
+    const nuevos = ejerciciosNuevos(d, plantilla);
+    const si = await confirmar(`¿Añadir «${plantilla.nombre}» a tus rutinas?`
+      + (nuevos.length ? ` Se crearán ${nuevos.length} ejercicios que aún no tienes: ${nuevos.join(', ')}.` : ' Ya tienes todos sus ejercicios.'),
+    { si: 'Añadir' });
+    if (!si) return;
+    let id;
+    estado.cambiar((datos) => { id = anadirPlantilla(datos, plantilla); });
+    aviso('Rutina añadida. Revisa los pesos de partida en cada ejercicio.');
+    location.hash = `#/rutina/${id}`;
+  }
+  return h('article', { class: 'tarjeta plantilla' },
+    h('strong', {}, plantilla.nombre),
+    h('div', { class: 'suave' }, plantilla.autor),
+    h('p', {}, plantilla.resumen),
+    h('details', { class: 'explicacion' }, h('summary', {}, 'Por qué es así'), h('p', {}, plantilla.porQue)),
+    h('details', { class: 'explicacion' }, h('summary', {}, 'Cómo se hace'), h('p', {}, plantilla.comoSeHace)),
+    h('details', { class: 'explicacion' }, h('summary', {}, 'Días y ejercicios'),
+      plantilla.dias.map((dia) => h('div', {},
+        h('p', {}, h('strong', {}, dia.nombre)),
+        h('ul', {}, dia.ejercicios.map((x) => h('li', {}, x.nombre + (x.opcional ? ' (opcional)' : '') + (x.nota ? ` · ${x.nota}` : ''))))))),
+    h('button', { class: 'boton secundario', onclick: anadir }, yaEsta ? 'Añadir otra copia' : 'Añadir a mis rutinas'));
 }
 
 // ---------------------------------------------------------------------------
@@ -84,7 +115,11 @@ export function vistaFormularioRutina(contenedor, { id }) {
   const nombreEj = (ejId) => d.ejercicios.find((e) => e.id === ejId)?.nombre ?? 'Ejercicio borrado';
 
   const zona = h('div');
-  anadir(contenedor, h('h1', {}, existente ? 'Editar rutina' : 'Nueva rutina'), zona);
+  anadir(contenedor, h('h1', {}, existente ? 'Editar rutina' : 'Nueva rutina'),
+    borrador.descripcion && h('details', { class: 'tarjeta explicacion' },
+      h('summary', {}, 'Por qué es así y cómo se hace'),
+      borrador.descripcion.split('\n\n').map((p) => h('p', {}, p))),
+    zona);
 
   function repintar() {
     const scroll = window.scrollY;
@@ -130,7 +165,8 @@ export function vistaFormularioRutina(contenedor, { id }) {
           onclick: () => { borrador.dias.splice(i, 1); repintar(); } }, '🗑')),
 
       dia.ejercicios.map((item, j) => h('div', { class: 'fila-ejercicio' },
-        h('span', {}, nombreEj(item.ejercicioId)),
+        h('span', {}, nombreEj(item.ejercicioId), item.opcional && h('small', { class: 'suave' }, ' (opcional)'),
+          item.nota && h('small', { class: 'suave bloque' }, item.nota)),
         h('button', { type: 'button', class: 'boton-icono', 'aria-label': 'Subir', disabled: j === 0,
           onclick: () => { dia.ejercicios.splice(j - 1, 0, dia.ejercicios.splice(j, 1)[0]); repintar(); } }, '↑'),
         h('button', { type: 'button', class: 'boton-icono', 'aria-label': 'Bajar', disabled: j === dia.ejercicios.length - 1,

@@ -7,6 +7,8 @@ import { VERSION_APP } from '../version.js';
 import { anadir, confirmar, h, hoyISO, leerNumero } from '../ui.js';
 import { DESCANSO_TRAMOS_POR_DEFECTO, RESPIRACION_POR_DEFECTO } from './descanso.js';
 import { TIPOS_SEDE, nuevaSede, sedesActivas } from '../sedes.js';
+import { calibrar, textoCalibracion } from '../formula1rm.js';
+import { explicaciones1RM } from './ejercicios.js';
 import { tramosPorDefecto } from '../calculos.js';
 
 export function vistaAjustes(contenedor) {
@@ -103,6 +105,19 @@ export function vistaAjustes(contenedor) {
           (x, v) => { x.perfil.respiracion = { ...RESPIRACION_POR_DEFECTO, ...x.perfil.respiracion, espirar: v }; }))),
 
     seccionSedes(d),
+
+    h('section', { class: 'tarjeta' },
+      h('h2', {}, 'Cómo se estima tu 1RM'),
+      h('p', { class: 'nota' }, 'Con la fórmula de Marzagao (2026) y un factor propio de cada ejercicio que se ajusta solo con tus series. '
+        + 'Toca cada apartado para ver los detalles.'),
+      explicaciones1RM(),
+      h('details', { class: 'explicacion' },
+        h('summary', {}, 'Tu factor en cada ejercicio'),
+        h('ul', { class: 'lista-factores' }, d.ejercicios
+          .filter((e) => !e.archivado && e.carga?.tipo !== 'ninguna' && (e.formula1RM ?? 'personal') !== 'peso')
+          .map((e) => ({ e, c: calibrar(d, e) }))
+          .sort((a, b) => b.c.ventanas - a.c.ventanas || a.e.nombre.localeCompare(b.e.nombre))
+          .map(({ e, c }) => h('li', {}, h('a', { href: `#/ejercicio/${e.id}` }, e.nombre), `: ${textoCalibracion(c)}`))))),
 
     h('section', { class: 'tarjeta formulario' },
       h('h2', {}, 'Drop sets por defecto'),
