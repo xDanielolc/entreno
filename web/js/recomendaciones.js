@@ -110,7 +110,8 @@ export function recomendacionesGenerales(datos, ahora = new Date()) {
         + 'conviene tocarlo al menos una vez por semana, mejor dos.'));
       continue;
     }
-    if (n > 0 && n < MINIMO) {
+    // Solo se pide más volumen de lo que entrenas como músculo principal.
+    if (n > 0 && n < MINIMO && conEste.length) {
       lista.push(r('volumen-bajo', 'consejo', `${nombre}: ${series(n)} en los últimos 7 días. Sube hasta al menos ${MINIMO}.`));
     } else if (n > MAXIMO) {
       lista.push(r('volumen-alto', 'aviso', `${nombre}: ${series(n)} en 7 días. Por encima de ${MAXIMO} no se gana más y la fatiga sube.`));
