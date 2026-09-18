@@ -1,15 +1,19 @@
 import {
-  aPasoDeDisco, cargaDesdeLectura, esfuerzoTotal, formatearNumero, records,
-  rmDeReferencia, sugerenciaSerie, trabajoSerie, tramosPropuestos, usaTramos,
+  aPasoDeDisco, cargaDesdeLectura, esfuerzoTotal, formatearNumero,
+  redondear, rmDeReferencia, sugerenciaSerie, trabajoSerie, tramosPropuestos, usaTramos,
 } from '../calculos.js';
 import * as estado from '../estado.js';
 import {
   TIPOS_CARGA, TIPOS_ESFUERZO, TIPOS_SERIE, camposDe, recamaraDe, tipoDeFallo, tramosDe,
 } from '../esquema.js';
 import { imagenDe } from '../imagenes.js';
-import { crearSerieDesdePlan, serieSuelta } from '../series.js';
-import { anadir, aviso, confirmar, h, leerNumero, modal, nuevoId } from '../ui.js';
-import { arrancarDescanso, barraDescanso } from './descanso.js';
+import {
+  crearSerieDesdePlan, entradaDeEjercicio, rellenarDropSets, saltoDeTramo, serieSuelta,
+} from '../series.js';
+import { anadir, aviso, confirmar, h, leerNumero } from '../ui.js';
+import { arrancarDescanso, barraDescanso, descansoDeTramo } from './descanso.js';
+import { comparacionSerie, mostrarResumen } from './resumen-sesion.js';
+import { ejercicioDesdeCatalogo, elegirEjercicio as abrirSelector } from './selector-ejercicios.js';
 import { selectorTecnicas, textoTecnicas } from './tecnicas.js';
 
 // En modo guiado se ve un ejercicio cada vez. Se recuerda por sesión.
@@ -89,7 +93,7 @@ export function vistaSesion(contenedor, { id }) {
   function tarjetaEjercicio(entrada, indice) {
     const ej = ejercicioDe(entrada.ejercicioId);
     if (!ej) return h('div', { class: 'tarjeta' }, 'Ejercicio borrado');
-    return h('article', { class: 'tarjeta ejercicio-sesion' },
+    return h('article', { class: 'tarjeta ejercicio-sesion', 'data-entrada': indice },
       h('div', { class: 'cabecera-tarjeta' },
         imagenDe(ej.nombre) && h('img', { class: 'miniatura', src: imagenDe(ej.nombre).archivo, alt: '', loading: 'lazy' }),
         h('h2', { class: 'crece' }, ej.nombre),
@@ -162,11 +166,12 @@ export function vistaSesion(contenedor, { id }) {
     serie.tecnicas ??= [];
     serie.detalle ??= {};
     const tramos = tramosDe(serie.tecnicas);
-    return h('div', { class: `serie ${serie.hecha ? 'hecha' : ''}` },
+    return h('div', { class: `serie ${serie.hecha ? 'hecha' : ''}`, 'data-serie': j },
       lineaSugerencia(ej, serie),
       cabeceraSerie(ej, i, j, serie),
       tramos ? tramosSerie(ej, i, j, serie, tramos) : valoresSerie(ej, i, j, serie),
-      camposTecnicas(ej, i, j, serie));
+      camposTecnicas(ej, i, j, serie),
+      h('p', { class: 'comparacion' }, comparacionSerie(d, ej, serie, { excluirSesion: id })));
   }
 
   // Casillas propias de cada técnica: los segundos del isométrico final, las
@@ -201,7 +206,8 @@ export function vistaSesion(contenedor, { id }) {
         const x = s.ejercicios[i].series[j];
         x.tecnicas = nuevas;
         x.recamara = recamaraDe(nuevas, d.perfil.recamaraPorDefecto ?? 1);
-        x.tramos = tramosDe(nuevas) ? (x.tramos ?? tramosPropuestos(x, null, null)) : null;
+        x.tramos = tramosDe(nuevas) ? (x.tramos ?? tramosPropuestos(x, { dropSet: d.perfil.dropSet }, null)) : null;
+        if (x.tramos) x.cargaAutomatica = true;
       })),
 
       marcaObjetivo(serie),
@@ -242,10 +248,15 @@ export function vistaSesion(contenedor, { id }) {
 
       h('label', { class: 'valor' },
         h('input', { type: 'text', inputmode: 'decimal', value: serie.esfuerzo ?? '', 'aria-label': TIPOS_ESFUERZO[ej.esfuerzo.tipo].etiqueta,
-          oninput: (e) => actualizar((x) => {
-            x.esfuerzo = leerNumero(e.target.value);
-            marcarHecha(e.target, x);
-          }) }),
+          oninput: (e) => {
+            actualizar((x) => {
+              const antes = x.esfuerzo;
+              x.esfuerzo = leerNumero(e.target.value);
+              marcarHecha(e.target, x, ej);
+              if (antes == null && x.esfuerzo != null) descansoEntreSeries();
+            });
+            rellenarDeAbajo(ej, i);
+          } }),
         h('span', {}, unidadEsfuerzo(ej))),
 
       // «En recámara»: las repeticiones que podrías haber hecho y no hiciste.
@@ -266,16 +277,20 @@ export function vistaSesion(contenedor, { id }) {
   function campoCargaConPorcentaje(ej, i, j, serie, tramo = null) {
     const destino = () => (tramo == null ? serie : serie.tramos[tramo]);
     const rm = rmDeReferencia(d, ej, { cicloN: serie.cicloN })?.valor ?? null;
-    const kilos = h('input', { type: 'text', inputmode: 'decimal', value: destino().carga ?? '',
+    const valido = (v) => (Number.isFinite(v) ? v : null);
+    const kilos = h('input', { type: 'text', inputmode: 'decimal', value: valido(destino().carga) ?? '',
+      'data-campo': 'kilos',
       'aria-label': tramo == null ? TIPOS_CARGA[ej.carga.tipo].etiqueta : `Carga de la bajada ${tramo + 1}` });
     const porcentaje = rm
-      ? h('input', { type: 'text', inputmode: 'decimal', class: 'porcentaje',
-        value: destino().carga != null ? Math.round((destino().carga / rm) * 100) : '',
+      ? h('input', { type: 'text', inputmode: 'decimal', class: 'porcentaje', 'data-campo': 'porcentaje', 'data-rm': rm,
+        value: valido(destino().carga) != null ? Math.round((destino().carga / rm) * 100) : '',
         'aria-label': 'Porcentaje del 1RM' })
       : null;
 
+    // Si tocas a mano el peso de un tramo, la app deja de recalcularlo.
     const guardar = (fn) => cambiarSesion((s) => {
       const x = s.ejercicios[i].series[j];
+      if (tramo != null) x.cargaAutomatica = false;
       fn(tramo == null ? x : x.tramos[tramo]);
     }, { tecleo: true });
 
@@ -284,6 +299,7 @@ export function vistaSesion(contenedor, { id }) {
       guardar((x) => { x.carga = v; });
       destino().carga = v;
       if (porcentaje) porcentaje.value = v != null && rm ? Math.round((v / rm) * 100) : '';
+      if (tramo == null) rellenarDeAbajo(ej, i);
     });
     porcentaje?.addEventListener('input', () => {
       const p = leerNumero(porcentaje.value);
@@ -300,7 +316,7 @@ export function vistaSesion(contenedor, { id }) {
 
   // Drop set, rest-pause y miorrepeticiones: una línea por bajada.
   function tramosSerie(ej, i, j, serie, tramos) {
-    serie.tramos ??= tramosPropuestos(serie, null, null);
+    serie.tramos ??= tramosPropuestos(serie, { dropSet: d.perfil.dropSet }, null);
     const total = h('p', { class: 'nota' });
     const pintarTotal = () => {
       const t = trabajoSerie(serie);
@@ -312,16 +328,26 @@ export function vistaSesion(contenedor, { id }) {
     const actualizar = (fn) => cambiarSesion((s) => fn(s.ejercicios[i].series[j]), { tecleo: true });
 
     return h('div', { class: 'tramos' },
-      serie.tramos.map((tramo, k) => h('div', { class: 'tramo' },
+      h('p', { class: 'nota nota-relleno' }, textoRelleno(serie)),
+      serie.tramos.map((tramo, k) => h('div', { class: 'tramo', 'data-tramo': k },
         h('span', { class: 'tramo-n', title: `${tramos.nombre} ${k + 1}` }, k + 1),
         ej.carga.tipo !== 'ninguna' && campoCargaConPorcentaje(ej, i, j, serie, k),
         h('label', { class: 'valor' },
           h('input', { type: 'text', inputmode: 'decimal', value: tramo.esfuerzo ?? '', 'aria-label': `Repeticiones de la bajada ${k + 1}`,
             oninput: (e) => actualizar((x) => {
+              const antes = x.tramos[k].esfuerzo;
               x.tramos[k].esfuerzo = leerNumero(e.target.value);
               x.hecha = x.tramos.some((t) => t.esfuerzo != null);
               pintarTotal();
-              marcarHecha(e.target, x);
+              marcarHecha(e.target, x, ej);
+              // Al apuntar un tramo, descanso corto hasta el siguiente; al
+              // apuntar el último, el descanso normal entre series.
+              if (antes == null && x.tramos[k].esfuerzo != null) {
+                if (k < x.tramos.length - 1) {
+                  arrancarDescanso(descansoDeTramo(d.perfil, tramos.tecnica), {
+                    texto: tramos.tecnica === 'drop-set' ? 'para cambiar el peso' : 'para respirar' });
+                } else descansoEntreSeries();
+              }
             }) }),
           h('span', {}, unidadEsfuerzo(ej))),
         serie.tramos.length > 1 && h('button', { class: 'boton-icono', 'aria-label': `Quitar ${tramos.nombre.toLowerCase()} ${k + 1}`,
@@ -330,12 +356,55 @@ export function vistaSesion(contenedor, { id }) {
       h('button', { class: 'boton enlace', onclick: () => cambiarSesion((s) => {
         const x = s.ejercicios[i].series[j];
         const ultimo = x.tramos.at(-1);
-        x.tramos.push({ carga: ultimo?.carga != null ? Math.round(ultimo.carga * (1 - tramos.bajada)) : null, esfuerzo: null });
+        const salto = saltoDeTramo(d, ej, x);
+        x.tramos.push({
+          carga: Number.isFinite(ultimo?.carga) ? Math.max(0, redondear(ultimo.carga - salto, 2)) : null,
+          esfuerzo: null,
+        });
       }) }, `+ ${tramos.nombre}`),
       total);
   }
 
-  function marcarHecha(input, serie) {
+  // Texto que explica de dónde salen los pesos del drop set.
+  function textoRelleno(serie) {
+    if (!serie.rellenoDesde || !serie.cargaAutomatica) return '';
+    return `Pesos al ${serie.rellenoDesde.porcentaje} % del 1RM que acabas de hacer arriba `
+      + `(${formatearNumero(serie.rellenoDesde.rm)} kg). Si tocas un peso, se queda como lo pongas.`;
+  }
+
+  function descansoEntreSeries() {
+    if (d.perfil.descansoSegundos) arrancarDescanso(d.perfil.descansoSegundos);
+  }
+
+  // Tras apuntar una serie normal, los drop sets de abajo que aún no has
+  // empezado se recalculan con el 1RM que acabas de demostrar.
+  function rellenarDeAbajo(ej, i) {
+    const datos = estado.datos();
+    const s = datos.sesiones.find((x) => x.id === id);
+    const entrada = s?.ejercicios[i];
+    if (!entrada) return;
+    const tocadas = rellenarDropSets(datos, ej, entrada);
+    if (!tocadas.length) return;
+    cambiarSesion(() => {}, { tecleo: true });
+    const tarjeta = document.querySelector(`[data-entrada="${i}"]`);
+    for (const j of tocadas) {
+      const serie = entrada.series[j];
+      const caja = tarjeta?.querySelector(`[data-serie="${j}"]`);
+      if (!caja) continue;
+      serie.tramos.forEach((t, k) => {
+        const fila = caja.querySelector(`[data-tramo="${k}"]`);
+        const kilos = fila?.querySelector('[data-campo="kilos"]');
+        const pct = fila?.querySelector('[data-campo="porcentaje"]');
+        if (kilos) kilos.value = t.carga ?? '';
+        const rm = Number(pct?.dataset.rm);
+        if (pct && rm) pct.value = t.carga != null ? Math.round((t.carga / rm) * 100) : '';
+      });
+      const nota = caja.querySelector('.nota-relleno');
+      if (nota) nota.textContent = textoRelleno(serie);
+    }
+  }
+
+  function marcarHecha(input, serie, ej) {
     serie.hecha = serie.tramos?.length ? serie.tramos.some((t) => t.esfuerzo != null) : serie.esfuerzo != null;
     const caja = input.closest('.serie');
     caja?.classList.toggle('hecha', serie.hecha);
@@ -346,25 +415,15 @@ export function vistaSesion(contenedor, { id }) {
       marca.textContent = esfuerzo == null ? '' : (superado ? '✓ superado' : '✗ no superado');
       marca.className = `marca ${superado ? 'bien' : 'mal'}`;
     }
-    if (serie.hecha && d.perfil.descansoSegundos) arrancarDescanso(d.perfil.descansoSegundos);
+    const comparacion = caja?.querySelector('.comparacion');
+    if (comparacion && ej) comparacion.textContent = comparacionSerie(d, ej, serie, { excluirSesion: id });
   }
 
   // -------------------------------------------------------------------------
 
   function anadirEjercicio(ej) {
     cambiarSesion((s, datos) => {
-      const planes = ej.series?.length ? ej.series : [];
-      const entrada = {
-        ejercicioId: ej.id,
-        cicloN: null,
-        diaCiclo: null,
-        series: planes.map((plan) => crearSerieDesdePlan(datos, ej, plan, { excluirSesion: id })),
-        notas: '',
-      };
-      const bilbo = entrada.series.find((x) => x.cicloN != null);
-      if (bilbo) { entrada.cicloN = bilbo.cicloN; entrada.diaCiclo = bilbo.diaCiclo; }
-      if (!entrada.series.length) entrada.series.push(serieSuelta());
-      s.ejercicios.push(entrada);
+      s.ejercicios.push(entradaDeEjercicio(datos, ej, { excluirSesion: id }));
     });
     if (posicion != null) irA(sesion.ejercicios.length - 1);
   }
@@ -384,7 +443,7 @@ export function vistaSesion(contenedor, { id }) {
         carga: anterior?.carga ?? null, recamara: anterior?.recamara ?? null });
       copia.planId = anterior?.planId ?? null;
       copia.lectura = anterior?.lectura ?? null;
-      if (usaTramos(copia.tecnicas)) copia.tramos = tramosPropuestos(copia, null, anterior);
+      if (usaTramos(copia.tecnicas)) copia.tramos = tramosPropuestos(copia, { dropSet: datos.perfil.dropSet }, anterior);
       s.ejercicios[i].series.push(copia);
     });
   }
@@ -406,47 +465,39 @@ export function vistaSesion(contenedor, { id }) {
       fn: () => cambiarSesion((s) => { s.ejercicios.splice(i, 0, quitada); }) } });
   }
 
+  // Tus ejercicios y, debajo, los de la lista general; si eliges uno de la
+  // lista, se pregunta antes de añadirlo a los tuyos.
   function elegirEjercicio() {
     const disponibles = d.ejercicios.filter((e) => !e.archivado).sort((a, b) => a.nombre.localeCompare(b.nombre));
-    const lista = h('div', { class: 'lista-eleccion' });
-    const pintar = (filtro = '') => {
-      const f = filtro.trim().toLowerCase();
-      lista.replaceChildren(...disponibles
-        .filter((e) => !f || `${e.nombre} ${e.grupo || ''}`.toLowerCase().includes(f))
-        .map((e) => h('button', { class: 'tarjeta fila-enlace', onclick: () => { cerrar(); anadirEjercicio(e); } },
-          h('div', {},
-            h('strong', {}, e.nombre),
-            h('div', { class: 'suave' }, e.grupo || '')),
-          sesion.ejercicios.some((x) => x.ejercicioId === e.id) && h('span', { class: 'etiqueta' }, 'Ya añadido'))));
-      if (!lista.children.length) lista.append(h('p', { class: 'suave' }, 'Ningún ejercicio coincide.'));
-    };
-    pintar();
-    const cerrar = modal('Añadir ejercicio', h('div', {},
-      disponibles.length > 6 && h('input', { type: 'search', placeholder: 'Buscar', class: 'buscador',
-        oninput: (e) => pintar(e.target.value) }),
-      lista,
-      h('a', { class: 'boton secundario', href: '#/ejercicio/nuevo', onclick: () => cerrar() }, 'Crear ejercicio nuevo')));
+    const cerrar = abrirSelector({
+      titulo: 'Añadir ejercicio',
+      mios: disponibles,
+      marcarMio: (e) => sesion.ejercicios.some((x) => x.ejercicioId === e.id) && 'Ya añadido',
+      alElegirMio: anadirEjercicio,
+      alElegirCatalogo: async (x) => {
+        const si = await confirmar(`«${x.nombre}» no está en tus ejercicios. ¿Lo añado a los tuyos tal y como viene en la lista?`,
+          { si: 'Añadir a mis ejercicios' });
+        if (!si) return;
+        const nuevo = ejercicioDesdeCatalogo(x);
+        estado.cambiar((datos) => { datos.ejercicios.push(nuevo); });
+        anadirEjercicio(nuevo);
+      },
+      pie: h('a', { class: 'boton secundario', href: `#/ejercicio/nuevo/para/${id}`, onclick: () => cerrar() },
+        'Crear ejercicio nuevo'),
+    });
   }
 
+  // Al terminar se cierra el entrenamiento y sale un resumen: récords,
+  // mejoras, volumen de la semana y, si has cambiado algo respecto a la
+  // rutina, si lo quieres solo para hoy o para siempre.
   function terminar() {
-    const nuevosRecords = [];
-    for (const entrada of sesion.ejercicios) {
-      const ej = ejercicioDe(entrada.ejercicioId);
-      if (!ej) continue;
-      const previos = records({ ...d, sesiones: d.sesiones.filter((s) => s.id !== id) }, ej.id);
-      const ahora = records(d, ej.id);
-      if (ahora.mejorTrabajo && (!previos.mejorTrabajo || ahora.mejorTrabajo.valor > previos.mejorTrabajo.valor)
-        && sesion.ejercicios.some((e) => e.ejercicioId === ej.id)) {
-        nuevosRecords.push(`${ej.nombre}: récord de trabajo (${formatearNumero(ahora.mejorTrabajo.valor)})`);
-      }
-    }
     cambiarSesion((s) => {
       s.estado = 'terminada';
       s.fin = new Date().toISOString();
     });
     guiado.delete(id);
     location.hash = '#/';
-    if (nuevosRecords.length) aviso(`¡Récord! ${nuevosRecords[0]}`, { ms: 6000 });
+    mostrarResumen(estado.datos(), id);
   }
 
   // Un entrenamiento nunca se borra del todo: va a la papelera del historial.

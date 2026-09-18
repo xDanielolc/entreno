@@ -64,18 +64,25 @@ export function leerNumero(texto) {
 
 let temporizadorAviso;
 // accion: { texto: 'Deshacer', fn } añade un botón al aviso (y lo alarga).
+// El tiempo crece con la longitud del texto, para que dé tiempo a leerlo, y
+// tocando el aviso se cierra antes.
 export function aviso(texto, { tipo = 'info', ms, accion } = {}) {
   let caja = document.getElementById('aviso');
   if (!caja) {
     caja = h('div', { id: 'aviso', role: 'status', 'aria-live': 'polite' });
+    caja.addEventListener('click', (e) => { if (!e.target.closest('button')) caja.classList.remove('visible'); });
     document.body.append(caja);
   }
   const ocultar = () => caja.classList.remove('visible');
-  caja.replaceChildren(h('span', {}, texto),
+  const porLectura = 4000 + String(texto).length * 60;
+  // Con anadir() y no con replaceChildren(): sin acción, este segundo hijo
+  // es undefined y el navegador lo escribiría como texto («undefined»).
+  caja.replaceChildren();
+  anadir(caja, h('span', {}, texto),
     accion && h('button', { class: 'aviso-accion', onclick: () => { ocultar(); accion.fn(); } }, accion.texto));
   caja.className = `aviso aviso-${tipo} visible`;
   clearTimeout(temporizadorAviso);
-  temporizadorAviso = setTimeout(ocultar, ms ?? (accion ? 8000 : 3500));
+  temporizadorAviso = setTimeout(ocultar, ms ?? Math.min(15000, accion ? Math.max(10000, porLectura) : porLectura));
 }
 
 // Ventana modal sencilla. Devuelve una función para cerrarla.

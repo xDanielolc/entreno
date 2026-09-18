@@ -79,10 +79,30 @@
    "autor": "Everkinetic",
    "nombreEnWger": "Press inclinado con mancuernas"
   },
+  "Press inclinado con mancuernas": {
+   "archivo": "imagenes/ejercicios/press-inclinado-con-mancuernas.png",
+   "autor": "Everkinetic",
+   "nombreEnWger": "Press inclinado con mancuernas"
+  },
+  "Press declinado": {
+   "archivo": "imagenes/ejercicios/press-declinado.png",
+   "autor": "Everkinetic",
+   "nombreEnWger": "Press de Banca Declinado con Barra"
+  },
+  "Press de pecho en máquina": {
+   "archivo": "imagenes/ejercicios/press-de-pecho-en-maquina.webp",
+   "autor": "roneydya",
+   "nombreEnWger": "Press de Pecho en Máquina"
+  },
   "Aperturas de pecho": {
    "archivo": "imagenes/ejercicios/aperturas-de-pecho.png",
    "autor": "wger",
    "nombreEnWger": "Aperturas en Máquina para Pecho"
+  },
+  "Aperturas con mancuernas": {
+   "archivo": "imagenes/ejercicios/aperturas-con-mancuernas.png",
+   "autor": "cshep442",
+   "nombreEnWger": "Aperturas con Mancuernas"
   },
   "Fondos de tríceps": {
    "archivo": "imagenes/ejercicios/fondos-de-triceps.png",
@@ -99,28 +119,73 @@
    "autor": "Franpol",
    "nombreEnWger": "Press militar"
   },
+  "Press de hombro con mancuernas": {
+   "archivo": "imagenes/ejercicios/press-de-hombro-con-mancuernas.jpg",
+   "autor": "philip",
+   "nombreEnWger": "Press de hombro con mancuernas"
+  },
   "Press de hombro en máquina": {
    "archivo": "imagenes/ejercicios/press-de-hombro-en-maquina.png",
    "autor": "wger.de",
    "nombreEnWger": "Press de hombro con maquina"
+  },
+  "Elevaciones laterales": {
+   "archivo": "imagenes/ejercicios/elevaciones-laterales.png",
+   "autor": "Everkinetic",
+   "nombreEnWger": "Lateral Raises"
+  },
+  "Elevaciones laterales en polea": {
+   "archivo": "imagenes/ejercicios/elevaciones-laterales-en-polea.jpg",
+   "autor": "carlos3c",
+   "nombreEnWger": "Elevaciones laterales en polea (a un brazo)"
+  },
+  "Elevaciones frontales": {
+   "archivo": "imagenes/ejercicios/elevaciones-frontales.png",
+   "autor": "philip",
+   "nombreEnWger": "Elevaciones frontales"
+  },
+  "Press cerrado": {
+   "archivo": "imagenes/ejercicios/press-cerrado.png",
+   "autor": "Everkinetic",
+   "nombreEnWger": "Press de Banca con Agarre Cerrado"
+  },
+  "Press francés": {
+   "archivo": "imagenes/ejercicios/press-frances.png",
+   "autor": "Everkinetic",
+   "nombreEnWger": "Press Francés con Barra SZ"
   },
   "Extensión de tríceps en polea": {
    "archivo": "imagenes/ejercicios/extension-de-triceps-en-polea.png",
    "autor": "Franpol",
    "nombreEnWger": "Extension de triceps polea"
   },
-  "Extensión de tríceps en máquina": {
-   "archivo": "imagenes/ejercicios/extension-de-triceps-en-maquina.png",
-   "autor": "Franpol",
-   "nombreEnWger": "Barbell Triceps Extension"
+  "Extensión de tríceps sobre la cabeza": {
+   "archivo": "imagenes/ejercicios/extension-de-triceps-sobre-la-cabeza.webp",
+   "autor": "wger",
+   "nombreEnWger": "Extensión de tríceps sobre la cabeza (mancuerna)"
   },
   "Flexiones": {
    "archivo": "imagenes/ejercicios/flexiones.png",
+   "autor": "Settebello",
+   "nombreEnWger": "Push-Up"
+  },
+  "Flexiones en pica": {
+   "archivo": "imagenes/ejercicios/flexiones-en-pica.png",
+   "autor": "wger",
+   "nombreEnWger": "Flexiones de pica"
+  },
+  "Flexiones en pino": {
+   "archivo": "imagenes/ejercicios/flexiones-en-pino.png",
    "autor": "wger",
    "nombreEnWger": "Flexiones en pino"
   },
   "Dominadas": {
    "archivo": "imagenes/ejercicios/dominadas.jpg",
+   "autor": "Imobard",
+   "nombreEnWger": "Dominadas"
+  },
+  "Dominadas supinas": {
+   "archivo": "imagenes/ejercicios/dominadas-supinas.jpg",
    "autor": "Imobard",
    "nombreEnWger": "Dominadas"
   },
@@ -130,9 +195,19 @@
    "nombreEnWger": "Dominadas"
   },
   "Jalón al pecho": {
-   "archivo": "imagenes/ejercicios/jalon-al-pecho.png",
+   "archivo": "imagenes/ejercicios/jalon-al-pecho.PNG",
+   "autor": "Franpol",
+   "nombreEnWger": "Jalón al pecho con agarre neutro"
+  },
+  "Jalón con agarre estrecho": {
+   "archivo": "imagenes/ejercicios/jalon-con-agarre-estrecho.png",
    "autor": "Franpol",
    "nombreEnWger": "Jalón al Pecho con Agarre Cerrado"
+  },
+  "Remo en T": {
+   "archivo": "imagenes/ejercicios/remo-en-t.png",
+   "autor": "Everkinetic",
+   "nombreEnWger": "Remo en \"T\""
   },
   "Remo en polea": {
    "archivo": "imagenes/ejercicios/remo-en-polea.jpg",
@@ -144,10 +219,25 @@
    "autor": "barry",
    "nombreEnWger": "Remo sentado (máquina)"
   },
+  "Remo invertido": {
+   "archivo": "imagenes/ejercicios/remo-invertido.jpg",
+   "autor": "Gavru",
+   "nombreEnWger": "Remo invertido"
+  },
   "Face pull": {
    "archivo": "imagenes/ejercicios/face-pull.webp",
    "autor": "AlucardEvil40",
    "nombreEnWger": "Dumbbell Bent Over Face Pull"
+  },
+  "Remo al mentón": {
+   "archivo": "imagenes/ejercicios/remo-al-menton.png",
+   "autor": "wger",
+   "nombreEnWger": "Remo al Menton"
+  },
+  "Encogimientos de trapecio": {
+   "archivo": "imagenes/ejercicios/encogimientos-de-trapecio.png",
+   "autor": "Everkinetic",
+   "nombreEnWger": "Encogimientos de hombros con mancuernas"
   },
   "Curl de bíceps con barra": {
    "archivo": "imagenes/ejercicios/curl-de-biceps-con-barra.png",
@@ -159,15 +249,40 @@
    "autor": "Everkinetic",
    "nombreEnWger": "Curl Martillo"
   },
-  "Curl de bíceps en máquina": {
-   "archivo": "imagenes/ejercicios/curl-de-biceps-en-maquina.png",
+  "Curl inclinado": {
+   "archivo": "imagenes/ejercicios/curl-inclinado.png",
+   "autor": "wger",
+   "nombreEnWger": "Curl inclinado con mancuernas"
+  },
+  "Curl en polea": {
+   "archivo": "imagenes/ejercicios/curl-en-polea.png",
    "autor": "Everkinetic",
-   "nombreEnWger": "Curl biceps à la barre"
+   "nombreEnWger": "Curl de Bíceps en Polea"
+  },
+  "Curl de muñeca": {
+   "archivo": "imagenes/ejercicios/curl-de-muneca.png",
+   "autor": "wger",
+   "nombreEnWger": "Curl De Muñeca Con Barra"
   },
   "Sentadilla": {
    "archivo": "imagenes/ejercicios/sentadilla.jpeg",
    "autor": "philip",
    "nombreEnWger": "Sentadilla con disco"
+  },
+  "Sentadilla frontal": {
+   "archivo": "imagenes/ejercicios/sentadilla-frontal.png",
+   "autor": "Everkinetic",
+   "nombreEnWger": "Sentadilla Frontal"
+  },
+  "Sentadilla búlgara": {
+   "archivo": "imagenes/ejercicios/sentadilla-bulgara.png",
+   "autor": "Franpol",
+   "nombreEnWger": "Sentadilla búlgara izquierda"
+  },
+  "Sentadilla en multipower": {
+   "archivo": "imagenes/ejercicios/sentadilla-en-multipower.jpg",
+   "autor": "wger",
+   "nombreEnWger": "Sentadilla multipower"
   },
   "Prensa de piernas": {
    "archivo": "imagenes/ejercicios/prensa-de-piernas.webp",
@@ -179,6 +294,11 @@
    "autor": "philip",
    "nombreEnWger": "Peso Muerto Convencional"
   },
+  "Peso muerto sumo": {
+   "archivo": "imagenes/ejercicios/peso-muerto-sumo.webp",
+   "autor": "wger",
+   "nombreEnWger": "Peso muerto sumo"
+  },
   "Peso muerto rumano": {
    "archivo": "imagenes/ejercicios/peso-muerto-rumano.png",
    "autor": "wger",
@@ -188,6 +308,21 @@
    "archivo": "imagenes/ejercicios/zancadas.png",
    "autor": "Franpol",
    "nombreEnWger": "Zancadas con peso"
+  },
+  "Hip thrust": {
+   "archivo": "imagenes/ejercicios/hip-thrust.webp",
+   "autor": "AlucardEvil40",
+   "nombreEnWger": "Dumbbell Hip Thrust"
+  },
+  "Puente de glúteo": {
+   "archivo": "imagenes/ejercicios/puente-de-gluteo.png",
+   "autor": "wger",
+   "nombreEnWger": "Puente de glúteos"
+  },
+  "Extensión de cuádriceps": {
+   "archivo": "imagenes/ejercicios/extension-de-cuadriceps.png",
+   "autor": "Franpol",
+   "nombreEnWger": "Leg Extension"
   },
   "Curl femoral tumbado": {
    "archivo": "imagenes/ejercicios/curl-femoral-tumbado.png",
@@ -201,6 +336,11 @@
   },
   "Elevación de gemelos": {
    "archivo": "imagenes/ejercicios/elevacion-de-gemelos.jpeg",
+   "autor": "clafal",
+   "nombreEnWger": "Elevación de talón de pie"
+  },
+  "Elevación de gemelos sentado": {
+   "archivo": "imagenes/ejercicios/elevacion-de-gemelos-sentado.jpeg",
    "autor": "AlucardEvil40",
    "nombreEnWger": "Elevación de gemelos sentado con mancuerna"
   },
@@ -228,6 +368,11 @@
    "archivo": "imagenes/ejercicios/elevaciones-de-piernas.png",
    "autor": "Everkinetic",
    "nombreEnWger": "Elevaciones de piernas tumbado"
+  },
+  "Elevaciones de rodillas en paralelas": {
+   "archivo": "imagenes/ejercicios/elevaciones-de-rodillas-en-paralelas.png",
+   "autor": "wger",
+   "nombreEnWger": "Elevaciones de Rodillas en Barra"
   }
  }
 }

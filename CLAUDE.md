@@ -51,8 +51,14 @@ https://xdanielolc.github.io/entreno/.
   encargo ya está escrito en `docs/encargo-para-design.md`.
 - Dibujo propio del cuerpo: el actual es de wger y funciona; mejorarlo con
   Design usando el segundo encargo de ese mismo archivo.
-- Al terminar un entrenamiento, preguntar si los cambios sobre la rutina son
-  solo para hoy o permanentes (el esquema ya lo contempla).
+- Movilidad y estiramientos con opciones propias al elegirlos: técnica (FNP
+  contracción-relajación, PIR, inhibición recíproca, estático, dinámico,
+  activo, pasivo, CARs, neurodinámica, liberación miofascial), asistencia
+  (pared, ladrillo con su escala por mano, cinta, goma, compañero…).
+- Bloquear la secuencia de pesos de un drop set por ejercicio (máquinas de
+  placas).
+- Imágenes para los ejercicios sin ella (64 de 126 más el yoga): wger no las
+  tiene. Solo fuentes libres o dibujos propios, nunca imágenes con derechos.
 - Calibrar el 1RM por ejercicio con series de prueba de pocas repeticiones:
   las fórmulas fallan un 10-25 % por encima de 15 repeticiones, y en hombros más.
 - Sedes (gimnasios) en la interfaz.
@@ -67,3 +73,9 @@ Rutinas con día automático y modo de uno en uno; series con progresión propia
 por ejercicio; técnicas de intensidad combinables con sus medidas; recámara;
 progresión «máximo trabajo»; gráficas de 1RM y trabajo por ciclos; cronómetro
 de descanso; catálogo de ejercicios predefinidos; papelera y deshacer.
+0.9.0: 19 músculos en el mapa (7 capas propias en `herramientas/dibujar_capas_extra.py`),
+catálogo de 200 ejercicios con yoga (español y sánscrito, índice de Kaminoff),
+buscador con filtros y tres vistas, drop set rellenado con el 1RM de la serie
+de arriba, descansos cortos entre bajadas, resumen al terminar con récords,
+mejoras, volumen y «¿solo hoy o para siempre?», explicación del cálculo de
+recuperación.

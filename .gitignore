@@ -8,3 +8,4 @@ desktop.ini
 
 # Libros y guias: uso personal, nunca se publican
 Literatura/
+__pycache__/

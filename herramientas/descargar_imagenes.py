@@ -61,6 +61,17 @@ def palabras(texto):
 # Mapa del cuerpo
 # ---------------------------------------------------------------------------
 
+# Tres capas de wger (hombro, pecho y bíceps) vienen con otro lienzo que el
+# cuerpo: 362 de alto y desplazadas 7 píxeles. Se igualan al del cuerpo para
+# que caigan justo encima.
+def alinear(datos):
+    texto = datos.decode("utf-8")
+    if "translate(-395.71431,-323.50506)" in texto:
+        texto = texto.replace("translate(-395.71431,-323.50506)", "translate(-395.71431,-316.50506)")
+        texto = texto.replace('height="362"', 'height="369"', 1)
+    return texto.encode("utf-8")
+
+
 def descargar_musculos():
     destino = IMAGENES / "musculos"
     destino.mkdir(parents=True, exist_ok=True)
@@ -77,7 +88,7 @@ def descargar_musculos():
             print(f"  aviso: wger ya no tiene el músculo {idWger} ({nombre})")
             continue
         archivo = destino / f"{nombre}.svg"
-        archivo.write_bytes(bajar(info["image_url_main"]))
+        archivo.write_bytes(alinear(bajar(info["image_url_main"])))
         creditos[nombre] = {
             "archivo": f"imagenes/musculos/{nombre}.svg",
             "wger": info["name"],
@@ -117,12 +128,27 @@ def indice_de_ejercicios():
 # Cuando el parecido de nombres engaña, se dice a mano con qué ejercicio de
 # wger se corresponde (o que no tiene imagen buena: None).
 EXCEPCIONES = {
-    "Flexiones": "Flexiones",
+    "Flexiones": "Push-Up",
     "Flexiones a una mano": None,
-    "Fondos asistidos": "Fondos en máquina asistida",
-    "Extensión de tríceps en máquina": "Extensión de tríceps en polea",
-    "Curl de bíceps en máquina": "Curl de bíceps en máquina",
-    "Press inclinado": "Press inclinado con barra",
+    "Fondos asistidos": "Fondos",
+    "Fondos en banco": None,
+    "Extensión de tríceps en máquina": None,
+    "Curl de bíceps en máquina": None,
+    "Curl de bíceps con mancuernas": None,
+    "Press inclinado": "Press inclinado con mancuernas",
+    "Jalón al pecho": "Jalón al pecho con agarre neutro",
+    "Jalón con agarre estrecho": "Jalón al Pecho con Agarre Cerrado",
+    "Elevaciones laterales": "Lateral Raises",
+    "Encogimientos de trapecio": "Encogimientos de hombros con mancuernas",
+    "Extensión de cuádriceps": "Leg Extension",
+    "Puente de glúteo": "Puente de glúteos",
+    "Elevación de gemelos": "Elevación de talón de pie",
+    "Subida al cajón": None,
+    "Curl nórdico": None,
+    "Crunch en polea": None,
+    "Crunch inverso": None,
+    "Flexión lateral de cuello": None,
+    "Saltos al cajón": None,
 }
 
 
@@ -135,6 +161,7 @@ def mejor_coincidencia(nombre, indice):
             for candidato in datos["nombres"]:
                 if normalizar(candidato) == normalizar(pedido):
                     return (datos, candidato)
+        return None  # si el elegido ya no está en wger, mejor sin imagen que una equivocada
     objetivo = palabras(nombre)
     mejor, puntos_mejor = None, 0
     for datos in indice:

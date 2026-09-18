@@ -5,6 +5,7 @@ import * as estado from '../estado.js';
 import { desconectar, sincronizar, situacionActual } from '../sincronizacion.js';
 import { VERSION_APP } from '../version.js';
 import { anadir, confirmar, h, hoyISO, leerNumero } from '../ui.js';
+import { DESCANSO_TRAMOS_POR_DEFECTO } from './descanso.js';
 
 export function vistaAjustes(contenedor) {
   const d = estado.datos();
@@ -53,7 +54,22 @@ export function vistaAjustes(contenedor) {
         h('span', { class: 'etiqueta-campo' }, 'Descanso entre series (segundos)'),
         h('input', { type: 'text', inputmode: 'decimal', value: d.perfil.descansoSegundos ?? '',
           oninput: (e) => estado.cambiar((x) => { x.perfil.descansoSegundos = leerNumero(e.target.value); }, { tecleo: true }) }),
-        h('small', { class: 'nota' }, 'El cronómetro arranca solo al apuntar una serie. Ponlo a 0 para desactivarlo.')),
+        h('small', { class: 'nota' }, 'El cronómetro arranca solo al apuntar una serie, y al apuntar la última bajada de un drop set. '
+          + 'Ponlo a 0 para desactivarlo.')),
+
+      h('div', { class: 'campo' },
+        h('span', { class: 'etiqueta-campo' }, 'Descanso dentro de una serie (segundos)'),
+        h('div', { class: 'fila-campos' },
+          [['drop-set', 'Entre bajadas'], ['rest-pause', 'Rest-pause'], ['miorepeticiones', 'Miorrepeticiones']]
+            .map(([clave, texto]) => h('label', { class: 'campo' },
+              h('span', { class: 'etiqueta-campo' }, texto),
+              h('input', { type: 'text', inputmode: 'decimal',
+                value: d.perfil.descansoTramos?.[clave] ?? DESCANSO_TRAMOS_POR_DEFECTO[clave],
+                oninput: (e) => estado.cambiar((x) => {
+                  x.perfil.descansoTramos = { ...DESCANSO_TRAMOS_POR_DEFECTO, ...x.perfil.descansoTramos, [clave]: leerNumero(e.target.value) };
+                }, { tecleo: true }) })))),
+        h('small', { class: 'nota' }, 'Al apuntar una bajada arranca esta cuenta corta: lo justo para cambiar el disco '
+          + 'o para respirar entre miniseries. Al apuntar la última, el descanso normal.')),
 
       h('label', { class: 'campo' },
         h('span', { class: 'etiqueta-campo' }, 'Peso corporal (kg)'),
@@ -78,7 +94,13 @@ export function vistaAjustes(contenedor) {
         h('label', { class: 'campo' },
           h('span', { class: 'etiqueta-campo' }, 'Arranca al (% del 1RM)'),
           h('input', { type: 'text', inputmode: 'decimal', value: d.perfil.dropSet?.inicioPorcentaje ?? 80,
-            oninput: (e) => estado.cambiar((x) => { x.perfil.dropSet = { ...x.perfil.dropSet, inicioPorcentaje: leerNumero(e.target.value) }; }, { tecleo: true }) })))),
+            oninput: (e) => estado.cambiar((x) => { x.perfil.dropSet = { ...x.perfil.dropSet, inicioPorcentaje: leerNumero(e.target.value) }; }, { tecleo: true }) }))),
+      h('label', { class: 'casilla' },
+        h('input', { type: 'checkbox', checked: d.perfil.dropSet?.autoRellenar !== false,
+          onchange: (e) => estado.cambiar((x) => { x.perfil.dropSet = { ...x.perfil.dropSet, autoRellenar: e.target.checked }; }) }),
+        'Rellenar los pesos del drop set con el 1RM que acabas de hacer en la serie de arriba'),
+      h('small', { class: 'nota' }, 'Por ejemplo: haces la Bilbo con 60 kg × 20 y el drop set de debajo se rellena solo '
+        + 'al porcentaje de arriba. Si tocas un peso a mano, se respeta.')),
 
     h('section', { class: 'tarjeta' },
       h('h2', {}, 'De dónde sale cada cosa'),
@@ -109,7 +131,8 @@ export function vistaAjustes(contenedor) {
         'Los dibujos del cuerpo y de los ejercicios vienen de ',
         h('a', { href: 'https://wger.de', target: '_blank', rel: 'noopener' }, 'wger.de'),
         ', con licencia Creative Commons Atribución-CompartirIgual (CC-BY-SA). '
-        + 'Se usan citando a sus autores y manteniendo esa licencia.'),
+        + 'Se usan citando a sus autores y manteniendo esa licencia. Las capas de antebrazo, hombro posterior, '
+        + 'lumbares, aductores, abductores, cuello y tibial son dibujos propios de la app sobre esa silueta.'),
       h('p', { class: 'nota' },
         `Imágenes incluidas: ${Object.keys(creditosCargados()?.ejercicios ?? {}).length} de ejercicios `
         + `y ${Object.keys(creditosCargados()?.musculos ?? {}).length} capas de músculo.`)),

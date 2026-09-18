@@ -1,4 +1,8 @@
-# Esquema de datos — versión 3
+# Esquema de datos — versión 7
+
+> Las secciones de abajo describen la versión 3. Los cambios posteriores están
+> resumidos en «Cambios desde la versión 3», al final del apartado 9, y en
+> `web/js/esquema.js` (MIGRACIONES).
 
 Este documento describe **cómo se guardan tus datos**. Es la pieza más
 importante del proyecto: el código se puede reescribir entero mañana, pero el
@@ -408,6 +412,22 @@ formato anterior al nuevo. Al abrir la app:
 4. Guarda el resultado y sigue.
 
 El paso 3 no es opcional. Es la red de seguridad.
+
+### Cambios desde la versión 3
+
+- **v4.** El fallo deja de ser una técnica: se deduce de `recamara` (0 =
+  fallo). Cada plantilla de serie gana `tramoSalto` (kilos por bajada).
+- **v5.** `perfil.dropSet = { bajadas, salto, inicioPorcentaje }`.
+- **v6.** Cada ejercicio gana `musculos = { principales: [], secundarios: [] }`
+  con claves de `web/js/musculos.js` (cuello, trapecio, hombro,
+  hombroPosterior, pecho, biceps, triceps, antebrazo, abdomen, oblicuos,
+  dorsal, lumbar, gluteo, abductores, cuadriceps, aductores, isquios, gemelo,
+  tibial).
+- **v7.** `perfil.descansoTramos = { 'drop-set': 30, 'rest-pause': 20,
+  miorepeticiones: 20 }` (segundos) y `perfil.dropSet.autoRellenar`. En las
+  series con tramos: `cargaAutomatica` (la app puede recalcular sus pesos
+  mientras no los toques) y `rellenoDesde = { rm, porcentaje }`. Se limpian
+  los pesos no numéricos que dejaba «+ Bajada».
 
 ---
 

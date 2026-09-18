@@ -6,11 +6,13 @@ import {
   DIAS_CICLO_POR_DEFECTO, TIPOS_CARGA, TIPOS_ESFUERZO, TIPOS_PROGRESION, TIPOS_SERIE,
   progresionPorDefecto, serieNuevaPlantilla, sobrePorDefecto, tramosDe,
 } from '../esquema.js';
-import { CATALOGO, buscarEnCatalogo } from '../catalogo.js';
-import { MUSCULOS, ORDEN_MUSCULOS } from '../musculos.js';
+import { CATALOGO, normalizar } from '../catalogo.js';
+import { ORDEN_MUSCULOS, nombreMusculo } from '../musculos.js';
+import { entradaDeEjercicio } from '../series.js';
 import { seccionProgreso } from './graficas.js';
 import { imagenDe } from '../imagenes.js';
-import { anadir, aviso, confirmar, h, leerNumero, modal, nuevoId } from '../ui.js';
+import { anadir, aviso, confirmar, h, leerNumero, nuevoId } from '../ui.js';
+import { barraFiltros, cajaLista, elegirEjercicio, filtrar, tarjetaItem } from './selector-ejercicios.js';
 import { selectorTecnicas } from './tecnicas.js';
 
 // ---------------------------------------------------------------------------
@@ -18,7 +20,6 @@ import { selectorTecnicas } from './tecnicas.js';
 // ---------------------------------------------------------------------------
 
 let verArchivados = false;
-let busqueda = '';
 
 export function vistaEjercicios(contenedor) {
   const d = estado.datos();
@@ -30,10 +31,7 @@ export function vistaEjercicios(contenedor) {
       h('h1', {}, 'Ejercicios'),
       h('a', { class: 'boton', href: '#/ejercicio/nuevo' }, '+ Nuevo')),
 
-    d.ejercicios.length > 5 && h('input', {
-      type: 'search', class: 'buscador', placeholder: 'Buscar ejercicio', value: busqueda,
-      oninput: (e) => { busqueda = e.target.value; pintarLista(); },
-    }),
+    d.ejercicios.length > 0 && barraFiltros(() => pintarLista()),
 
     zona,
 
@@ -41,10 +39,7 @@ export function vistaEjercicios(contenedor) {
       verArchivados ? 'Ocultar archivados' : 'Ver archivados'));
 
   function pintarLista() {
-    const texto = busqueda.trim().toLowerCase();
-    const lista = d.ejercicios
-      .filter((e) => (verArchivados || !e.archivado)
-        && (!texto || `${e.nombre} ${e.grupo || ''}`.toLowerCase().includes(texto)))
+    const lista = filtrar(d.ejercicios.filter((e) => verArchivados || !e.archivado))
       .sort((a, b) => (a.grupo || '~').localeCompare(b.grupo || '~') || a.nombre.localeCompare(b.nombre));
 
     const grupos = new Map();
@@ -57,13 +52,13 @@ export function vistaEjercicios(contenedor) {
     zona.replaceChildren();
     if (!lista.length) {
       anadir(zona, h('p', { class: 'suave' }, d.ejercicios.length
-        ? 'Ningún ejercicio coincide con la búsqueda.'
+        ? 'Ningún ejercicio coincide con los filtros.'
         : 'Crea tu primer ejercicio: eliges qué mide y cómo progresa cada una de sus series.'));
       return;
     }
     anadir(zona, [...grupos].map(([grupo, ejercicios]) => h('section', {},
       h('h2', {}, grupo.charAt(0).toUpperCase() + grupo.slice(1)),
-      ejercicios.map((e) => tarjetaEjercicio(d, e)))));
+      anadir(cajaLista(), ejercicios.map((e) => tarjetaEjercicio(d, e))))));
   }
   pintarLista();
 }
@@ -76,13 +71,14 @@ function tarjetaEjercicio(datos, ej) {
     const hechos = registrosDelCiclo(datos, ej, plan, ciclo.n).length;
     return `${TIPOS_SERIE[plan.tipo]}: ciclo ${ciclo.n}, día ${Math.min(hechos + 1, ciclo.escalera.length)} de ${ciclo.escalera.length}`;
   });
-  const imagen = imagenDe(ej.nombre);
-  return h('a', { class: `tarjeta fila-enlace ${ej.archivado ? 'archivado' : ''}`, href: `#/ejercicio/${ej.id}` },
-    imagen && h('img', { class: 'miniatura', src: imagen.archivo, alt: '', loading: 'lazy' }),
-    h('div', { class: 'crece' },
-      h('strong', {}, ej.nombre),
-      h('div', { class: 'suave' }, partes.join(' · ') || 'Sin series configuradas')),
-    ej.archivado && h('span', { class: 'etiqueta' }, 'Archivado'));
+  const sinMusculos = !ej.musculos?.principales?.length;
+  return tarjetaItem(ej, {
+    href: `#/ejercicio/${ej.id}`,
+    clase: ej.archivado ? 'archivado' : '',
+    pie: partes.join(' · ') || 'Sin series configuradas',
+    extra: ej.archivado ? h('span', { class: 'etiqueta' }, 'Archivado')
+      : sinMusculos && h('span', { class: 'etiqueta aviso-etiqueta' }, 'Sin músculos'),
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -108,7 +104,7 @@ function ejercicioVacio() {
   return base;
 }
 
-export function vistaFormularioEjercicio(contenedor, { id }) {
+export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) {
   const d = estado.datos();
   const existente = id !== 'nuevo' ? d.ejercicios.find((e) => e.id === id) : null;
   if (id !== 'nuevo' && !existente) {
@@ -140,19 +136,7 @@ export function vistaFormularioEjercicio(contenedor, { id }) {
 
   // Lista de ejercicios habituales, para no escribirlo todo a mano.
   function elegirDelCatalogo() {
-    const lista = h('div', { class: 'lista-eleccion' });
-    const pintar = (filtro = '') => {
-      lista.replaceChildren(...buscarEnCatalogo(filtro).map((x) => h('button', {
-        type: 'button', class: 'tarjeta fila-enlace', onclick: () => { cerrar(); aplicar(x); },
-      },
-      h('div', {},
-        h('strong', {}, x.nombre),
-        h('div', { class: 'suave' }, `${x.grupo} · ${x.material} · ${x.musculos}`)))));
-    };
-    pintar();
-    const cerrar = modal('Ejercicios habituales', h('div', {},
-      h('input', { type: 'search', class: 'buscador', placeholder: 'Buscar', oninput: (e) => pintar(e.target.value) }),
-      lista));
+    elegirEjercicio({ titulo: 'Ejercicios habituales', mios: [], alElegirCatalogo: aplicar, etiquetaCatalogo: null });
   }
 
   function aplicar(x) {
@@ -201,6 +185,8 @@ export function vistaFormularioEjercicio(contenedor, { id }) {
         h('legend', {}, '¿Qué músculos trabaja?'),
         h('p', { class: 'nota' }, 'Sirve para el mapa de recuperación y para los avisos de volumen. '
           + 'Los secundarios cuentan la mitad.'),
+        !borrador.musculos.principales.length && h('p', { class: 'aviso-texto' },
+          'Sin músculo principal, este ejercicio no aparecerá en el mapa de recuperación ni en el volumen semanal.'),
         sugerenciaDelCatalogo(),
         selectorMusculos('Principales', borrador.musculos.principales, borrador.musculos.secundarios),
         selectorMusculos('Secundarios', borrador.musculos.secundarios, borrador.musculos.principales)),
@@ -223,7 +209,7 @@ export function vistaFormularioEjercicio(contenedor, { id }) {
         oninput: (e) => { borrador.notas = e.target.value; } })),
 
       h('div', { class: 'fila-botones' },
-        h('a', { class: 'boton secundario', href: '#/ejercicios' }, 'Cancelar'),
+        h('a', { class: 'boton secundario', href: paraSesion ? `#/sesion/${paraSesion}` : '#/ejercicios' }, 'Cancelar'),
         h('button', { class: 'boton', type: 'submit' }, 'Guardar')),
 
       existente && h('button', { type: 'button', class: 'boton enlace', onclick: archivar },
@@ -231,16 +217,23 @@ export function vistaFormularioEjercicio(contenedor, { id }) {
   }
 
   // Si el ejercicio se llama como uno del catálogo, se ofrecen sus músculos.
+  // También si ya tiene músculos pero la lista los tiene distintos (por
+  // ejemplo, desde que existe el hombro posterior).
   function sugerenciaDelCatalogo() {
-    if (borrador.musculos.principales.length) return null;
-    const nombre = (borrador.nombre || '').trim().toLowerCase();
+    const nombre = normalizar(borrador.nombre);
     if (!nombre) return null;
-    const enCatalogo = CATALOGO.find((x) => x.nombre.toLowerCase() === nombre)
-      ?? CATALOGO.find((x) => nombre.includes(x.nombre.toLowerCase()) || x.nombre.toLowerCase().includes(nombre));
+    const enCatalogo = CATALOGO.find((x) => normalizar(x.nombre) === nombre)
+      ?? (!borrador.musculos.principales.length
+        ? CATALOGO.find((x) => nombre.includes(normalizar(x.nombre)) || normalizar(x.nombre).includes(nombre))
+        : null);
     if (!enCatalogo?.musculos?.principales?.length) return null;
+    const igual = (a, b) => [...a].sort().join() === [...b].sort().join();
+    if (igual(enCatalogo.musculos.principales, borrador.musculos.principales)
+      && igual(enCatalogo.musculos.secundarios ?? [], borrador.musculos.secundarios)) return null;
+    const nombres = (lista) => lista.map((m) => nombreMusculo(m)).join(', ');
     return h('div', { class: 'tarjeta aviso-tarjeta' },
-      h('p', {}, `En la lista, «${enCatalogo.nombre}» trabaja `
-        + `${enCatalogo.musculos.principales.map((m) => MUSCULOS[m].nombre).join(', ')}.`),
+      h('p', {}, `En la lista, «${enCatalogo.nombre}» trabaja ${nombres(enCatalogo.musculos.principales)}`
+        + (enCatalogo.musculos.secundarios?.length ? ` y, de secundarios, ${nombres(enCatalogo.musculos.secundarios)}.` : '.')),
       h('button', { type: 'button', class: 'boton secundario', onclick: () => {
         borrador.musculos = {
           principales: [...enCatalogo.musculos.principales],
@@ -270,7 +263,7 @@ export function vistaFormularioEjercicio(contenedor, { id }) {
             }
             repintar();
           },
-        }, MUSCULOS[m].nombre))));
+        }, nombreMusculo(m)))));
   }
 
   function tarjetaPlan(plan, i) {
@@ -416,6 +409,17 @@ export function vistaFormularioEjercicio(contenedor, { id }) {
       if (i >= 0) datos.ejercicios[i] = borrador;
       else datos.ejercicios.push(borrador);
     });
+    if (paraSesion) {
+      // Creado desde el entrenamiento: se añade a él y se vuelve allí.
+      estado.cambiar((datos) => {
+        const sesion = datos.sesiones.find((s) => s.id === paraSesion);
+        const ej = datos.ejercicios.find((e) => e.id === borrador.id);
+        if (sesion && ej) sesion.ejercicios.push(entradaDeEjercicio(datos, ej, { excluirSesion: paraSesion }));
+      });
+      aviso(`${borrador.nombre} guardado y añadido al entrenamiento`);
+      location.hash = `#/sesion/${paraSesion}`;
+      return;
+    }
     aviso('Ejercicio guardado');
     location.hash = '#/ejercicios';
   }

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="369" viewBox="0 0 200 369">
+  <!-- antebrazo (detras): capa propia de la app -->
+  <g fill="#000" stroke="#000" stroke-width="1.5" stroke-linejoin="round">
+    <path d="M 48 135 L 58 139 L 56 152 L 48 168 L 38 186 L 29 188 L 32 172 L 40 152 Z"/>
+    <path d="M 152 135 L 142 139 L 144 152 L 152 168 L 162 186 L 171 188 L 168 172 L 160 152 Z"/>
+  </g>
+</svg>

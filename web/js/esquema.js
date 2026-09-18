@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 6;
+export const VERSION_ACTUAL = 7;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -133,7 +133,8 @@ export function archivoNuevo({ nombre = '', correo = null } = {}) {
       tema: 'sistema',
       descansoSegundos: 120,
       recamaraPorDefecto: 1,
-      dropSet: { bajadas: 4, salto: 10, inicioPorcentaje: 80 },
+      dropSet: { bajadas: 4, salto: 10, inicioPorcentaje: 80, autoRellenar: true },
+      descansoTramos: { 'drop-set': 30, 'rest-pause': 20, miorepeticiones: 20 },
     },
     sedes: [],
     ejercicios: [],
@@ -240,6 +241,24 @@ const MIGRACIONES = {
   5: (datos) => {
     for (const ej of datos.ejercicios) ej.musculos ??= { principales: [], secundarios: [] };
     datos.version = 6;
+    return datos;
+  },
+
+  // v7: descansos propios dentro de una serie (entre bajadas de un drop set,
+  // rest-pause y miorrepeticiones) y relleno automático del drop set con el
+  // 1RM de la serie de arriba. Además se limpian los pesos «NaN» que dejaba
+  // el botón «+ Bajada» de la versión anterior.
+  6: (datos) => {
+    datos.perfil.descansoTramos ??= { 'drop-set': 30, 'rest-pause': 20, miorepeticiones: 20 };
+    datos.perfil.dropSet = { autoRellenar: true, ...datos.perfil.dropSet };
+    for (const sesion of datos.sesiones) {
+      for (const entrada of sesion.ejercicios) {
+        for (const serie of entrada.series) {
+          for (const tramo of serie.tramos || []) if (!Number.isFinite(tramo.carga)) tramo.carga = null;
+        }
+      }
+    }
+    datos.version = 7;
     return datos;
   },
 };

@@ -697,3 +697,50 @@ input.fecha { width: auto; }
   background: #fff;
   border-radius: var(--radio);
 }
+
+/* Buscador de ejercicios: filtros y tres formas de ver la lista */
+.filtros-ejercicios { display: grid; gap: 8px; margin-bottom: 12px; }
+.filtros-ejercicios .buscador { margin: 0; }
+.fila-filtros { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.fila-filtros select { min-height: 40px; font-size: 16px; padding: 4px 6px; width: 100%; }
+.fila-filtros select.activo { border-color: var(--acento); background: var(--acento-suave); }
+.modos-vista { display: flex; gap: 6px; flex-wrap: wrap; }
+@media (max-width: 420px) { .fila-filtros { grid-template-columns: 1fr 1fr; } }
+
+.lista-eleccion { display: grid; gap: 8px; }
+.lista-eleccion > .tarjeta { margin: 0; }
+.miniatura.sin-imagen, .mosaico .sin-imagen {
+  display: grid; place-items: center;
+  background: var(--superficie-2); color: var(--texto-suave);
+  font-weight: 700; font-size: 0.9rem;
+}
+.lista-eleccion.modo-mosaico { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); }
+.item-ejercicio.mosaico {
+  flex-direction: column; justify-content: flex-start; align-items: stretch;
+  gap: 6px; padding: 8px; text-align: center;
+}
+.item-ejercicio.mosaico img, .item-ejercicio.mosaico .sin-imagen {
+  width: 100%; aspect-ratio: 1; object-fit: contain;
+  background: #fff; border-radius: var(--radio-pequeno);
+}
+.item-ejercicio.mosaico .nombre-mosaico { font-size: 0.8rem; line-height: 1.2; }
+.item-ejercicio.mosaico .etiqueta { margin: 0; align-self: center; }
+.aviso-etiqueta { background: var(--aviso-fondo); color: var(--aviso); }
+
+/* Mapa del cuerpo: explicación y ejercicios sin músculos */
+.lista-enlaces { margin: 4px 0 8px; padding-left: 20px; }
+.lista-enlaces a { color: inherit; }
+.bloque { display: block; }
+.explicacion { margin-top: 12px; font-size: 0.9rem; }
+.explicacion summary { cursor: pointer; font-weight: 600; min-height: 32px; }
+.explicacion ul { padding-left: 20px; }
+
+/* Entrenamiento: comparación con otras veces y resumen al terminar */
+.comparacion { margin: 6px 0 0; font-size: 0.85rem; color: var(--texto-suave); }
+.comparacion:empty, .nota-relleno:empty { display: none; }
+.resumen-sesion h3 { margin: 16px 0 6px; }
+.resumen-sesion ul { padding-left: 20px; margin: 0; }
+.resumen-sesion li { margin: 4px 0; }
+.lista-volumen li.mucho { color: var(--aviso); }
+.lista-volumen li.bien { color: var(--bien); }
+.aviso { cursor: pointer; }

@@ -11,17 +11,20 @@
 //
 // Todo esto es una estimación para orientar, no una medida.
 
+import { cuentaParaFatiga } from './catalogo.js';
 import { MUSCULOS, ORDEN_MUSCULOS } from './musculos.js';
 
 const HORAS_BASE = 36;
 const HORAS_MAXIMAS = 72;
 
-// Series efectivas de una sesión, por músculo, con su dureza.
-function fatigaDeSesion(datos, sesion) {
+// Series efectivas de una sesión, por músculo. Con `dureza`, cada serie pesa
+// según lo cerca del fallo que la dejaste (para la recuperación); sin ella,
+// cada serie cuenta una (para el volumen semanal).
+function fatigaDeSesion(datos, sesion, { dureza = true } = {}) {
   const porMusculo = new Map();
   for (const entrada of sesion.ejercicios) {
     const ej = datos.ejercicios.find((e) => e.id === entrada.ejercicioId);
-    if (!ej) continue;
+    if (!ej || !cuentaParaFatiga(ej)) continue;
     const principales = ej.musculos?.principales ?? [];
     const secundarios = ej.musculos?.secundarios ?? [];
     if (!principales.length && !secundarios.length) continue;
@@ -29,8 +32,9 @@ function fatigaDeSesion(datos, sesion) {
     for (const serie of entrada.series) {
       if (!serie.hecha || serie.tipo === 'calentamiento') continue;
       // Cuanto más cerca del fallo, más fatiga deja.
-      const cerca = serie.recamara == null ? 1 : serie.recamara <= 0 ? 1.3 : serie.recamara >= 3 ? 0.7 : 1;
-      const tramos = serie.tramos?.length ? 1 + (serie.tramos.length - 1) * 0.5 : 1;
+      const cerca = !dureza || serie.recamara == null ? 1 : serie.recamara <= 0 ? 1.3 : serie.recamara >= 3 ? 0.7 : 1;
+      const hechos = (serie.tramos || []).filter((t) => t.esfuerzo != null).length;
+      const tramos = hechos > 1 ? 1 + (hechos - 1) * 0.5 : 1;
       const peso = cerca * tramos;
       for (const m of principales) porMusculo.set(m, (porMusculo.get(m) ?? 0) + peso);
       for (const m of secundarios) porMusculo.set(m, (porMusculo.get(m) ?? 0) + peso * 0.5);
@@ -63,7 +67,7 @@ export function recuperacionPorMusculo(datos, ahora = new Date()) {
       const porcentaje = Math.max(0, Math.min(100, Math.round((horas / necesarias) * 100)));
       if (porcentaje < estado[musculo].porcentaje) {
         estado[musculo] = { musculo, porcentaje, ultima: sesion.fecha, series: Math.round(series * 10) / 10,
-          horasRestantes: Math.max(0, Math.round(necesarias - horas)) };
+          horasNecesarias: Math.round(necesarias), horasRestantes: Math.max(0, Math.round(necesarias - horas)) };
       }
     }
   }
@@ -84,6 +88,17 @@ export function claseDeRecuperacion(porcentaje) {
   return 'cansado';
 }
 
+// Para explicar un músculo concreto: de dónde salen sus horas.
+export function detalleDeRecuperacion(e) {
+  if (!e.ultima) return '';
+  const tamano = MUSCULOS[e.musculo]?.tamano ?? 'medio';
+  const ajuste = tamano === 'grande' ? '+6 h por ser grande' : tamano === 'pequeno' ? '−6 h por ser pequeño' : 'tamaño medio';
+  const extra = Math.max(0, e.series - 3) * 4;
+  return `${String(e.series).replace('.', ',')} series efectivas → 36 h de base, ${ajuste}`
+    + (extra ? `, +${Math.round(Math.min(24, extra))} h por las series de más` : '')
+    + ` = ${e.horasNecesarias} h en total.`;
+}
+
 export function textoDeRecuperacion(e) {
   const nombre = MUSCULOS[e.musculo]?.nombre ?? e.musculo;
   if (e.porcentaje >= 100) return `${nombre}: recuperado`;
@@ -98,7 +113,7 @@ export function seriesSemanales(datos, ahora = new Date()) {
     if (sesion.borrada || sesion.estado !== 'terminada') continue;
     const horas = horasDesde(sesion, ahora);
     if (horas == null || horas > 24 * 7) continue;
-    for (const [musculo, series] of fatigaDeSesion(datos, sesion)) {
+    for (const [musculo, series] of fatigaDeSesion(datos, sesion, { dureza: false })) {
       if (total[musculo] != null) total[musculo] += series;
     }
   }

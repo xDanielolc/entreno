@@ -1,6 +1,10 @@
 // Cronómetro de descanso entre series.
 //
 // Arranca solo al apuntar una serie y se ve en la pantalla de entrenamiento.
+// Hay dos clases de descanso:
+//   · entre series: el de Ajustes (2 minutos por defecto);
+//   · dentro de una serie con tramos: el justo para cambiar el peso en un
+//     drop set o para respirar en rest-pause y miorrepeticiones.
 // Es una cuenta atrás por hora de fin, no por sumar segundos: así sigue
 // siendo correcta aunque el móvil bloquee la pantalla.
 
@@ -8,10 +12,19 @@ import { aviso as avisoPulla, h } from '../ui.js';
 
 let finMs = null;
 let intervalo = null;
+let motivo = 'de descanso';
 const cajas = new Set();
 
-export function arrancarDescanso(segundos) {
+// Descanso que toca dentro de una serie, según su técnica.
+export const DESCANSO_TRAMOS_POR_DEFECTO = { 'drop-set': 30, 'rest-pause': 20, miorepeticiones: 20 };
+
+export function descansoDeTramo(perfil, tecnica) {
+  return perfil.descansoTramos?.[tecnica] ?? DESCANSO_TRAMOS_POR_DEFECTO[tecnica] ?? 20;
+}
+
+export function arrancarDescanso(segundos, { texto = 'de descanso' } = {}) {
   if (!segundos) return;
+  motivo = texto;
   finMs = Date.now() + segundos * 1000;
   pintar();
   clearInterval(intervalo);
@@ -41,6 +54,7 @@ function pintar() {
     caja.hidden = !finMs;
     if (!finMs) continue;
     caja.querySelector('.descanso-tiempo').textContent = formatear(segundos);
+    caja.querySelector('.descanso-motivo').textContent = motivo;
     caja.classList.toggle('acabado', segundos === 0);
   }
 }
@@ -78,13 +92,13 @@ const PULLAS = [
 
 function saltar() {
   pararDescanso();
-  avisoPulla(PULLAS[Math.floor(Math.random() * PULLAS.length)]);
+  avisoPulla(PULLAS[Math.floor(Math.random() * PULLAS.length)], { ms: 9000 });
 }
 
 export function barraDescanso() {
   const caja = h('div', { class: 'descanso', hidden: !finMs },
     h('span', { class: 'descanso-tiempo' }, formatear(restante())),
-    h('span', { class: 'suave' }, 'de descanso'),
+    h('span', { class: 'suave descanso-motivo' }, motivo),
     h('button', { class: 'boton enlace', onclick: () => arrancarDescanso(60) }, '+1 min'),
     h('button', { class: 'boton enlace', onclick: saltar }, 'Saltar'));
   cajas.add(caja);

@@ -18,6 +18,8 @@ import { vistaSesion } from './vistas/sesion.js';
 const RUTAS = [
   { patron: /^#?\/?$/, vista: vistaInicio, pestana: 'inicio' },
   { patron: /^#\/ejercicios$/, vista: vistaEjercicios, pestana: 'ejercicios' },
+  { patron: /^#\/ejercicio\/nuevo\/para\/([\w-]+)$/, pestana: 'inicio', params: ['paraSesion'],
+    vista: (contenedor, { paraSesion }) => vistaFormularioEjercicio(contenedor, { id: 'nuevo', paraSesion }) },
   { patron: /^#\/ejercicio\/([\w-]+)$/, vista: vistaFormularioEjercicio, pestana: 'ejercicios', params: ['id'] },
   { patron: /^#\/sesion\/([\w-]+)$/, vista: vistaSesion, pestana: 'inicio', params: ['id'] },
   { patron: /^#\/cuerpo$/, vista: vistaCuerpo, pestana: 'cuerpo' },

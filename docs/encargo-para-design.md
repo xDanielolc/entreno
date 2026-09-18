@@ -59,9 +59,10 @@ abajo la explicación de por qué pide lo que pide, por si quieres cambiarlo.
 > - Dos SVG (frente y espalda) en el mismo lienzo y a la misma escala, de forma
 >   que las dos siluetas se puedan poner una al lado de la otra.
 > - Cada músculo, un grupo `<g>` con un identificador exacto de esta lista:
->   `trapecio`, `hombro`, `pecho`, `biceps`, `triceps`, `antebrazo`, `abdomen`,
->   `oblicuos`, `dorsal`, `lumbar`, `gluteo`, `cuadriceps`, `isquios`,
->   `aductores`, `abductores`, `gemelo`.
+>   `cuello`, `trapecio`, `hombro` (deltoides anterior y lateral),
+>   `hombroPosterior`, `pecho`, `biceps`, `triceps`, `antebrazo`, `abdomen`,
+>   `oblicuos`, `dorsal`, `lumbar`, `gluteo`, `abductores` (glúteo medio),
+>   `cuadriceps`, `aductores`, `isquios`, `gemelo`, `tibial`.
 > - Los músculos simétricos incluyen los dos lados dentro del mismo grupo.
 > - Sin colores fijos: los rellenos deben usar `fill="currentColor"` o una
 >   variable CSS, para poder pintarlos desde la app.
