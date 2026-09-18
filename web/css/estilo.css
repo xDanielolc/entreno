@@ -766,3 +766,14 @@ input.fecha { width: auto; }
 /* Estiramientos: técnica, ayuda y escala de la mano */
 .serie-estiramiento { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .serie-estiramiento select { font-size: 16px; min-height: 40px; flex: 1 1 140px; }
+
+/* Escala de recuperación percibida, de 0 a 10 */
+.fila-sensacion { display: block; }
+.cabecera-sensacion { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+.escala-0-10 { display: grid; grid-template-columns: repeat(11, 1fr); gap: 3px; }
+.paso-escala {
+  min-height: 44px; padding: 0; border: 1px solid var(--borde); border-radius: var(--radio-pequeno);
+  background: var(--superficie-2); color: var(--texto); font: inherit; font-weight: 600; cursor: pointer;
+}
+.paso-escala.activo { background: var(--acento); border-color: var(--acento); color: var(--acento-texto); }
+.extremos-escala { display: flex; justify-content: space-between; font-size: 0.75rem; margin-top: 2px; }

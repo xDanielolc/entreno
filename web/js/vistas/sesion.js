@@ -15,7 +15,7 @@ import { arrancarDescanso, arrancarRespiracion, barraDescanso, descansoDeTramo }
 import { cuentaParaFatiga, tipoDeEjercicio } from '../catalogo.js';
 import { ASISTENCIAS, ESCALA_MANO, TECNICAS_ESTIRAMIENTO } from '../esquema.js';
 import { ORDEN_MUSCULOS, nombreMusculo } from '../musculos.js';
-import { SENSACIONES, recuperacionPorMusculo } from '../recuperacion.js';
+import { ESCALA_RECUPERACION, puntuacionSentida, recuperacionPorMusculo } from '../recuperacion.js';
 import { comparacionSerie, mostrarResumen } from './resumen-sesion.js';
 import { ejercicioDesdeCatalogo, elegirEjercicio as abrirSelector } from './selector-ejercicios.js';
 import { selectorTecnicas, textoTecnicas } from './tecnicas.js';
@@ -105,17 +105,25 @@ export function vistaSesion(contenedor, { id }) {
     const todas = lista.every((m) => respuestas[m]);
     return h('details', { class: 'tarjeta como-llegas', open: !todas },
       h('summary', {}, todas ? 'Cómo llegas: apuntado' : '¿Cómo llegas hoy? (opcional)'),
-      h('p', { class: 'nota' }, 'Toca cómo notas cada músculo. Sirve para ajustar el mapa de recuperación a tu ritmo.'),
-      lista.map((m) => h('div', { class: 'fila-sensacion' },
-        h('span', {}, nombreMusculo(m, { corto: true }), h('small', { class: 'suave bloque' }, `la app calcula ${previsto[m].porcentaje} %`)),
-        h('div', { class: 'botones-sensacion' }, Object.entries(SENSACIONES).map(([clave, s]) => h('button', {
-          class: `chip seleccionable ${respuestas[m]?.sentida === clave ? 'activo' : ''}`,
-          'aria-pressed': String(respuestas[m]?.sentida === clave),
-          onclick: () => cambiarSesion((x) => {
-            x.sensaciones ??= {};
-            x.sensaciones[m] = { sentida: clave, prevista: previsto[m].porcentaje };
-          }),
-        }, `${s.icono} ${s.texto}`))))),
+      h('p', { class: 'nota' }, 'Puntúa de 0 a 10 cómo de recuperado notas cada músculo: 0, nada; 5, a medias; 10, del todo. '
+        + 'Sirve para ajustar el mapa de recuperación a tu ritmo.'),
+      lista.map((m) => {
+        const puesta = respuestas[m] ? puntuacionSentida(respuestas[m]) : null;
+        return h('div', { class: 'fila-sensacion' },
+          h('div', { class: 'cabecera-sensacion' },
+            h('strong', {}, nombreMusculo(m, { corto: true })),
+            h('small', { class: 'suave' }, `la app calcula ${Math.round(previsto[m].porcentaje / 10)} de 10`)),
+          h('div', { class: 'escala-0-10', role: 'radiogroup', 'aria-label': `Recuperación de ${nombreMusculo(m)}` },
+            Array.from({ length: 11 }, (_, n) => h('button', {
+              class: `paso-escala ${puesta === n ? 'activo' : ''}`, role: 'radio', 'aria-checked': String(puesta === n),
+              title: ESCALA_RECUPERACION[n] ?? String(n),
+              onclick: () => cambiarSesion((x) => {
+                x.sensaciones ??= {};
+                x.sensaciones[m] = { sentida: n, prevista: previsto[m].porcentaje };
+              }),
+            }, n))),
+          h('div', { class: 'extremos-escala suave' }, h('span', {}, 'Nada'), h('span', {}, 'A medias'), h('span', {}, 'Del todo')));
+      }),
       h('button', { class: 'boton enlace', onclick: () => cambiarSesion((x) => { x.sensacionesCerrada = true; }) },
         'Hoy no'));
   }

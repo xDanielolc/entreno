@@ -158,17 +158,23 @@ export function seriesSemanales(datos, ahora = new Date()) {
 // Cómo llegas: tu sensación frente a lo que calcula la app
 // ---------------------------------------------------------------------------
 //
-// Al empezar un entrenamiento puedes decir cómo notas cada músculo (cargado,
-// normal o fresco). Si varias veces te notas fresco cuando la app te daba por
-// cansado, te recuperas más rápido de lo que calcula; si te notas cargado
-// cuando te daba por recuperado, más despacio. Con eso se propone cambiar
-// tu factor personal.
+// Al empezar un entrenamiento puedes puntuar cada músculo de 0 a 10: es la
+// escala de recuperación percibida de Laurent (2011), donde 0 es «nada
+// recuperado», 5 «a medias» y 10 «del todo». Si varias veces te pones mucho
+// más alto de lo que calcula la app, te recuperas más rápido; si te pones
+// mucho más bajo, más despacio. Con eso se propone cambiar tu factor personal.
 
-export const SENSACIONES = {
-  cargado: { texto: 'Cargado', icono: '😣' },
-  normal: { texto: 'Normal', icono: '🙂' },
-  fresco: { texto: 'Fresco', icono: '💪' },
-};
+export const ESCALA_RECUPERACION = { 0: 'Nada recuperado', 5: 'A medias', 10: 'Del todo' };
+
+// Las respuestas antiguas (cargado, normal, fresco) se leen como 3, 6 y 9.
+export function puntuacionSentida(s) {
+  if (typeof s.sentida === 'number') return s.sentida;
+  return { cargado: 3, normal: 6, fresco: 9 }[s.sentida] ?? null;
+}
+
+// Diferencia a partir de la cual una respuesta cuenta como «no cuadra»: 3
+// puntos de la escala, o sea, 30 puntos de porcentaje.
+const DESAJUSTE = 30;
 
 export const FACTORES = [
   { valor: 0.7, texto: 'Mucho más rápido' },
@@ -194,8 +200,9 @@ export function sugerenciasDeAjuste(datos) {
   const sugerencias = [];
   for (const [m, lista] of porMusculo) {
     if (lista.length < MINIMO_RESPUESTAS || !MUSCULOS[m]) continue;
-    const lento = lista.filter((s) => s.prevista >= 90 && s.sentida === 'cargado').length;
-    const rapido = lista.filter((s) => s.prevista <= 70 && s.sentida === 'fresco').length;
+    const diferencias = lista.map((s) => puntuacionSentida(s) * 10 - s.prevista).filter((x) => !Number.isNaN(x));
+    const lento = diferencias.filter((x) => x <= -DESAJUSTE).length;
+    const rapido = diferencias.filter((x) => x >= DESAJUSTE).length;
     const actual = factorPersonal(datos, m);
     const i = FACTORES.findIndex((f) => f.valor === actual);
     if (lento >= 2 && lento > rapido && i < FACTORES.length - 1) {

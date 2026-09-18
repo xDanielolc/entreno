@@ -148,15 +148,15 @@ function tarjetaAjustePersonal(d) {
     h('h2', {}, 'Tu ritmo de recuperación'),
     sugerencias.map((s) => h('div', { class: 'tarjeta aviso-tarjeta' },
       h('p', {}, s.sentido === 'lento'
-        ? `${nombreMusculo(s.musculo)}: ${s.veces} de ${s.total} veces llegaste cargado cuando la app te daba por recuperado. `
+        ? `${nombreMusculo(s.musculo)}: ${s.veces} de ${s.total} veces te pusiste al menos 3 puntos por debajo de lo que calculaba la app. `
           + 'Parece que te recuperas más despacio de lo normal.'
-        : `${nombreMusculo(s.musculo)}: ${s.veces} de ${s.total} veces llegaste fresco cuando la app te daba por cansado. `
+        : `${nombreMusculo(s.musculo)}: ${s.veces} de ${s.total} veces te pusiste al menos 3 puntos por encima de lo que calculaba la app. `
           + 'Parece que te recuperas antes de lo normal.'),
       h('div', { class: 'fila-botones' },
         h('button', { class: 'boton secundario', onclick: () => descartar(s.musculo) }, 'No, déjalo'),
         h('button', { class: 'boton', onclick: () => aplicar(s.musculo, s.nuevo) },
           `Ajustar a «${FACTORES.find((f) => f.valor === s.nuevo)?.texto.toLowerCase()}»`)))),
-    h('p', { class: 'nota' }, 'Al empezar cada entrenamiento puedes decir cómo llegas (cargado, normal o fresco). '
+    h('p', { class: 'nota' }, 'Al empezar cada entrenamiento puedes puntuar de 0 a 10 cómo de recuperado llega cada músculo. '
       + 'Con tres respuestas o más por músculo, la app te dirá si te recuperas antes o después de lo que calcula. '
       + 'También puedes ajustarlo a mano:'),
     conAjuste.length > 0 && h('p', {}, `Ajustados: ${conAjuste.map((m) => `${nombreMusculo(m)} ×${String(factorPersonal(d, m)).replace('.', ',')}`).join(', ')}.`),
