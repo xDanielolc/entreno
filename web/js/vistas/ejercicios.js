@@ -18,6 +18,9 @@ import { anadir, aviso, confirmar, h, leerNumero, nuevoId } from '../ui.js';
 import { barraFiltros, cajaLista, elegirEjercicio, filtrar, tarjetaItem } from './selector-ejercicios.js';
 import { selectorTecnicas } from './tecnicas.js';
 
+// Grupos habituales, para el desplegable de la ficha.
+const GRUPOS = ['empuje', 'tirón', 'pierna', 'core', 'cardio', 'estiramiento', 'movilidad', 'yoga'];
+
 // ---------------------------------------------------------------------------
 // Lista, con buscador
 // ---------------------------------------------------------------------------
@@ -67,13 +70,19 @@ export function vistaEjercicios(contenedor) {
 }
 
 function tarjetaEjercicio(datos, ej) {
-  const partes = (ej.series || []).map((plan) => {
+  // Varias series iguales («3 series libres: doble progresión») se agrupan.
+  const cuenta = new Map();
+  for (const plan of ej.series || []) {
     const prog = TIPOS_PROGRESION[plan.progresion?.tipo]?.etiqueta ?? 'Libre';
     const ciclo = plan.progresion?.tipo === 'bilbo' ? cicloActual(plan) : null;
-    if (!ciclo?.escalera?.length) return `${TIPOS_SERIE[plan.tipo]}: ${prog}`;
-    const hechos = registrosDelCiclo(datos, ej, plan, ciclo.n).length;
-    return `${TIPOS_SERIE[plan.tipo]}: ciclo ${ciclo.n}, día ${Math.min(hechos + 1, ciclo.escalera.length)} de ${ciclo.escalera.length}`;
-  });
+    let texto = `${TIPOS_SERIE[plan.tipo]}: ${prog.toLowerCase()}`;
+    if (ciclo?.escalera?.length) {
+      const hechos = registrosDelCiclo(datos, ej, plan, ciclo.n).length;
+      texto = `${TIPOS_SERIE[plan.tipo]}: ciclo ${ciclo.n}, día ${Math.min(hechos + 1, ciclo.escalera.length)} de ${ciclo.escalera.length}`;
+    }
+    cuenta.set(texto, (cuenta.get(texto) ?? 0) + 1);
+  }
+  const partes = [...cuenta].map(([texto, n]) => (n > 1 ? `${n} × ${texto}` : texto));
   const sinMusculos = !ej.musculos?.principales?.length;
   return tarjetaItem(ej, {
     href: `#/ejercicio/${ej.id}`,
@@ -114,14 +123,30 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
     anadir(contenedor, h('p', {}, 'Este ejercicio no existe.'));
     return;
   }
-  // Se edita un borrador: nada se guarda hasta pulsar «Guardar».
+  // Se edita un borrador que se guarda solo a cada cambio, en cuanto tiene
+  // nombre: salir de la pantalla no pierde nada.
   const borrador = existente ? structuredClone(existente) : ejercicioVacio();
   borrador.series ??= [];
   borrador.musculos ??= { principales: [], secundarios: [] };
-  const grupos = [...new Set(d.ejercicios.map((e) => e.grupo).filter(Boolean))];
+  const grupos = [...new Set([...GRUPOS, ...d.ejercicios.map((e) => e.grupo).filter(Boolean)])];
   const peso = d.perfil.pesoCorporalKg;
+  let creado = Boolean(existente);
+
+  function persistir() {
+    if (!borrador.nombre.trim()) return false;
+    estado.cambiar((datos) => {
+      const copia = structuredClone(borrador);
+      copia.nombre = copia.nombre.trim();
+      const i = datos.ejercicios.findIndex((e) => e.id === borrador.id);
+      if (i >= 0) datos.ejercicios[i] = copia;
+      else datos.ejercicios.push(copia);
+    }, { tecleo: true });
+    creado = true;
+    return true;
+  }
 
   const zona = h('div');
+  zona.addEventListener('input', () => persistir());
   const imagenFicha = existente ? imagenDe(existente.nombre) : null;
   anadir(contenedor,
     h('h1', {}, existente ? borrador.nombre || 'Editar ejercicio' : 'Nuevo ejercicio'),
@@ -132,6 +157,7 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
     zona);
 
   function repintar() {
+    persistir();
     const scroll = window.scrollY;
     zona.replaceChildren(formulario());
     window.scrollTo(0, scroll);
@@ -169,9 +195,7 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
       existente && !existente.sedeId && sedesActivas(d).length > 1 && h('button', { type: 'button', class: 'boton enlace',
         onclick: separar }, 'Separar en un ejercicio por sitio (reparte su historial)')),
 
-      campo('Grupo', h('input', { type: 'text', value: borrador.grupo || '', list: 'grupos', placeholder: 'empuje, pierna, tirón…',
-        oninput: (e) => { borrador.grupo = e.target.value.trim(); } }),
-      h('datalist', { id: 'grupos' }, grupos.map((g) => h('option', { value: g })))),
+      campoGrupo(),
 
       h('fieldset', {},
         h('legend', {}, '¿Qué carga usa?'),
@@ -239,12 +263,37 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
       campo('Notas', h('textarea', { rows: 3, value: borrador.notas || '',
         oninput: (e) => { borrador.notas = e.target.value; } })),
 
+      h('p', { class: 'nota centrado' }, existente || creado
+        ? 'Los cambios se guardan solos.'
+        : 'En cuanto le pongas nombre, se guarda solo.'),
       h('div', { class: 'fila-botones' },
-        h('a', { class: 'boton secundario', href: paraSesion ? `#/sesion/${paraSesion}` : '#/ejercicios' }, 'Cancelar'),
-        h('button', { class: 'boton', type: 'submit' }, 'Guardar')),
+        !existente && h('button', { type: 'button', class: 'boton secundario', onclick: descartar }, 'Descartar'),
+        h('button', { class: 'boton', type: 'submit' }, 'Listo')),
 
       existente && h('button', { type: 'button', class: 'boton enlace', onclick: archivar },
         borrador.archivado ? 'Recuperar ejercicio' : 'Archivar ejercicio'));
+  }
+
+  // Grupo: un desplegable con los habituales y los tuyos, más «Otro…» para
+  // escribir uno nuevo.
+  function campoGrupo() {
+    const actual = borrador.grupo || '';
+    const enLista = !actual || grupos.includes(actual);
+    const texto = h('input', { type: 'text', value: enLista ? '' : actual, placeholder: 'Nombre del grupo',
+      hidden: enLista, oninput: (e) => { borrador.grupo = e.target.value.trim(); } });
+    const select = h('select', { onchange: (e) => {
+      if (e.target.value === '__otro') { texto.hidden = false; texto.focus(); return; }
+      texto.hidden = true;
+      borrador.grupo = e.target.value;
+      persistir();
+    } },
+    h('option', { value: '', selected: !actual }, 'Sin grupo'),
+    grupos.map((g) => h('option', { value: g, selected: g === actual }, g.charAt(0).toUpperCase() + g.slice(1))),
+    h('option', { value: '__otro', selected: !enLista }, 'Otro…'));
+    return h('div', { class: 'campo' },
+      h('span', { class: 'etiqueta-campo' }, 'Grupo'),
+      select, texto,
+      h('small', { class: 'nota' }, 'Ordena la lista de ejercicios y sirve para los filtros (empuje, tirón, pierna…).'));
   }
 
   // Qué fórmula estima el 1RM y, si es la personal, cómo va su calibración.
@@ -319,8 +368,13 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
     return h('article', { class: 'tarjeta plan-serie' },
       h('div', { class: 'cabecera-tarjeta' },
         h('strong', {}, `Serie ${i + 1}`),
-        borrador.series.length > 1 && h('button', { type: 'button', class: 'boton-icono', 'aria-label': 'Quitar serie',
-          onclick: () => { borrador.series.splice(i, 1); repintar(); } }, '🗑')),
+        borrador.series.length > 1 && h('button', { type: 'button', class: 'boton-icono papelera', 'aria-label': 'Quitar serie',
+          onclick: async () => {
+            if (!await confirmar(`¿Quitar la serie ${i + 1} de este ejercicio? Lo ya apuntado en entrenamientos pasados se conserva.`,
+              { si: 'Quitar', peligro: true })) return;
+            borrador.series.splice(i, 1);
+            repintar();
+          } }, '🗑')),
 
       campo('Tipo', h('select', { onchange: (e) => { plan.tipo = e.target.value; repintar(); } },
         Object.entries(TIPOS_SERIE).map(([k, v]) => h('option', { value: k, selected: k === plan.tipo }, v)))),
@@ -370,14 +424,14 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
       tramos.salto > 0 && h('div', { class: 'fila-campos' },
         campo('Se baja cada vez (kg)', numeroInput(plan.tramoSalto ?? defecto.salto, (v) => { plan.tramoSalto = v; }))),
       tramos.tecnica === 'drop-set' && campo('Pesos fijos (máquina de placas)',
-        h('input', { type: 'text', inputmode: 'decimal', placeholder: 'Por ejemplo: 50; 42,5; 35; 27,5',
-          value: (plan.tramosFijos || []).map((p) => formatearNumero(p)).join('; '),
+        h('input', { type: 'text', placeholder: 'Por ejemplo: 50 42,5 35 27,5',
+          value: (plan.tramosFijos || []).map((p) => formatearNumero(p)).join(' '),
           oninput: (e) => {
-            const pesos = e.target.value.split(';').map((x) => leerNumero(x)).filter((x) => x != null);
+            const pesos = e.target.value.split(/[;/\s]+/).map((x) => leerNumero(x)).filter((x) => x != null);
             plan.tramosFijos = pesos.length ? pesos : null;
           } }),
-        h('small', { class: 'nota' }, 'Separados por punto y coma. Si los pones, cada drop set sale con estos pesos '
-          + 'y no se recalcula con el 1RM. También se pueden fijar desde el entrenamiento.'),
+        h('small', { class: 'nota' }, 'Separados por espacios (o punto y coma), con coma para los decimales. Si los pones, cada drop set '
+          + 'sale con estos pesos y no se recalcula con el 1RM. También se pueden fijar desde el entrenamiento.'),
         pesosDeOtros(plan)));
   }
 
@@ -395,7 +449,7 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         plan.tramosFijos = [...elegido.pesos];
         plan.tramosPrevistos = elegido.pesos.length;
         repintar();
-        aviso(`Pesos de ${elegido.nombre} copiados. Pulsa «Guardar» para quedártelos.`);
+        aviso(`Pesos de ${elegido.nombre} copiados y guardados.`);
       } },
     h('option', { value: '' }, 'Traer los pesos fijos de otro ejercicio…'),
     otros.map((o, i) => h('option', { value: i }, `${o.nombre}: ${o.pesos.map((x) => formatearNumero(x)).join(' → ')} kg`)));
@@ -513,24 +567,29 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
       && e.nombre.toLowerCase() === borrador.nombre.toLowerCase());
     if (repetido) aviso('Ojo: ya tenías otro ejercicio con ese nombre', { ms: 5000 });
 
-    estado.cambiar((datos) => {
-      const i = datos.ejercicios.findIndex((e) => e.id === borrador.id);
-      if (i >= 0) datos.ejercicios[i] = borrador;
-      else datos.ejercicios.push(borrador);
-    });
+    persistir();
     if (paraSesion) {
       // Creado desde el entrenamiento: se añade a él y se vuelve allí.
       estado.cambiar((datos) => {
         const sesion = datos.sesiones.find((s) => s.id === paraSesion);
         const ej = datos.ejercicios.find((e) => e.id === borrador.id);
-        if (sesion && ej) sesion.ejercicios.push(entradaDeEjercicio(datos, ej, { excluirSesion: paraSesion }));
+        if (sesion && ej && !sesion.ejercicios.some((x) => x.ejercicioId === ej.id)) {
+          sesion.ejercicios.push(entradaDeEjercicio(datos, ej, { excluirSesion: paraSesion }));
+        }
       });
       aviso(`${borrador.nombre} guardado y añadido al entrenamiento`);
       location.hash = `#/sesion/${paraSesion}`;
       return;
     }
-    aviso('Ejercicio guardado');
+    estado.emitir('datos');
     location.hash = '#/ejercicios';
+  }
+
+  // Un ejercicio nuevo que se descarta se quita, aunque ya se hubiera
+  // guardado solo al ponerle nombre.
+  function descartar() {
+    if (creado) estado.cambiar((datos) => { datos.ejercicios = datos.ejercicios.filter((e) => e.id !== borrador.id); });
+    location.hash = paraSesion ? `#/sesion/${paraSesion}` : '#/ejercicios';
   }
 
   async function separar() {

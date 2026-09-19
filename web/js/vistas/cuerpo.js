@@ -36,7 +36,7 @@ export function tarjetaRecuperacion(datos, { compacta = false } = {}) {
       h('h2', {}, 'Recuperación'),
       h('span', { class: `anillo ${claseDeRecuperacion(media)}` }, `${media} %`)),
 
-    h('div', { class: 'cuerpos' },
+    !compacta && h('div', { class: 'cuerpos' },
       siluetaCuerpo({ vista: 'delante', estadoPorMusculo: estados }),
       siluetaCuerpo({ vista: 'detras', estadoPorMusculo: estados })),
 
@@ -66,14 +66,51 @@ export function tarjetaRecuperacion(datos, { compacta = false } = {}) {
         h('li', {}, 'Lo cerca del fallo que acabaste las series, que es lo que más pesa: con 3 o más en recámara, 24 h; '
           + 'con 1 o 2, 36 h; al fallo, 48 h; al fallo con más de 15 repeticiones o con drop set, 60 h. '
           + 'Se hace la media de tus series con la más dura.'),
-        h('li', {}, 'El volumen, que pesa poco y cada vez menos: una serie se queda en el 70 % de esas horas, '
-          + 'tres en el 87 %, seis en el 96 % y a partir de ahí casi no cambia.'),
+        h('li', {}, 'El volumen, que pesa cada vez menos: una serie se queda en el 57 % de esas horas, '
+          + 'dos en el 69 %, tres en el 78 %, cinco en el 89 %, ocho en el 96 % y a partir de ahí casi no cambia.'),
         h('li', {}, 'Tu ajuste personal por músculo, si lo has puesto (abajo).')),
       h('p', { class: 'nota' }, 'Respaldo: las horas según la cercanía al fallo y que el volumen apenas influya salen de '
         + 'Morán-Navarro (2017) y Pareja-Blanco (2019 y 2020). La forma de la curva del volumen y la media con la serie más dura '
         + 'son aproximaciones de la app. No hay estudios que den un tiempo fijo por músculo; por eso existe el ajuste personal.')),
 
-    compacta && h('a', { class: 'boton enlace', href: '#/cuerpo' }, 'Ver el cuerpo entero y el volumen'));
+    compacta && h('a', { class: 'boton enlace', href: '#/cuerpo' }, 'Ver el mapa del cuerpo y el volumen'));
+}
+
+// Solo las propuestas de ajuste (para Hoy): si no hay ninguna, nada.
+export function tarjetaSugerenciasAjuste(d) {
+  const sugerencias = sugerenciasDeAjuste(d);
+  if (!sugerencias.length) return null;
+  return h('section', { class: 'tarjeta' },
+    h('h2', {}, 'Tu ritmo de recuperación'),
+    sugerencias.map((s) => tarjetaSugerencia(d, s)));
+}
+
+function tarjetaSugerencia(d, s) {
+  const aplicar = (m, factor) => estado.cambiar((x) => {
+    x.perfil.recuperacion ??= { factores: {}, desde: {} };
+    x.perfil.recuperacion.factores ??= {};
+    x.perfil.recuperacion.desde ??= {};
+    if (factor === 1) delete x.perfil.recuperacion.factores[m];
+    else x.perfil.recuperacion.factores[m] = factor;
+    x.perfil.recuperacion.desde[m] = hoyISO();
+    aviso(`${nombreMusculo(m)}: ajuste guardado`);
+  });
+  const descartar = (m) => estado.cambiar((x) => {
+    x.perfil.recuperacion ??= { factores: {}, desde: {} };
+    x.perfil.recuperacion.desde ??= {};
+    x.perfil.recuperacion.desde[m] = hoyISO();
+  });
+  return h('div', { class: 'tarjeta aviso-tarjeta' },
+    h('p', {}, s.sentido === 'lento'
+      ? `No estás recuperando ${nombreMusculo(s.musculo)} al ritmo esperado: ${s.veces} de ${s.total} veces te pusiste al menos `
+        + '3 puntos por debajo de lo que calculaba la app. Revisa sueño, comida (sobre todo proteína) y la distancia entre '
+        + 'entrenamientos. Si es tu ritmo normal, ajústalo para que el mapa te dé más horas.'
+      : `Recuperas ${nombreMusculo(s.musculo)} muy por encima de lo esperado: ${s.veces} de ${s.total} veces te pusiste al menos `
+        + '3 puntos por encima de lo que calculaba la app. Quizá puedas entrenarlo más a menudo o con más series.'),
+    h('div', { class: 'fila-botones' },
+      h('button', { class: 'boton secundario', onclick: () => descartar(s.musculo) }, 'No, déjalo'),
+      h('button', { class: 'boton', onclick: () => aplicar(s.musculo, s.nuevo) },
+        `Ajustar a «${FACTORES.find((f) => f.valor === s.nuevo)?.texto.toLowerCase()}»`)));
 }
 
 export function vistaCuerpo(contenedor) {
@@ -148,17 +185,7 @@ function tarjetaAjustePersonal(d) {
 
   return h('section', { class: 'tarjeta' },
     h('h2', {}, 'Tu ritmo de recuperación'),
-    sugerencias.map((s) => h('div', { class: 'tarjeta aviso-tarjeta' },
-      h('p', {}, s.sentido === 'lento'
-        ? `No estás recuperando ${nombreMusculo(s.musculo)} al ritmo esperado: ${s.veces} de ${s.total} veces te pusiste al menos `
-          + '3 puntos por debajo de lo que calculaba la app. Revisa sueño, comida (sobre todo proteína) y la distancia entre '
-          + 'entrenamientos. Si es tu ritmo normal, ajústalo para que el mapa te dé más horas.'
-        : `Recuperas ${nombreMusculo(s.musculo)} muy por encima de lo esperado: ${s.veces} de ${s.total} veces te pusiste al menos `
-          + '3 puntos por encima de lo que calculaba la app. Quizá puedas entrenarlo más a menudo o con más series y exprimir más tus límites.'),
-      h('div', { class: 'fila-botones' },
-        h('button', { class: 'boton secundario', onclick: () => descartar(s.musculo) }, 'No, déjalo'),
-        h('button', { class: 'boton', onclick: () => aplicar(s.musculo, s.nuevo) },
-          `Ajustar a «${FACTORES.find((f) => f.valor === s.nuevo)?.texto.toLowerCase()}»`)))),
+    sugerencias.map((s) => tarjetaSugerencia(d, s)),
     h('p', { class: 'nota' }, 'Al empezar cada entrenamiento puedes puntuar de 0 a 10 cómo de recuperado llega cada músculo. '
       + 'Con tres respuestas o más por músculo, la app te dirá si te recuperas antes o después de lo que calcula. '
       + 'También puedes ajustarlo a mano:'),

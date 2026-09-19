@@ -220,37 +220,6 @@ export const PLANTILLAS = [
     ],
   },
   {
-    id: 'angel7real-torso-pierna',
-    nombre: 'Torso / pierna (pautas de Ángel7Real)',
-    autor: 'Montada con las pautas de volumen y ejercicios de la guía de Ángel7Real (2023)',
-    resumen: 'Cuatro días (torso, pierna, torso, pierna): cada músculo dos veces por semana, de 9 a 16 series semanales.',
-    porQue: 'La guía no trae una rutina cerrada, sino cuánto y cómo trabajar cada músculo: dos sesiones por semana para casi todos, '
-      + 'de 5 a 15 repeticiones (más altas en brazos, gemelo y abdomen) y sus ejercicios preferidos. Esta rutina reparte esas pautas '
-      + 'en un torso-pierna para nivel intermedio.',
-    comoSeHace: 'Cuatro días por semana, por ejemplo lunes, martes, jueves y viernes. Cada serie con doble progresión: cuando llegues '
-      + 'al máximo del rango en todas, sube el peso. Acaba cada serie a 1-3 repeticiones del fallo.',
-    dias: [
-      { nombre: 'Torso A', ejercicios: [
-        e('Press de banca', series(3, 6, 8)), e('Dominadas', series(3, 6, 10)), e('Press de hombro con mancuernas', series(3, 6, 8)),
-        e('Remo en polea', series(3, 8, 12)), e('Elevaciones laterales en polea', series(3, 10, 12)),
-        e('Curl de bíceps con barra', series(2, 8, 12)), e('Press francés', series(2, 8, 12)),
-      ] },
-      { nombre: 'Pierna A', ejercicios: [
-        e('Sentadilla', series(3, 5, 8)), e('Peso muerto rumano', series(3, 6, 10)), e('Prensa de piernas', series(2, 10, 15)),
-        e('Curl femoral tumbado', series(2, 10, 15)), e('Elevación de gemelos', series(3, 8, 12)), e('Crunch en polea', series(3, 10, 15)),
-      ] },
-      { nombre: 'Torso B', ejercicios: [
-        e('Press inclinado con mancuernas', series(3, 8, 10)), e('Jalón al pecho', series(3, 8, 12)), e('Press militar', series(3, 6, 8)),
-        e('Remo con mancuerna', series(3, 8, 12)), e('Pájaros con mancuernas', series(3, 12, 15)),
-        e('Curl martillo', series(2, 10, 12)), e('Extensión de tríceps sobre la cabeza', series(2, 10, 15)),
-      ] },
-      { nombre: 'Pierna B', ejercicios: [
-        e('Sentadilla hack', series(3, 8, 12)), e('Hip thrust', series(3, 6, 10)), e('Sentadilla búlgara', series(2, 8, 12)),
-        e('Curl femoral sentado', series(3, 10, 15)), e('Elevación de gemelos sentado', series(3, 10, 15)), e('Rueda abdominal', series(3, 10, 15)),
-      ] },
-    ],
-  },
-  {
     id: 'pesos-libres-cualquier-gimnasio',
     nombre: 'Sin máquinas: igual en cualquier gimnasio',
     autor: 'Propuesta de la app',

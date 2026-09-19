@@ -43,6 +43,9 @@ export function recomendacionesDeSesion(datos, sesion) {
   const lista = [];
   const hoy = seriesPorMusculoDeSesion(datos, sesion);
   const semana = seriesSemanales(datos);
+  // El volumen semanal solo se juzga con una semana medio hecha: tras la
+  // primera sesión de la semana no tiene sentido decir que falta volumen.
+  const sesionesSemana = terminadas(datos).filter((s) => horasDesdeSesion(s) <= 7 * DIA).length;
   const inicio = sesion.inicio ? new Date(sesion.inicio) : new Date();
   const antes = recuperacionPorMusculo({ ...datos, sesiones: datos.sesiones.filter((s) => s.id !== sesion.id) }, inicio);
 
@@ -62,7 +65,7 @@ export function recomendacionesDeSesion(datos, sesion) {
         + 'Pasadas unas 10 en la misma sesión, rinden menos: repártelas en dos días.'));
     }
     // 3 y 4. Volumen de la semana (solo de lo que ha sido principal hoy).
-    if (nHoy < 1) continue;
+    if (nHoy < 1 || sesionesSemana < 3) continue;
     const n = Math.round((semana[m] ?? 0) * 10) / 10;
     if (n < MINIMO) {
       lista.push(r('volumen-bajo', 'consejo', `${nombre}: ${series(n)} esta semana. Lo recomendado son de ${MINIMO} a ${MAXIMO}; `

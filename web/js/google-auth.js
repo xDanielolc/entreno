@@ -8,6 +8,9 @@ import { CONFIG } from './config.js';
 
 const URL_SCRIPT = 'https://accounts.google.com/gsi/client';
 const CLAVE_TOKEN = 'tokenGoogle';
+// El pase se guarda en localStorage y no en sessionStorage: al cerrar la app
+// instalada y volver a abrirla, la sesión del navegador es otra y se perdía.
+const almacen = () => { try { return localStorage; } catch { return null; } };
 
 let cargaScript;
 
@@ -28,15 +31,23 @@ function cargarScript() {
 
 export function tokenVigente() {
   try {
-    const guardado = JSON.parse(sessionStorage.getItem(CLAVE_TOKEN));
+    const guardado = JSON.parse(almacen()?.getItem(CLAVE_TOKEN));
     if (guardado && guardado.caduca - Date.now() > 60_000) return guardado.token;
   } catch { /* sin token */ }
   return null;
 }
 
+// Minutos que le quedan al pase (null si no hay).
+export function minutosDeToken() {
+  try {
+    const guardado = JSON.parse(almacen()?.getItem(CLAVE_TOKEN));
+    return guardado ? (guardado.caduca - Date.now()) / 60_000 : null;
+  } catch { return null; }
+}
+
 export function olvidarToken() {
   const token = tokenVigente();
-  try { sessionStorage.removeItem(CLAVE_TOKEN); } catch { /* nada */ }
+  try { almacen()?.removeItem(CLAVE_TOKEN); } catch { /* nada */ }
   if (token && window.google?.accounts?.oauth2) google.accounts.oauth2.revoke(token, () => {});
 }
 
@@ -65,7 +76,7 @@ export async function pedirToken({ silencioso = false, pista = null } = {}) {
         }
         const caduca = Date.now() + Number(respuesta.expires_in || 3600) * 1000;
         try {
-          sessionStorage.setItem(CLAVE_TOKEN, JSON.stringify({ token: respuesta.access_token, caduca }));
+          almacen()?.setItem(CLAVE_TOKEN, JSON.stringify({ token: respuesta.access_token, caduca }));
         } catch { /* se pedirá de nuevo al recargar */ }
         resolver(respuesta.access_token);
       },

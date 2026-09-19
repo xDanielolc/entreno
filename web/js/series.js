@@ -114,12 +114,12 @@ export function avisoPrimeraBajada(datos, ejercicio, serie) {
   if (!(esperadas >= 4)) return null;
   const hechas = primera.esfuerzo;
   const redondo = Math.round(esperadas);
-  if (hechas < esperadas * 0.6) {
+  if (hechas < esperadas * 0.75) {
     return `Con ${primera.carga} kg la fórmula esperaba unas ${redondo} repeticiones y han salido ${hechas}. Puede que la fórmula esté `
       + 'desajustada en este ejercicio, que vengas cansado de la serie anterior o que no estés bien recuperado. '
       + 'La app lo tendrá en cuenta: la próxima vez propondrá algo menos de peso en la primera bajada.';
   }
-  if (hechas > esperadas * 1.5) {
+  if (hechas > esperadas * 1.25) {
     return `Con ${primera.carga} kg la fórmula esperaba unas ${redondo} repeticiones y han salido ${hechas}: has rendido bastante más. `
       + 'La próxima vez la primera bajada irá con algo más de peso.';
   }

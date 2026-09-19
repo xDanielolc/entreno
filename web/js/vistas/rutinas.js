@@ -113,8 +113,25 @@ export function vistaFormularioRutina(contenedor, { id }) {
     id: nuevoId('rut'), nombre: '', activa: !d.rutinas.some((r) => r.activa), dias: [],
   };
   const nombreEj = (ejId) => d.ejercicios.find((e) => e.id === ejId)?.nombre ?? 'Ejercicio borrado';
+  let creada = Boolean(existente);
+
+  // Se guarda solo a cada cambio, en cuanto tiene nombre.
+  function persistir() {
+    if (!borrador.nombre.trim()) return false;
+    estado.cambiar((datos) => {
+      const copia = structuredClone(borrador);
+      copia.nombre = copia.nombre.trim();
+      if (copia.activa) for (const r of datos.rutinas) if (r.id !== copia.id) r.activa = false;
+      const i = datos.rutinas.findIndex((r) => r.id === copia.id);
+      if (i >= 0) datos.rutinas[i] = copia;
+      else datos.rutinas.push(copia);
+    }, { tecleo: true });
+    creada = true;
+    return true;
+  }
 
   const zona = h('div');
+  zona.addEventListener('input', () => persistir());
   anadir(contenedor, h('h1', {}, existente ? 'Editar rutina' : 'Nueva rutina'),
     borrador.descripcion && h('details', { class: 'tarjeta explicacion' },
       h('summary', {}, 'Por qué es así y cómo se hace'),
@@ -122,6 +139,7 @@ export function vistaFormularioRutina(contenedor, { id }) {
     zona);
 
   function repintar() {
+    persistir();
     const scroll = window.scrollY;
     zona.replaceChildren(formulario());
     window.scrollTo(0, scroll);
@@ -149,9 +167,10 @@ export function vistaFormularioRutina(contenedor, { id }) {
         repintar();
       } }, '+ Añadir día'),
 
+      h('p', { class: 'nota centrado' }, existente || creada ? 'Los cambios se guardan solos.' : 'En cuanto le pongas nombre, se guarda sola.'),
       h('div', { class: 'fila-botones' },
-        h('a', { class: 'boton secundario', href: '#/rutinas' }, 'Cancelar'),
-        h('button', { class: 'boton', type: 'submit' }, 'Guardar')),
+        !existente && h('button', { type: 'button', class: 'boton secundario', onclick: descartar }, 'Descartar'),
+        h('button', { class: 'boton', type: 'submit' }, 'Listo')),
 
       existente && h('button', { type: 'button', class: 'boton enlace peligro-texto', onclick: borrar }, 'Borrar rutina'));
   }
@@ -161,8 +180,12 @@ export function vistaFormularioRutina(contenedor, { id }) {
       h('div', { class: 'cabecera-tarjeta' },
         h('input', { type: 'text', value: dia.nombre, 'aria-label': 'Nombre del día',
           oninput: (e) => { dia.nombre = e.target.value; } }),
-        h('button', { type: 'button', class: 'boton-icono', 'aria-label': 'Quitar día',
-          onclick: () => { borrador.dias.splice(i, 1); repintar(); } }, '🗑')),
+        h('button', { type: 'button', class: 'boton-icono papelera', 'aria-label': 'Quitar día',
+          onclick: async () => {
+            if (!await confirmar(`¿Quitar «${dia.nombre}» de la rutina?`, { si: 'Quitar', peligro: true })) return;
+            borrador.dias.splice(i, 1);
+            repintar();
+          } }, '🗑')),
 
       dia.ejercicios.map((item, j) => h('div', { class: 'fila-ejercicio' },
         h('span', {}, nombreEj(item.ejercicioId), item.opcional && h('small', { class: 'suave' }, ' (opcional)'),
@@ -209,13 +232,12 @@ export function vistaFormularioRutina(contenedor, { id }) {
   function guardar() {
     borrador.nombre = borrador.nombre.trim();
     if (!borrador.nombre) { aviso('Ponle un nombre a la rutina', { tipo: 'error' }); return; }
-    estado.cambiar((datos) => {
-      if (borrador.activa) for (const r of datos.rutinas) r.activa = false;
-      const i = datos.rutinas.findIndex((r) => r.id === borrador.id);
-      if (i >= 0) datos.rutinas[i] = borrador;
-      else datos.rutinas.push(borrador);
-    });
-    aviso('Rutina guardada');
+    persistir();
+    location.hash = '#/rutinas';
+  }
+
+  function descartar() {
+    if (creada) estado.cambiar((datos) => { datos.rutinas = datos.rutinas.filter((r) => r.id !== borrador.id); });
     location.hash = '#/rutinas';
   }
 

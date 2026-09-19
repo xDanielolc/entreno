@@ -47,8 +47,12 @@ export async function guardarPruebaEnCuenta() {
     estado.cambiar((datos) => { resumen = fusionar(datos, prueba); });
     await sincronizar();
     location.hash = '#/';
-    aviso(`Guardado en tu cuenta: ${resumen.sesiones} entrenamientos, ${resumen.ejercicios} ejercicios nuevos `
-      + `y ${resumen.rutinas} rutinas.`, { ms: 9000 });
+    const n = (x, uno, varios) => `${x} ${x === 1 ? uno : varios}`;
+    const cerrar = modal('Guardado en tu cuenta', h('div', {},
+      h('p', {}, `Lo que hiciste en modo prueba ya está en tu Google Drive: ${n(resumen.sesiones, 'entrenamiento', 'entrenamientos')}, `
+        + `${n(resumen.ejercicios, 'ejercicio nuevo', 'ejercicios nuevos')} y ${n(resumen.rutinas, 'rutina', 'rutinas')}. `
+        + 'Los ejercicios que ya tenías con el mismo nombre no se han duplicado.'),
+      h('button', { class: 'boton', onclick: () => cerrar() }, 'Entendido')));
   } catch (e) {
     aviso(`No se ha podido entrar con Google: ${e.message}`, { tipo: 'error', ms: 8000 });
   }

@@ -12,7 +12,7 @@ import { CONFIG } from './config.js';
 import * as drive from './drive.js';
 import { migrar, necesitaMigrar, validar } from './esquema.js';
 import * as estado from './estado.js';
-import { olvidarToken, pedirToken, tokenVigente } from './google-auth.js';
+import { minutosDeToken, olvidarToken, pedirToken, tokenVigente } from './google-auth.js';
 
 // 'sin-cuenta' | 'desconectada' | 'sincronizando' | 'al-dia' | 'pendiente' | 'sin-internet' | 'error'
 let situacion = 'desconectada';
@@ -157,6 +157,23 @@ estado.suscribir((motivo) => {
   if (motivo === 'datos' || motivo === 'tecleo') programar(motivo === 'tecleo' ? 4000 : 1500);
 });
 window.addEventListener('online', () => programar(500));
+
+// El pase de Google dura una hora. Para que no «se salga de la cuenta» a
+// mitad de entrenamiento, se renueva en silencio aprovechando cualquier toque
+// del usuario (el navegador solo deja abrir la ventana de Google, aunque se
+// cierre sola, dentro de un toque). Si Google pidiera intervención, no se
+// insiste: el indicador de arriba queda en rojo y con un toque se arregla.
+let ultimaRenovacion = 0;
+document.addEventListener('click', () => {
+  if (!estado.usuario() || estado.esSinCuenta() || !navigator.onLine) return;
+  const minutos = minutosDeToken();
+  if (minutos != null && minutos > 12) return;
+  if (Date.now() - ultimaRenovacion < 3 * 60_000) return;
+  ultimaRenovacion = Date.now();
+  pedirToken({ silencioso: true, pista: estado.usuario() })
+    .then(() => sincronizar())
+    .catch(() => {});
+}, true);
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') {
     estado.guardarYa();

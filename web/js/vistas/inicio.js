@@ -3,7 +3,8 @@ import { sedeInicial } from '../sedes.js';
 import { barraModoPrueba } from '../modo-prueba.js';
 import { crearSerieDesdePlan } from '../series.js';
 import { anadir, fechaLarga, h, hoyISO, modal, nuevoId } from '../ui.js';
-import { tarjetaRecuperacion } from './cuerpo.js';
+import { tarjetaRecuperacion, tarjetaSugerenciasAjuste } from './cuerpo.js';
+import { tarjetaInstalar } from './instalar.js';
 import { masRecienteAntes, resumenSesion } from './historial.js';
 import { empezarDia, proximoDia, rutinaActiva } from './rutinas.js';
 
@@ -67,14 +68,18 @@ export function vistaInicio(contenedor) {
         : h('button', { class: 'boton grande', onclick: empezarSuelto }, 'Empezar entrenamiento'),
 
     !activos.length && h('div', { class: 'tarjeta' },
-      h('p', {}, 'Aún no tienes ejercicios. Crea el primero para poder registrar series con su progresión.'),
-      h('a', { class: 'boton secundario', href: '#/ejercicio/nuevo' }, 'Crear ejercicio')),
+      h('p', {}, 'Aún no tienes ejercicios. Puedes añadir una rutina prehecha (trae sus ejercicios) o crear el primero.'),
+      h('div', { class: 'fila-botones' },
+        h('a', { class: 'boton', href: '#/rutinas' }, 'Rutinas prehechas'),
+        h('a', { class: 'boton secundario', href: '#/ejercicio/nuevo' }, 'Crear ejercicio'))),
 
     activos.length > 0 && !rutina && h('a', { class: 'boton enlace', href: '#/rutinas' },
-      'Crear una rutina para que te diga qué toca cada día'),
+      'Elegir o crear una rutina para que te diga qué toca cada día'),
     rutina && h('a', { class: 'boton enlace', href: '#/rutinas' }, 'Ver mis rutinas'),
 
-    activos.length > 0 && tarjetaRecuperacion(d, { compacta: true }),
+    tarjetaSugerenciasAjuste(d),
+    tarjetaRecuperacion(d, { compacta: true }),
+    tarjetaInstalar(),
 
     recientes.length > 0 && h('section', {},
       h('h2', {}, 'Últimos entrenamientos'),

@@ -170,8 +170,9 @@ a { color: var(--acento); }
 
 .indicador:disabled { cursor: default; }
 .indicador.al-dia { color: var(--bien); }
-.indicador.desconectada, .indicador.pendiente { color: var(--aviso); border-color: var(--aviso); }
-.indicador.error { color: var(--peligro); border-color: var(--peligro); }
+.indicador.desconectada, .indicador.pendiente, .indicador.sin-internet, .indicador.error {
+  color: var(--peligro); border-color: var(--peligro); font-weight: 600;
+}
 
 /* --------------------------------------------------------------------------
    Botones
@@ -207,6 +208,20 @@ a { color: var(--acento); }
   font-weight: 500;
 }
 .peligro-texto { color: var(--peligro) !important; }
+
+/* Papeleras: en rojo, separadas del nombre y pegadas a la derecha. */
+.boton-icono.papelera {
+  color: var(--peligro);
+  border: 1px solid var(--peligro);
+  margin-left: auto;
+  background: transparent;
+}
+.cabecera-tarjeta .boton-icono.papelera { margin-left: 12px; }
+
+/* Tarjeta de instalar la app (solo se ve desde el navegador). */
+.instalar { border-color: var(--acento-suave); }
+.instalar details { margin-top: 6px; }
+.instalar summary { cursor: pointer; color: var(--acento); }
 
 .boton-icono {
   min-width: 44px;

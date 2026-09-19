@@ -214,11 +214,14 @@ function seccionSedes(d) {
         h('input', { type: 'radio', name: 'sede-defecto', checked: d.perfil.sedePorDefecto === s.id,
           onchange: () => estado.cambiar((x) => { x.perfil.sedePorDefecto = s.id; }) }),
         'Por defecto'),
-      h('button', { class: 'boton-icono', 'aria-label': `Quitar ${s.nombre}`,
-        onclick: () => cambiarSede(s.id, (y, x) => {
-          y.archivado = true;
-          if (x.perfil.sedePorDefecto === y.id) x.perfil.sedePorDefecto = null;
-        }) }, '🗑'))),
+      h('button', { class: 'boton-icono papelera', 'aria-label': `Quitar ${s.nombre}`,
+        onclick: async () => {
+          if (!await confirmar(`¿Quitar «${s.nombre}»? Los entrenamientos hechos allí se conservan.`, { si: 'Quitar', peligro: true })) return;
+          cambiarSede(s.id, (y, x) => {
+            y.archivado = true;
+            if (x.perfil.sedePorDefecto === y.id) x.perfil.sedePorDefecto = null;
+          });
+        } }, '🗑'))),
     h('button', { class: 'boton secundario', onclick: () => estado.cambiar((x) => {
       x.sedes.push(nuevaSede(sedes.length ? `Sitio ${sedes.length + 1}` : 'Mi gimnasio'));
     }) }, '+ Añadir sitio'));
@@ -235,11 +238,11 @@ function numeroAjuste(etiqueta, valor, guardar) {
 export function textoSituacion(situacion) {
   return {
     'sin-cuenta': 'Solo en este dispositivo.',
-    desconectada: 'Sin conectar con Google.',
-    sincronizando: 'Guardando en Drive…',
-    'al-dia': 'Todo guardado en Drive.',
-    pendiente: 'Hay cambios sin subir a Drive.',
-    'sin-internet': 'Sin internet: se subirá al recuperar la conexión.',
-    error: 'No se ha podido guardar en Drive.',
+    desconectada: 'Sin guardar en Google Drive: solo en este dispositivo.',
+    sincronizando: 'Guardando en Google Drive…',
+    'al-dia': 'Todo guardado en Google Drive.',
+    pendiente: 'Sin subir a Google Drive: solo en este dispositivo.',
+    'sin-internet': 'Sin internet: se subirá a Google Drive al recuperar la conexión.',
+    error: 'No se ha podido guardar en Google Drive.',
   }[situacion] ?? '';
 }

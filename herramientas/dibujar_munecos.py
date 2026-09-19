@@ -81,6 +81,14 @@ def dibujar_objeto(o, j):
         return f'<rect x="{o[1]:.1f}" y="{o[2]:.1f}" width="{o[3]:.1f}" height="{o[4]:.1f}" rx="2" fill="{OBJETO}" opacity=".45"/>'
     if tipo == "rodillo":
         return f'<circle cx="{o[1]:.1f}" cy="{o[2]:.1f}" r="5" fill="{OBJETO}" opacity=".6"/>'
+    if tipo == "rueda":          # rueda abdominal en la mano: disco con eje
+        m = j[o[1]]
+        return (f'<circle cx="{m[0]:.1f}" cy="{m[1] + 4:.1f}" r="7" fill="none" stroke="{OBJETO}" stroke-width="3"/>'
+                f'<line x1="{m[0] - 6:.1f}" y1="{m[1] + 4:.1f}" x2="{m[0] + 6:.1f}" y2="{m[1] + 4:.1f}" stroke="{OBJETO}" stroke-width="2.5" stroke-linecap="round"/>')
+    if tipo == "corazon":        # ("corazon", x, y, tamaño): un corazón para el cardio
+        x, y, s = o[1], o[2], (o[3] if len(o) > 3 else 1)
+        return (f'<path transform="translate({x:.1f} {y:.1f}) scale({s})" fill="#d64545" '
+                'd="M0 4 C-6 -3 -10 -8 -5 -12 C-2 -14 0 -10 0 -8 C0 -10 2 -14 5 -12 C10 -8 6 -3 0 4 Z"/>')
     if tipo == "arco":           # círculo discontinuo alrededor de una articulación
         c = j[o[1]]
         return f'<circle cx="{c[0]:.1f}" cy="{c[1]:.1f}" r="{o[2]}" fill="none" stroke="{OBJETO}" stroke-width="1.5" stroke-dasharray="3 3"/>'
@@ -105,6 +113,9 @@ def svg_de(p):
             xs.append(o[2][0]); ys.append(o[2][1])
         elif o[0] == "rodillo":
             xs += [o[1] - 5, o[1] + 5]; ys += [o[2] - 5, o[2] + 5]
+        elif o[0] == "corazon":
+            s = o[3] if len(o) > 3 else 1
+            xs += [o[1] - 11 * s, o[1] + 11 * s]; ys += [o[2] - 15 * s, o[2] + 5 * s]
     suelo_y = max(ys) + 4
     minx, maxx = min(xs) - 10, max(xs) + 10
     miny, maxy = min(ys) - 10, suelo_y + 4
@@ -173,6 +184,9 @@ MUNECOS = {
     "Escaleras": P(DE_PIE, t=-85, a1=(60, 100), a2=(120, 80), l1=(20, 90, 0), l2=(110, 80, 0),
                    objetos=[("caja", 4, 20, 20, 19), ("caja", 24, 8, 20, 31)]),
     "Carrera": P(t=-80, a1=(60, -30), a2=(130, 60), l1=(30, 120, 0), l2=(125, 60, 20)),
+    "Cardio": P(t=-80, a1=(60, -30), a2=(130, 60), l1=(30, 120, 0), l2=(125, 60, 20), objetos=[("corazon", 34, -34, 1.8)]),
+    "Rueda abdominal": P(t=-10, cabeza=-10, a1=(50, 45), a2=(52, 47), l1=(90, 180, 180), l2=(92, 182, 180),
+                         objetos=[("rueda", "mano1")]),
     "Bicicleta": P(t=-45, a1=(35, 60), a2=(40, 65), l1=(20, 100, 0), l2=(70, 110, 0), suelo=False,
                    objetos=[("disco", "tobillo1", 1), ("linea", (-5, 3), (30, -18))]),
     "Elíptica": P(DE_PIE, t=-88, a1=(40, -40), a2=(70, -60), l1=(70, 100, 0), l2=(110, 80, 0)),

@@ -110,7 +110,8 @@ export function sugerenciaSerie(datos, ejercicio, plan, { excluirSesion } = {}) 
   const referencia = ultima
     ?? seriesDeEjercicio(datos, ejercicio.id, { excluirSesion }).filter((x) => x.serie.carga != null).at(-1)
     ?? null;
-  const base = { modo: prog.tipo, sobre, ultima, referencia, primeraVez: !ultima };
+  // «Primera vez» solo si el ejercicio no se ha hecho nunca, con ninguna serie.
+  const base = { modo: prog.tipo, sobre, ultima, referencia, primeraVez: !ultima && !referencia };
 
   if (prog.tipo === 'bilbo') return { ...base, ...sugerenciaBilbo(datos, ejercicio, plan, { excluirSesion, sobre }) };
 

@@ -92,3 +92,14 @@ si la primera bajada se aleja de lo esperado, modo prueba con cartel y paso a
 la cuenta (`modo-prueba.js`, fusiona sin duplicar), cinco rutinas prehechas más
 (PPL 3 días suya de 11-2025, torso/pierna con pautas de Ángel7Real, sin máquinas,
 principiantes, calistenia).
+0.13.1 (tras su prueba en el móvil): pase de Google en localStorage y renovado
+en silencio con cada toque (se «salía de la cuenta» al caducar); indicador en
+rojo y con «Google Drive»; fichas de ejercicio y rutina se guardan solas (sin
+botón Guardar: «Listo»/«Descartar»); papeleras rojas con confirmación; grupo como
+desplegable; «primera vez» solo si nunca se hizo el ejercicio; curva de volumen
+de la recuperación más pendiente (1 serie = 57 %); volumen semanal solo con ≥3
+sesiones; aviso de drop set al 75 %/125 %; Hoy sin cuerpo pero con recuperación,
+rutinas y sugerencias de ajuste aunque no haya ejercicios; tarjeta de instalar
+(`vistas/instalar.js`: el aviso «app no segura» es de Samsung Internet, no
+nuestro); quitada la rutina de Ángel7Real (su guía no trae rutina); muñecos
+de cardio (corazón) y rueda abdominal; cuello delantero desplazado 1,5 px.

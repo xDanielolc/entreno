@@ -207,8 +207,8 @@ export function vistaSesion(contenedor, { id }) {
     } else if (s.primeraVez) {
       partes.push('Primera vez con esta serie');
     } else {
-      const u = s.ultima.serie;
-      partes.push(`Última vez: ${textoSerie(ej, u)}`);
+      const u = (s.ultima ?? s.referencia).serie;
+      partes.push(`${s.ultima ? 'Última vez' : 'Última vez (en otra serie)'}: ${textoSerie(ej, u)}`);
       if (s.modo === 'carga' && s.sube) partes.push(`hoy sube a ${formatearNumero(s.carga)} ${uCarga}`);
       if (s.modo === 'carga' && !s.sube && s.rango) partes.push(`llega a ${s.rango[1]} ${uEsf} para subir`);
       if (s.modo === 'esfuerzo') partes.push(`hoy intenta ${formatearNumero(s.esfuerzoObjetivo)} ${uEsf}`);

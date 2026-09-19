@@ -53,6 +53,11 @@ def reflejar(poligono):
     return [(ANCHO - x, y) for x, y in poligono]
 
 
+# El cuerpo de wger no está centrado exactamente en x = 100: el cuello, visto
+# de frente, queda 1,5 px a la derecha. Desplazamiento de la capa entera.
+DESPLAZAMIENTO = {("cuello", "delante"): -1.5}
+
+
 def trazado(poligono):
     puntos = " L ".join(f"{x:g} {y:g}" for x, y in poligono)
     return f'<path d="M {puntos} Z"/>'
@@ -62,10 +67,12 @@ def main():
     for musculo, vistas in CAPAS.items():
         for vista, poligonos in vistas.items():
             todos = poligonos + [reflejar(p) for p in poligonos]
+            dx = DESPLAZAMIENTO.get((musculo, vista), 0)
+            transform = f' transform="translate({dx:g} 0)"' if dx else ""
             svg = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{ANCHO}" height="{ALTO}" '
                    f'viewBox="0 0 {ANCHO} {ALTO}">\n'
                    f'  <!-- {musculo} ({vista}): capa propia de la app -->\n'
-                   f'  <g fill="#000" stroke="#000" stroke-width="1.5" stroke-linejoin="round">\n    '
+                   f'  <g fill="#000" stroke="#000" stroke-width="1.5" stroke-linejoin="round"{transform}>\n    '
                    + "\n    ".join(trazado(p) for p in todos)
                    + "\n  </g>\n</svg>\n")
             archivo = DESTINO / f"{musculo}-{vista}.svg"

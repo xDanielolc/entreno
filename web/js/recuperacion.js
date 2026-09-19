@@ -8,7 +8,8 @@
 //     Pareja-Blanco 2019 y 2020). De ahí salen las 24, 36, 48 y 60 horas.
 //   · El volumen total apenas cambia ese tiempo (Pareja-Blanco 2019): cada
 //     serie de más añade cada vez menos. Eso se modela con una curva que se
-//     aplana (la primera serie cuenta el 70 %, a partir de 6 casi el 100 %).
+//     aplana (una serie cuenta el 57 %; tres, el 78 %; ocho, el 96 %). Una
+//     serie suelta al fallo no puede dejar un músculo tocado dos días.
 //     La forma exacta de la curva es una aproximación nuestra.
 //   · No hay evidencia de un tiempo fijo por músculo. Sí la hay de que cada
 //     persona se recupera a su ritmo y de que la sensación de recuperación es
@@ -34,9 +35,9 @@ function horasDeSerie(serie) {
   return conTramos || muchas ? 60 : 48;
 }
 
-// Cuánto pesa el volumen: 1 serie = 70 %, 3 = 87 %, 6 = 96 %, 10 o más ≈ 100 %.
+// Cuánto pesa el volumen: 1 serie = 57 %, 2 = 69 %, 3 = 78 %, 5 = 89 %, 8 = 96 %.
 function factorVolumen(series) {
-  return 0.55 + 0.45 * (1 - Math.exp(-series / 2.5));
+  return 0.4 + 0.6 * (1 - Math.exp(-series / 3));
 }
 
 // Series de una sesión por músculo, con las horas que pide cada una. En un

@@ -68,6 +68,11 @@ abajo la explicación de por qué pide lo que pide, por si quieres cambiarlo.
 >   variable CSS, para poder pintarlos desde la app.
 > - El cuerpo de fondo, en un grupo aparte llamado `silueta`.
 > - Sin texto, sin degradados, sin filtros: solo trazados.
+>
+> Defectos del dibujo actual (wger) que conviene evitar: la silueta de frente
+> tiene un hueco claro en el centro del pecho, y no está centrada exactamente
+> (el cuello queda 1,5 px a la derecha del eje), lo que obliga a desplazar
+> capas a mano.
 
 ---
 

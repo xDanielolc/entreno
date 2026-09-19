@@ -195,7 +195,7 @@
    "nombreEnWger": "Dominadas"
   },
   "Jalón al pecho": {
-   "archivo": "imagenes/ejercicios/jalon-al-pecho.PNG",
+   "archivo": "imagenes/ejercicios/jalon-al-pecho.png",
    "autor": "Franpol",
    "nombreEnWger": "Jalón al pecho con agarre neutro"
   },
@@ -353,11 +353,6 @@
    "archivo": "imagenes/ejercicios/plancha.png",
    "autor": "utkb",
    "nombreEnWger": "Plancha de antebrazo"
-  },
-  "Rueda abdominal": {
-   "archivo": "imagenes/ejercicios/rueda-abdominal.jpg",
-   "autor": "wger",
-   "nombreEnWger": "Rueda abdominal"
   },
   "Press pallof": {
    "archivo": "imagenes/ejercicios/press-pallof.png",
@@ -1197,6 +1192,16 @@
   },
   "Sobre la cabeza con apoyo (Salamba Sirsasana)": {
    "archivo": "imagenes/munecos/sobre-la-cabeza-con-apoyo-salamba-sirsasana.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Rueda abdominal": {
+   "archivo": "imagenes/munecos/rueda-abdominal.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Cardio": {
+   "archivo": "imagenes/munecos/cardio.svg",
    "autor": "dibujo propio de la app",
    "fuente": "propia"
   }

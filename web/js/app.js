@@ -81,7 +81,7 @@ function pintarIndicador() {
   const { situacion, detalle } = situacionActual();
   const pulsable = ['desconectada', 'pendiente', 'error'].includes(situacion);
   indicador.className = `indicador ${situacion}`;
-  indicador.textContent = situacion === 'desconectada' ? 'Conectar con Google' : textoSituacion(situacion);
+  indicador.textContent = situacion === 'desconectada' ? 'Sin guardar en Google Drive: toca para conectar' : textoSituacion(situacion);
   indicador.title = detalle || '';
   indicador.disabled = !pulsable;
 }
