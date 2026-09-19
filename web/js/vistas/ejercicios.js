@@ -1,5 +1,6 @@
 import {
-  aPasoDeDisco, cicloActual, formatearNumero, generarEscalera, lecturaDesdeCarga, registrosDelCiclo, rmDeReferencia,
+  aPesoDisponible, cicloActual, formatearNumero, generarEscalera, lecturaDesdeCarga, pesosDeMaquina, registrosDelCiclo,
+  rmDeReferencia, seriesDelPrograma,
 } from '../calculos.js';
 import * as estado from '../estado.js';
 import {
@@ -8,14 +9,15 @@ import {
 } from '../esquema.js';
 import { tramosPorDefecto } from '../calculos.js';
 import { EXPLICACIONES_1RM, FORMULAS, calibrar, estimar1RM, modeloDe, textoCalibracion } from '../formula1rm.js';
-import { FRACCION_CORPORAL_POR_NOMBRE } from '../esquema.js';
+import { FRACCION_CORPORAL_POR_NOMBRE, PROGRAMAS } from '../esquema.js';
+import { hoyISO } from '../ui.js';
 import { CATALOGO, esMaquinaDePlacas, normalizar, tipoDeEjercicio } from '../catalogo.js';
 import { ORDEN_MUSCULOS, nombreMusculo } from '../musculos.js';
 import { entradaDeEjercicio } from '../series.js';
 import { nombreSede, sedesActivas, separarPorSede } from '../sedes.js';
 import { seccionProgreso } from './graficas.js';
 import { imagenDe, textoCredito } from '../imagenes.js';
-import { anadir, aviso, confirmar, h, leerNumero, nuevoId } from '../ui.js';
+import { anadir, aviso, confirmar, h, leerNumero, modal, nuevoId } from '../ui.js';
 import { pista } from './tutorial.js';
 import { barraFiltros, cajaLista, elegirEjercicio, filtrar, tarjetaItem } from './selector-ejercicios.js';
 import { selectorTecnicas } from './tecnicas.js';
@@ -31,7 +33,7 @@ let verArchivados = false;
 
 export function vistaEjercicios(contenedor) {
   const d = estado.datos();
-  const hayArchivados = d.ejercicios.some((e) => e.archivado);
+  const hayArchivados = d.ejercicios.some((e) => e.archivado && !e.borrado);
   const zona = h('div', { id: 'lista-ejercicios' });
 
   anadir(contenedor,
@@ -49,7 +51,7 @@ export function vistaEjercicios(contenedor) {
       verArchivados ? 'Ocultar archivados' : 'Ver archivados'));
 
   function pintarLista() {
-    const lista = filtrar(d.ejercicios.filter((e) => verArchivados || !e.archivado))
+    const lista = filtrar(d.ejercicios.filter((e) => !e.borrado && (verArchivados || !e.archivado)))
       .sort((a, b) => (a.grupo || '~').localeCompare(b.grupo || '~') || a.nombre.localeCompare(b.nombre));
 
     const grupos = new Map();
@@ -211,8 +213,9 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         }),
         ['peso', 'asistida'].includes(borrador.carga.tipo) && h('label', { class: 'casilla' },
           h('input', { type: 'checkbox', checked: Boolean(borrador.maquinaPlacas),
-            onchange: (e) => { borrador.maquinaPlacas = e.target.checked; } }),
-          'Máquina de placas o polea: los pesos van de placa en placa y se pueden fijar en los drop sets'),
+            onchange: (e) => { borrador.maquinaPlacas = e.target.checked; repintar(); } }),
+          'Máquina de placas o polea: los pesos van de placa en placa'),
+        borrador.maquinaPlacas && seccionPesosMaquina(),
         borrador.carga.tipo === 'asistida' && h('p', { class: 'nota' },
           peso ? `Apuntarás los kilos que marca la máquina; la carga real es tu peso (${formatearNumero(peso)} kg) menos esa ayuda.`
             : 'Indica tu peso corporal en Ajustes para calcular la carga real.'),
@@ -278,7 +281,54 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         h('button', { class: 'boton', type: 'submit' }, 'Listo')),
 
       existente && h('button', { type: 'button', class: 'boton enlace', onclick: archivar },
-        borrador.archivado ? 'Recuperar ejercicio' : 'Archivar ejercicio'));
+        borrador.archivado ? 'Recuperar ejercicio' : 'Archivar ejercicio'),
+      existente && h('button', { type: 'button', class: 'boton enlace peligro-texto', onclick: borrarEjercicio }, 'Borrar ejercicio'));
+  }
+
+  // Máquina con sus pesos: la app solo propone pesos que existen (drop sets,
+  // subidas de la doble progresión, ciclos). Se generan de golpe y se pueden
+  // copiar de otro ejercicio de la misma máquina.
+  function seccionPesosMaquina() {
+    const pesos = borrador.pesosMaquina ?? [];
+    const gen = { desde: pesos[0] ?? 5, hasta: pesos.at(-1) ?? 100, paso: pesos.length > 1 ? pesos[1] - pesos[0] : 5 };
+    const otros = d.ejercicios.filter((e) => e.id !== borrador.id && !e.archivado && e.pesosMaquina?.length);
+    const nuevo = h('input', { type: 'text', inputmode: 'decimal', placeholder: 'Añadir un peso (kg)', 'aria-label': 'Añadir un peso' });
+    return h('div', { class: 'campo pesos-maquina' },
+      h('span', { class: 'etiqueta-campo' }, 'Pesos de la máquina'),
+      pesos.length
+        ? h('div', { class: 'tecnicas' }, pesos.map((p) => h('span', { class: 'chip' }, formatearNumero(p),
+          h('button', { type: 'button', class: 'chip-quitar', 'aria-label': `Quitar ${p} kg`,
+            onclick: () => { borrador.pesosMaquina = pesos.filter((x) => x !== p); repintar(); } }, '✕'))))
+        : h('p', { class: 'nota' }, 'Sin pesos: la app redondeará a 2,5 kg. Mete los de la máquina para que solo te proponga pesos que existan.'),
+      h('div', { class: 'fila-campos' },
+        campo('Del primero', numeroInput(gen.desde, (v) => { gen.desde = v; })),
+        campo('Al último', numeroInput(gen.hasta, (v) => { gen.hasta = v; })),
+        campo('De … en …', numeroInput(gen.paso, (v) => { gen.paso = v; }))),
+      h('div', { class: 'fila-botones' },
+        h('button', { type: 'button', class: 'boton secundario', onclick: () => {
+          const lista = pesosDeMaquina(gen.desde, gen.hasta, gen.paso);
+          if (!lista.length) { aviso('Revisa los tres números', { tipo: 'error' }); return; }
+          borrador.pesosMaquina = [...new Set([...lista])].sort((a, b) => a - b);
+          repintar();
+        } }, 'Generar la lista'),
+        h('label', { class: 'campo crece' }, nuevo,
+          h('button', { type: 'button', class: 'boton enlace', onclick: () => {
+            const v = leerNumero(nuevo.value);
+            if (v == null) return;
+            borrador.pesosMaquina = [...new Set([...pesos, v])].sort((a, b) => a - b);
+            repintar();
+          } }, '+ Añadir'))),
+      otros.length > 0 && h('select', { 'aria-label': 'Copiar los pesos de otro ejercicio', onchange: (e) => {
+        const elegido = otros[Number(e.target.value)];
+        if (!elegido) return;
+        borrador.pesosMaquina = [...elegido.pesosMaquina];
+        repintar();
+        aviso(`Pesos de ${elegido.nombre} copiados.`);
+      } },
+      h('option', { value: '' }, 'Copiar los pesos de otro ejercicio de la misma máquina…'),
+      otros.map((o, i) => h('option', { value: i }, `${o.nombre}: ${o.pesosMaquina.length} pesos (${formatearNumero(o.pesosMaquina[0])} a ${formatearNumero(o.pesosMaquina.at(-1))} kg)`))),
+      pesos.length > 0 && h('small', { class: 'nota' }, `${pesos.length} pesos, de ${formatearNumero(pesos[0])} a ${formatearNumero(pesos.at(-1))} kg. `
+        + 'Los drop sets, las subidas y los ciclos usarán solo estos.'));
   }
 
   // Peso corporal: qué parte de tu peso levantas. En cada serie solo se
@@ -518,6 +568,7 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
     const queSube = sobre === 'carga' ? 'la carga' : TIPOS_ESFUERZO[borrador.esfuerzo.tipo].etiqueta.toLowerCase();
 
     if (p.tipo === 'bilbo') return seccionBilbo(plan, sobre, unidad);
+    if (p.tipo === 'programa') return seccionPrograma(plan);
     if (p.tipo === 'carga') {
       p.objetivoEsfuerzo ??= [8, 12];
       return h('div', {},
@@ -546,6 +597,29 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
     return null;
   }
 
+  // Programas clásicos: cuál, el peso inicial y desde cuándo se cuenta.
+  function seccionPrograma(plan) {
+    const p = plan.progresion;
+    p.programa ??= '5x5';
+    p.desde ??= hoyISO();
+    const info = PROGRAMAS[p.programa];
+    const muestra = p.inicial != null ? seriesDelPrograma(borrador, p, 0) : null;
+    return h('div', {},
+      opciones(Object.fromEntries(Object.entries(PROGRAMAS).map(([k, v]) => [k, { etiqueta: v.etiqueta }])), p.programa,
+        (k) => { p.programa = k; repintar(); }, { compacto: true }),
+      h('p', { class: 'nota' }, info.descripcion),
+      h('div', { class: 'fila-campos' },
+        campo(`${info.inicial} (kg)`, numeroInput(p.inicial, (v) => { p.inicial = v; }, { onchange: repintar })),
+        campo('Incremento (kg)', numeroInput(p.incremento ?? 2.5, (v) => { p.incremento = v; }))),
+      muestra && h('p', { class: 'nota' }, `Primera sesión: ${muestra.series.map((s) => `${formatearNumero(s.carga)} × ${s.reps}${s.amrap ? '+' : ''}`).join(' · ')}.`),
+      h('p', { class: 'nota' }, `Contando desde el ${p.desde}. `,
+        h('button', { type: 'button', class: 'boton enlace', onclick: () => { p.desde = hoyISO(); repintar(); aviso('El programa empieza de nuevo desde hoy.'); } },
+          'Empezar de nuevo desde hoy')),
+      p.programa === '531' && existente && rmDeReferencia(d, existente) && h('p', { class: 'nota' },
+        `Tu mejor 1RM estimado aquí es ${formatearNumero(Math.round(rmDeReferencia(d, existente).valor))} kg: el 90 % son `
+        + `${formatearNumero(aPesoDisponible(borrador, rmDeReferencia(d, existente).valor * 0.9))} kg.`));
+  }
+
   function seccionBilbo(plan, sobre, unidad) {
     const p = plan.progresion;
     p.diasPorCiclo ??= DIAS_CICLO_POR_DEFECTO;
@@ -564,7 +638,11 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
       ? new Map(registrosDelCiclo(d, existente, plan, ciclo.n).map((r) => [r.dia, r]))
       : new Map();
 
-    const regenerar = () => { ciclo.escalera = generarEscalera({ ...gen, dias: p.diasPorCiclo }); repintar(); };
+    const regenerar = () => {
+      ciclo.escalera = generarEscalera({ ...gen, dias: p.diasPorCiclo });
+      if (borrador.pesosMaquina?.length && sobre === 'carga') ciclo.escalera = ciclo.escalera.map((v) => aPesoDisponible(borrador, v));
+      repintar();
+    };
 
     return h('div', { class: 'bilbo' },
       h('p', { class: 'nota' },
@@ -604,7 +682,7 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
   // estimado en este ejercicio (el de Ajustes; 50 % por defecto).
   function inicioBilbo() {
     const rm = existente ? rmDeReferencia(d, existente)?.valor : null;
-    return rm ? aPasoDeDisco((rm * (d.perfil.bilboInicioPorcentaje ?? 50)) / 100) : null;
+    return rm ? aPesoDisponible(borrador, (rm * (d.perfil.bilboInicioPorcentaje ?? 50)) / 100) : null;
   }
 
   function nuevoCiclo(plan) {
@@ -658,15 +736,45 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
     location.hash = paraSesion ? `#/sesion/${paraSesion}` : '#/ejercicios';
   }
 
-  async function separar() {
+  // Separar por sitio: se eligen en cuáles. Los sitios que no marques siguen
+  // usando el ejercicio original (así las flexiones del gimnasio y las de
+  // casa pueden seguir siendo el mismo ejercicio).
+  function separar() {
     const sedes = sedesActivas(d);
-    const si = await confirmar(`¿Separar «${existente.nombre}» en ${sedes.length} ejercicios, uno por sitio? `
-      + 'Cada entrenamiento pasado se queda con el del sitio donde se hizo, y las rutinas de un sitio usarán el suyo.',
-    { si: 'Separar' });
+    const marcadas = new Set(sedes.map((s) => s.id));
+    const cerrar = modal('Separar por sitio', h('div', { class: 'formulario' },
+      h('p', {}, `«${existente.nombre}» pasará a ser un ejercicio distinto en cada sitio que marques. Cada entrenamiento pasado se `
+        + 'queda con el del sitio donde se hizo, y las rutinas de un sitio usarán el suyo. Los sitios sin marcar siguen con el original.'),
+      sedes.map((s) => h('label', { class: 'casilla' },
+        h('input', { type: 'checkbox', checked: true, onchange: (e) => { if (e.target.checked) marcadas.add(s.id); else marcadas.delete(s.id); } }),
+        nombreSede(d, s.id))),
+      h('div', { class: 'fila-botones' },
+        h('button', { class: 'boton secundario', onclick: () => cerrar() }, 'Cancelar'),
+        h('button', { class: 'boton', onclick: () => {
+          if (marcadas.size < 2) { aviso('Marca al menos dos sitios', { tipo: 'error' }); return; }
+          let n = 0;
+          estado.cambiar((datos) => { n = separarPorSede(datos, existente.id, [...marcadas]); });
+          cerrar();
+          aviso(`Separado en ${n} ejercicios, uno por sitio.`);
+          location.hash = '#/ejercicios';
+        } }, 'Separar'))));
+  }
+
+  // Borrar: desaparece de todas las listas, pero los entrenamientos pasados
+  // conservan sus series. Se recupera desde Ajustes.
+  async function borrarEjercicio() {
+    const usado = d.sesiones.some((s) => s.ejercicios.some((x) => x.ejercicioId === borrador.id));
+    const si = await confirmar(usado
+      ? `¿Borrar «${borrador.nombre}»? Desaparece de tus listas y rutinas; los entrenamientos pasados conservan sus series. Se puede recuperar en Ajustes.`
+      : `¿Borrar «${borrador.nombre}»? No tiene historial, así que se elimina del todo.`, { si: 'Borrar', peligro: true });
     if (!si) return;
-    let n = 0;
-    estado.cambiar((datos) => { n = separarPorSede(datos, existente.id); });
-    aviso(`Separado en ${n} ejercicios, uno por sitio.`);
+    estado.cambiar((datos) => {
+      if (!usado) { datos.ejercicios = datos.ejercicios.filter((e) => e.id !== borrador.id); return; }
+      const e = datos.ejercicios.find((x) => x.id === borrador.id);
+      if (e) { e.archivado = true; e.borrado = hoyISO(); }
+      for (const r of datos.rutinas) for (const dia of r.dias) dia.ejercicios = dia.ejercicios.filter((x) => x.ejercicioId !== borrador.id);
+    });
+    aviso(usado ? 'Ejercicio borrado. Se puede recuperar en Ajustes.' : 'Ejercicio eliminado.');
     location.hash = '#/ejercicios';
   }
 

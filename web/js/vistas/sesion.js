@@ -1,5 +1,5 @@
 import {
-  aPasoDeDisco, cargaCorporal, cargaDesdeLectura, esfuerzoTotal, formatearNumero,
+  aPesoDisponible, cargaCorporal, cargaDesdeLectura, esfuerzoTotal, formatearNumero,
   redondear, rmDeReferencia, sugerenciaSerie, trabajoSerie, tramosPropuestos, usaTramos,
 } from '../calculos.js';
 import { pista } from './tutorial.js';
@@ -15,7 +15,7 @@ import {
 import { anadir, aviso, confirmar, h, leerNumero } from '../ui.js';
 import { arrancarDescanso, arrancarRespiracion, barraDescanso, descansoDeTramo } from './descanso.js';
 import { cuentaParaFatiga, tipoDeEjercicio } from '../catalogo.js';
-import { ASISTENCIAS, ESCALA_MANO, TECNICAS_ESTIRAMIENTO } from '../esquema.js';
+import { ASISTENCIAS, ESCALA_MANO, PROGRAMAS, TECNICAS_ESTIRAMIENTO } from '../esquema.js';
 import { ORDEN_MUSCULOS, nombreMusculo } from '../musculos.js';
 import { ESCALA_RECUPERACION, puntuacionSentida, recuperacionPorMusculo } from '../recuperacion.js';
 import { comparacionSerie, mostrarResumen } from './resumen-sesion.js';
@@ -221,8 +221,8 @@ export function vistaSesion(contenedor, { id }) {
     if (!rm) return null;
     return h('p', { class: 'nota' },
       `1RM estimado ${rm.delCiclo ? 'del ciclo' : '(histórico)'}: ${formatearNumero(Math.round(rm.valor))} kg · `
-      + `80 % = ${formatearNumero(aPasoDeDisco(rm.valor * 0.8))} · 70 % = ${formatearNumero(aPasoDeDisco(rm.valor * 0.7))} · `
-      + `60 % = ${formatearNumero(aPasoDeDisco(rm.valor * 0.6))}`);
+      + `80 % = ${formatearNumero(aPesoDisponible(ej, rm.valor * 0.8))} · 70 % = ${formatearNumero(aPesoDisponible(ej, rm.valor * 0.7))} · `
+      + `60 % = ${formatearNumero(aPesoDisponible(ej, rm.valor * 0.6))}`);
   }
 
   // Cabecera de cada serie: qué toca y cómo fue la última vez.
@@ -245,6 +245,13 @@ export function vistaSesion(contenedor, { id }) {
             ? `llega a ${formatearNumero(serie.objetivo)} ${uEsf}`
             : `objetivo ${formatearNumero(serie.objetivo)} ${uEsf}`);
         }
+      }
+    } else if (s.modo === 'programa') {
+      if (s.sinPrograma) partes.push('Programa sin peso inicial: ponlo en la ficha');
+      else {
+        partes.push(`${PROGRAMAS[s.programa]?.etiqueta ?? s.programa} · ${s.nombreSesion}`);
+        if (serie.programaSet) partes.push(`serie ${serie.programaSet} de ${s.seriesPrograma.length}`);
+        if (serie.carga != null) partes.push(`${formatearNumero(serie.carga)} ${uCarga} × ${formatearNumero(serie.objetivo)}${serie.amrap ? ' o más' : ''}`);
       }
     } else if (s.modo === 'maximo-trabajo') {
       if (s.pocosDatos && !s.carga) partes.push('Máximo trabajo: aún faltan datos, entrena con el peso que quieras');
@@ -444,7 +451,7 @@ export function vistaSesion(contenedor, { id }) {
     porcentaje.addEventListener('input', () => {
       const p = leerNumero(porcentaje.value);
       const r = rmActual();
-      const v = p != null && r ? aPasoDeDisco((r * p) / 100) : null;
+      const v = p != null && r ? aPesoDisponible(ej, (r * p) / 100) : null;
       guardar((x) => { x.carga = v; if (tramo != null) x.pct = p; });
       kilos.value = v ?? '';
       if (tramo == null) recalcularAbajo(ej, i);

@@ -1,7 +1,7 @@
 import * as estado from '../estado.js';
 import { sedeInicial } from '../sedes.js';
 import { barraModoPrueba } from '../modo-prueba.js';
-import { crearSerieDesdePlan } from '../series.js';
+import { seriesDesdePlan } from '../series.js';
 import { anadir, fechaLarga, h, hoyISO, modal, nuevoId } from '../ui.js';
 import { tarjetaRecuperacion, tarjetaSugerenciasAjuste } from './cuerpo.js';
 import { tarjetaInstalar } from './instalar.js';
@@ -12,7 +12,7 @@ import { recuperacionPorMusculo } from '../recuperacion.js';
 
 let preguntandoTutorial = false;
 import { masRecienteAntes, resumenSesion } from './historial.js';
-import { empezarDia, proximoDia, rutinaActiva } from './rutinas.js';
+import { empezarDia, queToca, rutinasActivas } from './rutinas.js';
 
 // ¿Toca de verdad entrenar hoy? Mira los músculos del día que toca y, si
 // alguno sigue tocado, dice cuándo estará listo. Y si llevas más días parado
@@ -67,8 +67,10 @@ export function vistaInicio(contenedor) {
     .sort(masRecienteAntes).slice(0, 3);
   const necesitaPeso = d.perfil.pesoCorporalKg == null
     && activos.some((e) => ['asistida', 'pesoCorporal'].includes(e.carga.tipo));
-  const rutina = rutinaActiva(d);
-  const dia = rutina ? proximoDia(d, rutina) : null;
+  const toca = queToca(d, recuperacionPorMusculo(d));
+  const rutina = toca?.rutina ?? null;
+  const dia = toca?.dia ?? null;
+  const otras = (toca?.alternativas ?? []).filter((a) => a.rutina.id !== rutina?.id);
 
   // Primera vez: ¿cuánto tutorial quieres? (no encima de otro cartel)
   if (nivelTutorial(d) == null && !preguntandoTutorial) {
@@ -90,18 +92,23 @@ export function vistaInicio(contenedor) {
     location.hash = `#/sesion/${id}`;
   }
 
-  function empezarConRutina(elegido) {
-    const id = empezarDia(rutina, elegido, (datos, ej, plan) => crearSerieDesdePlan(datos, ej, plan));
+  function empezarConRutina(elegido, deRutina = rutina) {
+    const id = empezarDia(deRutina, elegido, (datos, ej, plan) => seriesDesdePlan(datos, ej, plan));
     location.hash = `#/sesion/${id}`;
   }
 
+  // Cualquier día de cualquier rutina activa.
   function elegirDia() {
+    const activas = rutinasActivas(d);
     const cerrar = modal('Elegir día', h('div', { class: 'lista-eleccion' },
-      rutina.dias.map((x) => h('button', { class: 'tarjeta fila-enlace', onclick: () => { cerrar(); empezarConRutina(x); } },
-        h('div', {},
-          h('strong', {}, x.nombre),
-          h('div', { class: 'suave' }, `${x.ejercicios.length} ejercicios`)),
-        x.id === dia.id && h('span', { class: 'etiqueta' }, 'Toca hoy')))));
+      activas.map((r) => [
+        activas.length > 1 && h('p', { class: 'nota' }, r.nombre),
+        r.dias.map((x) => h('button', { class: 'tarjeta fila-enlace', onclick: () => { cerrar(); empezarConRutina(x, r); } },
+          h('div', {},
+            h('strong', {}, x.nombre),
+            h('div', { class: 'suave' }, `${x.ejercicios.length} ejercicios`)),
+          r.id === rutina.id && x.id === dia.id && h('span', { class: 'etiqueta' }, 'Toca hoy'))),
+      ])));
   }
 
   anadir(contenedor,
@@ -118,13 +125,20 @@ export function vistaInicio(contenedor) {
       ? h('a', { class: 'boton grande', href: `#/sesion/${enCurso.id}` }, 'Continuar entrenamiento')
       : dia
         ? h('section', { class: 'tarjeta' },
-          h('p', { class: 'suave' }, `${rutina.nombre} · hoy toca`),
+          h('p', { class: 'suave' }, `${rutina.nombre} · ${toca.descansoHoy ? 'siguiente' : 'hoy toca'}`
+            + (toca.motivo ? ` (${toca.motivo})` : '')),
           h('h2', {}, dia.nombre),
           h('p', { class: 'suave' }, dia.ejercicios.length
             ? dia.ejercicios.map((x) => d.ejercicios.find((e) => e.id === x.ejercicioId)?.nombre ?? '—').join(', ')
             : 'Este día no tiene ejercicios todavía'),
           avisoCuandoToca(d, rutina, dia),
-          h('button', { class: 'boton grande', onclick: () => empezarConRutina(dia) }, 'Empezar'),
+          rutina.descripcion && h('details', { class: 'explicacion' },
+            h('summary', {}, 'Por qué esta rutina es así y cómo se hace'),
+            rutina.descripcion.split('\n\n').map((p) => h('p', {}, p))),
+          h('button', { class: 'boton grande', onclick: () => empezarConRutina(dia) }, toca.descansoHoy ? 'Empezar igualmente' : 'Empezar'),
+          otras.length > 0 && h('p', { class: 'nota' }, 'Otras rutinas activas: ',
+            otras.map((a, i) => [i > 0 && ' · ', h('a', { href: '#/', onclick: (e) => { e.preventDefault(); empezarConRutina(a.dia, a.rutina); } },
+              `${a.rutina.nombre} (${a.dia.nombre})`)])),
           h('div', { class: 'fila-botones' },
             h('button', { class: 'boton secundario', onclick: elegirDia }, 'Otro día'),
             h('button', { class: 'boton secundario', onclick: empezarSuelto }, 'Sin rutina')))

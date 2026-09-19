@@ -25,6 +25,7 @@ export const TIPOS_PROGRESION = {
   bilbo:    { etiqueta: 'Bilbo',            descripcion: 'Ciclo de días con el valor de cada día fijado de antemano. Cada día intentas superar el anterior.' },
   carga:    { etiqueta: 'Doble progresión', descripcion: 'Trabajas en un rango de repeticiones, por ejemplo de 8 a 12. Primero subes repeticiones con el mismo peso; al llegar a 12, subes peso y vuelves a empezar por 8.' },
   esfuerzo: { etiqueta: 'A más cada vez',   descripcion: 'Cada vez un poco más que la última: más repeticiones con el mismo peso, o más peso con las mismas repeticiones (se elige debajo).' },
+  programa: { etiqueta: 'Programa (5×5, 5/3/1, HST)', descripcion: 'Un programa clásico con sus series y pesos fijados de antemano sesión a sesión. Cada sesión sabe qué toca.' },
   'maximo-trabajo': { etiqueta: 'Máximo trabajo', descripcion: 'Experimental: busca en tu historial el peso con el que más trabajo (peso × repeticiones) haces, y te mantiene ahí.' },
   libre:    { etiqueta: 'Libre',            descripcion: 'La app solo registra y te recuerda lo último que hiciste.' },
 };
@@ -137,6 +138,8 @@ export function progresionPorDefecto(tipo, ejercicio) {
       return { tipo, sobre, objetivoEsfuerzo: [8, 12], incremento: sobre === 'carga' ? 2.5 : 1 };
     case 'esfuerzo':
       return { tipo, sobre: 'esfuerzo', incremento: 1 };
+    case 'programa':
+      return { tipo, sobre: 'carga', programa: '5x5', inicial: null, incremento: 2.5, desde: null };
     case 'maximo-trabajo':
       return { tipo, sobre: 'carga', topeEsfuerzo: 50 };
     default:
@@ -375,6 +378,32 @@ const MIGRACIONES = {
     }
     datos.version = 10;
     return datos;
+  },
+};
+
+// Programas clásicos. Cada uno dice qué series (peso y repeticiones) tocan en
+// la sesión n desde que se empezó. Los pesos salen del «inicial» de la ficha
+// (en 5/3/1, el máximo de entrenamiento: el 90 % de tu 1RM).
+export const PROGRAMAS = {
+  '5x5': {
+    etiqueta: '5×5',
+    descripcion: 'Cinco series de cinco con el mismo peso. Cada sesión que las completas, sube el incremento; si fallas tres '
+      + 'sesiones seguidas, baja un 10 % y vuelve a subir. Es el esquema de StrongLifts y de Bill Starr.',
+    inicial: 'Peso de la primera sesión',
+  },
+  '531': {
+    etiqueta: '5/3/1 (Wendler)',
+    descripcion: 'Ciclos de cuatro sesiones por ejercicio: semana de 5 (65-75-85 %), de 3 (70-80-90 %), de 5/3/1 (75-85-95 %) '
+      + 'y descarga (40-50-60 %). Los porcentajes son de tu máximo de entrenamiento (el 90 % de tu 1RM), que sube el incremento '
+      + 'cada ciclo. La última serie de cada sesión es «las que puedas» (mínimo las marcadas).',
+    inicial: 'Máximo de entrenamiento (90 % de tu 1RM)',
+  },
+  hst: {
+    etiqueta: 'HST',
+    descripcion: 'Bloques de seis sesiones: primero a 15 repeticiones, luego a 10 y luego a 5. Dentro de cada bloque el peso sube '
+      + 'cada sesión hasta llegar a tu máximo de esas repeticiones en la sexta. Dos series por sesión. Al acabar los tres bloques, '
+      + 'se repite con los máximos subidos el incremento.',
+    inicial: 'Tu 15RM (peso con el que haces 15 justas)',
   },
 };
 

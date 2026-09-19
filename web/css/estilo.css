@@ -239,6 +239,8 @@ a { color: var(--acento); }
 .apartado h3 { margin: 14px 0 4px; font-size: 1rem; }
 .desplegable-musculos > summary { font-weight: 600; min-height: var(--alto-toque); display: flex; align-items: center; cursor: pointer; }
 .modo-carga-item { display: block; margin-top: 4px; font-size: 0.85rem; min-height: 36px; }
+.pesos-maquina .chip { font-variant-numeric: tabular-nums; }
+.pesos-maquina .campo.crece { flex: 1; flex-direction: row; align-items: center; gap: 6px; }
 
 /* Series de una en una */
 .serie.oculta { display: none; }

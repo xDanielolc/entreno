@@ -81,7 +81,6 @@ export function fusionar(datos, prueba) {
   for (const rutina of prueba.rutinas) {
     if (datos.rutinas.some((r) => r.id === rutina.id)) continue;
     for (const dia of rutina.dias) for (const item of dia.ejercicios) item.ejercicioId = nuevoId(item.ejercicioId);
-    rutina.activa = rutina.activa && !datos.rutinas.some((r) => r.activa);
     datos.rutinas.push(rutina);
     resumen.rutinas += 1;
   }

@@ -24,6 +24,8 @@ const unilateral = (forma) => ({ ...forma, tecnicas: [...forma.tecnicas, 'unilat
 // Varias series iguales con doble progresión en un rango de repeticiones.
 const series = (n, min, max) => Array.from({ length: n }, () => ({ tipo: 'libre', progresion: 'carga', objetivo: [min, max] }));
 
+const programa = (cual, inicial = null) => ({ tipo: 'libre', progresion: 'programa', programa: cual, inicial });
+
 const e = (nombre, series, extra = {}) => ({ nombre, series, ...extra });
 
 export const PLANTILLAS = [
@@ -35,7 +37,7 @@ export const PLANTILLAS = [
     porQue: 'Junta dos ideas. El método Bilbo sube la carga un poco cada día dentro de un ciclo y te pide superar el 1RM del día '
       + 'anterior, con series largas (20-30 repeticiones) que construyen resistencia y fuerza sin cargar demasiado las articulaciones. '
       + 'Detrás va una sola serie muy intensa al estilo Heavy Duty (drop set, isométrico final o excéntricas lentas), que da el '
-      + 'estímulo de alta intensidad con poco volumen. Alternar empuje, pierna y tirón deja descansar cada grupo varios días.',
+      + 'estímulo de alta intensidad con poco volumen. Alternar empuje, pierna y tirón deja descansar cada grupo varios días. Filosofía: poco volumen, mucha intención. Cada serie tiene un porqué y un número que superar; no hay series de relleno. Si una sesión no mejora nada, es que faltó descanso, no series.',
     comoSeHace: 'Rota los cuatro días en orden, entrenando en días alternos o cuando el mapa de recuperación lo permita. En cada '
       + 'ejercicio haz primero la serie Bilbo con el peso del día del ciclo, y justo después la de intensidad. El cardio del final es '
       + 'opcional. Antes de empezar, pon en la ficha de cada ejercicio el peso inicial de su ciclo Bilbo.',
@@ -76,7 +78,7 @@ export const PLANTILLAS = [
     autor: 'Mike Mentzer, «Heavy Duty»',
     resumen: 'Cuerpo entero, una serie por ejercicio de 15 a 20 repeticiones, sin llegar al fallo. Unas tres semanas.',
     porQue: 'Mentzer propone empezar aprendiendo bien la técnica de los básicos y acostumbrar el cuerpo al esfuerzo antes de '
-      + 'entrenar a la máxima intensidad. Una sola serie por ejercicio y sin fallo: debes acabar algo cansado, no agotado.',
+      + 'entrenar a la máxima intensidad. Una sola serie por ejercicio y sin fallo: debes acabar algo cansado, no agotado. Filosofía de Mentzer: entrenar es un estímulo, no un fin; el músculo crece descansando. Antes de llegar al fallo hay que ganarse el derecho a hacerlo con técnica limpia.',
     comoSeHace: 'Tres días por semana, en días alternos. Una serie de 15 a 20 repeticiones por ejercicio, parando antes del fallo. '
       + 'Tras unas tres semanas, pasa a «Heavy Duty 2».',
     dias: [
@@ -94,7 +96,7 @@ export const PLANTILLAS = [
     autor: 'Mike Mentzer, «Heavy Duty»',
     resumen: 'Cuerpo entero, una sola serie por ejercicio hasta el fallo, en menos de 40 minutos.',
     porQue: 'La idea central de Mentzer: el estímulo para crecer lo da la intensidad (llegar al fallo), no la cantidad de series. '
-      + 'Una serie bien hecha basta, y el resto del tiempo es para recuperarse.',
+      + 'Una serie bien hecha basta, y el resto del tiempo es para recuperarse. Filosofía: una sola serie al fallo por ejercicio, exacta y sin engañarse, seguida de días de descanso completos. Más series no añaden estímulo, solo restan recuperación.',
     comoSeHace: 'Días alternos, tres veces por semana; si en dos o tres semanas no progresas, baja a dos. Sentadilla y pullover se '
       + 'hacen seguidos, sin descanso entre ellos (superserie). Descansa lo justo para recuperar el aliento entre ejercicios.',
     dias: [
@@ -113,7 +115,7 @@ export const PLANTILLAS = [
     resumen: 'Dos días: A (pierna, espalda y bíceps) y B (pecho, hombro, tríceps y abdomen), alternados en días alternos.',
     porQue: 'Cuando el cuerpo entero se queda corto para recuperarse, Mentzer divide el cuerpo en dos, agrupando los músculos que '
       + 'ya trabajan juntos: la pierna y la espalda se ayudan (el peso muerto carga los femorales, los remos los bíceps), y el pecho '
-      + 'arrastra al hombro y al tríceps.',
+      + 'arrastra al hombro y al tríceps. Filosofía: el volumen semanal baja aún más y cada músculo se trabaja una vez cada varios días. Si sigues progresando con menos, es que antes sobraba.',
     comoSeHace: 'Semana 1: A, descanso, B, descanso, A, fin de semana libre. Semana 2: al revés (B, A, B). Una serie al fallo por '
       + 'ejercicio; toda la sesión en unos 20-30 minutos. Si es demasiado, quita la prensa y el peso muerto.',
     dias: [
@@ -134,7 +136,7 @@ export const PLANTILLAS = [
     autor: 'Mike Mentzer, «Heavy Duty»',
     resumen: 'La división A / B con superseries: primero un ejercicio aislado y, sin descanso, uno compuesto del mismo músculo.',
     porQue: 'En los ejercicios compuestos a veces falla antes un músculo pequeño (el bíceps en un jalón, el tríceps en el press) que '
-      + 'el grande que quieres trabajar. Cansar antes el grande con un ejercicio aislado hace que el compuesto lo lleve de verdad al fallo.',
+      + 'el grande que quieres trabajar. Cansar antes el grande con un ejercicio aislado hace que el compuesto lo lleve de verdad al fallo. Filosofía: llevar al fallo real el músculo grande, no al eslabón débil. Es la forma de Mentzer de exprimir una sola serie sin añadir más.',
     comoSeHace: 'Cada pareja se hace seguida, sin descanso entre los dos ejercicios. Una serie al fallo de cada uno. Mismo reparto de '
       + 'días que la división A / B.',
     dias: [
@@ -160,7 +162,7 @@ export const PLANTILLAS = [
     autor: 'Mike Mentzer, «Heavy Duty»',
     resumen: 'Pierna; pecho, hombro, tríceps y abdomen; espalda y bíceps. Cada grupo, una vez cada 7 a 14 días.',
     porQue: 'El último paso de Mentzer: a medida que te haces más fuerte, cada sesión cansa más y necesitas más descanso. Divide el '
-      + 'cuerpo en tres y, cuando se estanca, alarga el ciclo (de 7 a 10 y luego a 14 días) en vez de añadir series.',
+      + 'cuerpo en tres y, cuando se estanca, alarga el ciclo (de 7 a 10 y luego a 14 días) en vez de añadir series. Filosofía: cuanto más fuerte, más raro entrenar. Mentzer llegó a proponer una sesión cada 4-7 días; si el peso sube en cada sesión, el descanso es el correcto.',
     comoSeHace: 'Como mucho dos series por músculo grande y una por músculo pequeño (la espalda admite tres). Empieza con lunes, '
       + 'miércoles y viernes; si te estancas, pasa a dos días por semana (lunes y jueves) siguiendo el orden de los tres días.',
     dias: [
@@ -186,7 +188,7 @@ export const PLANTILLAS = [
     porQue: 'La misma idea que la PLPL, en tres días en lugar de cuatro: la serie Bilbo (20-30 repeticiones sin llegar al fallo) '
       + 'construye la base, y la serie Heavy Duty (6-12 repeticiones con rest-pause, drop set, isométrico o excéntricas) da el estímulo '
       + 'intenso. En peso muerto, press, sentadilla, dominadas y fondos se para en el fallo técnico, antes de perder la postura; '
-      + 'en máquinas se puede ir al fallo total.',
+      + 'en máquinas se puede ir al fallo total. Filosofía: la misma que la de cuatro días, con una sesión menos por semana para quien tiene menos tiempo o se recupera más despacio. Cada ejercicio, una serie que construye y otra que exprime.',
     comoSeHace: 'Rota empuje, tirón y pierna. En cada ejercicio, primero la serie Bilbo y después la de intensidad. Subida explosiva '
       + 'y bajada lenta en todo. El día de pierna empieza con unos saltos para calentar. Correr 10-20 minutos al final es opcional.',
     dias: [
@@ -220,12 +222,61 @@ export const PLANTILLAS = [
     ],
   },
   {
+    id: 'cinco-por-cinco',
+    nombre: '5×5 clásico',
+    autor: 'Programa clásico de fuerza (Bill Starr, StrongLifts)',
+    resumen: 'Tres días por semana alternando A y B. Cinco series de cinco en los básicos con barra; cada sesión, un poco más de peso.',
+    porQue: 'La progresión lineal más simple que existe: si hoy haces las cinco series de cinco, la próxima vez llevas 2,5 kg más. '
+      + 'Funciona porque al principio la fuerza sube de sesión en sesión; cuando deja de hacerlo, se baja un 10 % y se vuelve a subir. '
+      + 'Filosofía: pocos ejercicios, muy repetidos, con barra, y una regla que cabe en una frase. No busca sensación de trabajo, sino '
+      + 'que el número de la barra suba.',
+    comoSeHace: 'Lunes, miércoles y viernes, alternando A y B. Empieza con un peso cómodo (la barra sola si hace falta): el programa '
+      + 'lo sube solo. Pon el peso inicial de cada ejercicio en su ficha, en «Programa». Descansa de 3 a 5 minutos entre series pesadas.',
+    dias: [
+      { nombre: 'A', ejercicios: [
+        e('Sentadilla', [programa('5x5')]), e('Press de banca', [programa('5x5')]), e('Remo con barra', [programa('5x5')]),
+      ] },
+      { nombre: 'B', ejercicios: [
+        e('Sentadilla', [programa('5x5')]), e('Press militar', [programa('5x5')]),
+        e('Peso muerto', [programa('5x5')], { nota: 'Vale con una sola serie de cinco; las demás, opcionales' }),
+      ] },
+    ],
+  },
+  {
+    id: 'cinco-tres-uno',
+    nombre: '5/3/1 (Wendler)',
+    autor: 'Jim Wendler, resumido con palabras propias',
+    resumen: 'Cuatro días por semana, uno por básico: sentadilla, press de banca, peso muerto y press militar. Ciclos de cuatro semanas.',
+    porQue: 'Wendler parte de un «máximo de entrenamiento» (el 90 % de tu 1RM) y programa tres series por sesión a porcentajes '
+      + 'que suben cada semana: de 5, de 3 y de 5/3/1, y una cuarta de descarga. La última serie de cada día es «las que puedas». '
+      + 'Cada ciclo el máximo sube 2,5 kg. Filosofía: progresar despacio y sin fallar; empezar más ligero de lo que '
+      + 'crees y ganar en meses lo que otros pierden por ir demasiado rápido. Los accesorios son secundarios: se eligen para cubrir '
+      + 'lo que el básico no toca.',
+    comoSeHace: 'Un básico por día. En la ficha de cada uno, en «Programa», pon tu máximo de entrenamiento (la app te enseña el 90 % '
+      + 'de tu 1RM estimado). Después del básico, dos o tres accesorios a 3 series de 8-12. Al acabar la semana de descarga, el '
+      + 'programa pasa solo al ciclo siguiente.',
+    dias: [
+      { nombre: 'Press militar', ejercicios: [
+        e('Press militar', [programa('531')]), e('Dominadas', series(3, 6, 10)), e('Fondos de tríceps', series(3, 8, 12)),
+      ] },
+      { nombre: 'Peso muerto', ejercicios: [
+        e('Peso muerto', [programa('531')]), e('Zancadas', series(3, 8, 12)), e('Elevaciones de piernas', series(3, 10, 15)),
+      ] },
+      { nombre: 'Press de banca', ejercicios: [
+        e('Press de banca', [programa('531')]), e('Remo con mancuerna', series(3, 8, 12)), e('Press inclinado con mancuernas', series(3, 8, 12)),
+      ] },
+      { nombre: 'Sentadilla', ejercicios: [
+        e('Sentadilla', [programa('531')]), e('Curl femoral tumbado', series(3, 10, 12)), e('Plancha', series(3, 30, 60)),
+      ] },
+    ],
+  },
+  {
     id: 'pesos-libres-cualquier-gimnasio',
     nombre: 'Sin máquinas: igual en cualquier gimnasio',
     autor: 'Propuesta de la app',
     resumen: 'Cuerpo entero en dos días alternos (A y B), solo con barra, mancuernas y tu peso: los kilos valen en cualquier gimnasio.',
     porQue: 'Una barra olímpica y unas mancuernas pesan lo mismo en todas partes; una máquina, no. Si cambias de gimnasio o viajas, '
-      + 'esta rutina no pierde el hilo de tu progresión. Los básicos con barra además trabajan mucho músculo a la vez.',
+      + 'esta rutina no pierde el hilo de tu progresión. Los básicos con barra además trabajan mucho músculo a la vez. Filosofía: lo portátil. Un programa que no dependa de ninguna máquina, para que el historial y la progresión sigan aunque cambies de sitio, apoyado en los básicos con barra, que enseñan a moverse con cargas.',
     comoSeHace: 'Tres días por semana alternando A y B (A-B-A una semana, B-A-B la siguiente). Tres series por ejercicio con doble '
       + 'progresión, acabando a 1-3 del fallo. Estos ejercicios quedan como «igual en todos los sitios».',
     dias: [
@@ -245,7 +296,7 @@ export const PLANTILLAS = [
     autor: 'Propuesta de la app',
     resumen: 'Tres días por semana, dos sesiones alternas (A y B), ejercicios sencillos y seguros para aprender la técnica.',
     porQue: 'Al empezar, entrenar cada músculo tres veces por semana con poco volumen es lo que más rápido hace progresar, y repetir '
-      + 'los mismos movimientos ayuda a aprenderlos. Las máquinas y las mancuernas son más fáciles de controlar que la barra libre.',
+      + 'los mismos movimientos ayuda a aprenderlos. Las máquinas y las mancuernas son más fáciles de controlar que la barra libre. Filosofía: aprender antes que cargar. En los primeros meses casi cualquier cosa funciona; lo que marca la diferencia es la técnica, la constancia y no lesionarse. Por eso hay pocos ejercicios, sencillos y repetidos.',
     comoSeHace: 'Alterna A y B en días no seguidos. Dos o tres series de 8 a 12 repeticiones, dejando 2 en recámara: no hace falta '
       + 'llegar al fallo. Cuando hagas 12 en todas las series, sube un poco el peso. Tras unos meses, pasa a una rutina de 4 días.',
     dias: [
@@ -265,7 +316,7 @@ export const PLANTILLAS = [
     autor: 'Propuesta de la app',
     resumen: 'Solo con tu peso, una barra y unas paralelas (o un parque). Tres días por semana.',
     porQue: 'Para entrenar en casa o en la calle sin material. Se progresa haciendo más repeticiones y pasando a variantes más '
-      + 'difíciles: de flexiones con rodillas a flexiones, de remo invertido a dominadas, de sentadilla a sentadilla a una pierna.',
+      + 'difíciles: de flexiones con rodillas a flexiones, de remo invertido a dominadas, de sentadilla a sentadilla a una pierna. Filosofía: el cuerpo como única carga. Se progresa cambiando la palanca (la variante), no el peso; enseña control corporal y sirve en cualquier sitio.',
     comoSeHace: 'Tres días no seguidos, la misma sesión. Tres series por ejercicio a 1-2 del fallo. Si una variante te sale con más de '
       + '15 repeticiones, pasa a la siguiente; si no llegas a 5, usa la anterior (con rodillas, con goma, con apoyo).',
     dias: [
@@ -298,6 +349,11 @@ function planDesde(ej, forma) {
     plan.objetivoEsfuerzo = forma.objetivo;
     if (plan.progresion.tipo === 'carga') plan.progresion.objetivoEsfuerzo = [...forma.objetivo];
   }
+  if (plan.progresion.tipo === 'programa') {
+    plan.progresion.programa = forma.programa;
+    plan.progresion.inicial = forma.inicial ?? null;
+    plan.progresion.incremento = 2.5;
+  }
   return plan;
 }
 
@@ -323,7 +379,7 @@ export function anadirPlantilla(datos, plantilla) {
     return nuevo.id;
   };
   const rutina = {
-    id: nuevoId('rut'), nombre: plantilla.nombre, activa: !datos.rutinas.some((r) => r.activa),
+    id: nuevoId('rut'), nombre: plantilla.nombre, activa: true, diasSemana: null,
     sedeId: null, plantilla: plantilla.id,
     descripcion: `${plantilla.porQue}\n\n${plantilla.comoSeHace}`,
     dias: plantilla.dias.map((dia) => ({

@@ -3,7 +3,7 @@
 // drop set, las bajadas propuestas.
 
 import {
-  aPasoDeDisco, cargaCorporal, esfuerzoTotal, lecturaDesdeCarga, redondear, rmDeReferencia, sugerenciaSerie,
+  aPesoDisponible, cargaCorporal, esfuerzoTotal, lecturaDesdeCarga, redondear, rmDeReferencia, sugerenciaSerie,
   tramosPropuestos, usaTramos,
 } from './calculos.js';
 import { recamaraDe, tramosDe } from './esquema.js';
@@ -41,7 +41,7 @@ export function crearSerieDesdePlan(datos, ejercicio, plan, { excluirSesion } = 
     const inicio = plan.tramoInicio ?? datos.perfil.dropSet?.inicioPorcentaje ?? null;
     if (serie.carga == null && inicio) {
       const rm = rmDeReferencia(datos, ejercicio, { cicloN: serie.cicloN, excluirSesion });
-      if (rm) serie.carga = aPasoDeDisco((rm.valor * inicio) / 100);
+      if (rm) serie.carga = aPesoDisponible(ejercicio, (rm.valor * inicio) / 100);
     }
     serie.tramos = tramosPropuestos(serie, plan, s.ultima?.serie ?? null, datos.perfil);
     // Cada tramo guarda su porcentaje del 1RM: así, cuando hoy hagas la serie
@@ -50,6 +50,18 @@ export function crearSerieDesdePlan(datos, ejercicio, plan, { excluirSesion } = 
     if (rm) for (const tramo of serie.tramos) if (tramo.carga != null) tramo.pct = redondear((tramo.carga / rm.valor) * 100, 1);
   }
   return serie;
+}
+
+// Un plan de programa (5×5, 5/3/1, HST) mete varias series de golpe, cada
+// una con su peso y sus repeticiones.
+export function seriesDesdePlan(datos, ejercicio, plan, { excluirSesion } = {}) {
+  const base = crearSerieDesdePlan(datos, ejercicio, plan, { excluirSesion });
+  if (plan.progresion?.tipo !== 'programa') return [base];
+  const s = sugerenciaSerie(datos, ejercicio, plan, { excluirSesion });
+  if (!s.seriesPrograma?.length) return [base];
+  return s.seriesPrograma.map((x, k) => ({
+    ...structuredClone(base), id: nuevoId('s'), carga: x.carga, objetivo: x.reps, programaSet: k + 1, amrap: Boolean(x.amrap),
+  }));
 }
 
 export function serieSuelta({ tipo = 'libre', carga = null, tecnicas = [], recamara = null } = {}) {
@@ -66,7 +78,7 @@ export function entradaDeEjercicio(datos, ej, { excluirSesion } = {}) {
   const planes = ej.series?.length ? ej.series : [];
   const entrada = {
     ejercicioId: ej.id, cicloN: null, diaCiclo: null, notas: '',
-    series: planes.map((plan) => crearSerieDesdePlan(datos, ej, plan, { excluirSesion })),
+    series: planes.flatMap((plan) => seriesDesdePlan(datos, ej, plan, { excluirSesion })),
   };
   const bilbo = entrada.series.find((x) => x.cicloN != null);
   if (bilbo) { entrada.cicloN = bilbo.cicloN; entrada.diaCiclo = bilbo.diaCiclo; }
@@ -192,13 +204,13 @@ export function recalcularTramos(datos, ejercicio, entrada, { excluirSesion, ses
     const salto = saltoDeTramo(datos, ejercicio, serie);
     // Los tramos sin porcentaje bajan desde el primero, de salto en salto.
     const primero = serie.tramos[0]?.pct ?? inicio;
-    const base = aPasoDeDisco((rm.valor * primero) / 100);
+    const base = aPesoDisponible(ejercicio, (rm.valor * primero) / 100);
     serie.tramos.forEach((tramo, k) => {
       if (tramo.pct == null) {
         const kilos = tramo.carga ?? Math.max(0, base - salto * k);
         tramo.pct = redondear((kilos / rm.valor) * 100, 1);
       }
-      tramo.carga = aPasoDeDisco((rm.valor * tramo.pct) / 100);
+      tramo.carga = aPesoDisponible(ejercicio, (rm.valor * tramo.pct) / 100);
     });
     serie.carga = serie.tramos[0]?.carga ?? serie.carga;
     serie.rmUsado = rm;

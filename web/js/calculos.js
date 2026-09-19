@@ -1,6 +1,6 @@
 // Cálculos de entrenamiento. Funciones puras: no leen ni guardan nada.
 
-import { TECNICAS, recamaraDe, tramosDe } from './esquema.js';
+import { PROGRAMAS, TECNICAS, recamaraDe, tramosDe } from './esquema.js';
 import { modeloDe, repsParaIgualar, rmDeSerie } from './formula1rm.js';
 
 // Fórmula de Epley, la misma de tus Excel: 1RM = carga × reps × 0,03 + carga.
@@ -123,6 +123,8 @@ export function sugerenciaSerie(datos, ejercicio, plan, { excluirSesion } = {}) 
 
   if (prog.tipo === 'bilbo') return { ...base, ...sugerenciaBilbo(datos, ejercicio, plan, { excluirSesion, sobre }) };
 
+  if (prog.tipo === 'programa') return { ...base, ...sugerenciaPrograma(datos, ejercicio, plan, { excluirSesion }) };
+
   if (prog.tipo === 'maximo-trabajo') {
     return { ...base, ...maximoTrabajo(datos, ejercicio, { excluirSesion, tope: prog.topeEsfuerzo ?? 50 }) };
   }
@@ -132,7 +134,10 @@ export function sugerenciaSerie(datos, ejercicio, plan, { excluirSesion } = {}) 
     if (!ultima) return { ...base, rango: prog.objetivoEsfuerzo, carga: referencia?.serie.carga ?? null };
     const valorUltimo = sobre === 'carga' ? ultima.serie.carga : esfuerzoTotal(ultima.serie);
     const sube = max != null && esfuerzoTotal(ultima.serie) >= max;
-    const siguiente = sube ? redondear((valorUltimo ?? 0) + (prog.incremento || 0)) : valorUltimo;
+    // En una máquina con sus pesos, subir es pasar al siguiente peso que hay.
+    const siguiente = !sube ? valorUltimo
+      : sobre === 'carga' && ejercicio.pesosMaquina?.length ? aPesoDisponible(ejercicio, valorUltimo ?? 0, { hacia: 'arriba' })
+        : redondear((valorUltimo ?? 0) + (prog.incremento || 0));
     return {
       ...base,
       rango: prog.objetivoEsfuerzo,
@@ -149,7 +154,9 @@ export function sugerenciaSerie(datos, ejercicio, plan, { excluirSesion } = {}) 
     if (sobre === 'carga') {
       return {
         ...base,
-        carga: redondear((ultima.serie.carga ?? 0) + (prog.incremento || 2.5)),
+        carga: ejercicio.pesosMaquina?.length
+          ? aPesoDisponible(ejercicio, ultima.serie.carga ?? 0, { hacia: 'arriba' })
+          : redondear((ultima.serie.carga ?? 0) + (prog.incremento || 2.5)),
         esfuerzoObjetivo: esfuerzoTotal(ultima.serie),
       };
     }
@@ -191,10 +198,94 @@ function sugerenciaBilbo(datos, ejercicio, plan, { excluirSesion, sobre }) {
   return { ...resultado, carga: valor, objetivoSuperar };
 }
 
+// ---------------------------------------------------------------------------
+// Programas: 5×5, 5/3/1 y HST
+// ---------------------------------------------------------------------------
+
+// Sesiones ya hechas de este plan desde que se empezó el programa, en orden,
+// con sus series (todas las de la misma sesión juntas).
+function sesionesDelPrograma(datos, ejercicio, plan, { excluirSesion } = {}) {
+  const desde = plan.progresion.desde ?? '';
+  const porSesion = new Map();
+  for (const x of seriesDeEjercicio(datos, ejercicio.id, { excluirSesion, planId: plan.id })) {
+    if (x.sesion.fecha < desde) continue;
+    if (!porSesion.has(x.sesion.id)) porSesion.set(x.sesion.id, []);
+    porSesion.get(x.sesion.id).push(x.serie);
+  }
+  return [...porSesion.values()];
+}
+
+// Las series (peso y repeticiones) que tocan en la sesión n de cada programa.
+export function seriesDelPrograma(ejercicio, prog, n, historial = []) {
+  const inc = prog.incremento || 2.5;
+  const p = (kg) => aPesoDisponible(ejercicio, kg);
+  if (prog.programa === '531') {
+    const semanas = [
+      { pct: [0.65, 0.75, 0.85], reps: [5, 5, 5], nombre: 'semana de 5' },
+      { pct: [0.70, 0.80, 0.90], reps: [3, 3, 3], nombre: 'semana de 3' },
+      { pct: [0.75, 0.85, 0.95], reps: [5, 3, 1], nombre: 'semana 5/3/1' },
+      { pct: [0.40, 0.50, 0.60], reps: [5, 5, 5], nombre: 'descarga' },
+    ];
+    const semana = semanas[n % 4];
+    const tm = (prog.inicial ?? 0) + inc * Math.floor(n / 4);
+    return { nombre: `ciclo ${Math.floor(n / 4) + 1}, ${semana.nombre}`,
+      series: semana.pct.map((x, i) => ({ carga: p(tm * x), reps: semana.reps[i], amrap: i === 2 && n % 4 !== 3 })) };
+  }
+  if (prog.programa === 'hst') {
+    const bloque = Math.floor(n / 6) % 3;
+    const paso = n % 6;
+    const vuelta = Math.floor(n / 18);
+    const rm15 = (prog.inicial ?? 0) + inc * vuelta;
+    const maximos = [rm15, rm15 * 1.15, rm15 * 1.32];
+    const reps = [15, 10, 5][bloque];
+    const carga = p(maximos[bloque] * (0.75 + 0.05 * paso));
+    return { nombre: `bloque de ${reps}, sesión ${paso + 1} de 6`, series: [{ carga, reps }, { carga, reps }] };
+  }
+  // 5×5: sube cuando completas las cinco; tres fallos seguidos, baja un 10 %.
+  let carga = prog.inicial ?? 0;
+  let fallos = 0;
+  for (const series of historial) {
+    const completa = series.length >= 5 && series.every((s) => (esfuerzoTotal(s) ?? 0) >= 5);
+    if (completa) { carga = redondear(carga + inc); fallos = 0; }
+    else if (++fallos >= 3) { carga = p(carga * 0.9); fallos = 0; }
+  }
+  return { nombre: `sesión ${n + 1}`, series: Array.from({ length: 5 }, () => ({ carga: p(carga), reps: 5 })) };
+}
+
+function sugerenciaPrograma(datos, ejercicio, plan, { excluirSesion } = {}) {
+  const prog = plan.progresion;
+  if (!PROGRAMAS[prog.programa] || prog.inicial == null) return { sinPrograma: true, programa: prog.programa };
+  const historial = sesionesDelPrograma(datos, ejercicio, plan, { excluirSesion });
+  const n = historial.length;
+  const toca = seriesDelPrograma(ejercicio, prog, n, historial);
+  return { programa: prog.programa, sesionN: n + 1, nombreSesion: toca.nombre, seriesPrograma: toca.series,
+    carga: toca.series[0]?.carga ?? null, esfuerzoObjetivo: toca.series[0]?.reps ?? null };
+}
+
 // Redondea a medios discos: en el gimnasio no hay 25,6 kg.
 export function aPasoDeDisco(kg, paso = 2.5) {
   if (kg == null) return null;
   return redondear(Math.round(kg / paso) * paso, 2);
+}
+
+// Redondea a un peso que exista de verdad: si el ejercicio está atado a una
+// máquina con sus pesos, al más cercano de ellos (o al siguiente por arriba o
+// por abajo); si no, a medios discos.
+export function aPesoDisponible(ejercicio, kg, { hacia = 'cerca' } = {}) {
+  if (kg == null) return null;
+  const pesos = ejercicio?.pesosMaquina?.length ? [...ejercicio.pesosMaquina].sort((a, b) => a - b) : null;
+  if (!pesos) return aPasoDeDisco(kg);
+  if (hacia === 'arriba') return pesos.find((p) => p > kg + 0.01) ?? pesos.at(-1);
+  if (hacia === 'abajo') return [...pesos].reverse().find((p) => p < kg - 0.01) ?? pesos[0];
+  return pesos.reduce((mejor, p) => (Math.abs(p - kg) < Math.abs(mejor - kg) ? p : mejor), pesos[0]);
+}
+
+// Genera la lista de pesos de una máquina: de `desde` a `hasta` de `paso` en `paso`.
+export function pesosDeMaquina(desde, hasta, paso) {
+  if (!(paso > 0) || desde == null || hasta == null || hasta < desde) return [];
+  const lista = [];
+  for (let p = desde; p <= hasta + 1e-9 && lista.length < 200; p = redondear(p + paso, 3)) lista.push(p);
+  return lista;
 }
 
 // 1RM de referencia para los porcentajes: el mejor del ciclo en curso y, si

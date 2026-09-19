@@ -144,6 +144,15 @@ export function vistaAjustes(contenedor) {
           .sort((a, b) => b.c.ventanas - a.c.ventanas || a.e.nombre.localeCompare(b.e.nombre))
           .map(({ e, c }) => h('li', {}, h('a', { href: `#/ejercicio/${e.id}` }, e.nombre), `: ${textoCalibracion(c)}`))))),
 
+    d.ejercicios.some((e) => e.borrado) && apartado(`Ejercicios borrados (${d.ejercicios.filter((e) => e.borrado).length})`,
+      h('p', { class: 'nota' }, 'Conservan su historial. Recupéralos si borraste alguno sin querer.'),
+      h('ul', { class: 'lista-enlaces' }, d.ejercicios.filter((e) => e.borrado).map((e) => h('li', { class: 'fila-ejercicio' },
+        h('span', {}, e.nombre, h('small', { class: 'suave' }, ` · borrado el ${e.borrado}`)),
+        h('button', { class: 'boton enlace', onclick: () => {
+          estado.cambiar((x) => { const y = x.ejercicios.find((z) => z.id === e.id); if (y) { y.borrado = null; y.archivado = false; } });
+          aviso(`${e.nombre} recuperado.`);
+        } }, 'Recuperar'))))),
+
     apartado('Tutorial',
       h('p', { class: 'nota' }, 'Las notas que explican cada pantalla la primera vez. Se cierran con ✕ y no vuelven, salvo que las reactives aquí.'),
       opciones(NIVELES, nivelTutorial(d) ?? 'basico', (n) => { fijarNivel(n); aviso('Tutorial cambiado'); }),

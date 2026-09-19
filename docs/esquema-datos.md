@@ -451,6 +451,12 @@ El paso 3 no es opcional. Es la red de seguridad.
   también en cada plantilla de serie y en cada ejercicio de un día de rutina
   (null = heredar). La progresión «esfuerzo» admite `sobre: 'carga'` (más
   peso con las mismas repeticiones).
+- **Sin cambio de versión (0.15.0).** Rutinas: `activa` puede ser true en
+  varias a la vez y `diasSemana` (lista de 0 = lunes … 6 = domingo, o null).
+  Ejercicios: `pesosMaquina` (lista de kg disponibles, o null) y `borrado`
+  (fecha, o null; va con `archivado: true`). Progresión `programa`:
+  `{ tipo: 'programa', programa: '5x5' | '531' | 'hst', inicial, incremento,
+  desde }`; sus series llevan `programaSet` (1…n) y `amrap`.
 - **Sin cambio de versión (0.12.0).** `formula1RM` acepta 'personal' y 'peso'
   ('epley' se lee como 'personal'). Las rutinas pueden llevar `descripcion` y
   `plantilla` (id de la rutina prehecha de la que salen), y cada ejercicio de

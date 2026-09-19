@@ -151,6 +151,73 @@ export const CATALOGO = [
   ej('Elevaciones de rodillas en paralelas', 'core', 'paralelas', ['abdomen'], [], corporal),
   ej('Bandera del dragón', 'core', 'banco', ['abdomen'], ['oblicuos', 'lumbar'], corporal),
 
+  // === Ampliación: guía de Ángel7Real y Heavy Duty (Mentzer) ===============
+
+  // --- Antebrazo ----------------------------------------------------------
+  ej('Curl de muñeca con barra', 'tirón', 'barra', ['antebrazo'], []),
+  ej('Sujeción de barra en rack', 'tirón', 'barra', ['antebrazo'], ['trapecio'], { esfuerzo: 'tiempo' }),
+  ej('Jalón con cuerda', 'tirón', 'polea', ['dorsal', 'antebrazo'], ['biceps']),
+
+  // --- Bíceps -------------------------------------------------------------
+  ej('Curl bayesian en polea', 'tirón', 'polea', ['biceps'], ['antebrazo']),
+  ej('Curl araña', 'tirón', 'mancuernas', ['biceps'], []),
+  ej('Curl predicador en polea', 'tirón', 'polea', ['biceps'], ['antebrazo']),
+  ej('Jalón supino', 'tirón', 'polea', ['dorsal', 'biceps'], ['antebrazo']),
+
+  // --- Tríceps ------------------------------------------------------------
+  ej('JM press en multipower', 'empuje', 'multipower', ['triceps'], ['pecho', 'hombro']),
+  ej('Extensión de tríceps unilateral en polea', 'empuje', 'polea', ['triceps'], []),
+  ej('Extensión de tríceps tipo katana', 'empuje', 'polea', ['triceps'], []),
+  ej('Patada de tríceps en polea', 'empuje', 'polea', ['triceps'], []),
+
+  // --- Hombro -------------------------------------------------------------
+  ej('Press de hombro en multipower', 'empuje', 'multipower', ['hombro'], ['triceps', 'trapecio']),
+  ej('Press tras nuca', 'empuje', 'barra', ['hombro'], ['triceps', 'trapecio']),
+  ej('Elevaciones laterales en máquina', 'empuje', 'máquina', ['hombro'], []),
+  ej('Pájaros en polea', 'tirón', 'polea', ['hombroPosterior'], ['trapecio']),
+  ej('Pull apart en polea', 'tirón', 'polea', ['hombroPosterior'], ['trapecio']),
+  ej('Remo abierto en polea', 'tirón', 'polea', ['hombroPosterior'], ['trapecio', 'dorsal']),
+
+  // --- Espalda y trapecio -------------------------------------------------
+  ej('Jalón unilateral en polea', 'tirón', 'polea', ['dorsal'], ['biceps']),
+  ej('Jalón tras nuca', 'tirón', 'polea', ['dorsal'], ['trapecio', 'biceps']),
+  ej('Dominadas tras nuca', 'tirón', 'barra fija', ['dorsal'], ['trapecio', 'biceps'], corporal),
+  ej('Remo unilateral en polea', 'tirón', 'polea', ['dorsal'], ['biceps', 'hombroPosterior']),
+  ej('Pullover con mancuerna', 'tirón', 'mancuerna', ['dorsal'], ['pecho', 'triceps']),
+  ej('Pullover en máquina', 'tirón', 'máquina', ['dorsal'], ['triceps']),
+  ej('Encogimientos de trapecio con barra', 'tirón', 'barra', ['trapecio'], ['antebrazo']),
+
+  // --- Pecho --------------------------------------------------------------
+  ej('Press de banca en multipower', 'empuje', 'multipower', ['pecho'], ['triceps', 'hombro']),
+  ej('Press convergente en máquina', 'empuje', 'máquina', ['pecho'], ['triceps', 'hombro']),
+  ej('Press unilateral en polea', 'empuje', 'polea', ['pecho'], ['triceps', 'hombro']),
+  ej('Cruces en polea baja', 'empuje', 'polea', ['pecho'], ['hombro']),
+  ej('Cruces en polea sentado', 'empuje', 'polea', ['pecho'], ['hombro']),
+  ej('Fondos de pecho', 'empuje', 'paralelas', ['pecho'], ['triceps', 'hombro'], corporal),
+
+  // --- Isquios y glúteo ---------------------------------------------------
+  ej('Peso muerto piernas rígidas', 'pierna', 'barra', ['isquios'], ['gluteo', 'lumbar']),
+  ej('Curl femoral de pie', 'pierna', 'máquina', ['isquios'], []),
+  ej('Hip thrust en máquina', 'pierna', 'máquina', ['gluteo'], ['isquios']),
+  ej('Hiperextensiones inversas', 'pierna', 'banco', ['gluteo'], ['isquios', 'lumbar'], corporal),
+  ej('Pull through en polea', 'pierna', 'polea', ['gluteo'], ['isquios', 'lumbar']),
+
+  // --- Gemelo -------------------------------------------------------------
+  ej('Elevación de gemelos en multipower', 'pierna', 'multipower', ['gemelo'], []),
+  ej('Elevación de gemelos en prensa', 'pierna', 'máquina', ['gemelo'], []),
+  ej('Elevación de gemelos tipo burro', 'pierna', 'máquina', ['gemelo'], []),
+
+  // --- Abdomen y oblicuos -------------------------------------------------
+  ej('Crunch en suelo', 'core', 'suelo', ['abdomen'], [], corporal),
+  ej('Crunch lastrado', 'core', 'disco', ['abdomen'], []),
+  ej('Plancha dinámica', 'core', 'peso corporal', ['abdomen'], ['oblicuos', 'hombro'], corporal),
+  ej('Plancha con arrastre de kettlebell', 'core', 'kettlebell', ['abdomen'], ['oblicuos', 'hombro']),
+  ej('Giros en landmine', 'core', 'landmine', ['oblicuos'], ['abdomen', 'hombro']),
+  ej('Inclinaciones laterales con mancuerna', 'core', 'mancuerna', ['oblicuos'], ['abdomen']),
+
+  // --- Cardio -------------------------------------------------------------
+  ej('Escalador', 'cardio', 'máquina', ['cuadriceps'], ['gluteo', 'gemelo'], { ...sinCarga, distancia: true }),
+
   // --- Cuello -------------------------------------------------------------
   ej('Flexión de cuello con disco', 'core', 'disco', ['cuello'], []),
   ej('Extensión de cuello con arnés', 'core', 'arnés', ['cuello'], ['trapecio']),

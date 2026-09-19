@@ -16,6 +16,66 @@ export function rutinaActiva(datos) {
   return datos.rutinas.find((r) => r.activa && r.dias.length) ?? null;
 }
 
+// Puede haber varias rutinas activas a la vez (una de gimnasio y otra de
+// casa, por ejemplo).
+export function rutinasActivas(datos) {
+  return datos.rutinas.filter((r) => r.activa && r.dias.length);
+}
+
+export const DIAS_SEMANA = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+export const NOMBRES_DIAS = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
+
+// Qué toca hoy entre las rutinas activas. Dos formas de repartir, que se
+// pueden mezclar:
+//   · una rutina con días fijos de la semana (diasSemana: 0 = lunes … 6 =
+//     domingo) toca en esos días y solo en esos;
+//   · las que no los tienen, las propone la app: la de su próximo día con
+//     los músculos más recuperados y, en empate, la que lleve más tiempo
+//     sin hacerse.
+// Devuelve { rutina, dia, motivo, alternativas } o null.
+export function queToca(datos, recuperacion = null, ahora = new Date()) {
+  const activas = rutinasActivas(datos);
+  if (!activas.length) return null;
+  const hoyIndice = (ahora.getDay() + 6) % 7;
+  const conDias = activas.filter((r) => r.diasSemana?.length);
+  const libres = activas.filter((r) => !r.diasSemana?.length);
+  const opcion = (rutina, motivo) => ({ rutina, dia: proximoDia(datos, rutina), motivo });
+  const alternativas = activas.map((r) => opcion(r, ''));
+
+  const deHoy = conDias.find((r) => r.diasSemana.includes(hoyIndice));
+  if (deHoy) return { ...opcion(deHoy, `hoy es ${NOMBRES_DIAS[hoyIndice]}`), alternativas };
+
+  if (libres.length) {
+    const puntuacion = (r) => {
+      const dia = proximoDia(datos, r);
+      const musculos = new Set();
+      for (const item of dia.ejercicios) {
+        const ej = datos.ejercicios.find((e) => e.id === item.ejercicioId);
+        for (const m of ej?.musculos?.principales ?? []) musculos.add(m);
+      }
+      const pct = [...musculos].map((m) => recuperacion?.[m]?.porcentaje ?? 100);
+      const minimo = pct.length ? Math.min(...pct) : 100;
+      const ultima = datos.sesiones.filter((s) => !s.borrada && s.rutinaId === r.id).map((s) => s.fecha).sort().at(-1) ?? '';
+      return { minimo, ultima };
+    };
+    const ordenadas = libres.map((r) => ({ r, ...puntuacion(r) }))
+      .sort((a, b) => b.minimo - a.minimo || a.ultima.localeCompare(b.ultima));
+    const mejor = ordenadas[0];
+    const motivo = libres.length > 1
+      ? (mejor.minimo >= 90 ? 'sus músculos están recuperados' : 'es la que mejor recuperada tienes')
+      : '';
+    return { ...opcion(mejor.r, motivo), alternativas };
+  }
+
+  // Todas tienen días fijos y hoy no toca ninguna: la más próxima.
+  const proxima = conDias.map((r) => {
+    const faltan = Math.min(...r.diasSemana.map((d) => (d - hoyIndice + 7) % 7 || 7));
+    return { r, faltan };
+  }).sort((a, b) => a.faltan - b.faltan)[0];
+  const cuando = proxima.faltan === 1 ? 'mañana' : `el ${NOMBRES_DIAS[(hoyIndice + proxima.faltan) % 7]}`;
+  return { ...opcion(proxima.r, `hoy no toca según tus días; la siguiente es ${cuando}`), descansoHoy: true, alternativas };
+}
+
 // Día que toca: el siguiente al del último entrenamiento terminado de esa rutina.
 export function proximoDia(datos, rutina) {
   const hechas = datos.sesiones
@@ -40,7 +100,7 @@ export function empezarDia(rutina, dia, crearSerie) {
       if (!ej || ej.archivado) continue;
       const planes = (ej.series || []).filter((p) => !item.series || item.series.includes(p.id));
       const entrada = { ejercicioId: ej.id, cicloN: null, diaCiclo: null, notas: '',
-        series: planes.map((plan) => crearSerie(datos, ej, plan, id)) };
+        series: planes.flatMap((plan) => { const s = crearSerie(datos, ej, plan, id); return Array.isArray(s) ? s : [s]; }) };
       const bilbo = entrada.series.find((x) => x.cicloN != null);
       if (bilbo) { entrada.cicloN = bilbo.cicloN; entrada.diaCiclo = bilbo.diaCiclo; }
       sesion.ejercicios.push(entrada);
@@ -64,15 +124,25 @@ export function vistaRutinas(contenedor) {
       + 'Abajo tienes rutinas prehechas para empezar sin montar nada.'),
     !d.rutinas.length && h('p', { class: 'suave' },
       'Una rutina son tus días de entrenamiento en orden. La app te propondrá el siguiente cada vez que entrenes.'),
-    d.rutinas.map((r) => h('a', { class: 'tarjeta fila-enlace', href: `#/rutina/${r.id}` },
-      h('div', {},
-        h('strong', {}, r.nombre),
-        h('div', { class: 'suave' }, r.dias.map((x) => x.nombre).join(' · ') || 'Sin días')),
-      r.activa && h('span', { class: 'etiqueta' }, 'Activa'))),
+
+    d.rutinas.some((r) => r.activa) && h('h2', {}, 'Activas'),
+    d.rutinas.filter((r) => r.activa).map((r) => tarjetaRutina(r)),
+    d.rutinas.some((r) => !r.activa) && h('h2', {}, 'Mías, sin activar'),
+    d.rutinas.filter((r) => !r.activa).map((r) => tarjetaRutina(r)),
 
     h('h2', {}, 'Rutinas prehechas'),
     h('p', { class: 'nota' }, 'Añádelas a tus rutinas si te encajan; si no, ignóralas. Sus ejercicios se crean solo si no los tienes ya.'),
     PLANTILLAS.map((p) => tarjetaPlantilla(d, p)));
+}
+
+function tarjetaRutina(r) {
+  const dias = r.diasSemana?.length ? r.diasSemana.map((i) => DIAS_SEMANA[i]).join(' ') : null;
+  return h('a', { class: 'tarjeta fila-enlace', href: `#/rutina/${r.id}` },
+    h('div', {},
+      h('strong', {}, r.nombre),
+      h('div', { class: 'suave' }, r.dias.map((x) => x.nombre).join(' · ') || 'Sin días'),
+      dias && h('div', { class: 'suave' }, `Días fijos: ${dias}`)),
+    r.activa && h('span', { class: 'etiqueta' }, 'Activa'));
 }
 
 function tarjetaPlantilla(d, plantilla) {
@@ -113,7 +183,7 @@ export function vistaFormularioRutina(contenedor, { id }) {
     return;
   }
   const borrador = existente ? structuredClone(existente) : {
-    id: nuevoId('rut'), nombre: '', activa: !d.rutinas.some((r) => r.activa), dias: [],
+    id: nuevoId('rut'), nombre: '', activa: true, dias: [], diasSemana: null,
   };
   const nombreEj = (ejId) => d.ejercicios.find((e) => e.id === ejId)?.nombre ?? 'Ejercicio borrado';
   let creada = Boolean(existente);
@@ -124,7 +194,6 @@ export function vistaFormularioRutina(contenedor, { id }) {
     estado.cambiar((datos) => {
       const copia = structuredClone(borrador);
       copia.nombre = copia.nombre.trim();
-      if (copia.activa) for (const r of datos.rutinas) if (r.id !== copia.id) r.activa = false;
       const i = datos.rutinas.findIndex((r) => r.id === copia.id);
       if (i >= 0) datos.rutinas[i] = copia;
       else datos.rutinas.push(copia);
@@ -155,8 +224,22 @@ export function vistaFormularioRutina(contenedor, { id }) {
 
       h('label', { class: 'casilla' },
         h('input', { type: 'checkbox', checked: borrador.activa,
-          onchange: (e) => { borrador.activa = e.target.checked; } }),
-        'Rutina activa: es la que propone la app al empezar'),
+          onchange: (e) => { borrador.activa = e.target.checked; persistir(); } }),
+        'Rutina activa: Hoy te la propone (puedes tener varias activas)'),
+
+      borrador.activa && h('div', { class: 'campo' },
+        h('span', { class: 'etiqueta-campo' }, 'Días fijos de la semana (opcional)'),
+        h('div', { class: 'tecnicas' }, DIAS_SEMANA.map((letra, i) => h('button', {
+          type: 'button', class: `chip seleccionable ${borrador.diasSemana?.includes(i) ? 'activo' : ''}`,
+          'aria-pressed': String(Boolean(borrador.diasSemana?.includes(i))), 'aria-label': NOMBRES_DIAS[i],
+          onclick: () => {
+            const dias = new Set(borrador.diasSemana ?? []);
+            if (dias.has(i)) dias.delete(i); else dias.add(i);
+            borrador.diasSemana = dias.size ? [...dias].sort() : null;
+            repintar();
+          } }, letra))),
+        h('small', { class: 'nota' }, 'Sin días fijos, la app propone esta rutina cuando sus músculos están recuperados. '
+          + 'Con días fijos, solo esos días. Sirve para combinar dos rutinas activas: una con días fijos y otra libre, por ejemplo.')),
 
       sedesActivas(d).length > 0 && campo('Dónde se hace', h('select', {
         onchange: (e) => { borrador.sedeId = e.target.value || null; } },

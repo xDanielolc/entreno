@@ -47,9 +47,9 @@ export function ejercicioEnSede(ej, sedeId) {
 // Parte un ejercicio «igual en todos los sitios» en uno por sitio. El
 // original se queda con el primer sitio (y con lo que no tenga sitio); las
 // copias, con el resto. Cambia `datos` directamente (dentro de estado.cambiar).
-export function separarPorSede(datos, ejercicioId) {
+export function separarPorSede(datos, ejercicioId, sedeIds = null) {
   const original = datos.ejercicios.find((e) => e.id === ejercicioId);
-  const sedes = sedesActivas(datos);
+  const sedes = sedesActivas(datos).filter((s) => !sedeIds || sedeIds.includes(s.id));
   if (!original || original.sedeId || sedes.length < 2) return 0;
   const copias = new Map([[sedes[0].id, original]]);
   original.sedeId = sedes[0].id;

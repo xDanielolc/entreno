@@ -114,3 +114,12 @@ las series saltadas también sin rutina, peso corporal automático con fracción
 «A más cada vez» en repeticiones o en peso, sin Bilbo en series de intensidad,
 bajadas ocultas con pesos fijos, aviso en Hoy de cuándo toca (músculos aún
 tocados y días parado).
+0.15.0: varias rutinas activas con `queToca()` (días fijos de la semana o
+propuesta por recuperación; `diasSemana` en la rutina), explicación de la
+rutina visible en Hoy, Rutinas en activas / mías / prehechas, +45 ejercicios
+de la guía de Ángel7Real y Mentzer (catálogo 174), borrar ejercicio (blando:
+`borrado`, se recupera en Ajustes; sin historial se elimina), máquinas con sus
+pesos (`pesosMaquina`, `aPesoDisponible()` en drop sets, doble progresión,
+ciclos), separar por sitio eligiendo sitios, progresión «programa» (5×5,
+5/3/1, HST: `PROGRAMAS`, `seriesDelPrograma`, un plan genera varias series con
+`programaSet`), rutinas prehechas 5×5 y 5/3/1 y filosofía en todas.
