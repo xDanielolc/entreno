@@ -8,6 +8,7 @@ import {
 } from '../esquema.js';
 import { tramosPorDefecto } from '../calculos.js';
 import { EXPLICACIONES_1RM, FORMULAS, calibrar, estimar1RM, modeloDe, textoCalibracion } from '../formula1rm.js';
+import { FRACCION_CORPORAL_POR_NOMBRE } from '../esquema.js';
 import { CATALOGO, esMaquinaDePlacas, normalizar, tipoDeEjercicio } from '../catalogo.js';
 import { ORDEN_MUSCULOS, nombreMusculo } from '../musculos.js';
 import { entradaDeEjercicio } from '../series.js';
@@ -15,6 +16,7 @@ import { nombreSede, sedesActivas, separarPorSede } from '../sedes.js';
 import { seccionProgreso } from './graficas.js';
 import { imagenDe, textoCredito } from '../imagenes.js';
 import { anadir, aviso, confirmar, h, leerNumero, nuevoId } from '../ui.js';
+import { pista } from './tutorial.js';
 import { barraFiltros, cajaLista, elegirEjercicio, filtrar, tarjetaItem } from './selector-ejercicios.js';
 import { selectorTecnicas } from './tecnicas.js';
 
@@ -37,6 +39,8 @@ export function vistaEjercicios(contenedor) {
       h('h1', {}, 'Ejercicios'),
       h('a', { class: 'boton', href: '#/ejercicio/nuevo' }, '+ Nuevo')),
 
+    pista('ejercicios-lista', 'Cada ejercicio guarda cómo progresa: tócalo para cambiar sus series, técnicas y músculos. '
+      + 'Con «+ Nuevo» eliges uno de la lista general o lo creas a mano.'),
     d.ejercicios.length > 0 && barraFiltros(() => pintarLista()),
 
     zona,
@@ -211,7 +215,8 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
           'Máquina de placas o polea: los pesos van de placa en placa y se pueden fijar en los drop sets'),
         borrador.carga.tipo === 'asistida' && h('p', { class: 'nota' },
           peso ? `Apuntarás los kilos que marca la máquina; la carga real es tu peso (${formatearNumero(peso)} kg) menos esa ayuda.`
-            : 'Indica tu peso corporal en Ajustes para calcular la carga real.')),
+            : 'Indica tu peso corporal en Ajustes para calcular la carga real.'),
+        borrador.carga.tipo === 'pesoCorporal' && campoFraccionCorporal()),
 
       h('fieldset', {},
         h('legend', {}, '¿Qué apuntas en cada serie?'),
@@ -223,12 +228,14 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
 
       borrador.carga.tipo !== 'ninguna' && seccionFormula(),
 
-      h('fieldset', {},
-        h('legend', {}, '¿Qué músculos trabaja?'),
-        h('p', { class: 'nota' }, 'Sirve para el mapa de recuperación y para los avisos de volumen. '
-          + 'Los secundarios cuentan la mitad.'),
+      h('details', { class: 'tarjeta explicacion desplegable-musculos', open: !borrador.musculos.principales.length || undefined },
+        h('summary', {}, borrador.musculos.principales.length
+          ? `Músculos: ${borrador.musculos.principales.map((m) => nombreMusculo(m, { corto: true })).join(', ')}`
+            + (borrador.musculos.secundarios.length ? ` (y ${borrador.musculos.secundarios.map((m) => nombreMusculo(m, { corto: true })).join(', ')})` : '')
+          : '⚠ Músculos: sin marcar'),
         !borrador.musculos.principales.length && h('p', { class: 'aviso-texto' },
           'Sin músculo principal, este ejercicio no aparecerá en el mapa de recuperación ni en el volumen semanal.'),
+        h('p', { class: 'nota' }, 'Sirve para el mapa de recuperación y para los avisos de volumen. Los secundarios cuentan la mitad.'),
         sugerenciaDelCatalogo(),
         selectorMusculos('Principales', borrador.musculos.principales, borrador.musculos.secundarios),
         selectorMusculos('Secundarios', borrador.musculos.secundarios, borrador.musculos.principales)),
@@ -274,6 +281,21 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         borrador.archivado ? 'Recuperar ejercicio' : 'Archivar ejercicio'));
   }
 
+  // Peso corporal: qué parte de tu peso levantas. En cada serie solo se
+  // apunta el lastre; la carga sale sola.
+  function campoFraccionCorporal() {
+    borrador.fraccionCorporal ??= FRACCION_CORPORAL_POR_NOMBRE(borrador.nombre);
+    const pct = Math.round(borrador.fraccionCorporal * 100);
+    return h('div', { class: 'campo' },
+      h('span', { class: 'etiqueta-campo' }, 'Qué parte de tu peso levantas (%)'),
+      numeroInput(pct, (v) => { borrador.fraccionCorporal = v != null ? Math.max(1, Math.min(200, v)) / 100 : 1; }),
+      h('small', { class: 'nota' }, peso
+        ? `Con tu peso (${formatearNumero(peso)} kg) la carga de cada serie sale sola: ${formatearNumero(Math.round(peso * borrador.fraccionCorporal))} kg, `
+          + 'más el lastre que apuntes. En flexiones normales es un 64 % (Ebben 2011); con rodillas, 49 %; con los pies en alto, 74 %. '
+          + 'En dominadas o fondos, el 100 %.'
+        : 'Pon tu peso corporal en Ajustes para que la carga salga sola.'));
+  }
+
   // Grupo: un desplegable con los habituales y los tuyos, más «Otro…» para
   // escribir uno nuevo.
   function campoGrupo() {
@@ -305,11 +327,15 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
     const explicacion = estadoCalibracion ? textoCalibracion(estadoCalibracion) : null;
     const ejemplo = modelo && [[60, 20], [80, 8]].map(([p, r]) => `${p} kg × ${r} ≈ ${Math.round(estimar1RM(modelo, p, r, 1))} kg`).join(' · ');
     return h('fieldset', {},
-      h('legend', {}, '¿Cómo se calcula el 1RM?'),
+      h('legend', {}, 'Fórmula del 1RM'),
       opciones(FORMULAS, borrador.formula1RM, (f) => { borrador.formula1RM = f; repintar(); }),
-      explicacion && h('p', { class: 'nota' }, explicacion),
-      ejemplo && h('p', { class: 'nota' }, `Ejemplo con 1 en recámara: ${ejemplo}.`),
-      explicaciones1RM());
+      pista('ficha-formula', 'El 1RM es el peso que podrías levantar una sola vez. La app lo estima a partir de cada serie '
+        + 'y con él propone pesos. «Se ajusta a ti» corrige la fórmula con tus propias series.', { avanzada: true }),
+      h('details', { class: 'explicacion' },
+        h('summary', {}, 'Saber más'),
+        explicacion && h('p', { class: 'nota' }, explicacion),
+        ejemplo && h('p', { class: 'nota' }, `Ejemplo con 1 en recámara: ${ejemplo}.`),
+        explicaciones1RM()));
   }
 
   // Si el ejercicio se llama como uno del catálogo, se ofrecen sus músculos.
@@ -376,8 +402,14 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
             repintar();
           } }, '🗑')),
 
-      campo('Tipo', h('select', { onchange: (e) => { plan.tipo = e.target.value; repintar(); } },
-        Object.entries(TIPOS_SERIE).map(([k, v]) => h('option', { value: k, selected: k === plan.tipo }, v)))),
+      campo('Tipo', h('select', { onchange: (e) => {
+        plan.tipo = e.target.value;
+        // Una serie de intensidad no sigue un ciclo Bilbo; una Bilbo, sí.
+        if (plan.tipo === 'intensidad' && plan.progresion.tipo === 'bilbo') plan.progresion = progresionPorDefecto('libre', borrador);
+        if (plan.tipo === 'bilbo' && plan.progresion.tipo !== 'bilbo') plan.progresion = progresionPorDefecto('bilbo', borrador);
+        repintar();
+      } },
+      Object.entries(TIPOS_SERIE).map(([k, v]) => h('option', { value: k, selected: k === plan.tipo }, v)))),
 
       h('div', { class: 'campo' },
         h('span', { class: 'etiqueta-campo' }, 'Técnicas'),
@@ -392,13 +424,23 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
 
       h('div', { class: 'campo' },
         h('span', { class: 'etiqueta-campo' }, 'Progresión'),
-        opciones(TIPOS_PROGRESION, plan.progresion.tipo, (tipo) => {
+        opciones(progresionesPara(plan), plan.progresion.tipo, (tipo) => {
           if (tipo !== plan.progresion.tipo) plan.progresion = progresionPorDefecto(tipo, borrador);
           repintar();
         }, { compacto: true }),
         h('small', { class: 'nota' }, TIPOS_PROGRESION[plan.progresion.tipo].descripcion)),
 
       detalleProgresion(plan));
+  }
+
+  // Qué progresiones puede llevar una serie según su tipo: la Bilbo solo en
+  // series Bilbo (en una de intensidad no tiene sentido).
+  function progresionesPara(plan) {
+    if (plan.tipo === 'intensidad') {
+      const { bilbo, ...resto } = TIPOS_PROGRESION;
+      return resto;
+    }
+    return TIPOS_PROGRESION;
   }
 
   // Cómo se rellenan los tramos cada vez que el ejercicio entra en un
@@ -413,16 +455,28 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         + (defecto.reps ? ` de ${defecto.reps} repeticiones` : '') + (defecto.salto ? `, bajando ${defecto.salto} kg` : '') + '.' },
       plantilla: { etiqueta: 'Lo de aquí', descripcion: 'Los valores que pongas debajo, siempre.' },
     };
+    const fijos = Boolean(plan.tramosFijos?.length);
+    const modosCarga = {
+      '': { etiqueta: 'Lo de Ajustes', descripcion: '' },
+      rm: { etiqueta: '% del 1RM', descripcion: '' },
+      kg: { etiqueta: 'Kilos a mano', descripcion: '' },
+    };
     return h('div', { class: 'campo' },
-      h('span', { class: 'etiqueta-campo' }, `${tramos.nombre}s: de dónde salen cada vez`),
-      opciones(modos, plan.tramosModo, (modo) => { plan.tramosModo = modo; repintar(); }),
-      plan.tramosModo === 'plantilla' && h('div', { class: 'fila-campos' },
+      !fijos && h('span', { class: 'etiqueta-campo' }, `${tramos.nombre}s: de dónde salen cada vez`),
+      !fijos && opciones(modos, plan.tramosModo, (modo) => { plan.tramosModo = modo; repintar(); }),
+      !fijos && plan.tramosModo === 'plantilla' && h('div', { class: 'fila-campos' },
         campo(`${tramos.nombre}s`, numeroInput(plan.tramosPrevistos ?? defecto.tramos,
           (v) => { plan.tramosPrevistos = v == null ? null : Math.max(1, Math.round(v)); })),
         tramos.tecnica !== 'drop-set' && campo('Repeticiones por miniserie',
           numeroInput(plan.tramoReps ?? defecto.reps, (v) => { plan.tramoReps = v; }))),
-      tramos.salto > 0 && h('div', { class: 'fila-campos' },
+      !fijos && tramos.salto > 0 && h('div', { class: 'fila-campos' },
         campo('Se baja cada vez (kg)', numeroInput(plan.tramoSalto ?? defecto.salto, (v) => { plan.tramoSalto = v; }))),
+      !fijos && tramos.tecnica === 'drop-set' && h('div', { class: 'campo' },
+        h('span', { class: 'etiqueta-campo' }, 'Los pesos del drop set, por'),
+        opciones(modosCarga, plan.modoCarga ?? '', (m) => { plan.modoCarga = m || null; repintar(); }, { compacto: true }),
+        h('small', { class: 'nota' }, 'Por % del 1RM, los kilos se recalculan con lo que hagas ese día en la serie de arriba; '
+          + 'a mano, se quedan como los dejes. Se puede cambiar también en cada rutina y en cada serie del día.')),
+      fijos && h('p', { class: 'nota' }, 'Con pesos fijos, cada drop set sale con estos pesos y no hace falta nada más.'),
       tramos.tecnica === 'drop-set' && campo('Pesos fijos (máquina de placas)',
         h('input', { type: 'text', placeholder: 'Por ejemplo: 50 42,5 35 27,5',
           value: (plan.tramosFijos || []).map((p) => formatearNumero(p)).join(' '),
@@ -474,8 +528,20 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         h('small', { class: 'nota' }, `Al llegar al máximo sube ${queSube}.`));
     }
     if (p.tipo === 'esfuerzo') {
-      return campo(`Aumento cada vez (${TIPOS_ESFUERZO[borrador.esfuerzo.tipo].unidad})`,
-        numeroInput(p.incremento, (v) => { p.incremento = v; }));
+      const conCarga = borrador.carga.tipo !== 'ninguna';
+      const formas = {
+        esfuerzo: { etiqueta: `Más ${TIPOS_ESFUERZO[borrador.esfuerzo.tipo].etiqueta.toLowerCase()}`, descripcion: 'Con el mismo peso.' },
+        carga: { etiqueta: 'Más peso', descripcion: `Con ${TIPOS_ESFUERZO[borrador.esfuerzo.tipo].etiqueta.toLowerCase()} iguales.` },
+      };
+      const actual = conCarga && p.sobre === 'carga' ? 'carga' : 'esfuerzo';
+      return h('div', {},
+        conCarga && opciones(formas, actual, (f) => {
+          p.sobre = f;
+          p.incremento = f === 'carga' ? 2.5 : 1;
+          repintar();
+        }),
+        campo(`Aumento cada vez (${actual === 'carga' ? TIPOS_CARGA[borrador.carga.tipo].unidad : TIPOS_ESFUERZO[borrador.esfuerzo.tipo].unidad})`,
+          numeroInput(p.incremento, (v) => { p.incremento = v; })));
     }
     return null;
   }

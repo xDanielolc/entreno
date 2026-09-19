@@ -1,4 +1,4 @@
-# Esquema de datos — versión 9
+# Esquema de datos — versión 10
 
 > Las secciones de abajo describen la versión 3. Los cambios posteriores están
 > resumidos en «Cambios desde la versión 3», al final del apartado 9, y en
@@ -442,6 +442,15 @@ El paso 3 no es opcional. Es la red de seguridad.
   sede lleva `tipo` (gimnasio, casa, calle, otro) y las rutinas `sedeId`. En
   las series con tramos, `modoCarga` ('rm' o 'kg'), `rmUsado` y en cada tramo
   `pct` (porcentaje del 1RM); desaparecen `cargaAutomatica` y `rellenoDesde`.
+- **v10.** `perfil.tutoriales = { nivel: 'basico' | 'avanzado' | 'ninguno' | null,
+  vistos: { clave: true } }`, `perfil.modoEntreno` ('serie' | 'ejercicio' |
+  'todo'), `perfil.dropSet.modoCarga` ('rm' | 'kg'; sustituye a
+  `autoRellenar`, que se conserva). En cada ejercicio de peso corporal,
+  `fraccionCorporal` (parte del peso que se levanta: flexiones 0,64) y en sus
+  series `lastre` (kg; null = la carga se escribió a mano). `modoCarga`
+  también en cada plantilla de serie y en cada ejercicio de un día de rutina
+  (null = heredar). La progresión «esfuerzo» admite `sobre: 'carga'` (más
+  peso con las mismas repeticiones).
 - **Sin cambio de versión (0.12.0).** `formula1RM` acepta 'personal' y 'peso'
   ('epley' se lee como 'personal'). Las rutinas pueden llevar `descripcion` y
   `plantilla` (id de la rutina prehecha de la que salen), y cada ejercicio de

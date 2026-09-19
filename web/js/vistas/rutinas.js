@@ -10,6 +10,7 @@ import { anadir, aviso, confirmar, h, hoyISO, nuevoId } from '../ui.js';
 import { campo } from './ejercicios.js';
 import { ejercicioDesdeCatalogo, elegirEjercicio as abrirSelector } from './selector-ejercicios.js';
 import { PLANTILLAS, anadirPlantilla, ejerciciosNuevos } from '../plantillas.js';
+import { pista } from './tutorial.js';
 
 export function rutinaActiva(datos) {
   return datos.rutinas.find((r) => r.activa && r.dias.length) ?? null;
@@ -59,6 +60,8 @@ export function vistaRutinas(contenedor) {
     h('div', { class: 'cabecera-vista' },
       h('h1', {}, 'Rutinas'),
       h('a', { class: 'boton', href: '#/rutina/nueva' }, '+ Nueva')),
+    pista('rutinas', 'Una rutina son tus días de entrenamiento en orden. La activa es la que te propone Hoy. '
+      + 'Abajo tienes rutinas prehechas para empezar sin montar nada.'),
     !d.rutinas.length && h('p', { class: 'suave' },
       'Una rutina son tus días de entrenamiento en orden. La app te propondrá el siguiente cada vez que entrenes.'),
     d.rutinas.map((r) => h('a', { class: 'tarjeta fila-enlace', href: `#/rutina/${r.id}` },
@@ -189,7 +192,12 @@ export function vistaFormularioRutina(contenedor, { id }) {
 
       dia.ejercicios.map((item, j) => h('div', { class: 'fila-ejercicio' },
         h('span', {}, nombreEj(item.ejercicioId), item.opcional && h('small', { class: 'suave' }, ' (opcional)'),
-          item.nota && h('small', { class: 'suave bloque' }, item.nota)),
+          item.nota && h('small', { class: 'suave bloque' }, item.nota),
+          tieneDropSet(item.ejercicioId) && h('select', { class: 'modo-carga-item', 'aria-label': 'Pesos del drop set en esta rutina',
+            onchange: (e) => { item.modoCarga = e.target.value || null; persistir(); } },
+          h('option', { value: '', selected: !item.modoCarga }, 'Drop set: como en el ejercicio'),
+          h('option', { value: 'rm', selected: item.modoCarga === 'rm' }, 'Drop set: por % del 1RM'),
+          h('option', { value: 'kg', selected: item.modoCarga === 'kg' }, 'Drop set: kilos a mano'))),
         h('button', { type: 'button', class: 'boton-icono', 'aria-label': 'Subir', disabled: j === 0,
           onclick: () => { dia.ejercicios.splice(j - 1, 0, dia.ejercicios.splice(j, 1)[0]); repintar(); } }, '↑'),
         h('button', { type: 'button', class: 'boton-icono', 'aria-label': 'Bajar', disabled: j === dia.ejercicios.length - 1,
@@ -210,6 +218,10 @@ export function vistaFormularioRutina(contenedor, { id }) {
       alElegirMio: (e) => anadirAlDia(dia, e.id),
       alElegirCatalogo: (x) => desdeCatalogo(dia, x),
     });
+  }
+
+  function tieneDropSet(ejercicioId) {
+    return (d.ejercicios.find((e) => e.id === ejercicioId)?.series || []).some((p) => (p.tecnicas || []).includes('drop-set'));
   }
 
   function anadirAlDia(dia, ejercicioId) {

@@ -11,6 +11,7 @@ import {
 } from '../recuperacion.js';
 import { recomendacionesGenerales } from '../recomendaciones.js';
 import { anadir, aviso, h, hoyISO } from '../ui.js';
+import { pista } from './tutorial.js';
 
 // Referencias de volumen semanal por músculo (ver Ajustes → De dónde sale cada cosa).
 const SERIES_MINIMAS = 10;
@@ -124,6 +125,8 @@ export function vistaCuerpo(contenedor) {
 
   anadir(contenedor,
     h('h1', {}, 'Tu cuerpo'),
+    pista('cuerpo', 'Verde, recuperado; naranja, a medias; rojo, aún tocado. Toca «¿Cómo se calculan…?» para ver de dónde salen '
+      + 'las horas. Más abajo, las series de la semana por músculo y qué conviene cambiar.'),
     tarjetaRecuperacion(d),
     tarjetaRecomendaciones(d),
     tarjetaAjustePersonal(d),

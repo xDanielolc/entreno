@@ -140,6 +140,7 @@ export function ejercicioDesdeCatalogo(x) {
     esfuerzoExtra: x.distancia ? { tipo: 'distancia', opcional: true } : null,
     formula1RM: 'personal',
     maquinaPlacas: esMaquinaDePlacas(x),
+    fraccionCorporal: x.carga === 'pesoCorporal' ? (x.fraccion ?? 1) : null,
     musculos: {
       principales: [...(x.musculos?.principales ?? [])],
       secundarios: [...(x.musculos?.secundarios ?? [])],

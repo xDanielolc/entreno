@@ -178,14 +178,24 @@ function cambiosRespectoARutina(datos, sesion) {
       cambios.push({ tipo: 'anadir-series', ejercicioId: ej.id, series: extra.map((s) => ({ tipo: s.tipo, tecnicas: [...(s.tecnicas || [])] })),
         texto: `Añadir ${extra.length} serie${extra.length > 1 ? 's' : ''} más a ${ej.nombre} para siempre` });
     }
+    // Series de la plantilla que hoy no has hecho (saltadas): se ofrece
+    // quitarlas del día de la rutina o, sin rutina, del propio ejercicio.
+    const hechas = new Set(entrada.series.filter((s) => s.hecha && s.planId).map((s) => s.planId));
+    if (!hechas.size) continue;
     const item = dia?.ejercicios.find((x) => x.ejercicioId === ej.id);
-    if (item) {
-      const previstos = (ej.series || []).filter((p) => !item.series || item.series.includes(p.id));
-      const quitados = previstos.filter((p) => !vistos.has(p.id));
-      if (quitados.length && quitados.length < previstos.length) {
+    const previstos = (ej.series || []).filter((p) => !item?.series || item.series.includes(p.id));
+    const quitados = previstos.filter((p) => !hechas.has(p.id));
+    const nombres = quitados.length === 1
+      ? `la serie ${TIPOS_SERIE[quitados[0].tipo] ?? ''}`.trim()
+      : `${quitados.length} series (${quitados.map((p) => TIPOS_SERIE[p.tipo] ?? '').join(', ').toLowerCase()})`;
+    if (quitados.length && quitados.length < previstos.length) {
+      if (item) {
         cambios.push({ tipo: 'quitar-series', rutinaId: rutina.id, diaId: dia.id, ejercicioId: ej.id,
-          quedan: previstos.filter((p) => vistos.has(p.id)).map((p) => p.id),
-          texto: `En «${dia.nombre}», no hacer más ${quitados.map((p) => `la serie ${TIPOS_SERIE[p.tipo] ?? ''}`.trim()).join(' ni ')} de ${ej.nombre}` });
+          quedan: previstos.filter((p) => hechas.has(p.id)).map((p) => p.id),
+          texto: `En «${dia.nombre}», no hacer más ${nombres} de ${ej.nombre}` });
+      } else {
+        cambios.push({ tipo: 'quitar-planes', ejercicioId: ej.id, ids: quitados.map((p) => p.id),
+          texto: `Quitar ${nombres} de ${ej.nombre} para siempre` });
       }
     }
   }
@@ -225,6 +235,14 @@ function aplicarCambios(cambios) {
       if (c.tipo === 'quitar-series' && dia) {
         const item = dia.ejercicios.find((x) => x.ejercicioId === c.ejercicioId);
         if (item) item.series = c.quedan;
+      }
+      if (c.tipo === 'quitar-planes' && ej) {
+        ej.series = (ej.series || []).filter((p) => !c.ids.includes(p.id));
+        for (const r of datos.rutinas) {
+          for (const d of r.dias) {
+            for (const item of d.ejercicios) if (item.ejercicioId === ej.id && item.series) item.series = item.series.filter((x) => !c.ids.includes(x));
+          }
+        }
       }
     }
   });

@@ -33,6 +33,14 @@ export function lecturaDesdeCarga(carga, pesoCorporalKg) {
   return redondear(pesoCorporalKg - carga);
 }
 
+// Carga real de un ejercicio de peso corporal: la parte de tu peso que
+// levantas (flexiones ≈ 64 %) más el lastre que lleves.
+export function cargaCorporal(ejercicio, pesoCorporalKg, lastre = 0) {
+  if (pesoCorporalKg == null) return null;
+  const fraccion = ejercicio.fraccionCorporal ?? 1;
+  return redondear(pesoCorporalKg * fraccion + (lastre || 0), 1);
+}
+
 export function redondear(n, decimales = 2) {
   if (n == null || Number.isNaN(n)) return null;
   const f = 10 ** decimales;
@@ -136,6 +144,15 @@ export function sugerenciaSerie(datos, ejercicio, plan, { excluirSesion } = {}) 
 
   if (prog.tipo === 'esfuerzo') {
     if (!ultima) return { ...base, carga: referencia?.serie.carga ?? null };
+    // «A más cada vez»: más repeticiones con el mismo peso, o más peso con
+    // las mismas repeticiones.
+    if (sobre === 'carga') {
+      return {
+        ...base,
+        carga: redondear((ultima.serie.carga ?? 0) + (prog.incremento || 2.5)),
+        esfuerzoObjetivo: esfuerzoTotal(ultima.serie),
+      };
+    }
     return {
       ...base,
       carga: ultima.serie.carga,

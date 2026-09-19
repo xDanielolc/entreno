@@ -3,7 +3,7 @@
 // drop set, las bajadas propuestas.
 
 import {
-  aPasoDeDisco, esfuerzoTotal, lecturaDesdeCarga, redondear, rmDeReferencia, sugerenciaSerie,
+  aPasoDeDisco, cargaCorporal, esfuerzoTotal, lecturaDesdeCarga, redondear, rmDeReferencia, sugerenciaSerie,
   tramosPropuestos, usaTramos,
 } from './calculos.js';
 import { recamaraDe, tramosDe } from './esquema.js';
@@ -29,7 +29,13 @@ export function crearSerieDesdePlan(datos, ejercicio, plan, { excluirSesion } = 
     tramos: null,
     cicloN: s.cicloN ?? null,
     diaCiclo: s.dia ?? null,
+    lastre: null,
   };
+  // Peso corporal: la carga sale de tu peso (y del lastre de la última vez).
+  if (ejercicio.carga.tipo === 'pesoCorporal') {
+    serie.lastre = s.ultima?.serie.lastre ?? 0;
+    serie.carga = cargaCorporal(ejercicio, datos.perfil.pesoCorporalKg, serie.lastre) ?? carga;
+  }
   if (usaTramos(plan.tecnicas)) {
     // Un drop set suele arrancar a un porcentaje del 1RM (80 % por defecto).
     const inicio = plan.tramoInicio ?? datos.perfil.dropSet?.inicioPorcentaje ?? null;
@@ -143,20 +149,41 @@ export function rmParaTramos(datos, ejercicio, entrada, j, { excluirSesion } = {
 
 // «Elegir carga por»: en 'rm' cada tramo guarda su porcentaje del 1RM y los
 // kilos se recalculan cuando cambia el 1RM; en 'kg' los kilos son fijos.
-// Con pesos fijos de máquina de placas, siempre kilos.
-export function modoCargaDe(datos, ejercicio, serie) {
+// Se decide en cuatro niveles, del más concreto al más general: la serie de
+// hoy, el ejercicio dentro de la rutina, el ejercicio y Ajustes. Con pesos
+// fijos de máquina de placas, siempre kilos.
+export function modoCargaDe(datos, ejercicio, serie, sesion = null) {
   const plan = (ejercicio.series || []).find((p) => p.id === serie.planId);
   if (plan?.tramosFijos?.length) return 'kg';
-  return serie.modoCarga ?? (datos.perfil.dropSet?.autoRellenar === false ? 'kg' : 'rm');
+  const item = sesion?.rutinaId
+    ? datos.rutinas.find((r) => r.id === sesion.rutinaId)?.dias.find((x) => x.id === sesion.diaRutinaId)
+      ?.ejercicios.find((x) => x.ejercicioId === ejercicio.id)
+    : null;
+  return serie.modoCarga ?? item?.modoCarga ?? plan?.modoCarga ?? datos.perfil.dropSet?.modoCarga
+    ?? (datos.perfil.dropSet?.autoRellenar === false ? 'kg' : 'rm');
+}
+
+// De dónde viene el modo que se está aplicando, para explicarlo en pantalla.
+export function origenModoCarga(datos, ejercicio, serie, sesion = null) {
+  const plan = (ejercicio.series || []).find((p) => p.id === serie.planId);
+  if (plan?.tramosFijos?.length) return 'pesos fijos de la máquina';
+  if (serie.modoCarga) return 'elegido hoy';
+  const item = sesion?.rutinaId
+    ? datos.rutinas.find((r) => r.id === sesion.rutinaId)?.dias.find((x) => x.id === sesion.diaRutinaId)
+      ?.ejercicios.find((x) => x.ejercicioId === ejercicio.id)
+    : null;
+  if (item?.modoCarga) return 'de la rutina';
+  if (plan?.modoCarga) return 'de la ficha del ejercicio';
+  return 'de Ajustes';
 }
 
 // Recalcula los kilos de los tramos en modo 'rm' de las series que aún no
 // has empezado. Da igual en qué orden hayas tocado las casillas: los kilos
 // siempre salen de porcentaje × 1RM. Devuelve las series que ha tocado.
-export function recalcularTramos(datos, ejercicio, entrada, { excluirSesion } = {}) {
+export function recalcularTramos(datos, ejercicio, entrada, { excluirSesion, sesion = null } = {}) {
   const tocadas = [];
   entrada.series.forEach((serie, j) => {
-    if (!serie.tramos?.length || modoCargaDe(datos, ejercicio, serie) !== 'rm') return;
+    if (!serie.tramos?.length || modoCargaDe(datos, ejercicio, serie, sesion) !== 'rm') return;
     if (serie.tramos.some((t) => t.esfuerzo != null)) return;
     const rm = rmParaTramos(datos, ejercicio, entrada, j, { excluirSesion });
     if (!rm) return;

@@ -223,6 +223,28 @@ a { color: var(--acento); }
 .instalar details { margin-top: 6px; }
 .instalar summary { cursor: pointer; color: var(--acento); }
 
+/* Pistas del tutorial */
+.pista {
+  display: flex; align-items: flex-start; gap: 8px;
+  background: var(--aviso-fondo); color: var(--texto);
+  border-left: 3px solid var(--aviso); border-radius: var(--radio-pequeno);
+  padding: 8px 10px; margin: 8px 0; font-size: 0.9rem;
+}
+.pista-texto { flex: 1; }
+.pista-cerrar { background: none; border: none; font: inherit; color: var(--texto-suave); min-width: 32px; min-height: 32px; cursor: pointer; }
+.tutorial-niveles .tarjeta { width: 100%; text-align: left; margin: 8px 0; }
+
+/* Apartados plegados de Ajustes */
+.apartado > summary { font-size: 1.1rem; font-weight: 700; min-height: var(--alto-toque); display: flex; align-items: center; cursor: pointer; }
+.apartado h3 { margin: 14px 0 4px; font-size: 1rem; }
+.desplegable-musculos > summary { font-weight: 600; min-height: var(--alto-toque); display: flex; align-items: center; cursor: pointer; }
+.modo-carga-item { display: block; margin-top: 4px; font-size: 0.85rem; min-height: 36px; }
+
+/* Series de una en una */
+.serie.oculta { display: none; }
+.como-ir .tarjeta { width: 100%; text-align: left; margin: 8px 0; }
+.como-ir .tarjeta.preferido { border-color: var(--acento); }
+
 .boton-icono {
   min-width: 44px;
   min-height: 44px;

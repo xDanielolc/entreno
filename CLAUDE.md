@@ -103,3 +103,14 @@ rutinas y sugerencias de ajuste aunque no haya ejercicios; tarjeta de instalar
 (`vistas/instalar.js`: el aviso «app no segura» es de Samsung Internet, no
 nuestro); quitada la rutina de Ángel7Real (su guía no trae rutina); muñecos
 de cardio (corazón) y rueda abdominal; cuello delantero desplazado 1,5 px.
+0.14.0: esquema v10. Tutorial por niveles con pistas cerrables
+(`vistas/tutorial.js`, `pista(clave, texto)`), Ajustes en apartados plegados
+con perfil y cuenta arriba, fórmula con dos opciones y «Saber más», músculos
+en desplegable con aviso, «¿Cómo quieres ir?» al empezar (series de una en
+una / ejercicios / todo, recordado en `perfil.modoEntreno`), descanso: al
+saltar o alargar ofrece cambiar el ajuste (sin pullas), resumen ofrece quitar
+las series saltadas también sin rutina, peso corporal automático con fracción
+(Ebben 2011) y lastre, drop set por kg/% en cuatro niveles (`modoCargaDe`),
+«A más cada vez» en repeticiones o en peso, sin Bilbo en series de intensidad,
+bajadas ocultas con pesos fijos, aviso en Hoy de cuándo toca (músculos aún
+tocados y días parado).

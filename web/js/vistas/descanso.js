@@ -11,11 +11,15 @@
 // Es una cuenta atrás por hora de fin, no por sumar segundos: así sigue
 // siendo correcta aunque el móvil bloquee la pantalla.
 
-import { aviso as avisoPulla, h } from '../ui.js';
+import * as estado from '../estado.js';
+import { aviso, h } from '../ui.js';
 
 let finMs = null;
 let intervalo = null;
 let motivo = 'de descanso';
+let totalSeg = 0;          // lo que duraba este descanso al arrancar
+let alargadoSeg = 0;       // cuánto se le ha añadido con «+1 min»
+let ofrecido = false;      // ya se ha ofrecido cambiar el ajuste en esta sesión
 let respiracion = null;   // { veces, inspirar, espirar, inicioMs } mientras se respira
 const cajas = new Set();
 
@@ -44,6 +48,8 @@ export function arrancarDescanso(segundos, { texto = 'de descanso' } = {}) {
   if (!segundos) return;
   respiracion = null;
   motivo = texto;
+  totalSeg = segundos;
+  alargadoSeg = 0;
   finMs = Date.now() + segundos * 1000;
   pintar();
   clearInterval(intervalo);
@@ -124,18 +130,42 @@ function avisar() {
   } catch { /* si el navegador no deja sonar, no pasa nada */ }
 }
 
-// Saltarse el descanso tiene respuesta, pero nunca bloquea nada.
-const PULLAS = [
-  'Descanso saltado. Tus fibras musculares han tomado nota.',
-  'Saltado. Seguro que esta serie sale igual de bien. Seguro.',
-  'Sin descanso. El ácido láctico te lo agradecerá luego, con intereses.',
-  'Prisa registrada. La barra no se va a ir a ningún lado, pero tú sí.',
-  'Saltado otra vez. Vamos a llamarlo «entrenamiento metabólico» y quedamos bien.',
-];
+// Saltar o alargar el descanso entre series ofrece cambiar el ajuste desde
+// aquí mismo, sin ir a Ajustes. Solo una vez por sesión de la app, y solo si
+// la diferencia es de verdad (no por 10 segundos).
+const entreSeries = () => motivo === 'de descanso' && !respiracion;
+
+function proponer(segundos, texto) {
+  if (ofrecido) return;
+  ofrecido = true;
+  aviso(texto, { accion: { texto: `Sí, ${segundos} s`, fn: () => {
+    estado.cambiar((x) => { x.perfil.descansoSegundos = segundos; });
+    aviso(`Descanso entre series: ${segundos} s.`);
+  } } });
+}
 
 function saltar() {
+  const quedaban = restante();
+  const usado = Math.max(0, totalSeg + alargadoSeg - quedaban);
+  const era = entreSeries();
   pararDescanso();
-  avisoPulla(PULLAS[Math.floor(Math.random() * PULLAS.length)], { ms: 9000 });
+  if (!era || !totalSeg) return;
+  const propuesto = Math.max(15, Math.round(usado / 15) * 15);
+  if (usado >= 30 && quedaban >= 20 && propuesto < totalSeg) {
+    proponer(propuesto, `Descanso saltado a los ${usado} s de ${totalSeg}. ¿Dejar el descanso entre series en ${propuesto} s?`);
+  }
+}
+
+function alargar() {
+  if (!finMs) return;
+  finMs = Math.max(finMs, Date.now()) + 60_000;
+  alargadoSeg += 60;
+  clearInterval(intervalo);
+  intervalo = setInterval(pintar, 1000);
+  pintar();
+  if (entreSeries() && totalSeg) {
+    proponer(totalSeg + alargadoSeg, `Un minuto más. ¿Subir el descanso entre series a ${totalSeg + alargadoSeg} s?`);
+  }
 }
 
 export function barraDescanso() {
@@ -145,7 +175,7 @@ export function barraDescanso() {
     h('div', { class: 'respira', hidden: true },
       h('span', { class: 'circulo-respira', 'aria-hidden': 'true' }),
       h('span', { class: 'texto-respira' })),
-    h('button', { class: 'boton enlace', onclick: () => arrancarDescanso(60) }, '+1 min'),
+    h('button', { class: 'boton enlace', onclick: alargar }, '+1 min'),
     h('button', { class: 'boton enlace', onclick: saltar }, 'Saltar'));
   cajas.add(caja);
   return caja;

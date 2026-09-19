@@ -4,14 +4,18 @@ import { formatearNumero } from '../calculos.js';
 import * as estado from '../estado.js';
 import { desconectar, sincronizar, situacionActual } from '../sincronizacion.js';
 import { VERSION_APP } from '../version.js';
-import { anadir, confirmar, h, hoyISO, leerNumero } from '../ui.js';
+import { anadir, aviso, confirmar, h, hoyISO, leerNumero } from '../ui.js';
 import { DESCANSO_TRAMOS_POR_DEFECTO, RESPIRACION_POR_DEFECTO } from './descanso.js';
 import { TIPOS_SEDE, nuevaSede, sedesActivas } from '../sedes.js';
 import { calibrar, textoCalibracion } from '../formula1rm.js';
 import { TEXTO_AVISO, guardarPruebaEnCuenta } from '../modo-prueba.js';
-import { explicaciones1RM } from './ejercicios.js';
+import { explicaciones1RM, opciones } from './ejercicios.js';
 import { tramosPorDefecto } from '../calculos.js';
+import { NIVELES, fijarNivel, nivelTutorial, pista, reiniciarPistas } from './tutorial.js';
+import { MODOS_ENTRENO } from './sesion.js';
 
+// Ajustes: lo importante arriba (perfil y cuenta) y el resto en apartados
+// plegados, para que no se vea todo de golpe.
 export function vistaAjustes(contenedor) {
   const d = estado.datos();
   const sinCuenta = estado.esSinCuenta();
@@ -27,19 +31,25 @@ export function vistaAjustes(contenedor) {
   }
 
   async function salir() {
-    const aviso = sinCuenta
+    const texto = sinCuenta
       ? '¿Salir? Los datos de prueba se quedan en este dispositivo y los verás si vuelves a «Probar sin cuenta».'
       : estado.meta().pendiente
-        ? 'Hay cambios que aún no se han subido a Drive. Se quedan guardados en este dispositivo y se subirán la próxima vez que entres. ¿Salir?'
+        ? 'Hay cambios que aún no se han subido a Google Drive. Se quedan guardados en este dispositivo y se subirán la próxima vez que entres. ¿Salir?'
         : '¿Salir de la cuenta en este dispositivo?';
-    if (!await confirmar(aviso, { si: 'Salir' })) return;
+    if (!await confirmar(texto, { si: 'Salir' })) return;
     desconectar();
     estado.cerrarUsuario();
     location.hash = '#/';
   }
 
+  // Un apartado plegado: título y, dentro, sus ajustes.
+  const apartado = (titulo, ...contenido) => h('details', { class: 'tarjeta formulario apartado' },
+    h('summary', {}, titulo), ...contenido);
+
   anadir(contenedor,
     h('h1', {}, 'Ajustes'),
+    pista('ajustes', 'Arriba, lo que más se usa: tu nombre, tu peso y la cuenta. Lo demás está en apartados plegados; '
+      + 'toca uno para abrirlo.'),
 
     h('section', { class: 'tarjeta formulario' },
       h('h2', {}, 'Perfil'),
@@ -48,63 +58,36 @@ export function vistaAjustes(contenedor) {
         h('input', { type: 'text', value: d.perfil.nombre || '',
           oninput: (e) => estado.cambiar((x) => { x.perfil.nombre = e.target.value.trim(); }, { tecleo: true }) })),
       h('label', { class: 'campo' },
-        h('span', { class: 'etiqueta-campo' }, 'Repeticiones en recámara por defecto'),
-        h('input', { type: 'text', inputmode: 'decimal', value: d.perfil.recamaraPorDefecto ?? '',
-          oninput: (e) => estado.cambiar((x) => { x.perfil.recamaraPorDefecto = leerNumero(e.target.value); }, { tecleo: true }) }),
-        h('small', { class: 'nota' },
-          'Las que sueles dejarte sin hacer al acabar una serie. Aparecen ya puestas en cada serie, '
-          + 'y se apuntan aparte: «45 kg × 12 + 1».')),
-
-      h('label', { class: 'campo' },
-        h('span', { class: 'etiqueta-campo' }, 'Descanso entre series (segundos)'),
-        h('input', { type: 'text', inputmode: 'decimal', value: d.perfil.descansoSegundos ?? '',
-          oninput: (e) => estado.cambiar((x) => { x.perfil.descansoSegundos = leerNumero(e.target.value); }, { tecleo: true }) }),
-        h('small', { class: 'nota' }, 'El cronómetro arranca solo al apuntar una serie, y al apuntar la última bajada de un drop set. '
-          + 'Ponlo a 0 para desactivarlo.')),
-
-      h('label', { class: 'campo' },
         h('span', { class: 'etiqueta-campo' }, 'Peso corporal (kg)'),
         h('input', { type: 'text', inputmode: 'decimal', value: d.perfil.pesoCorporalKg ?? '',
           oninput: (e) => estado.cambiar((x) => { x.perfil.pesoCorporalKg = leerNumero(e.target.value); }, { tecleo: true }) }),
         h('small', { class: 'nota' },
-          'Se usa en las máquinas asistidas (dominadas, fondos): la carga real es tu peso menos la ayuda de la máquina. ',
-          'Cambiarlo no altera las series ya guardadas.')),
+          'Lo usan los ejercicios de peso corporal (flexiones, dominadas) y las máquinas asistidas. Cambiarlo no altera las series ya guardadas.'))),
 
-      h('div', { class: 'campo' },
-        h('span', { class: 'etiqueta-campo' }, 'Descanso dentro de una serie (segundos)'),
-        h('div', { class: 'fila-campos' },
-          [['drop-set', 'Entre bajadas'], ['rest-pause', 'Rest-pause']]
-            .map(([clave, texto]) => h('label', { class: 'campo' },
-              h('span', { class: 'etiqueta-campo' }, texto),
-              h('input', { type: 'text', inputmode: 'decimal',
-                value: d.perfil.descansoTramos?.[clave] ?? DESCANSO_TRAMOS_POR_DEFECTO[clave],
-                oninput: (e) => estado.cambiar((x) => {
-                  x.perfil.descansoTramos = { ...DESCANSO_TRAMOS_POR_DEFECTO, ...x.perfil.descansoTramos, [clave]: leerNumero(e.target.value) };
-                }, { tecleo: true }) })))),
-        h('small', { class: 'nota' }, 'Al apuntar una bajada arranca esta cuenta corta: lo justo para cambiar el disco '
-          + 'o recuperar el aliento entre miniseries. Al apuntar la última, el descanso normal.'))),
+    h('section', { class: 'tarjeta' },
+      h('h2', {}, 'Cuenta y copia de seguridad'),
+      sinCuenta
+        ? [h('p', {}, TEXTO_AVISO),
+          h('button', { class: 'boton', onclick: guardarPruebaEnCuenta }, 'Entrar con Google y guardar lo hecho')]
+        : [
+          h('p', {}, 'Conectado como ', h('strong', {}, estado.usuario())),
+          h('p', { class: `suave ${['al-dia', 'sincronizando'].includes(situacion) ? '' : 'peligro-texto'}` }, textoSituacion(situacion), detalle && ` ${detalle}`),
+          h('p', { class: 'nota' }, 'Todo lo de esta pantalla se guarda también en tu Google Drive, con tus entrenamientos.'),
+          h('button', { class: 'boton secundario', onclick: () => sincronizar({ interactivo: true }) }, 'Sincronizar ahora'),
+        ],
+      h('button', { class: 'boton secundario', onclick: descargarCopia }, 'Descargar una copia de mis datos'),
+      h('button', { class: 'boton enlace', onclick: salir }, sinCuenta ? 'Salir del modo de prueba' : 'Salir de la cuenta')),
 
-    h('section', { class: 'tarjeta formulario' },
-      h('h2', {}, 'Ciclos Bilbo'),
-      numeroAjuste('Un ciclo nuevo empieza al (% de tu 1RM)', d.perfil.bilboInicioPorcentaje ?? 50,
-        (x, v) => { x.perfil.bilboInicioPorcentaje = v; }),
-      h('details', { class: 'explicacion' }, h('summary', {}, 'Por qué'),
-        h('p', {}, 'Al empezar un ciclo, el primer día va a este porcentaje de tu mejor 1RM estimado en ese ejercicio y cada día '
-          + 'sube un poco. Empezar bajo (50 %) deja margen para superarte muchos días seguidos con series largas.'))),
-
-    h('section', { class: 'tarjeta formulario' },
-      h('h2', {}, 'Rest-pause y miorrepeticiones por defecto'),
-      h('p', { class: 'nota' }, 'Lo que propone la app al crear estas series. Cada ejercicio puede usar esto, '
-        + 'repetir lo de la última vez o tener sus propios valores (en su ficha).'),
+    apartado('Descansos',
+      numeroAjuste('Entre series (segundos)', d.perfil.descansoSegundos, (x, v) => { x.perfil.descansoSegundos = v; }),
+      h('small', { class: 'nota' }, 'El cronómetro arranca solo al apuntar una serie, y al apuntar la última bajada de un drop set. '
+        + 'Ponlo a 0 para desactivarlo. Si lo saltas o le añades tiempo, la app te ofrece cambiarlo desde allí.'),
       h('div', { class: 'fila-campos' },
-        numeroAjuste('Miniseries de rest-pause', tramosPorDefecto(d.perfil, 'rest-pause').tramos,
-          (x, v) => { x.perfil.tramosPorDefecto = { ...x.perfil.tramosPorDefecto, 'rest-pause': { ...x.perfil.tramosPorDefecto?.['rest-pause'], tramos: v } }; }),
-        numeroAjuste('Tramos de miorrepeticiones (activación + miniseries)', tramosPorDefecto(d.perfil, 'miorepeticiones').tramos,
-          (x, v) => { x.perfil.tramosPorDefecto = { ...x.perfil.tramosPorDefecto, miorepeticiones: { ...x.perfil.tramosPorDefecto?.miorepeticiones, tramos: v } }; }),
-        numeroAjuste('Repeticiones por miniserie', tramosPorDefecto(d.perfil, 'miorepeticiones').reps,
-          (x, v) => { x.perfil.tramosPorDefecto = { ...x.perfil.tramosPorDefecto, miorepeticiones: { ...x.perfil.tramosPorDefecto?.miorepeticiones, reps: v } }; })),
-      h('p', { class: 'nota' }, 'Entre miniseries de miorrepeticiones no sale un reloj, sino una guía de respiración: '
-        + 'un círculo que crece al coger aire y mengua al soltarlo.'),
+        [['drop-set', 'Entre bajadas (s)'], ['rest-pause', 'Rest-pause (s)']]
+          .map(([clave, texto]) => numeroAjuste(texto, d.perfil.descansoTramos?.[clave] ?? DESCANSO_TRAMOS_POR_DEFECTO[clave],
+            (x, v) => { x.perfil.descansoTramos = { ...DESCANSO_TRAMOS_POR_DEFECTO, ...x.perfil.descansoTramos, [clave]: v }; }))),
+      h('small', { class: 'nota' }, 'Dentro de una serie: lo justo para cambiar el disco o recuperar el aliento entre miniseries.'),
+      h('p', { class: 'nota' }, 'Entre miniseries de miorrepeticiones no hay reloj, sino una guía de respiración.'),
       h('div', { class: 'fila-campos' },
         numeroAjuste('Respiraciones', d.perfil.respiracion?.veces ?? RESPIRACION_POR_DEFECTO.veces,
           (x, v) => { x.perfil.respiracion = { ...RESPIRACION_POR_DEFECTO, ...x.perfil.respiracion, veces: v }; }),
@@ -113,12 +96,45 @@ export function vistaAjustes(contenedor) {
         numeroAjuste('Soltarlo (s)', d.perfil.respiracion?.espirar ?? RESPIRACION_POR_DEFECTO.espirar,
           (x, v) => { x.perfil.respiracion = { ...RESPIRACION_POR_DEFECTO, ...x.perfil.respiracion, espirar: v }; }))),
 
-    seccionSedes(d),
+    apartado('Entrenamiento y series',
+      h('div', { class: 'campo' },
+        h('span', { class: 'etiqueta-campo' }, 'Cómo ir por el entrenamiento'),
+        opciones(MODOS_ENTRENO, d.perfil.modoEntreno ?? 'ejercicio', (m) => estado.cambiar((x) => { x.perfil.modoEntreno = m; }), { compacto: true }),
+        h('small', { class: 'nota' }, 'Es lo que sale marcado al empezar cada entrenamiento; allí puedes elegir otra cosa.')),
+      numeroAjuste('Repeticiones en recámara por defecto', d.perfil.recamaraPorDefecto, (x, v) => { x.perfil.recamaraPorDefecto = v; }),
+      h('small', { class: 'nota' }, 'Las que sueles dejarte sin hacer al acabar una serie. Aparecen ya puestas y se apuntan aparte: «45 kg × 12 + 1».'),
+      h('h3', {}, 'Drop sets'),
+      h('div', { class: 'fila-campos' },
+        numeroAjuste('Bajadas', d.perfil.dropSet?.bajadas ?? 4, (x, v) => { x.perfil.dropSet = { ...x.perfil.dropSet, bajadas: v }; }),
+        numeroAjuste('Kilos por bajada', d.perfil.dropSet?.salto ?? 10, (x, v) => { x.perfil.dropSet = { ...x.perfil.dropSet, salto: v }; }),
+        numeroAjuste('Arranca al (% del 1RM)', d.perfil.dropSet?.inicioPorcentaje ?? 80, (x, v) => { x.perfil.dropSet = { ...x.perfil.dropSet, inicioPorcentaje: v }; })),
+      h('div', { class: 'campo' },
+        h('span', { class: 'etiqueta-campo' }, 'Los pesos del drop set, por'),
+        opciones({ rm: { etiqueta: '% del 1RM' }, kg: { etiqueta: 'Kilos a mano' } }, d.perfil.dropSet?.modoCarga ?? 'rm',
+          (m) => estado.cambiar((x) => { x.perfil.dropSet = { ...x.perfil.dropSet, modoCarga: m, autoRellenar: m === 'rm' }; }), { compacto: true }),
+        h('small', { class: 'nota' }, 'Por % del 1RM: haces la Bilbo con 60 kg × 20 y el drop set de debajo se rellena solo al porcentaje de arriba. '
+          + 'A mano: los kilos se quedan como los dejes. Cada ejercicio, cada rutina y cada serie del día pueden cambiarlo.')),
+      h('h3', {}, 'Rest-pause y miorrepeticiones'),
+      h('div', { class: 'fila-campos' },
+        numeroAjuste('Miniseries de rest-pause', tramosPorDefecto(d.perfil, 'rest-pause').tramos,
+          (x, v) => { x.perfil.tramosPorDefecto = { ...x.perfil.tramosPorDefecto, 'rest-pause': { ...x.perfil.tramosPorDefecto?.['rest-pause'], tramos: v } }; }),
+        numeroAjuste('Tramos de miorrepeticiones', tramosPorDefecto(d.perfil, 'miorepeticiones').tramos,
+          (x, v) => { x.perfil.tramosPorDefecto = { ...x.perfil.tramosPorDefecto, miorepeticiones: { ...x.perfil.tramosPorDefecto?.miorepeticiones, tramos: v } }; }),
+        numeroAjuste('Repeticiones por miniserie', tramosPorDefecto(d.perfil, 'miorepeticiones').reps,
+          (x, v) => { x.perfil.tramosPorDefecto = { ...x.perfil.tramosPorDefecto, miorepeticiones: { ...x.perfil.tramosPorDefecto?.miorepeticiones, reps: v } }; })),
+      h('small', { class: 'nota' }, 'Lo que propone la app al crear estas series; cada ejercicio puede tener lo suyo en su ficha.')),
 
-    h('section', { class: 'tarjeta' },
-      h('h2', {}, 'Cómo se estima tu 1RM'),
-      h('p', { class: 'nota' }, 'Con la fórmula de Marzagao (2026) y un factor propio de cada ejercicio que se ajusta solo con tus series. '
-        + 'Toca cada apartado para ver los detalles.'),
+    apartado('Ciclos Bilbo',
+      numeroAjuste('Un ciclo nuevo empieza al (% de tu 1RM)', d.perfil.bilboInicioPorcentaje ?? 50,
+        (x, v) => { x.perfil.bilboInicioPorcentaje = v; }),
+      h('small', { class: 'nota' }, 'Al empezar un ciclo, el primer día va a este porcentaje de tu mejor 1RM estimado en ese ejercicio y cada día '
+        + 'sube un poco. Empezar bajo deja margen para superarte muchos días seguidos con series largas.')),
+
+    seccionSedes(d, apartado),
+
+    apartado('Cómo se estima tu 1RM',
+      h('p', { class: 'nota' }, 'Con la fórmula de Marzagao (2026) y, si el ejercicio lo tiene en «Se ajusta a ti», un factor propio '
+        + 'que se calcula solo con tus series.'),
       explicaciones1RM(),
       h('details', { class: 'explicacion' },
         h('summary', {}, 'Tu factor en cada ejercicio'),
@@ -128,31 +144,13 @@ export function vistaAjustes(contenedor) {
           .sort((a, b) => b.c.ventanas - a.c.ventanas || a.e.nombre.localeCompare(b.e.nombre))
           .map(({ e, c }) => h('li', {}, h('a', { href: `#/ejercicio/${e.id}` }, e.nombre), `: ${textoCalibracion(c)}`))))),
 
-    h('section', { class: 'tarjeta formulario' },
-      h('h2', {}, 'Drop sets por defecto'),
-      h('p', { class: 'nota' }, 'Lo que propone la app al crear un drop set. Se puede cambiar en cada ejercicio.'),
-      h('div', { class: 'fila-campos' },
-        h('label', { class: 'campo' },
-          h('span', { class: 'etiqueta-campo' }, 'Bajadas'),
-          h('input', { type: 'text', inputmode: 'decimal', value: d.perfil.dropSet?.bajadas ?? 4,
-            oninput: (e) => estado.cambiar((x) => { x.perfil.dropSet = { ...x.perfil.dropSet, bajadas: leerNumero(e.target.value) }; }, { tecleo: true }) })),
-        h('label', { class: 'campo' },
-          h('span', { class: 'etiqueta-campo' }, 'Kilos por bajada'),
-          h('input', { type: 'text', inputmode: 'decimal', value: d.perfil.dropSet?.salto ?? 10,
-            oninput: (e) => estado.cambiar((x) => { x.perfil.dropSet = { ...x.perfil.dropSet, salto: leerNumero(e.target.value) }; }, { tecleo: true }) })),
-        h('label', { class: 'campo' },
-          h('span', { class: 'etiqueta-campo' }, 'Arranca al (% del 1RM)'),
-          h('input', { type: 'text', inputmode: 'decimal', value: d.perfil.dropSet?.inicioPorcentaje ?? 80,
-            oninput: (e) => estado.cambiar((x) => { x.perfil.dropSet = { ...x.perfil.dropSet, inicioPorcentaje: leerNumero(e.target.value) }; }, { tecleo: true }) }))),
-      h('label', { class: 'casilla' },
-        h('input', { type: 'checkbox', checked: d.perfil.dropSet?.autoRellenar !== false,
-          onchange: (e) => estado.cambiar((x) => { x.perfil.dropSet = { ...x.perfil.dropSet, autoRellenar: e.target.checked }; }) }),
-        'Rellenar los pesos del drop set con el 1RM que acabas de hacer en la serie de arriba'),
-      h('small', { class: 'nota' }, 'Por ejemplo: haces la Bilbo con 60 kg × 20 y el drop set de debajo se rellena solo '
-        + 'al porcentaje de arriba. Si tocas un peso a mano, se respeta.')),
+    apartado('Tutorial',
+      h('p', { class: 'nota' }, 'Las notas que explican cada pantalla la primera vez. Se cierran con ✕ y no vuelven, salvo que las reactives aquí.'),
+      opciones(NIVELES, nivelTutorial(d) ?? 'basico', (n) => { fijarNivel(n); aviso('Tutorial cambiado'); }),
+      h('button', { class: 'boton secundario', onclick: () => { reiniciarPistas(); aviso('Las notas del tutorial volverán a salir.'); } },
+        'Volver a mostrar todas las notas')),
 
-    h('section', { class: 'tarjeta' },
-      h('h2', {}, 'De dónde sale cada cosa'),
+    apartado('De dónde sale cada cosa',
       h('p', { class: 'nota' }, 'Qué recomienda la app, con qué respaldo y dónde falla.'),
       BIBLIOGRAFIA.map((x) => h('details', { class: 'fuente' },
         h('summary', {}, x.tema),
@@ -162,21 +160,7 @@ export function vistaAjustes(contenedor) {
           ? h('ul', {}, x.fuentes.map((f) => h('li', {}, h('a', { href: f.url, target: '_blank', rel: 'noopener' }, f.texto))))
           : h('p', { class: 'nota' }, 'Sin respaldo científico directo: es una decisión práctica.')))),
 
-    h('section', { class: 'tarjeta' },
-      h('h2', {}, 'Cuenta y copia de seguridad'),
-      sinCuenta
-        ? [h('p', {}, TEXTO_AVISO),
-          h('button', { class: 'boton', onclick: guardarPruebaEnCuenta }, 'Entrar con Google y guardar lo hecho')]
-        : [
-          h('p', {}, 'Conectado como ', h('strong', {}, estado.usuario())),
-          h('p', { class: 'suave' }, textoSituacion(situacion), detalle && ` ${detalle}`),
-          h('button', { class: 'boton secundario', onclick: () => sincronizar({ interactivo: true }) }, 'Sincronizar ahora'),
-        ],
-      h('button', { class: 'boton secundario', onclick: descargarCopia }, 'Descargar una copia de mis datos'),
-      h('button', { class: 'boton enlace', onclick: salir }, sinCuenta ? 'Salir del modo de prueba' : 'Salir de la cuenta')),
-
-    h('section', { class: 'tarjeta' },
-      h('h2', {}, 'Créditos de las imágenes'),
+    apartado('Créditos de las imágenes',
       h('p', { class: 'nota' },
         'Los dibujos del cuerpo y de los ejercicios vienen de ',
         h('a', { href: 'https://wger.de', target: '_blank', rel: 'noopener' }, 'wger.de'),
@@ -195,14 +179,13 @@ export function vistaAjustes(contenedor) {
 
 // Sitios donde entrenas. El de por defecto es el que se pone al empezar un
 // entrenamiento sin rutina (las rutinas pueden tener el suyo).
-function seccionSedes(d) {
+function seccionSedes(d, apartado) {
   const sedes = sedesActivas(d);
-  const cambiarSede = (id, fn, opciones) => estado.cambiar((x) => {
+  const cambiarSede = (id, fn, opcionesCambio) => estado.cambiar((x) => {
     const s = x.sedes.find((y) => y.id === id);
     if (s) fn(s, x);
-  }, opciones);
-  return h('section', { class: 'tarjeta formulario' },
-    h('h2', {}, 'Dónde entrenas'),
+  }, opcionesCambio);
+  return apartado(sedes.length ? `Dónde entrenas (${sedes.length})` : 'Dónde entrenas',
     h('p', { class: 'nota' }, 'Gimnasios, casa, la calle… Cada entrenamiento apunta dónde se hizo, y cada ejercicio puede ser '
       + 'igual en todos los sitios o de uno solo (en su ficha).'),
     sedes.map((s) => h('div', { class: 'fila-sede' },

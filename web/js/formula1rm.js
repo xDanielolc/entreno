@@ -29,8 +29,8 @@
 const redondear = (n, d = 2) => Math.round(n * 10 ** d) / 10 ** d;
 
 export const FORMULAS = {
-  personal: { etiqueta: 'Ajustada a ti', descripcion: 'La fórmula del estudio con un factor propio de este ejercicio que se calcula solo con tus series.' },
-  peso: { etiqueta: 'La del estudio, sin ajustar', descripcion: 'Marzagao (2026) tal cual, igual para todo el mundo.' },
+  personal: { etiqueta: 'Se ajusta a ti', descripcion: 'Aprende de tus series cada día para recomendarte pesos.' },
+  peso: { etiqueta: 'Genérica', descripcion: 'La misma fórmula para todo el mundo.' },
 };
 
 const EXPONENTE_ESTUDIO = 0.85;

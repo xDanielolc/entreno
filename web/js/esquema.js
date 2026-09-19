@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 9;
+export const VERSION_ACTUAL = 10;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -24,7 +24,7 @@ export const TIPOS_ESFUERZO = {
 export const TIPOS_PROGRESION = {
   bilbo:    { etiqueta: 'Bilbo',            descripcion: 'Ciclo de días con el valor de cada día fijado de antemano. Cada día intentas superar el anterior.' },
   carga:    { etiqueta: 'Doble progresión', descripcion: 'Trabajas en un rango de repeticiones, por ejemplo de 8 a 12. Primero subes repeticiones con el mismo peso; al llegar a 12, subes peso y vuelves a empezar por 8.' },
-  esfuerzo: { etiqueta: 'A más cada vez',   descripcion: 'La carga no cambia: intentas hacer algo más que la última vez.' },
+  esfuerzo: { etiqueta: 'A más cada vez',   descripcion: 'Cada vez un poco más que la última: más repeticiones con el mismo peso, o más peso con las mismas repeticiones (se elige debajo).' },
   'maximo-trabajo': { etiqueta: 'Máximo trabajo', descripcion: 'Experimental: busca en tu historial el peso con el que más trabajo (peso × repeticiones) haces, y te mantiene ahí.' },
   libre:    { etiqueta: 'Libre',            descripcion: 'La app solo registra y te recuerda lo último que hiciste.' },
 };
@@ -173,11 +173,13 @@ export function archivoNuevo({ nombre = '', correo = null } = {}) {
       tema: 'sistema',
       descansoSegundos: 120,
       recamaraPorDefecto: 1,
-      dropSet: { bajadas: 4, salto: 10, inicioPorcentaje: 80, autoRellenar: true },
+      dropSet: { bajadas: 4, salto: 10, inicioPorcentaje: 80, autoRellenar: true, modoCarga: 'rm' },
       descansoTramos: { 'drop-set': 30, 'rest-pause': 20, miorepeticiones: 20 },
       tramosPorDefecto: { 'rest-pause': { tramos: 3, reps: null }, miorepeticiones: { tramos: 5, reps: 5 } },
       respiracion: { veces: 3, inspirar: 4, espirar: 4 },
       recuperacion: { factores: {}, desde: {} },
+      tutoriales: { nivel: null, vistos: {} },
+      modoEntreno: 'ejercicio',
     },
     sedes: [],
     ejercicios: [],
@@ -350,7 +352,43 @@ const MIGRACIONES = {
     datos.version = 9;
     return datos;
   },
+
+  // v10: tutoriales (nivel y avisos ya vistos), modo de entreno preferido,
+  // drop set por kg o % en cuatro niveles (Ajustes, ejercicio, ejercicio de
+  // una rutina y serie del día), fracción del peso corporal por ejercicio
+  // (flexiones ≈ 64 %) y lastre en las series de peso corporal.
+  9: (datos) => {
+    datos.perfil.tutoriales ??= { nivel: null, vistos: {} };
+    datos.perfil.modoEntreno ??= 'ejercicio';
+    datos.perfil.dropSet = { modoCarga: datos.perfil.dropSet?.autoRellenar === false ? 'kg' : 'rm', ...datos.perfil.dropSet };
+    for (const ej of datos.ejercicios) {
+      if (ej.carga?.tipo === 'pesoCorporal') ej.fraccionCorporal ??= FRACCION_CORPORAL_POR_NOMBRE(ej.nombre);
+      for (const plan of ej.series || []) plan.modoCarga ??= null;
+    }
+    for (const rutina of datos.rutinas) {
+      for (const dia of rutina.dias) for (const item of dia.ejercicios) item.modoCarga ??= null;
+    }
+    // Las series de peso corporal ya apuntadas conservan su carga tal cual
+    // (lastre = null significa «la carga se escribió a mano»).
+    for (const sesion of datos.sesiones) {
+      for (const entrada of sesion.ejercicios) for (const serie of entrada.series) serie.lastre ??= null;
+    }
+    datos.version = 10;
+    return datos;
+  },
 };
+
+// Qué parte del peso corporal se levanta en cada ejercicio, según su nombre.
+// Flexiones: 64 % del peso (Ebben 2011); con rodillas, 49 %; con los pies en
+// alto, 74 %; con las manos en alto, 41 %. Lo demás, el peso entero.
+export function FRACCION_CORPORAL_POR_NOMBRE(nombre = '') {
+  const n = nombre.toLowerCase();
+  if (!/flexion/.test(n)) return 1;
+  if (/rodilla/.test(n)) return 0.49;
+  if (/pica|declinad|pies en alto|pino/.test(n)) return 0.74;
+  if (/inclinad|manos en alto|pared/.test(n)) return 0.41;
+  return 0.64;
+}
 
 export function necesitaMigrar(datos) {
   return datos.version < VERSION_ACTUAL;

@@ -18,6 +18,8 @@ const ej = (nombre, grupo, material, principales, secundarios = [], extra = {}) 
 
 const sinCarga = { carga: 'ninguna', esfuerzo: 'tiempo' };
 const corporal = { carga: 'pesoCorporal' };
+// Fracción del peso corporal que se levanta (Ebben 2011: flexiones ≈ 64 %).
+const flexion = (f) => ({ carga: 'pesoCorporal', fraccion: f });
 
 const estiramiento = (nombre, principales, secundarios = [], material = 'libre') =>
   ej(nombre, 'estiramiento', material, principales, secundarios, sinCarga);
@@ -58,10 +60,10 @@ export const CATALOGO = [
   ej('Extensión de tríceps sobre la cabeza', 'empuje', 'polea', ['triceps'], []),
   ej('Extensión de tríceps en máquina', 'empuje', 'máquina', ['triceps'], []),
   ej('Patada de tríceps', 'empuje', 'mancuernas', ['triceps'], []),
-  ej('Flexiones', 'empuje', 'peso corporal', ['pecho'], ['triceps', 'hombro', 'abdomen'], corporal),
-  ej('Flexiones diamante', 'empuje', 'peso corporal', ['triceps'], ['pecho', 'hombro'], corporal),
-  ej('Flexiones en pica', 'empuje', 'peso corporal', ['hombro'], ['triceps', 'trapecio'], corporal),
-  ej('Flexiones en pino', 'empuje', 'pared', ['hombro'], ['triceps', 'trapecio'], corporal),
+  ej('Flexiones', 'empuje', 'peso corporal', ['pecho'], ['triceps', 'hombro', 'abdomen'], flexion(0.64)),
+  ej('Flexiones diamante', 'empuje', 'peso corporal', ['triceps'], ['pecho', 'hombro'], flexion(0.64)),
+  ej('Flexiones en pica', 'empuje', 'peso corporal', ['hombro'], ['triceps', 'trapecio'], flexion(0.74)),
+  ej('Flexiones en pino', 'empuje', 'pared', ['hombro'], ['triceps', 'trapecio'], flexion(0.74)),
   ej('Flexiones a una mano', 'empuje', 'peso corporal', ['pecho'], ['triceps', 'abdomen', 'oblicuos'], { carga: 'altura' }),
 
   // --- Tirón --------------------------------------------------------------
