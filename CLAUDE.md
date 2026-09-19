@@ -133,3 +133,9 @@ borra. Saludo aleatorio por hora en Hoy. `web/privacidad.html` enlazada
 desde la entrada y Ajustes; pasos de verificación en docs/google-cloud.md
 (los tiene que dar él en la consola). El texto «Anterior / Siguiente» que
 vio en el móvil lo pone el navegador sobre los desplegables, no la app.
+0.16.1: guía paso a paso real (`iniciarGuia`/`pintarGuia` en tutorial.js: panel
+fijo abajo, 7 pasos básicos + 4 avanzados, `perfil.tutoriales.paso`), el
+cartel «¿Te guío?» espera a que se cierre el de modo prueba, tarjeta de
+instalar arriba de Hoy y en la pantalla de entrada, y la app ya NO se recarga
+sola con la pantalla a la vista al llegar una versión nueva (cortaba el
+acceso de Google y obligaba a entrar dos veces): avisa con «Actualizar».

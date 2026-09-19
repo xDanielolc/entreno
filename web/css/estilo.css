@@ -233,6 +233,15 @@ a { color: var(--acento); }
 .pista-texto { flex: 1; }
 .pista-cerrar { background: none; border: none; font: inherit; color: var(--texto-suave); min-width: 32px; min-height: 32px; cursor: pointer; }
 .tutorial-niveles .tarjeta { width: 100%; text-align: left; margin: 8px 0; }
+.guia {
+  position: fixed; left: 8px; right: 8px; bottom: calc(64px + env(safe-area-inset-bottom, 0px)); z-index: 30;
+  background: var(--superficie); color: var(--texto); border: 2px solid var(--acento); border-radius: var(--radio-pequeno);
+  padding: 12px 14px; box-shadow: 0 6px 24px rgba(0,0,0,.25); max-width: 640px; margin: 0 auto;
+}
+.guia-cabecera { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.guia p { margin: 6px 0 10px; font-size: .95rem; }
+.guia .fila-botones { margin: 0; }
+.guia .fila-botones .boton { min-height: 40px; padding: 6px 12px; }
 
 /* Apartados plegados de Ajustes */
 .apartado > summary { font-size: 1.1rem; font-weight: 700; min-height: var(--alto-toque); display: flex; align-items: center; cursor: pointer; }

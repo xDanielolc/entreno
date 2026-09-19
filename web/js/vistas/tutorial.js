@@ -1,17 +1,17 @@
-// Tutorial por niveles y «pistas»: notas pequeñas que explican una pantalla
-// la primera vez y se cierran con ✕ para no volver. Lo visto se guarda en el
-// perfil, así va con la cuenta a cualquier dispositivo.
+// Tutorial: una guía paso a paso por las pantallas y «pistas», notas
+// pequeñas que explican una pantalla la primera vez y se cierran con ✕ para
+// no volver. Lo visto se guarda en el perfil, así va con la cuenta.
 //
-// Niveles: 'basico' (solo las pistas básicas), 'avanzado' (todas) y
-// 'ninguno'. Hasta que se elige, se enseñan las básicas.
+// Niveles: 'basico' (guía de siete pasos y pistas básicas), 'avanzado'
+// (además, cuatro pasos y pistas sobre los cálculos) y 'ninguno'.
 
 import * as estado from '../estado.js';
 import { h, modal } from '../ui.js';
 
 export const NIVELES = {
-  basico: { etiqueta: 'Guíame por lo básico', descripcion: 'Una nota corta en cada pantalla la primera vez que la abres. Lo demás lo descubres cuando quieras en «Saber más».' },
-  avanzado: { etiqueta: 'Quiero entenderlo todo', descripcion: 'Las notas básicas y además las de los cálculos: 1RM, drop sets, recuperación.' },
-  ninguno: { etiqueta: 'Sin tutorial', descripcion: 'Ninguna nota. Siempre puedes activarlas en Ajustes.' },
+  basico: { etiqueta: 'Guíame por lo básico', descripcion: 'Un paseo de siete pasos por las pantallas, y una nota corta en cada una la primera vez.' },
+  avanzado: { etiqueta: 'Quiero entenderlo todo', descripcion: 'El paseo básico más cuatro pasos sobre los cálculos: 1RM, drop sets, recuperación y programas.' },
+  ninguno: { etiqueta: 'Sin tutorial', descripcion: 'Ninguna guía ni nota. Siempre puedes activarlas en Ajustes.' },
 };
 
 function config(d = estado.datos()) {
@@ -61,7 +61,8 @@ export function pista(clave, texto, { avanzada = false } = {}) {
 }
 
 // Cartel de bienvenida al tutorial: la app es grande, elige cuánto quieres
-// que te guíe. Sale una vez, al entrar por primera vez.
+// que te guíe. Sale una vez, al entrar por primera vez. Al elegir un nivel
+// con guía, la guía empieza en el acto.
 export function elegirNivel({ alElegir } = {}) {
   const cerrar = modal('¿Te guío?', h('div', { class: 'tutorial-niveles' },
     h('p', {}, 'La app es grande: registra series, calcula tu 1RM, propone pesos, mide tu recuperación y más. '
@@ -70,8 +71,102 @@ export function elegirNivel({ alElegir } = {}) {
       fijarNivel(clave);
       cerrar();
       alElegir?.(clave);
+      if (clave !== 'ninguno') iniciarGuia();
     } },
     h('div', {}, h('strong', {}, n.etiqueta), h('div', { class: 'suave' }, n.descripcion)))),
-    h('p', { class: 'nota' }, 'Se puede cambiar en Ajustes, en «Tutorial», donde también se pueden volver a mostrar las notas.')));
+    h('p', { class: 'nota' }, 'Se puede cambiar en Ajustes, en «Tutorial», donde también se puede repetir la guía.')));
   return cerrar;
+}
+
+// ---------------------------------------------------------------------------
+// Guía paso a paso: un panel abajo que te lleva por las pantallas
+// ---------------------------------------------------------------------------
+
+const PASOS_BASICOS = [
+  { ruta: '#/', titulo: 'Hoy', texto: 'Esta es tu pantalla de inicio. Arriba, qué toca hoy según tu rutina; debajo, cómo va tu recuperación. '
+    + 'Desde aquí se empieza cada entrenamiento con el botón grande.' },
+  { ruta: '#/rutinas', titulo: 'Rutinas', texto: 'Una rutina son tus días de entrenamiento en orden. Abajo hay rutinas prehechas: con «Añadir a mis rutinas» '
+    + 'te llevas la rutina y sus ejercicios en un toque. Puedes tener varias activas.' },
+  { ruta: '#/ejercicios', titulo: 'Ejercicios', texto: 'Aquí están tus ejercicios. Cada uno guarda cómo progresa (Bilbo, doble progresión, un programa…), '
+    + 'qué músculos trabaja y sus series. Tócalo para cambiarlo; se guarda solo.' },
+  { ruta: '#/', titulo: 'Apuntar un entrenamiento', texto: 'Al empezar eliges cómo ir: series de una en una, ejercicios de uno en uno o todo. '
+    + 'Apunta cada serie justo al acabarla: al escribir las repeticiones arranca el descanso. La casilla «+» son las repeticiones que te quedaban '
+    + '(recámara): 45 kg × 12 + 1. Al terminar sale un resumen con récords y consejos.' },
+  { ruta: '#/cuerpo', titulo: 'Cuerpo', texto: 'El mapa: verde recuperado, rojo aún tocado. Debajo, las series de la semana por músculo y qué conviene cambiar. '
+    + 'Al empezar cada entrenamiento puedes decir cómo llegas, y la app aprende tu ritmo.' },
+  { ruta: '#/historial', titulo: 'Historial', texto: 'Todos tus entrenamientos. Con «+ De otro día» apuntas uno pasado. Lo borrado va a una papelera y se recupera.' },
+  { ruta: '#/ajustes', titulo: 'Ajustes', texto: 'Arriba, tu nombre, tu peso y la cuenta de Google. Lo demás está plegado por apartados: descansos, drop sets, '
+    + 'ciclos, sitios, cómo se estima el 1RM, este tutorial y la zona de peligro. Fin de lo básico: ya puedes entrenar.' },
+];
+
+const PASOS_AVANZADOS = [
+  { ruta: '#/ajustes', titulo: 'El 1RM', texto: 'El 1RM es lo que podrías levantar una sola vez. La app lo estima con cada serie (fórmula de Marzagao) y, '
+    + 'si el ejercicio está en «Se ajusta a ti», corrige la fórmula con tus propios datos. En Ajustes, «Cómo se estima tu 1RM» lo explica.' },
+  { ruta: '#/ajustes', titulo: 'Drop sets y máquinas', texto: 'Un drop set se rellena solo a un porcentaje del 1RM que acabas de hacer arriba, o con kilos a mano; '
+    + 'se elige en Ajustes, en el ejercicio, en la rutina o en la serie del día. Si atas un ejercicio a una máquina con su lista de pesos, '
+    + 'la app solo propone pesos que existen.' },
+  { ruta: '#/cuerpo', titulo: 'Recuperación', texto: 'Las horas que pide cada músculo salen de lo cerca del fallo que acabaste las series (lo que más pesa), '
+    + 'del número de series (cada vez menos) y de tu ajuste personal. «¿Cómo se calculan…?» lo desglosa.' },
+  { ruta: '#/rutinas', titulo: 'Progresiones y programas', texto: 'Bilbo: un ciclo con el peso de cada día fijado y un objetivo de repeticiones que superar. '
+    + 'Doble progresión: sube repeticiones y luego peso. Programa: 5×5, 5/3/1 o HST con las series de cada sesión ya decididas. '
+    + 'Todo se elige en cada serie de la ficha del ejercicio. Fin del tutorial avanzado.' },
+];
+
+let panel = null;
+
+function pasosDe(nivel) {
+  return nivel === 'avanzado' ? [...PASOS_BASICOS, ...PASOS_AVANZADOS] : PASOS_BASICOS;
+}
+
+const enInicio = () => location.hash === '' || location.hash === '#' || location.hash === '#/';
+
+export function iniciarGuia() {
+  estado.cambiar((x) => {
+    x.perfil.tutoriales ??= { nivel: null, vistos: {} };
+    x.perfil.tutoriales.paso = 0;
+  }, { tecleo: true });
+  if (!enInicio()) location.hash = '#/';
+  window.scrollTo(0, 0);
+  pintarGuia();
+}
+
+function terminarGuia() {
+  estado.cambiar((x) => {
+    x.perfil.tutoriales ??= { nivel: null, vistos: {} };
+    x.perfil.tutoriales.paso = null;
+    x.perfil.tutoriales.guiaHecha = true;
+  }, { tecleo: true });
+  pintarGuia();
+}
+
+// Se llama después de pintar cada pantalla: enseña el panel si la guía va
+// por algún paso, o lo quita.
+export function pintarGuia() {
+  const d = estado.datos();
+  const t = d?.perfil?.tutoriales;
+  const n = t?.paso;
+  if (!estado.usuario() || n == null || t.nivel === 'ninguno') { panel?.remove(); panel = null; return; }
+  const pasos = pasosDe(t.nivel);
+  const paso = pasos[Math.min(n, pasos.length - 1)];
+  if (!panel || !panel.isConnected) {
+    panel = h('aside', { class: 'guia', role: 'dialog', 'aria-label': 'Guía paso a paso' });
+    document.body.append(panel);
+  }
+  const ir = (k) => {
+    if (k >= pasos.length) { terminarGuia(); return; }
+    estado.cambiar((x) => { x.perfil.tutoriales.paso = k; }, { tecleo: true });
+    const destino = pasos[k];
+    const yaAlli = destino.ruta === '#/' ? enInicio() : location.hash === destino.ruta;
+    if (yaAlli) pintarGuia(); else location.hash = destino.ruta;
+    window.scrollTo(0, 0);
+  };
+  panel.replaceChildren(
+    h('div', { class: 'guia-cabecera' },
+      h('strong', {}, paso.titulo),
+      h('span', { class: 'suave' }, `paso ${n + 1} de ${pasos.length}`)),
+    h('p', {}, paso.texto),
+    h('div', { class: 'fila-botones' },
+      h('button', { class: 'boton enlace', onclick: terminarGuia }, 'Salir'),
+      n > 0 && h('button', { class: 'boton secundario', onclick: () => ir(n - 1) }, 'Anterior'),
+      h('button', { class: 'boton', onclick: () => ir(n + 1) }, n + 1 >= pasos.length ? 'Terminar' : 'Siguiente')));
 }

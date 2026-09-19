@@ -12,7 +12,7 @@ import { calibrar, textoCalibracion } from '../formula1rm.js';
 import { TEXTO_AVISO, guardarPruebaEnCuenta } from '../modo-prueba.js';
 import { explicaciones1RM, opciones } from './ejercicios.js';
 import { tramosPorDefecto } from '../calculos.js';
-import { NIVELES, fijarNivel, nivelTutorial, pista, reiniciarPistas } from './tutorial.js';
+import { NIVELES, fijarNivel, iniciarGuia, nivelTutorial, pista, reiniciarPistas } from './tutorial.js';
 import { MODOS_ENTRENO } from './sesion.js';
 
 // Ajustes: lo importante arriba (perfil y cuenta) y el resto en apartados
@@ -163,6 +163,8 @@ export function vistaAjustes(contenedor) {
     apartado('Tutorial',
       h('p', { class: 'nota' }, 'Las notas que explican cada pantalla la primera vez. Se cierran con ✕ y no vuelven, salvo que las reactives aquí.'),
       opciones(NIVELES, nivelTutorial(d) ?? 'basico', (n) => { fijarNivel(n); aviso('Tutorial cambiado'); }),
+      h('button', { class: 'boton secundario', onclick: () => { if (nivelTutorial(d) === 'ninguno') fijarNivel('basico'); iniciarGuia(); } },
+        'Ver la guía paso a paso'),
       h('button', { class: 'boton secundario', onclick: () => { reiniciarPistas(); aviso('Las notas del tutorial volverán a salir.'); } },
         'Volver a mostrar todas las notas')),
 

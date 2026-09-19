@@ -13,6 +13,7 @@ import { vistaInicio } from './vistas/inicio.js';
 import { vistaCuerpo } from './vistas/cuerpo.js';
 import { vistaFormularioRutina, vistaRutinas } from './vistas/rutinas.js';
 import { vistaSesion } from './vistas/sesion.js';
+import { pintarGuia } from './vistas/tutorial.js';
 
 // Rutas: el fragmento de la dirección (#/…) decide qué pantalla se ve.
 const RUTAS = [
@@ -68,6 +69,7 @@ function renderizar() {
   }
   pintarNavegacion(ruta.pestana);
   pintarIndicador();
+  pintarGuia();
   window.scrollTo(0, mismaRuta ? scroll : 0);
 }
 
@@ -124,13 +126,14 @@ function registrarServiceWorker() {
   // En la primera visita no hay versión anterior y no hace falta recargar.
   const habiaVersionAnterior = Boolean(navigator.serviceWorker.controller);
   let recargando = false;
+  // Nunca se recarga sola con la pantalla a la vista (cortaba el acceso de
+  // Google a medias): si está en segundo plano se recarga; si no, avisa.
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     if (recargando || !habiaVersionAnterior) return;
     recargando = true;
     estado.guardarYa();
-    if (document.visibilityState === 'hidden' || !document.activeElement?.matches('input, textarea, select')) {
-      location.reload();
-    }
+    if (document.visibilityState === 'hidden') location.reload();
+    else aviso('Hay una versión nueva de la app.', { ms: 15000, accion: { texto: 'Actualizar', fn: () => location.reload() } });
   });
 }
 

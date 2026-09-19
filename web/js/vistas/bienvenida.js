@@ -4,6 +4,7 @@ import { pedirToken } from '../google-auth.js';
 import { sincronizar } from '../sincronizacion.js';
 import { anadir, aviso, h } from '../ui.js';
 import { avisarModoPrueba } from '../modo-prueba.js';
+import { tarjetaInstalar } from './instalar.js';
 
 export function vistaBienvenida(contenedor) {
   let ocupado = false;
@@ -49,5 +50,6 @@ export function vistaBienvenida(contenedor) {
         'Tus datos se guardan en tu propio Google Drive, en una carpeta que crea la app. ',
         'La app no puede ver nada más de tu Drive. ',
         h('a', { href: 'privacidad.html', target: '_blank', rel: 'noopener' }, 'Política de privacidad'), '.'),
-      h('button', { class: 'boton enlace', onclick: probarSinCuenta }, 'Probar sin cuenta (no se guarda en ninguna cuenta)')));
+      h('button', { class: 'boton enlace', onclick: probarSinCuenta }, 'Probar sin cuenta (no se guarda en ninguna cuenta)')),
+    tarjetaInstalar());
 }

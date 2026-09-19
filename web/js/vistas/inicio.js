@@ -101,8 +101,11 @@ export function vistaInicio(contenedor) {
   // Primera vez: ¿cuánto tutorial quieres? (no encima de otro cartel)
   if (nivelTutorial(d) == null && !preguntandoTutorial) {
     preguntandoTutorial = true;
-    setTimeout(() => {
-      if (document.querySelector('.modal-fondo')) { preguntandoTutorial = false; return; }
+    // Si hay otro cartel abierto (el de modo prueba), se espera a que se cierre.
+    const intento = setInterval(() => {
+      if (document.querySelector('.modal-fondo')) return;
+      clearInterval(intento);
+      if (nivelTutorial(estado.datos()) != null) { preguntandoTutorial = false; return; }
       elegirNivel({ alElegir: () => { preguntandoTutorial = false; } });
     }, 400);
   }
@@ -141,6 +144,7 @@ export function vistaInicio(contenedor) {
     estado.esSinCuenta() && barraModoPrueba(),
     h('p', { class: 'fecha-hoy' }, fechaLarga(hoyISO())),
     h('h1', {}, saludo(d.perfil.nombre)),
+    tarjetaInstalar(),
     pista('hoy', 'Aquí ves qué toca hoy según tu rutina y cómo va tu recuperación. Abajo: Cuerpo (mapa y volumen), '
       + 'Ejercicios, Historial y Ajustes.'),
 
@@ -182,7 +186,6 @@ export function vistaInicio(contenedor) {
 
     tarjetaSugerenciasAjuste(d),
     tarjetaRecuperacion(d, { compacta: true }),
-    tarjetaInstalar(),
 
     recientes.length > 0 && h('section', {},
       h('h2', {}, 'Últimos entrenamientos'),
