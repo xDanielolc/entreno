@@ -77,6 +77,19 @@ export function reemplazarDatos(nuevos, nuevaMeta) {
   emitir('datos-remotos');
 }
 
+// Borra todos los datos del usuario abierto y deja un archivo nuevo (con su
+// nombre y correo). El archivo de Drive se sobrescribe en la siguiente subida.
+export function vaciarDatos() {
+  if (!registro) return;
+  const { nombre, correo } = registro.datos.perfil;
+  registro.datos = archivoNuevo({ nombre, correo });
+  registro.datos.revision = 1;
+  registro.meta.pendiente = true;
+  registro.meta.csvRevision = null;
+  guardarYa();
+  emitir('datos');
+}
+
 export function actualizarMeta(parcial) {
   Object.assign(registro.meta, parcial);
   guardarYa();

@@ -2,7 +2,8 @@ import { BIBLIOGRAFIA } from '../bibliografia.js';
 import { creditosCargados } from '../imagenes.js';
 import { formatearNumero } from '../calculos.js';
 import * as estado from '../estado.js';
-import { desconectar, sincronizar, situacionActual } from '../sincronizacion.js';
+import { desconectar, eliminarCuenta, rehacerCopiasLegibles, sincronizar, situacionActual } from '../sincronizacion.js';
+import { modal } from '../ui.js';
 import { VERSION_APP } from '../version.js';
 import { anadir, aviso, confirmar, h, hoyISO, leerNumero } from '../ui.js';
 import { DESCANSO_TRAMOS_POR_DEFECTO, RESPIRACION_POR_DEFECTO } from './descanso.js';
@@ -76,6 +77,12 @@ export function vistaAjustes(contenedor) {
           h('button', { class: 'boton secundario', onclick: () => sincronizar({ interactivo: true }) }, 'Sincronizar ahora'),
         ],
       h('button', { class: 'boton secundario', onclick: descargarCopia }, 'Descargar una copia de mis datos'),
+      !sinCuenta && h('p', { class: 'nota' }, 'En tu Google Drive, en la carpeta «App de entrenamiento», hay además dos hojas de cálculo '
+        + 'legibles (entrenamientos; ejercicios y rutinas) que se rehacen solas como mucho cada media hora.'),
+      !sinCuenta && h('button', { class: 'boton enlace', onclick: async () => {
+        try { await rehacerCopiasLegibles(); aviso('Hojas legibles actualizadas en Google Drive.'); } catch (e) { aviso(`No se ha podido: ${e.message}`, { tipo: 'error' }); }
+      } }, 'Rehacer ahora las hojas legibles'),
+      h('p', { class: 'nota' }, h('a', { href: 'privacidad.html', target: '_blank', rel: 'noopener' }, 'Política de privacidad')),
       h('button', { class: 'boton enlace', onclick: salir }, sinCuenta ? 'Salir del modo de prueba' : 'Salir de la cuenta')),
 
     apartado('Descansos',
@@ -182,8 +189,63 @@ export function vistaAjustes(contenedor) {
         `Imágenes incluidas: ${Object.keys(creditosCargados()?.ejercicios ?? {}).length} de ejercicios `
         + `y ${Object.keys(creditosCargados()?.musculos ?? {}).length} capas de músculo.`)),
 
+    apartado('Zona de peligro',
+      h('p', { class: 'nota' }, 'Dos botones que no tienen vuelta atrás. Cada uno pide escribir una palabra para confirmar.'),
+      h('button', { class: 'boton secundario peligro-texto', onclick: () => zonaPeligro('borrar') }, 'Borrar todos mis datos'),
+      h('p', { class: 'nota' }, 'Se vacían ejercicios, rutinas, entrenamientos y ajustes, aquí y en Google Drive. La cuenta sigue conectada.'),
+      h('button', { class: 'boton peligro', onclick: () => zonaPeligro('eliminar') }, sinCuenta ? 'Eliminar los datos de prueba' : 'Eliminar mi cuenta'),
+      h('p', { class: 'nota' }, sinCuenta
+        ? 'Se borra todo lo de prueba de este dispositivo.'
+        : 'Se borran los archivos de la app en tu Google Drive (datos, copias y hojas), la copia de este dispositivo y el permiso '
+          + 'que diste a la app. Para volver tendrías que entrar con Google otra vez, desde cero.')),
+
     h('p', { class: 'nota centrado' },
       `Versión ${VERSION_APP} · formato de datos v${d.version} · revisión ${formatearNumero(d.revision)}`));
+
+  // Dos capas: un cartel que explica y una palabra que hay que escribir.
+  function zonaPeligro(accion) {
+    const palabra = accion === 'borrar' ? 'BORRAR' : 'ELIMINAR';
+    const campo = h('input', { type: 'text', autocomplete: 'off', placeholder: `Escribe ${palabra}` });
+    const botonFinal = h('button', { class: 'boton peligro', disabled: true, onclick: () => ejecutar() },
+      accion === 'borrar' ? 'Borrar todos mis datos' : 'Eliminar para siempre');
+    campo.addEventListener('input', () => { botonFinal.disabled = campo.value.trim().toUpperCase() !== palabra; });
+    const cerrar = modal(accion === 'borrar' ? '¿Borrar todos tus datos?' : '¿Eliminar tu cuenta?', h('div', { class: 'formulario' },
+      h('p', {}, accion === 'borrar'
+        ? 'Se vacían todos tus ejercicios, rutinas, entrenamientos y ajustes. Se conservan tu nombre y la conexión con Google. '
+          + 'El archivo de Google Drive se sobrescribe vacío en cuanto haya conexión.'
+        : sinCuenta
+          ? 'Se borra todo lo que has hecho en modo prueba en este dispositivo.'
+          : 'Se borran los archivos de la app en tu Google Drive, la copia de este dispositivo y el permiso de la app. '
+            + 'No hay copia en ningún otro sitio: si quieres conservar algo, descarga antes una copia.'),
+      h('p', { class: 'nota' }, `Para confirmar, escribe ${palabra} en mayúsculas.`),
+      campo,
+      h('div', { class: 'fila-botones' },
+        h('button', { class: 'boton secundario', onclick: () => cerrar() }, 'Cancelar'),
+        botonFinal)));
+
+    async function ejecutar() {
+      botonFinal.disabled = true;
+      botonFinal.textContent = 'Un momento…';
+      try {
+        if (accion === 'borrar') {
+          estado.vaciarDatos();
+          cerrar();
+          if (!sinCuenta) await sincronizar({ interactivo: true });
+          aviso('Todos tus datos se han borrado.');
+          location.hash = '#/';
+        } else {
+          const n = await eliminarCuenta();
+          cerrar();
+          aviso(sinCuenta ? 'Datos de prueba eliminados.' : `Cuenta eliminada: ${n} archivos borrados de tu Google Drive.`, { ms: 8000 });
+          location.hash = '#/';
+        }
+      } catch (e) {
+        botonFinal.disabled = false;
+        botonFinal.textContent = 'Reintentar';
+        aviso(`No se ha podido: ${e.message}`, { tipo: 'error', ms: 8000 });
+      }
+    }
+  }
 }
 
 // Sitios donde entrenas. El de por defecto es el que se pone al empezar un

@@ -123,3 +123,13 @@ pesos (`pesosMaquina`, `aPesoDisponible()` en drop sets, doble progresión,
 ciclos), separar por sitio eligiendo sitios, progresión «programa» (5×5,
 5/3/1, HST: `PROGRAMAS`, `seriesDelPrograma`, un plan genera varias series con
 `programaSet`), rutinas prehechas 5×5 y 5/3/1 y filosofía en todas.
+0.16.0: cuenta. Zona de peligro en Ajustes: «Borrar todos mis datos»
+(`estado.vaciarDatos()`, se sobrescribe Drive) y «Eliminar mi cuenta»
+(`eliminarCuenta()`: borra todo lo de la app en Drive, revoca el pase y quita
+la copia local), ambas escribiendo BORRAR / ELIMINAR. Hojas legibles CSV en la
+carpeta de Drive (`exportar.js`, se rehacen cada media hora si hay cambios;
+meta.csvIds/csvRevision/csvHora). `drive.js` admite cualquier tipo, lista y
+borra. Saludo aleatorio por hora en Hoy. `web/privacidad.html` enlazada
+desde la entrada y Ajustes; pasos de verificación en docs/google-cloud.md
+(los tiene que dar él en la consola). El texto «Anterior / Siguiente» que
+vio en el móvil lo pone el navegador sobre los desplegables, no la app.

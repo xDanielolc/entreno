@@ -47,6 +47,7 @@ export function vistaBienvenida(contenedor) {
       botonGoogle,
       h('p', { class: 'nota' },
         'Tus datos se guardan en tu propio Google Drive, en una carpeta que crea la app. ',
-        'La app no puede ver nada más de tu Drive.'),
+        'La app no puede ver nada más de tu Drive. ',
+        h('a', { href: 'privacidad.html', target: '_blank', rel: 'noopener' }, 'Política de privacidad'), '.'),
       h('button', { class: 'boton enlace', onclick: probarSinCuenta }, 'Probar sin cuenta (no se guarda en ninguna cuenta)')));
 }

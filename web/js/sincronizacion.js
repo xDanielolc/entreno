@@ -13,6 +13,8 @@ import * as drive from './drive.js';
 import { migrar, necesitaMigrar, validar } from './esquema.js';
 import * as estado from './estado.js';
 import { minutosDeToken, olvidarToken, pedirToken, tokenVigente } from './google-auth.js';
+import { NOMBRES_CSV, csvEjerciciosYRutinas, csvEntrenamientos } from './exportar.js';
+import * as local from './almacen-local.js';
 
 // 'sin-cuenta' | 'desconectada' | 'sincronizando' | 'al-dia' | 'pendiente' | 'sin-internet' | 'error'
 let situacion = 'desconectada';
@@ -141,7 +143,61 @@ async function sincronizarArchivo() {
     estado.actualizarMeta({ fileId, revisionRemota: subida,
       pendiente: estado.datos().revision !== subida });
   }
+  await subirCopiasLegibles();
   return conflicto;
+}
+
+// Las dos hojas legibles se rehacen como mucho cada media hora, y solo si
+// los datos han cambiado desde la última vez.
+const MEDIA_HORA = 30 * 60_000;
+async function subirCopiasLegibles({ forzar = false } = {}) {
+  const meta = estado.meta();
+  const d = estado.datos();
+  if (!forzar && (meta.csvRevision === d.revision || Date.now() - (meta.csvHora ?? 0) < MEDIA_HORA)) return;
+  const ids = { ...(meta.csvIds || {}) };
+  const hojas = { entrenamientos: csvEntrenamientos(d), ejercicios: csvEjerciciosYRutinas(d) };
+  for (const [clave, texto] of Object.entries(hojas)) {
+    const nombre = NOMBRES_CSV[clave];
+    try {
+      if (ids[clave]) {
+        await drive.actualizar(ids[clave], texto, {}, 'text/csv');
+      } else {
+        const existente = await drive.buscarPorNombre(nombre);
+        if (existente) { await drive.actualizar(existente.id, texto, {}, 'text/csv'); ids[clave] = existente.id; }
+        else ids[clave] = (await drive.crear(nombre, texto, { copia: 'legible' }, 'text/csv')).id;
+      }
+    } catch (e) {
+      if (e.estado === 404) { delete ids[clave]; continue; }
+      throw e;
+    }
+  }
+  estado.actualizarMeta({ csvIds: ids, csvRevision: d.revision, csvHora: Date.now() });
+}
+
+export function rehacerCopiasLegibles() {
+  return subirCopiasLegibles({ forzar: true });
+}
+
+// Borra en Drive todo lo que creó la app (datos, copias, hojas y carpeta),
+// retira el permiso y quita la copia del dispositivo. Devuelve cuántos
+// archivos ha borrado. Se llama desde Ajustes, con varias confirmaciones.
+export async function eliminarCuenta() {
+  const usuario = estado.usuario();
+  let borrados = 0;
+  if (!estado.esSinCuenta()) {
+    await pedirToken({ silencioso: true, pista: usuario });
+    const archivos = await drive.listarTodo();
+    // Primero los archivos y al final las carpetas.
+    archivos.sort((a, b) => (a.mimeType.includes('folder') ? 1 : 0) - (b.mimeType.includes('folder') ? 1 : 0));
+    for (const a of archivos) {
+      try { await drive.borrar(a.id); borrados += 1; } catch (e) { if (e.estado !== 404) throw e; }
+    }
+    olvidarToken();
+  }
+  estado.cerrarUsuario();
+  await local.borrarUsuario(usuario);
+  fijar('desconectada');
+  return borrados;
 }
 
 function propiedades(d) {

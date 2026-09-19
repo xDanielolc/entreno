@@ -59,6 +59,32 @@ function cuandoTexto(fecha, ahora) {
   return `el ${fecha.toLocaleDateString('es-ES', { weekday: 'long' })} ${tramo}`;
 }
 
+// Un saludo distinto cada vez (cambia cada hora, no en cada toque).
+const SALUDOS = [
+  'Hola, {n}. La barra no se va a levantar sola.',
+  '{n}, hoy también cuenta.',
+  'Buenas, {n}. Un día más es un día más fuerte.',
+  '{n}, el mejor entrenamiento es el que se hace.',
+  'Hola, {n}. Poco a poco y sin parar.',
+  '{n}, lo difícil ya lo has hecho: abrir la app.',
+  'Hola, {n}. Hoy, una repetición más que ayer.',
+  '{n}, tu yo de dentro de un año te lo agradecerá.',
+  'Buenas, {n}. Calienta bien, que luego nos quejamos.',
+  '{n}, si dudas, empieza por la primera serie.',
+  'Hola, {n}. Descansar también es entrenar.',
+  '{n}, la constancia gana a la motivación.',
+  'Hola, {n}. Hoy toca lo que toca, y ya está.',
+  '{n}, apunta las series: lo que no se mide no mejora.',
+  'Buenas, {n}. Cada serie, con intención.',
+  '{n}, sin prisa: el peso subirá.',
+];
+
+function saludo(nombre) {
+  const base = SALUDOS[Math.floor(Date.now() / 3_600_000) % SALUDOS.length];
+  const texto = base.replace('{n}', nombre || '');
+  return texto.replace(/,\s*[.,]/, ',').replace(/^\s*,\s*/, '').replace(/,\s*$/, '').replace(/\s{2,}/g, ' ').replace(/^(\w)/, (m) => m.toUpperCase());
+}
+
 export function vistaInicio(contenedor) {
   const d = estado.datos();
   const enCurso = d.sesiones.find((s) => s.estado === 'en-curso' && !s.borrada);
@@ -114,7 +140,7 @@ export function vistaInicio(contenedor) {
   anadir(contenedor,
     estado.esSinCuenta() && barraModoPrueba(),
     h('p', { class: 'fecha-hoy' }, fechaLarga(hoyISO())),
-    h('h1', {}, d.perfil.nombre ? `Hola, ${d.perfil.nombre}` : 'Hola'),
+    h('h1', {}, saludo(d.perfil.nombre)),
     pista('hoy', 'Aquí ves qué toca hoy según tu rutina y cómo va tu recuperación. Abajo: Cuerpo (mapa y volumen), '
       + 'Ejercicios, Historial y Ajustes.'),
 

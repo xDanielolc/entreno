@@ -83,30 +83,50 @@ export async function descargar(id) {
   return r.json();
 }
 
-function cuerpoMultiparte(metadatosArchivo, contenido) {
+// contenido: un objeto (se guarda como JSON) o un texto ya hecho (CSV…).
+function cuerpoMultiparte(metadatosArchivo, contenido, mime = 'application/json') {
   const limite = `limite${crypto.getRandomValues(new Uint32Array(1))[0]}`;
+  const texto = typeof contenido === 'string' ? contenido : JSON.stringify(contenido);
   const cuerpo =
     `--${limite}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n` +
     `${JSON.stringify(metadatosArchivo)}\r\n` +
-    `--${limite}\r\nContent-Type: application/json\r\n\r\n` +
-    `${JSON.stringify(contenido)}\r\n--${limite}--`;
+    `--${limite}\r\nContent-Type: ${mime}; charset=UTF-8\r\n\r\n` +
+    `${texto}\r\n--${limite}--`;
   return { cuerpo, tipo: `multipart/related; boundary=${limite}` };
 }
 
-export async function crear(nombre, contenido, propiedades = {}) {
+export async function crear(nombre, contenido, propiedades = {}, mime = 'application/json') {
   const padre = await carpetaDeLaApp();
   const { cuerpo, tipo } = cuerpoMultiparte(
-    { name: nombre, mimeType: 'application/json', parents: [padre], appProperties: propiedades }, contenido);
+    { name: nombre, mimeType: mime, parents: [padre], appProperties: propiedades }, contenido, mime);
   const r = await peticion(`${API_SUBIDA}/files?uploadType=multipart&fields=id,appProperties`, {
     method: 'POST', headers: { 'Content-Type': tipo }, body: cuerpo,
   });
   return r.json();
 }
 
-export async function actualizar(id, contenido, propiedades = {}) {
-  const { cuerpo, tipo } = cuerpoMultiparte({ appProperties: propiedades }, contenido);
+export async function actualizar(id, contenido, propiedades = {}, mime = 'application/json') {
+  const { cuerpo, tipo } = cuerpoMultiparte({ appProperties: propiedades }, contenido, mime);
   const r = await peticion(`${API_SUBIDA}/files/${id}?uploadType=multipart&fields=id,appProperties`, {
     method: 'PATCH', headers: { 'Content-Type': tipo }, body: cuerpo,
   });
   return r.json();
+}
+
+// Un archivo cualquiera de la app por su nombre (CSV incluidos).
+export async function buscarPorNombre(nombre) {
+  const [archivo] = await buscar(`name = '${escaparConsulta(nombre)}'`);
+  return archivo || null;
+}
+
+// Todo lo que la app ha creado en Drive: archivos y su carpeta.
+export async function listarTodo() {
+  const campos = encodeURIComponent('files(id,name,mimeType)');
+  const r = await peticion(`${API}/files?q=${encodeURIComponent('trashed = false')}&fields=${campos}&pageSize=200&spaces=drive`);
+  return (await r.json()).files;
+}
+
+// Borrado definitivo (no va a la papelera de Drive).
+export async function borrar(id) {
+  await peticion(`${API}/files/${id}`, { method: 'DELETE' });
 }
