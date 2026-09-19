@@ -56,7 +56,8 @@ export function vistaEjercicios(contenedor) {
 
     const grupos = new Map();
     for (const e of lista) {
-      const g = e.grupo || 'Sin grupo';
+      // «Empuje» y «empuje» son el mismo grupo.
+      const g = (e.grupo || 'Sin grupo').trim().toLowerCase();
       if (!grupos.has(g)) grupos.set(g, []);
       grupos.get(g).push(e);
     }

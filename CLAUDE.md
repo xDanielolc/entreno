@@ -139,3 +139,9 @@ cartel «¿Te guío?» espera a que se cierre el de modo prueba, tarjeta de
 instalar arriba de Hoy y en la pantalla de entrada, y la app ya NO se recarga
 sola con la pantalla a la vista al llegar una versión nueva (cortaba el
 acceso de Google y obligaba a entrar dos veces): avisa con «Actualizar».
+0.16.2 (probado por Claude en el Chrome de Dan, modo prueba): grupos de la
+lista sin distinguir mayúsculas («Empuje» y «empuje» eran dos), objetivo Bilbo
+entero y con tope 40 (avisa «peso muy bajo»), «+ Serie» tras una Bilbo crea
+una libre sin plantilla (no duplica el día del ciclo), programa sin peso
+inicial estima uno (60 % del 1RM, 90 % en 5/3/1, o 20 kg). Google Drive no se
+puede probar desde la extensión de Chrome: bloquea la ventana de Google.

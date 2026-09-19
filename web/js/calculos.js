@@ -194,8 +194,9 @@ function sugerenciaBilbo(datos, ejercicio, plan, { excluirSesion, sobre }) {
     : null;
   const recamara = recamaraDe(plan.tecnicas, datos.perfil.recamaraPorDefecto ?? 1);
   const reps = rmAnterior && valor > 0 ? repsParaIgualar(modeloDe(datos, ejercicio), rmAnterior, valor, recamara) : null;
-  const objetivoSuperar = reps != null ? redondear(Math.max(0, reps), 1) : null;
-  return { ...resultado, carga: valor, objetivoSuperar };
+  // Repeticiones enteras y con tope: por encima de 40 el peso es demasiado bajo.
+  const objetivoSuperar = reps != null ? Math.min(40, Math.ceil(Math.max(0, reps))) : null;
+  return { ...resultado, carga: valor, objetivoSuperar, pesoBajo: reps != null && reps > 40 };
 }
 
 // ---------------------------------------------------------------------------
@@ -254,11 +255,21 @@ export function seriesDelPrograma(ejercicio, prog, n, historial = []) {
 
 function sugerenciaPrograma(datos, ejercicio, plan, { excluirSesion } = {}) {
   const prog = plan.progresion;
-  if (!PROGRAMAS[prog.programa] || prog.inicial == null) return { sinPrograma: true, programa: prog.programa };
+  if (!PROGRAMAS[prog.programa]) return { sinPrograma: true, programa: prog.programa };
+  // Sin peso inicial en la ficha se estima: en 5/3/1 el 90 % de tu 1RM; en
+  // los demás, el 60 %; y sin historial, la barra (20 kg).
+  let estimado = false;
+  let progUsada = prog;
+  if (prog.inicial == null) {
+    const rm = rmDeReferencia(datos, ejercicio, { excluirSesion })?.valor;
+    const inicial = rm ? aPesoDisponible(ejercicio, rm * (prog.programa === '531' ? 0.9 : 0.6)) : 20;
+    progUsada = { ...prog, inicial };
+    estimado = true;
+  }
   const historial = sesionesDelPrograma(datos, ejercicio, plan, { excluirSesion });
   const n = historial.length;
-  const toca = seriesDelPrograma(ejercicio, prog, n, historial);
-  return { programa: prog.programa, sesionN: n + 1, nombreSesion: toca.nombre, seriesPrograma: toca.series,
+  const toca = seriesDelPrograma(ejercicio, progUsada, n, historial);
+  return { programa: prog.programa, sesionN: n + 1, nombreSesion: toca.nombre, seriesPrograma: toca.series, inicialEstimado: estimado,
     carga: toca.series[0]?.carga ?? null, esfuerzoObjetivo: toca.series[0]?.reps ?? null };
 }
 

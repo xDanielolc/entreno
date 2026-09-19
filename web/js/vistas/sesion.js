@@ -239,6 +239,7 @@ export function vistaSesion(contenedor, { id }) {
       else if (s.cicloTerminado) partes.push(`Ciclo ${s.cicloN} terminado: prepara el siguiente en la ficha`);
       else {
         partes.push(`Ciclo ${s.cicloN} · día ${serie.diaCiclo ?? s.dia} de ${s.diasCiclo}`);
+        if (s.pesoBajo) partes.push('peso muy bajo para tu 1RM: revisa el ciclo en la ficha');
         if (serie.carga != null && s.sobre === 'carga') partes.push(`${formatearNumero(serie.carga)} ${uCarga}`);
         if (serie.objetivo != null) {
           partes.push(s.sobre === 'carga'
@@ -247,9 +248,10 @@ export function vistaSesion(contenedor, { id }) {
         }
       }
     } else if (s.modo === 'programa') {
-      if (s.sinPrograma) partes.push('Programa sin peso inicial: ponlo en la ficha');
+      if (s.sinPrograma) partes.push('Programa sin configurar: revisa la ficha');
       else {
         partes.push(`${PROGRAMAS[s.programa]?.etiqueta ?? s.programa} · ${s.nombreSesion}`);
+        if (s.inicialEstimado) partes.push('peso inicial estimado (cámbialo en la ficha)');
         if (serie.programaSet) partes.push(`serie ${serie.programaSet} de ${s.seriesPrograma.length}`);
         if (serie.carga != null) partes.push(`${formatearNumero(serie.carga)} ${uCarga} × ${formatearNumero(serie.objetivo)}${serie.amrap ? ' o más' : ''}`);
       }
@@ -649,9 +651,12 @@ export function vistaSesion(contenedor, { id }) {
         return;
       }
       const anterior = s.ejercicios[i].series.at(-1);
-      const copia = serieSuelta({ tipo: anterior?.tipo ?? 'libre', tecnicas: anterior?.tecnicas ?? [],
+      // Una Bilbo no se repite: la serie de más es libre, sin plantilla, para
+      // no contar dos veces en el ciclo.
+      const esBilbo = anterior?.tipo === 'bilbo' || planDe(ej, anterior ?? {})?.progresion?.tipo === 'bilbo';
+      const copia = serieSuelta({ tipo: esBilbo ? 'libre' : anterior?.tipo ?? 'libre', tecnicas: anterior?.tecnicas ?? [],
         carga: anterior?.carga ?? null, recamara: anterior?.recamara ?? null });
-      copia.planId = anterior?.planId ?? null;
+      copia.planId = esBilbo ? null : anterior?.planId ?? null;
       copia.lectura = anterior?.lectura ?? null;
       if (usaTramos(copia.tecnicas)) copia.tramos = tramosPropuestos(copia, planDe(ej, copia), anterior, datos.perfil);
       s.ejercicios[i].series.push(copia);
