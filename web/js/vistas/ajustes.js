@@ -14,6 +14,8 @@ import { explicaciones1RM, opciones } from './ejercicios.js';
 import { tramosPorDefecto } from '../calculos.js';
 import { NIVELES, fijarNivel, iniciarGuia, nivelTutorial, pista, reiniciarPistas } from './tutorial.js';
 import { MODOS_ENTRENO } from './sesion.js';
+import { aplicarTema, hacerCuestionario } from './cuestionario.js';
+import { listaGlosario } from './glosario.js';
 
 // Ajustes: lo importante arriba (perfil y cuenta) y el resto en apartados
 // plegados, para que no se vea todo de golpe.
@@ -63,7 +65,11 @@ export function vistaAjustes(contenedor) {
         h('input', { type: 'text', inputmode: 'decimal', value: d.perfil.pesoCorporalKg ?? '',
           oninput: (e) => estado.cambiar((x) => { x.perfil.pesoCorporalKg = leerNumero(e.target.value); }, { tecleo: true }) }),
         h('small', { class: 'nota' },
-          'Lo usan los ejercicios de peso corporal (flexiones, dominadas) y las máquinas asistidas. Cambiarlo no altera las series ya guardadas.'))),
+          'Solo para calcular la carga en flexiones, dominadas y máquinas asistidas; esta app no va de controlar el peso.')),
+      h('div', { class: 'campo' },
+        h('span', { class: 'etiqueta-campo' }, 'Tema'),
+        opciones({ claro: { etiqueta: 'Claro' }, oscuro: { etiqueta: 'Oscuro' }, sistema: { etiqueta: 'Como el móvil' } }, d.perfil.tema ?? 'sistema',
+          (t) => { estado.cambiar((x) => { x.perfil.tema = t; }); aplicarTema(t); }, { compacto: true }))),
 
     h('section', { class: 'tarjeta' },
       h('h2', {}, 'Cuenta y copia de seguridad'),
@@ -135,7 +141,10 @@ export function vistaAjustes(contenedor) {
       numeroAjuste('Un ciclo nuevo empieza al (% de tu 1RM)', d.perfil.bilboInicioPorcentaje ?? 50,
         (x, v) => { x.perfil.bilboInicioPorcentaje = v; }),
       h('small', { class: 'nota' }, 'Al empezar un ciclo, el primer día va a este porcentaje de tu mejor 1RM estimado en ese ejercicio y cada día '
-        + 'sube un poco. Empezar bajo deja margen para superarte muchos días seguidos con series largas.')),
+        + 'sube un poco. Empezar bajo deja margen para superarte muchos días seguidos con series largas.'),
+      numeroAjuste('El ciclo se agota cuando el objetivo baja de (repeticiones)', d.perfil.bilboMinReps ?? 15,
+        (x, v) => { x.perfil.bilboMinReps = v; }),
+      h('small', { class: 'nota' }, 'Cuando el peso del día pide menos repeticiones que estas, la app avisa de que toca ciclo nuevo.')),
 
     seccionSedes(d, apartado),
 
@@ -166,7 +175,11 @@ export function vistaAjustes(contenedor) {
       h('button', { class: 'boton secundario', onclick: () => { if (nivelTutorial(d) === 'ninguno') fijarNivel('basico'); iniciarGuia(); } },
         'Ver la guía paso a paso'),
       h('button', { class: 'boton secundario', onclick: () => { reiniciarPistas(); aviso('Las notas del tutorial volverán a salir.'); } },
-        'Volver a mostrar todas las notas')),
+        'Volver a mostrar todas las notas'),
+      h('button', { class: 'boton secundario', onclick: () => hacerCuestionario() }, 'Repetir el cuestionario de bienvenida'),
+      h('h3', {}, 'Glosario'),
+      h('p', { class: 'nota' }, 'Qué significa cada palabra, explicado desde cero.'),
+      listaGlosario()),
 
     apartado('De dónde sale cada cosa',
       h('p', { class: 'nota' }, 'Qué recomienda la app, con qué respaldo y dónde falla.'),

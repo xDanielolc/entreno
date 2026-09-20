@@ -5,7 +5,7 @@
 // Separador «;» y coma decimal, como espera Excel en español. Empiezan con
 // la marca UTF-8 para que las tildes salgan bien.
 
-import { esfuerzoTotal, trabajoSerie } from './calculos.js';
+import { esfuerzoTotal } from './calculos.js';
 import { TIPOS_CARGA, TIPOS_PROGRESION, TIPOS_SERIE } from './esquema.js';
 import { rmDeSerie } from './formula1rm.js';
 import { nombreMusculo } from './musculos.js';
@@ -27,10 +27,28 @@ function filas(lineas) {
 
 const hora = (iso) => (iso ? new Date(iso).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : '');
 
-// Una fila por serie (y por bajada en un drop set).
+// Una fila por ejercicio y día, con cada serie en su columna, como en una
+// hoja de gimnasio: «60 kg × 12 + 1» (peso × repeticiones + recámara); un
+// drop set se escribe «60×8 → 50×6 → 40×5».
+const coma = (n) => (n == null ? '' : String(Math.round(n * 100) / 100).replace('.', ','));
+
+function textoSerieCorto(ej, serie) {
+  if (serie.tramos?.length) {
+    return serie.tramos.filter((t) => t.esfuerzo != null).map((t) => `${coma(t.carga)}×${coma(t.esfuerzo)}`).join(' → ');
+  }
+  const partes = [];
+  if (ej.carga?.tipo !== 'ninguna' && serie.carga != null) partes.push(`${coma(serie.carga)} kg`);
+  if (serie.esfuerzo != null) partes.push(`${coma(serie.esfuerzo)}${serie.recamara ? ` + ${serie.recamara}` : ''}`);
+  const tec = textoTecnicas(serie.tecnicas);
+  return partes.join(' × ') + (tec ? ` (${tec})` : '');
+}
+
 export function csvEntrenamientos(datos) {
-  const lineas = [['Fecha', 'Hora', 'Rutina', 'Día', 'Sitio', 'Ejercicio', 'Serie', 'Tipo', 'Técnicas', 'Tramo',
-    'Kg', 'Repeticiones o segundos', 'En recámara', 'Objetivo', '1RM estimado', 'Trabajo (kg × reps)', 'Notas']];
+  const MAX = 8;
+  const cabecera = ['Fecha', 'Rutina', 'Día', 'Sitio', 'Ejercicio'];
+  for (let i = 1; i <= MAX; i++) cabecera.push(`Serie ${i}`);
+  cabecera.push('Mejor 1RM del día', 'Notas');
+  const lineas = [['Cada serie: peso × repeticiones + las que te quedaban. Un drop set: 60×8 → 50×6.'], cabecera];
   const sesiones = [...datos.sesiones].filter((s) => !s.borrada)
     .sort((a, b) => (a.fecha + (a.inicio || '')).localeCompare(b.fecha + (b.inicio || '')));
   for (const s of sesiones) {
@@ -39,21 +57,15 @@ export function csvEntrenamientos(datos) {
     for (const entrada of s.ejercicios) {
       const ej = datos.ejercicios.find((e) => e.id === entrada.ejercicioId);
       if (!ej) continue;
-      entrada.series.forEach((serie, j) => {
-        if (!serie.hecha) return;
-        const base = [s.fecha, hora(s.inicio), rutina?.nombre ?? '', dia?.nombre ?? '', s.sedeId ? nombreSede(datos, s.sedeId) : '',
-          ej.nombre, j + 1, TIPOS_SERIE[serie.tipo] ?? serie.tipo, textoTecnicas(serie.tecnicas)];
-        if (serie.tramos?.length) {
-          serie.tramos.forEach((t, k) => {
-            if (t.esfuerzo == null) return;
-            lineas.push([...base, k + 1, t.carga, t.esfuerzo, '', t.objetivo ?? '', '', (t.carga ?? 0) * (t.esfuerzo ?? 0), k === 0 ? entrada.notas || '' : '']);
-          });
-        } else {
-          const rm = ej.carga?.tipo !== 'ninguna' ? rmDeSerie(datos, ej, serie, esfuerzoTotal(serie)) : null;
-          lineas.push([...base, '', serie.carga, serie.esfuerzo, serie.recamara, serie.objetivo, rm != null ? Math.round(rm * 10) / 10 : '',
-            trabajoSerie(serie), entrada.notas || '']);
-        }
-      });
+      const hechas = entrada.series.filter((x) => x.hecha);
+      if (!hechas.length) continue;
+      const celdas = hechas.slice(0, MAX).map((x) => textoSerieCorto(ej, x));
+      if (hechas.length > MAX) celdas[MAX - 1] += ` (+${hechas.length - MAX} más)`;
+      while (celdas.length < MAX) celdas.push('');
+      const rms = ej.carga?.tipo !== 'ninguna'
+        ? hechas.filter((x) => !x.tramos?.length).map((x) => rmDeSerie(datos, ej, x, esfuerzoTotal(x))).filter(Boolean) : [];
+      lineas.push([s.fecha, rutina?.nombre ?? '', dia?.nombre ?? '', s.sedeId ? nombreSede(datos, s.sedeId) : '', ej.nombre,
+        ...celdas, rms.length ? Math.round(Math.max(...rms) * 10) / 10 : '', entrada.notas || s.notas || '']);
     }
   }
   return filas(lineas);

@@ -196,7 +196,11 @@ function sugerenciaBilbo(datos, ejercicio, plan, { excluirSesion, sobre }) {
   const reps = rmAnterior && valor > 0 ? repsParaIgualar(modeloDe(datos, ejercicio), rmAnterior, valor, recamara) : null;
   // Repeticiones enteras y con tope: por encima de 40 el peso es demasiado bajo.
   const objetivoSuperar = reps != null ? Math.min(40, Math.ceil(Math.max(0, reps))) : null;
-  return { ...resultado, carga: valor, objetivoSuperar, pesoBajo: reps != null && reps > 40 };
+  // El ciclo se agota cuando el objetivo baja de las repeticiones mínimas
+  // (15 por defecto, en Ajustes): toca empezar uno nuevo.
+  const minimo = datos.perfil.bilboMinReps ?? 15;
+  return { ...resultado, carga: valor, objetivoSuperar, pesoBajo: reps != null && reps > 40,
+    cicloAgotado: objetivoSuperar != null && objetivoSuperar < minimo };
 }
 
 // ---------------------------------------------------------------------------

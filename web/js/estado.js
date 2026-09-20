@@ -81,9 +81,13 @@ export function reemplazarDatos(nuevos, nuevaMeta) {
 // nombre y correo). El archivo de Drive se sobrescribe en la siguiente subida.
 export function vaciarDatos() {
   if (!registro) return;
-  const { nombre, correo } = registro.datos.perfil;
+  const { nombre, correo, tema } = registro.datos.perfil;
+  const revision = registro.datos.revision;
   registro.datos = archivoNuevo({ nombre, correo });
-  registro.datos.revision = 1;
+  registro.datos.perfil.tema = tema ?? 'sistema';
+  // La revisión sigue subiendo: así los demás dispositivos ven que Drive
+  // tiene algo más nuevo (aunque esté vacío) y no vuelven a subir lo viejo.
+  registro.datos.revision = revision + 1;
   registro.meta.pendiente = true;
   registro.meta.csvRevision = null;
   guardarYa();

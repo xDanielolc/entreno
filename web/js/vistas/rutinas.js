@@ -120,8 +120,7 @@ export function vistaRutinas(contenedor) {
     h('div', { class: 'cabecera-vista' },
       h('h1', {}, 'Rutinas'),
       h('a', { class: 'boton', href: '#/rutina/nueva' }, '+ Nueva')),
-    pista('rutinas', 'Una rutina son tus días de entrenamiento en orden. La activa es la que te propone Hoy. '
-      + 'Abajo tienes rutinas prehechas para empezar sin montar nada.'),
+    pista('rutinas', 'Tus días de entrenamiento en orden. Las activas son las que te propone Hoy. Abajo, prehechas para empezar ya.'),
     !d.rutinas.length && h('p', { class: 'suave' },
       'Una rutina son tus días de entrenamiento en orden. La app te propondrá el siguiente cada vez que entrenes.'),
 
@@ -133,6 +132,13 @@ export function vistaRutinas(contenedor) {
     h('h2', {}, 'Rutinas prehechas'),
     h('p', { class: 'nota' }, 'Añádelas a tus rutinas si te encajan; si no, ignóralas. Sus ejercicios se crean solo si no los tienes ya.'),
     PLANTILLAS.map((p) => tarjetaPlantilla(d, p)));
+}
+
+// Un texto largo, frase a frase, como lista: se lee más fácil.
+export function enPuntos(texto) {
+  const frases = (texto || '').split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚÑ«¿¡0-9])/).map((f) => f.trim()).filter(Boolean);
+  if (frases.length < 2) return h('p', {}, texto);
+  return h('ul', { class: 'puntos' }, frases.map((f) => h('li', {}, f)));
 }
 
 function tarjetaRutina(r) {
@@ -162,8 +168,8 @@ function tarjetaPlantilla(d, plantilla) {
     h('strong', {}, plantilla.nombre),
     h('div', { class: 'suave' }, plantilla.autor),
     h('p', {}, plantilla.resumen),
-    h('details', { class: 'explicacion' }, h('summary', {}, 'Por qué es así'), h('p', {}, plantilla.porQue)),
-    h('details', { class: 'explicacion' }, h('summary', {}, 'Cómo se hace'), h('p', {}, plantilla.comoSeHace)),
+    h('details', { class: 'explicacion' }, h('summary', {}, 'Por qué es así'), enPuntos(plantilla.porQue)),
+    h('details', { class: 'explicacion' }, h('summary', {}, 'Cómo se hace'), enPuntos(plantilla.comoSeHace)),
     h('details', { class: 'explicacion' }, h('summary', {}, 'Días y ejercicios'),
       plantilla.dias.map((dia) => h('div', {},
         h('p', {}, h('strong', {}, dia.nombre)),
@@ -207,7 +213,7 @@ export function vistaFormularioRutina(contenedor, { id }) {
   anadir(contenedor, h('h1', {}, existente ? 'Editar rutina' : 'Nueva rutina'),
     borrador.descripcion && h('details', { class: 'tarjeta explicacion' },
       h('summary', {}, 'Por qué es así y cómo se hace'),
-      borrador.descripcion.split('\n\n').map((p) => h('p', {}, p))),
+      borrador.descripcion.split('\n\n').map((p) => enPuntos(p))),
     zona);
 
   function repintar() {

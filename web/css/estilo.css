@@ -254,6 +254,17 @@ a { color: var(--acento); }
 /* Series de una en una */
 .serie.oculta { display: none; }
 .como-ir .tarjeta { width: 100%; text-align: left; margin: 8px 0; }
+.cambiar-vista { text-align: left; padding-left: 0; }
+.que-es { font: inherit; font-size: .8rem; color: var(--acento); background: none; border: 1px solid var(--acento-suave); border-radius: 999px; padding: 1px 8px; margin-left: 4px; cursor: pointer; }
+.guia-glosario { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; }
+.puntos { padding-left: 20px; margin: 6px 0; }
+.puntos li { margin: 4px 0; }
+.tabla-comparacion { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.tabla-comparacion td { padding: 6px 4px; border-bottom: 1px solid var(--borde); vertical-align: top; }
+.tabla-comparacion tr.bien td:last-child { color: var(--bien); }
+.tabla-comparacion tr.mal td:last-child { color: var(--mal); }
+.descanso .boton.enlace { width: auto; min-height: 40px; padding: 4px 10px; }
+.glosario .explicacion { margin-top: 4px; }
 .como-ir .tarjeta.preferido { border-color: var(--acento); }
 
 .boton-icono {
@@ -464,7 +475,11 @@ input.fecha { width: auto; }
 }
 
 .aviso.visible { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
-.aviso { display: flex; align-items: center; gap: 16px; }
+.aviso { display: flex; align-items: center; gap: 12px; }
+.aviso-texto-caja { flex: 1; }
+.aviso-cerrar { font: inherit; color: inherit; background: none; border: none; min-width: 36px; min-height: 36px; cursor: pointer; opacity: .8; }
+html, body { overflow-x: hidden; max-width: 100%; }
+input, select, textarea { max-width: 100%; box-sizing: border-box; }
 .aviso-accion {
   font: inherit;
   font-weight: 700;

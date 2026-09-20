@@ -136,8 +136,8 @@ function avisar() {
 const entreSeries = () => motivo === 'de descanso' && !respiracion;
 
 function proponer(segundos, texto) {
-  if (ofrecido) return;
-  ofrecido = true;
+  if (ofrecido === segundos) return;
+  ofrecido = segundos;
   aviso(texto, { accion: { texto: `Sí, ${segundos} s`, fn: () => {
     estado.cambiar((x) => { x.perfil.descansoSegundos = segundos; });
     aviso(`Descanso entre series: ${segundos} s.`);
@@ -151,7 +151,7 @@ function saltar() {
   pararDescanso();
   if (!era || !totalSeg) return;
   const propuesto = Math.max(15, Math.round(usado / 15) * 15);
-  if (usado >= 30 && quedaban >= 20 && propuesto < totalSeg) {
+  if (usado >= 20 && quedaban >= 15 && propuesto < totalSeg) {
     proponer(propuesto, `Descanso saltado a los ${usado} s de ${totalSeg}. ¿Dejar el descanso entre series en ${propuesto} s?`);
   }
 }

@@ -41,8 +41,7 @@ export function vistaEjercicios(contenedor) {
       h('h1', {}, 'Ejercicios'),
       h('a', { class: 'boton', href: '#/ejercicio/nuevo' }, '+ Nuevo')),
 
-    pista('ejercicios-lista', 'Cada ejercicio guarda cómo progresa: tócalo para cambiar sus series, técnicas y músculos. '
-      + 'Con «+ Nuevo» eliges uno de la lista general o lo creas a mano.'),
+    pista('ejercicios-lista', 'Toca un ejercicio para cambiar sus series y músculos. «+ Nuevo» para añadir de la lista o crear uno.'),
     d.ejercicios.length > 0 && barraFiltros(() => pintarLista()),
 
     zona,

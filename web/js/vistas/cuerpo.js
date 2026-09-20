@@ -59,10 +59,9 @@ export function tarjetaRecuperacion(datos, { compacta = false } = {}) {
 
     !compacta && h('details', { class: 'explicacion' },
       h('summary', {}, '¿Cómo se calculan estos porcentajes y horas?'),
-      h('p', {}, 'El porcentaje es el tiempo que ha pasado desde que entrenaste ese músculo, dividido entre el que necesita. '
-        + 'Justo al acabar está al 0 % y va subiendo hasta el 100 %. No tiene nada que ver con las 10 a 20 series por semana: '
-        + 'eso es cuánto conviene entrenar cada músculo en total; esto, cuánto tarda en reponerse de la última sesión.'),
-      h('p', {}, 'Cuántas horas necesita, en tres pasos:'),
+      h('p', {}, 'Tu recuperación depende de tres cosas: lo dura que fue la sesión (lo cerca del fallo que acabaste), cuántas series '
+        + 'hiciste y tu genética (tu ajuste personal). Justo al acabar el músculo está al 0 % y va subiendo hasta el 100 %.'),
+      h('p', { class: 'nota' }, 'Con detalle, para quien quiera saberlo:'),
       h('ul', {},
         h('li', {}, 'Lo cerca del fallo que acabaste las series, que es lo que más pesa: con 3 o más en recámara, 24 h; '
           + 'con 1 o 2, 36 h; al fallo, 48 h; al fallo con más de 15 repeticiones o con drop set, 60 h. '
@@ -125,8 +124,7 @@ export function vistaCuerpo(contenedor) {
 
   anadir(contenedor,
     h('h1', {}, 'Tu cuerpo'),
-    pista('cuerpo', 'Verde, recuperado; naranja, a medias; rojo, aún tocado. Toca «¿Cómo se calculan…?» para ver de dónde salen '
-      + 'las horas. Más abajo, las series de la semana por músculo y qué conviene cambiar.'),
+    pista('cuerpo', 'Verde: listo. Naranja: a medias. Rojo: aún tocado. Debajo, las series de la semana y consejos.'),
     tarjetaRecuperacion(d),
     tarjetaRecomendaciones(d),
     tarjetaAjustePersonal(d),

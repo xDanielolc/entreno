@@ -6,7 +6,8 @@
 // (además, cuatro pasos y pistas sobre los cálculos) y 'ninguno'.
 
 import * as estado from '../estado.js';
-import { h, modal } from '../ui.js';
+import { h, modal, nuevoId, hoyISO } from '../ui.js';
+import { queEs } from './glosario.js';
 
 export const NIVELES = {
   basico: { etiqueta: 'Guíame por lo básico', descripcion: 'Un paseo de siete pasos por las pantallas, y una nota corta en cada una la primera vez.' },
@@ -89,11 +90,11 @@ const PASOS_BASICOS = [
     + 'te llevas la rutina y sus ejercicios en un toque. Puedes tener varias activas.' },
   { ruta: '#/ejercicios', titulo: 'Ejercicios', texto: 'Aquí están tus ejercicios. Cada uno guarda cómo progresa (Bilbo, doble progresión, un programa…), '
     + 'qué músculos trabaja y sus series. Tócalo para cambiarlo; se guarda solo.' },
-  { ruta: '#/', titulo: 'Apuntar un entrenamiento', texto: 'Al empezar eliges cómo ir: series de una en una, ejercicios de uno en uno o todo. '
-    + 'Apunta cada serie justo al acabarla: al escribir las repeticiones arranca el descanso. La casilla «+» son las repeticiones que te quedaban '
-    + '(recámara): 45 kg × 12 + 1. Al terminar sale un resumen con récords y consejos.' },
-  { ruta: '#/cuerpo', titulo: 'Cuerpo', texto: 'El mapa: verde recuperado, rojo aún tocado. Debajo, las series de la semana por músculo y qué conviene cambiar. '
-    + 'Al empezar cada entrenamiento puedes decir cómo llegas, y la app aprende tu ritmo.' },
+  { ruta: '#/', titulo: 'Apuntar un entrenamiento', texto: 'Lo mejor es probarlo: el botón de abajo abre un entrenamiento de prueba con '
+    + 'flexiones. Apunta una serie (peso, repeticiones y cuántas te quedaban) y mira cómo arranca el descanso. Al terminar podrás '
+    + 'guardarlo o borrarlo.', prueba: true, glosario: ['serie', 'recamara', 'rm'] },
+  { ruta: '#/cuerpo', titulo: 'Cuerpo', texto: 'El mapa: verde recuperado, rojo aún tocado. Debajo, las series de la semana por músculo y consejos. '
+    + 'Tu recuperación depende de lo dura que fue la sesión, de cuántas series hiciste y de tu genética.', glosario: ['recuperacion', 'volumen'] },
   { ruta: '#/historial', titulo: 'Historial', texto: 'Todos tus entrenamientos. Con «+ De otro día» apuntas uno pasado. Lo borrado va a una papelera y se recupera.' },
   { ruta: '#/ajustes', titulo: 'Ajustes', texto: 'Arriba, tu nombre, tu peso y la cuenta de Google. Lo demás está plegado por apartados: descansos, drop sets, '
     + 'ciclos, sitios, cómo se estima el 1RM, este tutorial y la zona de peligro. Fin de lo básico: ya puedes entrenar.' },
@@ -104,7 +105,7 @@ const PASOS_AVANZADOS = [
     + 'si el ejercicio está en «Se ajusta a ti», corrige la fórmula con tus propios datos. En Ajustes, «Cómo se estima tu 1RM» lo explica.' },
   { ruta: '#/ajustes', titulo: 'Drop sets y máquinas', texto: 'Un drop set se rellena solo a un porcentaje del 1RM que acabas de hacer arriba, o con kilos a mano; '
     + 'se elige en Ajustes, en el ejercicio, en la rutina o en la serie del día. Si atas un ejercicio a una máquina con su lista de pesos, '
-    + 'la app solo propone pesos que existen.' },
+    + 'la app solo propone pesos que existen.', glosario: ['drop-set', 'rest-pause', 'fallo'] },
   { ruta: '#/cuerpo', titulo: 'Recuperación', texto: 'Las horas que pide cada músculo salen de lo cerca del fallo que acabaste las series (lo que más pesa), '
     + 'del número de series (cada vez menos) y de tu ajuste personal. «¿Cómo se calculan…?» lo desglosa.' },
   { ruta: '#/rutinas', titulo: 'Progresiones y programas', texto: 'Bilbo: un ciclo con el peso de cada día fijado y un objetivo de repeticiones que superar. '
@@ -113,6 +114,29 @@ const PASOS_AVANZADOS = [
 ];
 
 let panel = null;
+
+// Un entrenamiento de prueba con flexiones (se crea el ejercicio si no lo
+// tienes). Al terminarlo, la app pregunta si guardarlo o borrarlo.
+async function entrenamientoDePrueba() {
+  const { CATALOGO, normalizar } = await import('../catalogo.js');
+  const { ejercicioDesdeCatalogo } = await import('./selector-ejercicios.js');
+  const { entradaDeEjercicio } = await import('../series.js');
+  const { sedeInicial } = await import('../sedes.js');
+  const id = nuevoId('ses');
+  estado.cambiar((datos) => {
+    let ej = datos.ejercicios.find((e) => normalizar(e.nombre) === normalizar('Flexiones') && !e.archivado);
+    if (!ej) {
+      ej = ejercicioDesdeCatalogo(CATALOGO.find((x) => x.nombre === 'Flexiones'));
+      datos.ejercicios.push(ej);
+    }
+    datos.sesiones.push({
+      id, fecha: hoyISO(), sedeId: sedeInicial(datos, null), rutinaId: null, diaRutinaId: null, tutorial: true,
+      estado: 'en-curso', inicio: new Date().toISOString(), fin: null, notas: '', borrada: null, sensacionesCerrada: true,
+      ejercicios: [entradaDeEjercicio(datos, ej, { excluirSesion: id })],
+    });
+  });
+  location.hash = `#/sesion/${id}`;
+}
 
 function pasosDe(nivel) {
   return nivel === 'avanzado' ? [...PASOS_BASICOS, ...PASOS_AVANZADOS] : PASOS_BASICOS;
@@ -165,6 +189,8 @@ export function pintarGuia() {
       h('strong', {}, paso.titulo),
       h('span', { class: 'suave' }, `paso ${n + 1} de ${pasos.length}`)),
     h('p', {}, paso.texto),
+    paso.glosario && h('p', { class: 'guia-glosario' }, paso.glosario.map((g) => queEs(g))),
+    paso.prueba && h('button', { class: 'boton secundario', onclick: entrenamientoDePrueba }, 'Hacer un entrenamiento de prueba'),
     h('div', { class: 'fila-botones' },
       h('button', { class: 'boton enlace', onclick: terminarGuia }, 'Salir'),
       n > 0 && h('button', { class: 'boton secundario', onclick: () => ir(n - 1) }, 'Anterior'),

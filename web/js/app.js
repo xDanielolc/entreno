@@ -14,6 +14,17 @@ import { vistaCuerpo } from './vistas/cuerpo.js';
 import { vistaFormularioRutina, vistaRutinas } from './vistas/rutinas.js';
 import { vistaSesion } from './vistas/sesion.js';
 import { pintarGuia } from './vistas/tutorial.js';
+import { aplicarTema } from './vistas/cuestionario.js';
+
+// La última pantalla se recuerda: si el móvil cierra la app en mitad de un
+// entrenamiento, al volver se abre donde estabas.
+const CLAVE_RUTA = 'entreno-ultima-ruta';
+function recordarRuta() {
+  try { localStorage.setItem(CLAVE_RUTA, location.hash); } catch { /* nada */ }
+}
+function rutaRecordada() {
+  try { return localStorage.getItem(CLAVE_RUTA) || ''; } catch { return ''; }
+}
 
 // Rutas: el fragmento de la dirección (#/…) decide qué pantalla se ve.
 const RUTAS = [
@@ -70,6 +81,8 @@ function renderizar() {
   pintarNavegacion(ruta.pestana);
   pintarIndicador();
   pintarGuia();
+  aplicarTema(estado.datos()?.perfil?.tema);
+  recordarRuta();
   window.scrollTo(0, mismaRuta ? scroll : 0);
 }
 
@@ -114,6 +127,14 @@ async function arrancar() {
       aviso(`No se han podido abrir tus datos: ${e.message}`, { tipo: 'error', ms: 8000 });
     }
   }
+  // Sin dirección concreta, vuelve a la última pantalla si era un
+  // entrenamiento en curso.
+  if (estado.usuario() && (location.hash === '' || location.hash === '#' || location.hash === '#/')) {
+    const anterior = rutaRecordada();
+    const id = anterior.match(/^#\/sesion\/([\w-]+)$/)?.[1];
+    const sesion = id && estado.datos().sesiones.find((s) => s.id === id && s.estado === 'en-curso' && !s.borrada);
+    if (sesion) location.hash = anterior;
+  }
   renderizar();
   if (estado.usuario()) sincronizar();
 }
@@ -133,7 +154,7 @@ function registrarServiceWorker() {
     recargando = true;
     estado.guardarYa();
     if (document.visibilityState === 'hidden') location.reload();
-    else aviso('Hay una versión nueva de la app.', { ms: 15000, accion: { texto: 'Actualizar', fn: () => location.reload() } });
+    else aviso('Hay una versión nueva de la app. Al actualizar no pierdes nada.', { ms: 60000, accion: { texto: 'Actualizar', fn: () => location.reload() } });
   });
 }
 

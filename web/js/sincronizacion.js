@@ -76,7 +76,7 @@ async function ejecutar(interactivo) {
     console.error(e);
     if (e.estado === 401) {
       olvidarToken();
-      fijar('desconectada', 'La conexión con Google ha caducado.');
+      fijar('desconectada', 'La conexión con Google ha caducado: toca el indicador de arriba o desliza hacia abajo para recargar.');
     } else if (e.estado === 0) {
       fijar('sin-internet');
     } else {
@@ -105,7 +105,17 @@ async function sincronizarArchivo() {
   }
 
   // Primera vez: no hay nada en Drive, se sube lo que haya en el dispositivo.
+  // Si este dispositivo ya conocía un archivo y ha desaparecido (borrado
+  // desde otro dispositivo con «Borrar todos mis datos» o «Eliminar mi
+  // cuenta»), se pregunta antes de volver a subir lo de aquí.
   if (!fileId) {
+    if (meta.fileId && (estado.datos().sesiones.length || estado.datos().ejercicios.length)) {
+      const subir = await preguntarArchivoDesaparecido();
+      if (!subir) {
+        estado.vaciarDatos();
+        estado.actualizarMeta({ fileId: null, revisionRemota: null });
+      }
+    }
     const d = estado.datos();
     const creado = await drive.crear(CONFIG.nombreArchivoDatos, d, propiedades(d));
     estado.actualizarMeta({ fileId: creado.id, revisionRemota: d.revision,
@@ -192,12 +202,24 @@ export async function eliminarCuenta() {
     for (const a of archivos) {
       try { await drive.borrar(a.id); borrados += 1; } catch (e) { if (e.estado !== 404) throw e; }
     }
-    olvidarToken();
+    olvidarToken({ revocar: true });
   }
   estado.cerrarUsuario();
   await local.borrarUsuario(usuario);
   fijar('desconectada');
   return borrados;
+}
+
+async function preguntarArchivoDesaparecido() {
+  const { h, modal } = await import('./ui.js');
+  return new Promise((resolver) => {
+    const cerrar = modal('Tus datos de Google Drive han desaparecido', h('div', {},
+      h('p', {}, 'Seguramente los borraste desde otro dispositivo con «Borrar todos mis datos» o «Eliminar mi cuenta». '
+        + 'Este dispositivo aún tiene una copia. ¿Qué hacemos con ella?'),
+      h('div', { class: 'fila-botones' },
+        h('button', { class: 'boton secundario peligro-texto', onclick: () => { cerrar(); resolver(false); } }, 'Vaciar este dispositivo también'),
+        h('button', { class: 'boton', onclick: () => { cerrar(); resolver(true); } }, 'Subir esta copia a Drive'))));
+  });
 }
 
 function propiedades(d) {

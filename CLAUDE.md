@@ -145,3 +145,25 @@ entero y con tope 40 (avisa «peso muy bajo»), «+ Serie» tras una Bilbo crea
 una libre sin plantilla (no duplica el día del ciclo), programa sin peso
 inicial estima uno (60 % del 1RM, 90 % en 5/3/1, o 20 kg). Google Drive no se
 puede probar desde la extensión de Chrome: bloquea la ventana de Google.
+0.17.0 (tras su segunda prueba): cuestionario de bienvenida (`vistas/
+cuestionario.js`: experiencia, objetivo, dónde, tema → `perfil.cuestionario`,
+`perfil.tema` aplicado con data-tema, rutina recomendada en Hoy); glosario con
+«¿Qué es…?» (`vistas/glosario.js`); guía con «entrenamiento de prueba»
+(sesion.tutorial: al terminar, guardar o borrar); elección de vista a pantalla
+completa y reversible («Vista: … · cambiar», guardada en sesion.vista) y
+última pantalla recordada al reabrir; resumen reescrito («Estadísticas y
+consejos», tabla, «Has hecho N series menos… ¿las quito?»); avisos con ✕;
+Google: el pase ya no se revoca al caducar ni al salir (solo al eliminar la
+cuenta); «Borrar todos mis datos» mantiene la revisión subiendo y, si el
+archivo de Drive desaparece, la app pregunta antes de volver a subir lo local;
+modo prueba pregunta si continuar la anterior o empezar de cero; descanso
+ofrece cambiar el ajuste cada vez; ciclo Bilbo «agotado» por debajo de 15
+repeticiones (`perfil.bilboMinReps`); CSV de entrenamientos con una fila por
+ejercicio y las series en columnas; filosofía de las rutinas en puntos;
+overflow horizontal cortado.
+PENDIENTE (pedido por él el 20-09-2026): HIIT con cronómetro y sonido en
+cardio; repasar estiramientos; sus rutinas de yoga prehechas completas;
+ciclos configurables por el usuario (qué sube, cuándo se corta, alargar o
+cortar a mano) con prehechos que reinicien solos; «diagnóstico gym» que dice
+que no se ve (no sé a qué se refiere: preguntar); tutorial más interactivo
+(botón que parpadea); nombre e icono con Design.

@@ -78,8 +78,9 @@ export function aviso(texto, { tipo = 'info', ms, accion } = {}) {
   // Con anadir() y no con replaceChildren(): sin acción, este segundo hijo
   // es undefined y el navegador lo escribiría como texto («undefined»).
   caja.replaceChildren();
-  anadir(caja, h('span', {}, texto),
-    accion && h('button', { class: 'aviso-accion', onclick: () => { ocultar(); accion.fn(); } }, accion.texto));
+  anadir(caja, h('span', { class: 'aviso-texto-caja' }, texto),
+    accion && h('button', { class: 'aviso-accion', onclick: () => { ocultar(); accion.fn(); } }, accion.texto),
+    h('button', { class: 'aviso-cerrar', 'aria-label': 'Cerrar aviso', onclick: ocultar }, '✕'));
   caja.className = `aviso aviso-${tipo} visible`;
   clearTimeout(temporizadorAviso);
   temporizadorAviso = setTimeout(ocultar, ms ?? Math.min(15000, accion ? Math.max(10000, porLectura) : porLectura));

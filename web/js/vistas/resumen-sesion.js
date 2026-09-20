@@ -74,10 +74,12 @@ export function mostrarResumen(datos, sesionId) {
   if (!sesion) return;
   const cambios = cambiosRespectoARutina(datos, sesion);
 
-  const cerrar = modal('Entrenamiento terminado', h('div', { class: 'resumen-sesion' },
-    seccionRecords(datos, sesion),
-    seccionMejoras(datos, sesion),
-    seccionVolumen(datos, sesion),
+  const records = seccionRecords(datos, sesion);
+  const mejoras = seccionMejoras(datos, sesion);
+  const consejos = seccionVolumen(datos, sesion);
+  const cerrar = modal('Estadísticas y consejos', h('div', { class: 'resumen-sesion' },
+    !records && !mejoras && !consejos && h('p', {}, 'Entrenamiento guardado. Hoy no hay récords ni nada que corregir.'),
+    records, mejoras, consejos,
     cambios.length > 0 && seccionCambios(cambios),
     h('div', { class: 'fila-botones' },
       cambios.length > 0
@@ -124,7 +126,17 @@ function seccionMejoras(datos, sesion) {
   if (!lineas.length) return null;
   return h('section', {},
     h('h3', {}, 'Frente a otras veces'),
-    h('ul', {}, lineas.map((l) => h('li', {}, l))));
+    h('table', { class: 'tabla-comparacion' },
+      h('tbody', {}, lineas.map((l) => {
+        const [nombre, resto] = l.split(/: (.+)/);
+        const partes = (resto || '').split(' · ');
+        const flecha = partes.slice(1).map((p) => p.match(/^(▲|▼|=)/)?.[1] ?? '').find(Boolean) ?? '';
+        const clase = flecha === '▲' ? 'bien' : flecha === '▼' ? 'mal' : '';
+        return h('tr', { class: clase },
+          h('td', {}, nombre),
+          h('td', {}, partes[0]),
+          h('td', {}, partes.slice(1).map((p) => p.replace(' frente a la última vez', ' vs. última').replace(/ frente al día (\d+) del ciclo (\d+)/, ' vs. día $1 del ciclo $2')).join(' · ')));
+      }))));
 }
 
 // Qué conviene hacer tras esta sesión: volumen de la semana, distancia entre
@@ -133,7 +145,7 @@ function seccionVolumen(datos, sesion) {
   const lista = recomendacionesDeSesion(datos, sesion);
   if (!lista.length) return null;
   return h('section', {},
-    h('h3', {}, 'Qué conviene hacer'),
+    h('h3', {}, 'Consejos'),
     listaRecomendaciones(lista));
 }
 
@@ -150,15 +162,17 @@ function cambiosRespectoARutina(datos, sesion) {
   if (dia) {
     for (const entrada of sesion.ejercicios) {
       if (!dia.ejercicios.some((x) => x.ejercicioId === entrada.ejercicioId)) {
-        cambios.push({ tipo: 'anadir-al-dia', texto: `Añadir ${nombreEj(entrada.ejercicioId)} a «${dia.nombre}»`,
+        cambios.push({ tipo: 'anadir-al-dia', texto: `Hoy has hecho ${nombreEj(entrada.ejercicioId)}, que no estaba en «${dia.nombre}». ¿Lo añado a ese día?`,
           rutinaId: rutina.id, diaId: dia.id, ejercicioId: entrada.ejercicioId });
       }
     }
     for (const item of dia.ejercicios) {
       const ej = datos.ejercicios.find((e) => e.id === item.ejercicioId);
       if (!ej || ej.archivado) continue;
-      if (!sesion.ejercicios.some((x) => x.ejercicioId === item.ejercicioId)) {
-        cambios.push({ tipo: 'quitar-del-dia', texto: `Quitar ${ej.nombre} de «${dia.nombre}»`,
+      // No estaba en la sesión, o estaba pero no se hizo ninguna serie.
+      const entrada = sesion.ejercicios.find((x) => x.ejercicioId === item.ejercicioId);
+      if (!entrada || !entrada.series.some((s) => s.hecha)) {
+        cambios.push({ tipo: 'quitar-del-dia', texto: `Hoy no has hecho ${ej.nombre}. ¿Lo quito de «${dia.nombre}»?`,
           rutinaId: rutina.id, diaId: dia.id, ejercicioId: item.ejercicioId });
       }
     }
@@ -176,26 +190,25 @@ function cambiosRespectoARutina(datos, sesion) {
     }).filter((s) => s.hecha);
     if (extra.length) {
       cambios.push({ tipo: 'anadir-series', ejercicioId: ej.id, series: extra.map((s) => ({ tipo: s.tipo, tecnicas: [...(s.tecnicas || [])] })),
-        texto: `Añadir ${extra.length} serie${extra.length > 1 ? 's' : ''} más a ${ej.nombre} para siempre` });
+        texto: `En ${ej.nombre} has hecho ${extra.length} ${extra.length > 1 ? 'series' : 'serie'} más de lo planeado. ¿Las añado a los próximos entrenos?` });
     }
     // Series de la plantilla que hoy no has hecho (saltadas): se ofrece
     // quitarlas del día de la rutina o, sin rutina, del propio ejercicio.
     const hechas = new Set(entrada.series.filter((s) => s.hecha && s.planId).map((s) => s.planId));
     if (!hechas.size) continue;
+    // En un programa (5×5, 5/3/1…) las series las fija el programa: no se ofrece quitarlas.
+    if ((ej.series || []).every((p) => p.progresion?.tipo === 'programa')) continue;
     const item = dia?.ejercicios.find((x) => x.ejercicioId === ej.id);
     const previstos = (ej.series || []).filter((p) => !item?.series || item.series.includes(p.id));
     const quitados = previstos.filter((p) => !hechas.has(p.id));
-    const nombres = quitados.length === 1
-      ? `la serie ${TIPOS_SERIE[quitados[0].tipo] ?? ''}`.trim()
-      : `${quitados.length} series (${quitados.map((p) => TIPOS_SERIE[p.tipo] ?? '').join(', ').toLowerCase()})`;
-    if (quitados.length && quitados.length < previstos.length) {
+    const n = quitados.length;
+    const texto = `En ${ej.nombre} has hecho ${n} ${n > 1 ? 'series' : 'serie'} menos de lo planeado. ¿${n > 1 ? 'Las' : 'La'} quito de los próximos entrenos?`;
+    if (n && n < previstos.length) {
       if (item) {
         cambios.push({ tipo: 'quitar-series', rutinaId: rutina.id, diaId: dia.id, ejercicioId: ej.id,
-          quedan: previstos.filter((p) => hechas.has(p.id)).map((p) => p.id),
-          texto: `En «${dia.nombre}», no hacer más ${nombres} de ${ej.nombre}` });
+          quedan: previstos.filter((p) => hechas.has(p.id)).map((p) => p.id), texto });
       } else {
-        cambios.push({ tipo: 'quitar-planes', ejercicioId: ej.id, ids: quitados.map((p) => p.id),
-          texto: `Quitar ${nombres} de ${ej.nombre} para siempre` });
+        cambios.push({ tipo: 'quitar-planes', ejercicioId: ej.id, ids: quitados.map((p) => p.id), texto });
       }
     }
   }
@@ -204,8 +217,8 @@ function cambiosRespectoARutina(datos, sesion) {
 
 function seccionCambios(cambios) {
   return h('section', {},
-    h('h3', {}, 'Has cambiado cosas respecto a la rutina'),
-    h('p', { class: 'nota' }, 'Marca lo que quieras que se quede para siempre. Lo que no marques, solo ha sido por hoy.'),
+    h('h3', {}, 'Cambios respecto a lo planeado'),
+    h('p', { class: 'nota' }, 'Marca lo que quieras que se quede para los próximos entrenos. Sin marcar, solo ha sido hoy.'),
     cambios.map((c) => h('label', { class: 'casilla' },
       h('input', { type: 'checkbox', onchange: (e) => { c.marcado = e.target.checked; } }),
       c.texto)));

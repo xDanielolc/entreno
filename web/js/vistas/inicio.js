@@ -5,14 +5,16 @@ import { seriesDesdePlan } from '../series.js';
 import { anadir, fechaLarga, h, hoyISO, modal, nuevoId } from '../ui.js';
 import { tarjetaRecuperacion, tarjetaSugerenciasAjuste } from './cuerpo.js';
 import { tarjetaInstalar } from './instalar.js';
-import { elegirNivel, nivelTutorial, pista } from './tutorial.js';
+import { pista } from './tutorial.js';
+import { cuestionarioHecho, hacerCuestionario, rutinaRecomendada } from './cuestionario.js';
+import { PLANTILLAS } from '../plantillas.js';
 import { cuentaParaFatiga } from '../catalogo.js';
 import { nombreMusculo } from '../musculos.js';
 import { recuperacionPorMusculo } from '../recuperacion.js';
 
 let preguntandoTutorial = false;
 import { masRecienteAntes, resumenSesion } from './historial.js';
-import { empezarDia, queToca, rutinasActivas } from './rutinas.js';
+import { empezarDia, enPuntos, queToca, rutinasActivas } from './rutinas.js';
 
 // ¿Toca de verdad entrenar hoy? Mira los músculos del día que toca y, si
 // alguno sigue tocado, dice cuándo estará listo. Y si llevas más días parado
@@ -85,6 +87,15 @@ function saludo(nombre) {
   return texto.replace(/,\s*[.,]/, ',').replace(/^\s*,\s*/, '').replace(/,\s*$/, '').replace(/\s{2,}/g, ' ').replace(/^(\w)/, (m) => m.toUpperCase());
 }
 
+// Con el cuestionario hecho y sin rutinas: la prehecha que mejor encaja.
+function tarjetaRecomendacion(d) {
+  const plantilla = PLANTILLAS.find((p) => p.id === rutinaRecomendada(d.perfil));
+  if (!plantilla) return null;
+  return h('section', { class: 'tarjeta aviso-tarjeta' },
+    h('p', {}, h('strong', {}, 'Para empezar te recomiendo: '), plantilla.nombre, '. ', plantilla.resumen),
+    h('a', { class: 'boton', href: '#/rutinas' }, 'Ver las rutinas prehechas'));
+}
+
 export function vistaInicio(contenedor) {
   const d = estado.datos();
   const enCurso = d.sesiones.find((s) => s.estado === 'en-curso' && !s.borrada);
@@ -99,14 +110,15 @@ export function vistaInicio(contenedor) {
   const otras = (toca?.alternativas ?? []).filter((a) => a.rutina.id !== rutina?.id);
 
   // Primera vez: ¿cuánto tutorial quieres? (no encima de otro cartel)
-  if (nivelTutorial(d) == null && !preguntandoTutorial) {
+  // Primera vez: el cuestionario de bienvenida (nivel, objetivo, dónde,
+  // tema). Si hay otro cartel abierto (el de modo prueba), espera.
+  if (!cuestionarioHecho(d) && !preguntandoTutorial) {
     preguntandoTutorial = true;
-    // Si hay otro cartel abierto (el de modo prueba), se espera a que se cierre.
     const intento = setInterval(() => {
       if (document.querySelector('.modal-fondo')) return;
       clearInterval(intento);
-      if (nivelTutorial(estado.datos()) != null) { preguntandoTutorial = false; return; }
-      elegirNivel({ alElegir: () => { preguntandoTutorial = false; } });
+      if (cuestionarioHecho(estado.datos())) { preguntandoTutorial = false; return; }
+      hacerCuestionario({ alTerminar: () => { preguntandoTutorial = false; } });
     }, 400);
   }
 
@@ -145,8 +157,7 @@ export function vistaInicio(contenedor) {
     h('p', { class: 'fecha-hoy' }, fechaLarga(hoyISO())),
     h('h1', {}, saludo(d.perfil.nombre)),
     tarjetaInstalar(),
-    pista('hoy', 'Aquí ves qué toca hoy según tu rutina y cómo va tu recuperación. Abajo: Cuerpo (mapa y volumen), '
-      + 'Ejercicios, Historial y Ajustes.'),
+    pista('hoy', 'Qué toca hoy y cómo va tu recuperación. Si quieres más ayuda, en Ajustes → Tutorial están la guía y el glosario.'),
 
     necesitaPeso && h('a', { class: 'tarjeta aviso-tarjeta', href: '#/ajustes' },
       'Indica tu peso corporal en Ajustes: lo necesitan tus ejercicios con máquina asistida.'),
@@ -164,7 +175,7 @@ export function vistaInicio(contenedor) {
           avisoCuandoToca(d, rutina, dia),
           rutina.descripcion && h('details', { class: 'explicacion' },
             h('summary', {}, 'Por qué esta rutina es así y cómo se hace'),
-            rutina.descripcion.split('\n\n').map((p) => h('p', {}, p))),
+            rutina.descripcion.split('\n\n').map((p) => enPuntos(p))),
           h('button', { class: 'boton grande', onclick: () => empezarConRutina(dia) }, toca.descansoHoy ? 'Empezar igualmente' : 'Empezar'),
           otras.length > 0 && h('p', { class: 'nota' }, 'Otras rutinas activas: ',
             otras.map((a, i) => [i > 0 && ' · ', h('a', { href: '#/', onclick: (e) => { e.preventDefault(); empezarConRutina(a.dia, a.rutina); } },
@@ -173,6 +184,8 @@ export function vistaInicio(contenedor) {
             h('button', { class: 'boton secundario', onclick: elegirDia }, 'Otro día'),
             h('button', { class: 'boton secundario', onclick: empezarSuelto }, 'Sin rutina')))
         : h('button', { class: 'boton grande', onclick: empezarSuelto }, 'Empezar entrenamiento'),
+
+    !d.rutinas.length && cuestionarioHecho(d) && tarjetaRecomendacion(d),
 
     !activos.length && h('div', { class: 'tarjeta' },
       h('p', {}, 'Aún no tienes ejercicios. Puedes añadir una rutina prehecha (trae sus ejercicios) o crear el primero.'),

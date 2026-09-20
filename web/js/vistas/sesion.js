@@ -3,6 +3,8 @@ import {
   redondear, rmDeReferencia, sugerenciaSerie, trabajoSerie, tramosPropuestos, usaTramos,
 } from '../calculos.js';
 import { pista } from './tutorial.js';
+import { queEs } from './glosario.js';
+import { modal } from '../ui.js';
 import * as estado from '../estado.js';
 import {
   TIPOS_CARGA, TIPOS_ESFUERZO, TIPOS_SERIE, camposDe, recamaraDe, tipoDeFallo, tramosDe,
@@ -30,9 +32,9 @@ import { selectorTecnicas, textoTecnicas } from './tecnicas.js';
 const guiado = new Map();     // id de sesión → { modo, pos }
 
 export const MODOS_ENTRENO = {
-  serie: { etiqueta: 'Series de una en una', descripcion: 'Solo ves la serie que toca. Al apuntarla aparece la siguiente.' },
-  ejercicio: { etiqueta: 'Ejercicios de uno en uno', descripcion: 'Un ejercicio con todas sus series; pasas al siguiente cuando acabas.' },
-  todo: { etiqueta: 'Todo el entrenamiento', descripcion: 'La lista entera, para moverte libremente.' },
+  serie: { etiqueta: 'Solo la serie que toca', descripcion: 'Al apuntarla aparece la siguiente. Lo más limpio.' },
+  ejercicio: { etiqueta: 'Solo el ejercicio en el que estoy', descripcion: 'Con todas sus series; pasas al siguiente cuando acabas.' },
+  todo: { etiqueta: 'Todos los ejercicios', descripcion: 'La lista entera, para moverte libremente.' },
 };
 
 export function vistaSesion(contenedor, { id }) {
@@ -43,6 +45,9 @@ export function vistaSesion(contenedor, { id }) {
     return;
   }
   const ejercicioDe = (ejId) => d.ejercicios.find((e) => e.id === ejId);
+  // La vista elegida se guarda en la sesión: si el móvil cierra la app y
+  // vuelves, sigues donde estabas.
+  if (!guiado.has(id) && sesion.vista?.modo) guiado.set(id, { modo: sesion.vista.modo, pos: sesion.vista.pos ?? null });
   const eleccion = guiado.get(id) ?? null;
   const modo = eleccion?.modo ?? 'todo';
   const posicion = eleccion?.pos ?? null;     // null = ver el entrenamiento entero
@@ -80,7 +85,8 @@ export function vistaSesion(contenedor, { id }) {
 
     enCurso && posicion == null && tarjetaComoLlegas(),
 
-    enCurso && !eleccion && sesion.ejercicios.length > 0 && !algoHecho && tarjetaComoIr(),
+    enCurso && eleccion && sesion.ejercicios.length > 0 && h('button', { class: 'boton enlace cambiar-vista', onclick: () => elegirVista() },
+      `Vista: ${MODOS_ENTRENO[modo]?.etiqueta.toLowerCase() ?? 'todos los ejercicios'} · cambiar`),
 
     barraDescanso(),
 
@@ -98,9 +104,8 @@ export function vistaSesion(contenedor, { id }) {
 
     h('button', { class: 'boton secundario grande', onclick: elegirEjercicio }, '+ Añadir ejercicio'),
 
-    enCurso && sesion.ejercicios.length > 0 && (posicion == null
-      ? h('button', { class: 'boton enlace', onclick: () => { guiado.delete(id); estado.emitir('vista'); } }, 'Ir de uno en uno')
-      : h('button', { class: 'boton secundario grande', onclick: () => irA(null) }, 'Ver el entrenamiento entero')),
+    enCurso && sesion.ejercicios.length > 0 && posicion != null
+      && h('button', { class: 'boton secundario grande', onclick: () => irA(null) }, 'Ver todos los ejercicios'),
 
     posicion == null && h('label', { class: 'campo' },
       h('span', { class: 'etiqueta-campo' }, 'Notas del entrenamiento'),
@@ -155,25 +160,39 @@ export function vistaSesion(contenedor, { id }) {
   }
 
   // Al empezar: series de una en una, ejercicios de uno en uno o todo.
-  function tarjetaComoIr() {
-    const preferido = d.perfil.modoEntreno ?? 'ejercicio';
-    return h('section', { class: 'tarjeta como-ir' },
-      h('h2', {}, '¿Cómo quieres ir?'),
+  // Cómo ver el entrenamiento. Sale a pantalla completa al empezar y se
+  // puede cambiar en cualquier momento desde «Vista: … · cambiar».
+  function elegirVista() {
+    const preferido = guiado.get(id)?.modo ?? d.perfil.modoEntreno ?? 'ejercicio';
+    const cerrar = modal('¿Cómo quieres verlo?', h('div', { class: 'como-ir' },
+      h('p', { class: 'nota' }, 'Se puede cambiar cuando quieras desde arriba del entrenamiento.'),
       Object.entries(MODOS_ENTRENO).map(([clave, m]) => h('button', {
         class: `tarjeta fila-enlace ${clave === preferido ? 'preferido' : ''}`,
         onclick: () => {
+          cerrar();
+          const actual = guiado.get(id)?.pos ?? 0;
+          const pos = clave === 'todo' ? null : Math.min(actual, Math.max(0, sesion.ejercicios.length - 1));
           estado.cambiar((x) => { x.perfil.modoEntreno = clave; }, { tecleo: true });
-          guiado.set(id, { modo: clave, pos: clave === 'todo' ? null : 0 });
+          guardarVista(clave, pos);
           estado.emitir('vista');
         } },
       h('div', {}, h('strong', {}, m.etiqueta), h('div', { class: 'suave' }, m.descripcion)),
-      clave === preferido && h('span', { class: 'etiqueta' }, 'La última vez'))));
+      clave === preferido && h('span', { class: 'etiqueta' }, 'Actual')))));
+  }
+
+  function guardarVista(modo, pos) {
+    guiado.set(id, { modo, pos });
+    cambiarSesion((s) => { s.vista = { modo, pos }; }, { tecleo: true });
+  }
+
+  if (enCurso && !eleccion && sesion.ejercicios.length > 0 && !algoHecho && !document.querySelector('.modal-fondo')) {
+    setTimeout(elegirVista, 50);
   }
 
   function irA(nueva) {
     const modoActual = guiado.get(id)?.modo ?? d.perfil.modoEntreno ?? 'ejercicio';
-    if (nueva == null) guiado.set(id, { modo: 'todo', pos: null });
-    else guiado.set(id, { modo: modoActual === 'todo' ? 'ejercicio' : modoActual, pos: Math.max(0, Math.min(nueva, sesion.ejercicios.length - 1)) });
+    if (nueva == null) guardarVista('todo', null);
+    else guardarVista(modoActual === 'todo' ? 'ejercicio' : modoActual, Math.max(0, Math.min(nueva, sesion.ejercicios.length - 1)));
     estado.emitir('vista');
   }
 
@@ -198,10 +217,8 @@ export function vistaSesion(contenedor, { id }) {
 
       referencia1RM(ej, entrada),
 
-      indice === 0 && enCurso && pista('sesion-datos', 'Apunta cada serie justo al acabarla: en cuanto escribes las repeticiones '
-        + 'arranca el descanso. La casilla «+» son las repeticiones que te quedaban sin hacer (recámara): 45 kg × 12 + 1.'),
-      indice === 0 && enCurso && pista('sesion-1rm', 'El 1RM estimado es el peso que podrías levantar una sola vez. Sus porcentajes sirven '
-        + 'para elegir el peso de los drop sets y para saber cuánto pesa cada serie respecto a tu máximo.', { avanzada: true }),
+      indice === 0 && enCurso && pista('sesion-datos', 'Apunta la serie al acabarla: al escribir las repeticiones arranca el descanso. '
+        + 'La casilla «+» es la recámara (toca «?» para saber más).'),
 
       entrada.series.map((serie, j) => {
         const bloque = bloqueSerie(ej, entrada, indice, j, serie);
@@ -220,7 +237,7 @@ export function vistaSesion(contenedor, { id }) {
     const rm = rmDeReferencia(d, ej, { cicloN: entrada.cicloN });
     if (!rm) return null;
     return h('p', { class: 'nota' },
-      `1RM estimado ${rm.delCiclo ? 'del ciclo' : '(histórico)'}: ${formatearNumero(Math.round(rm.valor))} kg · `
+      queEs('rm', '1RM'), ` estimado ${rm.delCiclo ? 'del ciclo' : '(histórico)'}: ${formatearNumero(Math.round(rm.valor))} kg · `
       + `80 % = ${formatearNumero(aPesoDisponible(ej, rm.valor * 0.8))} · 70 % = ${formatearNumero(aPesoDisponible(ej, rm.valor * 0.7))} · `
       + `60 % = ${formatearNumero(aPesoDisponible(ej, rm.valor * 0.6))}`);
   }
@@ -240,6 +257,7 @@ export function vistaSesion(contenedor, { id }) {
       else {
         partes.push(`Ciclo ${s.cicloN} · día ${serie.diaCiclo ?? s.dia} de ${s.diasCiclo}`);
         if (s.pesoBajo) partes.push('peso muy bajo para tu 1RM: revisa el ciclo en la ficha');
+        if (s.cicloAgotado) partes.push(`objetivo por debajo de ${d.perfil.bilboMinReps ?? 15}: el ciclo está agotado, empieza uno nuevo en la ficha`);
         if (serie.carga != null && s.sobre === 'carga') partes.push(`${formatearNumero(serie.carga)} ${uCarga}`);
         if (serie.objetivo != null) {
           partes.push(s.sobre === 'carga'
@@ -414,7 +432,8 @@ export function vistaSesion(contenedor, { id }) {
         h('span', {}, '+'),
         h('input', { type: 'text', inputmode: 'decimal', value: serie.recamara ?? '', 'aria-label': 'Repeticiones en recámara',
           oninput: (e) => { actualizar((x) => { x.recamara = leerNumero(e.target.value); }); recalcularAbajo(ej, i); } }),
-        h('span', {}, serie.recamara != null ? (tipoDeFallo(serie.recamara) || 'recámara') : 'recámara')),
+        h('span', {}, serie.recamara != null ? (tipoDeFallo(serie.recamara) || 'recámara') : 'recámara'),
+        queEs('recamara', '?')),
 
       ej.esfuerzoExtra && h('label', { class: 'valor' },
         h('input', { type: 'text', inputmode: 'decimal', value: serie.esfuerzoExtra ?? '', 'aria-label': 'Distancia',
@@ -716,6 +735,18 @@ export function vistaSesion(contenedor, { id }) {
     });
     guiado.delete(id);
     location.hash = '#/';
+    if (sesion.tutorial) {
+      const cerrar = modal('Entrenamiento de prueba terminado', h('div', {},
+        h('p', {}, 'Era el del tutorial. ¿Lo guardo como un entrenamiento de verdad o lo borro?'),
+        h('div', { class: 'fila-botones' },
+          h('button', { class: 'boton secundario', onclick: () => {
+            estado.cambiar((x) => { x.sesiones = x.sesiones.filter((s) => s.id !== id); });
+            cerrar();
+            aviso('Entrenamiento de prueba borrado.');
+          } }, 'Borrarlo'),
+          h('button', { class: 'boton', onclick: () => { cerrar(); mostrarResumen(estado.datos(), id); } }, 'Guardarlo'))));
+      return;
+    }
     mostrarResumen(estado.datos(), id);
   }
 

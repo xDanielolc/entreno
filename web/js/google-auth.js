@@ -45,10 +45,12 @@ export function minutosDeToken() {
   } catch { return null; }
 }
 
-export function olvidarToken() {
+// Olvida el pase. Solo se revoca el permiso (Google vuelve a pedir
+// consentimiento) al eliminar la cuenta; al caducar o al salir, no.
+export function olvidarToken({ revocar = false } = {}) {
   const token = tokenVigente();
   try { almacen()?.removeItem(CLAVE_TOKEN); } catch { /* nada */ }
-  if (token && window.google?.accounts?.oauth2) google.accounts.oauth2.revoke(token, () => {});
+  if (revocar && token && window.google?.accounts?.oauth2) google.accounts.oauth2.revoke(token, () => {});
 }
 
 // Pide un token. Con «silencioso» no muestra la pantalla de elegir cuenta si

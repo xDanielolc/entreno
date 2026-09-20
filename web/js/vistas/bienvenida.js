@@ -2,7 +2,8 @@ import * as drive from '../drive.js';
 import * as estado from '../estado.js';
 import { pedirToken } from '../google-auth.js';
 import { sincronizar } from '../sincronizacion.js';
-import { anadir, aviso, h } from '../ui.js';
+import { anadir, aviso, h, modal } from '../ui.js';
+import * as local from '../almacen-local.js';
 import { avisarModoPrueba } from '../modo-prueba.js';
 import { tarjetaInstalar } from './instalar.js';
 
@@ -31,6 +32,21 @@ export function vistaBienvenida(contenedor) {
   }
 
   async function probarSinCuenta() {
+    // Si quedó una prueba anterior en este dispositivo, se elige.
+    const anterior = await local.leerUsuario(estado.USUARIO_SIN_CUENTA);
+    const conDatos = anterior && (anterior.datos.sesiones.length || anterior.datos.ejercicios.length);
+    if (conDatos) {
+      const cerrar = modal('Ya hay una prueba anterior', h('div', {},
+        h('p', {}, `En este dispositivo quedó una prueba con ${anterior.datos.ejercicios.length} ejercicios y ${anterior.datos.sesiones.length} entrenamientos.`),
+        h('div', { class: 'fila-botones' },
+          h('button', { class: 'boton secundario', onclick: async () => { cerrar(); await local.borrarUsuario(estado.USUARIO_SIN_CUENTA); await abrirPrueba(); } }, 'Empezar de cero'),
+          h('button', { class: 'boton', onclick: async () => { cerrar(); await abrirPrueba(); } }, 'Continuar la prueba'))));
+      return;
+    }
+    await abrirPrueba();
+  }
+
+  async function abrirPrueba() {
     await estado.abrirUsuario(estado.USUARIO_SIN_CUENTA);
     location.hash = '#/';
     avisarModoPrueba();
