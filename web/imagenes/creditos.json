@@ -1204,6 +1204,26 @@
    "archivo": "imagenes/munecos/cardio.svg",
    "autor": "dibujo propio de la app",
    "fuente": "propia"
+  },
+  "HIIT": {
+   "archivo": "imagenes/munecos/hiit.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Tabata": {
+   "archivo": "imagenes/munecos/tabata.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Jumping jacks": {
+   "archivo": "imagenes/munecos/jumping-jacks.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Rodillas al pecho": {
+   "archivo": "imagenes/munecos/rodillas-al-pecho.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
   }
  }
 }

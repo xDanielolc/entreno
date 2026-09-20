@@ -168,8 +168,13 @@ esfuerzo máximo, reinicio automático (al % del 1RM, al % del último, igual o
 a mano) con `renovarSiToca()` al crear la serie del día, «+5 sesiones» y
 «Cortar y empezar otro». El día 1 de un ciclo compara con la última serie
 del anterior.
-PENDIENTE (pedido por él el 20-09-2026): HIIT con cronómetro y sonido en
-cardio; repasar estiramientos; sus rutinas de yoga prehechas completas;
+0.19.0: cronómetro de intervalos HIIT (`vistas/intervalos.js`): prehechos
+Tabata, 30/30, 40/20, EMOM, sprints y a mi manera; pitidos por fase y en los
+últimos 3 s; pausa, saltar, parar; Wake Lock; al acabar apunta los segundos
+de trabajo en la serie y el detalle en las notas. Botón «⏱ Intervalos» en los
+ejercicios de cardio medidos en tiempo. Catálogo: HIIT, Tabata, Burpees,
+Jumping jacks, Rodillas al pecho, con muñeco.
+PENDIENTE (pedido por él el 20-09-2026): repasar estiramientos; sus rutinas de yoga prehechas completas;
 «diagnóstico gym» que dice
 que no se ve (no sé a qué se refiere: preguntar); tutorial más interactivo
 (botón que parpadea); nombre e icono con Design.

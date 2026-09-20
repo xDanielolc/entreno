@@ -4,6 +4,7 @@ import {
 } from '../calculos.js';
 import { pista } from './tutorial.js';
 import { queEs } from './glosario.js';
+import { abrirIntervalos } from './intervalos.js';
 import { modal } from '../ui.js';
 import * as estado from '../estado.js';
 import {
@@ -216,6 +217,19 @@ export function vistaSesion(contenedor, { id }) {
       ej.notas && h('p', { class: 'nota' }, ej.notas),
 
       referencia1RM(ej, entrada),
+
+      enCurso && tipoDeEjercicio(ej) === 'cardio' && ej.esfuerzo.tipo === 'tiempo'
+        && h('button', { class: 'boton secundario', onclick: () => abrirIntervalos({ alTerminar: (segundos, texto) => {
+          cambiarSesion((s) => {
+            const e = s.ejercicios[indice];
+            let serie = e.series.find((x) => !x.hecha);
+            if (!serie) { serie = serieSuelta({ tipo: 'libre' }); e.series.push(serie); }
+            serie.esfuerzo = segundos;
+            serie.hecha = true;
+            e.notas = [e.notas, texto].filter(Boolean).join(' · ');
+          });
+          aviso(`Apuntado: ${texto}, ${segundos >= 60 ? `${Math.round(segundos / 60)} min` : `${segundos} s`} de trabajo.`);
+        } }) }, '⏱ Intervalos (HIIT)'),
 
       indice === 0 && enCurso && pista('sesion-datos', 'Apunta la serie al acabarla: al escribir las repeticiones arranca el descanso. '
         + 'La casilla «+» es la recámara (toca «?» para saber más).'),

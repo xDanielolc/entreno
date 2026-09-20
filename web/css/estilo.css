@@ -265,6 +265,13 @@ a { color: var(--acento); }
 .tabla-comparacion tr.mal td:last-child { color: var(--mal); }
 .descanso .boton.enlace { width: auto; min-height: 40px; padding: 4px 10px; }
 .glosario .explicacion { margin-top: 4px; }
+.intervalos { text-align: center; padding: 8px 0; }
+.intervalos-fase { font-size: 1.3rem; font-weight: 700; }
+.intervalos-tiempo { font-size: 4rem; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1.1; margin: 8px 0; }
+.intervalos[data-fase="trabajo"] .intervalos-tiempo { color: var(--peligro); }
+.intervalos[data-fase="descanso"] .intervalos-tiempo { color: var(--bien); }
+.intervalos .barra-progreso { margin: 10px 0 14px; }
+.intervalos-config .opciones { margin-bottom: 6px; }
 .como-ir .tarjeta.preferido { border-color: var(--acento); }
 
 .boton-icono {

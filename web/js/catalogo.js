@@ -226,6 +226,11 @@ export const CATALOGO = [
 
   // --- Cardio -------------------------------------------------------------
   ej('Cardio', 'cardio', 'libre', [], [], { ...sinCarga, distancia: true }),
+  ej('HIIT', 'cardio', 'libre', [], ['cuadriceps', 'gemelo'], sinCarga),
+  ej('Tabata', 'cardio', 'libre', [], ['cuadriceps', 'gemelo'], sinCarga),
+  ej('Burpees', 'cardio', 'peso corporal', ['cuadriceps'], ['pecho', 'hombro', 'abdomen'], { carga: 'ninguna', esfuerzo: 'repeticiones' }),
+  ej('Jumping jacks', 'cardio', 'peso corporal', [], ['gemelo', 'hombro'], sinCarga),
+  ej('Rodillas al pecho', 'cardio', 'peso corporal', [], ['cuadriceps', 'abdomen'], sinCarga),
   ej('Comba', 'cardio', 'comba', ['gemelo'], [], sinCarga),
   ej('Boxeo', 'cardio', 'saco o sombra', [], ['hombro'], sinCarga),
   ej('Escaleras', 'cardio', 'libre', ['cuadriceps'], ['gemelo'], { ...sinCarga, distancia: true }),
