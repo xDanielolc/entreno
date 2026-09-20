@@ -8,17 +8,25 @@
 
 import * as estado from '../estado.js';
 import { h, modal } from '../ui.js';
+import { queEs } from './glosario.js';
 
 export const PRESETS_HIIT = {
   tabata: { etiqueta: 'Tabata', trabajo: 20, descanso: 10, rondas: 8, descripcion: '8 rondas de 20 s a tope y 10 s de descanso: 4 minutos.' },
   '30-30': { etiqueta: '30 / 30', trabajo: 30, descanso: 30, rondas: 10, descripcion: '10 rondas de 30 s de trabajo y 30 s de descanso: 10 minutos.' },
   '40-20': { etiqueta: '40 / 20', trabajo: 40, descanso: 20, rondas: 10, descripcion: '10 rondas de 40 s de trabajo y 20 s de descanso: 10 minutos.' },
-  emom: { etiqueta: 'EMOM 10', trabajo: 60, descanso: 0, rondas: 10, descripcion: 'Cada minuto, un bloque de trabajo; lo que sobre del minuto, descanso.' },
+  emom: { etiqueta: 'EMOM 10', trabajo: 60, descanso: 0, rondas: 10, descripcion: '10 minutos: al empezar cada minuto haces tu bloque (por ejemplo, 10 burpees) y descansas lo que sobre.' },
   sprints: { etiqueta: 'Sprints 15 / 45', trabajo: 15, descanso: 45, rondas: 8, descripcion: '8 sprints de 15 s con 45 s de recuperación.' },
   personalizado: { etiqueta: 'A mi manera', trabajo: 30, descanso: 30, rondas: 8, descripcion: 'Pon tus segundos y rondas.' },
 };
 
 let audio = null;
+
+// «4 min», «6 s» o «2 min 30 s».
+function duracionTexto(seg) {
+  if (seg < 60) return `${seg} s`;
+  const m = Math.floor(seg / 60), s = seg % 60;
+  return s ? `${m} min ${s} s` : `${m} min`;
+}
 
 // Pitido: corto y agudo para avisar, largo y grave al cambiar de fase.
 function pitar(frecuencia = 880, duracion = 0.15, volumen = 0.25) {
@@ -53,6 +61,7 @@ export function abrirIntervalos({ alTerminar } = {}) {
       h('input', { type: 'text', inputmode: 'decimal', value: config[clave],
         oninput: (e) => { config[clave] = Math.max(0, Math.round(Number(String(e.target.value).replace(',', '.')) || 0)); config.preset = 'personalizado'; } }));
     cerrar = modal('Intervalos', h('div', { class: 'formulario intervalos-config' },
+      h('p', { class: 'nota' }, 'Tramos cortos a tope y descansos, varias veces seguidas. Elige uno o pon el tuyo. ', queEs('hiit')),
       h('div', { class: 'opciones compacto', role: 'radiogroup' }, Object.entries(PRESETS_HIIT).map(([k, p]) => h('button', {
         type: 'button', role: 'radio', 'aria-checked': String(k === config.preset), class: `opcion ${k === config.preset ? 'elegida' : ''}`,
         onclick: () => { Object.assign(config, { trabajo: p.trabajo, descanso: p.descanso, rondas: p.rondas, preset: k }); pintarConfig(); },
@@ -60,7 +69,7 @@ export function abrirIntervalos({ alTerminar } = {}) {
       h('p', { class: 'nota' }, PRESETS_HIIT[config.preset]?.descripcion ?? ''),
       h('div', { class: 'fila-campos' },
         campo('Trabajo (s)', 'trabajo'), campo('Descanso (s)', 'descanso'), campo('Rondas', 'rondas')),
-      h('p', { class: 'nota' }, `Total: ${Math.round((config.trabajo + config.descanso) * config.rondas / 60)} min. Suena un pitido en cada cambio y tres avisos antes.`),
+      h('p', { class: 'nota' }, `Total: ${duracionTexto((config.trabajo + config.descanso) * config.rondas)}. Suena un pitido en cada cambio y tres avisos antes.`),
       h('button', { class: 'boton grande', onclick: () => {
         if (!(config.trabajo > 0) || !(config.rondas > 0)) return;
         estado.cambiar((x) => { x.perfil.hiit = { preset: config.preset, trabajo: config.trabajo, descanso: config.descanso, rondas: config.rondas }; }, { tecleo: true });

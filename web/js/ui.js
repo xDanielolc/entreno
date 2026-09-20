@@ -45,6 +45,13 @@ export function hoyISO() {
   return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 }
 
+// «20/09/2026» a partir de «2026-09-20».
+export function fechaCorta(iso) {
+  if (!iso) return '';
+  const [a, m, d] = String(iso).slice(0, 10).split('-');
+  return d && m && a ? `${d}/${m}/${a}` : String(iso);
+}
+
 export function fechaLarga(iso) {
   if (!iso) return 'Sin fecha';
   const [a, m, d] = iso.split('-').map(Number);

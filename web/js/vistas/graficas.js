@@ -11,7 +11,7 @@ import {
   esfuerzoTotal, formatearNumero, records, registrosDelCiclo, trabajoSerie,
 } from '../calculos.js';
 import { rmDeSerie } from '../formula1rm.js';
-import { h } from '../ui.js';
+import { fechaCorta, h } from '../ui.js';
 
 const CICLOS_A_MOSTRAR = 4;
 const ANCHO = 320;
@@ -166,7 +166,7 @@ export function seccionProgreso(datos, ejercicio) {
     graficas.push(graficaLineas({
       titulo: conCarga ? 'Trabajo en la serie' : 'Evolución',
       series: serie((s) => (conCarga ? trabajoSerie(s) : esfuerzoTotal(s))),
-      unidad: conCarga ? 'kg × reps' : (ejercicio.esfuerzo?.unidad ?? ''),
+      unidad: conCarga ? 'kg de trabajo: peso × repeticiones' : (ejercicio.esfuerzo?.unidad ?? ''),
     }));
   }
 
@@ -176,11 +176,11 @@ export function seccionProgreso(datos, ejercicio) {
       r.mejor1RM && h('div', { class: 'tarjeta record' },
         h('span', { class: 'suave' }, 'Récord de 1RM estimado'),
         h('strong', {}, `${formatearNumero(r.mejor1RM.valor)} kg`),
-        h('span', { class: 'suave' }, r.mejor1RM.fecha)),
+        h('span', { class: 'suave' }, fechaCorta(r.mejor1RM.fecha))),
       r.mejorTrabajo && h('div', { class: 'tarjeta record' },
-        h('span', { class: 'suave' }, 'Récord de trabajo'),
-        h('strong', {}, formatearNumero(r.mejorTrabajo.valor)),
-        h('span', { class: 'suave' }, r.mejorTrabajo.fecha))),
+        h('span', { class: 'suave' }, 'Récord de trabajo en una serie'),
+        h('strong', {}, `${formatearNumero(r.mejorTrabajo.valor)} kg`),
+        h('span', { class: 'suave' }, fechaCorta(r.mejorTrabajo.fecha)))),
     graficas.filter(Boolean),
     !graficas.filter(Boolean).length && h('p', { class: 'suave' },
       'Cuando tengas dos días registrados en un ciclo aparecerán aquí las gráficas.'));

@@ -659,7 +659,7 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         h('small', { class: 'nota' }, PRESETS_CICLO[p.preset]?.descripcion ?? '')),
       h('p', { class: 'nota' }, `Este ciclo: ${describirCiclo(p, sobre === 'carga' ? unidad : unidadEsfuerzo)}`),
       h('p', { class: 'nota' },
-        `Ciclo ${ciclo.n} de ${p.ciclos.length}. ${hechos.size} sesiones hechas de ${ciclo.escalera.length}. `
+        `Ciclo ${ciclo.n} de ${p.ciclos.length}. ${hechos.size === 1 ? '1 sesión hecha' : `${hechos.size} sesiones hechas`} de ${ciclo.escalera.length}. `
         + `Cada sesión tiene su ${sobre === 'carga' ? 'carga fijada' : 'objetivo fijado'}; puedes cambiar cualquier casilla.`),
 
       h('div', { class: 'barra-progreso', role: 'img',
