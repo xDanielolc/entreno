@@ -109,15 +109,18 @@ export const ASISTENCIAS = {
 };
 
 // Escala de apoyo con la mano, de más ayuda a ninguna.
+// De más alto a más bajo: la mano se apoya en el suelo y marca hasta dónde
+// llegas. Surf (meñique y pulgar) es lo más alto; luego el pulgar en alto,
+// el puño, la mano plana, tres, dos y un dedo, y al final sin mano.
 export const ESCALA_MANO = {
-  puno: '1 · Puño',
-  surf: '2 · Surf',
-  pulgar: '3 · Pulgar',
-  'mano-abierta': '4 · Mano abierta',
-  'tres-dedos': '5 · Tres dedos',
-  'dos-dedos': '6 · Dos dedos',
-  'un-dedo': '7 · Un dedo',
-  'sin-mano': '8 · Sin mano',
+  surf: '1 · 🤙 Surf',
+  pulgar: '2 · 👍 Pulgar',
+  puno: '3 · ✊ Puño',
+  'mano-abierta': '4 · ✋ Mano abierta',
+  'tres-dedos': '5 · 🤟 Tres dedos',
+  'dos-dedos': '6 · ✌️ Dos dedos',
+  'un-dedo': '7 · ☝️ Un dedo',
+  'sin-mano': '8 · 🚫 Sin mano',
 };
 
 export const DIAS_CICLO_POR_DEFECTO = 17;

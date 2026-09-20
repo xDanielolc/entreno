@@ -290,9 +290,10 @@
    "nombreEnWger": "Prensa de piernas"
   },
   "Peso muerto": {
-   "archivo": "imagenes/ejercicios/peso-muerto.jpeg",
-   "autor": "philip",
-   "nombreEnWger": "Peso Muerto Convencional"
+   "archivo": "imagenes/ejercicios/peso-muerto-rumano.png",
+   "autor": "wger",
+   "nombreEnWger": "Peso muerto rumano con barra",
+   "aliasDe": "Peso muerto rumano"
   },
   "Peso muerto sumo": {
    "archivo": "imagenes/ejercicios/peso-muerto-sumo.webp",
@@ -1618,6 +1619,11 @@
    "autor": "Everkinetic",
    "nombreEnWger": "Press de Banca",
    "aliasDe": "Press de banca"
+  },
+  "Peso muerto con mancuernas": {
+   "archivo": "imagenes/ejercicios/peso-muerto.jpeg",
+   "autor": "philip",
+   "nombreEnWger": "Peso Muerto Convencional"
   }
  }
 }

@@ -118,6 +118,9 @@ let panel = null;
 // Un entrenamiento de prueba con flexiones (se crea el ejercicio si no lo
 // tienes). Al terminarlo, la app pregunta si guardarlo o borrarlo.
 async function entrenamientoDePrueba() {
+  for (const m of document.querySelectorAll('.modal-fondo')) m.remove();
+  const abierta = estado.datos().sesiones.find((s) => s.tutorial && s.estado === 'en-curso' && !s.borrada);
+  if (abierta) { location.hash = `#/sesion/${abierta.id}`; return; }
   const { CATALOGO, normalizar } = await import('../catalogo.js');
   const { ejercicioDesdeCatalogo } = await import('./selector-ejercicios.js');
   const { entradaDeEjercicio } = await import('../series.js');
@@ -172,7 +175,10 @@ function terminarGuia() {
     x.perfil.tutoriales ??= { nivel: null, vistos: {} };
     x.perfil.tutoriales.paso = null;
     x.perfil.tutoriales.guiaHecha = true;
-  }, { tecleo: true });
+    // Un entrenamiento de prueba sin terminar no se queda colgado.
+    x.sesiones = x.sesiones.filter((s) => !(s.tutorial && s.estado === 'en-curso'));
+  });
+  if (/^#\/sesion\//.test(location.hash)) location.hash = '#/';
   pintarGuia();
 }
 
@@ -205,7 +211,10 @@ export function pintarGuia() {
   };
   // El elemento del que habla el paso parpadea para que se vea dónde tocar.
   for (const el of document.querySelectorAll('.parpadea')) el.classList.remove('parpadea');
-  const objetivo = paso.selector ? document.querySelector(paso.selector) : null;
+  // Solo parpadea algo si estamos en la pantalla del paso: fuera de ella
+  // (por ejemplo, dentro de un entrenamiento) no hay nada que señalar.
+  const enSuRuta = paso.ruta === '#/' ? enInicio() : location.hash === paso.ruta;
+  const objetivo = paso.selector && enSuRuta ? document.querySelector(paso.selector) : null;
   objetivo?.classList.add('parpadea');
   panel.replaceChildren();
   anadir(panel,

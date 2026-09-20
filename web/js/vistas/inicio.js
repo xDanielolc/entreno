@@ -163,7 +163,13 @@ export function vistaInicio(contenedor) {
     necesitaPeso && h('a', { class: 'tarjeta aviso-tarjeta', href: '#/ajustes' },
       'Indica tu peso corporal en Ajustes: lo necesitan tus ejercicios con máquina asistida.'),
 
-    enCurso
+    enCurso?.tutorial
+      ? h('section', { class: 'tarjeta' },
+        h('p', {}, 'Tienes a medias el entrenamiento de prueba del tutorial.'),
+        h('div', { class: 'fila-botones' },
+          h('a', { class: 'boton', href: `#/sesion/${enCurso.id}` }, 'Seguir con la prueba'),
+          h('button', { class: 'boton secundario', onclick: () => estado.cambiar((x) => { x.sesiones = x.sesiones.filter((s) => s.id !== enCurso.id); }) }, 'Borrar la prueba')))
+      : enCurso
       ? h('a', { class: 'boton grande', href: `#/sesion/${enCurso.id}` }, 'Continuar entrenamiento')
       : dia
         ? h('section', { class: 'tarjeta' },
@@ -181,10 +187,9 @@ export function vistaInicio(contenedor) {
           otras.length > 0 && h('p', { class: 'nota' }, 'Otras rutinas activas: ',
             otras.map((a, i) => [i > 0 && ' · ', h('a', { href: '#/', onclick: (e) => { e.preventDefault(); empezarConRutina(a.dia, a.rutina); } },
               `${a.rutina.nombre} (${a.dia.nombre})`)])),
-          h('div', { class: 'fila-botones' },
-            h('button', { class: 'boton secundario', onclick: elegirDia }, 'Otro día'),
-            h('button', { class: 'boton secundario', onclick: empezarSuelto }, 'Sin rutina')))
+          h('button', { class: 'boton secundario', onclick: elegirDia }, 'Otro día de la rutina'))
         : h('button', { class: 'boton grande', onclick: empezarSuelto }, 'Empezar entrenamiento'),
+    !enCurso && dia && h('button', { class: 'boton enlace', onclick: empezarSuelto }, 'Entrenar sin rutina (elijo yo los ejercicios)'),
 
     !d.rutinas.length && cuestionarioHecho(d) && tarjetaRecomendacion(d),
 

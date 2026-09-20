@@ -118,7 +118,12 @@ export function vistaAjustes(contenedor) {
         opciones(MODOS_ENTRENO, d.perfil.modoEntreno ?? 'ejercicio', (m) => estado.cambiar((x) => { x.perfil.modoEntreno = m; }), { compacto: true }),
         h('small', { class: 'nota' }, 'Es lo que sale marcado al empezar cada entrenamiento; allí puedes elegir otra cosa.')),
       numeroAjuste('Repeticiones en recámara por defecto', d.perfil.recamaraPorDefecto, (x, v) => { x.perfil.recamaraPorDefecto = v; }),
-      h('small', { class: 'nota' }, 'Las que sueles dejarte sin hacer al acabar una serie. Aparecen ya puestas y se apuntan aparte: «45 kg × 12 + 1».'),
+      h('small', { class: 'nota' }, 'Las que sueles dejarte sin hacer al acabar una serie. Viene puesto 1 porque es lo que recomendamos '
+        + '(quedarse a una del fallo rinde casi igual y cansa menos). Aparece ya puesto y se apunta aparte: «45 kg × 12 + 1».'),
+      h('label', { class: 'casilla' },
+        h('input', { type: 'checkbox', checked: d.perfil.preguntarComoLlegas !== false,
+          onchange: (e) => estado.cambiar((x) => { x.perfil.preguntarComoLlegas = e.target.checked; x.perfil.comoLlegasSaltos = 0; }) }),
+        'Preguntar «¿cómo llegas hoy?» al empezar (tu sensación de cada músculo, para afinar la recuperación)'),
       h('h3', {}, 'Drop sets'),
       h('div', { class: 'fila-campos' },
         numeroAjuste('Bajadas', d.perfil.dropSet?.bajadas ?? 4, (x, v) => { x.perfil.dropSet = { ...x.perfil.dropSet, bajadas: v }; }),

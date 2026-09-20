@@ -60,6 +60,32 @@ export function fechaLarga(iso) {
   return texto.charAt(0).toUpperCase() + texto.slice(1);
 }
 
+// Segundos desde «90», «1:30», «1:02:30» o «45 min». null si está vacío.
+export function leerTiempo(texto) {
+  if (texto == null) return null;
+  const limpio = String(texto).trim().toLowerCase().replace(',', '.');
+  if (limpio === '') return null;
+  const min = limpio.match(/^(\d+(?:\.\d+)?)\s*min$/);
+  if (min) return Math.round(Number(min[1]) * 60);
+  if (limpio.includes(':')) {
+    const partes = limpio.split(':').map((x) => Number(x));
+    if (partes.some((x) => Number.isNaN(x))) return null;
+    return partes.reduce((t, x) => t * 60 + x, 0);
+  }
+  const n = Number(limpio);
+  return Number.isNaN(n) ? null : n;
+}
+
+// «45», «1:30» o «1:02:30» a partir de segundos.
+export function formatearTiempo(seg) {
+  if (seg == null || Number.isNaN(seg)) return '';
+  const s = Math.round(seg);
+  if (s < 60) return String(s);
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), r = s % 60;
+  const dos = (x) => String(x).padStart(2, '0');
+  return h ? `${h}:${dos(m)}:${dos(r)}` : `${m}:${dos(r)}`;
+}
+
 // Número desde un campo de texto, admitiendo coma decimal.
 export function leerNumero(texto) {
   if (texto == null) return null;

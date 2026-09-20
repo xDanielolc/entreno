@@ -12,6 +12,8 @@ export const GLOSARIO = {
     + 'También se llama RIR.' },
   fallo: { pregunta: '¿Qué es el fallo?', termino: 'Fallo', texto: 'Llegar al punto en que no puedes hacer ni una repetición más con buena técnica. No hace falta ir '
     + 'al fallo para ganar músculo: quedarse a 1-3 repeticiones da casi lo mismo y cansa menos.' },
+  repeticion: { pregunta: '¿Qué es una repetición?', termino: 'Repetición', texto: 'Hacer el movimiento completo una vez: bajar y subir en una '
+    + 'sentadilla, o empujar y volver en una flexión. «12 repeticiones» son doce veces seguidas.' },
   serie: { pregunta: '¿Qué es una serie?', termino: 'Serie', texto: 'Un grupo de repeticiones seguidas, sin soltar. «3 series de 10» son diez repeticiones, descanso, '
     + 'diez más, descanso y diez más.' },
   'drop-set': { pregunta: '¿Qué es un drop set?', termino: 'Drop set', texto: 'Una serie en la que, al no poder más, bajas el peso y sigues sin descansar, varias veces. '
@@ -41,7 +43,7 @@ export const GLOSARIO = {
 // Palabras del glosario que pueden aparecer en cualquier texto de la app, y
 // su clave. Se usa para poner un «?» detrás de la primera vez que salen.
 const TERMINOS = [
-  ['1RM', 'rm'], ['recámara', 'recamara'], ['fallo', 'fallo'], ['drop set', 'drop-set'], ['rest-pause', 'rest-pause'],
+  ['1RM', 'rm'], ['recámara', 'recamara'], ['fallo', 'fallo'], ['repeticiones', 'repeticion'], ['drop set', 'drop-set'], ['rest-pause', 'rest-pause'],
   ['volumen', 'volumen'], ['Bilbo', 'bilbo'], ['descarga', 'descarga'], ['doble progresión', 'doble-progresion'], ['HIIT', 'hiit'],
 ];
 const RE_TERMINOS = new RegExp(`(^|[^\\p{L}\\d])(${TERMINOS.map(([t]) => t).join('|')})(?![\\p{L}\\d])`, 'iu');

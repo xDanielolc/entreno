@@ -15,7 +15,7 @@ import {
   avisoPrimeraBajada, crearSerieDesdePlan, entradaDeEjercicio, modoCargaDe, origenModoCarga, recalcularTramos, saltoDeTramo,
   serieSuelta,
 } from '../series.js';
-import { anadir, aviso, confirmar, h, leerNumero } from '../ui.js';
+import { anadir, aviso, confirmar, h, formatearTiempo, leerNumero, leerTiempo } from '../ui.js';
 import { DESCANSO_ESTIRAMIENTOS_POR_DEFECTO, arrancarDescanso, arrancarRespiracion, barraDescanso, descansoDeTramo } from './descanso.js';
 import { cuentaParaFatiga, tipoDeEjercicio } from '../catalogo.js';
 import { ASISTENCIAS, ESCALA_MANO, PROGRAMAS, TECNICAS_ESTIRAMIENTO } from '../esquema.js';
@@ -85,7 +85,7 @@ export function vistaSesion(contenedor, { id }) {
 
     sesion.diaRutinaId && h('p', { class: 'suave' }, nombreDelDia(d, sesion)),
 
-    enCurso && posicion == null && tarjetaComoLlegas(),
+    enCurso && (posicion == null || posicion === 0) && tarjetaComoLlegas(),
 
     enCurso && eleccion && sesion.ejercicios.length > 0 && h('button', { class: 'boton enlace cambiar-vista', onclick: () => elegirVista() },
       `Vista: ${MODOS_ENTRENO[modo]?.etiqueta.toLowerCase() ?? 'todos los ejercicios'} · cambiar`),
@@ -125,7 +125,7 @@ export function vistaSesion(contenedor, { id }) {
   // lo que calcula la app. Con varias respuestas, la app te dirá si te
   // recuperas antes o después de lo normal (pestaña Cuerpo).
   function tarjetaComoLlegas() {
-    if (sesion.sensacionesCerrada) return null;
+    if (sesion.sensacionesCerrada || d.perfil.preguntarComoLlegas === false) return null;
     const musculos = new Set();
     for (const entrada of sesion.ejercicios) {
       const ej = ejercicioDe(entrada.ejercicioId);
@@ -150,15 +150,27 @@ export function vistaSesion(contenedor, { id }) {
             Array.from({ length: 11 }, (_, n) => h('button', {
               class: `paso-escala ${puesta === n ? 'activo' : ''}`, role: 'radio', 'aria-checked': String(puesta === n),
               title: ESCALA_RECUPERACION[n] ?? String(n),
-              onclick: () => cambiarSesion((x) => {
-                x.sensaciones ??= {};
-                x.sensaciones[m] = { sentida: n, prevista: previsto[m].porcentaje };
-              }),
+              onclick: () => {
+                cambiarSesion((x) => {
+                  x.sensaciones ??= {};
+                  x.sensaciones[m] = { sentida: n, prevista: previsto[m].porcentaje };
+                });
+                estado.cambiar((x) => { x.perfil.comoLlegasSaltos = 0; }, { tecleo: true });
+              },
             }, n))),
           h('div', { class: 'extremos-escala suave' }, h('span', {}, 'Nada'), h('span', {}, 'A medias'), h('span', {}, 'Del todo')));
       }),
-      h('button', { class: 'boton enlace', onclick: () => cambiarSesion((x) => { x.sensacionesCerrada = true; }) },
-        'Hoy no'));
+      h('button', { class: 'boton enlace', onclick: () => {
+        cambiarSesion((x) => { x.sensacionesCerrada = true; });
+        // Dos veces seguidas «hoy no»: se ofrece quitar la pregunta.
+        const saltos = (d.perfil.comoLlegasSaltos ?? 0) + 1;
+        estado.cambiar((x) => { x.perfil.comoLlegasSaltos = saltos; }, { tecleo: true });
+        if (saltos >= 2) {
+          aviso('Te lo has saltado dos veces. ¿Quito la pregunta? (Si la quieres luego, está en Ajustes.)', { accion: { texto: 'Sí, quítala', fn: () => {
+            estado.cambiar((x) => { x.perfil.preguntarComoLlegas = false; x.perfil.comoLlegasSaltos = 0; });
+          } } });
+        }
+      } }, 'Hoy no'));
   }
 
   // Al empezar: series de una en una, ejercicios de uno en uno o todo.
@@ -264,10 +276,9 @@ export function vistaSesion(contenedor, { id }) {
     if (ej.carga?.tipo === 'ninguna') return null;
     const rm = rmDeReferencia(d, ej, { cicloN: entrada.cicloN });
     if (!rm) return null;
-    const al = (p) => `${formatearNumero(aPesoDisponible(ej, rm.valor * p))} kg`;
     return h('p', { class: 'nota' },
       'Tu máximo (', queEs('rm', '1RM'), `) estimado ${rm.delCiclo ? 'en este ciclo' : 'según tu historial'}: `
-      + `${formatearNumero(Math.round(rm.valor))} kg. Al 80 % son ${al(0.8)}, al 70 % ${al(0.7)} y al 60 % ${al(0.6)}.`);
+      + `${formatearNumero(Math.round(rm.valor))} kg.`);
   }
 
   // Cabecera de cada serie: qué toca y cómo fue la última vez.
@@ -443,11 +454,13 @@ export function vistaSesion(contenedor, { id }) {
         : campoCargaConPorcentaje(ej, i, j, serie)),
 
       h('label', { class: 'valor' },
-        h('input', { type: 'text', inputmode: 'decimal', value: serie.esfuerzo ?? '', 'aria-label': TIPOS_ESFUERZO[ej.esfuerzo.tipo].etiqueta,
+        h('input', { type: 'text', inputmode: esTiempo(ej) ? 'numeric' : 'decimal', 'aria-label': TIPOS_ESFUERZO[ej.esfuerzo.tipo].etiqueta,
+          value: esTiempo(ej) ? formatearTiempo(serie.esfuerzo) : (serie.esfuerzo ?? ''),
+          placeholder: esTiempo(ej) ? 'mm:ss' : null,
           oninput: (e) => {
             actualizar((x) => {
               const antes = x.esfuerzo;
-              x.esfuerzo = leerNumero(e.target.value);
+              x.esfuerzo = esTiempo(ej) ? leerTiempo(e.target.value) : leerNumero(e.target.value);
               marcarHecha(e.target, x, ej);
               if (antes == null && x.esfuerzo != null) descansoEntreSeries(ej);
             });
@@ -523,7 +536,7 @@ export function vistaSesion(contenedor, { id }) {
     const pintarTotal = () => {
       const t = trabajoSerie(serie);
       const reps = esfuerzoTotal(serie);
-      total.textContent = reps ? `Hoy: ${serie.tramos.length} ${tramos.nombre.toLowerCase()}s · ${formatearNumero(reps)} ${unidadEsfuerzo(ej)}`
+      total.textContent = reps ? `Hoy: ${serie.tramos.length} ${tramos.nombre.toLowerCase()}s · ${textoEsfuerzo(ej, reps)}`
         + (t ? ` · ${formatearNumero(t)} kg de trabajo` : '') : '';
     };
     pintarTotal();
@@ -547,7 +560,7 @@ export function vistaSesion(contenedor, { id }) {
       conCarga && h('p', { class: 'nota nota-relleno' }, textoRelleno(ej, serie)),
       h('p', { class: 'aviso-texto aviso-bajada' }, avisoPrimeraBajada(d, ej, serie) ?? ''),
       anterior?.tramos?.length && h('p', { class: 'nota' }, `La otra vez: ${textoSerie(ej, anterior)}`
-        + ` (${formatearNumero(esfuerzoTotal(anterior))} ${unidadEsfuerzo(ej)}`
+        + ` (${textoEsfuerzo(ej, esfuerzoTotal(anterior))}`
         + `${trabajoSerie(anterior) ? `, ${formatearNumero(trabajoSerie(anterior))} kg de trabajo` : ''}).`),
       h('div', { class: 'tramo cabecera-tramos', 'aria-hidden': 'true' },
         h('span', { class: 'tramo-n vacio' }),
@@ -835,7 +848,8 @@ export function textoSerie(ej, serie) {
   }
   if (serie.carga != null) partes.push(`${formatearNumero(serie.carga)} ${unidadCarga(ej)}`);
   if (serie.esfuerzo != null) {
-    partes.push(`${formatearNumero(serie.esfuerzo)}${serie.recamara ? ` + ${serie.recamara}` : ''} ${unidadEsfuerzo(ej)}`);
+    partes.push(esTiempo(ej) ? textoEsfuerzo(ej, serie.esfuerzo)
+      : `${formatearNumero(serie.esfuerzo)}${serie.recamara ? ` + ${serie.recamara}` : ''} ${unidadEsfuerzo(ej)}`);
   }
   const tec = textoTecnicas(serie.tecnicas);
   return partes.join(' × ') + (tec ? ` (${tec})` : '');
@@ -846,6 +860,16 @@ export function unidadCarga(ej) {
 }
 
 export function unidadEsfuerzo(ej) {
+  if (esTiempo(ej)) return 'min:s';
   return TIPOS_ESFUERZO[ej.esfuerzo.tipo]?.unidad ?? '';
+}
+
+const esTiempo = (ej) => ej.esfuerzo?.tipo === 'tiempo';
+
+// «12 reps», «1,5 km» o «45 s» / «1:02:30».
+export function textoEsfuerzo(ej, valor) {
+  if (valor == null) return '';
+  if (esTiempo(ej)) return valor < 60 ? `${Math.round(valor)} s` : formatearTiempo(valor);
+  return `${formatearNumero(valor)} ${TIPOS_ESFUERZO[ej.esfuerzo.tipo]?.unidad ?? ''}`.trim();
 }
 

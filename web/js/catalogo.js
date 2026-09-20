@@ -111,6 +111,7 @@ export const CATALOGO = [
   ej('Sentadilla sissy', 'pierna', 'peso corporal', ['cuadriceps'], [], corporal),
   ej('Prensa de piernas', 'pierna', 'máquina', ['cuadriceps'], ['gluteo']),
   ej('Peso muerto', 'pierna', 'barra', ['isquios', 'gluteo'], ['lumbar', 'trapecio', 'antebrazo']),
+  ej('Peso muerto con mancuernas', 'pierna', 'mancuernas', ['isquios', 'gluteo'], ['lumbar', 'trapecio', 'antebrazo']),
   ej('Peso muerto sumo', 'pierna', 'barra', ['gluteo', 'aductores'], ['isquios', 'lumbar', 'cuadriceps']),
   ej('Peso muerto rumano', 'pierna', 'barra', ['isquios'], ['gluteo', 'lumbar']),
   ej('Buenos días', 'pierna', 'barra', ['isquios', 'lumbar'], ['gluteo']),
