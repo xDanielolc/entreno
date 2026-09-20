@@ -206,5 +206,39 @@ duplicar (`preguntandoVista`). Textos en llano: línea del 1RM del ciclo, tabla
 fechas dd/mm/aaaa (`fechaCorta` en ui.js), total exacto del HIIT y frase de
 introducción con glosario, saludo sin nombre, plural «1 sesión hecha».
 El «diagnóstico gym» lo dio él por cerrado (no era de la app).
-PENDIENTE: nombre e icono con Design («luego ya decoramos»); que él confirme
-que Drive recoge los archivos sueltos en la carpeta.
+0.20.12-0.21.3 (tras su prueba del 20-09-2026, todo pedido por él): avisos
+negros a casi todo el ancho; carteles (`.modal-fondo`) centrados y la guía
+oculta mientras hay uno (`body:has(.modal-fondo) .guia`); escala de la mano
+con emojis y orden real (surf, pulgar, puño, mano abierta, 3-2-1 dedos, sin
+mano); tiempo en «mm:ss» (`leerTiempo`/`formatearTiempo` en ui.js,
+`textoEsfuerzo` en sesion.js); «¿cómo llegas?» en cualquier vista, con oferta
+de quitarla al segundo «hoy no» (`perfil.preguntarComoLlegas`); sesión de
+prueba del tutorial que no se cuelga; peso muerto con barra (alias del rumano)
+y «Peso muerto con mancuernas» nuevo; banda verde «Entrenamiento en curso ·
+Volver» en cualquier pantalla (app.js `pintarBandaEntreno`); nota «primera vez
+con X» en el resumen. Tutorial reescrito: `PASOS` con texto largo y `corto`,
+niveles basico («explícamelo todo») / avanzado («solo dónde está cada cosa»:
+sin pistas salvo `sesion-datos`, sin glosario), primer entrenamiento guiado
+casilla a casilla (`subpasoDePrueba`: reps → recámara → terminar, la sesión
+llama a `pintarGuia()` al teclear), sin PASOS_AVANZADOS. Pantalla «Aprender»
+(`vistas/aprender.js`, ruta `#/aprender`, enlace desde Ajustes): tutorial,
+glosario, «Cómo decide la app qué te toca» (progresiones y programas en llano),
+estiramientos (técnicas, pasivo/activo, FNP/CRAC, ayudas, escala de la mano) y
+fuentes (antes en Ajustes). Rutinas: buscador y chips por tipo
+(`tipoDePlantilla`, `tipoDeRutina`), plantilla «Cardio: tres días». Ficha del
+ejercicio reestructurada (ejercicios.js): «¿Con qué peso se hace?» (peso
+libre / máquina de placas / peso corporal / asistida / altura o distancia de
+salto / sin peso → carga.tipo + maquinaPlacas), «¿Qué apuntas?» (reps / tiempo
+/ distancia / tiempo y distancia), «¿Cómo te lleva la app?» con una regla por
+serie (`progresionesPara()` según medida; `plan.tipo` sale de `tipoDePlan()`:
+calentamiento (casilla `plan.calentamiento`) / bilbo / intensidad / libre; ya
+no se elige el tipo), drop set con una sola pregunta (modos ultima / ajustes /
+plantilla / fijos), ciclo siempre «a mi manera» con chips de prehechos y corte
+también por `corte.cargaMax` y `corte.rmPct` (calculos.js), «Ajustes finos»
+plegados (sede, fórmula, `ej.recamaraPorDefecto`, notas). Recámara: al poner
+dos veces el mismo valor en un ejercicio, la sesión ofrece fijarlo
+(`ofrecerRecamara`). Pliometría en el catálogo (7 entradas, imagen por alias).
+Página de pruebas del artefacto ahora guarda en `pruebas/v021` (26 puntos).
+PENDIENTE: nombre e icono con Design («luego ya decoramos»); combinar varias
+ayudas y medidas en un estiramiento (mano + cm + segundos): él decide si urge;
+las casillas «apelotonadas» de la sesión: falta que diga en qué pantalla.
