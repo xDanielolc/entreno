@@ -6,7 +6,7 @@
 // (además, cuatro pasos y pistas sobre los cálculos) y 'ninguno'.
 
 import * as estado from '../estado.js';
-import { h, modal, nuevoId, hoyISO } from '../ui.js';
+import { h, anadir, modal, nuevoId, hoyISO } from '../ui.js';
 import { queEs } from './glosario.js';
 
 export const NIVELES = {
@@ -94,8 +94,8 @@ const PASOS_BASICOS = [
     + 'flexiones. Apunta una serie (peso, repeticiones y cuántas te quedaban) y mira cómo arranca el descanso. Al terminar podrás '
     + 'guardarlo o borrarlo.', prueba: true, glosario: ['serie', 'recamara', 'rm'] },
   { ruta: '#/cuerpo', titulo: 'Cuerpo', texto: 'El mapa: verde recuperado, rojo aún tocado. Debajo, las series de la semana por músculo y consejos. '
-    + 'Tu recuperación depende de lo dura que fue la sesión, de cuántas series hiciste y de tu genética.', glosario: ['recuperacion', 'volumen'] },
-  { ruta: '#/historial', titulo: 'Historial', texto: 'Todos tus entrenamientos. Con «+ De otro día» apuntas uno pasado. Lo borrado va a una papelera y se recupera.' },
+    + 'Tu recuperación depende de lo dura que fue la sesión, de cuántas series hiciste y de tu genética.', glosario: ['recuperacion', 'volumen'], selector: '.cuerpos' },
+  { ruta: '#/historial', titulo: 'Historial', texto: 'Todos tus entrenamientos. Con «+ De otro día» apuntas uno pasado. Lo borrado va a una papelera y se recupera.', selector: '.cabecera-vista .boton' },
   { ruta: '#/ajustes', titulo: 'Ajustes', texto: 'Arriba, tu nombre, tu peso y la cuenta de Google. Lo demás está plegado por apartados: descansos, drop sets, '
     + 'ciclos, sitios, cómo se estima el 1RM, este tutorial y la zona de peligro. Fin de lo básico: ya puedes entrenar.', selector: '.apartado' },
 ];
@@ -169,8 +169,10 @@ export function pintarGuia() {
   const d = estado.datos();
   const t = d?.perfil?.tutoriales;
   const n = t?.paso;
+  const principal = document.getElementById('vista');
   if (!estado.usuario() || n == null || t.nivel === 'ninguno') {
     panel?.remove(); panel = null;
+    if (principal) principal.style.paddingBottom = '';
     for (const el of document.querySelectorAll('.parpadea')) el.classList.remove('parpadea');
     return;
   }
@@ -190,16 +192,22 @@ export function pintarGuia() {
   };
   // El elemento del que habla el paso parpadea para que se vea dónde tocar.
   for (const el of document.querySelectorAll('.parpadea')) el.classList.remove('parpadea');
-  if (paso.selector) document.querySelector(paso.selector)?.classList.add('parpadea');
-  panel.replaceChildren(
+  const objetivo = paso.selector ? document.querySelector(paso.selector) : null;
+  objetivo?.classList.add('parpadea');
+  panel.replaceChildren();
+  anadir(panel,
     h('div', { class: 'guia-cabecera' },
       h('strong', {}, paso.titulo),
       h('span', { class: 'suave' }, `paso ${n + 1} de ${pasos.length}`)),
     h('p', {}, paso.texto),
     paso.glosario && h('p', { class: 'guia-glosario' }, paso.glosario.map((g) => queEs(g))),
-    paso.prueba && h('button', { class: 'boton secundario', onclick: entrenamientoDePrueba }, 'Hacer un entrenamiento de prueba'),
+    paso.prueba && h('button', { class: 'boton secundario parpadea', onclick: entrenamientoDePrueba }, 'Hacer un entrenamiento de prueba'),
     h('div', { class: 'fila-botones' },
       h('button', { class: 'boton enlace', onclick: terminarGuia }, 'Salir'),
       n > 0 && h('button', { class: 'boton secundario', onclick: () => ir(n - 1) }, 'Anterior'),
       h('button', { class: 'boton', onclick: () => ir(n + 1) }, n + 1 >= pasos.length ? 'Terminar' : 'Siguiente')));
+  // La pantalla deja sitio para el panel, y el elemento del que habla el
+  // paso se pone a la vista (después de que la app coloque el scroll).
+  if (principal) principal.style.paddingBottom = `${panel.offsetHeight + 24}px`;
+  if (objetivo) setTimeout(() => objetivo.scrollIntoView({ block: 'center', behavior: 'smooth' }), 50);
 }

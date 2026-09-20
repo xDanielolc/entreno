@@ -272,9 +272,16 @@ a { color: var(--acento); }
 .intervalos[data-fase="descanso"] .intervalos-tiempo { color: var(--bien); }
 .intervalos .barra-progreso { margin: 10px 0 14px; }
 .intervalos-config .opciones { margin-bottom: 6px; }
-@keyframes parpadeo { 0%, 100% { box-shadow: 0 0 0 0 var(--acento); } 50% { box-shadow: 0 0 0 8px transparent; } }
-.parpadea { animation: parpadeo 1.2s ease-out infinite; outline: 2px solid var(--acento); outline-offset: 2px; }
-@media (prefers-reduced-motion: reduce) { .parpadea { animation: none; } }
+/* El elemento del que habla la guía parpadea: se enciende y se apaga con
+   un halo naranja, que se ve sobre cualquier fondo y con cualquier tema. */
+@keyframes parpadeo {
+  0%, 100% { box-shadow: 0 0 0 3px #ff9800, 0 0 0 3px #ff9800; filter: brightness(1); transform: scale(1); }
+  50% { box-shadow: 0 0 0 3px transparent, 0 0 18px 6px #ff9800; filter: brightness(1.2); transform: scale(1.03); }
+}
+.parpadea { animation: parpadeo 0.9s ease-in-out infinite; position: relative; z-index: 1; }
+/* Si el móvil pide menos movimiento, se enciende y se apaga sin moverse. */
+@keyframes parpadeo-quieto { 0%, 100% { box-shadow: 0 0 0 3px #ff9800; } 50% { box-shadow: 0 0 0 3px transparent; } }
+@media (prefers-reduced-motion: reduce) { .parpadea { animation: parpadeo-quieto 1.2s ease-in-out infinite; } }
 .como-ir .tarjeta.preferido { border-color: var(--acento); }
 
 .boton-icono {
