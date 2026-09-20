@@ -2,7 +2,7 @@ import {
   aPesoDisponible, cargaCorporal, cargaDesdeLectura, esfuerzoTotal, formatearNumero,
   redondear, rmDeReferencia, sugerenciaSerie, trabajoSerie, tramosPropuestos, usaTramos,
 } from '../calculos.js';
-import { pista } from './tutorial.js';
+import { guiaTrasPrueba, pista } from './tutorial.js';
 import { queEs } from './glosario.js';
 import { abrirIntervalos } from './intervalos.js';
 import { modal } from '../ui.js';
@@ -189,7 +189,8 @@ export function vistaSesion(contenedor, { id }) {
 
   // Si la pantalla se vuelve a pintar antes de que salga el cartel (por
   // ejemplo, al llegar datos), no se abre dos veces.
-  if (enCurso && !eleccion && sesion.ejercicios.length > 0 && !algoHecho && !document.querySelector('.modal-fondo')
+  // En el entrenamiento de prueba del tutorial no se pregunta: ya hay bastante en pantalla.
+  if (enCurso && !eleccion && sesion.ejercicios.length > 0 && !algoHecho && !sesion.tutorial && !document.querySelector('.modal-fondo')
     && !preguntandoVista.has(id)) {
     preguntandoVista.add(id);
     setTimeout(() => {
@@ -780,8 +781,9 @@ export function vistaSesion(contenedor, { id }) {
             estado.cambiar((x) => { x.sesiones = x.sesiones.filter((s) => s.id !== id); });
             cerrar();
             aviso('Entrenamiento de prueba borrado.');
+            guiaTrasPrueba();
           } }, 'Borrarlo'),
-          h('button', { class: 'boton', onclick: () => { cerrar(); mostrarResumen(estado.datos(), id); } }, 'Guardarlo'))));
+          h('button', { class: 'boton', onclick: () => { cerrar(); guiaTrasPrueba(); mostrarResumen(estado.datos(), id); } }, 'Guardarlo'))));
       return;
     }
     mostrarResumen(estado.datos(), id);

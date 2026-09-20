@@ -138,6 +138,19 @@ async function entrenamientoDePrueba() {
   location.hash = `#/sesion/${id}`;
 }
 
+// Al acabar el entrenamiento de prueba (guardado o borrado), la guía pasa
+// sola al paso siguiente.
+export function guiaTrasPrueba() {
+  const t = estado.datos()?.perfil?.tutoriales;
+  if (t?.paso == null) return;
+  const k = pasosDe(t.nivel).findIndex((p) => p.prueba);
+  if (k < 0 || t.paso !== k) return;
+  estado.cambiar((x) => { x.perfil.tutoriales.paso = k + 1; }, { tecleo: true });
+  const destino = pasosDe(t.nivel)[k + 1];
+  if (destino && !(destino.ruta === '#/' ? enInicio() : location.hash === destino.ruta)) location.hash = destino.ruta;
+  else pintarGuia();
+}
+
 function pasosDe(nivel) {
   return nivel === 'avanzado' ? [...PASOS_BASICOS, ...PASOS_AVANZADOS] : PASOS_BASICOS;
 }
