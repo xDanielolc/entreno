@@ -454,7 +454,8 @@ El paso 3 no es opcional. Es la red de seguridad.
 - **Sin cambio de versión (0.17.0 a 0.20.0).** `perfil.cuestionario =
   { experiencia, objetivo, donde, tema, hecho }`, `perfil.tema` ('claro' |
   'oscuro' | 'sistema'), `perfil.tutoriales.paso` y `guiaHecha`,
-  `perfil.bilboMinReps`, `perfil.hiit = { preset, trabajo, descanso, rondas }`.
+  `perfil.bilboMinReps`, `perfil.hiit = { preset, trabajo, descanso, rondas }`,
+  `perfil.descansoEstiramientos` (segundos; 20 si falta).
   Sesiones: `vista = { modo, pos }` (cómo se está viendo el entreno) y
   `tutorial` (true en el entrenamiento de prueba de la guía). Progresión de
   ciclo (tipo 'bilbo'): `preset`, `corte = { sesiones, esfuerzoMin,

@@ -16,7 +16,7 @@ import {
   serieSuelta,
 } from '../series.js';
 import { anadir, aviso, confirmar, h, leerNumero } from '../ui.js';
-import { arrancarDescanso, arrancarRespiracion, barraDescanso, descansoDeTramo } from './descanso.js';
+import { DESCANSO_ESTIRAMIENTOS_POR_DEFECTO, arrancarDescanso, arrancarRespiracion, barraDescanso, descansoDeTramo } from './descanso.js';
 import { cuentaParaFatiga, tipoDeEjercicio } from '../catalogo.js';
 import { ASISTENCIAS, ESCALA_MANO, PROGRAMAS, TECNICAS_ESTIRAMIENTO } from '../esquema.js';
 import { ORDEN_MUSCULOS, nombreMusculo } from '../musculos.js';
@@ -31,6 +31,7 @@ import { selectorTecnicas, textoTecnicas } from './tecnicas.js';
 // (un ejercicio cada vez) o 'todo'. Se recuerda por sesión mientras la app
 // esté abierta, y la elección queda en el perfil para la próxima vez.
 const guiado = new Map();     // id de sesión → { modo, pos }
+const preguntandoVista = new Set();   // sesiones con el cartel de vista a punto de salir
 
 export const MODOS_ENTRENO = {
   serie: { etiqueta: 'Solo la serie que toca', descripcion: 'Al apuntarla aparece la siguiente. Lo más limpio.' },
@@ -186,8 +187,15 @@ export function vistaSesion(contenedor, { id }) {
     cambiarSesion((s) => { s.vista = { modo, pos }; }, { tecleo: true });
   }
 
-  if (enCurso && !eleccion && sesion.ejercicios.length > 0 && !algoHecho && !document.querySelector('.modal-fondo')) {
-    setTimeout(elegirVista, 50);
+  // Si la pantalla se vuelve a pintar antes de que salga el cartel (por
+  // ejemplo, al llegar datos), no se abre dos veces.
+  if (enCurso && !eleccion && sesion.ejercicios.length > 0 && !algoHecho && !document.querySelector('.modal-fondo')
+    && !preguntandoVista.has(id)) {
+    preguntandoVista.add(id);
+    setTimeout(() => {
+      preguntandoVista.delete(id);
+      if (!guiado.has(id) && !document.querySelector('.modal-fondo')) elegirVista();
+    }, 50);
   }
 
   function irA(nueva) {
@@ -231,8 +239,13 @@ export function vistaSesion(contenedor, { id }) {
           aviso(`Apuntado: ${texto}, ${segundos >= 60 ? `${Math.round(segundos / 60)} min` : `${segundos} s`} de trabajo.`);
         } }) }, '⏱ Intervalos (HIIT)'),
 
-      indice === 0 && enCurso && pista('sesion-datos', 'Apunta la serie al acabarla: al escribir las repeticiones arranca el descanso. '
-        + 'La casilla «+» es la recámara (toca «?» para saber más).'),
+      indice === 0 && enCurso && pista('sesion-datos', ['estiramiento', 'movilidad', 'yoga'].includes(tipoDeEjercicio(ej))
+        ? 'Apunta cada estiramiento al acabarlo: los segundos que has aguantado y, si te apoyas con la mano, hasta dónde llegas. '
+          + 'Al escribirlos arranca el descanso.'
+        : ej.esfuerzo?.tipo === 'tiempo'
+          ? 'Apunta la serie al acabarla: al escribir el tiempo arranca el descanso.'
+          : 'Apunta la serie al acabarla: al escribir las repeticiones arranca el descanso. '
+            + 'La casilla «+» es la recámara (toca «?» para saber más).'),
 
       entrada.series.map((serie, j) => {
         const bloque = bloqueSerie(ej, entrada, indice, j, serie);
@@ -435,7 +448,7 @@ export function vistaSesion(contenedor, { id }) {
               const antes = x.esfuerzo;
               x.esfuerzo = leerNumero(e.target.value);
               marcarHecha(e.target, x, ej);
-              if (antes == null && x.esfuerzo != null) descansoEntreSeries();
+              if (antes == null && x.esfuerzo != null) descansoEntreSeries(ej);
             });
             recalcularAbajo(ej, i);
           } }),
@@ -565,7 +578,7 @@ export function vistaSesion(contenedor, { id }) {
                     arrancarDescanso(descansoDeTramo(d.perfil, tramos.tecnica), {
                       texto: tramos.tecnica === 'drop-set' ? 'para cambiar el peso' : 'para recuperar el aliento' });
                   }
-                } else descansoEntreSeries();
+                } else descansoEntreSeries(ej);
               }
             }) }),
           h('span', {}, unidadEsfuerzo(ej))),
@@ -610,7 +623,13 @@ export function vistaSesion(contenedor, { id }) {
     return `Kilos por el 1RM ${serie.rmUsado.deHoy ? 'de hoy' : 'de tu historial'} (${formatearNumero(serie.rmUsado.base ?? serie.rmUsado.valor)} kg${fatiga}).`;
   }
 
-  function descansoEntreSeries() {
+  // Entre estiramientos el descanso es otro, más corto (se cambia en Ajustes).
+  function descansoEntreSeries(ej) {
+    if (['estiramiento', 'movilidad', 'yoga'].includes(tipoDeEjercicio(ej))) {
+      const seg = d.perfil.descansoEstiramientos ?? DESCANSO_ESTIRAMIENTOS_POR_DEFECTO;
+      if (seg) arrancarDescanso(seg, { texto: 'entre estiramientos' });
+      return;
+    }
     if (d.perfil.descansoSegundos) arrancarDescanso(d.perfil.descansoSegundos);
   }
 

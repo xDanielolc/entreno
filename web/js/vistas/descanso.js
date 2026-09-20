@@ -39,6 +39,8 @@ export function arrancarRespiracion(perfil) {
 
 // Descanso que toca dentro de una serie, según su técnica.
 export const DESCANSO_TRAMOS_POR_DEFECTO = { 'drop-set': 30, 'rest-pause': 20, miorepeticiones: 20 };
+// Segundos entre estiramientos (perfil.descansoEstiramientos si se cambia).
+export const DESCANSO_ESTIRAMIENTOS_POR_DEFECTO = 20;
 
 export function descansoDeTramo(perfil, tecnica) {
   return perfil.descansoTramos?.[tecnica] ?? DESCANSO_TRAMOS_POR_DEFECTO[tecnica] ?? 20;
@@ -81,6 +83,7 @@ function pintar() {
     if (!finMs) continue;
     caja.querySelector('.descanso-tiempo').textContent = formatear(segundos);
     caja.querySelector('.descanso-motivo').textContent = motivo;
+    caja.querySelector('.descanso-alargar').textContent = pasoAlargar() === 30 ? '+30 s' : '+1 min';
     caja.classList.toggle('acabado', segundos === 0);
     pintarRespiracion(caja);
   }
@@ -156,10 +159,14 @@ function saltar() {
   }
 }
 
+// Con descansos cortos (estiramientos, bajadas) se añaden 30 s; si no, un minuto.
+const pasoAlargar = () => (totalSeg && totalSeg < 60 ? 30 : 60);
+
 function alargar() {
   if (!finMs) return;
-  finMs = Math.max(finMs, Date.now()) + 60_000;
-  alargadoSeg += 60;
+  const paso = pasoAlargar();
+  finMs = Math.max(finMs, Date.now()) + paso * 1000;
+  alargadoSeg += paso;
   clearInterval(intervalo);
   intervalo = setInterval(pintar, 1000);
   pintar();
@@ -175,7 +182,7 @@ export function barraDescanso() {
     h('div', { class: 'respira', hidden: true },
       h('span', { class: 'circulo-respira', 'aria-hidden': 'true' }),
       h('span', { class: 'texto-respira' })),
-    h('button', { class: 'boton enlace', onclick: alargar }, '+1 min'),
+    h('button', { class: 'boton enlace descanso-alargar', onclick: alargar }, pasoAlargar() === 30 ? '+30 s' : '+1 min'),
     h('button', { class: 'boton enlace', onclick: saltar }, 'Saltar'));
   cajas.add(caja);
   return caja;
