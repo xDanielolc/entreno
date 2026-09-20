@@ -406,6 +406,32 @@ export function cuentaParaFatiga(ej) {
   return !['estiramiento', 'movilidad', 'yoga'].includes(ej?.grupo);
 }
 
+// Ejercicios creados «en blanco» (sin grupo ni músculos, por ejemplo desde
+// una rutina prehecha cuando aún no estaban en el catálogo) se completan con
+// lo que diga el catálogo si el nombre coincide. Lo que ya se rellenó a mano
+// no se toca. Devuelve cuántos se han completado.
+export function completarDesdeCatalogo(datos) {
+  let n = 0;
+  const usados = new Set((datos.sesiones ?? []).flatMap((s) => (s.ejercicios ?? []).map((x) => x.ejercicioId)));
+  for (const ej of datos.ejercicios ?? []) {
+    if (ej.borrado || ej.grupo || ej.musculos?.principales?.length) continue;
+    const base = CATALOGO.find((c) => normalizar(c.nombre) === normalizar(ej.nombre));
+    if (!base) continue;
+    ej.grupo = base.grupo;
+    ej.musculos = { principales: [...(base.musculos?.principales ?? [])], secundarios: [...(base.musculos?.secundarios ?? [])] };
+    if (!ej.material && base.material) ej.material = base.material;
+    if (base.asistencia && !ej.estiramiento) ej.estiramiento = { tecnica: null, asistencia: base.asistencia };
+    // Cómo se mide solo se cambia si nunca se ha apuntado nada con él.
+    if (!usados.has(ej.id)) {
+      if (base.carga) ej.carga = { ...ej.carga, tipo: base.carga };
+      if (base.esfuerzo) ej.esfuerzo = { ...ej.esfuerzo, tipo: base.esfuerzo };
+      if (base.carga === 'pesoCorporal') ej.fraccionCorporal = base.fraccion ?? 1;
+    }
+    n += 1;
+  }
+  return n;
+}
+
 export function buscarEnCatalogo(texto) {
   const f = normalizar(texto);
   if (!f) return CATALOGO;

@@ -6,6 +6,7 @@
 
 import * as local from './almacen-local.js';
 import { archivoNuevo, migrar, necesitaMigrar, validar } from './esquema.js';
+import { completarDesdeCatalogo } from './catalogo.js';
 
 export const USUARIO_SIN_CUENTA = 'sin-cuenta';
 
@@ -39,6 +40,7 @@ export async function abrirUsuario(id, { nombre = '', correo = null } = {}) {
       r.datos = migrar(r.datos);
       r.meta.pendiente = true;
     }
+    if (completarDesdeCatalogo(r.datos) > 0) r.meta.pendiente = true;
   }
   if (correo && !r.datos.perfil.correo) r.datos.perfil.correo = correo;
   if (nombre && !r.datos.perfil.nombre) r.datos.perfil.nombre = nombre;

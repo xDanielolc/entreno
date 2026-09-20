@@ -102,8 +102,8 @@ function seccionRecords(datos, sesion) {
         + `(antes ${formatearNumero(antes.mejor1RM.valor)} kg)` });
     }
     if (ahora.mejorTrabajo && antes.mejorTrabajo && ahora.mejorTrabajo.valor > antes.mejorTrabajo.valor) {
-      lineas.push({ ej, texto: `${ej.nombre}: trabajo de ${formatearNumero(ahora.mejorTrabajo.valor)} kg×reps en una serie `
-        + `(antes ${formatearNumero(antes.mejorTrabajo.valor)})` });
+      lineas.push({ ej, texto: `${ej.nombre}: ${formatearNumero(ahora.mejorTrabajo.valor)} kg de trabajo en una serie `
+        + `(antes ${formatearNumero(antes.mejorTrabajo.valor)}); el trabajo es el peso por las repeticiones` });
     }
   }
   if (!lineas.length) return null;
@@ -136,7 +136,9 @@ function seccionMejoras(datos, sesion) {
         return h('tr', { class: clase },
           h('td', {}, nombre),
           h('td', {}, partes[0]),
-          h('td', {}, partes.slice(1).map((p) => p.replace(' frente a la última vez', ' vs. última').replace(/ frente al día (\d+) del ciclo (\d+)/, ' vs. día $1 del ciclo $2')).join(' · ')));
+          h('td', {}, partes.slice(1).map((p) => p.replace(' frente al día', ' frente a el día')
+            .replace(/^▲ (\d+) % frente a/, '▲ $1 % más que').replace(/^▼ (\d+) % frente a/, '▼ $1 % menos que')
+            .replace('= igual frente a', '= igual que')).join(' · ')));
       }))));
 }
 

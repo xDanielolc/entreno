@@ -12,6 +12,7 @@ import { CONFIG } from './config.js';
 import * as drive from './drive.js';
 import { migrar, necesitaMigrar, validar } from './esquema.js';
 import * as estado from './estado.js';
+import { completarDesdeCatalogo } from './catalogo.js';
 import { minutosDeToken, olvidarToken, pedirToken, tokenVigente } from './google-auth.js';
 import { NOMBRES_CSV, csvEjerciciosYRutinas, csvEntrenamientos } from './exportar.js';
 import * as local from './almacen-local.js';
@@ -149,6 +150,7 @@ async function sincronizarArchivo() {
       descargado = migrar(descargado);
       migrado = true;
     }
+    if (completarDesdeCatalogo(descargado) > 0) migrado = true;
     estado.reemplazarDatos(descargado, { fileId, revisionRemota, pendiente: migrado });
   }
 
