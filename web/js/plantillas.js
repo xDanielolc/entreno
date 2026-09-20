@@ -225,6 +225,7 @@ export const PLANTILLAS = [
   },
   {
     id: 'flexibilidad-tres-sesiones',
+    tipo: 'flexibilidad',
     nombre: 'Flexibilidad: tres sesiones',
     autor: 'Propuesta de la app, basada en una rutina personal de fisioterapia',
     resumen: 'Tres sesiones cortas (10-12 minutos) de estiramientos y movilidad: cadera y pierna, cuello y espalda, y aperturas de cadera y hombro. Cada una con una prueba para medir el progreso.',
@@ -262,6 +263,7 @@ export const PLANTILLAS = [
   },
   {
     id: 'movilidad-para-meditar',
+    tipo: 'flexibilidad',
     nombre: 'Movilidad para sentarse a meditar',
     autor: 'Propuesta de la app, basada en una rutina personal',
     resumen: 'Dos rutinas de 15 minutos (cuello y espalda; piernas y caderas) y una progresión de tobillos para poder sentarse sobre los talones sin dolor.',
@@ -301,6 +303,29 @@ export const PLANTILLAS = [
         e('Héroe tendido (Supta Virasana)', [t(45)], { nota: 'Con ladrillo: alto, luego medio, luego bajo' }),
         e('Estiramiento de los dedos del pie', [t(30)]),
       ] },
+    ],
+  },
+  {
+    id: 'cardio-tres-dias',
+    tipo: 'cardio',
+    nombre: 'Cardio: tres días',
+    autor: 'Propuesta de la app',
+    resumen: 'Tres días a la semana: uno suave y largo (caminar o bici), uno de intervalos cortos (Tabata) y uno de carrera continua. '
+      + 'Para llegar a los 150 minutos semanales que recomienda la OMS sin aburrirse.',
+    porQue: 'La OMS recomienda de 150 a 300 minutos de actividad moderada a la semana, o de 75 a 150 de intensa. Mezclar un día '
+      + 'largo y suave con uno corto e intenso da lo mismo con menos tiempo y cansa menos que hacer siempre igual. Los intervalos '
+      + '(HIIT) mejoran la capacidad cardíaca en pocos minutos; el suave se recupera rápido y suma minutos.',
+    comoSeHace: 'El día suave, a un ritmo en el que puedas hablar. El día de intervalos, abre el cronómetro de la app (⏱ Intervalos) '
+      + 'y elige Tabata: 20 segundos a tope y 10 de descanso, ocho veces; si es demasiado, 30/30. El día de carrera, continuo y cómodo; '
+      + 'apunta minutos y, si quieres, kilómetros. Si vienes de cero, empieza por el día suave dos semanas.',
+    dias: [
+      { nombre: 'Suave y largo', ejercicios: [e('Caminar', [t(1800)], { nota: 'O bicicleta. Ritmo de poder hablar' })] },
+      { nombre: 'Intervalos', ejercicios: [
+        e('Caminar', [t(300)], { nota: 'Calentar 5 minutos' }),
+        e('Tabata', [t(240)], { nota: 'Con el cronómetro: 20 s a tope, 10 s de descanso, ocho veces' }),
+        e('Caminar', [t(300)], { nota: 'Soltar 5 minutos' }),
+      ] },
+      { nombre: 'Carrera continua', ejercicios: [e('Carrera', [t(1200)], { nota: 'Cómodo; si te ahogas, anda y sigue' })] },
     ],
   },
   {
@@ -440,6 +465,19 @@ function planDesde(ej, forma) {
 }
 
 // Qué ejercicios nuevos crearía la plantilla (los que no tienes ya).
+// Tipo de una rutina prehecha ('fuerza', 'cardio' o 'flexibilidad').
+export const tipoDePlantilla = (p) => p.tipo ?? 'fuerza';
+
+// Tipo de una rutina tuya, por lo que hay en ella.
+export function tipoDeRutina(datos, rutina) {
+  const grupos = rutina.dias.flatMap((d) => d.ejercicios.map((x) => datos.ejercicios.find((e) => e.id === x.ejercicioId)?.grupo));
+  const n = (lista) => grupos.filter((g) => lista.includes(g)).length;
+  const flex = n(['estiramiento', 'movilidad', 'yoga']), cardio = n(['cardio']);
+  if (flex > grupos.length / 2) return 'flexibilidad';
+  if (cardio > grupos.length / 2) return 'cardio';
+  return 'fuerza';
+}
+
 export function ejerciciosNuevos(datos, plantilla) {
   const tuyos = new Set(datos.ejercicios.filter((x) => !x.archivado).map((x) => normalizar(x.nombre)));
   const nombres = [...new Set(plantilla.dias.flatMap((d) => d.ejercicios.map((x) => x.nombre)))];

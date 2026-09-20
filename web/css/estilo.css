@@ -916,3 +916,6 @@ body:has(.modal-fondo) .guia { display: none; }
 
 .reglas dt { font-weight: 700; margin-top: 10px; }
 .reglas dd { margin: 2px 0 0; }
+
+.buscador { width: 100%; box-sizing: border-box; font: inherit; padding: 10px 12px; border: 1px solid var(--borde); border-radius: var(--radio-pequeno); background: var(--superficie); color: var(--texto); margin: 8px 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }

@@ -9,7 +9,8 @@ import { nombreSede, sedeInicial, sedesActivas } from '../sedes.js';
 import { anadir, aviso, confirmar, h, hoyISO, nuevoId } from '../ui.js';
 import { campo } from './ejercicios.js';
 import { ejercicioDesdeCatalogo, elegirEjercicio as abrirSelector } from './selector-ejercicios.js';
-import { PLANTILLAS, anadirPlantilla, ejerciciosNuevos } from '../plantillas.js';
+import { tipoDePlantilla, tipoDeRutina, PLANTILLAS, anadirPlantilla, ejerciciosNuevos } from '../plantillas.js';
+import { normalizar } from '../catalogo.js';
 import { pista } from './tutorial.js';
 import { conGlosario } from './glosario.js';
 
@@ -115,8 +116,33 @@ export function empezarDia(rutina, dia, crearSerie) {
 // Lista
 // ---------------------------------------------------------------------------
 
+const TIPOS_RUTINA = { todas: 'Todas', fuerza: 'Fuerza e hipertrofia', cardio: 'Cardio', flexibilidad: 'Yoga, estirar y movilidad' };
+const filtroRutinas = { tipo: 'todas', texto: '' };
+
 export function vistaRutinas(contenedor) {
   const d = estado.datos();
+  const zona = h('div');
+  const nombreDe = (id) => d.ejercicios.find((e) => e.id === id)?.nombre ?? '';
+  const cuadra = (tipo, texto) => (filtroRutinas.tipo === 'todas' || tipo === filtroRutinas.tipo)
+    && (!filtroRutinas.texto || normalizar(texto).includes(normalizar(filtroRutinas.texto)));
+
+  function pintarLista() {
+    const mias = d.rutinas.filter((r) => cuadra(tipoDeRutina(d, r),
+      `${r.nombre} ${r.dias.map((x) => `${x.nombre} ${x.ejercicios.map((e) => nombreDe(e.ejercicioId)).join(' ')}`).join(' ')}`));
+    const prehechas = PLANTILLAS.filter((p) => cuadra(tipoDePlantilla(p),
+      `${p.nombre} ${p.resumen} ${p.dias.map((x) => `${x.nombre} ${x.ejercicios.map((e) => e.nombre).join(' ')}`).join(' ')}`));
+    zona.replaceChildren();
+    anadir(zona,
+      mias.some((r) => r.activa) && h('h2', {}, 'Activas'),
+      mias.filter((r) => r.activa).map((r) => tarjetaRutina(r)),
+      mias.some((r) => !r.activa) && h('h2', {}, 'Mías, sin activar'),
+      mias.filter((r) => !r.activa).map((r) => tarjetaRutina(r)),
+      h('h2', {}, 'Rutinas prehechas'),
+      h('p', { class: 'nota' }, 'Añádelas a tus rutinas si te encajan; si no, ignóralas. Sus ejercicios se crean solo si no los tienes ya.'),
+      prehechas.map((p) => tarjetaPlantilla(d, p)),
+      !mias.length && !prehechas.length && h('p', { class: 'suave' }, 'Nada que cuadre con ese filtro.'));
+  }
+
   anadir(contenedor,
     h('div', { class: 'cabecera-vista' },
       h('h1', {}, 'Rutinas'),
@@ -124,15 +150,14 @@ export function vistaRutinas(contenedor) {
     pista('rutinas', 'Tus días de entrenamiento en orden. Las activas son las que te propone Hoy. Abajo, prehechas para empezar ya.'),
     !d.rutinas.length && h('p', { class: 'suave' },
       'Una rutina son tus días de entrenamiento en orden. La app te propondrá el siguiente cada vez que entrenes.'),
-
-    d.rutinas.some((r) => r.activa) && h('h2', {}, 'Activas'),
-    d.rutinas.filter((r) => r.activa).map((r) => tarjetaRutina(r)),
-    d.rutinas.some((r) => !r.activa) && h('h2', {}, 'Mías, sin activar'),
-    d.rutinas.filter((r) => !r.activa).map((r) => tarjetaRutina(r)),
-
-    h('h2', {}, 'Rutinas prehechas'),
-    h('p', { class: 'nota' }, 'Añádelas a tus rutinas si te encajan; si no, ignóralas. Sus ejercicios se crean solo si no los tienes ya.'),
-    PLANTILLAS.map((p) => tarjetaPlantilla(d, p)));
+    h('input', { type: 'search', class: 'buscador', placeholder: 'Buscar rutina o ejercicio…', value: filtroRutinas.texto,
+      'aria-label': 'Buscar rutina', oninput: (e) => { filtroRutinas.texto = e.target.value; pintarLista(); } }),
+    h('div', { class: 'chips filtros-rutinas' }, Object.entries(TIPOS_RUTINA).map(([k, v]) => h('button', {
+      type: 'button', class: `chip seleccionable ${filtroRutinas.tipo === k ? 'activo' : ''}`, 'aria-pressed': String(filtroRutinas.tipo === k),
+      onclick: () => { filtroRutinas.tipo = k; pintarLista(); },
+    }, v))),
+    zona);
+  pintarLista();
 }
 
 // Un texto largo, frase a frase, como lista: se lee más fácil.
