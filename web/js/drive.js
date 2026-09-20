@@ -57,15 +57,43 @@ async function buscar(consulta) {
   return (await r.json()).files;
 }
 
+let carpetaId = null;
 async function carpetaDeLaApp() {
+  if (carpetaId) return carpetaId;
   const existentes = await buscar(`name = '${NOMBRE_CARPETA}' and mimeType = '${TIPO_CARPETA}'`);
-  if (existentes.length) return existentes[0].id;
+  if (existentes.length) { carpetaId = existentes[0].id; return carpetaId; }
   const r = await peticion(`${API}/files?fields=id`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name: NOMBRE_CARPETA, mimeType: TIPO_CARPETA }),
   });
-  return (await r.json()).id;
+  carpetaId = (await r.json()).id;
+  return carpetaId;
+}
+
+// Mete un archivo en la carpeta de la app si no está ya (los creados por
+// versiones antiguas o desde otro dispositivo pueden haber quedado sueltos en
+// «Mi unidad»). Devuelve true si lo ha movido.
+export async function asegurarEnCarpeta(id) {
+  const padre = await carpetaDeLaApp();
+  const r = await peticion(`${API}/files/${id}?fields=parents`);
+  const padres = (await r.json()).parents ?? [];
+  if (padres.includes(padre)) return false;
+  const quitar = padres.length ? `&removeParents=${padres.join(',')}` : '';
+  await peticion(`${API}/files/${id}?addParents=${padre}${quitar}&fields=id`, { method: 'PATCH' });
+  return true;
+}
+
+// Recoge en la carpeta todo lo que la app haya dejado suelto.
+export async function ordenarCarpeta() {
+  const padre = await carpetaDeLaApp();
+  const archivos = await listarTodo();
+  let movidos = 0;
+  for (const a of archivos) {
+    if (a.id === padre || a.mimeType === TIPO_CARPETA) continue;
+    if (await asegurarEnCarpeta(a.id)) movidos += 1;
+  }
+  return movidos;
 }
 
 export async function buscarArchivo(nombre) {
@@ -121,7 +149,7 @@ export async function buscarPorNombre(nombre) {
 
 // Todo lo que la app ha creado en Drive: archivos y su carpeta.
 export async function listarTodo() {
-  const campos = encodeURIComponent('files(id,name,mimeType)');
+  const campos = encodeURIComponent('files(id,name,mimeType,parents)');
   const r = await peticion(`${API}/files?q=${encodeURIComponent('trashed = false')}&fields=${campos}&pageSize=200&spaces=drive`);
   return (await r.json()).files;
 }

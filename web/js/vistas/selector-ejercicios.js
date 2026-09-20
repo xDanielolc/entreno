@@ -141,6 +141,7 @@ export function ejercicioDesdeCatalogo(x) {
     formula1RM: 'personal',
     maquinaPlacas: esMaquinaDePlacas(x),
     fraccionCorporal: x.carga === 'pesoCorporal' ? (x.fraccion ?? 1) : null,
+    estiramiento: x.asistencia ? { tecnica: null, asistencia: x.asistencia } : undefined,
     musculos: {
       principales: [...(x.musculos?.principales ?? [])],
       secundarios: [...(x.musculos?.secundarios ?? [])],

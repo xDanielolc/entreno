@@ -18,6 +18,7 @@ import * as local from './almacen-local.js';
 
 // 'sin-cuenta' | 'desconectada' | 'sincronizando' | 'al-dia' | 'pendiente' | 'sin-internet' | 'error'
 let situacion = 'desconectada';
+let ordenado = false;
 let detalle = '';
 let enCurso = null;
 let temporizador = null;
@@ -123,6 +124,11 @@ async function sincronizarArchivo() {
     return false;
   }
 
+  // Una vez por sesión de la app, se comprueba que todo esté en la carpeta.
+  if (!ordenado) {
+    ordenado = true;
+    drive.ordenarCarpeta().catch(() => { ordenado = false; });
+  }
   const revisionRemota = Number(remoto.appProperties?.revision ?? -1);
   const conocida = meta.fileId === fileId ? meta.revisionRemota : null;
   let conflicto = false;

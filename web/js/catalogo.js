@@ -21,8 +21,10 @@ const corporal = { carga: 'pesoCorporal' };
 // Fracción del peso corporal que se levanta (Ebben 2011: flexiones ≈ 64 %).
 const flexion = (f) => ({ carga: 'pesoCorporal', fraccion: f });
 
-const estiramiento = (nombre, principales, secundarios = [], material = 'libre') =>
-  ej(nombre, 'estiramiento', material, principales, secundarios, sinCarga);
+const estiramiento = (nombre, principales, secundarios = [], material = 'libre', extra = {}) =>
+  ej(nombre, 'estiramiento', material, principales, secundarios, { ...sinCarga, ...extra });
+// Estiramiento que se mide con la escala de la mano (del puño a sin mano).
+const conMano = { asistencia: 'mano' };
 
 const movilidad = (nombre, principales, secundarios = [], material = 'libre', extra = {}) =>
   ej(nombre, 'movilidad', material, principales, secundarios, { ...sinCarga, ...extra });
@@ -247,7 +249,7 @@ export const CATALOGO = [
 
   // --- Estiramientos ------------------------------------------------------
   estiramiento('Estiramiento', []),
-  estiramiento('Estiramiento de isquios', ['isquios'], ['gemelo']),
+  estiramiento('Estiramiento de isquios', ['isquios'], ['gemelo'], 'libre', conMano),
   estiramiento('Estiramiento de cuádriceps', ['cuadriceps']),
   estiramiento('Estiramiento de psoas en zancada', ['cuadriceps'], ['abdomen']),
   estiramiento('Estiramiento de gemelo en pared', ['gemelo'], [], 'pared'),
@@ -281,8 +283,8 @@ export const CATALOGO = [
   estiramiento('Estiramiento de trapecio superior', ['trapecio'], ['cuello']),
   estiramiento('Estiramiento del elevador de la escápula', ['trapecio'], ['cuello']),
   movilidad('Puente por fases', ['lumbar'], ['gluteo', 'hombro'], 'suelo'),
-  estiramiento('Postura del sastre (apertura lateral)', ['aductores'], ['gluteo']),
-  estiramiento('Zancada hacia el split frontal', ['isquios'], ['cuadriceps', 'gluteo']),
+  estiramiento('Postura del sastre (apertura lateral)', ['aductores'], ['gluteo'], 'libre', conMano),
+  estiramiento('Zancada hacia el split frontal', ['isquios'], ['cuadriceps', 'gluteo'], 'libre', conMano),
   movilidad('Rotación externa de hombro con banda', ['hombroPosterior'], ['hombro'], 'goma'),
   movilidad('Rotación interna de hombro con toalla', ['hombro'], ['hombroPosterior'], 'toalla'),
   movilidad('Retracción cervical (chin tuck)', ['cuello'], [], 'libre', { esfuerzo: 'repeticiones' }),
