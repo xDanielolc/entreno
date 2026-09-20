@@ -10,6 +10,7 @@ import {
 import { tramosPorDefecto } from '../calculos.js';
 import { EXPLICACIONES_1RM, FORMULAS, calibrar, estimar1RM, modeloDe, textoCalibracion } from '../formula1rm.js';
 import { FRACCION_CORPORAL_POR_NOMBRE, PROGRAMAS } from '../esquema.js';
+import { MODOS_REINICIO, PRESETS_CICLO, alargarCiclo, aplicarPreset, completarCiclo, describirCiclo, empezarCicloNuevo, escaleraDe } from '../ciclos.js';
 import { hoyISO } from '../ui.js';
 import { CATALOGO, esMaquinaDePlacas, normalizar, tipoDeEjercicio } from '../catalogo.js';
 import { ORDEN_MUSCULOS, nombreMusculo } from '../musculos.js';
@@ -624,6 +625,8 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
     const p = plan.progresion;
     p.diasPorCiclo ??= DIAS_CICLO_POR_DEFECTO;
     p.ciclos ??= [];
+    completarCiclo(p, d.perfil);
+    if (sobre === 'esfuerzo' && p.preset === 'bilbo' && !p.ciclos.length) aplicarPreset(p, 'repeticiones', borrador);
     if (!p.ciclos.length) {
       p.ciclos.push({ n: 1, inicio: null, fin: null,
         generador: { inicial: sobre === 'carga' ? inicioBilbo() ?? 20 : 10, incremento: sobre === 'carga' ? 2.5 : 1, cada: 1 },
@@ -639,25 +642,48 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
       : new Map();
 
     const regenerar = () => {
-      ciclo.escalera = generarEscalera({ ...gen, dias: p.diasPorCiclo });
-      if (borrador.pesosMaquina?.length && sobre === 'carga') ciclo.escalera = ciclo.escalera.map((v) => aPesoDisponible(borrador, v));
+      p.corte.sesiones = p.diasPorCiclo;
+      ciclo.escalera = escaleraDe(borrador, gen, p.diasPorCiclo);
       repintar();
     };
+    const presets = Object.fromEntries(Object.entries(PRESETS_CICLO).filter(([, x]) => !x.sobre || x.sobre === sobre).map(([k, x]) => [k, { etiqueta: x.etiqueta }]));
+    const unidadEsfuerzo = TIPOS_ESFUERZO[borrador.esfuerzo.tipo]?.unidad ?? 'reps';
 
     return h('div', { class: 'bilbo' },
+      h('div', { class: 'campo' },
+        h('span', { class: 'etiqueta-campo' }, 'Ciclo prehecho'),
+        opciones(presets, p.preset in presets ? p.preset : 'personalizado', (k) => {
+          if (k !== 'personalizado') aplicarPreset(p, k, borrador); else p.preset = k;
+          repintar();
+        }, { compacto: true }),
+        h('small', { class: 'nota' }, PRESETS_CICLO[p.preset]?.descripcion ?? '')),
+      h('p', { class: 'nota' }, `Este ciclo: ${describirCiclo(p, sobre === 'carga' ? unidad : unidadEsfuerzo)}`),
       h('p', { class: 'nota' },
-        `Ciclo ${ciclo.n} de ${p.ciclos.length}. ${hechos.size} días hechos de ${ciclo.escalera.length}. `
-        + `Cada día tiene su ${sobre === 'carga' ? 'carga fijada' : 'objetivo fijado'}; puedes cambiar cualquier casilla.`),
+        `Ciclo ${ciclo.n} de ${p.ciclos.length}. ${hechos.size} sesiones hechas de ${ciclo.escalera.length}. `
+        + `Cada sesión tiene su ${sobre === 'carga' ? 'carga fijada' : 'objetivo fijado'}; puedes cambiar cualquier casilla.`),
 
       h('div', { class: 'barra-progreso', role: 'img',
         'aria-label': `${hechos.size} de ${ciclo.escalera.length} días hechos` },
       h('span', { style: `width:${(hechos.size / ciclo.escalera.length) * 100}%` })),
 
       h('div', { class: 'fila-campos' },
-        campo(`Inicio (${unidad})`, numeroInput(gen.inicial, (v) => { gen.inicial = v ?? 0; }, { onchange: regenerar })),
-        campo('Incremento', numeroInput(gen.incremento, (v) => { gen.incremento = v ?? 0; }, { onchange: regenerar })),
-        campo('Sube cada (días)', numeroInput(gen.cada, (v) => { gen.cada = Math.max(1, Math.round(v ?? 1)); }, { onchange: regenerar })),
-        campo('Días del ciclo', numeroInput(p.diasPorCiclo, (v) => { p.diasPorCiclo = Math.max(1, Math.round(v ?? 17)); }, { onchange: regenerar }))),
+        campo(`Inicio (${unidad})`, numeroInput(gen.inicial, (v) => { gen.inicial = v ?? 0; p.preset = 'personalizado'; }, { onchange: regenerar })),
+        campo(`Sube (${unidad})`, numeroInput(gen.incremento, (v) => { gen.incremento = v ?? 0; p.preset = 'personalizado'; }, { onchange: regenerar })),
+        campo('Cada (sesiones)', numeroInput(gen.cada, (v) => { gen.cada = Math.max(1, Math.round(v ?? 1)); p.preset = 'personalizado'; }, { onchange: regenerar })),
+        campo('Sesiones del ciclo', numeroInput(p.diasPorCiclo, (v) => { p.diasPorCiclo = Math.max(1, Math.round(v ?? 17)); p.preset = 'personalizado'; }, { onchange: regenerar }))),
+      h('details', { class: 'explicacion', open: p.preset === 'personalizado' || undefined },
+        h('summary', {}, 'Cuándo se corta y cómo empieza el siguiente'),
+        h('div', { class: 'fila-campos' },
+          sobre === 'carga' && campo(`Se corta si el objetivo baja de (${unidadEsfuerzo})`, numeroInput(p.corte.esfuerzoMin, (v) => { p.corte.esfuerzoMin = v; p.preset = 'personalizado'; })),
+          campo(`Se corta si llegas a (${unidadEsfuerzo})`, numeroInput(p.corte.esfuerzoMax, (v) => { p.corte.esfuerzoMax = v; p.preset = 'personalizado'; }))),
+        h('small', { class: 'nota' }, 'Vacío = no se mira. Además siempre se corta al acabar las sesiones del ciclo.'),
+        h('div', { class: 'campo' },
+          h('span', { class: 'etiqueta-campo' }, 'El siguiente ciclo empieza'),
+          opciones(sobre === 'carga' ? MODOS_REINICIO : { mismo: MODOS_REINICIO.mismo, manual: MODOS_REINICIO.manual }, p.reinicio.modo,
+            (m) => { p.reinicio.modo = m; p.preset = 'personalizado'; repintar(); }, { compacto: true }),
+          ['porcentaje', 'ultimo'].includes(p.reinicio.modo) && campo('Porcentaje', numeroInput(p.reinicio.porcentaje ?? (p.reinicio.modo === 'ultimo' ? 90 : 50),
+            (v) => { p.reinicio.porcentaje = v; p.preset = 'personalizado'; })),
+          h('small', { class: 'nota' }, MODOS_REINICIO[p.reinicio.modo]?.descripcion ?? ''))),
 
       h('div', { class: 'escalera' },
         ciclo.escalera.map((valor, i) => {
@@ -675,7 +701,8 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         p.ciclos.length > 1 && h('select', { 'aria-label': 'Ciclo mostrado',
           onchange: (e) => { p.cicloActual = Number(e.target.value); repintar(); } },
         p.ciclos.map((c) => h('option', { value: c.n, selected: c.n === p.cicloActual }, `Ciclo ${c.n}`))),
-        h('button', { type: 'button', class: 'boton secundario', onclick: () => nuevoCiclo(plan) }, 'Empezar un ciclo nuevo')));
+        h('button', { type: 'button', class: 'boton secundario', onclick: () => { alargarCiclo(borrador, plan, 5); repintar(); aviso('Ciclo alargado 5 sesiones.'); } }, '+5 sesiones'),
+        h('button', { type: 'button', class: 'boton secundario', onclick: () => nuevoCiclo(plan) }, 'Cortar y empezar otro')));
   }
 
   // Peso de arranque de un ciclo Bilbo: un porcentaje de tu mejor 1RM
@@ -686,19 +713,8 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
   }
 
   function nuevoCiclo(plan) {
-    const p = plan.progresion;
-    const anterior = cicloActual(plan) || p.ciclos.at(-1);
-    const n = Math.max(0, ...p.ciclos.map((c) => c.n)) + 1;
-    const generador = { ...(anterior?.generador || { inicial: 20, incremento: 2.5, cada: 1 }) };
-    // Un ciclo nuevo arranca a un porcentaje de tu 1RM de ahora (50 % por defecto).
-    const inicio = (p.sobre || sobrePorDefecto(borrador)) === 'carga' ? inicioBilbo() : null;
-    if (inicio != null) generador.inicial = inicio;
-    p.ciclos.push({ n, inicio: null, fin: null, generador,
-      escalera: generarEscalera({ ...generador, dias: p.diasPorCiclo }) });
-    p.cicloActual = n;
-    aviso(inicio != null
-      ? `Ciclo ${n} preparado, empezando en ${formatearNumero(inicio)} kg (el ${d.perfil.bilboInicioPorcentaje ?? 50} % de tu 1RM). Revísalo y guarda.`
-      : `Ciclo ${n} preparado. Ajusta el valor inicial y guarda.`);
+    const ciclo = empezarCicloNuevo(d, existente ?? borrador, plan);
+    aviso(`Ciclo ${ciclo.n} preparado, empezando en ${formatearNumero(ciclo.generador.inicial)}. Revísalo si quieres.`);
     repintar();
   }
 

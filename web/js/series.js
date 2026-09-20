@@ -9,9 +9,12 @@ import {
 import { recamaraDe, tramosDe } from './esquema.js';
 import { modeloDe, repsParaIgualar, rmDeSerie } from './formula1rm.js';
 import { nuevoId } from './ui.js';
+import { renovarSiToca } from './ciclos.js';
 
 export function crearSerieDesdePlan(datos, ejercicio, plan, { excluirSesion } = {}) {
-  const s = sugerenciaSerie(datos, ejercicio, plan, { excluirSesion });
+  let s = sugerenciaSerie(datos, ejercicio, plan, { excluirSesion });
+  // Un ciclo terminado o agotado empieza el siguiente solo (si no es manual).
+  if (renovarSiToca(datos, ejercicio, plan, s)) s = sugerenciaSerie(datos, ejercicio, plan, { excluirSesion });
   const carga = s.carga ?? null;
   const serie = {
     id: nuevoId('s'),

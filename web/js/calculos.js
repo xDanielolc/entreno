@@ -184,23 +184,31 @@ function sugerenciaBilbo(datos, ejercicio, plan, { excluirSesion, sobre }) {
   const resultado = { cicloN: ciclo.n, dia, diasCiclo: ciclo.escalera.length, ultimaDelCiclo };
 
   if (sobre === 'esfuerzo') {
-    // Sin carga: la escalera son minutos, segundos o repeticiones.
-    return { ...resultado, carga: null, esfuerzoObjetivo: valor };
+    // Sin carga: la escalera son minutos, segundos o repeticiones. Se corta
+    // al llegar al máximo del corte.
+    const corte = prog.corte ?? {};
+    const hechoAntes = ultimaDelCiclo ? esfuerzoTotal(ultimaDelCiclo.serie) : null;
+    return { ...resultado, carga: null, esfuerzoObjetivo: valor,
+      cicloAgotado: Boolean(corte.esfuerzoMax && hechoAntes != null && hechoAntes >= corte.esfuerzoMax) };
   }
   // Objetivo: las repeticiones que igualan el 1RM del día anterior, con la
   // fórmula del ejercicio y descontando la recámara que sueles dejar.
-  const rmAnterior = ultimaDelCiclo
-    ? rmDeSerie(datos, ejercicio, ultimaDelCiclo.serie, esfuerzoTotal(ultimaDelCiclo.serie))
-    : null;
+  // El primer día de un ciclo nuevo se compara con la última serie del anterior.
+  const referencia = ultimaDelCiclo?.serie ?? seriesDeEjercicio(datos, ejercicio.id, { excluirSesion, planId: plan.id }).at(-1)?.serie ?? null;
+  const rmAnterior = referencia ? rmDeSerie(datos, ejercicio, referencia, esfuerzoTotal(referencia)) : null;
   const recamara = recamaraDe(plan.tecnicas, datos.perfil.recamaraPorDefecto ?? 1);
   const reps = rmAnterior && valor > 0 ? repsParaIgualar(modeloDe(datos, ejercicio), rmAnterior, valor, recamara) : null;
   // Repeticiones enteras y con tope: por encima de 40 el peso es demasiado bajo.
   const objetivoSuperar = reps != null ? Math.min(40, Math.ceil(Math.max(0, reps))) : null;
   // El ciclo se agota cuando el objetivo baja de las repeticiones mínimas
-  // (15 por defecto, en Ajustes): toca empezar uno nuevo.
-  const minimo = datos.perfil.bilboMinReps ?? 15;
-  return { ...resultado, carga: valor, objetivoSuperar, pesoBajo: reps != null && reps > 40,
-    cicloAgotado: objetivoSuperar != null && objetivoSuperar < minimo };
+  // del corte (15 por defecto) o cuando lo hecho llega al máximo: toca
+  // empezar uno nuevo.
+  const corte = prog.corte ?? {};
+  const minimo = corte.esfuerzoMin ?? datos.perfil.bilboMinReps ?? 15;
+  const hechoAntes = ultimaDelCiclo ? esfuerzoTotal(ultimaDelCiclo.serie) : null;
+  const agotado = (objetivoSuperar != null && minimo && objetivoSuperar < minimo)
+    || (corte.esfuerzoMax && hechoAntes != null && hechoAntes >= corte.esfuerzoMax);
+  return { ...resultado, carga: valor, objetivoSuperar, pesoBajo: reps != null && reps > 40, cicloAgotado: agotado };
 }
 
 // ---------------------------------------------------------------------------

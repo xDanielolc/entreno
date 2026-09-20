@@ -253,11 +253,11 @@ export function vistaSesion(contenedor, { id }) {
 
     if (s.modo === 'bilbo') {
       if (s.sinCiclo) partes.push('Sin ciclo configurado');
-      else if (s.cicloTerminado) partes.push(`Ciclo ${s.cicloN} terminado: prepara el siguiente en la ficha`);
+      else if (s.cicloTerminado) partes.push(`Ciclo ${s.cicloN} terminado: prepara el siguiente en la ficha (o pon el reinicio en automático)`);
       else {
         partes.push(`Ciclo ${s.cicloN} · día ${serie.diaCiclo ?? s.dia} de ${s.diasCiclo}`);
         if (s.pesoBajo) partes.push('peso muy bajo para tu 1RM: revisa el ciclo en la ficha');
-        if (s.cicloAgotado) partes.push(`objetivo por debajo de ${d.perfil.bilboMinReps ?? 15}: el ciclo está agotado, empieza uno nuevo en la ficha`);
+        if (s.cicloAgotado) partes.push('ciclo agotado: la próxima vez empieza el siguiente (o prepáralo en la ficha)');
         if (serie.carga != null && s.sobre === 'carga') partes.push(`${formatearNumero(serie.carga)} ${uCarga}`);
         if (serie.objetivo != null) {
           partes.push(s.sobre === 'carga'

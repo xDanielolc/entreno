@@ -137,7 +137,7 @@ export function vistaAjustes(contenedor) {
           (x, v) => { x.perfil.tramosPorDefecto = { ...x.perfil.tramosPorDefecto, miorepeticiones: { ...x.perfil.tramosPorDefecto?.miorepeticiones, reps: v } }; })),
       h('small', { class: 'nota' }, 'Lo que propone la app al crear estas series; cada ejercicio puede tener lo suyo en su ficha.')),
 
-    apartado('Ciclos Bilbo',
+    apartado('Ciclos (Bilbo y otros)',
       numeroAjuste('Un ciclo nuevo empieza al (% de tu 1RM)', d.perfil.bilboInicioPorcentaje ?? 50,
         (x, v) => { x.perfil.bilboInicioPorcentaje = v; }),
       h('small', { class: 'nota' }, 'Al empezar un ciclo, el primer día va a este porcentaje de tu mejor 1RM estimado en ese ejercicio y cada día '

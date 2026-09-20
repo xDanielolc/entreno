@@ -22,7 +22,7 @@ export const TIPOS_ESFUERZO = {
 };
 
 export const TIPOS_PROGRESION = {
-  bilbo:    { etiqueta: 'Bilbo',            descripcion: 'Ciclo de días con el valor de cada día fijado de antemano. Cada día intentas superar el anterior.' },
+  bilbo:    { etiqueta: 'Ciclo (Bilbo y otros)', descripcion: 'Una escalera: cada sesión tiene su valor fijado y sube poco a poco. Tú eliges cuánto sube, cuándo se corta y cómo empieza el siguiente; hay prehechos.' },
   carga:    { etiqueta: 'Doble progresión', descripcion: 'Trabajas en un rango de repeticiones, por ejemplo de 8 a 12. Primero subes repeticiones con el mismo peso; al llegar a 12, subes peso y vuelves a empezar por 8.' },
   esfuerzo: { etiqueta: 'A más cada vez',   descripcion: 'Cada vez un poco más que la última: más repeticiones con el mismo peso, o más peso con las mismas repeticiones (se elige debajo).' },
   programa: { etiqueta: 'Programa (5×5, 5/3/1, HST)', descripcion: 'Un programa clásico con sus series y pesos fijados de antemano sesión a sesión. Cada sesión sabe qué toca.' },

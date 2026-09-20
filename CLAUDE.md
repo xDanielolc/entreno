@@ -161,9 +161,15 @@ ofrece cambiar el ajuste cada vez; ciclo Bilbo «agotado» por debajo de 15
 repeticiones (`perfil.bilboMinReps`); CSV de entrenamientos con una fila por
 ejercicio y las series en columnas; filosofía de las rutinas en puntos;
 overflow horizontal cortado.
+0.18.0: ciclos configurables (`web/js/ciclos.js`): la progresión «bilbo» es
+ahora «Ciclo (Bilbo y otros)» con prehechos (Bilbo 17, lineal, semanal, más
+repeticiones, más tiempo, a mi manera), corte por sesiones / objetivo mínimo /
+esfuerzo máximo, reinicio automático (al % del 1RM, al % del último, igual o
+a mano) con `renovarSiToca()` al crear la serie del día, «+5 sesiones» y
+«Cortar y empezar otro». El día 1 de un ciclo compara con la última serie
+del anterior.
 PENDIENTE (pedido por él el 20-09-2026): HIIT con cronómetro y sonido en
 cardio; repasar estiramientos; sus rutinas de yoga prehechas completas;
-ciclos configurables por el usuario (qué sube, cuándo se corta, alargar o
-cortar a mano) con prehechos que reinicien solos; «diagnóstico gym» que dice
+«diagnóstico gym» que dice
 que no se ve (no sé a qué se refiere: preguntar); tutorial más interactivo
 (botón que parpadea); nombre e icono con Design.
