@@ -250,10 +250,10 @@ export function vistaSesion(contenedor, { id }) {
     if (ej.carga?.tipo === 'ninguna') return null;
     const rm = rmDeReferencia(d, ej, { cicloN: entrada.cicloN });
     if (!rm) return null;
+    const al = (p) => `${formatearNumero(aPesoDisponible(ej, rm.valor * p))} kg`;
     return h('p', { class: 'nota' },
-      queEs('rm', '1RM'), ` estimado ${rm.delCiclo ? 'del ciclo' : '(histórico)'}: ${formatearNumero(Math.round(rm.valor))} kg · `
-      + `80 % = ${formatearNumero(aPesoDisponible(ej, rm.valor * 0.8))} · 70 % = ${formatearNumero(aPesoDisponible(ej, rm.valor * 0.7))} · `
-      + `60 % = ${formatearNumero(aPesoDisponible(ej, rm.valor * 0.6))}`);
+      'Tu máximo (', queEs('rm', '1RM'), `) estimado ${rm.delCiclo ? 'en este ciclo' : 'según tu historial'}: `
+      + `${formatearNumero(Math.round(rm.valor))} kg. Al 80 % son ${al(0.8)}, al 70 % ${al(0.7)} y al 60 % ${al(0.6)}.`);
   }
 
   // Cabecera de cada serie: qué toca y cómo fue la última vez.

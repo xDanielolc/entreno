@@ -32,7 +32,38 @@ export const GLOSARIO = {
     + 'las máquinas asistidas. No es para controlar el peso: esta app va de entrenar.' },
   intensidad: { pregunta: '¿Qué es una serie de intensidad?', termino: 'Serie de intensidad', texto: 'Una serie dura con alguna técnica (drop set, rest-pause, isométrico…) que lleva '
     + 'el músculo al límite. Con una o dos por ejercicio basta.' },
+  descarga: { pregunta: '¿Qué es una semana de descarga?', termino: 'Semana de descarga', texto: 'Una semana más suave a propósito: menos peso o menos series (más o menos la mitad). '
+    + 'Sirve para quitarte el cansancio acumulado y volver con fuerza. Conviene una cada seis u ocho semanas, o cuando notas que todo cuesta.' },
+  hiit: { pregunta: '¿Qué es el HIIT?', termino: 'HIIT', texto: 'Intervalos de alta intensidad: tramos cortos a tope alternados con descansos, varias veces seguidas. '
+    + 'Tabata es el más conocido (20 segundos a tope y 10 de descanso, ocho veces). El cronómetro de la app los lleva por ti.' },
 };
+
+// Palabras del glosario que pueden aparecer en cualquier texto de la app, y
+// su clave. Se usa para poner un «?» detrás de la primera vez que salen.
+const TERMINOS = [
+  ['1RM', 'rm'], ['recámara', 'recamara'], ['fallo', 'fallo'], ['drop set', 'drop-set'], ['rest-pause', 'rest-pause'],
+  ['volumen', 'volumen'], ['Bilbo', 'bilbo'], ['descarga', 'descarga'], ['doble progresión', 'doble-progresion'], ['HIIT', 'hiit'],
+];
+const RE_TERMINOS = new RegExp(`(^|[^\\p{L}\\d])(${TERMINOS.map(([t]) => t).join('|')})(?![\\p{L}\\d])`, 'iu');
+
+// Un texto con un «?» detrás de la primera aparición de cada palabra del
+// glosario. Devuelve una lista de nodos y trozos de texto.
+export function conGlosario(texto) {
+  if (typeof texto !== 'string') return texto;
+  const partes = [];
+  const usadas = new Set();
+  let resto = texto;
+  for (let m = RE_TERMINOS.exec(resto); m; m = RE_TERMINOS.exec(resto)) {
+    const clave = TERMINOS.find(([t]) => t.toLowerCase() === m[2].toLowerCase())?.[1];
+    const fin = m.index + m[0].length;
+    if (usadas.has(clave)) { partes.push(resto.slice(0, fin)); resto = resto.slice(fin); continue; }
+    usadas.add(clave);
+    partes.push(resto.slice(0, fin), queEs(clave, '?'));
+    resto = resto.slice(fin);
+  }
+  partes.push(resto);
+  return partes;
+}
 
 // Enlace pequeño «¿Qué es…?» que abre la explicación.
 export function queEs(clave, texto = null) {

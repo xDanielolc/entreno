@@ -15,6 +15,7 @@ import { rmDeSerie } from '../formula1rm.js';
 import { recomendacionesDeSesion } from '../recomendaciones.js';
 import { aviso, h, modal } from '../ui.js';
 import { listaRecomendaciones } from './cuerpo.js';
+import { conGlosario } from './glosario.js';
 
 
 // ---------------------------------------------------------------------------
@@ -108,7 +109,7 @@ function seccionRecords(datos, sesion) {
   if (!lineas.length) return null;
   return h('section', {},
     h('h3', {}, lineas.length > 1 ? `¡${lineas.length} récords!` : '¡Récord!'),
-    h('ul', {}, lineas.map((l) => h('li', {}, l.texto))));
+    h('ul', {}, lineas.map((l) => h('li', {}, conGlosario(l.texto)))));
 }
 
 function seccionMejoras(datos, sesion) {

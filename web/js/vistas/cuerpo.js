@@ -11,6 +11,7 @@ import {
 } from '../recuperacion.js';
 import { recomendacionesGenerales } from '../recomendaciones.js';
 import { anadir, aviso, h, hoyISO } from '../ui.js';
+import { conGlosario } from './glosario.js';
 import { pista } from './tutorial.js';
 
 // Referencias de volumen semanal por músculo (ver Ajustes → De dónde sale cada cosa).
@@ -206,7 +207,7 @@ export function listaRecomendaciones(lista) {
   const icono = { aviso: '⚠', consejo: '→', bien: '✓' };
   return h('ul', { class: 'recomendaciones' }, lista.map((x) => h('li', { class: x.nivel },
     h('span', { class: 'icono-rec', 'aria-hidden': 'true' }, icono[x.nivel]),
-    x.enlace ? h('a', { href: x.enlace }, x.texto) : h('span', {}, x.texto))));
+    x.enlace ? h('a', { href: x.enlace }, conGlosario(x.texto)) : h('span', {}, conGlosario(x.texto)))));
 }
 
 function tarjetaRecomendaciones(d) {
