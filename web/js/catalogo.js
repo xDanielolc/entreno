@@ -247,6 +247,14 @@ export const CATALOGO = [
   ej('Senderismo', 'cardio', 'montaña', [], ['cuadriceps', 'gemelo'], { ...sinCarga, distancia: true }),
   ej('Burpees', 'cardio', 'peso corporal', [], ['pecho', 'cuadriceps'], { carga: 'ninguna' }),
   ej('Saltos al cajón', 'cardio', 'cajón', ['cuadriceps'], ['gluteo', 'gemelo'], { carga: 'altura' }),
+  // Pliometría: saltos y lanzamientos explosivos. Se apuntan repeticiones y, si procede, la altura o la distancia.
+  ej('Sentadilla con salto', 'pierna', 'peso corporal', ['cuadriceps', 'gluteo'], ['gemelo'], { carga: 'ninguna' }),
+  ej('Zancadas con salto', 'pierna', 'peso corporal', ['cuadriceps', 'gluteo'], ['gemelo'], { carga: 'ninguna' }),
+  ej('Salto vertical', 'pierna', 'peso corporal', ['cuadriceps', 'gluteo'], ['gemelo'], { carga: 'altura' }),
+  ej('Salto de longitud', 'pierna', 'peso corporal', ['cuadriceps', 'gluteo'], ['gemelo'], { carga: 'altura' }),
+  ej('Saltos a la pata coja', 'pierna', 'peso corporal', ['gemelo', 'cuadriceps'], ['gluteo'], { carga: 'ninguna' }),
+  ej('Flexiones con palmada', 'empuje', 'peso corporal', ['pecho', 'triceps'], ['hombro'], { carga: 'pesoCorporal', fraccion: 0.64 }),
+  ej('Lanzamiento de balón medicinal', 'core', 'balón medicinal', ['abdomen', 'hombro'], ['pecho'], { carga: 'peso' }),
 
   // --- Estiramientos ------------------------------------------------------
   estiramiento('Estiramiento', []),

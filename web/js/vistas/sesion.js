@@ -395,7 +395,7 @@ export function vistaSesion(contenedor, { id }) {
       serie.tipo === 'intensidad' && selectorTecnicas(serie.tecnicas, (nuevas) => cambiarSesion((s) => {
         const x = s.ejercicios[i].series[j];
         x.tecnicas = nuevas;
-        x.recamara = recamaraDe(nuevas, d.perfil.recamaraPorDefecto ?? 1);
+        x.recamara = recamaraDe(nuevas, ej.recamaraPorDefecto ?? d.perfil.recamaraPorDefecto ?? 1);
         x.tramos = tramosDe(nuevas) ? (x.tramos ?? tramosPropuestos(x, planDe(ej, x), null, d.perfil)) : null;
       })),
 
@@ -472,7 +472,8 @@ export function vistaSesion(contenedor, { id }) {
       ej.esfuerzo.tipo === 'repeticiones' && h('label', { class: 'valor recamara' },
         h('span', {}, '+'),
         h('input', { type: 'text', inputmode: 'decimal', value: serie.recamara ?? '', 'aria-label': 'Repeticiones en recámara',
-          oninput: (e) => { actualizar((x) => { x.recamara = leerNumero(e.target.value); }); recalcularAbajo(ej, i); } }),
+          oninput: (e) => { actualizar((x) => { x.recamara = leerNumero(e.target.value); }); recalcularAbajo(ej, i); },
+          onchange: (e) => ofrecerRecamara(ej, leerNumero(e.target.value)) }),
         h('span', {}, serie.recamara != null ? (tipoDeFallo(serie.recamara) || 'recámara') : 'recámara'),
         queEs('recamara', '?')),
 
@@ -638,6 +639,22 @@ export function vistaSesion(contenedor, { id }) {
   }
 
   // Entre estiramientos el descanso es otro, más corto (se cambia en Ajustes).
+  // Si en este entrenamiento cambias la recámara de un ejercicio dos veces
+  // al mismo número, la app ofrece dejarlo así siempre en ese ejercicio.
+  const recamarasTocadas = new Map();   // ejercicioId → { valor, veces }
+  function ofrecerRecamara(ej, valor) {
+    const porDefecto = ej.recamaraPorDefecto ?? d.perfil.recamaraPorDefecto ?? 1;
+    if (valor == null || valor === porDefecto) return;
+    const previo = recamarasTocadas.get(ej.id);
+    const veces = previo?.valor === valor ? previo.veces + 1 : 1;
+    recamarasTocadas.set(ej.id, { valor, veces });
+    if (veces !== 2) return;
+    aviso(`Has puesto ${valor} de recámara dos veces en ${ej.nombre}. ¿Lo dejo así siempre en este ejercicio?`, { accion: { texto: 'Sí', fn: () => {
+      estado.cambiar((x) => { const e = x.ejercicios.find((y) => y.id === ej.id); if (e) e.recamaraPorDefecto = valor; });
+      aviso(`${ej.nombre}: ${valor} en recámara por defecto. Se cambia en su ficha (Ajustes finos).`);
+    } } });
+  }
+
   function descansoEntreSeries(ej) {
     if (['estiramiento', 'movilidad', 'yoga'].includes(tipoDeEjercicio(ej))) {
       const seg = d.perfil.descansoEstiramientos ?? DESCANSO_ESTIRAMIENTOS_POR_DEFECTO;

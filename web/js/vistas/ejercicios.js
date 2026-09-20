@@ -290,6 +290,9 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         existente && !existente.sedeId && sedesActivas(d).length > 1 && h('button', { type: 'button', class: 'boton enlace',
           onclick: separar }, 'Separar en un ejercicio por sitio (reparte su historial)')),
         borrador.carga.tipo !== 'ninguna' && seccionFormula(),
+        borrador.esfuerzo.tipo === 'repeticiones' && campo('Repeticiones en recámara por defecto en este ejercicio',
+          numeroInput(borrador.recamaraPorDefecto, (v) => { borrador.recamaraPorDefecto = v; }),
+          h('small', { class: 'nota' }, `Vacío = lo de Ajustes (${d.perfil.recamaraPorDefecto ?? 1}).`)),
         campo('Notas', h('textarea', { rows: 3, value: borrador.notas || '',
           oninput: (e) => { borrador.notas = e.target.value; } }))),
 

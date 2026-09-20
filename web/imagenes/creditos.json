@@ -1624,6 +1624,42 @@
    "archivo": "imagenes/ejercicios/peso-muerto.jpeg",
    "autor": "philip",
    "nombreEnWger": "Peso Muerto Convencional"
+  },
+  "Sentadilla con salto": {
+   "archivo": "imagenes/ejercicios/sentadilla.jpeg",
+   "autor": "philip",
+   "nombreEnWger": "Sentadilla con disco",
+   "aliasDe": "Sentadilla"
+  },
+  "Zancadas con salto": {
+   "archivo": "imagenes/ejercicios/zancadas.png",
+   "autor": "Franpol",
+   "nombreEnWger": "Zancadas con peso",
+   "aliasDe": "Zancadas"
+  },
+  "Salto vertical": {
+   "archivo": "imagenes/munecos/saltos-al-cajon.svg",
+   "autor": "dibujo propio de la app",
+   "nombreEnWger": "",
+   "aliasDe": "Saltos al cajón"
+  },
+  "Salto de longitud": {
+   "archivo": "imagenes/munecos/saltos-al-cajon.svg",
+   "autor": "dibujo propio de la app",
+   "nombreEnWger": "",
+   "aliasDe": "Saltos al cajón"
+  },
+  "Saltos a la pata coja": {
+   "archivo": "imagenes/munecos/saltos-al-cajon.svg",
+   "autor": "dibujo propio de la app",
+   "nombreEnWger": "",
+   "aliasDe": "Saltos al cajón"
+  },
+  "Flexiones con palmada": {
+   "archivo": "imagenes/ejercicios/flexiones.png",
+   "autor": "Settebello",
+   "nombreEnWger": "Push-Up",
+   "aliasDe": "Flexiones"
   }
  }
 }

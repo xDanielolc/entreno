@@ -459,7 +459,8 @@ El paso 3 no es opcional. Es la red de seguridad.
   `perfil.preguntarComoLlegas` (false = no preguntar), `perfil.comoLlegasSaltos`,
   progresión ciclo `corte.cargaMax` y `corte.rmPct` (se corta si el peso llega
   a X kg o pasa del Y % del 1RM), `plan.calentamiento` (el tipo de serie ya no
-  se elige: sale de la regla, las técnicas y esta casilla).
+  se elige: sale de la regla, las técnicas y esta casilla), `ej.recamaraPorDefecto`
+  (recámara propia del ejercicio; si falta, la del perfil).
   Sesiones: `vista = { modo, pos }` (cómo se está viendo el entreno) y
   `tutorial` (true en el entrenamiento de prueba de la guía). Progresión de
   ciclo (tipo 'bilbo'): `preset`, `corte = { sesiones, esfuerzoMin,

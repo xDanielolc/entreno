@@ -22,7 +22,7 @@ export function crearSerieDesdePlan(datos, ejercicio, plan, { excluirSesion } = 
     tipo: plan.tipo,
     tecnicas: [...(plan.tecnicas || [])],
     detalle: {},
-    recamara: recamaraDe(plan.tecnicas, datos.perfil.recamaraPorDefecto ?? 1),
+    recamara: recamaraDe(plan.tecnicas, ejercicio.recamaraPorDefecto ?? datos.perfil.recamaraPorDefecto ?? 1),
     carga,
     lectura: ejercicio.carga.tipo === 'asistida' ? lecturaDesdeCarga(carga, datos.perfil.pesoCorporalKg) : null,
     esfuerzo: null,
