@@ -904,3 +904,12 @@ input, select, textarea { max-width: 100%; box-sizing: border-box; }
 .aviso-bajada { margin: 6px 0; }
 
 body:has(.modal-fondo) .guia { display: none; }
+
+/* Banda de «entrenamiento en curso» cuando estás en otra pantalla. */
+.banda-entreno {
+  position: sticky; top: 0; z-index: 15;
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  margin: 0 0 8px; padding: 10px 16px;
+  background: var(--acento); color: var(--acento-texto); text-decoration: none; font-weight: 600;
+}
+.banda-entreno strong { text-decoration: underline; }

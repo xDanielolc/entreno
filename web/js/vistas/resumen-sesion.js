@@ -106,9 +106,14 @@ function seccionRecords(datos, sesion) {
         + `(antes ${formatearNumero(antes.mejorTrabajo.valor)}); el trabajo es el peso por las repeticiones` });
     }
   }
-  if (!lineas.length) return null;
+  const primeras = sesion.ejercicios
+    .map((e) => datos.ejercicios.find((x) => x.id === e.ejercicioId))
+    .filter((ej) => ej && e_primeraVez(datos, ej, sesion));
+  if (!lineas.length && !primeras.length) return null;
   return h('section', {},
-    h('h3', {}, lineas.length > 1 ? `¡${lineas.length} récords!` : '¡Récord!'),
+    lineas.length > 0 && h('h3', {}, lineas.length > 1 ? `¡${lineas.length} récords!` : '¡Récord!'),
+    primeras.length > 0 && h('p', { class: 'nota' }, `Primera vez con ${primeras.map((x) => x.nombre).join(', ')}: `
+      + 'queda apuntado como referencia; los récords salen a partir de la siguiente.'),
     h('ul', {}, lineas.map((l) => h('li', {}, conGlosario(l.texto)))));
 }
 
@@ -216,6 +221,12 @@ function cambiosRespectoARutina(datos, sesion) {
     }
   }
   return cambios;
+}
+
+// True si el ejercicio no tiene ninguna serie hecha en otra sesión terminada.
+function e_primeraVez(datos, ej, sesion) {
+  return !datos.sesiones.some((s) => s.id !== sesion.id && !s.borrada && s.estado === 'terminada'
+    && s.ejercicios.some((e) => e.ejercicioId === ej.id && e.series.some((x) => x.hecha)));
 }
 
 function seccionCambios(cambios) {

@@ -80,10 +80,25 @@ function renderizar() {
   }
   pintarNavegacion(ruta.pestana);
   pintarIndicador();
+  pintarBandaEntreno();
   pintarGuia();
   aplicarTema(estado.datos()?.perfil?.tema);
   recordarRuta();
   window.scrollTo(0, mismaRuta ? scroll : 0);
+}
+
+// Si hay un entrenamiento a medias y estás en otra pantalla, una banda fija
+// arriba te lleva de vuelta: el entrenamiento no se pierde por cambiar de
+// pestaña.
+function pintarBandaEntreno() {
+  document.querySelector('.banda-entreno')?.remove();
+  const d = estado.datos();
+  const enCurso = d?.sesiones?.find((s) => s.estado === 'en-curso' && !s.borrada && !s.tutorial);
+  if (!enCurso || location.hash === `#/sesion/${enCurso.id}`) return;
+  const banda = h('a', { class: 'banda-entreno', href: `#/sesion/${enCurso.id}` },
+    h('span', {}, '⏱ Entrenamiento en curso'),
+    h('strong', {}, 'Volver'));
+  document.querySelector('.barra-superior').after(banda);
 }
 
 function pintarNavegacion(activa) {
