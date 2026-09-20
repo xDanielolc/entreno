@@ -11,6 +11,7 @@ import { campo } from './ejercicios.js';
 import { ejercicioDesdeCatalogo, elegirEjercicio as abrirSelector } from './selector-ejercicios.js';
 import { PLANTILLAS, anadirPlantilla, ejerciciosNuevos } from '../plantillas.js';
 import { pista } from './tutorial.js';
+import { conGlosario } from './glosario.js';
 
 export function rutinaActiva(datos) {
   return datos.rutinas.find((r) => r.activa && r.dias.length) ?? null;
@@ -137,8 +138,9 @@ export function vistaRutinas(contenedor) {
 // Un texto largo, frase a frase, como lista: se lee más fácil.
 export function enPuntos(texto) {
   const frases = (texto || '').split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚÑ«¿¡0-9])/).map((f) => f.trim()).filter(Boolean);
-  if (frases.length < 2) return h('p', {}, texto);
-  return h('ul', { class: 'puntos' }, frases.map((f) => h('li', {}, f)));
+  const usadas = new Set();
+  if (frases.length < 2) return h('p', {}, conGlosario(texto, usadas));
+  return h('ul', { class: 'puntos' }, frases.map((f) => h('li', {}, conGlosario(f, usadas))));
 }
 
 function tarjetaRutina(r) {
@@ -167,7 +169,7 @@ function tarjetaPlantilla(d, plantilla) {
   return h('article', { class: 'tarjeta plantilla' },
     h('strong', {}, plantilla.nombre),
     h('div', { class: 'suave' }, plantilla.autor),
-    h('p', {}, plantilla.resumen),
+    h('p', {}, conGlosario(plantilla.resumen)),
     h('details', { class: 'explicacion' }, h('summary', {}, 'Por qué es así'), enPuntos(plantilla.porQue)),
     h('details', { class: 'explicacion' }, h('summary', {}, 'Cómo se hace'), enPuntos(plantilla.comoSeHace)),
     h('details', { class: 'explicacion' }, h('summary', {}, 'Días y ejercicios'),

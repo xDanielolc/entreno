@@ -48,10 +48,9 @@ const RE_TERMINOS = new RegExp(`(^|[^\\p{L}\\d])(${TERMINOS.map(([t]) => t).join
 
 // Un texto con un «?» detrás de la primera aparición de cada palabra del
 // glosario. Devuelve una lista de nodos y trozos de texto.
-export function conGlosario(texto) {
+export function conGlosario(texto, usadas = new Set()) {
   if (typeof texto !== 'string') return texto;
   const partes = [];
-  const usadas = new Set();
   let resto = texto;
   for (let m = RE_TERMINOS.exec(resto); m; m = RE_TERMINOS.exec(resto)) {
     const clave = TERMINOS.find(([t]) => t.toLowerCase() === m[2].toLowerCase())?.[1];

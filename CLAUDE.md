@@ -188,5 +188,23 @@ de prueba (sastre, split, isquios) con `asistencia: 'mano'` de fábrica → la
 escala de la mano sale como desplegable en cada serie. Filas del drop set con
 cabecera única (kg / % 1RM / reps) y decimales con coma. El cardio sin
 músculo principal ya no sale como «falta músculo».
-PENDIENTE (pedido por él el 20-09-2026): «diagnóstico gym» que dice
-que no se ve (no sé a qué se refiere: preguntar); nombre e icono con Design.
+0.20.3-0.20.10 (rondas sin supervisión, 20-09-2026): parpadeo de la guía
+visible (halo naranja; con «reducir animaciones» activo en el móvil también
+parpadea, antes no: ese era su «no parpadea»), sin «undefined» en el panel
+(`anadir()` en vez de `replaceChildren` con hijos), la pantalla deja sitio al
+panel y el objetivo se pone a la vista; tras el entrenamiento de prueba la
+guía pasa sola al paso siguiente (`guiaTrasPrueba()`) y no pregunta la vista.
+`conGlosario(texto)` (glosario.js) pone «?» tras la primera aparición de cada
+término (1RM, fallo, recámara, drop set, volumen, Bilbo, descarga, HIIT…) en
+consejos, récords, rutinas prehechas y descripciones. `completarDesdeCatalogo()`
+(catalogo.js) rellena al abrir (y al descargar de Drive) los ejercicios en
+blanco cuyo nombre esté en el catálogo (los de las rutinas de yoga quedaron sin
+músculos). Descanso entre estiramientos aparte (`perfil.descansoEstiramientos`,
+20 s) y «+30 s» en descansos cortos. Cartel «¿Cómo quieres verlo?» sin
+duplicar (`preguntandoVista`). Textos en llano: línea del 1RM del ciclo, tabla
+«Frente a otras veces» («7 % más que la última vez»), récord de trabajo en kg,
+fechas dd/mm/aaaa (`fechaCorta` en ui.js), total exacto del HIIT y frase de
+introducción con glosario, saludo sin nombre, plural «1 sesión hecha».
+El «diagnóstico gym» lo dio él por cerrado (no era de la app).
+PENDIENTE: nombre e icono con Design («luego ya decoramos»); que él confirme
+que Drive recoge los archivos sueltos en la carpeta.
