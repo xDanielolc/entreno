@@ -181,5 +181,12 @@ meditar» (helper `t(seg)` en plantillas.js). Los 45 ejercicios de la guía
 llevan imagen por alias (`aliasDe` en creditos.json, misma foto que el
 ejercicio base). La guía hace parpadear el botón del que habla
 (`selector` en cada paso, clase `.parpadea`). Quitada `epley()` (sin uso).
+0.20.1-0.20.2: Drive: `carpetaDeLaApp()` cacheada, `asegurarEnCarpeta()` y
+`ordenarCarpeta()` (una vez por sesión de la app recoge en la carpeta todo lo
+que la app tenga suelto: él veía los archivos en «Mi unidad»). Estiramientos
+de prueba (sastre, split, isquios) con `asistencia: 'mano'` de fábrica → la
+escala de la mano sale como desplegable en cada serie. Filas del drop set con
+cabecera única (kg / % 1RM / reps) y decimales con coma. El cardio sin
+músculo principal ya no sale como «falta músculo».
 PENDIENTE (pedido por él el 20-09-2026): «diagnóstico gym» que dice
 que no se ve (no sé a qué se refiere: preguntar); nombre e icono con Design.

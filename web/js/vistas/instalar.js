@@ -33,8 +33,7 @@ export function tarjetaInstalar() {
   const esSamsung = /SamsungBrowser/i.test(navigator.userAgent);
   const esIos = /iPhone|iPad/i.test(navigator.userAgent);
   const tarjeta = h('section', { class: 'tarjeta instalar' },
-    h('p', {}, h('strong', {}, 'Instala la app en la pantalla de inicio. '),
-      'Se abre sin la barra del navegador y funciona sin cobertura.'),
+    h('p', {}, h('strong', {}, 'Instala la app en la pantalla de inicio'), ': sin barra del navegador y sin cobertura.'),
     h('details', {},
       h('summary', {}, 'Cómo se instala'),
       esIos

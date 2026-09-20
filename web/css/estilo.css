@@ -565,6 +565,12 @@ input, select, textarea { max-width: 100%; box-sizing: border-box; }
 .tramo { display: flex; align-items: center; gap: 8px; }
 .tramo .valor { flex: 1 1 100px; }
 .tramo .valor input { font-size: 1.05rem; }
+/* Con la cabecera común, las etiquetas de cada casilla sobran. */
+.tramo:not(.cabecera-tramos) .valor > span { display: none; }
+.tramo .carga-con-porcentaje { flex: 2 1 160px; }
+.cabecera-tramos { font-size: 0.8rem; color: var(--texto-suave); margin-bottom: -4px; }
+.cabecera-tramos .crece { flex: 1 1 0; text-align: center; }
+.tramo-n.vacio { background: transparent; }
 
 .tramo-n {
   flex: 0 0 26px;

@@ -18,8 +18,9 @@ const SERIES_MINIMAS = 10;
 const SERIES_MAXIMAS = 20;
 
 export function tarjetaRecuperacion(datos, { compacta = false } = {}) {
-  const sinMusculos = datos.ejercicios.filter((e) => !e.archivado && cuentaParaFatiga(e)
-    && !e.musculos?.principales?.length);
+  // El cardio general (correr, HIIT) no tiene músculo principal a propósito.
+  const sinMusculos = datos.ejercicios.filter((e) => !e.archivado && !e.borrado && cuentaParaFatiga(e)
+    && e.grupo !== 'cardio' && !e.musculos?.principales?.length);
   const rec = recuperacionPorMusculo(datos);
   const estados = {};
   for (const m of ORDEN_MUSCULOS) {

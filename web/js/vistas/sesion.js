@@ -462,7 +462,8 @@ export function vistaSesion(contenedor, { id }) {
     const destino = () => (tramo == null ? serie : serie.tramos[tramo]);
     const rm = (tramo != null ? serie.rmUsado?.valor : null) ?? rmDeReferencia(d, ej, { cicloN: serie.cicloN })?.valor ?? null;
     const valido = (v) => (Number.isFinite(v) ? v : null);
-    const kilos = h('input', { type: 'text', inputmode: 'decimal', value: valido(destino().carga) ?? '',
+    const coma = (v) => (v == null ? '' : String(v).replace('.', ','));
+    const kilos = h('input', { type: 'text', inputmode: 'decimal', value: coma(valido(destino().carga)),
       'data-campo': 'kilos',
       'aria-label': tramo == null ? TIPOS_CARGA[ej.carga.tipo].etiqueta : `Carga de la bajada ${tramo + 1}` });
     const porcentaje = h('input', { type: 'text', inputmode: 'decimal', class: 'porcentaje', 'data-campo': 'porcentaje',
@@ -488,7 +489,7 @@ export function vistaSesion(contenedor, { id }) {
       const r = rmActual();
       const v = p != null && r ? aPesoDisponible(ej, (r * p) / 100) : null;
       guardar((x) => { x.carga = v; if (tramo != null) x.pct = p; });
-      kilos.value = v ?? '';
+      kilos.value = coma(v);
       if (tramo == null) recalcularAbajo(ej, i);
     });
 
@@ -534,6 +535,11 @@ export function vistaSesion(contenedor, { id }) {
       anterior?.tramos?.length && h('p', { class: 'nota' }, `La otra vez: ${textoSerie(ej, anterior)}`
         + ` (${formatearNumero(esfuerzoTotal(anterior))} ${unidadEsfuerzo(ej)}`
         + `${trabajoSerie(anterior) ? `, ${formatearNumero(trabajoSerie(anterior))} kg de trabajo` : ''}).`),
+      h('div', { class: 'tramo cabecera-tramos', 'aria-hidden': 'true' },
+        h('span', { class: 'tramo-n vacio' }),
+        conCarga && h('span', { class: 'crece' }, 'kg'),
+        conCarga && h('span', { class: 'crece' }, '% 1RM'),
+        h('span', { class: 'crece' }, unidadEsfuerzo(ej))),
       serie.tramos.map((tramo, k) => h('div', { class: 'tramo', 'data-tramo': k },
         h('span', { class: 'tramo-n', title: `${tramos.nombre} ${k + 1}` }, k + 1),
         conCarga && campoCargaConPorcentaje(ej, i, j, serie, k),
@@ -597,13 +603,11 @@ export function vistaSesion(contenedor, { id }) {
     if (planDe(ej, serie)?.tramosFijos?.length) return 'Pesos fijos de la máquina (se cambian en la ficha del ejercicio).';
     const origen = origenModoCarga(d, ej, serie, sesion);
     if (modoCargaDe(d, ej, serie, sesion) === 'kg') return `Pesos a mano (${origen}): no cambian aunque cambie tu 1RM.`;
-    if (!serie.rmUsado) return `Por % del 1RM (${origen}): los kilos saldrán en cuanto hagas la serie de arriba.`;
+    if (!serie.rmUsado) return `Por % del 1RM (${origen}): los kilos salen al apuntar la serie de arriba.`;
     const fatiga = serie.rmUsado.deHoy && serie.rmUsado.fatiga && serie.rmUsado.fatiga !== 1
-      ? `, ajustado a lo que sueles rendir tras la primera serie (×${String(serie.rmUsado.fatiga).replace('.', ',')} → `
-        + `${formatearNumero(serie.rmUsado.valor)} kg)`
+      ? ` ×${String(serie.rmUsado.fatiga).replace('.', ',')} por el cansancio`
       : '';
-    return `Kilos según el ${serie.rmUsado.deHoy ? '1RM que acabas de hacer arriba' : '1RM de tu historial'} `
-      + `(${formatearNumero(serie.rmUsado.base ?? serie.rmUsado.valor)} kg)${fatiga}. Si cambias la serie de arriba, se recalculan.`;
+    return `Kilos por el 1RM ${serie.rmUsado.deHoy ? 'de hoy' : 'de tu historial'} (${formatearNumero(serie.rmUsado.base ?? serie.rmUsado.valor)} kg${fatiga}).`;
   }
 
   function descansoEntreSeries() {
@@ -631,7 +635,7 @@ export function vistaSesion(contenedor, { id }) {
         const fila = caja.querySelector(`[data-tramo="${k}"]`);
         const kilos = fila?.querySelector('[data-campo="kilos"]');
         const pct = fila?.querySelector('[data-campo="porcentaje"]');
-        if (kilos) kilos.value = t.carga ?? '';
+        if (kilos) kilos.value = t.carga == null ? '' : String(t.carga).replace('.', ',');
         if (pct) {
           pct.dataset.rm = serie.rmUsado.valor;
           pct.value = t.carga != null ? Math.round((t.carga / serie.rmUsado.valor) * 100) : '';
