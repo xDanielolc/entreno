@@ -3,12 +3,7 @@
 import { PROGRAMAS, TECNICAS, recamaraDe, tramosDe } from './esquema.js';
 import { modeloDe, repsParaIgualar, rmDeSerie } from './formula1rm.js';
 
-// Fórmula de Epley, la misma de tus Excel: 1RM = carga × reps × 0,03 + carga.
-// Las demás fórmulas están en formula1rm.js; cada ejercicio elige la suya.
-export function epley(carga, repeticiones) {
-  if (!(carga > 0) || !(repeticiones > 0)) return null;
-  return carga * repeticiones * 0.03 + carga;
-}
+// Las fórmulas del 1RM están en formula1rm.js (Marzagao con factor personal).
 
 // Genera la escalera de un ciclo Bilbo (de pesos, o de repeticiones y tiempo
 // cuando el ejercicio no lleva carga).

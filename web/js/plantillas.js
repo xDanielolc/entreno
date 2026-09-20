@@ -25,6 +25,8 @@ const unilateral = (forma) => ({ ...forma, tecnicas: [...forma.tecnicas, 'unilat
 const series = (n, min, max) => Array.from({ length: n }, () => ({ tipo: 'libre', progresion: 'carga', objetivo: [min, max] }));
 
 const programa = (cual, inicial = null) => ({ tipo: 'libre', progresion: 'programa', programa: cual, inicial });
+// Estiramiento o ejercicio de movilidad medido en segundos (o repeticiones).
+const t = (seg) => ({ tipo: 'libre', progresion: 'libre', objetivo: [seg, seg] });
 
 const e = (nombre, series, extra = {}) => ({ nombre, series, ...extra });
 
@@ -218,6 +220,86 @@ export const PLANTILLAS = [
         e('Aductores en máquina', [bilbo, dropSet(8, 10)]),
         e('Elevación de gemelos', [bilbo, unilateral(isometrico(10, 12))]),
         e('Carrera', [libre], { opcional: true }),
+      ] },
+    ],
+  },
+  {
+    id: 'flexibilidad-tres-sesiones',
+    nombre: 'Flexibilidad: tres sesiones',
+    autor: 'Propuesta de la app, basada en una rutina personal de fisioterapia',
+    resumen: 'Tres sesiones cortas (10-12 minutos) de estiramientos y movilidad: cadera y pierna, cuello y espalda, y aperturas de cadera y hombro. Cada una con una prueba para medir el progreso.',
+    porQue: 'La flexibilidad mejora a medio plazo, no en cada sesión: por eso cada sesión lleva un ejercicio de prueba que se mide cada dos o tres '
+      + 'semanas. Se mezclan tres cosas: estirar con contracción y relajación (PIR), movilizar el nervio con deslizamientos suaves y ganar rango '
+      + 'con fuerza al final del recorrido. Nunca hasta el dolor eléctrico ni el hormigueo: solo tensión.',
+    comoSeHace: 'Dos o tres días por semana, mejor el mismo día que la fuerza (por la tarde) o con dos días de separación. Cada ejercicio, el tiempo '
+      + 'indicado; en los de PIR, empuja 5 segundos, relaja y gana recorrido 5 segundos. En los de prueba, apunta cuántas repeticiones limpias o '
+      + 'a qué distancia llegas con la escala de la mano. Si algo duele de verdad, para y consúltalo.',
+    dias: [
+      { nombre: 'A: cadera y pierna', ejercicios: [
+        e('Deslizamiento neural ciático', [t(60)]),
+        e('Estiramiento de glúteo en figura de 4', [t(90)], { nota: 'Con PIR: empuja 5 s, relaja 5 s' }),
+        e('Rotación 90/90', [t(120)], { nota: 'Prueba: cuenta las rotaciones limpias sin manos' }),
+        e('Rotación tibial con rodilla flexionada', [t(60)]),
+        e('Estiramiento de gemelo en pared', [t(30)]),
+        e('Estiramiento de sóleo en pared', [t(30)]),
+      ] },
+      { nombre: 'B: cuello y espalda', ejercicios: [
+        e('Rotación torácica en cuadrupedia', [t(60)]),
+        e('Estiramiento de trapecio superior', [t(90)], { nota: 'Con PIR: empuja la cabeza contra la mano 5 s, relaja 5 s' }),
+        e('Deslizamiento neural cervical', [t(60)], { nota: 'Para si notas hormigueo' }),
+        e('Gato-camello', [t(90)]),
+        e('Puente por fases', [t(90)], { nota: 'Prueba: apunta la fase (1 a 4) y el tiempo' }),
+      ] },
+      { nombre: 'C: aperturas de cadera y hombro', ejercicios: [
+        e('Estiramiento de aductores en mariposa', [t(90)], { nota: 'Con PIR' }),
+        e('Postura del sastre (apertura lateral)', [t(60)], { nota: 'Prueba: distancia rodilla-suelo con la escala de la mano' }),
+        e('Estiramiento de psoas en zancada', [t(90)], { nota: 'Mete la cola antes de avanzar la cadera' }),
+        e('Zancada hacia el split frontal', [t(60)], { nota: 'Prueba: distancia ingle-suelo' }),
+        e('Rotación externa de hombro con banda', [t(60)]),
+        e('Rotación interna de hombro con toalla', [t(60)]),
+      ] },
+    ],
+  },
+  {
+    id: 'movilidad-para-meditar',
+    nombre: 'Movilidad para sentarse a meditar',
+    autor: 'Propuesta de la app, basada en una rutina personal',
+    resumen: 'Dos rutinas de 15 minutos (cuello y espalda; piernas y caderas) y una progresión de tobillos para poder sentarse sobre los talones sin dolor.',
+    porQue: 'Sentarse a meditar pide cuello y espalda libres, caderas que rotan y tobillos que se doblan. Cada rutina va en tres pasos: movilidad '
+      + 'activa para calentar, fuerza en el final del recorrido para que el rango se quede, y estiramientos pasivos al final. La progresión de '
+      + 'tobillos usa un ladrillo bajo los glúteos: alto hasta aguantar 10 minutos sin molestias, luego medio, luego bajo.',
+    comoSeHace: 'A y B en días alternos, y la de tobillos 3-4 veces por semana (5 minutos). Nunca con dolor por encima de 3 sobre 10. Mide cada '
+      + 'dos semanas: minutos sentado sin dolor, distancia pie-pared en el tobillo, y con qué apoyo (alto, medio, bajo, sin ladrillo).',
+    dias: [
+      { nombre: 'A: cuello, espalda y caderas', ejercicios: [
+        e('Retracción cervical (chin tuck)', series(2, 10, 10)),
+        e('Flexión lateral de cuello activa', series(2, 8, 8), { nota: 'Por lado' }),
+        e('Extensión torácica sobre rodillo', series(2, 8, 8)),
+        e('Gato-camello', [t(60)]),
+        e('Isométricos de cuello', [t(30)], { nota: '3 × 10 s por lado' }),
+        e('Elevaciones Y-T-W', series(2, 8, 8), { nota: 'Cada letra' }),
+        e('Cobra en el suelo', [t(30)]),
+        e('Estiramiento de trapecio superior', [t(30)], { nota: 'Por lado' }),
+        e('Estiramiento del elevador de la escápula', [t(30)], { nota: 'Por lado' }),
+        e('Niño o embrión (Balasana)', [t(45)]),
+      ] },
+      { nombre: 'B: piernas para sentarse', ejercicios: [
+        e('CARs de cadera', series(1, 5, 5), { nota: 'Por lado' }),
+        e('Rotación 90/90', series(1, 6, 8), { nota: 'Transiciones, por lado' }),
+        e('Tobillo con rodilla a la pared', series(1, 10, 10), { nota: 'Por lado' }),
+        e('Sentadilla cosaca', series(2, 6, 6), { nota: 'Por lado' }),
+        e('Sentadilla búlgara', series(2, 6, 6), { nota: 'Profunda, sin peso' }),
+        e('Elevación de gemelos', series(2, 10, 10), { nota: 'Pausa de 2 s abajo' }),
+        e('Estiramiento de aductores en mariposa', [t(40)]),
+        e('Estiramiento del sofá (couch stretch)', [t(40)], { nota: 'Por lado' }),
+        e('Estiramiento de glúteo en paloma', [t(40)], { nota: 'Por lado' }),
+      ] },
+      { nombre: 'Tobillos (5 min)', ejercicios: [
+        e('Flexión y extensión de dedos del pie', series(1, 10, 15)),
+        e('Isométrico de flexión plantar', [t(30)], { nota: '3 × 10 s' }),
+        e('Estiramiento del empeine', [t(30)]),
+        e('Héroe tendido (Supta Virasana)', [t(45)], { nota: 'Con ladrillo: alto, luego medio, luego bajo' }),
+        e('Estiramiento de los dedos del pie', [t(30)]),
       ] },
     ],
   },

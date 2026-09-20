@@ -174,7 +174,12 @@ Tabata, 30/30, 40/20, EMOM, sprints y a mi manera; pitidos por fase y en los
 de trabajo en la serie y el detalle en las notas. Botón «⏱ Intervalos» en los
 ejercicios de cardio medidos en tiempo. Catálogo: HIIT, Tabata, Burpees,
 Jumping jacks, Rodillas al pecho, con muñeco.
-PENDIENTE (pedido por él el 20-09-2026): repasar estiramientos; sus rutinas de yoga prehechas completas;
-«diagnóstico gym» que dice
-que no se ve (no sé a qué se refiere: preguntar); tutorial más interactivo
-(botón que parpadea); nombre e icono con Design.
+0.20.0: +23 estiramientos y ejercicios de movilidad con muñeco, dos rutinas
+prehechas nuevas sacadas de sus documentos de OneDrive (generalizadas, sin
+datos médicos): «Flexibilidad: tres sesiones» y «Movilidad para sentarse a
+meditar» (helper `t(seg)` en plantillas.js). Los 45 ejercicios de la guía
+llevan imagen por alias (`aliasDe` en creditos.json, misma foto que el
+ejercicio base). La guía hace parpadear el botón del que habla
+(`selector` en cada paso, clase `.parpadea`). Quitada `epley()` (sin uso).
+PENDIENTE (pedido por él el 20-09-2026): «diagnóstico gym» que dice
+que no se ve (no sé a qué se refiere: preguntar); nombre e icono con Design.

@@ -451,6 +451,16 @@ El paso 3 no es opcional. Es la red de seguridad.
   también en cada plantilla de serie y en cada ejercicio de un día de rutina
   (null = heredar). La progresión «esfuerzo» admite `sobre: 'carga'` (más
   peso con las mismas repeticiones).
+- **Sin cambio de versión (0.17.0 a 0.20.0).** `perfil.cuestionario =
+  { experiencia, objetivo, donde, tema, hecho }`, `perfil.tema` ('claro' |
+  'oscuro' | 'sistema'), `perfil.tutoriales.paso` y `guiaHecha`,
+  `perfil.bilboMinReps`, `perfil.hiit = { preset, trabajo, descanso, rondas }`.
+  Sesiones: `vista = { modo, pos }` (cómo se está viendo el entreno) y
+  `tutorial` (true en el entrenamiento de prueba de la guía). Progresión de
+  ciclo (tipo 'bilbo'): `preset`, `corte = { sesiones, esfuerzoMin,
+  esfuerzoMax }`, `reinicio = { modo, porcentaje }`; cada ciclo lleva
+  `inicio` y `fin` (fechas). En creditos.json, `aliasDe` marca las imágenes
+  que reutilizan la de otro ejercicio.
 - **Sin cambio de versión (0.15.0).** Rutinas: `activa` puede ser true en
   varias a la vez y `diasSemana` (lista de 0 = lunes … 6 = domingo, o null).
   Ejercicios: `pesosMaquina` (lista de kg disponibles, o null) y `borrado`

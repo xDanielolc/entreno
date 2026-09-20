@@ -85,11 +85,11 @@ export function elegirNivel({ alElegir } = {}) {
 
 const PASOS_BASICOS = [
   { ruta: '#/', titulo: 'Hoy', texto: 'Esta es tu pantalla de inicio. Arriba, qué toca hoy según tu rutina; debajo, cómo va tu recuperación. '
-    + 'Desde aquí se empieza cada entrenamiento con el botón grande.' },
+    + 'Desde aquí se empieza cada entrenamiento con el botón que parpadea.', selector: 'main .boton.grande' },
   { ruta: '#/rutinas', titulo: 'Rutinas', texto: 'Una rutina son tus días de entrenamiento en orden. Abajo hay rutinas prehechas: con «Añadir a mis rutinas» '
-    + 'te llevas la rutina y sus ejercicios en un toque. Puedes tener varias activas.' },
+    + 'te llevas la rutina y sus ejercicios en un toque. Puedes tener varias activas.', selector: '.plantilla button' },
   { ruta: '#/ejercicios', titulo: 'Ejercicios', texto: 'Aquí están tus ejercicios. Cada uno guarda cómo progresa (Bilbo, doble progresión, un programa…), '
-    + 'qué músculos trabaja y sus series. Tócalo para cambiarlo; se guarda solo.' },
+    + 'qué músculos trabaja y sus series. Tócalo para cambiarlo; se guarda solo.', selector: '.cabecera-vista .boton' },
   { ruta: '#/', titulo: 'Apuntar un entrenamiento', texto: 'Lo mejor es probarlo: el botón de abajo abre un entrenamiento de prueba con '
     + 'flexiones. Apunta una serie (peso, repeticiones y cuántas te quedaban) y mira cómo arranca el descanso. Al terminar podrás '
     + 'guardarlo o borrarlo.', prueba: true, glosario: ['serie', 'recamara', 'rm'] },
@@ -97,7 +97,7 @@ const PASOS_BASICOS = [
     + 'Tu recuperación depende de lo dura que fue la sesión, de cuántas series hiciste y de tu genética.', glosario: ['recuperacion', 'volumen'] },
   { ruta: '#/historial', titulo: 'Historial', texto: 'Todos tus entrenamientos. Con «+ De otro día» apuntas uno pasado. Lo borrado va a una papelera y se recupera.' },
   { ruta: '#/ajustes', titulo: 'Ajustes', texto: 'Arriba, tu nombre, tu peso y la cuenta de Google. Lo demás está plegado por apartados: descansos, drop sets, '
-    + 'ciclos, sitios, cómo se estima el 1RM, este tutorial y la zona de peligro. Fin de lo básico: ya puedes entrenar.' },
+    + 'ciclos, sitios, cómo se estima el 1RM, este tutorial y la zona de peligro. Fin de lo básico: ya puedes entrenar.', selector: '.apartado' },
 ];
 
 const PASOS_AVANZADOS = [
@@ -169,7 +169,11 @@ export function pintarGuia() {
   const d = estado.datos();
   const t = d?.perfil?.tutoriales;
   const n = t?.paso;
-  if (!estado.usuario() || n == null || t.nivel === 'ninguno') { panel?.remove(); panel = null; return; }
+  if (!estado.usuario() || n == null || t.nivel === 'ninguno') {
+    panel?.remove(); panel = null;
+    for (const el of document.querySelectorAll('.parpadea')) el.classList.remove('parpadea');
+    return;
+  }
   const pasos = pasosDe(t.nivel);
   const paso = pasos[Math.min(n, pasos.length - 1)];
   if (!panel || !panel.isConnected) {
@@ -184,6 +188,9 @@ export function pintarGuia() {
     if (yaAlli) pintarGuia(); else location.hash = destino.ruta;
     window.scrollTo(0, 0);
   };
+  // El elemento del que habla el paso parpadea para que se vea dónde tocar.
+  for (const el of document.querySelectorAll('.parpadea')) el.classList.remove('parpadea');
+  if (paso.selector) document.querySelector(paso.selector)?.classList.add('parpadea');
   panel.replaceChildren(
     h('div', { class: 'guia-cabecera' },
       h('strong', {}, paso.titulo),
