@@ -83,8 +83,9 @@ const SALUDOS = [
 
 function saludo(nombre) {
   const base = SALUDOS[Math.floor(Date.now() / 3_600_000) % SALUDOS.length];
-  const texto = base.replace('{n}', nombre || '');
-  return texto.replace(/,\s*[.,]/, ',').replace(/^\s*,\s*/, '').replace(/,\s*$/, '').replace(/\s{2,}/g, ' ').replace(/^(\w)/, (m) => m.toUpperCase());
+  // Sin nombre, la frase se queda sin el hueco: «Buenas. Un día más…».
+  const texto = nombre ? base.replace('{n}', nombre) : base.replace(', {n}.', '.').replace('{n}, ', '');
+  return texto.replace(/\s{2,}/g, ' ').replace(/^(\p{L})/u, (m) => m.toUpperCase());
 }
 
 // Con el cuestionario hecho y sin rutinas: la prehecha que mejor encaja.
