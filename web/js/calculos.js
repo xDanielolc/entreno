@@ -202,7 +202,9 @@ function sugerenciaBilbo(datos, ejercicio, plan, { excluirSesion, sobre }) {
   const minimo = corte.esfuerzoMin ?? datos.perfil.bilboMinReps ?? 15;
   const hechoAntes = ultimaDelCiclo ? esfuerzoTotal(ultimaDelCiclo.serie) : null;
   const agotado = (objetivoSuperar != null && minimo && objetivoSuperar < minimo)
-    || (corte.esfuerzoMax && hechoAntes != null && hechoAntes >= corte.esfuerzoMax);
+    || (corte.esfuerzoMax && hechoAntes != null && hechoAntes >= corte.esfuerzoMax)
+    || (corte.cargaMax && valor >= corte.cargaMax)
+    || (corte.rmPct && rmAnterior && valor >= (rmAnterior * corte.rmPct) / 100);
   return { ...resultado, carga: valor, objetivoSuperar, pesoBajo: reps != null && reps > 40, cicloAgotado: agotado };
 }
 

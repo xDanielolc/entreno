@@ -163,6 +163,8 @@ export function describirCiclo(prog, unidad) {
   if (c.sesiones) cortes.push(`a las ${c.sesiones} sesiones`);
   if (c.esfuerzoMin) cortes.push(`si el objetivo baja de ${c.esfuerzoMin}`);
   if (c.esfuerzoMax) cortes.push(`si llegas a ${c.esfuerzoMax}`);
+  if (c.cargaMax) cortes.push(`si el peso llega a ${formatearNumero(c.cargaMax)} ${unidad}`);
+  if (c.rmPct) cortes.push(`si el peso pasa del ${c.rmPct} % de tu 1RM`);
   if (cortes.length) partes.push(`se corta ${cortes.join(' o ')}`);
   const r = prog.reinicio ?? {};
   partes.push(r.modo === 'manual' ? 'y avisa para que prepares el siguiente'
