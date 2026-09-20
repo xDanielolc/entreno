@@ -7,7 +7,7 @@
 // Solo se ocupa del CÓDIGO de la app. Los datos del usuario nunca pasan por
 // aquí: viven en el dispositivo (IndexedDB) y en su Google Drive.
 
-const VERSION = '0.20.10';
+const VERSION = '0.20.11';
 const CACHE = `entreno-${VERSION}`;
 
 const ARCHIVOS = [

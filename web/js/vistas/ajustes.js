@@ -83,8 +83,9 @@ export function vistaAjustes(contenedor) {
           h('button', { class: 'boton secundario', onclick: () => sincronizar({ interactivo: true }) }, 'Sincronizar ahora'),
         ],
       h('button', { class: 'boton secundario', onclick: descargarCopia }, 'Descargar una copia de mis datos'),
-      !sinCuenta && h('p', { class: 'nota' }, 'En tu Google Drive, en la carpeta «App de entrenamiento», hay además dos hojas de cálculo '
-        + 'legibles (entrenamientos; ejercicios y rutinas) que se rehacen solas como mucho cada media hora.'),
+      !sinCuenta && h('p', { class: 'nota' }, 'En tu Google Drive, en la carpeta «App de entrenamiento», están el archivo de datos y dos hojas de cálculo '
+        + 'legibles (entrenamientos; ejercicios y rutinas) que se rehacen solas como mucho cada media hora. '
+        + 'Si alguno queda suelto en «Mi unidad», la app lo recoge al abrirse.'),
       !sinCuenta && h('button', { class: 'boton enlace', onclick: async () => {
         try { await rehacerCopiasLegibles(); aviso('Hojas legibles actualizadas en Google Drive.'); } catch (e) { aviso(`No se ha podido: ${e.message}`, { tipo: 'error' }); }
       } }, 'Rehacer ahora las hojas legibles'),
