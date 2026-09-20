@@ -2,7 +2,7 @@ import {
   aPesoDisponible, cargaCorporal, cargaDesdeLectura, esfuerzoTotal, formatearNumero,
   redondear, rmDeReferencia, sugerenciaSerie, trabajoSerie, tramosPropuestos, usaTramos,
 } from '../calculos.js';
-import { guiaTrasPrueba, pista } from './tutorial.js';
+import { guiaTrasPrueba, pintarGuia, pista } from './tutorial.js';
 import { queEs } from './glosario.js';
 import { abrirIntervalos } from './intervalos.js';
 import { modal } from '../ui.js';
@@ -115,7 +115,7 @@ export function vistaSesion(contenedor, { id }) {
         oninput: (e) => cambiarSesion((s) => { s.notas = e.target.value; }, { tecleo: true }) })),
 
     enCurso
-      ? h('button', { class: 'boton grande', onclick: terminar }, 'Terminar entrenamiento')
+      ? h('button', { class: 'boton grande terminar-entreno', onclick: terminar }, 'Terminar entrenamiento')
       : h('a', { class: 'boton secundario', href: '#/historial' }, 'Volver al historial'),
 
     !sesion.borrada && posicion == null
@@ -252,7 +252,7 @@ export function vistaSesion(contenedor, { id }) {
           aviso(`Apuntado: ${texto}, ${segundos >= 60 ? `${Math.round(segundos / 60)} min` : `${segundos} s`} de trabajo.`);
         } }) }, '⏱ Intervalos (HIIT)'),
 
-      indice === 0 && enCurso && pista('sesion-datos', ['estiramiento', 'movilidad', 'yoga'].includes(tipoDeEjercicio(ej))
+      indice === 0 && enCurso && !sesion.tutorial && pista('sesion-datos', ['estiramiento', 'movilidad', 'yoga'].includes(tipoDeEjercicio(ej))
         ? 'Apunta cada estiramiento al acabarlo: los segundos que has aguantado y, si te apoyas con la mano, hasta dónde llegas. '
           + 'Al escribirlos arranca el descanso.'
         : ej.esfuerzo?.tipo === 'tiempo'
@@ -350,7 +350,7 @@ export function vistaSesion(contenedor, { id }) {
   function camposTecnicas(ej, i, j, serie) {
     const campos = camposDe(serie.tecnicas);
     if (!campos.length) return null;
-    const actualizar = (fn) => cambiarSesion((s) => fn(s.ejercicios[i].series[j]), { tecleo: true });
+    const actualizar = (fn) => { cambiarSesion((s) => fn(s.ejercicios[i].series[j]), { tecleo: true }); if (sesion.tutorial) pintarGuia(); };
     return h('div', { class: 'serie-valores extras' },
       campos.map((c) => h('label', { class: 'valor' },
         h('input', { type: 'text', inputmode: 'decimal', value: serie.detalle?.[c.tecnica]?.[c.clave] ?? '',
@@ -421,7 +421,7 @@ export function vistaSesion(contenedor, { id }) {
     const asistida = tipoCarga === 'asistida';
     const cargaReal = h('small', { class: 'suave' },
       asistida && serie.carga != null ? `= ${formatearNumero(serie.carga)} kg reales` : '');
-    const actualizar = (fn) => cambiarSesion((s) => fn(s.ejercicios[i].series[j]), { tecleo: true });
+    const actualizar = (fn) => { cambiarSesion((s) => fn(s.ejercicios[i].series[j]), { tecleo: true }); if (sesion.tutorial) pintarGuia(); };
 
     const corporal = tipoCarga === 'pesoCorporal' && (serie.lastre != null || serie.carga == null);
     const cargaCorporalTexto = h('small', { class: 'suave' },
@@ -540,7 +540,7 @@ export function vistaSesion(contenedor, { id }) {
         + (t ? ` · ${formatearNumero(t)} kg de trabajo` : '') : '';
     };
     pintarTotal();
-    const actualizar = (fn) => cambiarSesion((s) => fn(s.ejercicios[i].series[j]), { tecleo: true });
+    const actualizar = (fn) => { cambiarSesion((s) => fn(s.ejercicios[i].series[j]), { tecleo: true }); if (sesion.tutorial) pintarGuia(); };
     const conCarga = ej.carga.tipo !== 'ninguna';
 
     return h('div', { class: 'tramos' },

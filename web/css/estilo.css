@@ -913,3 +913,6 @@ body:has(.modal-fondo) .guia { display: none; }
   background: var(--acento); color: var(--acento-texto); text-decoration: none; font-weight: 600;
 }
 .banda-entreno strong { text-decoration: underline; }
+
+.reglas dt { font-weight: 700; margin-top: 10px; }
+.reglas dd { margin: 2px 0 0; }

@@ -80,10 +80,10 @@ export function hacerCuestionario({ alTerminar } = {}) {
       x.perfil.tema = respuestas.tema ?? 'sistema';
     });
     // El nivel del tutorial sale de la experiencia; la guía arranca en el acto.
-    const nivel = respuestas.experiencia === 'avanzado' ? 'basico' : 'basico';
+    const nivel = respuestas.experiencia === 'avanzado' ? 'avanzado' : 'basico';
     fijarNivel(nivel);
     alTerminar?.(respuestas);
-    if (respuestas.experiencia !== 'avanzado') iniciarGuia();
+    iniciarGuia();
   };
 
   pintar();

@@ -82,7 +82,7 @@ export function explicar(clave) {
     h('button', { class: 'boton', onclick: () => cerrar() }, 'Entendido')));
 }
 
-// Lista completa, para Ajustes → Tutorial.
+// Lista completa, para Aprender.
 export function listaGlosario() {
   return h('div', { class: 'glosario' }, Object.entries(GLOSARIO).map(([k, g]) => h('details', { class: 'explicacion' },
     h('summary', {}, g.termino), h('p', {}, g.texto))));

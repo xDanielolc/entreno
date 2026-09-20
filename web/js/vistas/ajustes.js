@@ -1,4 +1,3 @@
-import { BIBLIOGRAFIA } from '../bibliografia.js';
 import { creditosCargados } from '../imagenes.js';
 import { formatearNumero } from '../calculos.js';
 import * as estado from '../estado.js';
@@ -12,10 +11,9 @@ import { calibrar, textoCalibracion } from '../formula1rm.js';
 import { TEXTO_AVISO, guardarPruebaEnCuenta } from '../modo-prueba.js';
 import { explicaciones1RM, opciones } from './ejercicios.js';
 import { tramosPorDefecto } from '../calculos.js';
-import { NIVELES, fijarNivel, iniciarGuia, nivelTutorial, pista, reiniciarPistas } from './tutorial.js';
+import { pista } from './tutorial.js';
 import { MODOS_ENTRENO } from './sesion.js';
 import { aplicarTema, hacerCuestionario } from './cuestionario.js';
-import { listaGlosario } from './glosario.js';
 
 // Ajustes: lo importante arriba (perfil y cuenta) y el resto en apartados
 // plegados, para que no se vea todo de golpe.
@@ -52,7 +50,9 @@ export function vistaAjustes(contenedor) {
   anadir(contenedor,
     h('h1', {}, 'Ajustes'),
     pista('ajustes', 'Arriba, lo que más se usa: tu nombre, tu peso y la cuenta. Lo demás está en apartados plegados; '
-      + 'toca uno para abrirlo.'),
+      + 'toca uno para abrirlo. Las explicaciones y el tutorial están en «Aprender».'),
+    h('a', { class: 'tarjeta fila-enlace', href: '#/aprender' },
+      h('div', {}, h('strong', {}, '📖 Aprender'), h('div', { class: 'suave' }, 'Tutorial, glosario, cómo decide la app qué te toca, técnicas de estiramiento y de dónde sale cada cosa.'))),
 
     h('section', { class: 'tarjeta formulario' },
       h('h2', {}, 'Perfil'),
@@ -176,28 +176,6 @@ export function vistaAjustes(contenedor) {
           estado.cambiar((x) => { const y = x.ejercicios.find((z) => z.id === e.id); if (y) { y.borrado = null; y.archivado = false; } });
           aviso(`${e.nombre} recuperado.`);
         } }, 'Recuperar'))))),
-
-    apartado('Tutorial',
-      h('p', { class: 'nota' }, 'Las notas que explican cada pantalla la primera vez. Se cierran con ✕ y no vuelven, salvo que las reactives aquí.'),
-      opciones(NIVELES, nivelTutorial(d) ?? 'basico', (n) => { fijarNivel(n); aviso('Tutorial cambiado'); }),
-      h('button', { class: 'boton secundario', onclick: () => { if (nivelTutorial(d) === 'ninguno') fijarNivel('basico'); iniciarGuia(); } },
-        'Ver la guía paso a paso'),
-      h('button', { class: 'boton secundario', onclick: () => { reiniciarPistas(); aviso('Las notas del tutorial volverán a salir.'); } },
-        'Volver a mostrar todas las notas'),
-      h('button', { class: 'boton secundario', onclick: () => hacerCuestionario() }, 'Repetir el cuestionario de bienvenida'),
-      h('h3', {}, 'Glosario'),
-      h('p', { class: 'nota' }, 'Qué significa cada palabra, explicado desde cero.'),
-      listaGlosario()),
-
-    apartado('De dónde sale cada cosa',
-      h('p', { class: 'nota' }, 'Qué recomienda la app, con qué respaldo y dónde falla.'),
-      BIBLIOGRAFIA.map((x) => h('details', { class: 'fuente' },
-        h('summary', {}, x.tema),
-        h('p', {}, x.dice),
-        h('p', { class: 'nota' }, x.matiz),
-        x.fuentes.length
-          ? h('ul', {}, x.fuentes.map((f) => h('li', {}, h('a', { href: f.url, target: '_blank', rel: 'noopener' }, f.texto))))
-          : h('p', { class: 'nota' }, 'Sin respaldo científico directo: es una decisión práctica.')))),
 
     apartado('Créditos de las imágenes',
       h('p', { class: 'nota' },

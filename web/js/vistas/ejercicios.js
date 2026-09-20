@@ -381,7 +381,7 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
       h('legend', {}, 'Fórmula del 1RM'),
       opciones(FORMULAS, borrador.formula1RM, (f) => { borrador.formula1RM = f; repintar(); }),
       pista('ficha-formula', 'El 1RM es el peso que podrías levantar una sola vez. La app lo estima a partir de cada serie '
-        + 'y con él propone pesos. «Se ajusta a ti» corrige la fórmula con tus propias series.', { avanzada: true }),
+        + 'y con él propone pesos. «Se ajusta a ti» corrige la fórmula con tus propias series.'),
       h('details', { class: 'explicacion' },
         h('summary', {}, 'Saber más'),
         explicacion && h('p', { class: 'nota' }, explicacion),

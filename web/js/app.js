@@ -14,6 +14,7 @@ import { vistaCuerpo } from './vistas/cuerpo.js';
 import { vistaFormularioRutina, vistaRutinas } from './vistas/rutinas.js';
 import { vistaSesion } from './vistas/sesion.js';
 import { pintarGuia } from './vistas/tutorial.js';
+import { vistaAprender } from './vistas/aprender.js';
 import { aplicarTema } from './vistas/cuestionario.js';
 
 // La última pantalla se recuerda: si el móvil cierra la app en mitad de un
@@ -39,6 +40,7 @@ const RUTAS = [
   { patron: /^#\/rutina\/([\w-]+)$/, vista: vistaFormularioRutina, pestana: 'inicio', params: ['id'] },
   { patron: /^#\/historial$/, vista: vistaHistorial, pestana: 'historial' },
   { patron: /^#\/ajustes$/, vista: vistaAjustes, pestana: 'ajustes' },
+  { patron: /^#\/aprender$/, vista: vistaAprender, pestana: 'ajustes' },
 ];
 
 const PESTANAS = [

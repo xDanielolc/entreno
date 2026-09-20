@@ -158,7 +158,7 @@ export function vistaInicio(contenedor) {
     h('p', { class: 'fecha-hoy' }, fechaLarga(hoyISO())),
     h('h1', {}, saludo(d.perfil.nombre)),
     tarjetaInstalar(),
-    pista('hoy', 'Qué toca hoy y cómo va tu recuperación. Si quieres más ayuda, en Ajustes → Tutorial están la guía y el glosario.'),
+    pista('hoy', 'Qué toca hoy y cómo va tu recuperación. Si quieres más ayuda, en Ajustes → Aprender están la guía y el glosario.'),
 
     necesitaPeso && h('a', { class: 'tarjeta aviso-tarjeta', href: '#/ajustes' },
       'Indica tu peso corporal en Ajustes: lo necesitan tus ejercicios con máquina asistida.'),
