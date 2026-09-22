@@ -478,7 +478,9 @@ El paso 3 no es opcional. Es la red de seguridad.
   `reinicio.modo` acepta `'rm-ciclo'` (al % del mejor 1RM logrado en ese ciclo)
   y `ciclo.generador` acepta `inicialEsfuerzo` e `incrementoEsfuerzo` (que
   suban peso y repeticiones a la vez). Planes de serie: `tramoInicio` (% del
-  1RM por el que arranca un drop set).
+  1RM por el que arranca un drop set). Estiramientos de una serie:
+  `estiramiento.asistencias` (lista; `asistencia` se mantiene con la primera,
+  para lo ya guardado) y `estiramiento.cm` (hasta dónde llegas, en centímetros).
 - **Sin cambio de versión (0.15.0).** Rutinas: `activa` puede ser true en
   varias a la vez y `diasSemana` (lista de 0 = lunes … 6 = domingo, o null).
   Ejercicios: `pesosMaquina` (lista de kg disponibles, o null) y `borrado`

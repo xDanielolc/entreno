@@ -295,6 +295,11 @@ cardio. Google: el pase se renueva a los quince minutos de margen, con
 «vigente»), como mucho cada diez minutos, nunca mientras escribes, y avisando
 antes: era el «parpadeo de la pantalla de Google» a mitad de entrenamiento.
 
+Estiramientos: `estiramiento.asistencias` (chips, varias a la vez) y
+`estiramiento.cm`, para medir por la mano y por centímetros en la misma serie.
+Al montar una rutina, `avisoChoques()` señala los días seguidos que comparten
+músculo principal. Un ejercicio nuevo arranca en doble progresión, no en ciclo.
+
 PENDIENTE: nombre e icono con Design («luego ya decoramos»); combinar varias
 ayudas y medidas en un estiramiento (mano + cm + segundos): él decide si urge;
 las casillas «apelotonadas» de la sesión: falta que diga en qué pantalla.
