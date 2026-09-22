@@ -49,13 +49,9 @@ export function vistaAjustes(contenedor) {
 
   anadir(contenedor,
     h('h1', {}, 'Ajustes'),
-    pista('ajustes', 'Arriba, lo que más se usa: tu nombre, tu peso y la cuenta. Lo demás está en apartados plegados; '
-      + 'toca uno para abrirlo. Las explicaciones y el tutorial están en «Aprender».'),
-    h('a', { class: 'tarjeta fila-enlace', href: '#/aprender' },
-      h('div', {}, h('strong', {}, '📖 Aprender'), h('div', { class: 'suave' }, 'Tutorial, glosario, cómo decide la app qué te toca, técnicas de estiramiento y de dónde sale cada cosa.'))),
-
-    h('section', { class: 'tarjeta formulario' },
-      h('h2', {}, 'Perfil'),
+    pista('ajustes', 'Todo va en apartados plegados: toca uno para abrirlo. Las explicaciones, el glosario y el '
+      + 'tutorial están en la pestaña «Aprender».'),
+    apartado('Perfil',
       h('label', { class: 'campo' },
         h('span', { class: 'etiqueta-campo' }, 'Nombre'),
         h('input', { type: 'text', value: d.perfil.nombre || '',
@@ -65,14 +61,16 @@ export function vistaAjustes(contenedor) {
         h('input', { type: 'text', inputmode: 'decimal', value: d.perfil.pesoCorporalKg ?? '',
           oninput: (e) => estado.cambiar((x) => { x.perfil.pesoCorporalKg = leerNumero(e.target.value); }, { tecleo: true }) }),
         h('small', { class: 'nota' },
-          'Solo para calcular la carga en flexiones, dominadas y máquinas asistidas; esta app no va de controlar el peso.')),
+          'Solo para calcular la carga en flexiones, dominadas y máquinas asistidas; esta app no va de controlar el peso.'))),
+
+    apartado('Personalización',
       h('div', { class: 'campo' },
         h('span', { class: 'etiqueta-campo' }, 'Tema'),
         opciones({ claro: { etiqueta: 'Claro' }, oscuro: { etiqueta: 'Oscuro' }, sistema: { etiqueta: 'Como el móvil' } }, d.perfil.tema ?? 'sistema',
-          (t) => { estado.cambiar((x) => { x.perfil.tema = t; }); aplicarTema(t); }, { compacto: true }))),
+          (t) => { estado.cambiar((x) => { x.perfil.tema = t; }); aplicarTema(t); }, { compacto: true }),
+        h('small', { class: 'nota' }, 'El diseño con nombre e icono propios llegará más adelante.'))),
 
-    h('section', { class: 'tarjeta' },
-      h('h2', {}, 'Cuenta y copia de seguridad'),
+    apartado('Cuenta y copia de seguridad',
       sinCuenta
         ? [h('p', {}, TEXTO_AVISO),
           h('button', { class: 'boton', onclick: guardarPruebaEnCuenta }, 'Entrar con Google y guardar lo hecho')]
@@ -156,18 +154,6 @@ export function vistaAjustes(contenedor) {
 
     seccionSedes(d, apartado),
 
-    apartado('Cómo se estima tu 1RM',
-      h('p', { class: 'nota' }, 'Con la fórmula de Marzagao (2026) y, si el ejercicio lo tiene en «Se ajusta a ti», un factor propio '
-        + 'que se calcula solo con tus series.'),
-      explicaciones1RM(),
-      h('details', { class: 'explicacion' },
-        h('summary', {}, 'Tu factor en cada ejercicio'),
-        h('ul', { class: 'lista-factores' }, d.ejercicios
-          .filter((e) => !e.archivado && e.carga?.tipo !== 'ninguna' && (e.formula1RM ?? 'personal') !== 'peso')
-          .map((e) => ({ e, c: calibrar(d, e) }))
-          .sort((a, b) => b.c.ventanas - a.c.ventanas || a.e.nombre.localeCompare(b.e.nombre))
-          .map(({ e, c }) => h('li', {}, h('a', { href: `#/ejercicio/${e.id}` }, e.nombre), `: ${textoCalibracion(c)}`))))),
-
     d.ejercicios.some((e) => e.borrado) && apartado(`Ejercicios borrados (${d.ejercicios.filter((e) => e.borrado).length})`,
       h('p', { class: 'nota' }, 'Conservan su historial. Recupéralos si borraste alguno sin querer.'),
       h('ul', { class: 'lista-enlaces' }, d.ejercicios.filter((e) => e.borrado).map((e) => h('li', { class: 'fila-ejercicio' },
@@ -176,19 +162,6 @@ export function vistaAjustes(contenedor) {
           estado.cambiar((x) => { const y = x.ejercicios.find((z) => z.id === e.id); if (y) { y.borrado = null; y.archivado = false; } });
           aviso(`${e.nombre} recuperado.`);
         } }, 'Recuperar'))))),
-
-    apartado('Créditos de las imágenes',
-      h('p', { class: 'nota' },
-        'Los dibujos del cuerpo y de los ejercicios vienen de ',
-        h('a', { href: 'https://wger.de', target: '_blank', rel: 'noopener' }, 'wger.de'),
-        ' y de ',
-        h('a', { href: 'https://github.com/everkinetic/data', target: '_blank', rel: 'noopener' }, 'Everkinetic'),
-        ', con licencia Creative Commons Atribución-CompartirIgual (CC-BY-SA). '
-        + 'Se usan citando a sus autores y manteniendo esa licencia. Las capas de antebrazo, hombro posterior, '
-        + 'lumbares, aductores, abductores, cuello y tibial, y los muñecos de yoga, estiramientos, movilidad y cardio, son dibujos propios de la app.'),
-      h('p', { class: 'nota' },
-        `Imágenes incluidas: ${Object.keys(creditosCargados()?.ejercicios ?? {}).length} de ejercicios `
-        + `y ${Object.keys(creditosCargados()?.musculos ?? {}).length} capas de músculo.`)),
 
     apartado('Zona de peligro',
       h('p', { class: 'nota' }, 'Dos botones que no tienen vuelta atrás. Cada uno pide escribir una palabra para confirmar.'),

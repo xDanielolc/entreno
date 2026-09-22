@@ -4,6 +4,9 @@
 // dónde sale cada recomendación.
 
 import { BIBLIOGRAFIA } from '../bibliografia.js';
+import { calibrar, textoCalibracion } from '../formula1rm.js';
+import { creditosCargados } from '../imagenes.js';
+import { explicaciones1RM } from './ejercicios.js';
 import { ASISTENCIAS, ESCALA_MANO, TECNICAS_ESTIRAMIENTO } from '../esquema.js';
 import * as estado from '../estado.js';
 import { anadir, aviso, h } from '../ui.js';
@@ -69,30 +72,76 @@ function estirar() {
       Object.values(ESCALA_MANO).join(' → ') + '. Cada vez que bajas un escalón, has ganado.'));
 }
 
+// Cómo se estima el 1RM y con qué factor propio. Venía de Ajustes: es una
+// explicación, así que su sitio es este.
+function comoSeEstimaTuRM(d) {
+  return apartado('Cómo se estima tu 1RM',
+    h('p', { class: 'nota' }, 'Con la fórmula de Marzagao (2026) y, si el ejercicio lo tiene en «Se ajusta a ti», un factor propio '
+      + 'que se calcula solo con tus series.'),
+    explicaciones1RM(),
+    h('details', { class: 'explicacion' },
+      h('summary', {}, 'Tu factor en cada ejercicio'),
+      h('ul', { class: 'lista-factores' }, d.ejercicios
+        .filter((e) => !e.archivado && e.carga?.tipo !== 'ninguna' && (e.formula1RM ?? 'personal') !== 'peso')
+        .map((e) => ({ e, c: calibrar(d, e) }))
+        .sort((a, b) => b.c.ventanas - a.c.ventanas || a.e.nombre.localeCompare(b.e.nombre))
+        .map(({ e, c }) => h('li', {}, h('a', { href: `#/ejercicio/${e.id}` }, e.nombre), `: ${textoCalibracion(c)}`)))));
+}
+
+// Los dibujos no son nuestros: quién los hizo y con qué licencia.
+function creditos() {
+  return apartado('Créditos de las imágenes',
+    h('p', { class: 'nota' },
+      'Los dibujos del cuerpo y de los ejercicios vienen de ',
+      h('a', { href: 'https://wger.de', target: '_blank', rel: 'noopener' }, 'wger.de'),
+      ' y de ',
+      h('a', { href: 'https://github.com/everkinetic/data', target: '_blank', rel: 'noopener' }, 'Everkinetic'),
+      ', con licencia Creative Commons Atribución-CompartirIgual (CC-BY-SA). '
+      + 'Se usan citando a sus autores y manteniendo esa licencia. Las capas de antebrazo, hombro posterior, '
+      + 'lumbares, aductores, abductores, cuello y tibial, y los muñecos de yoga, estiramientos, movilidad y cardio, son dibujos propios de la app.'),
+    h('p', { class: 'nota' },
+      `Imágenes incluidas: ${Object.keys(creditosCargados()?.ejercicios ?? {}).length} de ejercicios `
+      + `y ${Object.keys(creditosCargados()?.musculos ?? {}).length} capas de músculo.`));
+}
+
 function tutorial(d) {
   return apartado('Tutorial',
     h('p', { class: 'nota' }, 'La guía te pasea por las pantallas; las notas explican cada pantalla la primera vez y se cierran con ✕.'),
-    h('div', { class: 'opciones' }, Object.entries(NIVELES).map(([clave, n]) => h('button', {
-      type: 'button', class: `opcion ${(nivelTutorial(d) ?? 'basico') === clave ? 'elegida' : ''}`,
-      onclick: () => { fijarNivel(clave); aviso('Tutorial cambiado'); },
-    }, h('strong', {}, n.etiqueta), h('small', {}, n.descripcion)))),
+    (() => {
+      // Se marca la elegida a mano, sin repintar la pantalla: si no, se
+      // cerraría el apartado en cuanto tocas otra.
+      const caja = h('div', { class: 'opciones' });
+      const botones = Object.entries(NIVELES).map(([clave, n]) => h('button', {
+        type: 'button', class: `opcion ${(nivelTutorial(d) ?? 'basico') === clave ? 'elegida' : ''}`,
+        'data-nivel': clave,
+        onclick: () => {
+          fijarNivel(clave, { repintar: false });
+          for (const b of botones) b.classList.toggle('elegida', b.dataset.nivel === clave);
+          aviso(`Tutorial: ${n.etiqueta.toLowerCase()}.`);
+        },
+      }, h('strong', {}, n.etiqueta), h('small', {}, n.descripcion)));
+      anadir(caja, botones);
+      return caja;
+    })(),
     h('div', { class: 'fila-botones' },
       h('button', { class: 'boton secundario', onclick: () => { if (nivelTutorial(d) === 'ninguno') fijarNivel('basico'); iniciarGuia(); } },
-        'Ver la guía paso a paso'),
+        'Hacer el tutorial'),
       h('button', { class: 'boton secundario', onclick: () => { reiniciarPistas(); aviso('Las notas volverán a salir.'); } },
-        'Volver a mostrar las notas'),
-      h('button', { class: 'boton secundario', onclick: () => hacerCuestionario() }, 'Repetir el cuestionario de bienvenida')));
+        'Recuperar los consejos en notitas'),
+      h('button', { class: 'boton secundario', onclick: () => hacerCuestionario() }, 'Rehacer el cuestionario inicial')));
 }
 
 export function vistaAprender(contenedor) {
   const d = estado.datos();
   anadir(contenedor,
-    h('div', { class: 'cabecera-vista' }, h('h1', {}, 'Aprender'), h('a', { class: 'boton enlace', href: '#/ajustes' }, 'Ajustes')),
+    h('h1', {}, 'Aprender'),
     h('p', { class: 'suave' }, 'Todo lo que la app explica, junto: el tutorial, qué significa cada palabra y cómo decide lo que te toca.'),
     tutorial(d),
     apartado('Glosario', h('p', { class: 'nota' }, 'Qué significa cada palabra, explicado desde cero.'), listaGlosario()),
     comoDecideLaApp(),
     estirar(),
+    comoSeEstimaTuRM(d),
+    creditos(),
     apartado('De dónde sale cada cosa',
       h('p', { class: 'nota' }, 'Qué recomienda la app, con qué respaldo y dónde falla.'),
       BIBLIOGRAFIA.map((x) => h('details', { class: 'fuente' },

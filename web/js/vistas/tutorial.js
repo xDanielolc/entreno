@@ -29,11 +29,13 @@ export function nivelTutorial(d) {
   return config(d).nivel ?? null;
 }
 
-export function fijarNivel(nivel) {
+// repintar: false deja la pantalla como está, para que no se cierre el
+// apartado abierto mientras cambias de nivel.
+export function fijarNivel(nivel, { repintar = true } = {}) {
   estado.cambiar((x) => {
     x.perfil.tutoriales ??= { nivel: null, vistos: {} };
     x.perfil.tutoriales.nivel = nivel;
-  });
+  }, repintar ? {} : { tecleo: true });
 }
 
 export function marcarVista(clave) {

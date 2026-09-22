@@ -40,7 +40,7 @@ const RUTAS = [
   { patron: /^#\/rutina\/([\w-]+)$/, vista: vistaFormularioRutina, pestana: 'inicio', params: ['id'] },
   { patron: /^#\/historial$/, vista: vistaHistorial, pestana: 'historial' },
   { patron: /^#\/ajustes$/, vista: vistaAjustes, pestana: 'ajustes' },
-  { patron: /^#\/aprender$/, vista: vistaAprender, pestana: 'ajustes' },
+  { patron: /^#\/aprender$/, vista: vistaAprender, pestana: 'aprender' },
 ];
 
 const PESTANAS = [
@@ -48,6 +48,7 @@ const PESTANAS = [
   { id: 'cuerpo', texto: 'Cuerpo', icono: '🧍', href: '#/cuerpo' },
   { id: 'ejercicios', texto: 'Ejercicios', icono: '🏋️', href: '#/ejercicios' },
   { id: 'historial', texto: 'Historial', icono: '📅', href: '#/historial' },
+  { id: 'aprender', texto: 'Aprender', icono: '📖', href: '#/aprender' },
   { id: 'ajustes', texto: 'Ajustes', icono: '⚙️', href: '#/ajustes' },
 ];
 
