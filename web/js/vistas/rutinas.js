@@ -10,7 +10,8 @@ import { anadir, aviso, confirmar, h, hoyISO, nuevoId } from '../ui.js';
 import { campo } from './ejercicios.js';
 import { ejercicioDesdeCatalogo, elegirEjercicio as abrirSelector } from './selector-ejercicios.js';
 import { tipoDePlantilla, tipoDeRutina, PLANTILLAS, anadirPlantilla, ejerciciosNuevos } from '../plantillas.js';
-import { normalizar } from '../catalogo.js';
+import { cuentaParaFatiga, normalizar } from '../catalogo.js';
+import { nombreMusculo } from '../musculos.js';
 import { pista } from './tutorial.js';
 import { conGlosario } from './glosario.js';
 
@@ -279,6 +280,8 @@ export function vistaFormularioRutina(contenedor, { id }) {
       h('option', { value: '' }, 'En cualquier sitio'),
       sedesActivas(d).map((s) => h('option', { value: s.id, selected: s.id === borrador.sedeId }, nombreSede(d, s.id))))),
 
+      avisoChoques(),
+
       borrador.dias.map((dia, i) => tarjetaDia(dia, i)),
 
       h('button', { type: 'button', class: 'boton secundario', onclick: () => {
@@ -292,6 +295,40 @@ export function vistaFormularioRutina(contenedor, { id }) {
         h('button', { class: 'boton', type: 'submit' }, 'Listo')),
 
       existente && h('button', { type: 'button', class: 'boton enlace peligro-texto', onclick: borrar }, 'Borrar rutina'));
+  }
+
+  // Dos días seguidos que cargan los mismos músculos no se pueden hacer en
+  // días seguidos: conviene saberlo al montarla, no al chocarse con ello.
+  function avisoChoques() {
+    const principales = (dia) => {
+      const musculos = new Set();
+      for (const item of dia.ejercicios) {
+        const ej = d.ejercicios.find((e) => e.id === item.ejercicioId);
+        if (!ej || !cuentaParaFatiga(ej)) continue;
+        for (const m of ej.musculos?.principales ?? []) musculos.add(m);
+      }
+      return musculos;
+    };
+    const choques = [];
+    // Con dos días solo hay una pareja; con tres o más se mira también la
+    // vuelta del último al primero, que es la que se repite cada semana.
+    const parejas = borrador.dias.length < 2 ? 0
+      : borrador.dias.length === 2 ? 1 : borrador.dias.length;
+    for (let i = 0; i < parejas; i++) {
+      const a = borrador.dias[i];
+      const b = borrador.dias[(i + 1) % borrador.dias.length];
+      if (a === b) continue;
+      const enB = principales(b);
+      const comunes = [...principales(a)].filter((m) => enB.has(m));
+      if (comunes.length >= 1) choques.push({ a, b, comunes });
+    }
+    if (!choques.length) return null;
+    return h('div', { class: 'tarjeta aviso-tarjeta' },
+      h('p', {}, 'Ojo con el orden: hay días seguidos que cargan los mismos músculos, así que no podrás hacerlos un día detrás de otro.'),
+      h('ul', {}, choques.map((c) => h('li', {},
+        `${c.a.nombre} y ${c.b.nombre}: ${c.comunes.map((m) => nombreMusculo(m)).join(', ')}.`))),
+      h('p', { class: 'nota' }, 'No es un error: puedes dejar un día de descanso entre medias o cambiar el orden. '
+        + 'La app, de todas formas, te propondrá el día que mejor recuperado tengas.'));
   }
 
   function tarjetaDia(dia, i) {

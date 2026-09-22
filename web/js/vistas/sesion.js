@@ -396,15 +396,34 @@ export function vistaSesion(contenedor, { id }) {
     const actual = { ...ej.estiramiento, ...serie.estiramiento };
     const guardar = (clave, valor) => cambiarSesion((s) => {
       const x = s.ejercicios[i].series[j];
-      x.estiramiento = { ...ej.estiramiento, ...x.estiramiento, [clave]: valor || null };
+      x.estiramiento = { ...ej.estiramiento, ...x.estiramiento, [clave]: valor === '' || valor == null ? null : valor };
     });
     const desplegable = (clave, catalogo, vacio) => h('select', { 'aria-label': vacio, onchange: (e) => guardar(clave, e.target.value) },
       h('option', { value: '' }, vacio),
       Object.entries(catalogo).map(([k, v]) => h('option', { value: k, selected: k === actual[clave] }, v.etiqueta ?? v)));
+    // Las ayudas se pueden combinar (cinta y pared, por ejemplo) y se puede
+    // medir por varios sitios a la vez: la escala de la mano y centímetros.
+    const ayudas = actual.asistencias ?? (actual.asistencia ? [actual.asistencia] : []);
+    const cambiarAyuda = (clave, marcada) => {
+      const nuevas = ayudas.filter((x) => x !== clave && x !== 'ninguna');
+      if (marcada && clave !== 'ninguna') nuevas.push(clave);
+      cambiarSesion((s) => {
+        const x = s.ejercicios[i].series[j];
+        x.estiramiento = { ...ej.estiramiento, ...x.estiramiento, asistencias: nuevas, asistencia: nuevas[0] ?? null };
+      });
+    };
     return h('div', { class: 'serie-estiramiento' },
       desplegable('tecnica', TECNICAS_ESTIRAMIENTO, 'Técnica'),
-      desplegable('asistencia', ASISTENCIAS, 'Ayuda'),
-      actual.asistencia === 'mano' && desplegable('nivel', ESCALA_MANO, 'Apoyo de la mano'),
+      h('div', { class: 'chips' }, Object.entries(ASISTENCIAS).filter(([k]) => k !== 'ninguna').map(([k, v]) => h('button', {
+        type: 'button', class: `chip seleccionable ${ayudas.includes(k) ? 'activo' : ''}`,
+        'aria-pressed': String(ayudas.includes(k)),
+        onclick: () => cambiarAyuda(k, !ayudas.includes(k)),
+      }, v.etiqueta ?? v))),
+      ayudas.includes('mano') && desplegable('nivel', ESCALA_MANO, 'Apoyo de la mano'),
+      h('label', { class: 'valor' },
+        h('span', { class: 'et' }, 'Hasta dónde llegas (cm)'),
+        h('input', { type: 'text', inputmode: 'decimal', value: actual.cm ?? '', 'aria-label': 'Centímetros que te faltan o que llegas',
+          oninput: (e) => guardar('cm', leerNumero(e.target.value)) })),
       actual.tecnica && h('small', { class: 'nota bloque' }, TECNICAS_ESTIRAMIENTO[actual.tecnica]?.descripcion));
   }
 
