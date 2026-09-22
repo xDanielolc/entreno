@@ -145,7 +145,10 @@ function ejercicioVacio() {
     series: [],
     notas: '',
   };
-  base.series = [serieNuevaPlantilla(base, { tipo: 'bilbo', progresion: 'bilbo' })];
+  // Un ejercicio nuevo arranca con la regla que recomendamos: la doble
+  // progresion. Sube repeticiones y, al llegar arriba, sube el peso; no
+  // necesita ni 1RM ni ciclo montado. Se cambia en un toque.
+  base.series = [serieNuevaPlantilla(base, { tipo: 'libre', progresion: 'carga' })];
   return base;
 }
 
