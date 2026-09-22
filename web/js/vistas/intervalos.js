@@ -51,7 +51,14 @@ function pitar(frecuencia = 880, duracion = 0.15, volumen = 0.25) {
 export function abrirIntervalos({ alTerminar } = {}) {
   const perfil = estado.datos()?.perfil ?? {};
   const guardado = perfil.hiit ?? { preset: 'tabata' };
-  const config = { ...PRESETS_HIIT[guardado.preset ?? 'tabata'], ...(guardado.preset === 'personalizado' ? guardado : {}), preset: guardado.preset ?? 'tabata' };
+  // Los tuyos, guardados desde aquí, salen junto a los de siempre.
+  const mios = () => estado.datos()?.perfil?.hiitPropios ?? [];
+  const todos = () => ({
+    ...PRESETS_HIIT,
+    ...Object.fromEntries(mios().map((x, i) => [`mio-${i}`, { ...x, etiqueta: x.nombre, descripcion: `Tuyo: ${x.trabajo} s de trabajo y ${x.descanso} s de descanso, ${x.rondas} rondas.` }])),
+  });
+  const base = todos()[guardado.preset] ?? PRESETS_HIIT.tabata;
+  const config = { ...base, ...(guardado.preset === 'personalizado' ? guardado : {}), preset: guardado.preset ?? 'tabata' };
 
   let cerrar = null;
   const pintarConfig = () => {
@@ -62,14 +69,23 @@ export function abrirIntervalos({ alTerminar } = {}) {
         oninput: (e) => { config[clave] = Math.max(0, Math.round(Number(String(e.target.value).replace(',', '.')) || 0)); config.preset = 'personalizado'; } }));
     cerrar = modal('Intervalos', h('div', { class: 'formulario intervalos-config' },
       h('p', { class: 'nota' }, 'Tramos cortos a tope y descansos, varias veces seguidas. Elige uno o pon el tuyo. ', queEs('hiit')),
-      h('div', { class: 'opciones compacto', role: 'radiogroup' }, Object.entries(PRESETS_HIIT).map(([k, p]) => h('button', {
+      h('div', { class: 'opciones compacto', role: 'radiogroup' }, Object.entries(todos()).map(([k, p]) => h('button', {
         type: 'button', role: 'radio', 'aria-checked': String(k === config.preset), class: `opcion ${k === config.preset ? 'elegida' : ''}`,
         onclick: () => { Object.assign(config, { trabajo: p.trabajo, descanso: p.descanso, rondas: p.rondas, preset: k }); pintarConfig(); },
       }, h('strong', {}, p.etiqueta)))),
-      h('p', { class: 'nota' }, PRESETS_HIIT[config.preset]?.descripcion ?? ''),
+      h('p', { class: 'nota' }, todos()[config.preset]?.descripcion ?? ''),
       h('div', { class: 'fila-campos' },
         campo('Trabajo (s)', 'trabajo'), campo('Descanso (s)', 'descanso'), campo('Rondas', 'rondas')),
       h('p', { class: 'nota' }, `Total: ${duracionTexto((config.trabajo + config.descanso) * config.rondas)}. Suena un pitido en cada cambio y tres avisos antes.`),
+      h('button', { class: 'boton enlace', type: 'button', onclick: () => {
+        const nombre = `${config.trabajo}/${config.descanso} × ${config.rondas}`;
+        estado.cambiar((x) => {
+          x.perfil.hiitPropios = [...(x.perfil.hiitPropios ?? []).filter((y) => y.nombre !== nombre),
+            { nombre, trabajo: config.trabajo, descanso: config.descanso, rondas: config.rondas }];
+        }, { tecleo: true });
+        config.preset = `mio-${(estado.datos().perfil.hiitPropios ?? []).length - 1}`;
+        pintarConfig();
+      } }, 'Guardar estos intervalos como míos'),
       h('button', { class: 'boton grande', onclick: () => {
         if (!(config.trabajo > 0) || !(config.rondas > 0)) return;
         estado.cambiar((x) => { x.perfil.hiit = { preset: config.preset, trabajo: config.trabajo, descanso: config.descanso, rondas: config.rondas }; }, { tecleo: true });
@@ -155,7 +171,57 @@ function correr(config, alTerminar) {
     cerrar();
     if (!completo && fases[i]?.tipo === 'trabajo') hechoSeg += fases[i].seg - restante();
     const rondasHechas = completo ? config.rondas : Math.max(0, fases[Math.min(i, fases.length - 1)]?.ronda - (fases[i]?.tipo === 'trabajo' ? 1 : 0));
-    const texto = `${PRESETS_HIIT[config.preset]?.etiqueta ?? 'Intervalos'} ${config.trabajo}/${config.descanso} × ${rondasHechas}${completo ? '' : ` (parado en la ronda ${fases[i]?.ronda ?? config.rondas})`}`;
+    const texto = `Intervalos ${config.trabajo}/${config.descanso} × ${rondasHechas}${completo ? '' : ` (parado en la ronda ${fases[i]?.ronda ?? config.rondas})`}`;
     if (hechoSeg > 0) alTerminar?.(hechoSeg, texto);
+  }
+}
+
+
+// ---------------------------------------------------------------------------
+// Cronómetro sencillo: cuenta hacia arriba y apunta el tiempo al pararlo
+// ---------------------------------------------------------------------------
+//
+// Para cardio continuo (caminar, correr, bici) y para cualquier serie que se
+// mida en tiempo. Va por hora de inicio, así que sigue bien aunque el móvil
+// apague la pantalla.
+export function abrirCronometro({ alTerminar } = {}) {
+  const inicio = Date.now();
+  let pausadoEn = null;
+  let restado = 0;
+  let wakeLock = null;
+  navigator.wakeLock?.request?.('screen').then((w) => { wakeLock = w; }).catch(() => {});
+
+  const transcurrido = () => Math.floor(((pausadoEn ?? Date.now()) - inicio - restado) / 1000);
+  const tiempo = h('div', { class: 'intervalos-tiempo' });
+  const botonPausa = h('button', { class: 'boton secundario', onclick: () => pausar() }, 'Pausa');
+  const caja = h('div', { class: 'intervalos' },
+    h('div', { class: 'intervalos-fase' }, 'En marcha'),
+    tiempo,
+    h('p', { class: 'nota' }, 'Al parar se apunta el tiempo en la serie.'),
+    h('div', { class: 'fila-botones' },
+      botonPausa,
+      h('button', { class: 'boton', onclick: () => parar() }, 'Parar y apuntar')));
+  const cerrar = modal('Cronómetro', caja);
+  const reloj = setInterval(pintar, 250);
+  pintar();
+
+  function pintar() {
+    const s = Math.max(0, transcurrido());
+    const h1 = Math.floor(s / 3600);
+    tiempo.textContent = (h1 ? `${h1}:${String(Math.floor((s % 3600) / 60)).padStart(2, '0')}` : `${Math.floor(s / 60)}`)
+      + `:${String(s % 60).padStart(2, '0')}`;
+  }
+
+  function pausar() {
+    if (pausadoEn == null) { pausadoEn = Date.now(); botonPausa.textContent = 'Seguir'; }
+    else { restado += Date.now() - pausadoEn; pausadoEn = null; botonPausa.textContent = 'Pausa'; }
+  }
+
+  function parar() {
+    clearInterval(reloj);
+    wakeLock?.release?.();
+    cerrar();
+    const s = Math.max(0, transcurrido());
+    if (s > 0) alTerminar?.(s);
   }
 }

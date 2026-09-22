@@ -219,7 +219,8 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
   // maquinaPlacas y esfuerzo.tipo, que es lo que usa el resto de la app.
   const CARGAS = {
     libre: { etiqueta: 'Peso libre', descripcion: 'Barra, mancuernas, kettlebell. Apuntas los kilos.' },
-    placas: { etiqueta: 'Máquina de placas o polea', descripcion: 'Los pesos van de placa en placa: la app solo propone pesos que existan.' },
+    placas: { etiqueta: 'Máquina de placas o polea', descripcion: 'La del pincho: el peso va de placa en placa (5, 10, 15…) y no hay nada entre medias. '
+      + 'Diciéndolo aquí, la app nunca te pedirá un peso que esa máquina no tiene.' },
     pesoCorporal: { etiqueta: 'Mi peso corporal', descripcion: 'Flexiones, dominadas, fondos. Apuntas solo el lastre, si llevas.' },
     asistida: { etiqueta: 'Máquina asistida', descripcion: 'La máquina te quita peso. Apuntas los kilos de ayuda.' },
     altura: { etiqueta: 'Altura o distancia de salto', descripcion: 'Saltos al cajón, pliometría, ladrillo del yoga. Apuntas centímetros.' },
@@ -518,6 +519,8 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
     if (conCarga && reps) lista.programa = { etiqueta: 'Programa (5×5, 5/3/1, HST)', descripcion: 'Un programa clásico con las series de cada sesión ya decididas.' };
     if (conCarga && reps) lista['maximo-trabajo'] = { etiqueta: 'Máximo trabajo', descripcion: 'Experimental: el peso con el que más kilos totales mueves.' };
     lista.libre = { etiqueta: 'Yo decido', descripcion: 'La app solo apunta y te recuerda lo último.' };
+    // En cardio, el programa clásico y el máximo trabajo no pintan nada.
+    if (tipoDeEjercicio(borrador) === 'cardio') { delete lista.programa; delete lista['maximo-trabajo']; }
     return lista;
   }
 
@@ -559,7 +562,8 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
       h('small', { class: 'nota' }, reglas[plan.progresion.tipo]?.descripcion ?? ''),
       detalleProgresion(plan),
 
-      h('details', { class: 'explicacion', open: plan.tecnicas.length > 0 || undefined },
+      !['cardio', 'estiramiento', 'movilidad', 'yoga'].includes(tipoDeEjercicio(borrador))
+      && h('details', { class: 'explicacion', open: plan.tecnicas.length > 0 || undefined },
         h('summary', {}, plan.tecnicas.length ? `Técnicas: ${plan.tecnicas.map((k) => TECNICAS[k]?.etiqueta ?? k).join(', ')}` : 'Técnicas de intensidad (opcional)'),
         selectorTecnicas(plan.tecnicas, (nuevas) => {
           plan.tecnicas = nuevas;
@@ -579,46 +583,62 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
   // Cómo se rellenan los tramos cada vez que el ejercicio entra en un
   // entrenamiento: como la última vez, con los ajustes generales o con lo
   // que se guarde aquí. Y, en máquinas de placas, una secuencia de pesos fija.
+  // Cómo se rellenan las bajadas (o miniseries) cada vez que el ejercicio
+  // entra en un entrenamiento. Una sola pregunta: de dónde salen los pesos.
+  // Debajo, los números: cuántas, por dónde empieza y cuánto baja cada vez.
   function seccionTramos(plan, tramos) {
     const defecto = tramosPorDefecto(d.perfil, tramos.tecnica);
-    plan.tramosModo ??= 'ultima';
     const esDrop = tramos.tecnica === 'drop-set';
     const fijos = Boolean(plan.tramosFijos?.length);
-    // Una sola pregunta: de dónde salen las bajadas (o miniseries) cada vez.
+    plan.tramosModo ??= 'ultima';
+
+    // El modo que se enseña sale de lo guardado: los pesos fijos mandan, y
+    // si no, la plantilla se parte en «los calcula la app» y «a mano».
+    const modoActual = fijos ? 'fijos'
+      : plan.tramosModo !== 'plantilla' ? 'ultima'
+        : ((plan.modoCarga ?? d.perfil.dropSet?.modoCarga ?? 'rm') === 'kg' ? 'mano' : 'auto');
+
     const modos = {
-      ultima: { etiqueta: 'Como la última vez', descripcion: 'Mismos tramos y pesos que la última vez que lo hiciste.' },
-      ajustes: { etiqueta: 'Lo de Ajustes', descripcion: `${defecto.tramos} ${tramos.nombre.toLowerCase()}s`
-        + (defecto.reps ? ` de ${defecto.reps} repeticiones` : '') + (defecto.salto ? `, bajando ${defecto.salto}` : '') + '.' },
-      plantilla: { etiqueta: 'Lo que ponga aquí', descripcion: 'Los valores de debajo, siempre.' },
+      ultima: { etiqueta: 'Como la última vez', descripcion: `Los mismos pesos y ${tramos.nombre.toLowerCase()}s que la última vez que lo hiciste.` },
+      auto: { etiqueta: 'Que los calcule la app', descripcion: esDrop
+        ? 'Arranca a un porcentaje de tu 1RM del día y va bajando. Si cambias el peso de la serie de arriba, las bajadas se recalculan solas.'
+        : 'Los mismos números en cada entrenamiento, calculados con tu 1RM del día.' },
+      mano: { etiqueta: 'Los kilos que yo ponga', descripcion: 'Se quedan como los dejes, sin recalcular.' },
     };
     if (esDrop) modos.fijos = { etiqueta: 'Pesos fijos de la máquina', descripcion: 'Una lista de pesos, siempre la misma.' };
-    const modoActual = fijos ? 'fijos' : plan.tramosModo;
-    const modosCarga = {
-      '': { etiqueta: 'Lo de Ajustes' },
-      rm: { etiqueta: '% del 1RM de hoy' },
-      kg: { etiqueta: 'Kilos a mano' },
+
+    const elegir = (modo) => {
+      if (modo === 'fijos') { plan.tramosModo = 'plantilla'; plan.pedirFijos = true; plan.tramosFijos ??= null; }
+      else if (modo === 'ultima') { plan.tramosModo = 'ultima'; plan.tramosFijos = null; plan.pedirFijos = false; }
+      else {
+        plan.tramosModo = 'plantilla';
+        plan.tramosFijos = null;
+        plan.pedirFijos = false;
+        plan.modoCarga = modo === 'mano' ? 'kg' : 'rm';
+      }
+      repintar();
     };
+
+    const conNumeros = modoActual === 'auto' || modoActual === 'mano';
+    const unidadSalto = modoActual === 'auto' ? '% del 1RM' : (TIPOS_CARGA[borrador.carga.tipo]?.unidad || 'kg');
+
     return h('div', { class: 'campo' },
-      h('span', { class: 'etiqueta-campo' }, `${tramos.nombre}s: de dónde salen cada vez`),
-      opciones(modos, modoActual, (modo) => {
-        if (modo === 'fijos') { plan.tramosFijos ??= []; if (!plan.tramosFijos.length) plan.tramosFijos = null; plan.tramosModo = 'plantilla'; plan.pedirFijos = true; }
-        else { plan.tramosModo = modo; plan.tramosFijos = null; plan.pedirFijos = false; }
-        repintar();
-      }),
-      modoActual === 'plantilla' && !plan.pedirFijos && h('div', { class: 'fila-campos' },
+      h('span', { class: 'etiqueta-campo' }, `${tramos.nombre}s: de dónde salen los pesos`),
+      opciones(modos, modoActual, elegir),
+      conNumeros && h('div', { class: 'fila-campos' },
         campo(`${tramos.nombre}s`, numeroInput(plan.tramosPrevistos ?? defecto.tramos,
           (v) => { plan.tramosPrevistos = v == null ? null : Math.max(1, Math.round(v)); })),
-        tramos.tecnica !== 'drop-set' && campo('Repeticiones por miniserie',
+        esDrop && modoActual === 'auto' && campo('Empieza al (% del 1RM)',
+          numeroInput(plan.tramoInicio ?? d.perfil.dropSet?.inicioPorcentaje ?? 80, (v) => { plan.tramoInicio = v; })),
+        !esDrop && campo('Repeticiones por miniserie',
           numeroInput(plan.tramoReps ?? defecto.reps, (v) => { plan.tramoReps = v; })),
-        tramos.salto > 0 && campo(`Se baja cada vez (${(plan.modoCarga ?? d.perfil.dropSet?.modoCarga ?? 'rm') === 'rm' ? '% del 1RM' : 'kg'})`,
+        tramos.salto > 0 && campo(`Baja cada vez (${unidadSalto})`,
           numeroInput(plan.tramoSalto ?? defecto.salto, (v) => { plan.tramoSalto = v; }))),
-      esDrop && modoActual !== 'fijos' && h('div', { class: 'campo' },
-        h('span', { class: 'etiqueta-campo' }, 'Los kilos de cada bajada se calculan por'),
-        opciones(modosCarga, plan.modoCarga ?? '', (m) => { plan.modoCarga = m || null; repintar(); }, { compacto: true }),
-        h('small', { class: 'nota' }, 'Por % del 1RM, los kilos salen de lo que hagas ese día en la serie de arriba; a mano, se quedan como los dejes.')),
+      conNumeros && esDrop && h('small', { class: 'nota' },
+        `Vacío = lo de Ajustes (${d.perfil.dropSet?.bajadas ?? 4} bajadas, empieza al ${d.perfil.dropSet?.inicioPorcentaje ?? 80} % y baja ${d.perfil.dropSet?.salto ?? 10} cada vez).`),
       (modoActual === 'fijos' || plan.pedirFijos) && campo('Pesos fijos (máquina de placas)',
         h('input', { type: 'text', placeholder: 'Por ejemplo: 50 42,5 35 27,5',
-          value: (plan.tramosFijos || []).map((p) => formatearNumero(p)).join(' '),
+          value: (plan.tramosFijos || []).map((x) => formatearNumero(x)).join(' '),
           oninput: (e) => {
             const pesos = e.target.value.split(/[;/\s]+/).map((x) => leerNumero(x)).filter((x) => x != null);
             plan.tramosFijos = pesos.length ? pesos : null;

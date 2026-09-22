@@ -4,7 +4,7 @@ import {
 } from '../calculos.js';
 import { guiaTrasPrueba, pintarGuia, pista } from './tutorial.js';
 import { queEs } from './glosario.js';
-import { abrirIntervalos } from './intervalos.js';
+import { abrirCronometro, abrirIntervalos } from './intervalos.js';
 import { modal } from '../ui.js';
 import * as estado from '../estado.js';
 import {
@@ -240,18 +240,13 @@ export function vistaSesion(contenedor, { id }) {
 
       referencia1RM(ej, entrada),
 
-      enCurso && tipoDeEjercicio(ej) === 'cardio' && ej.esfuerzo.tipo === 'tiempo'
-        && h('button', { class: 'boton secundario', onclick: () => abrirIntervalos({ alTerminar: (segundos, texto) => {
-          cambiarSesion((s) => {
-            const e = s.ejercicios[indice];
-            let serie = e.series.find((x) => !x.hecha);
-            if (!serie) { serie = serieSuelta({ tipo: 'libre' }); e.series.push(serie); }
-            serie.esfuerzo = segundos;
-            serie.hecha = true;
-            e.notas = [e.notas, texto].filter(Boolean).join(' · ');
-          });
-          aviso(`Apuntado: ${texto}, ${segundos >= 60 ? `${Math.round(segundos / 60)} min` : `${segundos} s`} de trabajo.`);
-        } }) }, '⏱ Intervalos (HIIT)'),
+      // Cualquier ejercicio que se mida en tiempo puede usar el cronómetro y
+      // los intervalos: el tiempo se apunta solo en la primera serie vacía.
+      enCurso && esTiempo(ej) && h('div', { class: 'fila-botones' },
+        h('button', { class: 'boton secundario', onclick: () => abrirCronometro({
+          alTerminar: (segundos) => apuntarTiempo(indice, segundos, null) }) }, '⏱ Cronómetro'),
+        h('button', { class: 'boton secundario', onclick: () => abrirIntervalos({
+          alTerminar: (segundos, texto) => apuntarTiempo(indice, segundos, texto) }) }, '🔁 Intervalos (HIIT)')),
 
       indice === 0 && enCurso && !sesion.tutorial && pista('sesion-datos', ['estiramiento', 'movilidad', 'yoga'].includes(tipoDeEjercicio(ej))
         ? 'Apunta cada estiramiento al acabarlo: los segundos que has aguantado y, si te apoyas con la mano, hasta dónde llegas. '
@@ -696,6 +691,20 @@ export function vistaSesion(contenedor, { id }) {
       estado.cambiar((x) => { const e = x.ejercicios.find((y) => y.id === ej.id); if (e) e.recamaraPorDefecto = valor; });
       aviso(`${ej.nombre}: ${valor} en recámara por defecto. Se cambia en su ficha (Ajustes finos).`);
     } } });
+  }
+
+  // Lo que devuelven el cronómetro y los intervalos: va a la primera serie
+  // sin hacer de ese ejercicio, y si no queda ninguna se crea una.
+  function apuntarTiempo(indice, segundos, texto) {
+    cambiarSesion((s) => {
+      const e = s.ejercicios[indice];
+      let serie = e.series.find((x) => !x.hecha && x.esfuerzo == null);
+      if (!serie) { serie = serieSuelta({ tipo: 'libre' }); e.series.push(serie); }
+      serie.esfuerzo = segundos;
+      serie.hecha = true;
+      if (texto) e.notas = [e.notas, texto].filter(Boolean).join(' · ');
+    });
+    aviso(`Apuntado: ${formatearTiempo(segundos)}${texto ? ` (${texto})` : ''}.`);
   }
 
   function descansoEntreSeries(ej) {
