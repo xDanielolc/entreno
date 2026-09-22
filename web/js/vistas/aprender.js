@@ -72,7 +72,10 @@ function estirar() {
     h('p', {}, h('strong', {}, 'Ayudas. '), Object.values(ASISTENCIAS).join(', ') + '. Se marcan en cada serie del estiramiento.'),
     h('p', {}, h('strong', {}, 'La escala de la mano. '), 'Para medir hasta dónde llegas sin cinta métrica: apoyas la mano en el suelo y '
       + 'miras qué parte te sostiene. De más alto a más bajo: ',
-      Object.values(ESCALA_MANO).join(' → ') + '. Cada vez que bajas un escalón, has ganado.'));
+      Object.values(ESCALA_MANO).join(' → ') + '. Cada vez que bajas un escalón, has ganado.'),
+    h('p', { class: 'nota' }, 'Si no te imaginas la postura de la mano, se ve muy claro en los vídeos de ',
+      h('a', { href: 'https://www.youtube.com/@Matthewismith', target: '_blank', rel: 'noopener' }, 'Matthew Ismith'),
+      ', que es de donde viene la idea de medir así.'));
 }
 
 // Cómo se estima el 1RM y con qué factor propio. Venía de Ajustes: es una

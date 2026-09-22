@@ -56,9 +56,9 @@ export function olvidarToken({ revocar = false } = {}) {
 // Pide un token. Con «silencioso» no muestra la pantalla de elegir cuenta si
 // ya se dio permiso antes; aun así el navegador puede bloquear la ventana si
 // no viene de un toque del usuario, y entonces hay que pedirlo con un botón.
-export async function pedirToken({ silencioso = false, pista = null } = {}) {
+export async function pedirToken({ silencioso = false, pista = null, forzar = false } = {}) {
   const vigente = tokenVigente();
-  if (vigente) return vigente;
+  if (vigente && !forzar) return vigente;
   await cargarScript();
 
   return new Promise((resolver, rechazar) => {

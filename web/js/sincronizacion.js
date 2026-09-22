@@ -244,25 +244,50 @@ estado.suscribir((motivo) => {
 });
 window.addEventListener('online', () => programar(500));
 
-// El pase de Google dura una hora. Para que no «se salga de la cuenta» a
-// mitad de entrenamiento, se renueva en silencio aprovechando cualquier toque
-// del usuario (el navegador solo deja abrir la ventana de Google, aunque se
-// cierre sola, dentro de un toque). Si Google pidiera intervención, no se
-// insiste: el indicador de arriba queda en rojo y con un toque se arregla.
+// El pase de Google dura una hora y hay que renovarlo, y al renovarlo Google
+// abre su ventana un instante aunque no pida nada. Para que ese parpadeo no
+// te pille a media serie:
+//   · se renueva pronto, cuando quedan 15 minutos, no al filo;
+//   · como mucho una vez cada diez minutos;
+//   · nunca mientras escribes en una casilla;
+//   · mejor al volver a la app que a mitad de uso;
+//   · y se avisa antes con un cartel, para que no sea una sorpresa.
+// Si Google pidiera intervención, no se insiste: el indicador de arriba queda
+// en rojo y con un toque se arregla.
 let ultimaRenovacion = 0;
-document.addEventListener('click', () => {
-  if (!estado.usuario() || estado.esSinCuenta() || !navigator.onLine) return;
+
+function tocaRenovar() {
+  if (!estado.usuario() || estado.esSinCuenta() || !navigator.onLine) return false;
   const minutos = minutosDeToken();
-  if (minutos != null && minutos > 12) return;
-  if (Date.now() - ultimaRenovacion < 3 * 60_000) return;
+  if (minutos == null || minutos > 15) return false;
+  return Date.now() - ultimaRenovacion >= 10 * 60_000;
+}
+
+async function renovarPase() {
   ultimaRenovacion = Date.now();
-  pedirToken({ silencioso: true, pista: estado.usuario() })
-    .then(() => sincronizar())
-    .catch(() => {});
+  try {
+    const { aviso } = await import('./ui.js');
+    aviso('Renovando el permiso de Google: verás su ventana un instante.', { ms: 6000 });
+  } catch { /* sin aviso, da igual */ }
+  try {
+    await pedirToken({ silencioso: true, forzar: true, pista: estado.usuario() });
+    await sincronizar();
+  } catch { /* el indicador de arriba se pone en rojo */ }
+}
+
+document.addEventListener('click', (e) => {
+  // Ni mientras escribes ni mientras tocas una casilla del entrenamiento.
+  if (e.target?.closest?.('input, textarea, select')) return;
+  if (!tocaRenovar()) return;
+  renovarPase();
 }, true);
+
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') {
     estado.guardarYa();
     if (estado.meta()?.pendiente && tokenVigente()) sincronizar();
+    return;
   }
+  // Al volver a la app: buen momento para renovar sin estorbar.
+  if (tocaRenovar()) renovarPase();
 });
