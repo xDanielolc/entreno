@@ -21,6 +21,22 @@ export const TIPOS_ESFUERZO = {
   distancia:    { etiqueta: 'Distancia',    unidad: 'km' },
 };
 
+// Lo que se apunta en cada serie, en orden: la primera es la principal (la
+// que llevan las reglas) y las demás se apuntan al lado. Los ejercicios
+// antiguos tenían una principal y, como mucho, una extra.
+export function medidasDe(ejercicio) {
+  if (ejercicio?.medidas?.length) return ejercicio.medidas;
+  const lista = [ejercicio?.esfuerzo?.tipo ?? 'repeticiones'];
+  if (ejercicio?.esfuerzoExtra?.tipo) lista.push(ejercicio.esfuerzoExtra.tipo);
+  return lista;
+}
+
+// Lo apuntado en una medida que no es la principal.
+export function extraDeSerie(serie, tipo) {
+  if (serie?.extras && tipo in serie.extras) return serie.extras[tipo];
+  return serie?.esfuerzoExtra ?? null;   // formato antiguo: solo había una
+}
+
 export const TIPOS_PROGRESION = {
   bilbo:    { etiqueta: 'Ciclo (Bilbo y otros)', descripcion: 'Una escalera: cada sesión tiene su valor fijado y sube poco a poco. Tú eliges cuánto sube, cuándo se corta y cómo empieza el siguiente; hay prehechos.' },
   carga:    { etiqueta: 'Doble progresión', descripcion: 'Trabajas en un rango de repeticiones, por ejemplo de 8 a 12. Primero subes repeticiones con el mismo peso; al llegar a 12, subes peso y vuelves a empezar por 8.' },

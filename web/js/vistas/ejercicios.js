@@ -4,7 +4,7 @@ import {
 } from '../calculos.js';
 import * as estado from '../estado.js';
 import {
-  ASISTENCIAS, DIAS_CICLO_POR_DEFECTO, TECNICAS_ESTIRAMIENTO, TIPOS_CARGA, TIPOS_ESFUERZO, TIPOS_PROGRESION, TIPOS_SERIE,
+  ASISTENCIAS, DIAS_CICLO_POR_DEFECTO, medidasDe, TECNICAS_ESTIRAMIENTO, TIPOS_CARGA, TIPOS_ESFUERZO, TIPOS_PROGRESION, TIPOS_SERIE,
   progresionPorDefecto, serieNuevaPlantilla, sobrePorDefecto, tramosDe,
 } from '../esquema.js';
 import { tramosPorDefecto } from '../calculos.js';
@@ -182,6 +182,7 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
     borrador.carga = { tipo: x.carga || 'peso' };
     borrador.esfuerzo = { tipo: x.esfuerzo || 'repeticiones' };
     borrador.esfuerzoExtra = x.distancia ? { tipo: 'distancia', opcional: true } : null;
+    borrador.medidas = null;
     borrador.maquinaPlacas = esMaquinaDePlacas(x);
     borrador.musculos = { principales: [...(x.musculos?.principales ?? [])], secundarios: [...(x.musculos?.secundarios ?? [])] };
     for (const plan of borrador.series) plan.progresion.sobre = sobrePorDefecto(borrador);
@@ -201,12 +202,23 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
   };
   const MEDIDAS = {
     repeticiones: { etiqueta: 'Repeticiones', descripcion: 'Cuántas veces.' },
-    tiempo: { etiqueta: 'Tiempo', descripcion: 'Segundos o minutos.' },
-    distancia: { etiqueta: 'Distancia', descripcion: 'Kilómetros o metros.' },
-    'tiempo-distancia': { etiqueta: 'Tiempo y distancia', descripcion: 'Los minutos y, si quieres, los kilómetros.' },
+    tiempo: { etiqueta: 'Tiempo', descripcion: 'Horas, minutos y segundos.' },
+    distancia: { etiqueta: 'Distancia', descripcion: 'Kilómetros.' },
   };
   const cargaActual = () => (borrador.carga.tipo === 'peso' ? (borrador.maquinaPlacas ? 'placas' : 'libre') : borrador.carga.tipo);
-  const medidaActual = () => (borrador.esfuerzo.tipo === 'tiempo' && borrador.esfuerzoExtra ? 'tiempo-distancia' : borrador.esfuerzo.tipo);
+  // Se pueden marcar varias: la primera marcada es la principal (la que
+  // llevan las reglas) y las demás se apuntan al lado en cada serie.
+  const medidasElegidas = () => medidasDe(borrador);
+  function fijarMedidas(lista) {
+    const orden = ['repeticiones', 'tiempo', 'distancia'];
+    const limpia = orden.filter((x) => lista.includes(x));
+    if (!limpia.length) return;
+    borrador.medidas = limpia;
+    borrador.esfuerzo = { tipo: limpia[0] };
+    borrador.esfuerzoExtra = limpia[1] ? { tipo: limpia[1], opcional: true } : null;
+    for (const plan of borrador.series) plan.progresion.sobre = sobrePorDefecto(borrador);
+    repintar();
+  }
 
   function formulario() {
     const estira = ['estiramiento', 'movilidad', 'yoga'].includes(tipoDeEjercicio(borrador));
@@ -235,12 +247,18 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
       h('fieldset', {},
         h('legend', {}, '¿Qué apuntas en cada serie?'),
         h('p', { class: 'nota' }, borrador.carga.tipo === 'ninguna' ? 'Además del peso no hay nada: solo esto.' : 'Además del peso.'),
-        opciones(MEDIDAS, medidaActual(), (m) => {
-          borrador.esfuerzo = { tipo: m === 'tiempo-distancia' ? 'tiempo' : m };
-          borrador.esfuerzoExtra = m === 'tiempo-distancia' ? { tipo: 'distancia', opcional: true } : null;
-          for (const plan of borrador.series) plan.progresion.sobre = sobrePorDefecto(borrador);
-          repintar();
-        }, { compacto: true })),
+        Object.entries(MEDIDAS).map(([clave, m]) => h('label', { class: 'casilla' },
+          h('input', { type: 'checkbox', checked: medidasElegidas().includes(clave),
+            onchange: (e) => {
+              const lista = medidasElegidas().filter((x) => x !== clave);
+              if (e.target.checked) lista.push(clave);
+              if (!lista.length) { e.target.checked = true; aviso('Algo hay que apuntar: deja marcada al menos una.'); return; }
+              fijarMedidas(lista);
+            } }),
+          h('span', {}, h('strong', {}, m.etiqueta), ' ', h('small', { class: 'suave' }, m.descripcion)))),
+        h('small', { class: 'nota' }, medidasElegidas().length > 1
+          ? `La primera, ${MEDIDAS[medidasElegidas()[0]].etiqueta.toLowerCase()}, es la que llevan las reglas; las demás se apuntan al lado.`
+          : 'Puedes marcar varias: por ejemplo repeticiones y distancia, para un récord de zancadas.')),
 
       h('details', { class: 'tarjeta explicacion desplegable-musculos', open: !borrador.musculos.principales.length || undefined },
         h('summary', {}, borrador.musculos.principales.length

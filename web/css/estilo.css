@@ -952,3 +952,10 @@ body:has(.modal-fondo) .guia { display: none; }
 .condicion-valor input { width: 5em; text-align: center; font-weight: 600; }
 .condicion-valor small { color: var(--texto-suave); }
 .resumen-ciclo { background: var(--acento-suave); border-radius: var(--radio-pequeno); padding: 10px 12px; }
+
+/* El tiempo, en tres huecos: el teclado del movil no tiene dos puntos. */
+.valor.tiempo { grid-column: 1 / -1; }
+.trozos-tiempo { display: flex; gap: 6px; }
+.trozo-tiempo { display: flex; align-items: center; gap: 4px; flex: 1 1 0; min-width: 0; }
+.trozo-tiempo small { color: var(--texto-suave); order: 2; }
+.trozo-tiempo input { font-size: 1.25rem; font-weight: 600; text-align: center; width: 100%; min-width: 0; }

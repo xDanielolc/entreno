@@ -18,7 +18,7 @@ import {
 import { anadir, aviso, confirmar, h, formatearTiempo, leerNumero, leerTiempo } from '../ui.js';
 import { DESCANSO_ESTIRAMIENTOS_POR_DEFECTO, arrancarDescanso, arrancarRespiracion, barraDescanso, descansoDeTramo } from './descanso.js';
 import { cuentaParaFatiga, tipoDeEjercicio } from '../catalogo.js';
-import { ASISTENCIAS, ESCALA_MANO, PROGRAMAS, TECNICAS_ESTIRAMIENTO } from '../esquema.js';
+import { ASISTENCIAS, ESCALA_MANO, PROGRAMAS, TECNICAS_ESTIRAMIENTO, extraDeSerie, medidasDe } from '../esquema.js';
 import { ORDEN_MUSCULOS, nombreMusculo } from '../musculos.js';
 import { ESCALA_RECUPERACION, puntuacionSentida, recuperacionPorMusculo } from '../recuperacion.js';
 import { comparacionSerie, mostrarResumen } from './resumen-sesion.js';
@@ -343,6 +343,38 @@ export function vistaSesion(contenedor, { id }) {
       h('p', { class: 'comparacion' }, comparacionSerie(d, ej, serie, { excluirSesion: id })));
   }
 
+  // Lo apuntado en una medida que no es la principal. Se guarda por nombre,
+  // para que quepan varias (tiempo y distancia, o reps y distancia).
+  function guardarExtra(serie, tipo, valor) {
+    serie.extras ??= {};
+    serie.extras[tipo] = valor;
+    if (tipo === 'distancia') serie.esfuerzoExtra = valor;   // formato antiguo
+  }
+
+  // El tiempo, en tres huecos: horas, minutos y segundos. El teclado del
+  // móvil es numérico y no tiene dos puntos, así que nada de «12:30».
+  function campoTiempo(etiqueta, segundos, alCambiar) {
+    const total = segundos ?? 0;
+    const inicial = { h: Math.floor(total / 3600), m: Math.floor((total % 3600) / 60), s: Math.round(total % 60) };
+    const vacio = segundos == null;
+    const cajas = {};
+    const leerTodo = (caja) => {
+      const vacias = Object.values(cajas).every((x) => x.value.trim() === '');
+      const n = (clave) => Math.max(0, Math.round(leerNumero(cajas[clave].value) ?? 0));
+      alCambiar(vacias ? null : n('h') * 3600 + n('m') * 60 + n('s'), caja);
+    };
+    const hueco = (clave, nombre) => {
+      const caja = h('input', { type: 'text', inputmode: 'numeric', 'aria-label': `${etiqueta}: ${nombre}`,
+        value: vacio ? '' : String(inicial[clave]),
+        oninput: (e) => leerTodo(e.target) });
+      cajas[clave] = caja;
+      return h('label', { class: 'trozo-tiempo' }, h('small', {}, nombre), caja);
+    };
+    return h('div', { class: 'valor tiempo' },
+      h('span', { class: 'et' }, etiqueta),
+      h('div', { class: 'trozos-tiempo' }, hueco('h', 'h'), hueco('m', 'min'), hueco('s', 's')));
+  }
+
   // Casillas propias de cada técnica: los segundos del isométrico final, las
   // excéntricas lentas y sus segundos de bajada.
   function camposTecnicas(ej, i, j, serie) {
@@ -453,20 +485,29 @@ export function vistaSesion(contenedor, { id }) {
           cargaReal)
         : campoCargaConPorcentaje(ej, i, j, serie)),
 
-      h('label', { class: 'valor' },
-        h('span', { class: 'et' }, unidadEsfuerzo(ej)),
-        h('input', { type: 'text', inputmode: esTiempo(ej) ? 'numeric' : 'decimal', 'aria-label': TIPOS_ESFUERZO[ej.esfuerzo.tipo].etiqueta,
-          value: esTiempo(ej) ? formatearTiempo(serie.esfuerzo) : (serie.esfuerzo ?? ''),
-          placeholder: esTiempo(ej) ? 'mm:ss' : null,
-          oninput: (e) => {
-            actualizar((x) => {
-              const antes = x.esfuerzo;
-              x.esfuerzo = esTiempo(ej) ? leerTiempo(e.target.value) : leerNumero(e.target.value);
-              marcarHecha(e.target, x, ej);
-              if (antes == null && x.esfuerzo != null) descansoEntreSeries(ej);
-            });
-            recalcularAbajo(ej, i);
-          } })),
+      esTiempo(ej)
+        ? campoTiempo('Tiempo', serie.esfuerzo, (segundos, caja) => {
+          actualizar((x) => {
+            const antes = x.esfuerzo;
+            x.esfuerzo = segundos;
+            marcarHecha(caja, x, ej);
+            if (antes == null && x.esfuerzo != null) descansoEntreSeries(ej);
+          });
+          recalcularAbajo(ej, i);
+        })
+        : h('label', { class: 'valor' },
+          h('span', { class: 'et' }, unidadEsfuerzo(ej)),
+          h('input', { type: 'text', inputmode: 'decimal', 'aria-label': TIPOS_ESFUERZO[ej.esfuerzo.tipo].etiqueta,
+            value: serie.esfuerzo ?? '',
+            oninput: (e) => {
+              actualizar((x) => {
+                const antes = x.esfuerzo;
+                x.esfuerzo = leerNumero(e.target.value);
+                marcarHecha(e.target, x, ej);
+                if (antes == null && x.esfuerzo != null) descansoEntreSeries(ej);
+              });
+              recalcularAbajo(ej, i);
+            } })),
 
       // «En recámara»: las repeticiones que podrías haber hecho y no hiciste.
       ej.esfuerzo.tipo === 'repeticiones' && h('label', { class: 'valor recamara' },
@@ -476,10 +517,13 @@ export function vistaSesion(contenedor, { id }) {
           onchange: (e) => ofrecerRecamara(ej, leerNumero(e.target.value)) }),
         h('small', {}, serie.recamara != null ? (tipoDeFallo(serie.recamara) || '') : '')),
 
-      ej.esfuerzoExtra && h('label', { class: 'valor' },
-        h('span', { class: 'et' }, TIPOS_ESFUERZO[ej.esfuerzoExtra.tipo].unidad),
-        h('input', { type: 'text', inputmode: 'decimal', value: serie.esfuerzoExtra ?? '', 'aria-label': 'Distancia',
-          oninput: (e) => actualizar((x) => { x.esfuerzoExtra = leerNumero(e.target.value); }) })));
+      medidasDe(ej).slice(1).map((tipo) => (tipo === 'tiempo'
+        ? campoTiempo('Tiempo', extraDeSerie(serie, tipo), (segundos) => actualizar((x) => { guardarExtra(x, tipo, segundos); }))
+        : h('label', { class: 'valor' },
+          h('span', { class: 'et' }, TIPOS_ESFUERZO[tipo].etiqueta),
+          h('input', { type: 'text', inputmode: 'decimal', value: extraDeSerie(serie, tipo) ?? '',
+            'aria-label': TIPOS_ESFUERZO[tipo].etiqueta,
+            oninput: (e) => actualizar((x) => { guardarExtra(x, tipo, leerNumero(e.target.value)); }) })))));
   }
 
   // Kilos y porcentaje del 1RM, enlazados: escribes en uno y se rellena el
@@ -865,6 +909,10 @@ export function textoSerie(ej, serie) {
   if (serie.esfuerzo != null) {
     partes.push(esTiempo(ej) ? textoEsfuerzo(ej, serie.esfuerzo)
       : `${formatearNumero(serie.esfuerzo)}${serie.recamara ? ` + ${serie.recamara}` : ''} ${unidadEsfuerzo(ej)}`);
+  }
+  for (const tipo of medidasDe(ej).slice(1)) {
+    const v = extraDeSerie(serie, tipo);
+    if (v != null) partes.push(tipo === 'tiempo' ? formatearTiempo(v) : `${formatearNumero(v)} ${TIPOS_ESFUERZO[tipo].unidad}`);
   }
   const tec = textoTecnicas(serie.tecnicas);
   return partes.join(' × ') + (tec ? ` (${tec})` : '');
