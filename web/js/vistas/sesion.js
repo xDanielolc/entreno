@@ -87,27 +87,23 @@ export function vistaSesion(contenedor, { id }) {
 
     enCurso && (posicion == null || posicion === 0) && tarjetaComoLlegas(),
 
-    enCurso && eleccion && sesion.ejercicios.length > 0 && h('button', { class: 'boton enlace cambiar-vista', onclick: () => elegirVista() },
-      `Vista: ${MODOS_ENTRENO[modo]?.etiqueta.toLowerCase() ?? 'todos los ejercicios'} · cambiar`),
-
     barraDescanso(),
 
     posicion != null && h('div', { class: 'guiado-cabecera' },
-      h('button', { class: 'boton-icono', 'aria-label': 'Ejercicio anterior', disabled: posicion === 0,
+      h('button', { class: 'boton-paso', 'aria-label': 'Ejercicio anterior', disabled: posicion === 0,
         onclick: () => irA(posicion - 1) }, '‹'),
-      h('span', {}, `Ejercicio ${posicion + 1} de ${sesion.ejercicios.length}`),
-      h('button', { class: 'boton-icono', 'aria-label': 'Ejercicio siguiente',
+      h('button', { class: 'boton enlace', onclick: () => irA(null) }, `Ejercicio ${posicion + 1} de ${sesion.ejercicios.length}`),
+      h('button', { class: 'boton-paso', 'aria-label': 'Ejercicio siguiente',
         disabled: posicion >= sesion.ejercicios.length - 1, onclick: () => irA(posicion + 1) }, '›')),
 
     visibles.map(([entrada, i]) => tarjetaEjercicio(entrada, i)),
 
-    posicion != null && posicion < sesion.ejercicios.length - 1
-      && h('button', { class: 'boton grande', onclick: () => irA(posicion + 1) }, 'Siguiente ejercicio →'),
-
     h('button', { class: 'boton secundario grande', onclick: elegirEjercicio }, '+ Añadir ejercicio'),
 
-    enCurso && sesion.ejercicios.length > 0 && posicion != null
-      && h('button', { class: 'boton secundario grande', onclick: () => irA(null) }, 'Ver todos los ejercicios'),
+    // Cómo se ve el entrenamiento: solo aquí abajo, que arriba ya están las
+    // flechas para pasar de ejercicio.
+    enCurso && sesion.ejercicios.length > 0 && h('button', { class: 'boton enlace cambiar-vista', onclick: () => elegirVista() },
+      `Vista: ${MODOS_ENTRENO[modo]?.etiqueta.toLowerCase() ?? 'todos los ejercicios'} · cambiar`),
 
     posicion == null && h('label', { class: 'campo' },
       h('span', { class: 'etiqueta-campo' }, 'Notas del entrenamiento'),
@@ -179,7 +175,7 @@ export function vistaSesion(contenedor, { id }) {
   function elegirVista() {
     const preferido = guiado.get(id)?.modo ?? d.perfil.modoEntreno ?? 'ejercicio';
     const cerrar = modal('¿Cómo quieres verlo?', h('div', { class: 'como-ir' },
-      h('p', { class: 'nota' }, 'Se puede cambiar cuando quieras desde arriba del entrenamiento.'),
+      h('p', { class: 'nota' }, 'Se puede cambiar cuando quieras desde el final del entrenamiento («Vista: … · cambiar»).'),
       Object.entries(MODOS_ENTRENO).map(([clave, m]) => h('button', {
         class: `tarjeta fila-enlace ${clave === preferido ? 'preferido' : ''}`,
         onclick: () => {
@@ -191,7 +187,12 @@ export function vistaSesion(contenedor, { id }) {
           estado.emitir('vista');
         } },
       h('div', {}, h('strong', {}, m.etiqueta), h('div', { class: 'suave' }, m.descripcion)),
-      clave === preferido && h('span', { class: 'etiqueta' }, 'Actual')))));
+      clave === preferido && h('span', { class: 'etiqueta' }, 'Actual'))),
+      h('button', { class: 'boton enlace', onclick: () => {
+        estado.cambiar((x) => { x.perfil.preguntarVista = false; });
+        cerrar();
+        aviso('No se volverá a preguntar: se usará la vista que tengas puesta. Se recupera en Ajustes → Entrenamiento y series.');
+      } }, 'No volver a preguntarme esto')));
   }
 
   function guardarVista(modo, pos) {
@@ -202,8 +203,8 @@ export function vistaSesion(contenedor, { id }) {
   // Si la pantalla se vuelve a pintar antes de que salga el cartel (por
   // ejemplo, al llegar datos), no se abre dos veces.
   // En el entrenamiento de prueba del tutorial no se pregunta: ya hay bastante en pantalla.
-  if (enCurso && !eleccion && sesion.ejercicios.length > 0 && !algoHecho && !sesion.tutorial && !document.querySelector('.modal-fondo')
-    && !preguntandoVista.has(id)) {
+  if (enCurso && !eleccion && d.perfil.preguntarVista !== false && sesion.ejercicios.length > 0 && !algoHecho && !sesion.tutorial
+    && !document.querySelector('.modal-fondo') && !preguntandoVista.has(id)) {
     preguntandoVista.add(id);
     setTimeout(() => {
       preguntandoVista.delete(id);

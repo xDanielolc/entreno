@@ -1,7 +1,8 @@
 // Glosario: qué significa cada palabra de entrenamiento, explicado para
 // quien nunca ha entrenado. Se enseña en un cartel al tocar «¿Qué es…?».
 
-import { h, modal } from '../ui.js';
+import * as estado from '../estado.js';
+import { aviso, h, modal } from '../ui.js';
 
 export const GLOSARIO = {
   rm: { pregunta: '¿Qué es el 1RM?', termino: '1RM', texto: 'El peso máximo que podrías levantar una sola vez en un ejercicio. La app no te pide que lo pruebes: lo '
@@ -48,16 +49,30 @@ const TERMINOS = [
 ];
 const RE_TERMINOS = new RegExp(`(^|[^\\p{L}\\d])(${TERMINOS.map(([t]) => t).join('|')})(?![\\p{L}\\d])`, 'iu');
 
-// Un texto con un «?» detrás de la primera aparición de cada palabra del
-// glosario. Devuelve una lista de nodos y trozos de texto.
+// Cuánto «?» quieres: siempre (lo normal), solo la primera vez que sale la
+// palabra, o ninguno. Se cambia en Ajustes y también desde el propio cartel.
+export const MODOS_GLOSARIO = {
+  siempre: { etiqueta: 'Siempre', descripcion: 'Cada vez que salga la palabra.' },
+  primera: { etiqueta: 'Solo la primera vez', descripcion: 'Una vez por pantalla.' },
+  ninguno: { etiqueta: 'Ninguno', descripcion: 'Sin «?». El glosario sigue en Aprender.' },
+};
+
+export function modoGlosario(datos = estado.datos()) {
+  return datos?.perfil?.glosario ?? 'siempre';
+}
+
+// Un texto con un «?» detrás de las palabras del glosario. Devuelve una
+// lista de nodos y trozos de texto.
 export function conGlosario(texto, usadas = new Set()) {
   if (typeof texto !== 'string') return texto;
+  const modo = modoGlosario();
+  if (modo === 'ninguno') return texto;
   const partes = [];
   let resto = texto;
   for (let m = RE_TERMINOS.exec(resto); m; m = RE_TERMINOS.exec(resto)) {
     const clave = TERMINOS.find(([t]) => t.toLowerCase() === m[2].toLowerCase())?.[1];
     const fin = m.index + m[0].length;
-    if (usadas.has(clave)) { partes.push(resto.slice(0, fin)); resto = resto.slice(fin); continue; }
+    if (modo === 'primera' && usadas.has(clave)) { partes.push(resto.slice(0, fin)); resto = resto.slice(fin); continue; }
     usadas.add(clave);
     partes.push(resto.slice(0, fin), queEs(clave, '?'));
     resto = resto.slice(fin);
@@ -69,7 +84,7 @@ export function conGlosario(texto, usadas = new Set()) {
 // Enlace pequeño «¿Qué es…?» que abre la explicación.
 export function queEs(clave, texto = null) {
   const g = GLOSARIO[clave];
-  if (!g) return null;
+  if (!g || modoGlosario() === 'ninguno') return null;
   return h('button', { type: 'button', class: 'que-es', onclick: (e) => { e.preventDefault(); e.stopPropagation(); explicar(clave); } },
     texto ?? g.pregunta);
 }
@@ -79,7 +94,12 @@ export function explicar(clave) {
   if (!g) return;
   const cerrar = modal(g.termino, h('div', {},
     h('p', {}, g.texto),
-    h('button', { class: 'boton', onclick: () => cerrar() }, 'Entendido')));
+    h('button', { class: 'boton', onclick: () => cerrar() }, 'Entendido'),
+    h('button', { class: 'boton enlace', onclick: () => {
+      estado.cambiar((x) => { x.perfil.glosario = 'ninguno'; });
+      cerrar();
+      aviso('Quitados los «?». Para recuperarlos, Ajustes → Entrenamiento y series.');
+    } }, 'No me pongas más «?»')));
 }
 
 // Lista completa, para Aprender.

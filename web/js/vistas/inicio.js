@@ -158,7 +158,7 @@ export function vistaInicio(contenedor) {
     h('p', { class: 'fecha-hoy' }, fechaLarga(hoyISO())),
     h('h1', {}, saludo(d.perfil.nombre)),
     tarjetaInstalar(),
-    pista('hoy', 'Qué toca hoy y cómo va tu recuperación. Si quieres más ayuda, en Ajustes → Aprender están la guía y el glosario.'),
+    pista('hoy', 'Qué toca hoy y cómo va tu recuperación. Si quieres más ayuda, en la pestaña «Aprender» están el tutorial y el glosario.'),
 
     necesitaPeso && h('a', { class: 'tarjeta aviso-tarjeta', href: '#/ajustes' },
       'Indica tu peso corporal en Ajustes: lo necesitan tus ejercicios con máquina asistida.'),
@@ -180,6 +180,11 @@ export function vistaInicio(contenedor) {
             ? dia.ejercicios.map((x) => d.ejercicios.find((e) => e.id === x.ejercicioId)?.nombre ?? '—').join(', ')
             : 'Este día no tiene ejercicios todavía'),
           avisoCuandoToca(d, rutina, dia),
+          h('details', { class: 'explicacion' },
+            h('summary', {}, '¿Por qué esta y no otra?'),
+            h('p', { class: 'nota' }, 'La app mira, por este orden: si alguna rutina activa tiene puesto hoy como día de la semana, '
+              + 'esa; si no, la que tengas mejor recuperada de los músculos que toca; y dentro de la rutina, el día siguiente al '
+              + 'último que hiciste. Los días de la semana se ponen al editar la rutina, y si no pones ninguno manda la recuperación.')),
           rutina.descripcion && h('details', { class: 'explicacion' },
             h('summary', {}, 'Por qué esta rutina es así y cómo se hace'),
             rutina.descripcion.split('\n\n').map((p) => enPuntos(p))),
@@ -189,7 +194,9 @@ export function vistaInicio(contenedor) {
               `${a.rutina.nombre} (${a.dia.nombre})`)])),
           h('button', { class: 'boton secundario', onclick: elegirDia }, 'Otro día de la rutina'))
         : h('button', { class: 'boton grande', onclick: empezarSuelto }, 'Empezar entrenamiento'),
-    !enCurso && dia && h('button', { class: 'boton enlace', onclick: empezarSuelto }, 'Entrenar sin rutina (elijo yo los ejercicios)'),
+    !enCurso && dia && h('div', { class: 'fila-botones' },
+      h('button', { class: 'boton secundario', onclick: empezarSuelto }, 'Entrenar sin rutina'),
+      h('a', { class: 'boton secundario', href: '#/rutinas' }, 'Ver rutinas')),
 
     !d.rutinas.length && cuestionarioHecho(d) && tarjetaRecomendacion(d),
 
@@ -199,9 +206,8 @@ export function vistaInicio(contenedor) {
         h('a', { class: 'boton', href: '#/rutinas' }, 'Rutinas prehechas'),
         h('a', { class: 'boton secundario', href: '#/ejercicio/nuevo' }, 'Crear ejercicio'))),
 
-    activos.length > 0 && !rutina && h('a', { class: 'boton enlace', href: '#/rutinas' },
+    activos.length > 0 && !rutina && h('a', { class: 'boton secundario', href: '#/rutinas' },
       'Elegir o crear una rutina para que te diga qué toca cada día'),
-    rutina && h('a', { class: 'boton enlace', href: '#/rutinas' }, 'Ver mis rutinas'),
 
     tarjetaSugerenciasAjuste(d),
     tarjetaRecuperacion(d, { compacta: true }),

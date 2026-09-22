@@ -959,3 +959,19 @@ body:has(.modal-fondo) .guia { display: none; }
 .trozo-tiempo { display: flex; align-items: center; gap: 4px; flex: 1 1 0; min-width: 0; }
 .trozo-tiempo small { color: var(--texto-suave); order: 2; }
 .trozo-tiempo input { font-size: 1.25rem; font-weight: 600; text-align: center; width: 100%; min-width: 0; }
+
+/* Las flechas para pasar de ejercicio: grandes, que son la forma normal
+   de moverse cuando vas de uno en uno. */
+.boton-paso {
+  font: inherit;
+  font-size: 1.6rem;
+  line-height: 1;
+  min-width: 56px;
+  min-height: 48px;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-pequeno);
+  background: var(--superficie);
+  color: var(--acento);
+  cursor: pointer;
+}
+.boton-paso:disabled { color: var(--texto-suave); opacity: .4; }

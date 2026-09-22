@@ -11,6 +11,7 @@ import { calibrar, textoCalibracion } from '../formula1rm.js';
 import { TEXTO_AVISO, guardarPruebaEnCuenta } from '../modo-prueba.js';
 import { explicaciones1RM, opciones } from './ejercicios.js';
 import { tramosPorDefecto } from '../calculos.js';
+import { MODOS_GLOSARIO, modoGlosario } from './glosario.js';
 import { pista } from './tutorial.js';
 import { MODOS_ENTRENO } from './sesion.js';
 import { aplicarTema, hacerCuestionario } from './cuestionario.js';
@@ -118,6 +119,14 @@ export function vistaAjustes(contenedor) {
       numeroAjuste('Repeticiones en recámara por defecto', d.perfil.recamaraPorDefecto, (x, v) => { x.perfil.recamaraPorDefecto = v; }),
       h('small', { class: 'nota' }, 'Las que sueles dejarte sin hacer al acabar una serie. Viene puesto 1 porque es lo que recomendamos '
         + '(quedarse a una del fallo rinde casi igual y cansa menos). Aparece ya puesto y se apunta aparte: «45 kg × 12 + 1».'),
+      h('div', { class: 'campo' },
+        h('span', { class: 'etiqueta-campo' }, 'Los «?» que explican las palabras'),
+        opciones(MODOS_GLOSARIO, modoGlosario(d), (m) => estado.cambiar((x) => { x.perfil.glosario = m; }), { compacto: true }),
+        h('small', { class: 'nota' }, 'Salen detrás de palabras como 1RM, recámara o drop set. También se quitan desde el propio cartel.')),
+      h('label', { class: 'casilla' },
+        h('input', { type: 'checkbox', checked: d.perfil.preguntarVista !== false,
+          onchange: (e) => estado.cambiar((x) => { x.perfil.preguntarVista = e.target.checked; }) }),
+        'Preguntar «¿cómo quieres verlo?» al empezar cada entrenamiento'),
       h('label', { class: 'casilla' },
         h('input', { type: 'checkbox', checked: d.perfil.preguntarComoLlegas !== false,
           onchange: (e) => estado.cambiar((x) => { x.perfil.preguntarComoLlegas = e.target.checked; x.perfil.comoLlegasSaltos = 0; }) }),
