@@ -40,14 +40,23 @@ function factorVolumen(series) {
   return 0.4 + 0.6 * (1 - Math.exp(-series / 3));
 }
 
+// ¿Fue una serie dura? Lo es si la llevaste a una repetición del fallo o
+// menos, o si llevaba bajadas o miniseries (drop set, rest-pause): esas
+// terminan al fallo por definición.
+export function serieDura(serie) {
+  if ((serie.tramos || []).filter((t) => t.esfuerzo != null).length > 1) return true;
+  return serie.recamara != null && serie.recamara <= 1;
+}
+
 // Series de una sesión por músculo, con las horas que pide cada una. En un
 // drop set o rest-pause, cada tramo de más cuenta media serie; un músculo
 // secundario recibe la mitad.
 function cargaDeSesion(datos, sesion) {
   const porMusculo = new Map();
-  const sumar = (m, series, horas) => {
-    const x = porMusculo.get(m) ?? { series: 0, sumaHoras: 0, maxHoras: 0 };
+  const sumar = (m, series, horas, duras) => {
+    const x = porMusculo.get(m) ?? { series: 0, sumaHoras: 0, maxHoras: 0, duras: 0 };
     x.series += series;
+    x.duras += duras;
     x.sumaHoras += horas * series;
     x.maxHoras = Math.max(x.maxHoras, horas);
     porMusculo.set(m, x);
@@ -62,8 +71,9 @@ function cargaDeSesion(datos, sesion) {
       const hechos = (serie.tramos || []).filter((t) => t.esfuerzo != null).length;
       const series = hechos > 1 ? 1 + (hechos - 1) * 0.5 : 1;
       const horas = horasDeSerie(serie);
-      for (const m of principales) sumar(m, series, horas);
-      for (const m of secundarios) sumar(m, series * 0.5, horas);
+      const duras = serieDura(serie) ? series : 0;
+      for (const m of principales) sumar(m, series, horas, duras);
+      for (const m of secundarios) sumar(m, series * 0.5, horas, duras * 0.5);
     }
   }
   return porMusculo;
@@ -159,6 +169,24 @@ export function seriesSemanales(datos, ahora = new Date()) {
     if (horas == null || horas > 24 * 7) continue;
     for (const [musculo, carga] of cargaDeSesion(datos, sesion)) {
       if (total[musculo] != null) total[musculo] += carga.series;
+    }
+  }
+  return total;
+}
+
+// Qué parte de las series semanales de cada músculo fueron duras. Sirve para
+// no pedir diez series a quien entrena al fallo: con menos ya estimula.
+export function durezaSemanal(datos, ahora = new Date()) {
+  const total = {};
+  for (const m of ORDEN_MUSCULOS) total[m] = { series: 0, duras: 0 };
+  for (const sesion of datos.sesiones) {
+    if (sesion.borrada || sesion.estado !== 'terminada') continue;
+    const horas = horasDesde(sesion, ahora);
+    if (horas == null || horas > 24 * 7) continue;
+    for (const [musculo, carga] of cargaDeSesion(datos, sesion)) {
+      if (!total[musculo]) continue;
+      total[musculo].series += carga.series;
+      total[musculo].duras += carga.duras ?? 0;
     }
   }
   return total;

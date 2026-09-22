@@ -34,7 +34,8 @@ export const BIBLIOGRAFIA = [
   },
   {
     tema: 'Series por músculo y semana',
-    dice: 'La app avisa por debajo de 10 series semanales por músculo y a partir de unas 20.',
+    dice: 'La app avisa por debajo de 10 series semanales por músculo y a partir de unas 20. Ese 10 baja a 6 en los músculos '
+      + 'que entrenas al fallo o con bajadas, porque el rango clásico se midió con series a 2 o 3 repeticiones del fallo.',
     matiz: 'Más volumen sigue dando más crecimiento, pero cada vez aporta menos. El rango de 12 a 20 series semanales es un punto de partida razonable; '
       + 'por encima puede seguir funcionando si lo recuperas bien.',
     fuentes: [

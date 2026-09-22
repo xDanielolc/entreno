@@ -39,13 +39,19 @@ export const GLOSARIO = {
     + 'Sirve para quitarte el cansancio acumulado y volver con fuerza. Conviene una cada seis u ocho semanas, o cuando notas que todo cuesta.' },
   hiit: { pregunta: '¿Qué es el HIIT?', termino: 'HIIT', texto: 'Intervalos de alta intensidad: tramos cortos a tope alternados con descansos, varias veces seguidas. '
     + 'Tabata es el más conocido (20 segundos a tope y 10 de descanso, ocho veces). El cronómetro de la app los lleva por ti.' },
+  trabajo: {
+    termino: 'Trabajo',
+    pregunta: '¿Qué es el trabajo?',
+    texto: 'El peso por las repeticiones de una serie: 50 kg × 10 son 500 kg de trabajo. Sirve para comparar series en las que '
+      + 'has cambiado peso y repeticiones a la vez, y es la forma de tener récord en un drop set, donde el 1RM no vale.',
+  },
 };
 
 // Palabras del glosario que pueden aparecer en cualquier texto de la app, y
 // su clave. Se usa para poner un «?» detrás de la primera vez que salen.
 const TERMINOS = [
   ['1RM', 'rm'], ['recámara', 'recamara'], ['fallo', 'fallo'], ['repeticiones', 'repeticion'], ['drop set', 'drop-set'], ['rest-pause', 'rest-pause'],
-  ['volumen', 'volumen'], ['Bilbo', 'bilbo'], ['descarga', 'descarga'], ['doble progresión', 'doble-progresion'], ['HIIT', 'hiit'],
+  ['volumen', 'volumen'], ['trabajo', 'trabajo'], ['Bilbo', 'bilbo'], ['descarga', 'descarga'], ['doble progresión', 'doble-progresion'], ['HIIT', 'hiit'],
 ];
 const RE_TERMINOS = new RegExp(`(^|[^\\p{L}\\d])(${TERMINOS.map(([t]) => t).join('|')})(?![\\p{L}\\d])`, 'iu');
 

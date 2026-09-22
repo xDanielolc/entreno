@@ -7,7 +7,7 @@ import { cuentaParaFatiga } from '../catalogo.js';
 import { ORDEN_MUSCULOS, nombreMusculo, siluetaCuerpo } from '../musculos.js';
 import {
   FACTORES, claseDeRecuperacion, detalleDeRecuperacion, factorPersonal, recuperacionPorMusculo, seriesSemanales,
-  sugerenciasDeAjuste, textoDeRecuperacion,
+  sugerenciasDeAjuste, textoDeRecuperacion, durezaSemanal,
 } from '../recuperacion.js';
 import { recomendacionesGenerales } from '../recomendaciones.js';
 import { anadir, aviso, h, hoyISO } from '../ui.js';
@@ -120,7 +120,10 @@ export function vistaCuerpo(contenedor) {
   const semana = seriesSemanales(d);
   const conDatos = ORDEN_MUSCULOS.filter((m) => semana[m] > 0)
     .sort((a, b) => semana[b] - semana[a]);
-  const flojos = ORDEN_MUSCULOS.filter((m) => semana[m] > 0 && semana[m] < SERIES_MINIMAS);
+  // El minimo baja a 6 en los musculos que entrenas al fallo o con bajadas.
+  const dureza = durezaSemanal(d);
+  const minimoDe = (m) => (dureza[m]?.series > 0 && dureza[m].duras / dureza[m].series >= 0.5 ? 6 : SERIES_MINIMAS);
+  const flojos = ORDEN_MUSCULOS.filter((m) => semana[m] > 0 && semana[m] < minimoDe(m));
   const pasados = ORDEN_MUSCULOS.filter((m) => semana[m] > SERIES_MAXIMAS);
   const sinTocar = ORDEN_MUSCULOS.filter((m) => !semana[m]);
 
@@ -146,12 +149,14 @@ export function vistaCuerpo(contenedor) {
         : h('p', { class: 'suave' }, 'Aún no hay series registradas esta semana.'),
 
       h('p', { class: 'nota' },
-        `La referencia son ${SERIES_MINIMAS} a ${SERIES_MAXIMAS} series semanales por músculo, `
-        + 'repartidas en dos sesiones. Las series de un músculo secundario cuentan la mitad y, en un drop set, '
+        `La referencia son ${SERIES_MINIMAS} a ${SERIES_MAXIMAS} series semanales por músculo, repartidas en dos sesiones, `
+        + 'contando series en las que te dejas 2 o 3 repeticiones. Si las llevas al fallo o con bajadas, con unas 6 ya basta: '
+        + 'la app lo tiene en cuenta y deja de pedirte más. Las series de un músculo secundario cuentan la mitad y, en un drop set, '
         + 'cada bajada de más cuenta media serie. Estiramientos, movilidad y yoga no cuentan.'),
 
       flojos.length > 0 && h('p', { class: 'aviso-texto' },
-        `Vas corto en: ${flojos.map((m) => nombreMusculo(m)).join(', ')}. Reparte las que te faltan entre tus próximas sesiones: con dos sesiones por semana, 5 series de cada músculo por sesión.`),
+        `Vas corto en: ${flojos.map((m) => nombreMusculo(m)).join(', ')}. Si esas series las haces al fallo o con bajadas, no pasa nada; `
+        + 'si te dejas repeticiones, reparte las que faltan entre tus próximas sesiones.'),
       pasados.length > 0 && h('p', { class: 'aviso-texto' },
         `Te pasas de ${SERIES_MAXIMAS} series en: ${pasados.map((m) => nombreMusculo(m)).join(', ')}. `
         + 'No es un problema si lo recuperas bien, pero vigila cómo llegas a la siguiente sesión.'),

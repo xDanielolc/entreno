@@ -18,12 +18,22 @@ import { cuentaParaFatiga, tipoDeEjercicio } from './catalogo.js';
 import { rmDeSerie } from './formula1rm.js';
 import { ORDEN_MUSCULOS, nombreMusculo } from './musculos.js';
 import {
-  horasDesdeSesion, recuperacionPorMusculo, seriesPorMusculoDeSesion, seriesSemanales,
+  durezaSemanal, horasDesdeSesion, recuperacionPorMusculo, seriesPorMusculoDeSesion, seriesSemanales,
 } from './recuperacion.js';
 
 const MINIMO = 10;
+const MINIMO_DURO = 6;
 const MAXIMO = 20;
 const DIA = 24;
+
+// Cuántas series pedirle a un músculo esta semana. Las de 10 a 20 salen de
+// estudios con series a 2-3 repeticiones del fallo; si tú las llevas al
+// fallo o con drop sets, con bastantes menos ya hay estímulo de sobra.
+function minimoDe(dureza, musculo) {
+  const x = dureza[musculo];
+  const duro = x && x.series > 0 && x.duras / x.series >= 0.5;
+  return { minimo: duro ? MINIMO_DURO : MINIMO, duro };
+}
 
 // nivel: 'aviso' (conviene cambiar algo), 'consejo' (mejorable) o 'bien'.
 const r = (clave, nivel, texto, extra = {}) => ({ clave, nivel, texto, ...extra });
@@ -43,6 +53,7 @@ export function recomendacionesDeSesion(datos, sesion) {
   const lista = [];
   const hoy = seriesPorMusculoDeSesion(datos, sesion);
   const semana = seriesSemanales(datos);
+  const dureza = durezaSemanal(datos);
   // El volumen semanal solo se juzga con una semana medio hecha: tras la
   // primera sesión de la semana no tiene sentido decir que falta volumen.
   const sesionesSemana = terminadas(datos).filter((s) => horasDesdeSesion(s) <= 7 * DIA).length;
@@ -67,14 +78,18 @@ export function recomendacionesDeSesion(datos, sesion) {
     // 3 y 4. Volumen de la semana (solo de lo que ha sido principal hoy).
     if (nHoy < 1 || sesionesSemana < 3) continue;
     const n = Math.round((semana[m] ?? 0) * 10) / 10;
-    if (n < MINIMO) {
-      lista.push(r('volumen-bajo', 'consejo', `${nombre}: ${series(n)} esta semana. Lo recomendado son de ${MINIMO} a ${MAXIMO}; `
-        + `te faltan unas ${Math.ceil(MINIMO - n)} repartidas en tus próximas sesiones.`));
+    const { minimo, duro } = minimoDe(dureza, m);
+    if (n < minimo) {
+      lista.push(r('volumen-bajo', 'consejo', `${nombre}: ${series(n)} esta semana. `
+        + (duro
+          ? `Como las llevas al fallo o con bajadas, con unas ${MINIMO_DURO} a la semana basta.`
+          : `Lo recomendado son de ${MINIMO} a ${MAXIMO} series dejándote 2 o 3 repeticiones; te faltan unas ${Math.ceil(minimo - n)}.`)));
     } else if (n > MAXIMO) {
       lista.push(r('volumen-alto', 'aviso', `${nombre}: ${series(n)} en siete días. Por encima de ${MAXIMO} no se gana más `
         + 'músculo y la fatiga sube: recorta series o reparte la carga en más días.'));
     } else {
-      lista.push(r('volumen-bien', 'bien', `${nombre}: ${series(n)} esta semana, dentro del rango recomendado.`));
+      lista.push(r('volumen-bien', 'bien', `${nombre}: ${series(n)} esta semana`
+        + (duro ? ', y duras: suficiente.' : ', dentro del rango recomendado.')));
     }
   }
 
@@ -97,6 +112,7 @@ export function recomendacionesGenerales(datos, ahora = new Date()) {
   const lista = [];
   const sesiones = terminadas(datos);
   const semana = seriesSemanales(datos, ahora);
+  const dureza = durezaSemanal(datos, ahora);
   const recientes = sesiones.filter((s) => horasDesdeSesion(s, ahora) <= 7 * DIA);
   if (!sesiones.length) return lista;
 
@@ -114,8 +130,11 @@ export function recomendacionesGenerales(datos, ahora = new Date()) {
       continue;
     }
     // Solo se pide más volumen de lo que entrenas como músculo principal.
-    if (n > 0 && n < MINIMO && conEste.length) {
-      lista.push(r('volumen-bajo', 'consejo', `${nombre}: ${series(n)} en los últimos 7 días. Sube hasta al menos ${MINIMO}.`));
+    if (n > 0 && n < minimoDe(dureza, m).minimo && conEste.length) {
+      lista.push(r('volumen-bajo', 'consejo', `${nombre}: ${series(n)} en los últimos 7 días. `
+        + (minimoDe(dureza, m).duro
+          ? `Como las llevas al fallo o con bajadas, con unas ${MINIMO_DURO} a la semana basta.`
+          : `Sube hasta al menos ${MINIMO}.`)));
     } else if (n > MAXIMO) {
       lista.push(r('volumen-alto', 'aviso', `${nombre}: ${series(n)} en 7 días. Por encima de ${MAXIMO} no se gana más y la fatiga sube.`));
     }

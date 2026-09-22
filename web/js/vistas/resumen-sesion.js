@@ -103,7 +103,7 @@ function seccionRecords(datos, sesion) {
     }
     if (ahora.mejorTrabajo && antes.mejorTrabajo && ahora.mejorTrabajo.valor > antes.mejorTrabajo.valor) {
       lineas.push({ ej, texto: `${ej.nombre}: ${formatearNumero(ahora.mejorTrabajo.valor)} kg de trabajo en una serie `
-        + `(antes ${formatearNumero(antes.mejorTrabajo.valor)}); el trabajo es el peso por las repeticiones` });
+        + `(antes ${formatearNumero(antes.mejorTrabajo.valor)})` });
     }
   }
   const primeras = sesion.ejercicios
