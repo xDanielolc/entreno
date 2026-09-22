@@ -975,3 +975,6 @@ body:has(.modal-fondo) .guia { display: none; }
   cursor: pointer;
 }
 .boton-paso:disabled { color: var(--texto-suave); opacity: .4; }
+
+/* El boton del entrenamiento de prueba: centrado y a la vista. */
+.guia .guia-prueba { display: block; width: 100%; margin: 4px 0 10px; text-align: center; }

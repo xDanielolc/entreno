@@ -201,7 +201,7 @@ function tarjetaPlantilla(d, plantilla) {
       plantilla.dias.map((dia) => h('div', {},
         h('p', {}, h('strong', {}, dia.nombre)),
         h('ul', {}, dia.ejercicios.map((x) => h('li', {}, x.nombre + (x.opcional ? ' (opcional)' : '') + (x.nota ? ` · ${x.nota}` : ''))))))),
-    h('button', { class: 'boton secundario', onclick: anadir }, yaEsta ? 'Añadir otra copia' : 'Añadir a mis rutinas'));
+    h('button', { class: 'boton secundario anadir-plantilla', onclick: anadir }, yaEsta ? 'Añadir otra copia' : 'Añadir a mis rutinas'));
 }
 
 // ---------------------------------------------------------------------------

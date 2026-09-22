@@ -140,3 +140,10 @@ export function confirmar(pregunta, { si = 'Sí', no = 'Cancelar', peligro = fal
       h('button', { class: `boton ${peligro ? 'peligro' : ''}`, onclick: () => { cerrar(); resolver(true); } }, si)));
   });
 }
+
+// Un id estable a partir de un título, para poder señalar un apartado desde
+// la guía o enlazarlo: «Entrenamiento y series» → «ap-entrenamiento-y-series».
+export function idApartado(titulo) {
+  const limpio = String(titulo).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  return `ap-${limpio.replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
+}

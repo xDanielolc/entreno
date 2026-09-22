@@ -9,13 +9,13 @@ import { creditosCargados } from '../imagenes.js';
 import { explicaciones1RM } from './ejercicios.js';
 import { ASISTENCIAS, ESCALA_MANO, TECNICAS_ESTIRAMIENTO } from '../esquema.js';
 import * as estado from '../estado.js';
-import { anadir, aviso, h } from '../ui.js';
+import { anadir, aviso, h, idApartado } from '../ui.js';
 import { hacerCuestionario } from './cuestionario.js';
 import { listaGlosario, queEs } from './glosario.js';
-import { NIVELES, fijarNivel, iniciarGuia, nivelTutorial, reiniciarPistas } from './tutorial.js';
+import { GUIAS, NIVELES, fijarNivel, iniciarGuia, nivelTutorial, reiniciarPistas } from './tutorial.js';
 
 function apartado(titulo, ...contenido) {
-  return h('details', { class: 'tarjeta formulario apartado' }, h('summary', {}, titulo), ...contenido);
+  return h('details', { class: 'tarjeta formulario apartado', id: idApartado(titulo) }, h('summary', {}, titulo), ...contenido);
 }
 
 const parrafos = (...textos) => textos.map((t) => h('p', {}, t));
@@ -109,7 +109,8 @@ function creditos() {
 
 function tutorial(d) {
   return apartado('Tutorial',
-    h('p', { class: 'nota' }, 'La guía te pasea por las pantallas; las notas explican cada pantalla la primera vez y se cierran con ✕.'),
+    h('p', { class: 'nota' }, 'Las guías te pasean por las pantallas; las notas explican cada pantalla la primera vez y se cierran con ✕.'),
+    h('p', { class: 'etiqueta-campo' }, '¿Cuánto te explico?'),
     (() => {
       // Se marca la elegida a mano, sin repintar la pantalla: si no, se
       // cerraría el apartado en cuanto tocas otra.
@@ -126,9 +127,14 @@ function tutorial(d) {
       anadir(caja, botones);
       return caja;
     })(),
+    h('p', { class: 'etiqueta-campo' }, 'Hacer un tutorial'),
+    Object.entries(GUIAS).map(([clave, g]) => h('button', {
+      class: 'tarjeta fila-enlace', type: 'button',
+      onclick: () => { if (nivelTutorial(d) === 'ninguno') fijarNivel('basico', { repintar: false }); iniciarGuia(clave); },
+    },
+    h('div', {}, h('strong', {}, g.titulo), h('div', { class: 'suave' }, g.resumen)),
+    d.perfil?.tutoriales?.hechas?.[clave] && h('span', { class: 'etiqueta' }, 'Hecho'))),
     h('div', { class: 'fila-botones' },
-      h('button', { class: 'boton secundario', onclick: () => { if (nivelTutorial(d) === 'ninguno') fijarNivel('basico'); iniciarGuia(); } },
-        'Hacer el tutorial'),
       h('button', { class: 'boton secundario', onclick: () => { reiniciarPistas(); aviso('Las notas volverán a salir.'); } },
         'Recuperar los consejos en notitas'),
       h('button', { class: 'boton secundario', onclick: () => hacerCuestionario() }, 'Rehacer el cuestionario inicial')));

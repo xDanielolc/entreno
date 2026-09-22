@@ -1,12 +1,16 @@
-// Tutorial: una guía paso a paso por las pantallas y «pistas», notas
-// pequeñas que explican una pantalla la primera vez y se cierran con ✕ para
-// no volver. Lo visto se guarda en el perfil, así va con la cuenta.
+// Tutorial: guías paso a paso por las pantallas y «pistas», notas pequeñas
+// que explican una pantalla la primera vez y se cierran con ✕ para no
+// volver. Lo visto se guarda en el perfil, así va con la cuenta.
+//
+// Hay tres guías, y se hacen en este orden o sueltas:
+//   'bienvenida' de qué va la app, lo que ya viene hecho, los ajustes que
+//                te ahorran trabajo y un primer entrenamiento guiado;
+//   'ejercicios' cómo es la ficha de un ejercicio y cómo crear el tuyo;
+//   'rutinas'    cómo montar tus días y ponerles ejercicios.
 //
 // Niveles:
-//   'basico'   te lo explica todo: siete pasos con explicaciones, notas en
-//              cada pantalla y un primer entrenamiento guiado casilla a casilla.
-//   'avanzado' solo dónde está cada cosa: los mismos siete pasos, en corto,
-//              sin notas (salvo la de la recámara, que es cosa de esta app).
+//   'basico'   te lo explica todo;
+//   'avanzado' solo dónde está cada cosa, sin explicar conceptos;
 //   'ninguno'  nada.
 // Lo que va de conceptos (progresiones, programas, técnicas…) vive en la
 // pantalla «Aprender», no en la guía.
@@ -16,8 +20,8 @@ import { h, anadir, modal, nuevoId, hoyISO } from '../ui.js';
 import { queEs } from './glosario.js';
 
 export const NIVELES = {
-  basico: { etiqueta: 'Explícamelo todo', descripcion: 'Un paseo de siete pasos por las pantallas, una nota corta en cada una la primera vez y un primer entrenamiento guiado casilla a casilla.' },
-  avanzado: { etiqueta: 'Solo dime dónde está cada cosa', descripcion: 'El mismo paseo, en corto y sin explicar conceptos. Solo queda la nota de la recámara, que es particular de esta app.' },
+  basico: { etiqueta: 'Explícamelo todo', descripcion: 'Cada paso con su explicación, notas cortas en cada pantalla la primera vez y un primer entrenamiento guiado casilla a casilla.' },
+  avanzado: { etiqueta: 'Solo dime dónde está cada cosa', descripcion: 'Los mismos pasos, en corto y sin explicar conceptos. Solo queda la nota de la recámara, que es particular de esta app.' },
   ninguno: { etiqueta: 'Sin tutorial', descripcion: 'Ninguna guía ni nota. Siempre puedes activarlas en Aprender.' },
 };
 
@@ -84,45 +88,123 @@ export function elegirNivel({ alElegir } = {}) {
 }
 
 // ---------------------------------------------------------------------------
-// Guía paso a paso: un panel abajo que te lleva por las pantallas
+// Guías paso a paso: un panel abajo que te lleva por las pantallas
 // ---------------------------------------------------------------------------
 
 // Cada paso tiene el texto largo (explícamelo todo) y el corto (solo dónde
 // está cada cosa). `selector` es lo que parpadea en esa pantalla.
-const PASOS = [
-  { ruta: '#/', titulo: 'Hoy', selector: 'main .boton.grande',
-    texto: 'Esta es tu pantalla de inicio. Arriba te dice qué toca hoy según tu rutina y debajo cómo va tu recuperación. '
-      + 'Cada entrenamiento se empieza con el botón que parpadea.',
-    corto: 'Inicio: qué toca hoy, tu recuperación y el botón para empezar.' },
-  { ruta: '#/rutinas', titulo: 'Rutinas', selector: '.plantilla button',
-    texto: 'Una rutina son tus días de entrenamiento, en orden. Abajo hay rutinas ya hechas: con «Añadir a mis rutinas» '
-      + 'te llevas la rutina y sus ejercicios en un toque. Si no sabes cuál, la que te recomendé en Hoy.',
-    corto: 'Rutinas: las tuyas arriba, las prehechas abajo. Puedes tener varias activas y fijar días de la semana.' },
-  { ruta: '#/ejercicios', titulo: 'Ejercicios', selector: '.cabecera-vista .boton',
-    texto: 'Aquí están tus ejercicios. Tocando uno cambias sus series, sus músculos y cómo quieres que suba el peso. '
-      + 'Con el botón que parpadea añades uno de la lista o creas el tuyo. Se guarda todo solo.',
-    corto: 'Ejercicios: la ficha de cada uno (series, progresión, músculos, máquina). «+ Nuevo» para añadir de la lista.' },
-  { ruta: '#/', titulo: 'Tu primer entrenamiento', prueba: true,
-    texto: 'Lo mejor es probarlo. El botón de abajo abre un entrenamiento de prueba con flexiones y te voy diciendo qué '
-      + 'escribir en cada casilla. Al terminar decides si lo guardas o lo borras.',
-    corto: 'Un entrenamiento de prueba, para ver cómo se apunta una serie y cómo arranca el descanso. Puedes saltarlo.' },
-  { ruta: '#/cuerpo', titulo: 'Cuerpo', selector: '.cuerpos',
-    texto: 'El mapa: verde, listo; naranja, a medias; rojo, aún tocado. Debajo, cuántas series has hecho de cada músculo '
-      + 'esta semana y consejos. Todo lo calcula la app con lo que apuntas.',
-    corto: 'Cuerpo: recuperación por músculo, volumen semanal y consejos.', glosario: ['recuperacion', 'volumen'] },
-  { ruta: '#/historial', titulo: 'Historial', selector: '.cabecera-vista .boton',
-    texto: 'Todos tus entrenamientos. Con el botón que parpadea apuntas uno de otro día. Lo que borres va a una papelera '
-      + 'y se puede recuperar.',
-    corto: 'Historial: entrenamientos pasados, «+ De otro día» y la papelera.' },
-  { ruta: '#/ajustes', titulo: 'Ajustes y Aprender', selector: '.apartado',
-    texto: 'Arriba, tu nombre, tu peso y la cuenta de Google. Lo demás va por apartados plegados: descansos, drop sets, '
-      + 'sitios donde entrenas y la zona de peligro. Ya puedes entrenar. Lo que quieras entender (progresiones, programas, '
-      + 'técnicas de estiramiento, el glosario) está en «Aprender».',
-    corto: 'Ajustes: perfil, cuenta, descansos, drop sets, sitios y zona de peligro. En «Aprender», el glosario y las explicaciones.' },
-];
+export const GUIAS = {
+  bienvenida: {
+    titulo: 'Bienvenida',
+    resumen: 'De qué va la app, lo que ya viene hecho y tu primer entrenamiento guiado. Empieza por aquí.',
+    pasos: [
+      { ruta: '#/', titulo: 'Hoy', selector: 'main .boton.grande',
+        texto: 'Esta es la idea de la app: entras, te dice qué toca hoy y tú solo apuntas lo que haces. El peso y las '
+          + 'repeticiones los calcula ella con tu historial. No tienes que acordarte de nada ni llevar cuentas.',
+        corto: 'Inicio: qué toca hoy, tu recuperación y el botón para empezar.' },
+
+      { ruta: '#/rutinas', titulo: 'No tienes que montar nada', selector: '.anadir-plantilla',
+        texto: 'Antes de crear nada: aquí abajo hay rutinas ya hechas, con sus días y sus ejercicios explicados. Con '
+          + '«Añadir a mis rutinas» te llevas la rutina entera y sus ejercicios de un toque. En Ejercicios pasa igual: hay '
+          + 'una lista general con más de trescientos. Crear los tuyos es para cuando quieras algo que no esté.',
+        corto: 'Rutinas: las tuyas arriba, las prehechas abajo. Buscador y filtros por fuerza, cardio y yoga.' },
+
+      { ruta: '#/ajustes', titulo: 'Ponlo a tu gusto una sola vez', selector: '#ap-entrenamiento-y-series',
+        texto: 'Esto es lo que más tiempo ahorra y casi nadie lo ve. En estos apartados dices cuánto descansas, cuántas '
+          + 'repeticiones te dejas en recámara, cómo son tus drop sets y cómo empiezan tus ciclos. A partir de ahí, cualquier '
+          + 'rutina prehecha que cargues y cualquier ejercicio que añadas salen ya con tus números. Ajustes primero y una '
+          + 'rutina prehecha después: tienes tu rutina en dos minutos.',
+        corto: 'Ajustes: descansos, recámara, drop sets y ciclos. Lo que pongas aquí es lo que traen los ejercicios nuevos.' },
+
+      { ruta: '#/ejercicios', titulo: 'Ejercicios', selector: '.buscador',
+        texto: 'Aquí están los tuyos. Si escribes en el buscador que parpadea, debajo salen también los de la lista general, '
+          + 'y se añaden con un toque. Tocando un ejercicio abres su ficha: sus series, sus músculos y cómo quieres que suba '
+          + 'el peso. Para uno que no exista, «+ Nuevo» (hay una guía aparte para eso).',
+        corto: 'Ejercicios: el buscador encuentra los tuyos y los de la lista general. Toca uno para su ficha.' },
+
+      { ruta: '#/', titulo: 'Tu primer entrenamiento', prueba: true,
+        texto: 'Ahora lo pruebas. El botón de abajo abre un entrenamiento de prueba con flexiones y te voy diciendo qué '
+          + 'escribir en cada casilla. Al terminar decides si lo guardas o lo borras.',
+        corto: 'Un entrenamiento de prueba, para ver cómo se apunta una serie y cómo arranca el descanso. Puedes saltarlo.' },
+
+      { ruta: '#/cuerpo', titulo: 'Cuerpo', selector: '.cuerpos',
+        texto: 'El mapa: verde, listo; naranja, a medias; rojo, aún tocado. Debajo, cuántas series has hecho de cada músculo '
+          + 'esta semana y consejos. Todo lo calcula la app con lo que apuntas.',
+        corto: 'Cuerpo: recuperación por músculo, volumen semanal y consejos.', glosario: ['recuperacion', 'volumen'] },
+
+      { ruta: '#/historial', titulo: 'Historial', selector: '.cabecera-vista .boton',
+        texto: 'Todos tus entrenamientos. El botón que parpadea sirve para apuntar uno de otro día: tócalo y te enseño cómo '
+          + 'se hace; si no te hace falta, dale a «Siguiente» y seguimos. Lo que borres va a una papelera y se recupera.',
+        corto: 'Historial: entrenamientos pasados, «+ De otro día» y la papelera.' },
+
+      { ruta: '#/aprender', titulo: 'Aprender', selector: '#ap-glosario',
+        texto: 'Ya puedes entrenar. Lo que quieras entender está aquí: qué significa cada palabra, cómo decide la app el peso '
+          + 'de hoy, las técnicas de estiramiento y de dónde sale cada recomendación. También están las otras dos guías: '
+          + 'crear tus ejercicios y montar tus rutinas.',
+        corto: 'Aprender: glosario, cómo decide la app, estiramientos, fuentes y las otras guías.' },
+    ],
+  },
+
+  ejercicios: {
+    titulo: 'Crear tus propios ejercicios',
+    resumen: 'Qué es cada pregunta de la ficha y cómo dejarla como quieres.',
+    pasos: [
+      { ruta: '#/ejercicios', titulo: 'Antes de crear', selector: '.buscador',
+        texto: 'Búscalo primero: si está en la lista general, se añade con un toque y viene con sus músculos puestos. '
+          + 'Solo hace falta crearlo cuando no exista o cuando quieras una variante tuya.',
+        corto: 'Busca antes de crear: la lista general trae más de trescientos.' },
+      { ruta: '#/ejercicio/nuevo', titulo: 'Con qué peso se hace', selector: 'fieldset',
+        texto: 'La primera pregunta: peso libre, máquina de placas, tu peso corporal, máquina asistida, altura o distancia de '
+          + 'salto, o sin peso. De aquí sale cómo se apuntan los kilos y qué pesos te propone la app.',
+        corto: 'Primera pregunta: con qué peso se hace.' },
+      { ruta: '#/ejercicio/nuevo', titulo: 'Qué apuntas', selector: 'fieldset:nth-of-type(2)',
+        texto: 'La segunda: repeticiones, tiempo, distancia, o varias a la vez. La primera que marcas es la que llevan las '
+          + 'reglas; las demás se apuntan al lado, por si quieres guardar también los metros o los minutos.',
+        corto: 'Segunda pregunta: qué se apunta en cada serie. Se pueden marcar varias.' },
+      { ruta: '#/ejercicio/nuevo', titulo: 'Cómo te lleva la app', selector: '.plan-serie',
+        texto: 'La tercera, y la que hace el trabajo: una regla por serie. La más sencilla es la doble progresión (subes '
+          + 'repeticiones y, al llegar arriba, la app sube el peso). El ciclo a escalera son tres preguntas: qué mejora cada '
+          + 'sesión, cuándo se acaba el ciclo y por dónde empieza el siguiente, con prehechos para no pensar.',
+        corto: 'Tercera pregunta: la regla de cada serie. El ciclo va en tres bloques con prehechos.',
+        glosario: ['doble-progresion', 'bilbo'] },
+      { ruta: '#/ejercicio/nuevo', titulo: 'Lo demás está plegado', selector: 'details',
+        texto: 'Los músculos, las técnicas de intensidad y los «Ajustes finos» (dónde se hace, fórmula del 1RM, tu recámara '
+          + 'para este ejercicio, notas) están plegados: ábrelos solo si los necesitas. Todo se guarda solo, y si te '
+          + 'equivocas puedes deshacer o salir sin guardar.',
+        corto: 'Músculos, técnicas y ajustes finos van plegados. Se guarda solo.' },
+    ],
+  },
+
+  rutinas: {
+    titulo: 'Crear tus propias rutinas',
+    resumen: 'Montar tus días, ponerles ejercicios y decidir cuándo toca cada uno.',
+    pasos: [
+      { ruta: '#/rutinas', titulo: 'Copia antes de montar', selector: '.anadir-plantilla',
+        texto: 'Lo más rápido: añade una prehecha parecida a lo que quieres y luego cámbiale lo que no te encaje. Trae los '
+          + 'días, los ejercicios y una explicación de por qué es así.',
+        corto: 'Añade una prehecha y cámbiala: más rápido que empezar de cero.' },
+      { ruta: '#/rutina/nueva', titulo: 'Los días', selector: '.formulario',
+        texto: 'Una rutina son días en orden: «empuje», «tirón», «pierna»… Ponles el nombre que quieras. La app te propondrá '
+          + 'el siguiente al último que hiciste.',
+        corto: 'Días en orden, con el nombre que quieras.' },
+      { ruta: '#/rutina/nueva', titulo: 'Los ejercicios de cada día', selector: '.formulario',
+        texto: 'Dentro de cada día añades ejercicios, tuyos o de la lista general. El orden es el que verás al entrenar, y se '
+          + 'puede cambiar luego.',
+        corto: 'Cada día lleva sus ejercicios, en el orden en que los harás.' },
+      { ruta: '#/rutina/nueva', titulo: 'Cuándo toca', selector: '.formulario',
+        texto: 'Puedes fijar días de la semana (lunes y jueves, por ejemplo) o no poner ninguno. Sin días fijos, la app elige '
+          + 'la rutina que mejor recuperada tengas. Y puedes tener varias activas a la vez: fuerza y estiramientos, por ejemplo.',
+        corto: 'Días de la semana o, si no pones ninguno, manda la recuperación.' },
+    ],
+  },
+};
 
 let panel = null;
 let subpaso = 0;   // dentro del entrenamiento de prueba: qué casilla toca
+
+function guiaActual(t) {
+  return GUIAS[t?.guia] ?? GUIAS.bienvenida;
+}
 
 // Un entrenamiento de prueba con flexiones (se crea el ejercicio si no lo
 // tienes). Al terminarlo, la app pregunta si guardarlo o borrarlo.
@@ -159,32 +241,38 @@ async function entrenamientoDePrueba() {
 export function guiaTrasPrueba() {
   const t = estado.datos()?.perfil?.tutoriales;
   if (t?.paso == null) return;
-  const k = PASOS.findIndex((p) => p.prueba);
+  const pasos = guiaActual(t).pasos;
+  const k = pasos.findIndex((p) => p.prueba);
   if (k < 0 || t.paso !== k) return;
   estado.cambiar((x) => { x.perfil.tutoriales.paso = k + 1; }, { tecleo: true });
-  const destino = PASOS[k + 1];
+  const destino = pasos[k + 1];
   if (destino && !(destino.ruta === '#/' ? enInicio() : location.hash === destino.ruta)) location.hash = destino.ruta;
   else pintarGuia();
 }
 
 const enInicio = () => location.hash === '' || location.hash === '#' || location.hash === '#/';
 
-export function iniciarGuia() {
+export function iniciarGuia(clave = 'bienvenida') {
   subpaso = 0;
   estado.cambiar((x) => {
     x.perfil.tutoriales ??= { nivel: null, vistos: {} };
+    x.perfil.tutoriales.guia = clave;
     x.perfil.tutoriales.paso = 0;
   }, { tecleo: true });
-  if (!enInicio()) location.hash = '#/';
+  const destino = (GUIAS[clave] ?? GUIAS.bienvenida).pasos[0].ruta;
+  if (!(destino === '#/' ? enInicio() : location.hash === destino)) location.hash = destino;
   window.scrollTo(0, 0);
   pintarGuia();
 }
 
 function terminarGuia() {
+  const clave = estado.datos()?.perfil?.tutoriales?.guia ?? 'bienvenida';
   estado.cambiar((x) => {
     x.perfil.tutoriales ??= { nivel: null, vistos: {} };
     x.perfil.tutoriales.paso = null;
-    x.perfil.tutoriales.guiaHecha = true;
+    x.perfil.tutoriales.hechas ??= {};
+    x.perfil.tutoriales.hechas[clave] = true;
+    if (clave === 'bienvenida') x.perfil.tutoriales.guiaHecha = true;
     // Un entrenamiento de prueba sin terminar no se queda colgado.
     x.sesiones = x.sesiones.filter((s) => !(s.tutorial && s.estado === 'en-curso'));
   });
@@ -193,22 +281,29 @@ function terminarGuia() {
 }
 
 // Dentro del entrenamiento de prueba: qué casilla toca ahora y qué decir.
-// Se mira el estado real de la serie, así el texto va con lo que haces.
+// Se mira el estado real de la serie, así el texto va con lo que haces y no
+// se pasa de casilla hasta que la rellenas.
 function subpasoDePrueba(sesion) {
   const serie = sesion.ejercicios[0]?.series[0];
-  const hechas = serie?.esfuerzo != null;
-  if (!hechas) {
+  if (serie?.esfuerzo == null) {
     return { selector: '#vista .serie input[aria-label="Repeticiones"]',
       texto: ['Haz una serie de flexiones: todas las que puedas con buena forma. Luego escribe cuántas ', queEs('repeticion', 'repeticiones'),
-        ' has hecho en la casilla que parpadea. Si llevabas algún peso encima, va en «lastre»; si no, déjalo.'] };
+        ' has hecho en la casilla que parpadea. Cada casilla lleva encima su nombre.'] };
   }
   if (subpaso < 1) {
     return { selector: '#vista .serie input[aria-label="Repeticiones en recámara"]', boton: 'Ya está',
-      texto: ['En la casilla «+» va la ', queEs('recamara', 'recámara'), ': cuántas más podrías haber hecho. Viene puesto 1 porque es lo que ',
-        'recomendamos (quedarse a una del fallo). Si te dejaste 3, pon 3; si no podías más, 0. Abajo ya corre el descanso.'] };
+      texto: ['Debajo va la ', queEs('recamara', 'recámara'), ': cuántas más podrías haber hecho. Viene puesta 1 porque es lo que ',
+        'recomendamos (quedarse a una del fallo). Si te dejaste 3, pon 3; si no podías más, 0. Arriba ya está corriendo el descanso: '
+        + 'puedes alargarlo o saltarlo.'] };
+  }
+  if (subpaso < 2) {
+    return { selector: '#vista .boton.secundario.grande', boton: 'Sigo',
+      texto: 'Si un día te apetece hacer algo que no estaba en la rutina, con este botón lo añades al entrenamiento, aunque '
+        + 'no sea tuyo todavía: lo buscas y entra con sus músculos puestos. Hoy no hace falta.' };
   }
   return { selector: '#vista .boton.grande.terminar-entreno',
-    texto: 'Cuando acabe el descanso harías la siguiente serie. Hoy basta con una: toca «Terminar entrenamiento» y elige si lo guardas o lo borras.' };
+    texto: 'Ya está. Toca «Terminar entrenamiento» y elige si lo guardas o lo borras: al ser de prueba, no cuenta para tus récords '
+      + 'ni para la recuperación si lo borras.' };
 }
 
 // Se llama después de pintar cada pantalla: enseña el panel si la guía va
@@ -225,6 +320,8 @@ export function pintarGuia() {
     return;
   }
   const corto = t.nivel === 'avanzado';
+  const guia = guiaActual(t);
+  const PASOS = guia.pasos;
   const paso = PASOS[Math.min(n, PASOS.length - 1)];
   if (!panel || !panel.isConnected) {
     panel = h('aside', { class: 'guia', role: 'dialog', 'aria-label': 'Guía paso a paso' });
@@ -247,7 +344,7 @@ export function pintarGuia() {
 
   // Solo parpadea algo si estamos en la pantalla del paso: fuera de ella
   // (por ejemplo, dentro de otro entrenamiento) no hay nada que señalar.
-  const enSuRuta = paso.ruta === '#/' ? enInicio() : location.hash === paso.ruta;
+  const enSuRuta = paso.ruta === '#/' ? enInicio() : location.hash.startsWith(paso.ruta);
   for (const el of document.querySelectorAll('.parpadea')) el.classList.remove('parpadea');
   const selector = sub ? sub.selector : (enSuRuta ? paso.selector : null);
   const objetivo = selector ? document.querySelector(selector) : null;
@@ -258,12 +355,12 @@ export function pintarGuia() {
   anadir(panel,
     h('div', { class: 'guia-cabecera' },
       h('strong', {}, paso.titulo),
-      h('span', { class: 'suave' }, `paso ${n + 1} de ${PASOS.length}`)),
+      h('span', { class: 'suave' }, `${guia.titulo} · paso ${n + 1} de ${PASOS.length}`)),
     h('p', {}, sub ? sub.texto : (corto ? paso.corto : paso.texto)),
     !corto && !sub && paso.glosario && h('p', { class: 'guia-glosario' }, paso.glosario.map((g) => queEs(g))),
-    paso.prueba && !sub && h('button', { class: 'boton secundario parpadea', onclick: entrenamientoDePrueba },
+    paso.prueba && !sub && h('button', { class: 'boton grande parpadea guia-prueba', onclick: entrenamientoDePrueba },
       hayPrueba ? 'Volver al entrenamiento de prueba' : 'Hacer el entrenamiento de prueba'),
-    sub?.boton && h('button', { class: 'boton secundario', onclick: () => { subpaso = 1; pintarGuia(); } }, sub.boton),
+    sub?.boton && h('button', { class: 'boton secundario', onclick: () => { subpaso += 1; pintarGuia(); } }, sub.boton),
     h('div', { class: 'fila-botones' },
       h('button', { class: 'boton enlace', onclick: terminarGuia }, 'Salir'),
       n > 0 && !sub && h('button', { class: 'boton secundario', onclick: () => ir(n - 1) }, 'Anterior'),

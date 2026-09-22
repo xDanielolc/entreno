@@ -4,6 +4,7 @@
 
 import * as estado from '../estado.js';
 import { h, modal } from '../ui.js';
+import { TIPOS_SEDE, nuevaSede } from '../sedes.js';
 import { fijarNivel, iniciarGuia } from './tutorial.js';
 
 export const PREGUNTAS = [
@@ -39,6 +40,7 @@ export function aplicarTema(tema) {
 // Qué rutina prehecha encaja con lo que ha contestado.
 export function rutinaRecomendada(perfil) {
   const q = perfil.cuestionario ?? {};
+  if (q.objetivo === 'movilidad') return 'flexibilidad-tres-sesiones';
   if (q.donde === 'calle' || q.donde === 'casa') return 'calistenia-cuerpo-entero';
   if (q.experiencia === 'novato') return 'cuerpo-entero-principiantes';
   if (q.objetivo === 'fuerza') return 'cinco-por-cinco';
@@ -73,18 +75,46 @@ export function hacerCuestionario({ alTerminar } = {}) {
       i > 0 && h('button', { class: 'boton enlace', onclick: () => { i -= 1; pintar(); } }, 'Anterior')));
   };
 
+  // Lo que contestas cambia cosas de verdad, y al final se dice cuáles.
   const terminar = () => {
     cerrar?.();
+    const nivel = respuestas.experiencia === 'avanzado' ? 'avanzado' : 'basico';
     estado.cambiar((x) => {
       x.perfil.cuestionario = { ...respuestas, hecho: true };
       x.perfil.tema = respuestas.tema ?? 'sistema';
+      // Quien dice saber bastante no quiere «?» detrás de cada palabra.
+      x.perfil.glosario = respuestas.experiencia === 'avanzado' ? 'ninguno' : 'siempre';
+      // Quien empieza se queda más lejos del fallo: rinde casi igual y se
+      // recupera antes mientras coge técnica.
+      if (respuestas.experiencia === 'novato') x.perfil.recamaraPorDefecto ??= 2;
+      // El sitio donde entrenas queda creado, y es el que sale al entrenar.
+      if (respuestas.donde && !(x.sedes || []).length) {
+        const sede = nuevaSede(TIPOS_SEDE[respuestas.donde]?.etiqueta ?? 'Mi sitio', respuestas.donde);
+        x.sedes = [...(x.sedes || []), sede];
+        x.perfil.sedePorDefecto = sede.id;
+      }
     });
-    // El nivel del tutorial sale de la experiencia; la guía arranca en el acto.
-    const nivel = respuestas.experiencia === 'avanzado' ? 'avanzado' : 'basico';
     fijarNivel(nivel);
     alTerminar?.(respuestas);
-    iniciarGuia();
+    resumen(respuestas);
   };
+
+  // Qué ha cambiado con lo que ha contestado, en una lista corta.
+  function resumen(r) {
+    const lineas = [];
+    lineas.push(r.experiencia === 'avanzado'
+      ? 'Te digo solo dónde está cada cosa, sin explicar conceptos ni poner «?» detrás de las palabras.'
+      : r.experiencia === 'novato'
+        ? 'Te lo explico todo, con notas en cada pantalla, y dejo puesta una recámara de 2 (más lejos del fallo mientras coges técnica).'
+        : 'Te lo explico todo, con notas cortas en cada pantalla.');
+    if (r.donde) lineas.push(`He creado tu sitio: ${TIPOS_SEDE[r.donde]?.etiqueta}. Cada entrenamiento se guardará ahí.`);
+    lineas.push(`La rutina que te recomiendo en «Hoy» va con lo que buscas (${PREGUNTAS[1].opciones[r.objetivo]?.etiqueta.toLowerCase() ?? 'tu objetivo'}).`);
+    lineas.push('Todo esto se cambia luego en Ajustes y en Aprender; nada queda fijo.');
+    const cerrarR = modal('Listo, queda así', h('div', {},
+      h('ul', {}, lineas.map((x) => h('li', {}, x))),
+      h('button', { class: 'boton', onclick: () => { cerrarR(); iniciarGuia(); } }, 'Empezar el tutorial'),
+      h('button', { class: 'boton enlace', onclick: () => cerrarR() }, 'Ahora no')));
+  }
 
   pintar();
 }

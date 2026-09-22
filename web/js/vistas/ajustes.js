@@ -2,7 +2,7 @@ import { creditosCargados } from '../imagenes.js';
 import { formatearNumero } from '../calculos.js';
 import * as estado from '../estado.js';
 import { desconectar, eliminarCuenta, rehacerCopiasLegibles, sincronizar, situacionActual } from '../sincronizacion.js';
-import { modal } from '../ui.js';
+import { idApartado, modal } from '../ui.js';
 import { VERSION_APP } from '../version.js';
 import { anadir, aviso, confirmar, h, hoyISO, leerNumero } from '../ui.js';
 import { DESCANSO_ESTIRAMIENTOS_POR_DEFECTO, DESCANSO_TRAMOS_POR_DEFECTO, RESPIRACION_POR_DEFECTO } from './descanso.js';
@@ -45,7 +45,9 @@ export function vistaAjustes(contenedor) {
   }
 
   // Un apartado plegado: título y, dentro, sus ajustes.
-  const apartado = (titulo, ...contenido) => h('details', { class: 'tarjeta formulario apartado' },
+  // Cada apartado lleva su id (sacado del título) para que la guía pueda
+  // señalarlo y para poder enlazarlo desde otra pantalla.
+  const apartado = (titulo, ...contenido) => h('details', { class: 'tarjeta formulario apartado', id: idApartado(titulo) },
     h('summary', {}, titulo), ...contenido);
 
   anadir(contenedor,
