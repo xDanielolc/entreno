@@ -107,7 +107,7 @@ export function aviso(texto, { tipo = 'info', ms, accion } = {}) {
     document.body.append(caja);
   }
   const ocultar = () => caja.classList.remove('visible');
-  const porLectura = 4000 + String(texto).length * 60;
+  const porLectura = 5000 + String(texto).length * 90;
   // Con anadir() y no con replaceChildren(): sin acción, este segundo hijo
   // es undefined y el navegador lo escribiría como texto («undefined»).
   caja.replaceChildren();
@@ -116,7 +116,7 @@ export function aviso(texto, { tipo = 'info', ms, accion } = {}) {
     h('button', { class: 'aviso-cerrar', 'aria-label': 'Cerrar aviso', onclick: ocultar }, '✕'));
   caja.className = `aviso aviso-${tipo} visible`;
   clearTimeout(temporizadorAviso);
-  temporizadorAviso = setTimeout(ocultar, ms ?? Math.min(15000, accion ? Math.max(10000, porLectura) : porLectura));
+  temporizadorAviso = setTimeout(ocultar, ms ?? (accion ? Math.min(40000, Math.max(14000, porLectura)) : Math.min(25000, porLectura)));
 }
 
 // Ventana modal sencilla. Devuelve una función para cerrarla.

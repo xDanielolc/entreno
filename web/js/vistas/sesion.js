@@ -258,7 +258,7 @@ export function vistaSesion(contenedor, { id }) {
         : ej.esfuerzo?.tipo === 'tiempo'
           ? 'Apunta la serie al acabarla: al escribir el tiempo arranca el descanso.'
           : 'Apunta la serie al acabarla: al escribir las repeticiones arranca el descanso. '
-            + 'La casilla «+» es la recámara (toca «?» para saber más).'),
+            + 'Cada casilla lleva encima lo que va dentro (toca «?» para saber más).'),
 
       entrada.series.map((serie, j) => {
         const bloque = bloqueSerie(ej, entrada, indice, j, serie);
@@ -353,14 +353,14 @@ export function vistaSesion(contenedor, { id }) {
     const actualizar = (fn) => { cambiarSesion((s) => fn(s.ejercicios[i].series[j]), { tecleo: true }); if (sesion.tutorial) pintarGuia(); };
     return h('div', { class: 'serie-valores extras' },
       campos.map((c) => h('label', { class: 'valor' },
+        h('span', { class: 'et' }, `${c.etiqueta} (${c.unidad})`),
         h('input', { type: 'text', inputmode: 'decimal', value: serie.detalle?.[c.tecnica]?.[c.clave] ?? '',
           'aria-label': `${c.etiqueta} (${c.unidad})`,
           oninput: (e) => actualizar((x) => {
             x.detalle ??= {};
             x.detalle[c.tecnica] ??= {};
             x.detalle[c.tecnica][c.clave] = leerNumero(e.target.value);
-          }) }),
-        h('span', {}, `${c.etiqueta} (${c.unidad})`))));
+          }) }))));
   }
 
   // Estiramientos, movilidad y yoga: con qué técnica, con qué ayuda y, si
@@ -429,6 +429,7 @@ export function vistaSesion(contenedor, { id }) {
 
     return h('div', { class: 'serie-valores' },
       corporal && h('label', { class: 'valor' },
+        h('span', { class: 'et' }, 'Lastre (kg)'),
         h('input', { type: 'text', inputmode: 'decimal', value: serie.lastre ?? 0, 'aria-label': 'Lastre (kg)',
           oninput: (e) => {
             actualizar((x) => {
@@ -438,9 +439,10 @@ export function vistaSesion(contenedor, { id }) {
             });
             recalcularAbajo(ej, i);
           } }),
-        h('span', {}, 'kg lastre'), cargaCorporalTexto),
+        cargaCorporalTexto),
       tipoCarga !== 'ninguna' && !corporal && (asistida
         ? h('label', { class: 'valor' },
+          h('span', { class: 'et' }, 'kg de la máquina'),
           h('input', { type: 'text', inputmode: 'decimal', value: serie.lectura ?? '', 'aria-label': 'Kilos que marca la máquina',
             oninput: (e) => {
               actualizar((x) => {
@@ -450,10 +452,11 @@ export function vistaSesion(contenedor, { id }) {
               });
               recalcularAbajo(ej, i);
             } }),
-          h('span', {}, 'kg máq'), cargaReal)
+          cargaReal)
         : campoCargaConPorcentaje(ej, i, j, serie)),
 
       h('label', { class: 'valor' },
+        h('span', { class: 'et' }, unidadEsfuerzo(ej)),
         h('input', { type: 'text', inputmode: esTiempo(ej) ? 'numeric' : 'decimal', 'aria-label': TIPOS_ESFUERZO[ej.esfuerzo.tipo].etiqueta,
           value: esTiempo(ej) ? formatearTiempo(serie.esfuerzo) : (serie.esfuerzo ?? ''),
           placeholder: esTiempo(ej) ? 'mm:ss' : null,
@@ -465,22 +468,20 @@ export function vistaSesion(contenedor, { id }) {
               if (antes == null && x.esfuerzo != null) descansoEntreSeries(ej);
             });
             recalcularAbajo(ej, i);
-          } }),
-        h('span', {}, unidadEsfuerzo(ej))),
+          } })),
 
       // «En recámara»: las repeticiones que podrías haber hecho y no hiciste.
       ej.esfuerzo.tipo === 'repeticiones' && h('label', { class: 'valor recamara' },
-        h('span', {}, '+'),
+        h('span', { class: 'et' }, 'Recámara', queEs('recamara', '?')),
         h('input', { type: 'text', inputmode: 'decimal', value: serie.recamara ?? '', 'aria-label': 'Repeticiones en recámara',
           oninput: (e) => { actualizar((x) => { x.recamara = leerNumero(e.target.value); }); recalcularAbajo(ej, i); },
           onchange: (e) => ofrecerRecamara(ej, leerNumero(e.target.value)) }),
-        h('span', {}, serie.recamara != null ? (tipoDeFallo(serie.recamara) || 'recámara') : 'recámara'),
-        queEs('recamara', '?')),
+        h('small', {}, serie.recamara != null ? (tipoDeFallo(serie.recamara) || '') : '')),
 
       ej.esfuerzoExtra && h('label', { class: 'valor' },
+        h('span', { class: 'et' }, TIPOS_ESFUERZO[ej.esfuerzoExtra.tipo].unidad),
         h('input', { type: 'text', inputmode: 'decimal', value: serie.esfuerzoExtra ?? '', 'aria-label': 'Distancia',
-          oninput: (e) => actualizar((x) => { x.esfuerzoExtra = leerNumero(e.target.value); }) }),
-        h('span', {}, TIPOS_ESFUERZO[ej.esfuerzoExtra.tipo].unidad)));
+          oninput: (e) => actualizar((x) => { x.esfuerzoExtra = leerNumero(e.target.value); }) })));
   }
 
   // Kilos y porcentaje del 1RM, enlazados: escribes en uno y se rellena el
@@ -522,8 +523,8 @@ export function vistaSesion(contenedor, { id }) {
     });
 
     return h('div', { class: 'carga-con-porcentaje' },
-      h('label', { class: 'valor' }, kilos, h('span', {}, unidadCarga(ej))),
-      h('label', { class: 'valor' }, porcentaje, h('span', {}, '% 1RM')));
+      h('label', { class: 'valor' }, tramo == null && h('span', { class: 'et' }, unidadCarga(ej)), kilos),
+      h('label', { class: 'valor' }, tramo == null && h('span', { class: 'et' }, '% 1RM'), porcentaje));
   }
 
   // Drop set, rest-pause y miorrepeticiones: una línea por bajada, con lo que
@@ -595,8 +596,7 @@ export function vistaSesion(contenedor, { id }) {
                   }
                 } else descansoEntreSeries(ej);
               }
-            }) }),
-          h('span', {}, unidadEsfuerzo(ej))),
+            }) })),
         serie.tramos.length > 1 && h('button', { class: 'boton-icono', 'aria-label': `Quitar ${tramos.nombre.toLowerCase()} ${k + 1}`,
           onclick: () => cambiarSesion((s) => { s.ejercicios[i].series[j].tramos.splice(k, 1); }) }, '✕'))),
 

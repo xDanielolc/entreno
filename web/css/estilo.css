@@ -23,6 +23,9 @@
   --mal: #b3261e;
   --aviso: #8a5a00;
   --aviso-fondo: #fff4d6;
+  --cartel-fondo: #1d1f23;
+  --cartel-texto: #f6f5f2;
+  --cartel-borde: #1d1f23;
 
   --radio: 14px;
   --radio-pequeno: 10px;
@@ -47,6 +50,9 @@
   --mal: #ff8a80;
   --aviso: #ffd27a;
   --aviso-fondo: #3a3020;
+  --cartel-fondo: #2a2e36;
+  --cartel-texto: #eceef2;
+  --cartel-borde: #4b515e;
   --sombra: none;
 }
 
@@ -67,6 +73,9 @@
     --mal: #ff8a80;
     --aviso: #ffd27a;
     --aviso-fondo: #3a3020;
+    --cartel-fondo: #2a2e36;
+    --cartel-texto: #eceef2;
+    --cartel-borde: #4b515e;
     --sombra: none;
   }
 }
@@ -451,12 +460,17 @@ input.fecha { width: auto; }
 .serie-cabecera select { width: auto; flex: 0 1 auto; min-height: 40px; padding: 6px 10px; }
 .serie-cabecera .boton-icono { margin-left: auto; }
 
-.serie-valores { display: flex; flex-wrap: wrap; gap: 10px; }
+/* Cada casilla lleva su nombre encima, como la tabla de las bajadas. Las
+   columnas se reparten solas: caben tres en un móvil y más en pantallas
+   anchas, sin que nada se apelotone. */
+.serie-valores { display: grid; grid-template-columns: repeat(auto-fit, minmax(84px, 1fr)); gap: 10px; align-items: end; }
 
-.valor { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; flex: 1 1 130px; }
-.valor input { font-size: 1.25rem; font-weight: 600; text-align: center; max-width: 110px; }
+.valor { display: flex; flex-direction: column; align-items: stretch; gap: 3px; min-width: 0; }
+.valor input { font-size: 1.25rem; font-weight: 600; text-align: center; max-width: none; width: 100%; }
+.valor > .et { font-size: 0.8rem; line-height: 1.2; color: var(--texto-suave); display: flex; align-items: center; gap: 4px; min-height: 1.2em; }
+.valor > .et .que-es { flex: 0 0 auto; }
 .valor span { color: var(--texto-suave); }
-.valor small { flex-basis: 100%; }
+.valor small { color: var(--texto-suave); font-size: 0.78rem; }
 
 .serie.hecha .valor input { border-color: var(--acento); }
 
@@ -487,16 +501,21 @@ input.fecha { width: auto; }
   padding: 12px 16px;
   line-height: 1.35;
   border-radius: var(--radio-pequeno);
-  background: var(--texto);
-  color: var(--fondo);
+  background: var(--cartel-fondo);
+  color: var(--cartel-texto);
+  border: 1px solid var(--cartel-borde);
+  box-shadow: 0 6px 24px rgb(0 0 0 / 28%);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s, transform 0.2s;
 }
 
 .aviso.visible { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
-.aviso { display: flex; align-items: center; gap: 12px; }
-.aviso-texto-caja { flex: 1; }
+.aviso { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+/* El texto se queda en una línea con los botones si cabe; si no, se los
+   lleva abajo él solo. Así no hay que medir nada a mano. */
+.aviso-texto-caja { flex: 1 1 auto; min-width: min(100%, 20em); overflow-wrap: anywhere; }
+.aviso-accion { margin-left: auto; }
 .aviso-cerrar { font: inherit; color: inherit; background: none; border: none; min-width: 36px; min-height: 36px; cursor: pointer; opacity: .8; }
 html, body { overflow-x: hidden; max-width: 100%; }
 input, select, textarea { max-width: 100%; box-sizing: border-box; }
@@ -578,7 +597,7 @@ input, select, textarea { max-width: 100%; box-sizing: border-box; }
 .tramos { display: grid; gap: 8px; margin: 6px 0; }
 
 .tramo { display: flex; align-items: center; gap: 8px; }
-.tramo .valor { flex: 1 1 100px; }
+.tramo .valor { flex: 1 1 100px; min-width: 0; }
 .tramo .valor input { font-size: 1.05rem; }
 /* Con la cabecera común, las etiquetas de cada casilla sobran. */
 .tramo:not(.cabecera-tramos) .valor > span { display: none; }
@@ -665,8 +684,7 @@ input, select, textarea { max-width: 100%; box-sizing: border-box; }
 .serie-valores.extras { margin-top: 8px; }
 .serie-valores.extras .valor input { font-size: 1rem; }
 
-.valor.recamara { flex: 0 1 auto; }
-.valor.recamara input { max-width: 64px; font-size: 1rem; }
+.serie-valores.extras { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); }
 
 /* --------------------------------------------------------------------------
    Gráficas de progreso
@@ -701,9 +719,12 @@ input, select, textarea { max-width: 100%; box-sizing: border-box; }
 .tabla-datos tbody th { text-align: left; color: var(--texto-suave); font-weight: 400; }
 
 /* Kilos y porcentaje enlazados */
+/* Dentro de una serie, los kilos y el % del 1RM son dos columnas más de la
+   rejilla (display: contents); dentro de una bajada siguen en fila. */
+.serie-valores > .carga-con-porcentaje { display: contents; }
 .carga-con-porcentaje { display: flex; gap: 8px; flex: 1 1 200px; }
 .carga-con-porcentaje .valor { flex: 1 1 90px; }
-.carga-con-porcentaje input.porcentaje { font-size: 1rem; max-width: 70px; }
+.carga-con-porcentaje input.porcentaje { font-size: 1rem; }
 
 .fuente { border-bottom: 1px solid var(--borde); }
 .fuente summary { min-height: var(--alto-toque); display: flex; align-items: center; font-weight: 600; cursor: pointer; }
