@@ -20,7 +20,7 @@ import { seccionProgreso } from './graficas.js';
 import { imagenDe, textoCredito } from '../imagenes.js';
 import { anadir, aviso, confirmar, h, leerNumero, modal, nuevoId } from '../ui.js';
 import { pista } from './tutorial.js';
-import { barraFiltros, cajaLista, elegirEjercicio, filtrar, tarjetaItem } from './selector-ejercicios.js';
+import { barraFiltros, cajaLista, ejercicioDesdeCatalogo, elegirEjercicio, filtrar, hayFiltro, pieCatalogo, tarjetaItem } from './selector-ejercicios.js';
 import { selectorTecnicas } from './tecnicas.js';
 import { TECNICAS } from '../esquema.js';
 
@@ -63,18 +63,43 @@ export function vistaEjercicios(contenedor) {
       grupos.get(g).push(e);
     }
 
+    // Si estás buscando, también salen los de la lista general que aún no
+    // tienes: así «peso muerto con mancuernas» o la pliometría aparecen
+    // aunque no los hayas añadido nunca.
+    const mios = new Set(d.ejercicios.filter((e) => !e.borrado).map((e) => normalizar(e.nombre)));
+    const deLista = hayFiltro() ? filtrar(CATALOGO.filter((x) => !mios.has(normalizar(x.nombre)))) : [];
+
     zona.replaceChildren();
-    if (!lista.length) {
+    if (!lista.length && !deLista.length) {
       anadir(zona, h('p', { class: 'suave' }, d.ejercicios.length
-        ? 'Ningún ejercicio coincide con los filtros.'
+        ? 'Ningún ejercicio coincide con los filtros, ni tuyo ni de la lista general.'
         : 'Crea tu primer ejercicio: eliges qué mide y cómo progresa cada una de sus series.'));
       return;
     }
-    anadir(zona, [...grupos].map(([grupo, ejercicios]) => h('section', {},
-      h('h2', {}, grupo.charAt(0).toUpperCase() + grupo.slice(1)),
-      anadir(cajaLista(), ejercicios.map((e) => tarjetaEjercicio(d, e))))));
+    anadir(zona,
+      [...grupos].map(([grupo, ejercicios]) => h('section', {},
+        h('h2', {}, grupo.charAt(0).toUpperCase() + grupo.slice(1)),
+        anadir(cajaLista(), ejercicios.map((e) => tarjetaEjercicio(d, e))))),
+      deLista.length > 0 && h('section', {},
+        h('h2', {}, 'De la lista general'),
+        h('p', { class: 'nota' }, 'Aún no son tuyos. Toca uno y se añade con sus músculos puestos.'),
+        anadir(cajaLista(), deLista.map((x) => tarjetaCatalogo(x)))));
   }
   pintarLista();
+}
+
+// Un ejercicio de la lista general, para añadirlo desde el buscador.
+function tarjetaCatalogo(x) {
+  return tarjetaItem(x, {
+    pie: pieCatalogo(x),
+    extra: h('span', { class: 'etiqueta' }, '+ Añadir'),
+    onclick: () => {
+      const nuevo = ejercicioDesdeCatalogo(x);
+      estado.cambiar((datos) => { datos.ejercicios.push(nuevo); });
+      aviso(`${x.nombre} añadido a tus ejercicios.`,
+        { accion: { texto: 'Abrir', fn: () => { location.hash = `#/ejercicio/${nuevo.id}`; } } });
+    },
+  });
 }
 
 function tarjetaEjercicio(datos, ej) {
