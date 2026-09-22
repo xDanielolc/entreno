@@ -239,6 +239,62 @@ plegados (sede, fórmula, `ej.recamaraPorDefecto`, notas). Recámara: al poner
 dos veces el mismo valor en un ejercicio, la sesión ofrece fijarlo
 (`ofrecerRecamara`). Pliometría en el catálogo (7 entradas, imagen por alias).
 Página de pruebas del artefacto ahora guarda en `pruebas/v021` (26 puntos).
+## Rondas 0.22.0 a 0.23.2 (22-09-2026): la lista larga de Dan
+
+Casillas de la serie: rejilla `repeat(auto-fit, minmax(84px, 1fr))` con el
+nombre encima de cada una (`span.et`), como la tabla de las bajadas; el
+`.carga-con-porcentaje` usa `display: contents` dentro de la serie. Carteles
+negros: tokens propios `--cartel-fondo/-texto/-borde` por tema (en oscuro ya
+no salen blancos), se reparten solos (`min-width: min(100%, 20em)` en el
+texto) y duran más. «Aprender» es una pestaña (`pestana: 'aprender'`, seis
+columnas en la barra) y recoge «Cómo se estima tu 1RM» y los créditos de las
+imágenes; Ajustes queda entero plegado, con Perfil y Personalización aparte.
+Los apartados llevan `id` (`idApartado()` en ui.js: «ap-entrenamiento-y-
+series»), que es lo que señala la guía.
+
+Ciclos: la ficha los parte en tres bloques («¿Qué mejoras cada sesión?»,
+«¿Cuándo se acaba el ciclo?» con casilla por condición, «¿Por dónde empieza el
+siguiente?»). Nuevo modo de reinicio `rm-ciclo` (al % del mejor 1RM logrado en
+ese ciclo, `mejorRMDelCiclo()` en calculos.js), que es lo que hace Bilbo de
+verdad; las sesiones son un tope, no la meta. `ciclo.generador.inicialEsfuerzo`
+y `.incrementoEsfuerzo` permiten que suban peso y repeticiones a la vez. Los
+textos dejan de dar órdenes («objetivo X», no «llega a X»). Cortar un ciclo y
+quitar una serie se deshacen desde el aviso.
+
+Medidas: `ej.medidas` (lista ordenada; la primera manda) y `serie.extras`
+(por nombre de medida); `medidasDe()` y `extraDeSerie()` en esquema.js leen
+también el formato viejo (`esfuerzo` + `esfuerzoExtra`). El tiempo se escribe
+en tres huecos (h/min/s, `campoTiempo()` en sesion.js): el teclado del móvil
+no tiene dos puntos.
+
+Buscar en la pestaña Ejercicios encuentra también los del catálogo que aún no
+tienes, con «+ Añadir» (`tarjetaCatalogo`). Drop set: una sola pregunta («de
+dónde salen los pesos»: ultima / auto / mano / fijos) y se expone
+`plan.tramoInicio` (el % del 1RM por el que arranca). Glosario: `perfil.glosario`
+= siempre | primera | ninguno (por defecto siempre; avanzado = ninguno), y el
+propio cartel lleva «No me pongas más «?»». Sesión: fuera el botón grande de
+«Siguiente ejercicio» (quedan las flechas, ahora `.boton-paso`), la línea de
+vista solo al final, y el cartel de «¿cómo quieres verlo?» se puede quitar
+(`perfil.preguntarVista`). Volumen: el mínimo de 10 series baja a 6 en los
+músculos que entrenas al fallo o con bajadas (`durezaSemanal()`,
+`serieDura()`), que era la queja de «no me convence lo de las 10 series».
+
+Tutorial: tres guías (`GUIAS`: bienvenida / ejercicios / rutinas), la de
+bienvenida en orden lógico (lo que ya viene hecho → los ajustes que ahorran
+trabajo → ejercicios → entrenar → cuerpo → historial → aprender), y el
+entrenamiento de prueba va casilla a casilla incluido «+ Añadir ejercicio».
+El cuestionario de bienvenida ahora cambia cosas de verdad (crea la sede, fija
+`perfil.glosario`, la recámara si eres novato y la rutina recomendada) y al
+acabar dice qué ha cambiado.
+
+Cardio: cronómetro (`abrirCronometro`) además de los intervalos, en cualquier
+ejercicio medido en tiempo; intervalos propios (`perfil.hiitPropios`); quince
+tipos de cardio más en el catálogo; ni técnicas de intensidad ni programas en
+cardio. Google: el pase se renueva a los quince minutos de margen, con
+`pedirToken({ forzar: true })` (antes no renovaba nada porque el token seguía
+«vigente»), como mucho cada diez minutos, nunca mientras escribes, y avisando
+antes: era el «parpadeo de la pantalla de Google» a mitad de entrenamiento.
+
 PENDIENTE: nombre e icono con Design («luego ya decoramos»); combinar varias
 ayudas y medidas en un estiramiento (mano + cm + segundos): él decide si urge;
 las casillas «apelotonadas» de la sesión: falta que diga en qué pantalla.

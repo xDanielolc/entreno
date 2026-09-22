@@ -467,6 +467,18 @@ El paso 3 no es opcional. Es la red de seguridad.
   esfuerzoMax }`, `reinicio = { modo, porcentaje }`; cada ciclo lleva
   `inicio` y `fin` (fechas). En creditos.json, `aliasDe` marca las imágenes
   que reutilizan la de otro ejercicio.
+- **Sin cambio de versión (0.22-0.23).** Perfil: `glosario` ('siempre' |
+  'primera' | 'ninguno'), `preguntarVista` (false = no preguntar cómo ver el
+  entreno), `hiitPropios` (lista de `{ nombre, trabajo, descanso, rondas }`),
+  `tutoriales.guia` (guía en curso) y `tutoriales.hechas` (por guía).
+  Ejercicios: `medidas` (lista ordenada de 'repeticiones' | 'tiempo' |
+  'distancia'; la primera es la que llevan las reglas, y si falta se deduce de
+  `esfuerzo` + `esfuerzoExtra`). Series de una sesión: `extras` (lo apuntado en
+  las medidas que no son la principal, por nombre). Progresión de ciclo:
+  `reinicio.modo` acepta `'rm-ciclo'` (al % del mejor 1RM logrado en ese ciclo)
+  y `ciclo.generador` acepta `inicialEsfuerzo` e `incrementoEsfuerzo` (que
+  suban peso y repeticiones a la vez). Planes de serie: `tramoInicio` (% del
+  1RM por el que arranca un drop set).
 - **Sin cambio de versión (0.15.0).** Rutinas: `activa` puede ser true en
   varias a la vez y `diasSemana` (lista de 0 = lunes … 6 = domingo, o null).
   Ejercicios: `pesosMaquina` (lista de kg disponibles, o null) y `borrado`
