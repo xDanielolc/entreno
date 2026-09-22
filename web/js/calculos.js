@@ -165,6 +165,17 @@ export function sugerenciaSerie(datos, ejercicio, plan, { excluirSesion } = {}) 
   return { ...base, carga: ultima?.serie.carga ?? referencia?.serie.carga ?? null };
 }
 
+// El mejor 1RM estimado de las series hechas dentro de un ciclo. Es lo que
+// usa el reinicio «al % del mejor 1RM de este ciclo».
+export function mejorRMDelCiclo(datos, ejercicio, plan, cicloN) {
+  let mejor = null;
+  for (const r of registrosDelCiclo(datos, ejercicio, plan, cicloN)) {
+    const rm = rmDeSerie(datos, ejercicio, r.serie, esfuerzoTotal(r.serie));
+    if (rm && (mejor == null || rm > mejor)) mejor = rm;
+  }
+  return mejor;
+}
+
 function sugerenciaBilbo(datos, ejercicio, plan, { excluirSesion, sobre }) {
   const prog = plan.progresion;
   const ciclo = cicloActual(plan);
@@ -194,7 +205,14 @@ function sugerenciaBilbo(datos, ejercicio, plan, { excluirSesion, sobre }) {
   const recamara = recamaraDe(plan.tecnicas, ejercicio.recamaraPorDefecto ?? datos.perfil.recamaraPorDefecto ?? 1);
   const reps = rmAnterior && valor > 0 ? repsParaIgualar(modeloDe(datos, ejercicio), rmAnterior, valor, recamara) : null;
   // Repeticiones enteras y con tope: por encima de 40 el peso es demasiado bajo.
-  const objetivoSuperar = reps != null ? Math.min(40, Math.ceil(Math.max(0, reps))) : null;
+  let objetivoSuperar = reps != null ? Math.min(40, Math.ceil(Math.max(0, reps))) : null;
+  // Si además marcaste que suban las repeticiones, manda esa escalera: el
+  // objetivo del día sale de lo que pusiste, no de igualar el 1RM.
+  const gen = ciclo.generador ?? {};
+  if (gen.incrementoEsfuerzo) {
+    objetivoSuperar = Math.round((gen.inicialEsfuerzo ?? 8)
+      + gen.incrementoEsfuerzo * Math.floor((dia - 1) / Math.max(1, gen.cada ?? 1)));
+  }
   // El ciclo se agota cuando el objetivo baja de las repeticiones mínimas
   // del corte (15 por defecto) o cuando lo hecho llega al máximo: toca
   // empezar uno nuevo.

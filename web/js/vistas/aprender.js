@@ -28,11 +28,13 @@ function comoDecideLaApp() {
       'Cada serie de cada ejercicio lleva una regla. Tú apuntas lo que has hecho y la regla calcula el peso y las repeticiones de la próxima vez. '
       + 'La regla se elige en la ficha del ejercicio (o viene ya puesta si la rutina es prehecha). Estas son las que hay:'),
     h('dl', { class: 'reglas' },
-      h('dt', {}, 'Ciclo (Bilbo y otros)'),
-      h('dd', {}, 'Una escalera de sesiones. Cada día el peso viene fijado y sube un poco (en Bilbo, 2,5 kg por sesión durante 17). '
-        + 'Tu meta cada día es hacer más repeticiones de las que marca el objetivo. Ejemplo: día 1, 40 kg, objetivo 20 repeticiones; '
-        + 'día 2, 42,5 kg, objetivo 19… Cuando el objetivo baja del mínimo (15 en Bilbo) el ciclo se corta solo y empieza otro '
-        + 'más ligero. No tienes que pensar nada: la app te dice el peso y a cuántas llegar.'),
+      h('dt', {}, 'Ciclo a escalera (Bilbo y otros)'),
+      h('dd', {}, 'Una escalera de sesiones: el peso lo pone la app y sube un poco cada vez (en Bilbo, 2,5 kg). '
+        + 'Tú no persigues un número de repeticiones: haces todas las que puedas. El objetivo que ves en pantalla es solo la '
+        + 'referencia de lo que hiciste el día anterior, para saber si has mejorado. Ejemplo: día 1, 40 kg y te salen 22; '
+        + 'día 2, 42,5 kg y te salen 20; el peso sube y las repeticiones bajan solas. '
+        + 'Cuando el peso ya solo te deja 15, el ciclo se ha acabado: la app mide el mejor 1RM que has hecho en ese ciclo y '
+        + 'arranca el siguiente a la mitad de ese peso. Así cada vuelta empieza más arriba que la anterior.'),
       h('dt', {}, 'Doble progresión'),
       h('dd', {}, 'Trabajas entre dos números de repeticiones, por ejemplo de 8 a 12. Con el mismo peso vas subiendo repeticiones; '
         + 'el día que llegas a 12 en todas las series, la app sube el peso y vuelves a empezar por 8. Es la más sencilla y la '
@@ -49,8 +51,9 @@ function comoDecideLaApp() {
       h('dt', {}, 'Libre'),
       h('dd', {}, 'La app solo apunta y te recuerda lo último que hiciste. No propone nada. Vale para calentamientos y para '
         + 'ejercicios que no quieres llevar con regla.')),
-    h('p', { class: 'nota' }, 'Cuándo se corta un ciclo, cómo empieza el siguiente y cuánto sube cada vez se ajusta en la ficha del '
-      + 'ejercicio, con prehechos («Bilbo», «lineal», «sube cada semana») o «a mi manera».'),
+    h('p', { class: 'nota' }, 'En la ficha del ejercicio, el ciclo son tres preguntas: qué mejora cada sesión, cuándo se acaba '
+      + 'el ciclo y por dónde empieza el siguiente. Hay prehechos («Bilbo», «lineal», «sube cada semana») y luego puedes cambiar '
+      + 'cada número. Nada es definitivo: los cambios se pueden deshacer.'),
     h('p', {}, queEs('rm'), ' ', queEs('recamara'), ' ', queEs('fallo'), ' ', queEs('bilbo'), ' ', queEs('doble-progresion')));
 }
 

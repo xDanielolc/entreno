@@ -14,14 +14,15 @@
 //     valor) | 'manual', porcentaje }.
 // Además se puede cortar o alargar a mano desde la ficha.
 
-import { aPesoDisponible, formatearNumero, generarEscalera, rmDeReferencia } from './calculos.js';
+import { aPesoDisponible, formatearNumero, generarEscalera, mejorRMDelCiclo, rmDeReferencia } from './calculos.js';
 
 export const PRESETS_CICLO = {
   bilbo: {
-    etiqueta: 'Bilbo (17 sesiones)',
-    descripcion: 'Sube 2,5 kg cada sesión durante 17. Se corta antes si el objetivo baja de 15 repeticiones. El siguiente empieza al 50 % de tu 1RM.',
+    etiqueta: 'Bilbo',
+    descripcion: 'Cada sesión 2,5 kg más y todas las repeticiones que puedas. Cuando ya solo te salen 15, el ciclo se acaba y '
+      + 'empieza otro al 50 % del mejor 1RM que hayas hecho en él. Las sesiones (17) son un tope amplio, no la meta.',
     generador: { incremento: 2.5, cada: 1 }, corte: { sesiones: 17, esfuerzoMin: 15, esfuerzoMax: null },
-    reinicio: { modo: 'porcentaje', porcentaje: 50 }, sobre: 'carga',
+    reinicio: { modo: 'rm-ciclo', porcentaje: 50 }, sobre: 'carga',
   },
   lineal: {
     etiqueta: 'Lineal hasta atascarse',
@@ -52,7 +53,8 @@ export const PRESETS_CICLO = {
 };
 
 export const MODOS_REINICIO = {
-  porcentaje: { etiqueta: 'Al % de tu 1RM', descripcion: 'El siguiente ciclo empieza a un porcentaje de tu mejor 1RM (el de Ajustes).' },
+  'rm-ciclo': { etiqueta: 'Al % del mejor 1RM de este ciclo', descripcion: 'Se mira la mejor serie de este ciclo, se calcula el 1RM que sale de ella y el siguiente ciclo empieza a ese porcentaje. Es lo de Bilbo: cada vuelta parte de lo que acabas de demostrar.' },
+  porcentaje: { etiqueta: 'Al % de tu 1RM de siempre', descripcion: 'El siguiente ciclo empieza a un porcentaje de tu mejor 1RM estimado en todo el historial.' },
   ultimo: { etiqueta: 'Al % del último valor', descripcion: 'Empieza un poco por debajo de donde se cortó.' },
   mismo: { etiqueta: 'Como el anterior', descripcion: 'Vuelve al mismo valor inicial.' },
   manual: { etiqueta: 'A mano', descripcion: 'La app avisa y tú lo preparas en la ficha.' },
@@ -62,7 +64,7 @@ export const MODOS_REINICIO = {
 export function completarCiclo(prog, perfil = {}) {
   prog.corte ??= { sesiones: prog.diasPorCiclo ?? 17, esfuerzoMin: perfil.bilboMinReps ?? 15, esfuerzoMax: null };
   prog.corte.sesiones ??= prog.diasPorCiclo ?? 17;
-  prog.reinicio ??= { modo: 'porcentaje', porcentaje: perfil.bilboInicioPorcentaje ?? 50 };
+  prog.reinicio ??= { modo: 'rm-ciclo', porcentaje: perfil.bilboInicioPorcentaje ?? 50 };
   prog.preset ??= 'bilbo';
   prog.diasPorCiclo = prog.corte.sesiones;
   return prog;
@@ -90,12 +92,18 @@ export function escaleraDe(ejercicio, generador, sesiones) {
 }
 
 // Valor inicial del ciclo siguiente según el modo de reinicio.
-export function inicialSiguiente(datos, ejercicio, prog, ultimoValor) {
-  const r = prog.reinicio ?? { modo: 'porcentaje', porcentaje: 50 };
+export function inicialSiguiente(datos, ejercicio, prog, ultimoValor, plan = null) {
+  const r = prog.reinicio ?? { modo: 'rm-ciclo', porcentaje: 50 };
   const anterior = prog.ciclos?.at(-1)?.generador?.inicial ?? ultimoValor ?? 20;
   if (r.modo === 'mismo') return anterior;
   if (r.modo === 'ultimo' && ultimoValor != null) return aPesoDisponible(ejercicio, ultimoValor * ((r.porcentaje ?? 90) / 100));
-  if (r.modo === 'porcentaje') {
+  if (r.modo === 'rm-ciclo' && plan) {
+    // Lo de Bilbo: el ciclo que acaba deja un 1RM nuevo, y el siguiente
+    // arranca a un porcentaje de ese, no del de todo el historial.
+    const rm = mejorRMDelCiclo(datos, ejercicio, plan, prog.cicloActual);
+    if (rm) return aPesoDisponible(ejercicio, rm * ((r.porcentaje ?? 50) / 100));
+  }
+  if (r.modo === 'porcentaje' || r.modo === 'rm-ciclo') {
     const rm = rmDeReferencia(datos, ejercicio)?.valor;
     if (rm) return aPesoDisponible(ejercicio, rm * ((r.porcentaje ?? 50) / 100));
   }
@@ -109,7 +117,7 @@ export function empezarCicloNuevo(datos, ejercicio, plan, { inicial = null } = {
   const n = Math.max(0, ...prog.ciclos.map((c) => c.n)) + 1;
   const generador = { ...(anterior?.generador ?? { inicial: 20, incremento: 2.5, cada: 1 }) };
   const ultimoValor = anterior?.escalera?.length ? anterior.escalera[Math.max(0, Math.min(anterior.escalera.length, ultimaSesionHecha(datos, ejercicio, plan, anterior.n)) - 1)] : null;
-  generador.inicial = inicial ?? (prog.sobre === 'carga' ? inicialSiguiente(datos, ejercicio, prog, ultimoValor) : generador.inicial);
+  generador.inicial = inicial ?? (prog.sobre === 'carga' ? inicialSiguiente(datos, ejercicio, prog, ultimoValor, plan) : generador.inicial);
   if (anterior) anterior.fin = new Date().toISOString().slice(0, 10);
   const ciclo = { n, inicio: new Date().toISOString().slice(0, 10), fin: null, generador,
     escalera: escaleraDe(ejercicio, generador, prog.corte.sesiones) };
@@ -160,8 +168,8 @@ export function describirCiclo(prog, unidad) {
   const g = prog.ciclos?.find((x) => x.n === prog.cicloActual)?.generador ?? {};
   const partes = [`sube ${formatearNumero(g.incremento ?? 0)} ${unidad} cada ${g.cada === 1 || !g.cada ? 'sesión' : `${g.cada} sesiones`}`];
   const cortes = [];
-  if (c.sesiones) cortes.push(`a las ${c.sesiones} sesiones`);
-  if (c.esfuerzoMin) cortes.push(`si el objetivo baja de ${c.esfuerzoMin}`);
+  if (c.esfuerzoMin) cortes.push(`cuando ya solo te salgan ${c.esfuerzoMin}`);
+  if (c.sesiones) cortes.push(`como muy tarde a las ${c.sesiones} sesiones`);
   if (c.esfuerzoMax) cortes.push(`si llegas a ${c.esfuerzoMax}`);
   if (c.cargaMax) cortes.push(`si el peso llega a ${formatearNumero(c.cargaMax)} ${unidad}`);
   if (c.rmPct) cortes.push(`si el peso pasa del ${c.rmPct} % de tu 1RM`);
@@ -170,6 +178,7 @@ export function describirCiclo(prog, unidad) {
   partes.push(r.modo === 'manual' ? 'y avisa para que prepares el siguiente'
     : r.modo === 'mismo' ? 'y vuelve a empezar igual'
       : r.modo === 'ultimo' ? `y empieza otro al ${r.porcentaje} % del último valor`
-        : `y empieza otro al ${r.porcentaje} % de tu 1RM`);
+        : r.modo === 'rm-ciclo' ? `y empieza otro al ${r.porcentaje} % del mejor 1RM de este ciclo`
+          : `y empieza otro al ${r.porcentaje} % de tu 1RM de siempre`);
   return partes.join(', ') + '.';
 }

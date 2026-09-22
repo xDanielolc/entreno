@@ -294,14 +294,12 @@ export function vistaSesion(contenedor, { id }) {
       if (s.sinCiclo) partes.push('Sin ciclo configurado');
       else if (s.cicloTerminado) partes.push(`Ciclo ${s.cicloN} terminado: prepara el siguiente en la ficha (o pon el reinicio en automático)`);
       else {
-        partes.push(`Ciclo ${s.cicloN} · día ${serie.diaCiclo ?? s.dia} de ${s.diasCiclo}`);
+        partes.push(`Ciclo ${s.cicloN} · sesión ${serie.diaCiclo ?? s.dia}`);
         if (s.pesoBajo) partes.push('peso muy bajo para tu 1RM: revisa el ciclo en la ficha');
-        if (s.cicloAgotado) partes.push('ciclo agotado: la próxima vez empieza el siguiente (o prepáralo en la ficha)');
+        if (s.cicloAgotado) partes.push('el ciclo se acaba aquí: la próxima vez empieza el siguiente, más ligero');
         if (serie.carga != null && s.sobre === 'carga') partes.push(`${formatearNumero(serie.carga)} ${uCarga}`);
         if (serie.objetivo != null) {
-          partes.push(s.sobre === 'carga'
-            ? `llega a ${formatearNumero(serie.objetivo)} ${uEsf}`
-            : `objetivo ${formatearNumero(serie.objetivo)} ${uEsf}`);
+          partes.push(`objetivo ${formatearNumero(serie.objetivo)} ${uEsf}`);
         }
       }
     } else if (s.modo === 'programa') {
@@ -326,7 +324,7 @@ export function vistaSesion(contenedor, { id }) {
       const u = (s.ultima ?? s.referencia).serie;
       partes.push(`${s.ultima ? 'Última vez' : 'Última vez (en otra serie)'}: ${textoSerie(ej, u)}`);
       if (s.modo === 'carga' && s.sube) partes.push(`hoy sube a ${formatearNumero(s.carga)} ${uCarga}`);
-      if (s.modo === 'carga' && !s.sube && s.rango) partes.push(`llega a ${s.rango[1]} ${uEsf} para subir`);
+      if (s.modo === 'carga' && !s.sube && s.rango) partes.push(`objetivo ${s.rango[1]} ${uEsf}: al llegar, sube el peso`);
       if (s.modo === 'esfuerzo') partes.push(`hoy intenta ${formatearNumero(s.esfuerzoObjetivo)} ${uEsf}`);
     }
     return h('p', { class: 'sugerencia' }, partes.join(' · '));

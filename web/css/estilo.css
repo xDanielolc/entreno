@@ -942,3 +942,13 @@ body:has(.modal-fondo) .guia { display: none; }
 
 .buscador { width: 100%; box-sizing: border-box; font: inherit; padding: 10px 12px; border: 1px solid var(--borde); border-radius: var(--radio-pequeno); background: var(--superficie); color: var(--texto); margin: 8px 0; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+
+/* El ciclo, en tres bloques: qué mejora, cuándo se acaba y por dónde sigue. */
+.bloque-ciclo { border: 1px solid var(--borde); border-radius: var(--radio-pequeno); padding: 10px 12px 14px; margin: 14px 0; }
+.bloque-ciclo legend { font-weight: 600; padding: 0 6px; }
+.condicion { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin-top: 8px; }
+.condicion > .casilla { margin-top: 0; flex: 1 1 200px; }
+.condicion-valor { display: flex; align-items: center; gap: 6px; }
+.condicion-valor input { width: 5em; text-align: center; font-weight: 600; }
+.condicion-valor small { color: var(--texto-suave); }
+.resumen-ciclo { background: var(--acento-suave); border-radius: var(--radio-pequeno); padding: 10px 12px; }

@@ -467,9 +467,10 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
     const reps = borrador.esfuerzo.tipo === 'repeticiones';
     const lista = {};
     if (conCarga && reps) lista.carga = { etiqueta: 'Que decida la app (doble progresión)', descripcion: 'Entre 8 y 12 repeticiones: subes repeticiones y, al llegar arriba, la app sube el peso. Lo recomendado.' };
-    lista.bilbo = { etiqueta: 'Ciclo (Bilbo y otros)', descripcion: conCarga
-      ? 'Una escalera: cada sesión su peso, y un objetivo de repeticiones que superar. Se corta y empieza otro solo.'
-      : 'Una escalera: cada sesión un objetivo un poco mayor. Se corta al llegar al tope.' };
+    lista.bilbo = { etiqueta: 'Ciclo a escalera (Bilbo y otros)', descripcion: conCarga
+      ? 'Cada sesión pesa un poco más y haces las repeticiones que puedas. Cuando el peso ya solo te deja unas pocas, el ciclo se acaba '
+        + 'y empieza otro más ligero partiendo de lo que acabas de conseguir.'
+      : 'Una escalera: cada sesión un objetivo un poco mayor. Se acaba al llegar al tope y vuelve a empezar.' };
     lista.esfuerzo = { etiqueta: 'Un poco más cada vez', descripcion: conCarga ? 'Una repetición más, o un poco más de peso, que la última vez.' : 'Un poco más que la última vez.' };
     if (conCarga && reps) lista.programa = { etiqueta: 'Programa (5×5, 5/3/1, HST)', descripcion: 'Un programa clásico con las series de cada sesión ya decididas.' };
     if (conCarga && reps) lista['maximo-trabajo'] = { etiqueta: 'Máximo trabajo', descripcion: 'Experimental: el peso con el que más kilos totales mueves.' };
@@ -497,10 +498,11 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         h('strong', {}, borrador.series.length > 1 ? `Serie ${i + 1}` : 'Regla'),
         borrador.series.length > 1 && h('button', { type: 'button', class: 'boton-icono papelera', 'aria-label': 'Quitar serie',
           onclick: async () => {
-            if (!await confirmar(`¿Quitar la serie ${i + 1} de este ejercicio? Lo ya apuntado en entrenamientos pasados se conserva.`,
-              { si: 'Quitar', peligro: true })) return;
-            borrador.series.splice(i, 1);
+            if (!await confirmar(`¿Quitar la serie ${i + 1} de este ejercicio? Lo ya apuntado en entrenamientos pasados se conserva, `
+              + 'y podrás deshacerlo en el aviso de abajo o saliendo de la ficha sin guardar.', { si: 'Quitar', peligro: true })) return;
+            const [quitada] = borrador.series.splice(i, 1);
             repintar();
+            aviso(`Serie ${i + 1} quitada.`, { accion: { texto: 'Deshacer', fn: () => { borrador.series.splice(i, 0, quitada); repintar(); } } });
           } }, '🗑')),
 
       // La regla elegida, en una línea; las demás, plegadas.
@@ -664,6 +666,8 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         + `${formatearNumero(aPesoDisponible(borrador, rmDeReferencia(d, existente).valor * 0.9))} kg.`));
   }
 
+  // El ciclo, en tres preguntas: qué mejora, cuándo se acaba y por dónde
+  // empieza el siguiente. Arriba, prehechos para no empezar de cero.
   function seccionBilbo(plan, sobre, unidad) {
     const p = plan.progresion;
     p.diasPorCiclo ??= DIAS_CICLO_POR_DEFECTO;
@@ -691,38 +695,98 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
     };
     const toca = () => { p.preset = 'personalizado'; };
     const presets = Object.fromEntries(Object.entries(PRESETS_CICLO).filter(([k, x]) => k !== 'personalizado' && (!x.sobre || x.sobre === sobre)).map(([k, x]) => [k, { etiqueta: x.etiqueta }]));
-    const unidadEsfuerzo = TIPOS_ESFUERZO[borrador.esfuerzo.tipo]?.unidad ?? 'reps';
+    const uEsf = TIPOS_ESFUERZO[borrador.esfuerzo.tipo]?.unidad ?? 'reps';
+    const nEsf = TIPOS_ESFUERZO[borrador.esfuerzo.tipo]?.etiqueta.toLowerCase() ?? 'repeticiones';
+    const conCarga = borrador.carga.tipo !== 'ninguna';
+    const subeCarga = sobre === 'carga';
+    const subeEsfuerzo = !subeCarga || Boolean(gen.incrementoEsfuerzo);
+
+    // Una casilla con su número al lado: si la desmarcas, el número se borra
+    // y la app deja de mirar esa condición.
+    const casillaNumero = (marcada, etiqueta, valor, alCambiar, porDefecto, unidadTexto) => {
+      const caja = h('input', { type: 'checkbox', checked: marcada,
+        onchange: (e) => { alCambiar(e.target.checked ? (valor ?? porDefecto) : null); toca(); repintar(); } });
+      return h('div', { class: 'condicion' },
+        h('label', { class: 'casilla' }, caja, h('span', {}, etiqueta)),
+        marcada && h('span', { class: 'condicion-valor' },
+          numeroInput(valor, (v) => { alCambiar(v); toca(); }, { etiqueta }),
+          h('small', {}, unidadTexto)));
+    };
 
     return h('div', { class: 'bilbo' },
-      h('p', { class: 'nota' }, 'Rellena los números tú o empieza desde uno prehecho y cámbialo:'),
+      h('p', { class: 'nota' }, 'Empieza por uno prehecho y cámbiale lo que quieras; nada de esto es definitivo.'),
       h('div', { class: 'chips' }, Object.entries(presets).map(([k, x]) => h('button', {
         type: 'button', class: `chip seleccionable ${p.preset === k ? 'activo' : ''}`, 'aria-pressed': String(p.preset === k),
         onclick: () => { aplicarPreset(p, k, borrador); repintar(); },
       }, x.etiqueta))),
       p.preset in PRESETS_CICLO && p.preset !== 'personalizado' && h('small', { class: 'nota' }, PRESETS_CICLO[p.preset].descripcion),
 
-      h('div', { class: 'fila-campos' },
-        campo(`Empieza en (${unidad})`, numeroInput(gen.inicial, (v) => { gen.inicial = v ?? 0; toca(); }, { onchange: regenerar })),
-        campo(`Sube (${unidad})`, numeroInput(gen.incremento, (v) => { gen.incremento = v ?? 0; toca(); }, { onchange: regenerar })),
-        campo('Cada (sesiones)', numeroInput(gen.cada, (v) => { gen.cada = Math.max(1, Math.round(v ?? 1)); toca(); }, { onchange: regenerar })),
-        campo('Sesiones en total', numeroInput(p.diasPorCiclo, (v) => { p.diasPorCiclo = Math.max(1, Math.round(v ?? 17)); toca(); }, { onchange: regenerar }))),
+      // 1 · Qué mejora -----------------------------------------------------
+      h('fieldset', { class: 'bloque-ciclo' },
+        h('legend', {}, '1 · ¿Qué mejoras cada sesión?'),
+        conCarga && h('label', { class: 'casilla' },
+          h('input', { type: 'checkbox', checked: subeCarga,
+            onchange: (e) => {
+              p.sobre = e.target.checked ? 'carga' : 'esfuerzo';
+              if (!e.target.checked) { gen.incrementoEsfuerzo = null; gen.inicial = 10; gen.incremento = 1; }
+              else { gen.inicial = inicioBilbo() ?? 20; gen.incremento = 2.5; }
+              toca(); regenerar();
+            } }),
+          h('span', {}, `El peso (${TIPOS_CARGA[borrador.carga.tipo]?.unidad || 'kg'})`)),
+        subeCarga && h('div', { class: 'fila-campos' },
+          campo(`Empieza en (${unidad})`, numeroInput(gen.inicial, (v) => { gen.inicial = v ?? 0; toca(); }, { onchange: regenerar })),
+          campo(`Sube (${unidad})`, numeroInput(gen.incremento, (v) => { gen.incremento = v ?? 0; toca(); }, { onchange: regenerar })),
+          campo('Cada (sesiones)', numeroInput(gen.cada, (v) => { gen.cada = Math.max(1, Math.round(v ?? 1)); toca(); }, { onchange: regenerar }))),
 
-      h('div', { class: 'campo' },
-        h('span', { class: 'etiqueta-campo' }, 'Se corta antes de acabar las sesiones si… (vacío = no se mira)'),
-        h('div', { class: 'fila-campos' },
-          sobre === 'carga' && campo(`El objetivo baja de (${unidadEsfuerzo})`, numeroInput(p.corte.esfuerzoMin, (v) => { p.corte.esfuerzoMin = v; toca(); })),
-          campo(`Llegas a (${unidadEsfuerzo})`, numeroInput(p.corte.esfuerzoMax, (v) => { p.corte.esfuerzoMax = v; toca(); })),
-          sobre === 'carga' && campo(`El peso llega a (${unidad})`, numeroInput(p.corte.cargaMax, (v) => { p.corte.cargaMax = v; toca(); })),
-          sobre === 'carga' && campo('El peso pasa del (% de tu 1RM)', numeroInput(p.corte.rmPct, (v) => { p.corte.rmPct = v; toca(); })))),
-      h('div', { class: 'campo' },
-        h('span', { class: 'etiqueta-campo' }, 'Y el siguiente ciclo empieza'),
-        opciones(sobre === 'carga' ? MODOS_REINICIO : { mismo: MODOS_REINICIO.mismo, manual: MODOS_REINICIO.manual }, p.reinicio.modo,
-          (m) => { p.reinicio.modo = m; toca(); repintar(); }, { compacto: true }),
-        ['porcentaje', 'ultimo'].includes(p.reinicio.modo) && campo('Porcentaje', numeroInput(p.reinicio.porcentaje ?? (p.reinicio.modo === 'ultimo' ? 90 : 50),
-          (v) => { p.reinicio.porcentaje = v; toca(); })),
-        h('small', { class: 'nota' }, MODOS_REINICIO[p.reinicio.modo]?.descripcion ?? '')),
+        h('label', { class: 'casilla' },
+          h('input', { type: 'checkbox', checked: subeEsfuerzo, disabled: !conCarga,
+            onchange: (e) => {
+              if (!e.target.checked) gen.incrementoEsfuerzo = null;
+              else { gen.incrementoEsfuerzo = borrador.esfuerzo.tipo === 'tiempo' ? 10 : 1; gen.inicialEsfuerzo ??= borrador.esfuerzo.tipo === 'tiempo' ? 30 : 8; }
+              toca(); repintar();
+            } }),
+          h('span', {}, `${nEsf.charAt(0).toUpperCase()}${nEsf.slice(1)} (${uEsf})`)),
+        subeCarga && subeEsfuerzo && h('div', { class: 'fila-campos' },
+          campo(`Empiezan en (${uEsf})`, numeroInput(gen.inicialEsfuerzo ?? 8, (v) => { gen.inicialEsfuerzo = v; toca(); })),
+          campo(`Suben (${uEsf})`, numeroInput(gen.incrementoEsfuerzo, (v) => { gen.incrementoEsfuerzo = v; toca(); }))),
+        !subeCarga && h('div', { class: 'fila-campos' },
+          campo(`Empieza en (${uEsf})`, numeroInput(gen.inicial, (v) => { gen.inicial = v ?? 0; toca(); }, { onchange: regenerar })),
+          campo(`Sube (${uEsf})`, numeroInput(gen.incremento, (v) => { gen.incremento = v ?? 0; toca(); }, { onchange: regenerar })),
+          campo('Cada (sesiones)', numeroInput(gen.cada, (v) => { gen.cada = Math.max(1, Math.round(v ?? 1)); toca(); }, { onchange: regenerar }))),
+        h('small', { class: 'nota' }, subeCarga && !subeEsfuerzo
+          ? `Cada sesión pesa más, y tu meta es hacer todas las ${nEsf} que puedas. La app te dice cuántas igualarían el día anterior.`
+          : subeCarga ? `Cada sesión pesa más y pide más ${nEsf}: mandas tú, no el cálculo.`
+            : `Mismo peso y cada sesión un poco más de ${nEsf}.`)),
 
-      h('p', { class: 'nota' }, `En resumen: ${describirCiclo(p, sobre === 'carga' ? unidad : unidadEsfuerzo)}`),
+      // 2 · Cuándo se acaba -------------------------------------------------
+      h('fieldset', { class: 'bloque-ciclo' },
+        h('legend', {}, '2 · ¿Cuándo se acaba el ciclo?'),
+        h('p', { class: 'nota' }, 'Marca las que quieras: se acaba con la primera que ocurra.'),
+        subeCarga && casillaNumero(p.corte.esfuerzoMin != null, `Cuando ya solo te salen tantas ${nEsf}`,
+          p.corte.esfuerzoMin, (v) => { p.corte.esfuerzoMin = v; }, 15, uEsf),
+        casillaNumero(p.corte.esfuerzoMax != null, `Cuando llegas a tantas ${nEsf}`,
+          p.corte.esfuerzoMax, (v) => { p.corte.esfuerzoMax = v; }, subeCarga ? 20 : 20, uEsf),
+        subeCarga && casillaNumero(p.corte.cargaMax != null, 'Cuando el peso llega a',
+          p.corte.cargaMax, (v) => { p.corte.cargaMax = v; }, null, unidad),
+        subeCarga && casillaNumero(p.corte.rmPct != null, 'Cuando el peso pasa de este % de tu 1RM',
+          p.corte.rmPct, (v) => { p.corte.rmPct = v; }, 90, '%'),
+        h('div', { class: 'condicion' },
+          h('span', {}, 'Como muy tarde, a las'),
+          h('span', { class: 'condicion-valor' },
+            numeroInput(p.diasPorCiclo, (v) => { p.diasPorCiclo = Math.max(1, Math.round(v ?? 17)); toca(); }, { onchange: regenerar, etiqueta: 'Sesiones como mucho' }),
+            h('small', {}, 'sesiones'))),
+        h('small', { class: 'nota' }, 'Este número es un tope, no la meta: casi siempre el ciclo se acaba antes por lo de arriba.')),
+
+      // 3 · Por dónde empieza el siguiente ----------------------------------
+      h('fieldset', { class: 'bloque-ciclo' },
+        h('legend', {}, '3 · ¿Por dónde empieza el siguiente?'),
+        opciones(subeCarga ? MODOS_REINICIO : { mismo: MODOS_REINICIO.mismo, manual: MODOS_REINICIO.manual }, p.reinicio.modo,
+          (m) => { p.reinicio.modo = m; toca(); repintar(); }),
+        ['porcentaje', 'ultimo', 'rm-ciclo'].includes(p.reinicio.modo)
+          && campo('Porcentaje', numeroInput(p.reinicio.porcentaje ?? (p.reinicio.modo === 'ultimo' ? 90 : 50),
+            (v) => { p.reinicio.porcentaje = v; toca(); }))),
+
+      h('p', { class: 'nota resumen-ciclo' }, `En resumen: ${describirCiclo(p, subeCarga ? unidad : uEsf)}`),
       h('p', { class: 'nota' },
         `Ciclo ${ciclo.n} de ${p.ciclos.length}. ${hechos.size === 1 ? '1 sesión hecha' : `${hechos.size} sesiones hechas`} de ${ciclo.escalera.length}. `
         + 'Cada casilla se puede cambiar a mano.'),
@@ -760,8 +824,12 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
   }
 
   function nuevoCiclo(plan) {
+    // Nada de esto es definitivo hasta que guardas la ficha, y además se
+    // puede deshacer desde el propio aviso.
+    const antes = JSON.stringify(plan.progresion);
     const ciclo = empezarCicloNuevo(d, existente ?? borrador, plan);
-    aviso(`Ciclo ${ciclo.n} preparado, empezando en ${formatearNumero(ciclo.generador.inicial)}. Revísalo si quieres.`);
+    aviso(`Ciclo ${ciclo.n} preparado, empezando en ${formatearNumero(ciclo.generador.inicial)}. Revísalo si quieres.`,
+      { accion: { texto: 'Deshacer', fn: () => { plan.progresion = JSON.parse(antes); repintar(); aviso('Ciclo cortado deshecho.'); } } });
     repintar();
   }
 
