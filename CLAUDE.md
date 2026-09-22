@@ -300,6 +300,7 @@ Estiramientos: `estiramiento.asistencias` (chips, varias a la vez) y
 Al montar una rutina, `avisoChoques()` señala los días seguidos que comparten
 músculo principal. Un ejercicio nuevo arranca en doble progresión, no en ciclo.
 
-PENDIENTE: nombre e icono con Design («luego ya decoramos»); combinar varias
-ayudas y medidas en un estiramiento (mano + cm + segundos): él decide si urge;
-las casillas «apelotonadas» de la sesión: falta que diga en qué pantalla.
+PENDIENTE: nombre e icono con Design («luego ya decoramos»); publicar la app
+en la consola de Google (es cosa suya); repasar las descripciones de las
+progresiones contrastándolas con las fuentes, que él pidió y solo está hecho
+lo de Bilbo.
