@@ -76,6 +76,34 @@ abajo la explicación de por qué pide lo que pide, por si quieres cambiarlo.
 
 ---
 
+## Texto para pegar (dibujos de técnica de los ejercicios)
+
+> Necesito ilustraciones de técnica para los ejercicios de una app de
+> entrenamiento. Todas tienen que verse como una misma colección, con este
+> estilo exacto:
+>
+> - Figura humana en tres dimensiones, gris claro, sin ropa ni cara detallada,
+>   vista de perfil o tres cuartos, en la postura del ejercicio.
+> - **Los músculos que trabaja, en rojo**, integrados en la figura (no flechas
+>   ni etiquetas).
+> - El material (banco, máquina, barra, mancuerna) en blanco con líneas grises
+>   finas, sin marca ni logotipo.
+> - Fondo blanco liso, sin sombra proyectada, sin texto de ningún tipo.
+> - Cuadrado, 700 × 700 píxeles como mínimo, PNG o WebP con fondo blanco (no
+>   transparente).
+>
+> Referencia de estilo: las ilustraciones de wger.de (licencia CC-BY-SA); las
+> nuevas deben parecerse en aire y en encuadre, **sin copiar ninguna**.
+>
+> Cada ejercicio, dos imágenes: **inicio** y **final** del movimiento, con la
+> misma cámara y la misma figura, para poder montarlas luego como una
+> animación de dos fotogramas.
+>
+> Te paso la lista de ejercicios que faltan, con los músculos principales y
+> secundarios de cada uno, y el material que usa.
+
+---
+
 ## Por qué pide esto
 
 - **Las variables.** La app ya está escrita contra esos nombres. Si Design
@@ -92,3 +120,11 @@ abajo la explicación de por qué pide lo que pide, por si quieres cambiarlo.
 
 Mientras tanto, el mapa usa la silueta de wger (Creative Commons BY-SA), que
 funciona y es legal, así que el dibujo propio es una mejora, no una urgencia.
+
+- **Los dibujos de técnica.** El catálogo tiene 300 ejercicios y solo 97
+  imágenes; el resto reutilizan la de un ejercicio parecido o salen con las
+  iniciales. Dan quiere que todos se vean como el de «Prensa de piernas»:
+  figura 3D gris con los músculos en rojo. Las que hay son de wger y
+  Everkinetic (CC-BY-SA, citadas en Aprender); las nuevas serían propias, así
+  que hay que encargarlas, no copiarlas. Dos fotogramas por ejercicio permiten
+  montar el gesto sin grabar vídeo ni usar material ajeno.
