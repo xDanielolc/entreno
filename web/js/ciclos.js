@@ -14,7 +14,8 @@
 //     valor) | 'manual', porcentaje }.
 // Además se puede cortar o alargar a mano desde la ficha.
 
-import { aPesoDisponible, formatearNumero, generarEscalera, mejorRMDelCiclo, rmDeReferencia } from './calculos.js';
+import { aPesoDisponible, formatearNumero, generarEscalera, mejorRMDelCiclo, modeloDeEjercicio, rmDeReferencia } from './calculos.js';
+import { pesoParaReps } from './formula1rm.js';
 
 export const PRESETS_CICLO = {
   bilbo: {
@@ -55,6 +56,7 @@ export const PRESETS_CICLO = {
 export const MODOS_REINICIO = {
   'rm-ciclo': { etiqueta: 'Al % del mejor 1RM de este ciclo', descripcion: 'Se mira la mejor serie de este ciclo, se calcula el 1RM que sale de ella y el siguiente ciclo empieza a ese porcentaje. Es lo de Bilbo: cada vuelta parte de lo que acabas de demostrar.' },
   porcentaje: { etiqueta: 'Al % de tu 1RM de siempre', descripcion: 'El siguiente ciclo empieza a un porcentaje de tu mejor 1RM estimado en todo el historial.' },
+  reps: { etiqueta: 'Al peso con el que harías X repeticiones', descripcion: 'Dices con cuántas repeticiones quieres empezar y la app calcula el peso con la fórmula del ejercicio, a partir del mejor 1RM de este ciclo. Es lo más parecido a decir «quiero empezar haciendo series de 20».' },
   ultimo: { etiqueta: 'Al % del último valor', descripcion: 'Empieza un poco por debajo de donde se cortó.' },
   mismo: { etiqueta: 'Como el anterior', descripcion: 'Vuelve al mismo valor inicial.' },
   manual: { etiqueta: 'A mano', descripcion: 'La app avisa y tú lo preparas en la ficha.' },
@@ -97,6 +99,12 @@ export function inicialSiguiente(datos, ejercicio, prog, ultimoValor, plan = nul
   const anterior = prog.ciclos?.at(-1)?.generador?.inicial ?? ultimoValor ?? 20;
   if (r.modo === 'mismo') return anterior;
   if (r.modo === 'ultimo' && ultimoValor != null) return aPesoDisponible(ejercicio, ultimoValor * ((r.porcentaje ?? 90) / 100));
+  if (r.modo === 'reps' && plan) {
+    // Tú dices las repeticiones y la app busca el peso que las da.
+    const rm = mejorRMDelCiclo(datos, ejercicio, plan, prog.cicloActual) ?? rmDeReferencia(datos, ejercicio)?.valor;
+    const peso = rm ? pesoParaReps(modeloDeEjercicio(datos, ejercicio), rm, r.reps ?? 20, 0) : null;
+    if (peso) return aPesoDisponible(ejercicio, peso);
+  }
   if (r.modo === 'rm-ciclo' && plan) {
     // Lo de Bilbo: el ciclo que acaba deja un 1RM nuevo, y el siguiente
     // arranca a un porcentaje de ese, no del de todo el historial.
@@ -178,7 +186,8 @@ export function describirCiclo(prog, unidad) {
   partes.push(r.modo === 'manual' ? 'y avisa para que prepares el siguiente'
     : r.modo === 'mismo' ? 'y vuelve a empezar igual'
       : r.modo === 'ultimo' ? `y empieza otro al ${r.porcentaje} % del último valor`
-        : r.modo === 'rm-ciclo' ? `y empieza otro al ${r.porcentaje} % del mejor 1RM de este ciclo`
+        : r.modo === 'reps' ? `y empieza otro por el peso al que harías ${r.reps ?? 20} repeticiones`
+          : r.modo === 'rm-ciclo' ? `y empieza otro al ${r.porcentaje} % del mejor 1RM de este ciclo`
           : `y empieza otro al ${r.porcentaje} % de tu 1RM de siempre`);
   return partes.join(', ') + '.';
 }

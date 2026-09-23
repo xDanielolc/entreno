@@ -535,7 +535,7 @@ export function vistaSesion(contenedor, { id }) {
       medidasDe(ej).slice(1).map((tipo) => (tipo === 'tiempo'
         ? campoTiempo('Tiempo', extraDeSerie(serie, tipo), (segundos) => actualizar((x) => { guardarExtra(x, tipo, segundos); }))
         : h('label', { class: 'valor' },
-          h('span', { class: 'et' }, TIPOS_ESFUERZO[tipo].etiqueta),
+          h('span', { class: 'et' }, `${TIPOS_ESFUERZO[tipo].etiqueta} (${TIPOS_ESFUERZO[tipo].unidad})`),
           h('input', { type: 'text', inputmode: 'decimal', value: extraDeSerie(serie, tipo) ?? '',
             'aria-label': TIPOS_ESFUERZO[tipo].etiqueta,
             oninput: (e) => actualizar((x) => { guardarExtra(x, tipo, leerNumero(e.target.value)); }) })))));

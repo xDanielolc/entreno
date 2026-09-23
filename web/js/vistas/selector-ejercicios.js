@@ -46,7 +46,10 @@ export function filtrar(items) {
   return items.filter((x) => {
     const principales = x.musculos?.principales ?? [];
     const todos = [...principales, ...(x.musculos?.secundarios ?? [])];
-    if (texto && !normalizar(`${x.nombre} ${x.grupo || ''} ${x.material || ''} ${x.familia || ''}`).includes(texto)) return false;
+    // Solo por el nombre: si buscara también el material, escribir «peso
+    // muerto» sacaría antes todo lo de «peso corporal». Para el material y
+    // el grupo están los desplegables de al lado.
+    if (texto && !normalizar(x.nombre).includes(texto)) return false;
     if (filtro.musculo && !todos.includes(filtro.musculo)) return false;
     if (filtro.tipo && tipoDeEjercicio(x) !== filtro.tipo) return false;
     if (filtro.division === 'superior' && !principales.some((m) => TREN_SUPERIOR.includes(m))) return false;

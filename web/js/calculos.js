@@ -165,8 +165,22 @@ export function sugerenciaSerie(datos, ejercicio, plan, { excluirSesion } = {}) 
   return { ...base, carga: ultima?.serie.carga ?? referencia?.serie.carga ?? null };
 }
 
+// Objetivo del día para las medidas que no son la principal (la distancia de
+// una carrera, por ejemplo): empiezan en un valor y suben cada tantas sesiones.
+function objetivosExtra(gen, dia) {
+  if (!gen?.extras) return null;
+  const salida = {};
+  for (const [medida, x] of Object.entries(gen.extras)) {
+    if (!x || x.inicial == null) continue;
+    salida[medida] = redondear((x.inicial ?? 0) + (x.incremento ?? 0) * Math.floor((dia - 1) / Math.max(1, gen.cada ?? 1)), 2);
+  }
+  return Object.keys(salida).length ? salida : null;
+}
+
 // El mejor 1RM estimado de las series hechas dentro de un ciclo. Es lo que
 // usa el reinicio «al % del mejor 1RM de este ciclo».
+export const modeloDeEjercicio = (datos, ejercicio) => modeloDe(datos, ejercicio);
+
 export function mejorRMDelCiclo(datos, ejercicio, plan, cicloN) {
   let mejor = null;
   for (const r of registrosDelCiclo(datos, ejercicio, plan, cicloN)) {
@@ -189,12 +203,13 @@ function sugerenciaBilbo(datos, ejercicio, plan, { excluirSesion, sobre }) {
   const valor = ciclo.escalera[dia - 1];
   const resultado = { cicloN: ciclo.n, dia, diasCiclo: ciclo.escalera.length, ultimaDelCiclo };
 
+  const genEsf = ciclo.generador ?? {};
   if (sobre === 'esfuerzo') {
     // Sin carga: la escalera son minutos, segundos o repeticiones. Se corta
     // al llegar al máximo del corte.
     const corte = prog.corte ?? {};
     const hechoAntes = ultimaDelCiclo ? esfuerzoTotal(ultimaDelCiclo.serie) : null;
-    return { ...resultado, carga: null, esfuerzoObjetivo: valor,
+    return { ...resultado, carga: null, esfuerzoObjetivo: valor, objetivosExtra: objetivosExtra(genEsf, dia),
       cicloAgotado: Boolean(corte.esfuerzoMax && hechoAntes != null && hechoAntes >= corte.esfuerzoMax) };
   }
   // Objetivo: las repeticiones que igualan el 1RM del día anterior, con la
@@ -219,11 +234,23 @@ function sugerenciaBilbo(datos, ejercicio, plan, { excluirSesion, sobre }) {
   const corte = prog.corte ?? {};
   const minimo = corte.esfuerzoMin ?? datos.perfil.bilboMinReps ?? 15;
   const hechoAntes = ultimaDelCiclo ? esfuerzoTotal(ultimaDelCiclo.serie) : null;
-  const agotado = (objetivoSuperar != null && minimo && objetivoSuperar < minimo)
-    || (corte.esfuerzoMax && hechoAntes != null && hechoAntes >= corte.esfuerzoMax)
-    || (corte.cargaMax && valor >= corte.cargaMax)
-    || (corte.rmPct && rmAnterior && valor >= (rmAnterior * corte.rmPct) / 100);
-  return { ...resultado, carga: valor, objetivoSuperar, pesoBajo: reps != null && reps > 40, cicloAgotado: agotado };
+  // Cada condición marcada se mira aparte; `corte.cuantas` dice con cuántas
+  // hace falta que se acabe el ciclo (1 = la primera que pase, 'todas' = todas).
+  const condiciones = [
+    corte.esfuerzoMin != null && objetivoSuperar != null && minimo ? objetivoSuperar < minimo : null,
+    corte.esfuerzoMax != null ? hechoAntes != null && hechoAntes >= corte.esfuerzoMax : null,
+    corte.cargaMax != null ? valor >= corte.cargaMax : null,
+    corte.rmPct != null ? Boolean(rmAnterior) && valor >= (rmAnterior * corte.rmPct) / 100 : null,
+  ].filter((x) => x !== null);
+  const cumplidas = condiciones.filter(Boolean).length;
+  const piden = corte.cuantas === 'todas' ? condiciones.length : Math.max(1, Number(corte.cuantas) || 1);
+  // Sin ninguna condición marcada se sigue usando el mínimo de siempre, que
+  // es lo que hace Bilbo.
+  const agotado = condiciones.length
+    ? cumplidas >= Math.min(piden, condiciones.length)
+    : Boolean(objetivoSuperar != null && minimo && objetivoSuperar < minimo);
+  return { ...resultado, carga: valor, objetivoSuperar, objetivosExtra: objetivosExtra(gen, dia),
+    pesoBajo: reps != null && reps > 40, cicloAgotado: agotado };
 }
 
 // ---------------------------------------------------------------------------

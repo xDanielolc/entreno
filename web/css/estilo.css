@@ -462,17 +462,16 @@ input.fecha { width: auto; }
 .serie-cabecera select { width: auto; flex: 0 1 auto; min-height: 40px; padding: 6px 10px; }
 .serie-cabecera .boton-icono { margin-left: auto; }
 
-/* Cada casilla lleva su nombre encima, como la tabla de las bajadas. Las
-   columnas se reparten solas: caben tres en un móvil y más en pantallas
-   anchas, sin que nada se apelotone. */
-.serie-valores { display: grid; grid-template-columns: repeat(auto-fit, minmax(84px, 1fr)); gap: 10px; align-items: end; }
+/* Una serie, una línea: las casillas en columnas, con su nombre justo
+   encima y centrado, como una tabla. Caben cuatro o cinco en un móvil. */
+.serie-valores { display: grid; grid-template-columns: repeat(auto-fit, minmax(62px, 1fr)); gap: 6px; align-items: end; }
 
-.valor { display: flex; flex-direction: column; align-items: stretch; gap: 3px; min-width: 0; }
-.valor input { font-size: 1.25rem; font-weight: 600; text-align: center; max-width: none; width: 100%; }
-.valor > .et { font-size: 0.8rem; line-height: 1.2; color: var(--texto-suave); display: flex; align-items: center; gap: 4px; min-height: 1.2em; }
+.valor { display: flex; flex-direction: column; align-items: stretch; gap: 2px; min-width: 0; }
+.valor input { font-size: 1.15rem; font-weight: 600; text-align: center; max-width: none; width: 100%; padding-left: 4px; padding-right: 4px; }
+.valor > .et { font-size: 0.78rem; line-height: 1.15; color: var(--texto-suave); display: flex; align-items: flex-end; justify-content: center; gap: 3px; min-height: 2.3em; text-align: center; }
 .valor > .et .que-es { flex: 0 0 auto; }
 .valor span { color: var(--texto-suave); }
-.valor small { color: var(--texto-suave); font-size: 0.78rem; }
+.valor small { color: var(--texto-suave); font-size: 0.75rem; text-align: center; }
 
 .serie.hecha .valor input { border-color: var(--acento); }
 
@@ -516,7 +515,7 @@ input.fecha { width: auto; }
 .aviso { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
 /* El texto se queda en una línea con los botones si cabe; si no, se los
    lleva abajo él solo. Así no hay que medir nada a mano. */
-.aviso-texto-caja { flex: 1 1 auto; min-width: min(100%, 20em); overflow-wrap: anywhere; }
+.aviso-texto-caja { flex: 1 1 100%; overflow-wrap: anywhere; }
 .aviso-accion { margin-left: auto; }
 .aviso-cerrar { font: inherit; color: inherit; background: none; border: none; min-width: 36px; min-height: 36px; cursor: pointer; opacity: .8; }
 html, body { overflow-x: hidden; max-width: 100%; }
@@ -978,3 +977,31 @@ body:has(.modal-fondo) .guia { display: none; }
 
 /* El boton del entrenamiento de prueba: centrado y a la vista. */
 .guia .guia-prueba { display: block; width: 100%; margin: 4px 0 10px; text-align: center; }
+
+/* La ✕ para quitar unos intervalos tuyos, dentro de su boton. */
+.opcion .quitar-mio { margin-left: 8px; color: var(--texto-suave); cursor: pointer; padding: 0 4px; }
+
+/* El número de cada bajada sobra: ya van en orden y roba sitio. */
+.tramo-n { display: none; }
+
+/* Botones que se quedan marcados, en vez de casillas. */
+.boton-marca {
+  font: inherit;
+  text-align: left;
+  min-height: var(--alto-toque);
+  padding: 8px 14px;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-pequeno);
+  background: var(--superficie);
+  color: var(--texto);
+  cursor: pointer;
+  flex: 1 1 200px;
+}
+.boton-marca.activo { border-color: var(--acento); background: var(--acento-suave); font-weight: 600; }
+.boton-marca:disabled { opacity: .5; cursor: default; }
+.mejora { margin-top: 10px; }
+.mejora .boton-marca { width: 100%; }
+.mejora .fila-campos { margin-top: 6px; }
+
+.fila-marcas { display: flex; flex-wrap: wrap; gap: 8px; }
+.fila-marcas .boton-marca { flex: 1 1 150px; }

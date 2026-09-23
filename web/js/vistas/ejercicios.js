@@ -276,18 +276,19 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
       h('fieldset', {},
         h('legend', {}, '¿Qué apuntas en cada serie?'),
         h('p', { class: 'nota' }, borrador.carga.tipo === 'ninguna' ? 'Además del peso no hay nada: solo esto.' : 'Además del peso.'),
-        Object.entries(MEDIDAS).map(([clave, m]) => h('label', { class: 'casilla' },
-          h('input', { type: 'checkbox', checked: medidasElegidas().includes(clave),
-            onchange: (e) => {
-              const lista = medidasElegidas().filter((x) => x !== clave);
-              if (e.target.checked) lista.push(clave);
-              if (!lista.length) { e.target.checked = true; aviso('Algo hay que apuntar: deja marcada al menos una.'); return; }
-              fijarMedidas(lista);
-            } }),
-          h('span', {}, h('strong', {}, m.etiqueta), ' ', h('small', { class: 'suave' }, m.descripcion)))),
-        h('small', { class: 'nota' }, medidasElegidas().length > 1
-          ? `La primera, ${MEDIDAS[medidasElegidas()[0]].etiqueta.toLowerCase()}, es la que llevan las reglas; las demás se apuntan al lado.`
-          : 'Puedes marcar varias: por ejemplo repeticiones y distancia, para un récord de zancadas.')),
+        h('div', { class: 'fila-marcas' }, Object.entries(MEDIDAS).map(([clave, m]) => h('button', {
+          type: 'button', class: `boton-marca ${medidasElegidas().includes(clave) ? 'activo' : ''}`,
+          'aria-pressed': String(medidasElegidas().includes(clave)),
+          onclick: () => {
+            const puesta = medidasElegidas().includes(clave);
+            const lista = medidasElegidas().filter((x) => x !== clave);
+            if (!puesta) lista.push(clave);
+            if (!lista.length) { aviso('Algo hay que apuntar: deja marcada al menos una.'); return; }
+            fijarMedidas(lista);
+          },
+        }, h('strong', {}, m.etiqueta), ' ', h('small', { class: 'suave' }, m.descripcion)))),
+        h('small', { class: 'nota' }, 'Puedes marcar varias: por ejemplo repeticiones y distancia, para un récord de zancadas. '
+          + 'Todas se apuntan al entrenar, y abajo eliges cuáles quieres mejorar cada sesión.')),
 
       h('details', { class: 'tarjeta explicacion desplegable-musculos', open: !borrador.musculos.principales.length || undefined },
         h('summary', {}, borrador.musculos.principales.length
@@ -509,22 +510,86 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
   }
 
   // Qué reglas puede llevar una serie según cómo se mide el ejercicio.
-  function progresionesPara() {
+  // Qué hace la app con esta serie. Cuatro opciones y nada más: casi todo
+  // es un ciclo (una escalera que sube y, cuando se acaba, vuelve a empezar
+  // más arriba), y los prehechos clásicos son ciclos con sus números puestos.
+  const REGLAS = {
+    ciclo: { etiqueta: 'Un ciclo', descripcion: 'La app te dice el peso y el objetivo de cada sesión. Cuando el ciclo se acaba, empieza otro partiendo de lo que hayas conseguido. Bilbo, 5×5, 5/3/1 y la doble progresión son ciclos: cambia lo que sube, cuándo se acaba y por dónde sigue.' },
+    'maximo-trabajo': { etiqueta: 'Máximo trabajo', descripcion: 'Experimental: busca en tu historial el peso con el que más kilos totales mueves y te mantiene ahí.' },
+    calentamiento: { etiqueta: 'Calentamiento', descripcion: 'No progresa, no cuenta para récords ni para la recuperación. Solo queda apuntada.' },
+    libre: { etiqueta: 'Solo apuntar', descripcion: 'La app no propone nada: te recuerda lo último que hiciste y tú decides.' },
+  };
+
+  // Los prehechos, todos en la misma lista: cada uno deja puestos los números
+  // de los cuatro bloques de abajo, y desde ahí se cambia lo que quieras.
+  function prehechosPara() {
     const conCarga = borrador.carga.tipo !== 'ninguna';
     const reps = borrador.esfuerzo.tipo === 'repeticiones';
+    const cardio = tipoDeEjercicio(borrador) === 'cardio';
     const lista = {};
-    if (conCarga && reps) lista.carga = { etiqueta: 'Que decida la app (doble progresión)', descripcion: 'Entre 8 y 12 repeticiones: subes repeticiones y, al llegar arriba, la app sube el peso. Lo recomendado.' };
-    lista.bilbo = { etiqueta: 'Ciclo a escalera (Bilbo y otros)', descripcion: conCarga
-      ? 'Cada sesión pesa un poco más y haces las repeticiones que puedas. Cuando el peso ya solo te deja unas pocas, el ciclo se acaba '
-        + 'y empieza otro más ligero partiendo de lo que acabas de conseguir.'
-      : 'Una escalera: cada sesión un objetivo un poco mayor. Se acaba al llegar al tope y vuelve a empezar.' };
-    lista.esfuerzo = { etiqueta: 'Un poco más cada vez', descripcion: conCarga ? 'Una repetición más, o un poco más de peso, que la última vez.' : 'Un poco más que la última vez.' };
-    if (conCarga && reps) lista.programa = { etiqueta: 'Programa (5×5, 5/3/1, HST)', descripcion: 'Un programa clásico con las series de cada sesión ya decididas.' };
-    if (conCarga && reps) lista['maximo-trabajo'] = { etiqueta: 'Máximo trabajo', descripcion: 'Experimental: el peso con el que más kilos totales mueves.' };
-    lista.libre = { etiqueta: 'Yo decido', descripcion: 'La app solo apunta y te recuerda lo último.' };
-    // En cardio, el programa clásico y el máximo trabajo no pintan nada.
-    if (tipoDeEjercicio(borrador) === 'cardio') { delete lista.programa; delete lista['maximo-trabajo']; }
+    if (conCarga && reps) {
+      lista.doble = { etiqueta: 'Doble progresión', tipo: 'carga',
+        descripcion: 'Entre 8 y 12 repeticiones: subes repeticiones con el mismo peso y, al llegar a 12, la app sube el peso y vuelves a 8. La más sencilla.' };
+      lista.bilbo = { etiqueta: 'Bilbo', tipo: 'bilbo', preset: 'bilbo' };
+      lista.lineal = { etiqueta: 'Lineal', tipo: 'bilbo', preset: 'lineal' };
+      lista.semanal = { etiqueta: 'Sube cada semana', tipo: 'bilbo', preset: 'semanal' };
+      if (!cardio) {
+        lista.cincoPorCinco = { etiqueta: '5×5', tipo: 'programa', programa: '5x5' };
+        lista.cincoTresUno = { etiqueta: '5/3/1', tipo: 'programa', programa: '531' };
+        lista.hst = { etiqueta: 'HST', tipo: 'programa', programa: 'hst' };
+      }
+    }
+    if (reps) lista.repeticiones = { etiqueta: 'Más repeticiones', tipo: 'bilbo', preset: 'repeticiones' };
+    if (borrador.esfuerzo.tipo === 'tiempo') lista.tiempo = { etiqueta: 'Más tiempo', tipo: 'bilbo', preset: 'tiempo' };
+    lista.mia = { etiqueta: 'A mi manera', tipo: 'bilbo', preset: 'personalizado',
+      descripcion: 'Empieza en blanco y pon tú los cuatro bloques de abajo.' };
     return lista;
+  }
+
+  // Cuál de los prehechos está puesto ahora mismo, si es que hay alguno.
+  function prehechoActual(plan) {
+    const p = plan.progresion;
+    const lista = prehechosPara();
+    for (const [clave, x] of Object.entries(lista)) {
+      if (x.tipo !== p.tipo) continue;
+      if (x.tipo === 'programa' && x.programa !== p.programa) continue;
+      if (x.tipo === 'bilbo' && x.preset !== p.preset) continue;
+      return clave;
+    }
+    return null;
+  }
+
+  function aplicarPrehecho(plan, clave) {
+    const x = prehechosPara()[clave];
+    if (!x) return;
+    plan.progresion = progresionPorDefecto(x.tipo, borrador);
+    if (x.tipo === 'programa') plan.progresion.programa = x.programa;
+    if (x.tipo === 'bilbo') {
+      plan.progresion.preset = x.preset;
+      if (x.preset !== 'personalizado') aplicarPreset(plan.progresion, x.preset, borrador);
+    }
+    plan.tipo = tipoDePlan(plan);
+    repintar();
+  }
+
+  // Qué regla lleva esta serie, sacada de lo guardado.
+  function reglaDe(plan) {
+    if (plan.calentamiento) return 'calentamiento';
+    if (plan.progresion?.tipo === 'maximo-trabajo') return 'maximo-trabajo';
+    if (plan.progresion?.tipo === 'libre') return 'libre';
+    return 'ciclo';
+  }
+
+  function fijarRegla(plan, regla) {
+    plan.calentamiento = regla === 'calentamiento';
+    if (regla === 'calentamiento' || regla === 'libre') plan.progresion = progresionPorDefecto('libre', borrador);
+    else if (regla === 'maximo-trabajo') plan.progresion = progresionPorDefecto('maximo-trabajo', borrador);
+    else if (plan.progresion?.tipo === 'libre' || plan.progresion?.tipo === 'maximo-trabajo') {
+      aplicarPrehecho(plan, prehechosPara().doble ? 'doble' : 'mia');
+      return;
+    }
+    plan.tipo = tipoDePlan(plan);
+    repintar();
   }
 
   // El tipo de la serie sale de lo elegido: no se pide aparte.
@@ -537,11 +602,14 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
 
   function tarjetaPlan(plan, i) {
     plan.tecnicas ??= [];
-    plan.calentamiento = plan.tipo === 'calentamiento';
+    plan.calentamiento = plan.calentamiento ?? (plan.tipo === 'calentamiento');
     plan.tipo = tipoDePlan(plan);
     const tramos = tramosDe(plan.tecnicas);
-    const reglas = progresionesPara();
-    if (!reglas[plan.progresion.tipo]) plan.progresion = progresionPorDefecto(Object.keys(reglas)[0], borrador);
+    const regla = reglaDe(plan);
+    const prehechos = prehechosPara();
+    const puesto = prehechoActual(plan);
+    const estira = ['estiramiento', 'movilidad', 'yoga'].includes(tipoDeEjercicio(borrador));
+
     return h('article', { class: 'tarjeta plan-serie' },
       h('div', { class: 'cabecera-tarjeta' },
         h('strong', {}, borrador.series.length > 1 ? `Serie ${i + 1}` : 'Regla'),
@@ -554,33 +622,33 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
             aviso(`Serie ${i + 1} quitada.`, { accion: { texto: 'Deshacer', fn: () => { borrador.series.splice(i, 0, quitada); repintar(); } } });
           } }, '🗑')),
 
-      // La regla elegida, en una línea; las demás, plegadas.
-      h('details', { class: 'explicacion regla', open: !existente || undefined },
-        h('summary', {}, h('strong', {}, reglas[plan.progresion.tipo]?.etiqueta ?? plan.progresion.tipo), ' · cambiar'),
-        opciones(reglas, plan.progresion.tipo, (tipo) => {
-          if (tipo !== plan.progresion.tipo) plan.progresion = progresionPorDefecto(tipo, borrador);
-          plan.tipo = tipoDePlan(plan);
-          repintar();
-        })),
-      h('small', { class: 'nota' }, reglas[plan.progresion.tipo]?.descripcion ?? ''),
-      detalleProgresion(plan),
+      opciones(REGLAS, regla, (r) => fijarRegla(plan, r)),
+      h('small', { class: 'nota' }, REGLAS[regla]?.descripcion ?? ''),
 
-      !['cardio', 'estiramiento', 'movilidad', 'yoga'].includes(tipoDeEjercicio(borrador))
-      && h('details', { class: 'explicacion', open: plan.tecnicas.length > 0 || undefined },
-        h('summary', {}, plan.tecnicas.length ? `Técnicas: ${plan.tecnicas.map((k) => TECNICAS[k]?.etiqueta ?? k).join(', ')}` : 'Técnicas de intensidad (opcional)'),
+      regla === 'ciclo' && h('div', {},
+        h('p', { class: 'etiqueta-campo' }, 'Empieza por uno hecho y cámbiale lo que quieras'),
+        h('div', { class: 'chips' }, Object.entries(prehechos).map(([k, x]) => h('button', {
+          type: 'button', class: `chip seleccionable ${puesto === k ? 'activo' : ''}`, 'aria-pressed': String(puesto === k),
+          onclick: () => aplicarPrehecho(plan, k),
+        }, x.etiqueta))),
+        (prehechos[puesto]?.descripcion || (plan.progresion.preset && PRESETS_CICLO[plan.progresion.preset]?.descripcion))
+          && h('small', { class: 'nota' }, prehechos[puesto]?.descripcion ?? PRESETS_CICLO[plan.progresion.preset]?.descripcion),
+        detalleProgresion(plan)),
+
+      // Cómo es la serie: las técnicas valen para cualquier regla, también
+      // dentro de un ciclo. Un drop set es una forma de hacer la serie, no
+      // una progresión.
+      regla !== 'libre' && !estira && tipoDeEjercicio(borrador) !== 'cardio'
+      && h('fieldset', { class: 'bloque-ciclo' },
+        h('legend', {}, '¿Cómo es la serie?'),
         selectorTecnicas(plan.tecnicas, (nuevas) => {
           plan.tecnicas = nuevas;
           if (!tramosDe(nuevas)) plan.tramosPrevistos = null;
           plan.tipo = tipoDePlan(plan);
           repintar();
         }),
-        h('small', { class: 'nota' }, 'Se pueden combinar: unilateral, rest-pause y un isométrico final en la misma serie.'),
-        tramos && seccionTramos(plan, tramos)),
-
-      h('label', { class: 'casilla' },
-        h('input', { type: 'checkbox', checked: Boolean(plan.calentamiento),
-          onchange: (e) => { plan.calentamiento = e.target.checked; plan.tipo = tipoDePlan(plan); persistir(); } }),
-        'Es de calentamiento (no cuenta para récords ni para la recuperación)'));
+        h('small', { class: 'nota' }, 'Normal, o con técnicas que se pueden combinar: unilateral, drop set, rest-pause y un isométrico final en la misma serie.'),
+        tramos && seccionTramos(plan, tramos)));
   }
 
   // Cómo se rellenan los tramos cada vez que el ejercicio entra en un
@@ -716,9 +784,8 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
     p.desde ??= hoyISO();
     const info = PROGRAMAS[p.programa];
     const muestra = p.inicial != null ? seriesDelPrograma(borrador, p, 0) : null;
+    // Cuál de los tres se elige arriba, con los demás prehechos.
     return h('div', {},
-      opciones(Object.fromEntries(Object.entries(PROGRAMAS).map(([k, v]) => [k, { etiqueta: v.etiqueta }])), p.programa,
-        (k) => { p.programa = k; repintar(); }, { compacto: true }),
       h('p', { class: 'nota' }, info.descripcion),
       h('div', { class: 'fila-campos' },
         campo(`${info.inicial} (kg)`, numeroInput(p.inicial, (v) => { p.inicial = v; }, { onchange: repintar })),
@@ -760,65 +827,109 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
       repintar();
     };
     const toca = () => { p.preset = 'personalizado'; };
-    const presets = Object.fromEntries(Object.entries(PRESETS_CICLO).filter(([k, x]) => k !== 'personalizado' && (!x.sobre || x.sobre === sobre)).map(([k, x]) => [k, { etiqueta: x.etiqueta }]));
     const uEsf = TIPOS_ESFUERZO[borrador.esfuerzo.tipo]?.unidad ?? 'reps';
     const nEsf = TIPOS_ESFUERZO[borrador.esfuerzo.tipo]?.etiqueta.toLowerCase() ?? 'repeticiones';
     const conCarga = borrador.carga.tipo !== 'ninguna';
     const subeCarga = sobre === 'carga';
     const subeEsfuerzo = !subeCarga || Boolean(gen.incrementoEsfuerzo);
 
-    // Una casilla con su número al lado: si la desmarcas, el número se borra
-    // y la app deja de mirar esa condición.
-    const casillaNumero = (marcada, etiqueta, valor, alCambiar, porDefecto, unidadTexto) => {
-      const caja = h('input', { type: 'checkbox', checked: marcada,
-        onchange: (e) => { alCambiar(e.target.checked ? (valor ?? porDefecto) : null); toca(); repintar(); } });
-      return h('div', { class: 'condicion' },
-        h('label', { class: 'casilla' }, caja, h('span', {}, etiqueta)),
-        marcada && h('span', { class: 'condicion-valor' },
-          numeroInput(valor, (v) => { alCambiar(v); toca(); }, { etiqueta }),
-          h('small', {}, unidadTexto)));
+    // Un botón que se queda marcado, con su número al lado. Si lo apagas, el
+    // número se borra y la app deja de mirar esa condición.
+    const condicion = (marcada, etiqueta, valor, alCambiar, porDefecto, unidadTexto) => h('div', { class: 'condicion' },
+      h('button', { type: 'button', class: `boton-marca ${marcada ? 'activo' : ''}`, 'aria-pressed': String(marcada),
+        onclick: () => { alCambiar(marcada ? null : (valor ?? porDefecto)); toca(); repintar(); } }, etiqueta),
+      marcada && h('span', { class: 'condicion-valor' },
+        numeroInput(valor, (v) => { alCambiar(v); toca(); }, { etiqueta }),
+        h('small', {}, unidadTexto)));
+
+    // Cuántas condiciones de corte hay marcadas (el tope de sesiones no cuenta:
+    // ese va siempre).
+    const cuantasMarcadas = () => [p.corte.esfuerzoMin, p.corte.esfuerzoMax, p.corte.cargaMax, p.corte.rmPct]
+      .filter((x) => x != null).length;
+
+    const opcionesCuantas = () => {
+      const n = cuantasMarcadas();
+      const lista = { 1: { etiqueta: 'La primera que pase' } };
+      for (let k = 2; k < n; k++) lista[k] = { etiqueta: `Cuando pasen ${k}` };
+      lista.todas = { etiqueta: 'Todas a la vez' };
+      return lista;
     };
 
-    return h('div', { class: 'bilbo' },
-      h('p', { class: 'nota' }, 'Empieza por uno prehecho y cámbiale lo que quieras; nada de esto es definitivo.'),
-      h('div', { class: 'chips' }, Object.entries(presets).map(([k, x]) => h('button', {
-        type: 'button', class: `chip seleccionable ${p.preset === k ? 'activo' : ''}`, 'aria-pressed': String(p.preset === k),
-        onclick: () => { aplicarPreset(p, k, borrador); repintar(); },
-      }, x.etiqueta))),
-      p.preset in PRESETS_CICLO && p.preset !== 'personalizado' && h('small', { class: 'nota' }, PRESETS_CICLO[p.preset].descripcion),
+    // Una fila de «qué mejoras»: el botón que se queda marcado y, debajo, sus
+    // números. Vale para el peso, para la medida principal y para las demás.
+    const filaMejora = ({ clave, etiqueta, activa, bloqueada = false, alternar, campos }) => h('div', { class: 'mejora' },
+      h('button', { type: 'button', class: `boton-marca ${activa ? 'activo' : ''}`, 'aria-pressed': String(activa),
+        disabled: bloqueada, 'data-mejora': clave,
+        onclick: () => alternar(!activa) }, etiqueta),
+      campos && h('div', { class: 'fila-campos' }, campos.map(([et, valor, alCambiar, onchange]) => campo(et,
+        numeroInput(valor, alCambiar, onchange ? { onchange } : {})))));
 
+    return h('div', { class: 'bilbo' },
       // 1 · Qué mejora -----------------------------------------------------
+      // Una fila por cada cosa que mide el ejercicio: el peso y cada medida
+      // que hayas marcado arriba. Marcas las que quieras que suban.
       h('fieldset', { class: 'bloque-ciclo' },
         h('legend', {}, '1 · ¿Qué mejoras cada sesión?'),
-        conCarga && h('label', { class: 'casilla' },
-          h('input', { type: 'checkbox', checked: subeCarga,
-            onchange: (e) => {
-              p.sobre = e.target.checked ? 'carga' : 'esfuerzo';
-              if (!e.target.checked) { gen.incrementoEsfuerzo = null; gen.inicial = 10; gen.incremento = 1; }
-              else { gen.inicial = inicioBilbo() ?? 20; gen.incremento = 2.5; }
-              toca(); regenerar();
-            } }),
-          h('span', {}, `El peso (${TIPOS_CARGA[borrador.carga.tipo]?.unidad || 'kg'})`)),
-        subeCarga && h('div', { class: 'fila-campos' },
-          campo(`Empieza en (${unidad})`, numeroInput(gen.inicial, (v) => { gen.inicial = v ?? 0; toca(); }, { onchange: regenerar })),
-          campo(`Sube (${unidad})`, numeroInput(gen.incremento, (v) => { gen.incremento = v ?? 0; toca(); }, { onchange: regenerar })),
-          campo('Cada (sesiones)', numeroInput(gen.cada, (v) => { gen.cada = Math.max(1, Math.round(v ?? 1)); toca(); }, { onchange: regenerar }))),
-
-        h('label', { class: 'casilla' },
-          h('input', { type: 'checkbox', checked: subeEsfuerzo, disabled: !conCarga,
-            onchange: (e) => {
-              if (!e.target.checked) gen.incrementoEsfuerzo = null;
-              else { gen.incrementoEsfuerzo = borrador.esfuerzo.tipo === 'tiempo' ? 10 : 1; gen.inicialEsfuerzo ??= borrador.esfuerzo.tipo === 'tiempo' ? 30 : 8; }
+        conCarga && filaMejora({
+          clave: 'carga',
+          etiqueta: `El peso (${TIPOS_CARGA[borrador.carga.tipo]?.unidad || 'kg'})`,
+          activa: subeCarga,
+          alternar: (marcada) => {
+            p.sobre = marcada ? 'carga' : 'esfuerzo';
+            if (!marcada) { gen.incrementoEsfuerzo = null; gen.inicial = 10; gen.incremento = 1; }
+            else { gen.inicial = inicioBilbo() ?? 20; gen.incremento = 2.5; }
+            toca(); regenerar();
+          },
+          campos: subeCarga ? [
+            [`Empieza en (${unidad})`, gen.inicial, (v) => { gen.inicial = v ?? 0; toca(); }, regenerar],
+            [`Sube (${unidad})`, gen.incremento, (v) => { gen.incremento = v ?? 0; toca(); }, regenerar],
+            ['Cada (sesiones)', gen.cada, (v) => { gen.cada = Math.max(1, Math.round(v ?? 1)); toca(); }, regenerar],
+          ] : null,
+        }),
+        // La medida principal: si no sube el peso, es ella la que hace la
+        // escalera; si sube el peso, puede subir además con sus números.
+        filaMejora({
+          clave: 'principal',
+          etiqueta: `${nEsf.charAt(0).toUpperCase()}${nEsf.slice(1)} (${uEsf})`,
+          activa: subeEsfuerzo,
+          bloqueada: !conCarga,
+          alternar: (marcada) => {
+            if (!marcada) gen.incrementoEsfuerzo = null;
+            else {
+              gen.incrementoEsfuerzo = borrador.esfuerzo.tipo === 'tiempo' ? 10 : 1;
+              gen.inicialEsfuerzo ??= borrador.esfuerzo.tipo === 'tiempo' ? 30 : 8;
+            }
+            toca(); repintar();
+          },
+          campos: !subeCarga ? [
+            [`Empieza en (${uEsf})`, gen.inicial, (v) => { gen.inicial = v ?? 0; toca(); }, regenerar],
+            [`Sube (${uEsf})`, gen.incremento, (v) => { gen.incremento = v ?? 0; toca(); }, regenerar],
+            ['Cada (sesiones)', gen.cada, (v) => { gen.cada = Math.max(1, Math.round(v ?? 1)); toca(); }, regenerar],
+          ] : subeEsfuerzo ? [
+            [`Empiezan en (${uEsf})`, gen.inicialEsfuerzo ?? 8, (v) => { gen.inicialEsfuerzo = v; toca(); }],
+            [`Suben (${uEsf})`, gen.incrementoEsfuerzo, (v) => { gen.incrementoEsfuerzo = v; toca(); }],
+          ] : null,
+        }),
+        // Las demás medidas del ejercicio (distancia, tiempo…): su objetivo
+        // también puede subir sesión a sesión.
+        medidasDe(borrador).slice(1).map((medida) => {
+          gen.extras ??= {};
+          const x = gen.extras[medida];
+          const u = TIPOS_ESFUERZO[medida]?.unidad ?? '';
+          return filaMejora({
+            clave: medida,
+            etiqueta: `${TIPOS_ESFUERZO[medida]?.etiqueta ?? medida} (${u})`,
+            activa: Boolean(x),
+            alternar: (marcada) => {
+              gen.extras[medida] = marcada ? { inicial: medida === 'tiempo' ? 60 : 1, incremento: medida === 'tiempo' ? 10 : 0.5 } : null;
               toca(); repintar();
-            } }),
-          h('span', {}, `${nEsf.charAt(0).toUpperCase()}${nEsf.slice(1)} (${uEsf})`)),
-        subeCarga && subeEsfuerzo && h('div', { class: 'fila-campos' },
-          campo(`Empiezan en (${uEsf})`, numeroInput(gen.inicialEsfuerzo ?? 8, (v) => { gen.inicialEsfuerzo = v; toca(); })),
-          campo(`Suben (${uEsf})`, numeroInput(gen.incrementoEsfuerzo, (v) => { gen.incrementoEsfuerzo = v; toca(); }))),
-        !subeCarga && h('div', { class: 'fila-campos' },
-          campo(`Empieza en (${uEsf})`, numeroInput(gen.inicial, (v) => { gen.inicial = v ?? 0; toca(); }, { onchange: regenerar })),
-          campo(`Sube (${uEsf})`, numeroInput(gen.incremento, (v) => { gen.incremento = v ?? 0; toca(); }, { onchange: regenerar })),
-          campo('Cada (sesiones)', numeroInput(gen.cada, (v) => { gen.cada = Math.max(1, Math.round(v ?? 1)); toca(); }, { onchange: regenerar }))),
+            },
+            campos: x ? [
+              [`Empieza en (${u})`, x.inicial, (v) => { x.inicial = v; toca(); }],
+              [`Sube (${u})`, x.incremento, (v) => { x.incremento = v; toca(); }],
+            ] : null,
+          });
+        }),
         h('small', { class: 'nota' }, subeCarga && !subeEsfuerzo
           ? `Cada sesión pesa más, y tu meta es hacer todas las ${nEsf} que puedas. La app te dice cuántas igualarían el día anterior.`
           : subeCarga ? `Cada sesión pesa más y pide más ${nEsf}: mandas tú, no el cálculo.`
@@ -827,21 +938,25 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
       // 2 · Cuándo se acaba -------------------------------------------------
       h('fieldset', { class: 'bloque-ciclo' },
         h('legend', {}, '2 · ¿Cuándo se acaba el ciclo?'),
-        h('p', { class: 'nota' }, 'Marca las que quieras: se acaba con la primera que ocurra.'),
-        subeCarga && casillaNumero(p.corte.esfuerzoMin != null, `Cuando ya solo te salen tantas ${nEsf}`,
+        subeCarga && condicion(p.corte.esfuerzoMin != null, `Cuando ya solo te salen tantas ${nEsf}`,
           p.corte.esfuerzoMin, (v) => { p.corte.esfuerzoMin = v; }, 15, uEsf),
-        casillaNumero(p.corte.esfuerzoMax != null, `Cuando llegas a tantas ${nEsf}`,
-          p.corte.esfuerzoMax, (v) => { p.corte.esfuerzoMax = v; }, subeCarga ? 20 : 20, uEsf),
-        subeCarga && casillaNumero(p.corte.cargaMax != null, 'Cuando el peso llega a',
+        condicion(p.corte.esfuerzoMax != null, `Cuando llegas a tantas ${nEsf}`,
+          p.corte.esfuerzoMax, (v) => { p.corte.esfuerzoMax = v; }, 20, uEsf),
+        subeCarga && condicion(p.corte.cargaMax != null, 'Cuando el peso llega a',
           p.corte.cargaMax, (v) => { p.corte.cargaMax = v; }, null, unidad),
-        subeCarga && casillaNumero(p.corte.rmPct != null, 'Cuando el peso pasa de este % de tu 1RM',
+        subeCarga && condicion(p.corte.rmPct != null, 'Cuando el peso pasa de este % de tu 1RM',
           p.corte.rmPct, (v) => { p.corte.rmPct = v; }, 90, '%'),
+        cuantasMarcadas() > 1 && h('div', { class: 'campo' },
+          h('span', { class: 'etiqueta-campo' }, 'Con cuántas de esas hace falta que se acabe'),
+          opciones(opcionesCuantas(), String(p.corte.cuantas ?? 1),
+            (v) => { p.corte.cuantas = v === 'todas' ? 'todas' : Number(v); toca(); repintar(); }, { compacto: true }),
+          h('small', { class: 'nota' }, 'Con «la primera», en cuanto pase una se acaba. Con «todas», tienen que pasar todas a la vez.')),
         h('div', { class: 'condicion' },
           h('span', {}, 'Como muy tarde, a las'),
           h('span', { class: 'condicion-valor' },
             numeroInput(p.diasPorCiclo, (v) => { p.diasPorCiclo = Math.max(1, Math.round(v ?? 17)); toca(); }, { onchange: regenerar, etiqueta: 'Sesiones como mucho' }),
             h('small', {}, 'sesiones'))),
-        h('small', { class: 'nota' }, 'Este número es un tope, no la meta: casi siempre el ciclo se acaba antes por lo de arriba.')),
+        h('small', { class: 'nota' }, 'Este tope va aparte y siempre manda: sin él, un ciclo podría no acabarse nunca.')),
 
       // 3 · Por dónde empieza el siguiente ----------------------------------
       h('fieldset', { class: 'bloque-ciclo' },
@@ -850,7 +965,10 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
           (m) => { p.reinicio.modo = m; toca(); repintar(); }),
         ['porcentaje', 'ultimo', 'rm-ciclo'].includes(p.reinicio.modo)
           && campo('Porcentaje', numeroInput(p.reinicio.porcentaje ?? (p.reinicio.modo === 'ultimo' ? 90 : 50),
-            (v) => { p.reinicio.porcentaje = v; toca(); }))),
+            (v) => { p.reinicio.porcentaje = v; toca(); })),
+        p.reinicio.modo === 'reps' && campo(`Empezar haciendo (${uEsf})`,
+          numeroInput(p.reinicio.reps ?? 20, (v) => { p.reinicio.reps = v; toca(); })),
+        h('small', { class: 'nota' }, MODOS_REINICIO[p.reinicio.modo]?.descripcion ?? '')),
 
       h('p', { class: 'nota resumen-ciclo' }, `En resumen: ${describirCiclo(p, subeCarga ? unidad : uEsf)}`),
       h('p', { class: 'nota' },

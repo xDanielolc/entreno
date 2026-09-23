@@ -66,6 +66,23 @@ export function repsParaIgualar(modelo, rm, peso, recamara = 0) {
   return hastaFallo - Math.max(0, recamara ?? 0);
 }
 
+// Peso con el que harías esas repeticiones, dado un 1RM. Es la inversa de
+// estimar1RM y no se puede despejar a mano (el divisor depende del propio
+// peso), así que se busca partiendo el intervalo por la mitad: veinte vueltas
+// bastan para acertar al gramo.
+export function pesoParaReps(modelo, rm, reps, recamara = 0) {
+  if (!(rm > 0) || !(reps > 0)) return null;
+  let bajo = 0.01;
+  let alto = rm;
+  for (let i = 0; i < 40; i++) {
+    const medio = (bajo + alto) / 2;
+    const estimado = estimar1RM(modelo, medio, reps, recamara);
+    if (estimado == null) return null;
+    if (estimado > rm) alto = medio; else bajo = medio;
+  }
+  return (bajo + alto) / 2;
+}
+
 // ---------------------------------------------------------------------------
 // Calibración personal
 // ---------------------------------------------------------------------------

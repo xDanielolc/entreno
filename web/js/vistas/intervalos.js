@@ -72,7 +72,15 @@ export function abrirIntervalos({ alTerminar } = {}) {
       h('div', { class: 'opciones compacto', role: 'radiogroup' }, Object.entries(todos()).map(([k, p]) => h('button', {
         type: 'button', role: 'radio', 'aria-checked': String(k === config.preset), class: `opcion ${k === config.preset ? 'elegida' : ''}`,
         onclick: () => { Object.assign(config, { trabajo: p.trabajo, descanso: p.descanso, rondas: p.rondas, preset: k }); pintarConfig(); },
-      }, h('strong', {}, p.etiqueta)))),
+      }, h('strong', {}, p.etiqueta),
+      // Los tuyos se pueden quitar desde aquí mismo.
+      k.startsWith('mio-') && h('span', { class: 'quitar-mio', role: 'button', tabindex: '0', title: 'Quitar estos intervalos',
+        onclick: (e) => {
+          e.preventDefault(); e.stopPropagation();
+          estado.cambiar((x) => { x.perfil.hiitPropios = (x.perfil.hiitPropios ?? []).filter((y) => y.nombre !== p.nombre); }, { tecleo: true });
+          if (config.preset === k) config.preset = 'tabata';
+          pintarConfig();
+        } }, '✕')))),
       h('p', { class: 'nota' }, todos()[config.preset]?.descripcion ?? ''),
       h('div', { class: 'fila-campos' },
         campo('Trabajo (s)', 'trabajo'), campo('Descanso (s)', 'descanso'), campo('Rondas', 'rondas')),
