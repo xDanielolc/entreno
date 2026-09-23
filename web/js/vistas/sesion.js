@@ -242,7 +242,7 @@ export function vistaSesion(contenedor, { id }) {
 
       // Cualquier ejercicio que se mida en tiempo puede usar el cronómetro y
       // los intervalos: el tiempo se apunta solo en la primera serie vacía.
-      enCurso && esTiempo(ej) && h('div', { class: 'fila-botones' },
+      enCurso && mideTiempo(ej) && h('div', { class: 'fila-botones' },
         h('button', { class: 'boton secundario', onclick: () => abrirCronometro({
           alTerminar: (segundos) => apuntarTiempo(indice, segundos, null) }) }, '⏱ Cronómetro'),
         h('button', { class: 'boton secundario', onclick: () => abrirIntervalos({
@@ -717,9 +717,12 @@ export function vistaSesion(contenedor, { id }) {
   function apuntarTiempo(indice, segundos, texto) {
     cambiarSesion((s) => {
       const e = s.ejercicios[indice];
-      let serie = e.series.find((x) => !x.hecha && x.esfuerzo == null);
+      const ej = d.ejercicios.find((x) => x.id === e.ejercicioId);
+      const principal = ej?.esfuerzo?.tipo === 'tiempo';
+      let serie = e.series.find((x) => !x.hecha && (principal ? x.esfuerzo == null : extraDeSerie(x, 'tiempo') == null));
       if (!serie) { serie = serieSuelta({ tipo: 'libre' }); e.series.push(serie); }
-      serie.esfuerzo = segundos;
+      if (principal) serie.esfuerzo = segundos;
+      else { serie.extras ??= {}; serie.extras.tiempo = segundos; }
       serie.hecha = true;
       if (texto) e.notas = [e.notas, texto].filter(Boolean).join(' · ');
     });
@@ -957,6 +960,9 @@ export function unidadEsfuerzo(ej) {
 }
 
 const esTiempo = (ej) => ej.esfuerzo?.tipo === 'tiempo';
+// El cronómetro vale en cuanto el ejercicio apunte tiempo, aunque no sea su
+// medida principal (flexiones con repeticiones, tiempo y distancia).
+const mideTiempo = (ej) => medidasDe(ej).includes('tiempo');
 
 // «12 reps», «1,5 km» o «45 s» / «1:02:30».
 export function textoEsfuerzo(ej, valor) {

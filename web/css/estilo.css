@@ -464,14 +464,17 @@ input.fecha { width: auto; }
 
 /* Una serie, una línea: las casillas en columnas, con su nombre justo
    encima y centrado, como una tabla. Caben cuatro o cinco en un móvil. */
-.serie-valores { display: grid; grid-template-columns: repeat(auto-fit, minmax(62px, 1fr)); gap: 6px; align-items: end; }
+/* align-items: start y una altura fija para el nombre y para la nota de
+   debajo: así todas las casillas empiezan y acaban a la misma altura,
+   tenga nota o no. */
+.serie-valores { display: grid; grid-template-columns: repeat(auto-fit, minmax(62px, 1fr)); gap: 6px; align-items: start; }
 
 .valor { display: flex; flex-direction: column; align-items: stretch; gap: 2px; min-width: 0; }
 .valor input { font-size: 1.15rem; font-weight: 600; text-align: center; max-width: none; width: 100%; padding-left: 4px; padding-right: 4px; }
 .valor > .et { font-size: 0.78rem; line-height: 1.15; color: var(--texto-suave); display: flex; align-items: flex-end; justify-content: center; gap: 3px; min-height: 2.3em; text-align: center; }
 .valor > .et .que-es { flex: 0 0 auto; }
 .valor span { color: var(--texto-suave); }
-.valor small { color: var(--texto-suave); font-size: 0.75rem; text-align: center; }
+.valor small { color: var(--texto-suave); font-size: 0.75rem; text-align: center; min-height: 1.1em; }
 
 .serie.hecha .valor input { border-color: var(--acento); }
 
@@ -1005,3 +1008,12 @@ body:has(.modal-fondo) .guia { display: none; }
 
 .fila-marcas { display: flex; flex-wrap: wrap; gap: 8px; }
 .fila-marcas .boton-marca { flex: 1 1 150px; }
+
+/* Los botones del final del ciclo (elegir ciclo, +5 sesiones, cortar) no
+   caben en una linea sin partir las palabras: van uno debajo de otro. */
+.bilbo > .fila-botones { flex-direction: column; align-items: stretch; }
+.bilbo > .fila-botones > * { width: 100%; }
+
+/* El tiempo, cuando no es la medida principal, ocupa su propia linea
+   entera y se separa un poco de las casillas de arriba. */
+.serie-valores > .valor.tiempo { margin-top: 4px; }

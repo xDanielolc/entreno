@@ -244,50 +244,47 @@ estado.suscribir((motivo) => {
 });
 window.addEventListener('online', () => programar(500));
 
-// El pase de Google dura una hora y hay que renovarlo, y al renovarlo Google
-// abre su ventana un instante aunque no pida nada. Para que ese parpadeo no
-// te pille a media serie:
-//   · se renueva pronto, cuando quedan 15 minutos, no al filo;
-//   · como mucho una vez cada diez minutos;
-//   · nunca mientras escribes en una casilla;
-//   · mejor al volver a la app que a mitad de uso;
-//   · y se avisa antes con un cartel, para que no sea una sorpresa.
-// Si Google pidiera intervención, no se insiste: el indicador de arriba queda
-// en rojo y con un toque se arregla.
-let ultimaRenovacion = 0;
+// El pase de Google dura una hora. Renovarlo obliga a abrir la ventana de
+// Google, aunque no pida nada: en el móvil sale un parpadeo y el navegador
+// la bloquea si no viene de un toque. Así que la app NO la abre nunca sola.
+// Cuando al pase le quedan quince minutos, sale un cartel con un botón; el
+// toque en ese botón es lo que permite abrir la ventana sin que la bloqueen.
+let ultimoAvisoPase = 0;
 
-function tocaRenovar() {
+function tocaAvisar() {
   if (!estado.usuario() || estado.esSinCuenta() || !navigator.onLine) return false;
   const minutos = minutosDeToken();
   if (minutos == null || minutos > 15) return false;
-  return Date.now() - ultimaRenovacion >= 10 * 60_000;
+  return Date.now() - ultimoAvisoPase >= 10 * 60_000;
 }
 
 async function renovarPase() {
-  ultimaRenovacion = Date.now();
-  try {
-    const { aviso } = await import('./ui.js');
-    aviso('Renovando el permiso de Google: verás su ventana un instante.', { ms: 6000 });
-  } catch { /* sin aviso, da igual */ }
   try {
     await pedirToken({ silencioso: true, forzar: true, pista: estado.usuario() });
     await sincronizar();
-  } catch { /* el indicador de arriba se pone en rojo */ }
+    const { aviso } = await import('./ui.js');
+    aviso('Permiso renovado: otra hora por delante.');
+  } catch {
+    const { aviso } = await import('./ui.js');
+    aviso('Google no ha dejado renovar el permiso. Se reintenta con el indicador de arriba.', { tipo: 'error' });
+  }
 }
 
-document.addEventListener('click', (e) => {
-  // Ni mientras escribes ni mientras tocas una casilla del entrenamiento.
-  if (e.target?.closest?.('input, textarea, select')) return;
-  if (!tocaRenovar()) return;
-  renovarPase();
-}, true);
+async function avisarDelPase() {
+  ultimoAvisoPase = Date.now();
+  const minutos = Math.max(0, Math.round(minutosDeToken() ?? 0));
+  const { aviso } = await import('./ui.js');
+  aviso(`El permiso de Google caduca en ${minutos} min. Mientras tanto se sigue guardando en el móvil.`,
+    { accion: { texto: 'Renovar', fn: renovarPase } });
+}
 
+// El aviso sale al volver a la app, no a mitad de una serie.
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') {
     estado.guardarYa();
     if (estado.meta()?.pendiente && tokenVigente()) sincronizar();
     return;
   }
-  // Al volver a la app: buen momento para renovar sin estorbar.
-  if (tocaRenovar()) renovarPase();
+  if (tocaAvisar()) avisarDelPase();
 });
+window.addEventListener('focus', () => { if (tocaAvisar()) avisarDelPase(); });

@@ -31,10 +31,13 @@ export function medidasDe(ejercicio) {
   return lista;
 }
 
-// Lo apuntado en una medida que no es la principal.
+// Lo apuntado en una medida que no es la principal. El formato antiguo solo
+// tenía una medida extra y siempre era la distancia: por eso el respaldo vale
+// únicamente para ella.
 export function extraDeSerie(serie, tipo) {
   if (serie?.extras && tipo in serie.extras) return serie.extras[tipo];
-  return serie?.esfuerzoExtra ?? null;   // formato antiguo: solo había una
+  if (tipo === 'distancia') return serie?.esfuerzoExtra ?? null;
+  return null;
 }
 
 export const TIPOS_PROGRESION = {

@@ -337,6 +337,8 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         h('small', { class: 'nota' }, 'Si una máquina no pesa igual en dos gimnasios, cada uno debe llevar su propio ejercicio.'),
         existente && !existente.sedeId && sedesActivas(d).length > 1 && h('button', { type: 'button', class: 'boton enlace',
           onclick: separar }, 'Separar en un ejercicio por sitio (reparte su historial)')),
+        existente && h('button', { type: 'button', class: 'boton enlace', onclick: partirEnVariante },
+          'Partir en dos: este y una variante (máquina y mancuernas, por ejemplo)'),
         borrador.carga.tipo !== 'ninguna' && seccionFormula(),
         borrador.esfuerzo.tipo === 'repeticiones' && campo('Repeticiones en recámara por defecto en este ejercicio',
           numeroInput(borrador.recamaraPorDefecto, (v) => { borrador.recamaraPorDefecto = v; }),
@@ -1073,6 +1075,60 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
           aviso(`Separado en ${n} ejercicios, uno por sitio.`);
           location.hash = '#/ejercicios';
         } }, 'Separar'))));
+  }
+
+  // El mismo movimiento hecho con máquina y con mancuernas no es el mismo
+  // ejercicio: los pesos no se parecen y el 1RM sale mal si se mezclan. Esto
+  // crea la variante con la misma ficha y, si quieres, se lleva los
+  // entrenamientos desde una fecha (la app no puede adivinar con qué hiciste
+  // cada serie, así que la fecha la pones tú).
+  function partirEnVariante() {
+    const campoNombre = h('input', { type: 'text', value: `${existente.nombre} (variante)`, autocomplete: 'off',
+      'aria-label': 'Nombre de la variante' });
+    const campoDesde = h('input', { type: 'date', value: '', 'aria-label': 'Llevarse los entrenamientos desde' });
+    const cerrar = modal('Partir en dos', h('div', { class: 'formulario' },
+      h('p', {}, `Se crea un ejercicio nuevo con la misma ficha que «${existente.nombre}»: mismos músculos, mismas series y `
+        + 'mismas reglas. Luego le cambias lo que haga falta (la carga, los pesos de la máquina…).'),
+      campo('Nombre de la variante', campoNombre),
+      campo('Llevarse los entrenamientos desde (opcional)', campoDesde,
+        h('small', { class: 'nota' }, 'Si a partir de una fecha ya hacías la variante, ponla aquí y esos entrenamientos pasan al nuevo. '
+          + 'En blanco, el historial se queda entero en el original y la variante empieza limpia.')),
+      h('div', { class: 'fila-botones' },
+        h('button', { class: 'boton secundario', onclick: () => cerrar() }, 'Cancelar'),
+        h('button', { class: 'boton', onclick: () => {
+          const nombre = campoNombre.value.trim();
+          if (!nombre) { aviso('Ponle nombre a la variante', { tipo: 'error' }); return; }
+          const desde = campoDesde.value || null;
+          let movidas = 0;
+          const nuevoIdEj = nuevoId('ej');
+          estado.cambiar((datos) => {
+            const base = datos.ejercicios.find((x) => x.id === existente.id);
+            const copia = structuredClone(base);
+            copia.id = nuevoIdEj;
+            copia.nombre = nombre;
+            copia.borrado = null;
+            copia.archivado = false;
+            // Series nuevas: si compartieran identificador, los dos ejercicios
+            // se pisarían los ciclos y el historial.
+            copia.series = (copia.series || []).map((s) => ({ ...structuredClone(s), id: `pl_${Math.random().toString(36).slice(2, 9)}` }));
+            datos.ejercicios.push(copia);
+            if (!desde) return;
+            for (const s of datos.sesiones) {
+              if (s.borrada || s.fecha < desde) continue;
+              for (const e of s.ejercicios) {
+                if (e.ejercicioId !== base.id) continue;
+                e.ejercicioId = nuevoIdEj;
+                for (const serie of e.series) serie.planId = null;
+                movidas += 1;
+              }
+            }
+          });
+          cerrar();
+          aviso(desde
+            ? `«${nombre}» creado, con ${movidas} ${movidas === 1 ? 'entrenamiento' : 'entrenamientos'} desde el ${desde}.`
+            : `«${nombre}» creado, con la misma ficha y sin historial.`);
+          location.hash = `#/ejercicio/${nuevoIdEj}`;
+        } }, 'Partir'))));
   }
 
   // Borrar: desaparece de todas las listas, pero los entrenamientos pasados
