@@ -14,14 +14,15 @@ y al final lo que es decoración o depende de terceros.
 Es lo primero. Dan lo dijo así el 23-09-2026: *«Me rindo con el tutorial hasta
 que la app funcione en condiciones. Centrémonos en eso»*.
 
-- [ ] **Dividir un ejercicio en dos.** Un mismo movimiento hecho con máquina de
-      placas y con mancuernas no es el mismo ejercicio: hay que poder partirlo
-      («Tríceps katana placas» y «Tríceps katana mancuernas») repartiendo el
-      historial, como ya se hace al separar por sitio.
-- [ ] **Ventana de Google.** Sigue saliendo y el navegador la bloquea. Mientras
-      no haya una forma de renovar el pase sin abrir ventana, no debe abrirse
-      sola nunca: solo cuando Dan toque un botón.
-- [ ] **Borrar los intervalos guardados** desde el propio cartel de intervalos.
+- [ ] **Probar de verdad un ciclo entero** con la ficha nueva: que los cuatro
+      bloques abarquen todo lo que él tiene apuntado.
+- [ ] **Que las demás medidas (distancia, tiempo) puedan mandar en la
+      progresión**, no solo tener objetivo del día. Hoy la escalera del ciclo
+      la hace el peso o la medida principal.
+- [x] Partir un ejercicio en dos variantes (0.24.1).
+- [x] Ventana de Google: ya no se abre sola nunca (0.24.1). Queda comprobar en
+      el móvil que el cartel con el botón «Renovar» sí la deja abrir.
+- [x] Borrar los intervalos guardados (0.24.0).
 
 ## 2. Tutorial y explicaciones
 
