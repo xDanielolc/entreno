@@ -300,6 +300,43 @@ Estiramientos: `estiramiento.asistencias` (chips, varias a la vez) y
 Al montar una rutina, `avisoChoques()` señala los días seguidos que comparten
 músculo principal. Un ejercicio nuevo arranca en doble progresión, no en ciclo.
 
+## Rondas 0.24.0 a 0.24.2 (23-09-2026): la regla de la serie, reestructurada
+
+Dan lo dijo claro: «todo son ciclos». La regla de una serie son cuatro
+opciones (`REGLAS` en ejercicios.js): **un ciclo**, **máximo trabajo**,
+**calentamiento** (que sube al principio y no progresa) y **solo apuntar**.
+Dentro de «un ciclo» están todos los prehechos juntos (`prehechosPara()`:
+doble progresión, Bilbo, lineal, sube cada semana, 5×5, 5/3/1, HST, más
+repeticiones, más tiempo, a mi manera), que por debajo siguen siendo
+`progresion.tipo` 'carga' | 'bilbo' | 'programa'. Debajo, los bloques:
+1 · qué mejoras cada sesión (una fila por medida del ejercicio, incluidas
+distancia y tiempo, con `generador.extras`), 2 · cómo es la serie (las
+técnicas, drop set incluido, ahora **dentro** del ciclo: un drop set es una
+forma de hacer la serie, no una progresión), 3 · cuándo se acaba el ciclo y
+4 · por dónde empieza el siguiente.
+
+Corte: cada condición es un botón que se queda marcado (`.boton-marca`, no
+casillas: él las quiere así en toda la app) y `corte.cuantas` dice con
+cuántas hace falta (1, 2… o 'todas'); el tope de sesiones va aparte y siempre
+manda. Reinicio: modo `reps` («al peso con el que harías X repeticiones»),
+que usa `pesoParaReps()` en formula1rm.js, una bisección sobre `estimar1RM`.
+
+Serie en el entreno: una línea, columnas de 62px mínimo, nombre centrado
+encima y `align-items: start` con alturas fijas para `.et` y `small`, que es
+lo que estaba descuadrando las casillas. Fuera el número de cada bajada.
+
+Otros: partir un ejercicio en dos variantes (`partirEnVariante`, con fecha
+desde la que se lleva el historial), el cronómetro sale si el ejercicio mide
+tiempo aunque no sea su medida principal (`mideTiempo`), `extraDeSerie` solo
+respalda el formato viejo para la distancia, el buscador busca solo por
+nombre, y la ventana de Google **ya no se abre sola nunca**: sale un cartel
+con botón «Renovar» a los quince minutos, porque el navegador bloquea la
+ventana si no viene de un toque.
+
+Pendientes y encargos: `docs/pendientes.md` (lo que está hablado y sin
+hacer) y `docs/encargo-para-design.md` (temas, silueta y ahora los dibujos de
+técnica de todos los ejercicios).
+
 PENDIENTE: nombre e icono con Design («luego ya decoramos»); publicar la app
 en la consola de Google (es cosa suya); repasar las descripciones de las
 progresiones contrastándolas con las fuentes, que él pidió y solo está hecho
