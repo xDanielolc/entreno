@@ -28,6 +28,8 @@ export function crearSerieDesdePlan(datos, ejercicio, plan, { excluirSesion } = 
     esfuerzo: null,
     esfuerzoExtra: null,
     objetivo: s.objetivoSuperar ?? s.esfuerzoObjetivo ?? null,
+    // Objetivo del día de las demás medidas (la distancia, por ejemplo).
+    objetivosExtra: s.objetivosExtra ?? null,
     hecha: false,
     tramos: null,
     cicloN: s.cicloN ?? null,

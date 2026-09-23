@@ -37,11 +37,15 @@ export const BIBLIOGRAFIA = [
     dice: 'La app avisa por debajo de 10 series semanales por músculo y a partir de unas 20. Ese 10 baja a 6 en los músculos '
       + 'que entrenas al fallo o con bajadas, porque el rango clásico se midió con series a 2 o 3 repeticiones del fallo.',
     matiz: 'Más volumen sigue dando más crecimiento, pero cada vez aporta menos. El rango de 12 a 20 series semanales es un punto de partida razonable; '
-      + 'por encima puede seguir funcionando si lo recuperas bien.',
+      + 'por encima puede seguir funcionando si lo recuperas bien. Lo de bajar a 6 series cuando entrenas al fallo NO es una cifra de un estudio: '
+      + 'es una decisión práctica de esta app. Lo que sí está medido es que las series cercanas al fallo estimulan más por serie y fatigan más, '
+      + 'y que los estudios del rango 10-20 se hicieron con series que dejaban 2 o 3 repeticiones. Poner el mismo mínimo a quien entrena al fallo '
+      + 'y a quien no, sería peor que este apaño.',
     fuentes: [
       { texto: 'Baz-Valle et al. (2022), J Human Kinetics: 12-20 series semanales como recomendación estándar en entrenados.', url: 'https://consensus.app/papers/details/d82bc2b70af65cea97f69cdebc6ab92a/' },
       { texto: 'Schoenfeld et al. (2017), J Sports Sciences: relación dosis-respuesta entre volumen semanal e hipertrofia.', url: 'https://consensus.app/papers/details/0fec06fa365f5224b7c53cd5acdd007d/' },
       { texto: 'Pelland et al. (2025), Sports Medicine: más volumen mejora, con rendimientos decrecientes.', url: 'https://consensus.app/papers/details/28976bf04deb591980a56525e2ba77d1/' },
+      { texto: 'Refalo et al. (2023), Sports Medicine: llegar al fallo no da más hipertrofia y sí más fatiga.', url: 'https://consensus.app/papers/details/6dcb52427bcc51a9bbef57f2d0e5aa07/' },
     ],
   },
   {

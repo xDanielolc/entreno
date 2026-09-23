@@ -538,7 +538,10 @@ export function vistaSesion(contenedor, { id }) {
           h('span', { class: 'et' }, `${TIPOS_ESFUERZO[tipo].etiqueta} (${TIPOS_ESFUERZO[tipo].unidad})`),
           h('input', { type: 'text', inputmode: 'decimal', value: extraDeSerie(serie, tipo) ?? '',
             'aria-label': TIPOS_ESFUERZO[tipo].etiqueta,
-            oninput: (e) => actualizar((x) => { guardarExtra(x, tipo, leerNumero(e.target.value)); }) })))));
+            placeholder: serie.objetivosExtra?.[tipo] != null ? formatearNumero(serie.objetivosExtra[tipo]) : null,
+            oninput: (e) => actualizar((x) => { guardarExtra(x, tipo, leerNumero(e.target.value)); }) }),
+          serie.objetivosExtra?.[tipo] != null
+            && h('small', {}, `objetivo ${formatearNumero(serie.objetivosExtra[tipo])}`)))));
   }
 
   // Kilos y porcentaje del 1RM, enlazados: escribes en uno y se rellena el
