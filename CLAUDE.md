@@ -337,6 +337,27 @@ Pendientes y encargos: `docs/pendientes.md` (lo que está hablado y sin
 hacer) y `docs/encargo-para-design.md` (temas, silueta y ahora los dibujos de
 técnica de todos los ejercicios).
 
+## Ronda 0.25.0 (25-09-2026): prehechos a su gusto
+
+Prehechos (`prehechosPara()`), en este orden: Personalizar (preset
+'personalizado', en blanco), «Rango de hipertrofia (músculo) · recomendado»
+(tipo 'carga', 6-10 reps; 10-15 si `perfil.cuestionario.experiencia` es
+'novato'), «Bilbo / incremento de peso lineal (fuerza)» (absorbe lineal y
+«sube cada semana», que ya no se ofrecen aunque siguen en PRESETS_CICLO para
+lo guardado), 5×5, 5/3/1, HST, más repeticiones, más tiempo. Topes de 20
+sesiones (`DIAS_CICLO_POR_DEFECTO`). `inicialDelPrograma()` calcula el primer
+peso con la fórmula: 5/3/1 = 90 % del 1RM, HST = 15RM, 5×5 = peso para 5 con 3
+en recámara. 5/3/1 lleva `prog.porSemana`. Personalizar admite
+`generador.fases` ([{ reps, sesiones }], `faseDelDia()`), que manda sobre el
+objetivo del día. Los programas y los ciclos cuentan **sesiones del
+ejercicio**, no semanas: Dan preguntó cómo sabe la app en qué semana va.
+
+Ficha: bloques plegados con resumen (`bloque()` en ejercicios.js, recuerda
+los abiertos al repintar), `p.sinMejora` deja todo sin marcar con aviso rojo
+y bloquea «Listo», las técnicas son chips (tecnicas.js ya no usa `<select>`:
+el del móvil sacaba una barra «Anterior/Siguiente»). Ajustes tiene el
+apartado «Intervalos (HIIT)».
+
 PENDIENTE: nombre e icono con Design («luego ya decoramos»); publicar la app
 en la consola de Google (es cosa suya); repasar las descripciones de las
 progresiones contrastándolas con las fuentes, que él pidió y solo está hecho
