@@ -5,19 +5,16 @@ import { TECNICAS } from '../esquema.js';
 import { h } from '../ui.js';
 
 export function selectorTecnicas(tecnicas, alCambiar) {
+  // Todas a la vista, como botones que se quedan marcados: el desplegable
+  // del móvil sacaba una barra de «Anterior / Siguiente» que no pintaba nada.
   const puestas = tecnicas || [];
-  const libres = Object.entries(TECNICAS).filter(([k]) => !puestas.includes(k));
-
-  return h('div', { class: 'tecnicas' },
-    puestas.map((k) => h('span', { class: 'chip' },
-      TECNICAS[k]?.etiqueta ?? k,
-      h('button', { type: 'button', class: 'chip-quitar', 'aria-label': `Quitar ${TECNICAS[k]?.etiqueta ?? k}`,
-        onclick: () => alCambiar(puestas.filter((x) => x !== k)) }, '✕'))),
-
-    libres.length > 0 && h('select', { class: 'anadir-tecnica', 'aria-label': 'Añadir técnica',
-      onchange: (e) => { if (e.target.value) alCambiar([...puestas, e.target.value]); } },
-    h('option', { value: '' }, puestas.length ? '+ Otra técnica' : '+ Técnica'),
-    libres.map(([k, v]) => h('option', { value: k }, v.etiqueta))));
+  return h('div', { class: 'chips tecnicas' }, Object.entries(TECNICAS).map(([k, v]) => {
+    const marcada = puestas.includes(k);
+    return h('button', {
+      type: 'button', class: `chip seleccionable ${marcada ? 'activo' : ''}`, 'aria-pressed': String(marcada),
+      onclick: () => alCambiar(marcada ? puestas.filter((x) => x !== k) : [...puestas, k]),
+    }, v.etiqueta);
+  }));
 }
 
 // Texto corto para el historial: «Drop set + Unilateral».

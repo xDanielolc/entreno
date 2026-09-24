@@ -1,7 +1,7 @@
 // Cálculos de entrenamiento. Funciones puras: no leen ni guardan nada.
 
 import { PROGRAMAS, TECNICAS, recamaraDe, tramosDe } from './esquema.js';
-import { modeloDe, repsParaIgualar, rmDeSerie } from './formula1rm.js';
+import { modeloDe, pesoParaReps, repsParaIgualar, rmDeSerie } from './formula1rm.js';
 
 // Las fórmulas del 1RM están en formula1rm.js (Marzagao con factor personal).
 
@@ -165,6 +165,20 @@ export function sugerenciaSerie(datos, ejercicio, plan, { excluirSesion } = {}) 
   return { ...base, carga: ultima?.serie.carga ?? referencia?.serie.carga ?? null };
 }
 
+// La fase de repeticiones que toca en la sesión `dia` del ciclo. Cada fase
+// dura sus sesiones; al acabar la última se vuelve a la primera.
+export function faseDelDia(fases, dia) {
+  const lista = (fases ?? []).filter((f) => f && f.reps > 0 && f.sesiones > 0);
+  if (!lista.length) return null;
+  const total = lista.reduce((s, f) => s + f.sesiones, 0);
+  let pos = (dia - 1) % total;
+  for (const [i, f] of lista.entries()) {
+    if (pos < f.sesiones) return { ...f, n: i + 1, deN: lista.length };
+    pos -= f.sesiones;
+  }
+  return null;
+}
+
 // Objetivo del día para las medidas que no son la principal (la distancia de
 // una carrera, por ejemplo): empiezan en un valor y suben cada tantas sesiones.
 function objetivosExtra(gen, dia) {
@@ -228,6 +242,10 @@ function sugerenciaBilbo(datos, ejercicio, plan, { excluirSesion, sobre }) {
     objetivoSuperar = Math.round((gen.inicialEsfuerzo ?? 8)
       + gen.incrementoEsfuerzo * Math.floor((dia - 1) / Math.max(1, gen.cada ?? 1)));
   }
+  // Repeticiones por fases (15, 10, 5… como el HST): el objetivo del día es
+  // el de la fase en la que cae esta sesión, y las fases se repiten.
+  const fase = faseDelDia(gen.fases, dia);
+  if (fase) objetivoSuperar = fase.reps;
   // El ciclo se agota cuando el objetivo baja de las repeticiones mínimas
   // del corte (15 por defecto) o cuando lo hecho llega al máximo: toca
   // empezar uno nuevo.
@@ -249,7 +267,7 @@ function sugerenciaBilbo(datos, ejercicio, plan, { excluirSesion, sobre }) {
   const agotado = condiciones.length
     ? cumplidas >= Math.min(piden, condiciones.length)
     : Boolean(objetivoSuperar != null && minimo && objetivoSuperar < minimo);
-  return { ...resultado, carga: valor, objetivoSuperar, objetivosExtra: objetivosExtra(gen, dia),
+  return { ...resultado, carga: valor, objetivoSuperar, objetivosExtra: objetivosExtra(gen, dia), fase,
     pesoBajo: reps != null && reps > 40, cicloAgotado: agotado };
 }
 
@@ -281,10 +299,13 @@ export function seriesDelPrograma(ejercicio, prog, n, historial = []) {
       { pct: [0.75, 0.85, 0.95], reps: [5, 3, 1], nombre: 'semana 5/3/1' },
       { pct: [0.40, 0.50, 0.60], reps: [5, 5, 5], nombre: 'descarga' },
     ];
-    const semana = semanas[n % 4];
-    const tm = (prog.inicial ?? 0) + inc * Math.floor(n / 4);
-    return { nombre: `ciclo ${Math.floor(n / 4) + 1}, ${semana.nombre}`,
-      series: semana.pct.map((x, i) => ({ carga: p(tm * x), reps: semana.reps[i], amrap: i === 2 && n % 4 !== 3 })) };
+    // La «semana» del programa avanza cada tantas sesiones como veces hagas
+    // el ejercicio a la semana (una, por defecto).
+    const k = Math.floor(n / Math.max(1, prog.porSemana ?? 1));
+    const semana = semanas[k % 4];
+    const tm = (prog.inicial ?? 0) + inc * Math.floor(k / 4);
+    return { nombre: `ciclo ${Math.floor(k / 4) + 1}, ${semana.nombre}`,
+      series: semana.pct.map((x, i) => ({ carga: p(tm * x), reps: semana.reps[i], amrap: i === 2 && k % 4 !== 3 })) };
   }
   if (prog.programa === 'hst') {
     const bloque = Math.floor(n / 6) % 3;
@@ -307,6 +328,20 @@ export function seriesDelPrograma(ejercicio, prog, n, historial = []) {
   return { nombre: `sesión ${n + 1}`, series: Array.from({ length: 5 }, () => ({ carga: p(carga), reps: 5 })) };
 }
 
+// Peso de partida de un programa, calculado con la fórmula del ejercicio a
+// partir de tu 1RM estimado:
+//   5/3/1: el máximo de entrenamiento, que por definición es el 90 % del 1RM;
+//   HST:   tu 15RM, el peso con el que harías 15 justas;
+//   5×5:   el peso con el que harías 5 dejándote 3, que aguanta cinco series.
+export function inicialDelPrograma(datos, ejercicio, prog, { excluirSesion } = {}) {
+  const rm = rmDeReferencia(datos, ejercicio, { excluirSesion })?.valor;
+  if (!rm) return null;
+  if (prog.programa === '531') return aPesoDisponible(ejercicio, rm * 0.9);
+  const modelo = modeloDe(datos, ejercicio);
+  const peso = prog.programa === 'hst' ? pesoParaReps(modelo, rm, 15, 0) : pesoParaReps(modelo, rm, 5, 3);
+  return peso ? aPesoDisponible(ejercicio, peso) : null;
+}
+
 function sugerenciaPrograma(datos, ejercicio, plan, { excluirSesion } = {}) {
   const prog = plan.progresion;
   if (!PROGRAMAS[prog.programa]) return { sinPrograma: true, programa: prog.programa };
@@ -315,9 +350,7 @@ function sugerenciaPrograma(datos, ejercicio, plan, { excluirSesion } = {}) {
   let estimado = false;
   let progUsada = prog;
   if (prog.inicial == null) {
-    const rm = rmDeReferencia(datos, ejercicio, { excluirSesion })?.valor;
-    const inicial = rm ? aPesoDisponible(ejercicio, rm * (prog.programa === '531' ? 0.9 : 0.6)) : 20;
-    progUsada = { ...prog, inicial };
+    progUsada = { ...prog, inicial: inicialDelPrograma(datos, ejercicio, prog, { excluirSesion }) ?? 20 };
     estimado = true;
   }
   const historial = sesionesDelPrograma(datos, ejercicio, plan, { excluirSesion });

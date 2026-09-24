@@ -24,6 +24,20 @@ que la app funcione en condiciones. Centrémonos en eso»*.
       el móvil que el cartel con el botón «Renovar» sí la deja abrir.
 - [x] Borrar los intervalos guardados (0.24.0).
 
+- [ ] **Revisar cómo se apuntan las demás técnicas de alta intensidad**
+      (rest-pause, miorrepeticiones, isométrico final, excéntricas lentas,
+      unilateral). A Dan no le convence del todo cómo se apuntan, aunque le
+      falta probarlas. Pedido el 25-09-2026.
+- [ ] **Mirar las apps Lyfta y Hevy** y apuntar qué cosas suyas merecería la
+      pena traer aquí. Pedido el 25-09-2026.
+- [ ] **Más visual, más intuitivo, menos texto.** Repaso general de la ficha
+      del ejercicio y del entrenamiento con ese criterio (25-09-2026: «falta
+      pulir y que sea más visual, intuitivo, con menos texto, más sencillo»).
+- [ ] Decidir cómo contar un drop set para el volumen (hoy: cada bajada de
+      más, media serie) y si «máximo trabajo» debe poner un suelo de % del
+      1RM para no premiar pesos muy bajos. Hay propuesta en la conversación
+      del 25-09-2026; falta que Dan elija.
+
 ## 2. Tutorial y explicaciones
 
 Aparcado por decisión suya hasta que lo de arriba esté. No se tira nada de lo

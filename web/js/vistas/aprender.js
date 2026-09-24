@@ -25,35 +25,34 @@ const parrafos = (...textos) => textos.map((t) => h('p', {}, t));
 function comoDecideLaApp() {
   return apartado('Cómo decide la app qué te toca',
     parrafos(
-      'Cada serie de cada ejercicio lleva una regla. Tú apuntas lo que has hecho y la regla calcula el peso y las repeticiones de la próxima vez. '
-      + 'La regla se elige en la ficha del ejercicio (o viene ya puesta si la rutina es prehecha). Estas son las que hay:'),
+      'Cada serie lleva una regla. Tú apuntas lo que haces y la regla calcula el peso y el objetivo de la próxima vez. '
+      + 'Casi todo es un ciclo de sobrecarga progresiva: una escalera que sube sesión a sesión y, cuando se acaba, vuelve a '
+      + 'empezar un poco más arriba. Los prehechos son ciclos con los números ya puestos:'),
     h('dl', { class: 'reglas' },
-      h('dt', {}, 'Ciclo a escalera (Bilbo y otros)'),
-      h('dd', {}, 'Una escalera de sesiones: el peso lo pone la app y sube un poco cada vez (en Bilbo, 2,5 kg). '
-        + 'Tú no persigues un número de repeticiones: haces todas las que puedas. El objetivo que ves en pantalla es solo la '
-        + 'referencia de lo que hiciste el día anterior, para saber si has mejorado. Ejemplo: día 1, 40 kg y te salen 22; '
-        + 'día 2, 42,5 kg y te salen 20; el peso sube y las repeticiones bajan solas. '
-        + 'Cuando el peso ya solo te deja 15, el ciclo se ha acabado: la app mide el mejor 1RM que has hecho en ese ciclo y '
-        + 'arranca el siguiente a la mitad de ese peso. Así cada vuelta empieza más arriba que la anterior.'),
-      h('dt', {}, 'Doble progresión'),
-      h('dd', {}, 'Trabajas entre dos números de repeticiones, por ejemplo de 8 a 12. Con el mismo peso vas subiendo repeticiones; '
-        + 'el día que llegas a 12 en todas las series, la app sube el peso y vuelves a empezar por 8. Es la más sencilla y la '
-        + 'que recomendamos si empiezas.'),
-      h('dt', {}, 'A más cada vez'),
-      h('dd', {}, 'Cada vez un poco más que la última: una repetición más con el mismo peso, o un poco más de peso con las mismas '
-        + 'repeticiones. Tú eliges cuál de las dos cosas sube.'),
-      h('dt', {}, 'Programa (5×5, 5/3/1, HST)'),
-      h('dd', {}, 'Programas clásicos con las series y los pesos ya decididos para cada sesión, a partir de tu 1RM. '
-        + 'Si conoces alguno y quieres seguirlo tal cual, es esto.'),
-      h('dt', {}, 'Máximo trabajo'),
-      h('dd', {}, 'Experimental. Busca en tu historial con qué peso mueves más kilos en total (peso por repeticiones) y te '
-        + 'mantiene ahí, subiendo cuando ves que puedes.'),
-      h('dt', {}, 'Libre'),
-      h('dd', {}, 'La app solo apunta y te recuerda lo último que hiciste. No propone nada. Vale para calentamientos y para '
-        + 'ejercicios que no quieres llevar con regla.')),
-    h('p', { class: 'nota' }, 'En la ficha del ejercicio, el ciclo son tres preguntas: qué mejora cada sesión, cuándo se acaba '
-      + 'el ciclo y por dónde empieza el siguiente. Hay prehechos («Bilbo», «lineal», «sube cada semana») y luego puedes cambiar '
-      + 'cada número. Nada es definitivo: los cambios se pueden deshacer.'),
+      h('dt', {}, 'Rango de hipertrofia (el recomendado)'),
+      h('dd', {}, 'Entre 6 y 10 repeticiones (de 10 a 15 si empiezas). Con el mismo peso subes repeticiones; cuando llegas '
+        + 'arriba en todas las series, la app sube el peso y vuelves abajo.'),
+      h('dt', {}, 'Bilbo / incremento de peso lineal (fuerza)'),
+      h('dd', {}, 'El peso sube 2,5 kg cada sesión y tú haces todas las repeticiones que puedas. Cuando ya solo te salen 15, '
+        + 'el ciclo se acaba y el siguiente empieza al 50 % del mejor 1RM que hayas hecho en él.'),
+      h('dt', {}, '5×5'),
+      h('dd', {}, 'Cinco series de cinco con el mismo peso. Si las completas, la próxima sesión sube; si fallas tres seguidas, '
+        + 'baja un 10 %. El primer peso lo calcula la app: el que te dejaría 3 repeticiones en recámara haciendo 5.'),
+      h('dt', {}, '5/3/1'),
+      h('dd', {}, 'Cuatro «semanas»: de 5, de 3, de 5/3/1 y descarga, con porcentajes del 90 % de tu 1RM. La semana avanza '
+        + 'cada tantas sesiones de ese ejercicio como veces lo hagas a la semana (se pone en la ficha).'),
+      h('dt', {}, 'HST'),
+      h('dd', {}, 'Tres bloques de seis sesiones: a 15, a 10 y a 5 repeticiones, con el peso subiendo dentro de cada bloque. '
+        + 'El peso de partida es tu 15RM, calculado con tu 1RM. Seis sesiones son dos semanas si lo haces tres veces por semana.'),
+      h('dt', {}, 'Personalizar'),
+      h('dd', {}, 'En blanco: eliges qué mejora cada sesión (peso, repeticiones, tiempo, distancia, o repeticiones por fases '
+        + 'como 15, 10 y 5), cuándo se acaba el ciclo (con cuántas condiciones) y por dónde empieza el siguiente.')),
+    h('p', {}, h('strong', {}, 'Cómo sabe la app en qué punto vas. '), 'Cuenta las sesiones que has hecho de ese ejercicio desde '
+      + 'que empezó el ciclo o el programa, no las semanas del calendario. Por eso no hace falta decirle cuántas veces entrenas: '
+      + 'si un día no vas, no se salta nada. Lo único que depende de la semana es el 5/3/1, y para eso está la casilla de veces '
+      + 'por semana.'),
+    h('p', {}, h('strong', {}, 'Fuera del ciclo. '), 'Máximo trabajo (experimental: el peso con el que más kilos totales mueves), '
+      + 'calentamiento (no progresa ni cuenta para récords) y solo apuntar (la app no propone nada).'),
     h('p', {}, queEs('rm'), ' ', queEs('recamara'), ' ', queEs('fallo'), ' ', queEs('bilbo'), ' ', queEs('doble-progresion')));
 }
 

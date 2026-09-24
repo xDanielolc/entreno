@@ -93,6 +93,20 @@ export function vistaAjustes(contenedor) {
       h('p', { class: 'nota' }, h('a', { href: 'privacidad.html', target: '_blank', rel: 'noopener' }, 'Política de privacidad')),
       h('button', { class: 'boton enlace', onclick: salir }, sinCuenta ? 'Salir del modo de prueba' : 'Salir de la cuenta')),
 
+    // Los intervalos que guardaste desde el cronómetro de HIIT: aquí se ven
+    // todos y se quitan, además de desde el propio cartel.
+    apartado('Intervalos (HIIT)',
+      h('p', { class: 'nota' }, 'Se usan desde el botón «🔁 Intervalos» de cualquier ejercicio que se mida en tiempo. Los tuyos se '
+        + 'guardan allí con «Guardar estos intervalos como míos».'),
+      (d.perfil.hiitPropios ?? []).length
+        ? h('ul', { class: 'lista-enlaces' }, d.perfil.hiitPropios.map((x) => h('li', { class: 'fila-ejercicio' },
+          h('span', {}, `${x.trabajo} s de trabajo, ${x.descanso} s de descanso, ${x.rondas} rondas`),
+          h('button', { class: 'boton enlace peligro-texto', onclick: () => {
+            estado.cambiar((y) => { y.perfil.hiitPropios = (y.perfil.hiitPropios ?? []).filter((z) => z.nombre !== x.nombre); });
+            aviso('Intervalos quitados.');
+          } }, 'Quitar'))))
+        : h('p', { class: 'suave' }, 'Aún no has guardado ninguno.')),
+
     apartado('Descansos',
       numeroAjuste('Entre series (segundos)', d.perfil.descansoSegundos, (x, v) => { x.perfil.descansoSegundos = v; }),
       numeroAjuste('Entre estiramientos (segundos)', d.perfil.descansoEstiramientos ?? DESCANSO_ESTIRAMIENTOS_POR_DEFECTO,

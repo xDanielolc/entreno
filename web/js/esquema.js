@@ -142,7 +142,7 @@ export const ESCALA_MANO = {
   'sin-mano': '8 · 🚫 Sin mano',
 };
 
-export const DIAS_CICLO_POR_DEFECTO = 17;
+export const DIAS_CICLO_POR_DEFECTO = 20;
 
 // ¿La progresión actúa sobre la carga o sobre lo que se mide?
 // En cardio o estiramientos no hay carga que subir: se progresa en minutos,
@@ -157,7 +157,7 @@ export function progresionPorDefecto(tipo, ejercicio) {
     case 'bilbo':
       return { tipo, sobre, diasPorCiclo: DIAS_CICLO_POR_DEFECTO, cicloActual: 1, ciclos: [] };
     case 'carga':
-      return { tipo, sobre, objetivoEsfuerzo: [8, 12], incremento: sobre === 'carga' ? 2.5 : 1 };
+      return { tipo, sobre, objetivoEsfuerzo: [6, 10], incremento: sobre === 'carga' ? 2.5 : 1 };
     case 'esfuerzo':
       return { tipo, sobre: 'esfuerzo', incremento: 1 };
     case 'programa':

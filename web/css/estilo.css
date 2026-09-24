@@ -1017,3 +1017,17 @@ body:has(.modal-fondo) .guia { display: none; }
 /* El tiempo, cuando no es la medida principal, ocupa su propia linea
    entera y se separa un poco de las casillas de arriba. */
 .serie-valores > .valor.tiempo { margin-top: 4px; }
+
+/* Bloques plegados de la ficha: el título y, al lado, lo que tienen puesto. */
+details.bloque-ciclo.plegable { padding: 0 12px; }
+details.bloque-ciclo.plegable > summary {
+  min-height: var(--alto-toque); display: flex; flex-wrap: wrap; align-items: center; gap: 2px 10px;
+  cursor: pointer; padding: 8px 0;
+}
+details.bloque-ciclo.plegable[open] { padding-bottom: 14px; }
+.resumen-bloque { color: var(--texto-suave); font-size: 0.85rem; }
+.aviso-error-texto { color: var(--peligro); font-weight: 600; margin: 6px 0; }
+.chips.prehechos .chip { font-size: 0.95rem; }
+
+.fases { margin-top: 8px; }
+.fase { align-items: flex-end; }

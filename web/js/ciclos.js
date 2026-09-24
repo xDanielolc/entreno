@@ -19,17 +19,17 @@ import { pesoParaReps } from './formula1rm.js';
 
 export const PRESETS_CICLO = {
   bilbo: {
-    etiqueta: 'Bilbo',
+    etiqueta: 'Bilbo / incremento de peso lineal (fuerza)',
     descripcion: 'Cada sesión 2,5 kg más y todas las repeticiones que puedas. Cuando ya solo te salen 15, el ciclo se acaba y '
-      + 'empieza otro al 50 % del mejor 1RM que hayas hecho en él. Las sesiones (17) son un tope amplio, no la meta.',
-    generador: { incremento: 2.5, cada: 1 }, corte: { sesiones: 17, esfuerzoMin: 15, esfuerzoMax: null },
+      + 'empieza otro al 50 % del mejor 1RM que hayas hecho en él. Las 20 sesiones son solo un tope por si nunca se llega a 15.',
+    generador: { incremento: 2.5, cada: 1 }, corte: { sesiones: 20, esfuerzoMin: 15, esfuerzoMax: null },
     reinicio: { modo: 'rm-ciclo', porcentaje: 50 }, sobre: 'carga',
   },
   lineal: {
     etiqueta: 'Lineal hasta atascarse',
     descripcion: 'Sube 2,5 kg cada sesión sin límite de sesiones. Se corta cuando el objetivo baja de 5 repeticiones, y el siguiente '
       + 'empieza al 90 % del último peso.',
-    generador: { incremento: 2.5, cada: 1 }, corte: { sesiones: 60, esfuerzoMin: 5, esfuerzoMax: null },
+    generador: { incremento: 2.5, cada: 1 }, corte: { sesiones: 20, esfuerzoMin: 5, esfuerzoMax: null },
     reinicio: { modo: 'ultimo', porcentaje: 90 }, sobre: 'carga',
   },
   semanal: {
@@ -41,16 +41,16 @@ export const PRESETS_CICLO = {
   repeticiones: {
     etiqueta: 'Más repeticiones',
     descripcion: 'Sin cambiar el peso: una repetición más cada sesión hasta llegar a 20. Entonces vuelve a empezar (y toca subir peso a mano).',
-    generador: { incremento: 1, cada: 1 }, corte: { sesiones: 60, esfuerzoMin: null, esfuerzoMax: 20 },
+    generador: { incremento: 1, cada: 1 }, corte: { sesiones: 20, esfuerzoMin: null, esfuerzoMax: 20 },
     reinicio: { modo: 'mismo', porcentaje: null }, sobre: 'esfuerzo',
   },
   tiempo: {
     etiqueta: 'Más tiempo',
     descripcion: 'Diez segundos más cada sesión hasta llegar a dos minutos. Para planchas, isométricos y estiramientos.',
-    generador: { incremento: 10, cada: 1 }, corte: { sesiones: 60, esfuerzoMin: null, esfuerzoMax: 120 },
+    generador: { incremento: 10, cada: 1 }, corte: { sesiones: 20, esfuerzoMin: null, esfuerzoMax: 120 },
     reinicio: { modo: 'mismo', porcentaje: null }, sobre: 'esfuerzo',
   },
-  personalizado: { etiqueta: 'A mi manera', descripcion: 'Ajusta cada número abajo.' },
+  personalizado: { etiqueta: 'Personalizar', descripcion: 'Ajusta cada número abajo.' },
 };
 
 export const MODOS_REINICIO = {
