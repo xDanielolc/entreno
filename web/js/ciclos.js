@@ -171,10 +171,21 @@ export function renovarSiToca(datos, ejercicio, plan, sugerencia) {
 }
 
 // Texto corto para la ficha: qué hace este ciclo.
-export function describirCiclo(prog, unidad) {
+export function describirCiclo(prog, unidad, nombreEsfuerzo = 'repeticiones') {
   const c = prog.corte ?? {};
   const g = prog.ciclos?.find((x) => x.n === prog.cicloActual)?.generador ?? {};
-  const partes = [`sube ${formatearNumero(g.incremento ?? 0)} ${unidad} cada ${g.cada === 1 || !g.cada ? 'sesión' : `${g.cada} sesiones`}`];
+  const cada = g.cada === 1 || !g.cada ? 'cada sesión' : `cada ${g.cada} sesiones`;
+  // Qué sube de verdad: con 0 kg de subida y una repetición más, el ciclo va
+  // por repeticiones, no por peso, y así hay que contarlo.
+  const sube = [];
+  if (prog.sobre === 'esfuerzo') sube.push(`${formatearNumero(g.incremento ?? 0)} ${unidad}`);
+  else {
+    if ((g.incremento ?? 0) > 0) sube.push(`${formatearNumero(g.incremento)} ${unidad}`);
+    const singular = { repeticiones: 'repetición' }[nombreEsfuerzo] ?? nombreEsfuerzo;
+    if (g.incrementoEsfuerzo) sube.push(`${formatearNumero(g.incrementoEsfuerzo)} ${g.incrementoEsfuerzo === 1 ? singular : nombreEsfuerzo}`);
+  }
+  const partes = [sube.length ? `sube ${sube.join(' y ')} ${cada}` : 'mismo peso cada sesión'];
+  if (g.fases?.length) partes.push(`con ${nombreEsfuerzo} por fases (${g.fases.map((f) => f.reps).join(', ')})`);
   const cortes = [];
   if (c.esfuerzoMin) cortes.push(`cuando ya solo te salgan ${c.esfuerzoMin}`);
   if (c.sesiones) cortes.push(`como muy tarde a las ${c.sesiones} sesiones`);

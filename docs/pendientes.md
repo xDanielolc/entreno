@@ -33,10 +33,14 @@ que la app funcione en condiciones. Centrémonos en eso»*.
 - [ ] **Más visual, más intuitivo, menos texto.** Repaso general de la ficha
       del ejercicio y del entrenamiento con ese criterio (25-09-2026: «falta
       pulir y que sea más visual, intuitivo, con menos texto, más sencillo»).
-- [ ] Decidir cómo contar un drop set para el volumen (hoy: cada bajada de
-      más, media serie) y si «máximo trabajo» debe poner un suelo de % del
-      1RM para no premiar pesos muy bajos. Hay propuesta en la conversación
-      del 25-09-2026; falta que Dan elija.
+- [ ] Drop set y volumen: la evidencia (Ozaki 2018, Fink 2018, metaanálisis
+      de Coleman 2023) apoya lo de ahora, una serie más media por bajada. Falta
+      que Dan diga si lo deja así (26-09-2026: pidió ver la ciencia antes).
+- [ ] «Máximo trabajo»: ¿suelo de % del 1RM para que no derive hacia pesos
+      muy bajos? Explicado para qué serviría; falta su decisión.
+- [ ] Ejercicios ya existentes sin programar (con «solo apuntar» de antes):
+      ¿pasarlos a Bilbo o a hipertrofia según el objetivo? Hoy solo se aplica
+      a los nuevos.
 
 ## 2. Tutorial y explicaciones
 

@@ -9,9 +9,34 @@ import {
 import { recamaraDe, tramosDe } from './esquema.js';
 import { modeloDe, repsParaIgualar, rmDeSerie } from './formula1rm.js';
 import { nuevoId } from './ui.js';
-import { renovarSiToca } from './ciclos.js';
+import { aplicarPreset, empezarCicloNuevo, renovarSiToca } from './ciclos.js';
+import { progresionPorDefecto, serieNuevaPlantilla } from './esquema.js';
+
+// La regla de un ejercicio que aún no tiene ninguna: si en el cuestionario
+// dijiste que buscas fuerza, Bilbo; si no, el rango de hipertrofia (6-10).
+// Los que no llevan peso y repeticiones se quedan en «solo apuntar».
+export function planPorDefecto(datos, ejercicio) {
+  const conPeso = ejercicio.carga?.tipo !== 'ninguna' && ejercicio.esfuerzo?.tipo === 'repeticiones';
+  if (!conPeso) return serieNuevaPlantilla(ejercicio, { tipo: 'libre', progresion: 'libre' });
+  if (datos.perfil?.cuestionario?.objetivo === 'fuerza') {
+    const plan = serieNuevaPlantilla(ejercicio, { tipo: 'bilbo', progresion: 'bilbo' });
+    plan.progresion.preset = 'bilbo';
+    aplicarPreset(plan.progresion, 'bilbo', ejercicio);
+    return plan;
+  }
+  const plan = serieNuevaPlantilla(ejercicio, { tipo: 'libre', progresion: 'carga' });
+  plan.progresion = { ...progresionPorDefecto('carga', ejercicio), objetivoEsfuerzo: [6, 10] };
+  return plan;
+}
 
 export function crearSerieDesdePlan(datos, ejercicio, plan, { excluirSesion } = {}) {
+  // Un ciclo sin montar (Bilbo puesto por defecto, por ejemplo) se monta en
+  // cuanto hay un 1RM del que partir. La primera vez no lo hay: haces lo que
+  // puedas y con eso queda montado para la siguiente.
+  if (plan.progresion?.tipo === 'bilbo' && !plan.progresion.ciclos?.length
+    && rmDeReferencia(datos, ejercicio, { excluirSesion })) {
+    empezarCicloNuevo(datos, ejercicio, plan);
+  }
   let s = sugerenciaSerie(datos, ejercicio, plan, { excluirSesion });
   // Un ciclo terminado o agotado empieza el siguiente solo (si no es manual).
   if (renovarSiToca(datos, ejercicio, plan, s)) s = sugerenciaSerie(datos, ejercicio, plan, { excluirSesion });
@@ -80,6 +105,13 @@ export function serieSuelta({ tipo = 'libre', carga = null, tecnicas = [], recam
 // El ejercicio tal y como entra en un entrenamiento: con todas las series de
 // su plantilla ya preparadas.
 export function entradaDeEjercicio(datos, ej, { excluirSesion } = {}) {
+  // Un ejercicio sin regla recibe la de por defecto la primera vez que entra
+  // en un entrenamiento, y se queda guardada en su ficha.
+  if (!ej.series?.length) {
+    const propio = datos.ejercicios?.find((x) => x.id === ej.id) ?? ej;
+    propio.series = [planPorDefecto(datos, propio)];
+    ej = propio;
+  }
   const planes = ej.series?.length ? ej.series : [];
   const entrada = {
     ejercicioId: ej.id, cicloN: null, diaCiclo: null, notas: '',

@@ -147,3 +147,23 @@ export function idApartado(titulo) {
   const limpio = String(titulo).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
   return `ap-${limpio.replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
 }
+
+// Un «?» que abre una explicación. A diferencia de los del glosario, estos
+// salen siempre, se contestara lo que se contestara en el cuestionario: son
+// la forma de quitar texto de pantalla sin esconder cómo funciona cada cosa.
+// `texto` puede ser un párrafo o una lista de párrafos; `lista`, pares de
+// [nombre, explicación] que salen como una lista.
+export function ayuda(titulo, texto = null, { lista = null } = {}) {
+  return h('button', {
+    type: 'button', class: 'que-es ayuda', 'aria-label': `Cómo funciona: ${titulo}`,
+    onclick: (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const parrafos = texto == null ? [] : (Array.isArray(texto) ? texto : [texto]);
+      const cerrar = modal(titulo, h('div', { class: 'ayuda-texto' },
+        parrafos.map((p) => h('p', {}, p)),
+        lista && h('dl', { class: 'reglas' }, lista.flatMap(([nombre, que]) => [h('dt', {}, nombre), h('dd', {}, que)])),
+        h('button', { class: 'boton', onclick: () => cerrar() }, 'Entendido')));
+    },
+  }, '?');
+}

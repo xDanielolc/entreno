@@ -358,6 +358,21 @@ y bloquea «Listo», las técnicas son chips (tecnicas.js ya no usa `<select>`:
 el del móvil sacaba una barra «Anterior/Siguiente»). Ajustes tiene el
 apartado «Intervalos (HIIT)».
 
+## Ronda 0.26.0 (26-09-2026): «?» en vez de texto
+
+Regla de Dan: en el ciclo, como mucho una línea visible por cosa además del
+«?» y del resumen. `ayuda(titulo, texto, { lista })` en ui.js es un «?» que
+sale siempre (no depende de `perfil.glosario`). Las opciones (reglas,
+reinicio, bajadas) van en `opciones(…, { compacto: true })` y su explicación
+en el «?»; `bloque()` pone el «?» en el título si es lo primero del contenido.
+Fuera «Más repeticiones»; hipertrofia siempre 6-10. `describirCiclo(prog,
+unidad, nombreEsfuerzo)` cuenta lo que sube de verdad (0 kg y una repetición =
+«sube 1 repetición cada sesión»). `planPorDefecto()` en series.js: objetivo
+«fuerza» → Bilbo; si no, hipertrofia 6-10; sin peso → solo apuntar. Se usa
+al crear ejercicio a mano, al añadirlo del catálogo y al entrar en un
+entrenamiento un ejercicio sin reglas; Bilbo sin 1RM monta el ciclo en la
+segunda sesión (la primera: «haz todas las que puedas»).
+
 PENDIENTE: nombre e icono con Design («luego ya decoramos»); publicar la app
 en la consola de Google (es cosa suya); repasar las descripciones de las
 progresiones contrastándolas con las fuentes, que él pidió y solo está hecho

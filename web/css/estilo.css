@@ -1031,3 +1031,9 @@ details.bloque-ciclo.plegable[open] { padding-bottom: 14px; }
 
 .fases { margin-top: 8px; }
 .fase { align-items: flex-end; }
+
+/* El «?» de ayuda junto a un título. */
+.titulo-con-ayuda { display: flex; align-items: center; gap: 8px; margin: 10px 0 4px; }
+.titulo-con-ayuda .etiqueta-campo { margin: 0; }
+legend .ayuda, summary .ayuda { margin-left: 6px; vertical-align: middle; }
+.ayuda-texto p { margin: 0 0 10px; }

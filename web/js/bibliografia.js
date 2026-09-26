@@ -49,6 +49,16 @@ export const BIBLIOGRAFIA = [
     ],
   },
   {
+    tema: 'Cómo cuenta un drop set',
+    dice: 'Un drop set cuenta como una serie más media serie por cada bajada: uno de cuatro bajadas son tres series.',
+    matiz: 'Sale de los estudios que comparan drop sets con series normales: una serie con cuatro bajadas hizo crecer el músculo '
+      + 'como tres series normales (Ozaki 2018), y una con tres bajadas, como tres series de 12 (Fink 2018). Contar cada bajada '
+      + 'como una serie entera inflaría el volumen. Son estudios pequeños, de 9 a 32 personas, así que es una aproximación.',
+    fuentes: [
+      { texto: 'Coleman et al. (2023), Sports Medicine Open: metaanálisis, drop sets y series normales dan una hipertrofia parecida, en la mitad o un tercio del tiempo.', url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC10390395/' },
+    ],
+  },
+  {
     tema: 'Frecuencia',
     dice: 'La app avisa si llevas más de una semana sin tocar un músculo, y sugiere repartirlo en dos días.',
     matiz: 'A igualdad de volumen semanal, la frecuencia no cambia gran cosa para la hipertrofia; el reparto en dos sesiones sí ayuda cuando el volumen es alto, '

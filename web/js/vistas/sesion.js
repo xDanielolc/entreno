@@ -287,7 +287,7 @@ export function vistaSesion(contenedor, { id }) {
     const partes = [];
 
     if (s.modo === 'bilbo') {
-      if (s.sinCiclo) partes.push('Sin ciclo configurado');
+      if (s.sinCiclo) partes.push('Primera vez: haz todas las que puedas y con eso la app monta el ciclo');
       else if (s.cicloTerminado) partes.push(`Ciclo ${s.cicloN} terminado: prepara el siguiente en la ficha (o pon el reinicio en automático)`);
       else {
         partes.push(`Ciclo ${s.cicloN} · sesión ${serie.diaCiclo ?? s.dia}`);
