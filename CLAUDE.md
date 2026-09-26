@@ -373,6 +373,17 @@ al crear ejercicio a mano, al añadirlo del catálogo y al entrar en un
 entrenamiento un ejercicio sin reglas; Bilbo sin 1RM monta el ciclo en la
 segunda sesión (la primera: «haz todas las que puedas»).
 
+## Ronda 0.27.0 (26-09-2026): tu 1RM si lo sabes
+
+`ej.rmManual`: el 1RM que pones en la ficha (campo `campo1RM()`, en la
+fórmula del 1RM y, mientras el ejercicio no tenga series, en la propia
+regla). `rmDeReferencia` y el objetivo de Bilbo lo usan solo si no hay
+ninguna serie; cambiarlo recalcula un ciclo que aún no ha empezado. Sin él,
+la primera sesión dice «pon un peso con el que hagas de 5 a 15 y haz todas
+las que puedas». Máximo trabajo tiene suelo del 30 % del 1RM
+(`SUELO_MAXIMO_TRABAJO`): por debajo no hay estudios de que se gane músculo
+igual.
+
 PENDIENTE: nombre e icono con Design («luego ya decoramos»); publicar la app
 en la consola de Google (es cosa suya); repasar las descripciones de las
 progresiones contrastándolas con las fuentes, que él pidió y solo está hecho

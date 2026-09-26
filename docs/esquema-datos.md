@@ -478,7 +478,7 @@ El paso 3 no es opcional. Es la red de seguridad.
   `reinicio.modo` acepta `'rm-ciclo'` (al % del mejor 1RM logrado en ese ciclo)
   y `ciclo.generador` acepta `inicialEsfuerzo` e `incrementoEsfuerzo` (que
   suban peso y repeticiones a la vez). Planes de serie: `tramoInicio` (% del
-  1RM por el que arranca un drop set). Progresión de ciclo: `corte.cuantas`
+  1RM por el que arranca un drop set). Ejercicios: `rmManual` (kg; el 1RM que sabes, solo cuenta mientras no hay series). Progresión de ciclo: `corte.cuantas`
   (con cuántas condiciones marcadas se acaba: 1, 2… o 'todas'),
   `reinicio.modo` acepta `'reps'` con `reinicio.reps` (empieza por el peso al
   que harías esas repeticiones) y `ciclo.generador.extras`

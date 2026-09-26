@@ -36,8 +36,7 @@ que la app funcione en condiciones. Centrémonos en eso»*.
 - [ ] Drop set y volumen: la evidencia (Ozaki 2018, Fink 2018, metaanálisis
       de Coleman 2023) apoya lo de ahora, una serie más media por bajada. Falta
       que Dan diga si lo deja así (26-09-2026: pidió ver la ciencia antes).
-- [ ] «Máximo trabajo»: ¿suelo de % del 1RM para que no derive hacia pesos
-      muy bajos? Explicado para qué serviría; falta su decisión.
+- [x] «Máximo trabajo»: suelo del 30 % del 1RM (0.27.0).
 - [ ] Ejercicios ya existentes sin programar (con «solo apuntar» de antes):
       ¿pasarlos a Bilbo o a hipertrofia según el objetivo? Hoy solo se aplica
       a los nuevos.

@@ -230,7 +230,9 @@ function sugerenciaBilbo(datos, ejercicio, plan, { excluirSesion, sobre }) {
   // fórmula del ejercicio y descontando la recámara que sueles dejar.
   // El primer día de un ciclo nuevo se compara con la última serie del anterior.
   const referencia = ultimaDelCiclo?.serie ?? seriesDeEjercicio(datos, ejercicio.id, { excluirSesion, planId: plan.id }).at(-1)?.serie ?? null;
-  const rmAnterior = referencia ? rmDeSerie(datos, ejercicio, referencia, esfuerzoTotal(referencia)) : null;
+  // Sin ninguna serie todavía, vale el 1RM que hayas puesto en la ficha.
+  const rmAnterior = referencia ? rmDeSerie(datos, ejercicio, referencia, esfuerzoTotal(referencia))
+    : (ejercicio.rmManual > 0 ? ejercicio.rmManual : null);
   const recamara = recamaraDe(plan.tecnicas, ejercicio.recamaraPorDefecto ?? datos.perfil.recamaraPorDefecto ?? 1);
   const reps = rmAnterior && valor > 0 ? repsParaIgualar(modeloDe(datos, ejercicio), rmAnterior, valor, recamara) : null;
   // Repeticiones enteras y con tope: por encima de 40 el peso es demasiado bajo.
@@ -393,7 +395,9 @@ export function rmDeReferencia(datos, ejercicio, { cicloN, excluirSesion } = {})
   const delCiclo = cicloN != null ? series.filter((x) => x.entrada.cicloN === cicloN) : [];
   const candidatas = delCiclo.length ? delCiclo : series;
   const rms = candidatas.map((x) => rmDeSerie(datos, ejercicio, x.serie, esfuerzoTotal(x.serie))).filter(Boolean);
-  if (!rms.length) return null;
+  // Sin series todavía, vale el 1RM que hayas puesto tú en la ficha. En
+  // cuanto hay una serie apuntada, manda lo que sale de tus series.
+  if (!rms.length) return ejercicio.rmManual > 0 ? { valor: ejercicio.rmManual, delCiclo: false, manual: true } : null;
   return { valor: redondear(Math.max(...rms), 1), delCiclo: Boolean(delCiclo.length) };
 }
 
@@ -438,6 +442,10 @@ export function ajusteTrabajo(puntos) {
   return { a, b, c, trabajoEn: (x) => a * x * x + b * x + c };
 }
 
+// Por debajo del 30 % del 1RM no hay estudios que muestren la misma ganancia
+// de músculo que con más peso (Schoenfeld 2017; Lopez 2021): es el suelo.
+const SUELO_MAXIMO_TRABAJO = 0.3;
+
 export function maximoTrabajo(datos, ejercicio, { excluirSesion, tope = 50 } = {}) {
   const series = seriesDeEjercicio(datos, ejercicio.id, { excluirSesion })
     .filter((x) => x.serie.carga > 0 && esfuerzoTotal(x.serie) > 0);
@@ -469,6 +477,12 @@ export function maximoTrabajo(datos, ejercicio, { excluirSesion, tope = 50 } = {
     while (x < cima * 3 && repsEn(x) > tope) x += 2.5;
     aviso = `El máximo teórico pediría ${Math.round(repsEn(carga))} ${'repeticiones'}; con el tope de ${tope} sale ${aPasoDeDisco(x)}`;
     carga = aPasoDeDisco(x);
+  }
+  const rm = rmDeReferencia(datos, ejercicio, { excluirSesion })?.valor;
+  if (rm && carga < rm * SUELO_MAXIMO_TRABAJO) {
+    const suelo = aPesoDisponible(ejercicio, rm * SUELO_MAXIMO_TRABAJO, { hacia: 'arriba' });
+    aviso = `El máximo teórico quedaba por debajo del 30 % de tu 1RM; se sube a ${formatearNumero(suelo)}`;
+    carga = suelo;
   }
   return { ...resultado, carga, esfuerzoObjetivo: redondear(repsEn(carga), 0),
     trabajoEsperado: redondear(ajuste.trabajoEn(carga), 0), cima: aPasoDeDisco(cima), aviso };

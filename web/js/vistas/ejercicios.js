@@ -440,6 +440,36 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
   }
 
   // Qué fórmula estima el 1RM y, si es la personal, cómo va su calibración.
+  // Tu 1RM, si lo sabes. Sirve para que la app proponga pesos desde el
+  // primer día; en cuanto apuntas una serie, manda lo que sale de tus series.
+  function campo1RM() {
+    const conHistorial = existente && d.sesiones.some((s) => !s.borrada && s.ejercicios.some((x) => x.ejercicioId === existente.id
+      && x.series.some((y) => y.hecha)));
+    return h('div', { class: 'campo' },
+      h('div', { class: 'titulo-con-ayuda' },
+        h('span', { class: 'etiqueta-campo' }, 'Tu 1RM, si lo sabes (kg)'),
+        ayuda('Tu 1RM', [
+          'El 1RM es el peso que podrías levantar una sola vez. Con él, la app te propone pesos desde el primer día.',
+          'Si no lo sabes, déjalo vacío. La primera vez pon un peso con el que hagas entre 5 y 15 repeticiones y haz todas '
+            + 'las que puedas: con esa serie la app calcula tu fuerza y desde la siguiente ya te dice qué peso toca.',
+          'En cuanto apuntas una serie, manda lo que sale de tus series y esta casilla deja de usarse.'])),
+      numeroInput(borrador.rmManual, (v) => { borrador.rmManual = v; }, { etiqueta: 'Tu 1RM en kilos', onchange: () => {
+        // Un ciclo que aún no ha empezado arranca con este 1RM.
+        if (!sinHistorial()) return;
+        for (const plan of borrador.series) {
+          const prog = plan.progresion;
+          if (prog?.tipo !== 'bilbo' || prog.sobre !== 'carga') continue;
+          const ciclo = prog.ciclos?.find((c) => c.n === prog.cicloActual) ?? prog.ciclos?.at(-1);
+          const inicial = inicioBilbo();
+          if (!ciclo || inicial == null) continue;
+          ciclo.generador = { ...ciclo.generador, inicial };
+          ciclo.escalera = escaleraDe(borrador, ciclo.generador, prog.diasPorCiclo ?? prog.corte?.sesiones ?? 20);
+        }
+        repintar();
+      } }),
+      conHistorial && h('small', { class: 'nota' }, 'Ya lo calcula la app con tus series.'));
+  }
+
   function seccionFormula() {
     borrador.formula1RM ??= 'personal';
     const estadoCalibracion = existente && borrador.formula1RM === 'personal' ? calibrar(d, existente) : null;
@@ -449,6 +479,7 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
     const ejemplo = modelo && [[60, 20], [80, 8]].map(([p, r]) => `${p} kg × ${r} ≈ ${Math.round(estimar1RM(modelo, p, r, 1))} kg`).join(' · ');
     return h('fieldset', {},
       h('legend', {}, 'Fórmula del 1RM'),
+      campo1RM(),
       opciones(FORMULAS, borrador.formula1RM, (f) => { borrador.formula1RM = f; repintar(); }),
       pista('ficha-formula', 'El 1RM es el peso que podrías levantar una sola vez. La app lo estima a partir de cada serie '
         + 'y con él propone pesos. «Se ajusta a ti» corrige la fórmula con tus propias series.'),
@@ -578,6 +609,10 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
     repintar();
   }
 
+  // ¿Aún no hay ninguna serie apuntada de este ejercicio?
+  const sinHistorial = () => !existente || !d.sesiones.some((s) => !s.borrada
+    && s.ejercicios.some((x) => x.ejercicioId === existente.id && x.series.some((y) => y.hecha)));
+
   // Qué regla lleva esta serie, sacada de lo guardado.
   function reglaDe(plan) {
     if (plan.calentamiento) return 'calentamiento';
@@ -644,6 +679,8 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
           } }, '🗑')),
 
       opciones(REGLAS, regla, (r) => fijarRegla(plan, r), { compacto: true }),
+
+      regla !== 'libre' && regla !== 'calentamiento' && sinHistorial() && borrador.carga.tipo !== 'ninguna' && campo1RM(),
 
       regla === 'ciclo' && h('div', {},
         h('div', { class: 'titulo-con-ayuda' }, h('span', { class: 'etiqueta-campo' }, 'Prehechos'),
@@ -1080,7 +1117,8 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
   // Peso de arranque de un ciclo Bilbo: un porcentaje de tu mejor 1RM
   // estimado en este ejercicio (el de Ajustes; 50 % por defecto).
   function inicioBilbo() {
-    const rm = existente ? rmDeReferencia(d, existente)?.valor : null;
+    // Con el borrador y no con lo guardado: así cuenta el 1RM que acabas de escribir.
+    const rm = rmDeReferencia(d, borrador)?.valor;
     return rm ? aPesoDisponible(borrador, (rm * (d.perfil.bilboInicioPorcentaje ?? 50)) / 100) : null;
   }
 
