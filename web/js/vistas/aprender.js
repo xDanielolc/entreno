@@ -6,17 +6,16 @@
 import { BIBLIOGRAFIA } from '../bibliografia.js';
 import { calibrar, textoCalibracion } from '../formula1rm.js';
 import { creditosCargados } from '../imagenes.js';
-import { explicaciones1RM } from './ejercicios.js';
+import { explicaciones1RM, opciones } from './ejercicios.js';
+import { FORMAS_DROP_SET } from '../recuperacion.js';
 import { ASISTENCIAS, ESCALA_MANO, TECNICAS_ESTIRAMIENTO } from '../esquema.js';
 import * as estado from '../estado.js';
-import { anadir, aviso, h, idApartado } from '../ui.js';
+import { anadir, apartadoPlegable, aviso, h } from '../ui.js';
 import { hacerCuestionario } from './cuestionario.js';
 import { listaGlosario, queEs } from './glosario.js';
 import { GUIAS, NIVELES, fijarNivel, iniciarGuia, nivelTutorial, reiniciarPistas } from './tutorial.js';
 
-function apartado(titulo, ...contenido) {
-  return h('details', { class: 'tarjeta formulario apartado', id: idApartado(titulo) }, h('summary', {}, titulo), ...contenido);
-}
+const apartado = apartadoPlegable;
 
 const parrafos = (...textos) => textos.map((t) => h('p', {}, t));
 
@@ -152,6 +151,14 @@ export function vistaAprender(contenedor) {
     comoDecideLaApp(),
     estirar(),
     comoSeEstimaTuRM(d),
+    apartado('Cuánto cuenta un drop set',
+      h('p', {}, 'Para saber cuánto has trabajado cada músculo, la app convierte los drop sets en series normales.'),
+      h('p', { class: 'nota' }, 'Hay dos estudios pequeños y cada forma acierta en uno: una serie con 4 bajadas rindió como 3 series '
+        + '(Ozaki 2018) y una con 3 bajadas, también como 3 (Fink 2018). Las dos valen; por defecto va la primera.'),
+      h('div', { class: 'campo' },
+      h('span', { class: 'etiqueta-campo' }, 'Cuánto cuenta un drop set'),
+      opciones(FORMAS_DROP_SET, d.perfil.cuentaDropSet ?? 'ozaki', (m) => estado.cambiar((x) => { x.perfil.cuentaDropSet = m; }), { compacto: true }),
+      h('small', { class: 'nota' }, FORMAS_DROP_SET[d.perfil.cuentaDropSet ?? 'ozaki'].descripcion))),
     creditos(),
     apartado('De dónde sale cada cosa',
       h('p', { class: 'nota' }, 'Qué recomienda la app, con qué respaldo y dónde falla.'),

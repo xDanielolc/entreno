@@ -50,9 +50,11 @@ export const BIBLIOGRAFIA = [
   },
   {
     tema: 'Cómo cuenta un drop set',
-    dice: 'Un drop set cuenta como una serie más media serie por cada bajada: uno de cuatro bajadas son tres series.',
+    dice: 'Por defecto, un drop set cuenta como una serie más media por cada bajada (uno de cuatro bajadas son tres series). '
+      + 'En Ajustes o en Aprender puedes cambiarlo a «todo menos una» (uno de cuatro bajadas son cuatro series).',
     matiz: 'Sale de los estudios que comparan drop sets con series normales: una serie con cuatro bajadas hizo crecer el músculo '
-      + 'como tres series normales (Ozaki 2018), y una con tres bajadas, como tres series de 12 (Fink 2018). Contar cada bajada '
+      + 'como tres series normales (Ozaki 2018), y una con tres bajadas, como tres series de 12 (Fink 2018). La primera forma clava '
+      + 'el de Ozaki y la segunda el de Fink; con tan pocas personas no se puede decir cuál es mejor. Contar cada bajada '
       + 'como una serie entera inflaría el volumen. Son estudios pequeños, de 9 a 32 personas, así que es una aproximación.',
     fuentes: [
       { texto: 'Coleman et al. (2023), Sports Medicine Open: metaanálisis, drop sets y series normales dan una hipertrofia parecida, en la mitad o un tercio del tiempo.', url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC10390395/' },

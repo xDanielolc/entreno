@@ -3,6 +3,16 @@
 // h('button', { class: 'boton', onclick: fn }, 'Texto') crea un elemento.
 // Las propiedades que empiezan por «on» son eventos; los hijos nulos o false
 // se ignoran, así se pueden escribir condiciones dentro: cond && h(...).
+// Apartado plegable que recuerda si lo dejaste abierto: al tocar algo dentro
+// la pantalla se repinta, y sin esto se cerraría solo.
+const apartadosAbiertos = new Set();
+export function apartadoPlegable(titulo, ...contenido) {
+  const id = idApartado(titulo);
+  return h('details', { class: 'tarjeta formulario apartado', id, open: apartadosAbiertos.has(id),
+    ontoggle: (e) => { if (e.target.open) apartadosAbiertos.add(id); else apartadosAbiertos.delete(id); } },
+  h('summary', {}, titulo), ...contenido);
+}
+
 export function h(etiqueta, props = {}, ...hijos) {
   const el = document.createElement(etiqueta);
   for (const [clave, valor] of Object.entries(props || {})) {

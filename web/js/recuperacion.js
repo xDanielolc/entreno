@@ -48,8 +48,21 @@ export function serieDura(serie) {
   return serie.recamara != null && serie.recamara <= 1;
 }
 
-// Series de una sesión por músculo, con las horas que pide cada una. En un
-// drop set o rest-pause, cada tramo de más cuenta media serie; un músculo
+// Cuántas series vale un drop set (o un rest-pause) según sus tramos. Las
+// dos formas encajan con los estudios pequeños que hay; por defecto va la
+// que clava el de Ozaki 2018 (1 serie + 4 bajadas = 3 series).
+export const FORMAS_DROP_SET = {
+  ozaki: { etiqueta: 'Una serie + media por bajada', descripcion: 'Un drop set de 4 bajadas cuenta como 3 series. Encaja con Ozaki 2018.' },
+  'x-1': { etiqueta: 'Todo menos una', descripcion: 'Un drop set de 4 bajadas cuenta como 4 series (los 5 tramos menos uno). Encaja con Fink 2018.' },
+};
+
+export function seriesDeTramos(hechos, forma = 'ozaki') {
+  if (hechos <= 1) return 1;
+  return forma === 'x-1' ? hechos - 1 : 1 + (hechos - 1) * 0.5;
+}
+
+// Series de una sesión por músculo, con las horas que pide cada una. Un drop
+// set o rest-pause cuenta según la forma elegida en Ajustes; un músculo
 // secundario recibe la mitad.
 function cargaDeSesion(datos, sesion) {
   const porMusculo = new Map();
@@ -69,7 +82,7 @@ function cargaDeSesion(datos, sesion) {
     for (const serie of entrada.series) {
       if (!serie.hecha || serie.tipo === 'calentamiento') continue;
       const hechos = (serie.tramos || []).filter((t) => t.esfuerzo != null).length;
-      const series = hechos > 1 ? 1 + (hechos - 1) * 0.5 : 1;
+      const series = seriesDeTramos(hechos, datos.perfil?.cuentaDropSet);
       const horas = horasDeSerie(serie);
       const duras = serieDura(serie) ? series : 0;
       for (const m of principales) sumar(m, series, horas, duras);

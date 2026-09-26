@@ -384,6 +384,15 @@ las que puedas». Máximo trabajo tiene suelo del 30 % del 1RM
 (`SUELO_MAXIMO_TRABAJO`): por debajo no hay estudios de que se gane músculo
 igual.
 
+## Ronda 0.28.0 (27-09-2026): cómo cuenta un drop set
+
+`perfil.cuentaDropSet`: 'ozaki' (por defecto, 1 + 0,5 por tramo de más) o
+'x-1' (tramos menos uno). `seriesDeTramos()` en recuperacion.js; se elige en
+Ajustes → Entrenamiento y series y en Aprender. Máximo trabajo ya ajusta una
+parábola (U invertida) a sus series y va a la cima; el suelo solo actúa si la
+cima cae por debajo del 30 %. Los apartados de Ajustes y Aprender recuerdan
+si estaban abiertos (`apartadoPlegable` en ui.js).
+
 PENDIENTE: nombre e icono con Design («luego ya decoramos»); publicar la app
 en la consola de Google (es cosa suya); repasar las descripciones de las
 progresiones contrastándolas con las fuentes, que él pidió y solo está hecho

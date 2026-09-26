@@ -2,7 +2,7 @@ import { creditosCargados } from '../imagenes.js';
 import { formatearNumero } from '../calculos.js';
 import * as estado from '../estado.js';
 import { desconectar, eliminarCuenta, rehacerCopiasLegibles, sincronizar, situacionActual } from '../sincronizacion.js';
-import { idApartado, modal } from '../ui.js';
+import { apartadoPlegable, modal } from '../ui.js';
 import { VERSION_APP } from '../version.js';
 import { anadir, aviso, confirmar, h, hoyISO, leerNumero } from '../ui.js';
 import { DESCANSO_ESTIRAMIENTOS_POR_DEFECTO, DESCANSO_TRAMOS_POR_DEFECTO, RESPIRACION_POR_DEFECTO } from './descanso.js';
@@ -11,6 +11,7 @@ import { calibrar, textoCalibracion } from '../formula1rm.js';
 import { TEXTO_AVISO, guardarPruebaEnCuenta } from '../modo-prueba.js';
 import { explicaciones1RM, opciones } from './ejercicios.js';
 import { tramosPorDefecto } from '../calculos.js';
+import { FORMAS_DROP_SET } from '../recuperacion.js';
 import { MODOS_GLOSARIO, modoGlosario } from './glosario.js';
 import { pista } from './tutorial.js';
 import { MODOS_ENTRENO } from './sesion.js';
@@ -47,8 +48,7 @@ export function vistaAjustes(contenedor) {
   // Un apartado plegado: título y, dentro, sus ajustes.
   // Cada apartado lleva su id (sacado del título) para que la guía pueda
   // señalarlo y para poder enlazarlo desde otra pantalla.
-  const apartado = (titulo, ...contenido) => h('details', { class: 'tarjeta formulario apartado', id: idApartado(titulo) },
-    h('summary', {}, titulo), ...contenido);
+  const apartado = apartadoPlegable;
 
   anadir(contenedor,
     h('h1', {}, 'Ajustes'),
@@ -152,6 +152,10 @@ export function vistaAjustes(contenedor) {
         numeroAjuste('Bajadas', d.perfil.dropSet?.bajadas ?? 4, (x, v) => { x.perfil.dropSet = { ...x.perfil.dropSet, bajadas: v }; }),
         numeroAjuste('Kilos por bajada', d.perfil.dropSet?.salto ?? 10, (x, v) => { x.perfil.dropSet = { ...x.perfil.dropSet, salto: v }; }),
         numeroAjuste('Arranca al (% del 1RM)', d.perfil.dropSet?.inicioPorcentaje ?? 80, (x, v) => { x.perfil.dropSet = { ...x.perfil.dropSet, inicioPorcentaje: v }; })),
+      h('div', { class: 'campo' },
+        h('span', { class: 'etiqueta-campo' }, 'Cuánto cuenta un drop set'),
+        opciones(FORMAS_DROP_SET, d.perfil.cuentaDropSet ?? 'ozaki', (m) => estado.cambiar((x) => { x.perfil.cuentaDropSet = m; }), { compacto: true }),
+        h('small', { class: 'nota' }, FORMAS_DROP_SET[d.perfil.cuentaDropSet ?? 'ozaki'].descripcion)),
       h('div', { class: 'campo' },
         h('span', { class: 'etiqueta-campo' }, 'Los pesos del drop set, por'),
         opciones({ rm: { etiqueta: '% del 1RM' }, kg: { etiqueta: 'Kilos a mano' } }, d.perfil.dropSet?.modoCarga ?? 'rm',

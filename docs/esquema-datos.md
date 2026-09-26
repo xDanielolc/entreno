@@ -515,3 +515,7 @@ la vez, a veces sin cobertura):
    teníamos, **no se sobrescribe**: se avisa y se ofrece elegir. Este caso
    solo puede darse si entrenas desde dos dispositivos sin sincronizar entre
    medias.
+
+
+- **0.28.** `perfil.cuentaDropSet` ('ozaki' | 'x-1'): cuántas series vale
+  un drop set o rest-pause al contar el volumen por músculo.
