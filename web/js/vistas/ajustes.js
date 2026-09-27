@@ -1,7 +1,7 @@
 import { creditosCargados } from '../imagenes.js';
 import { formatearNumero } from '../calculos.js';
 import * as estado from '../estado.js';
-import { desconectar, eliminarCuenta, rehacerCopiasLegibles, sincronizar, situacionActual } from '../sincronizacion.js';
+import { copiasAparte, desconectar, eliminarCuenta, juntarCopia, rehacerCopiasLegibles, sincronizar, situacionActual } from '../sincronizacion.js';
 import { apartadoPlegable, modal, selector } from '../ui.js';
 import { VERSION_APP } from '../version.js';
 import { anadir, aviso, confirmar, h, hoyISO, leerNumero } from '../ui.js';
@@ -90,6 +90,7 @@ export function vistaAjustes(contenedor) {
       !sinCuenta && h('button', { class: 'boton enlace', onclick: async () => {
         try { await rehacerCopiasLegibles(); aviso('Hojas legibles actualizadas en Google Drive.'); } catch (e) { aviso(`No se ha podido: ${e.message}`, { tipo: 'error' }); }
       } }, 'Rehacer ahora las hojas legibles'),
+      !sinCuenta && h('button', { class: 'boton enlace', onclick: verCopiasAparte }, 'Recuperar algo de una copia guardada aparte'),
       h('button', { class: 'boton enlace', onclick: salir }, sinCuenta ? 'Salir del modo de prueba' : 'Salir de la cuenta')),
 
     // Los intervalos que guardaste desde el cronómetro de HIIT: aquí se ven
@@ -303,4 +304,42 @@ export function textoSituacion(situacion) {
     'sin-internet': 'Sin internet: se subirá a Google Drive al recuperar la conexión.',
     error: 'No se ha podido guardar en Google Drive.',
   }[situacion] ?? '';
+}
+
+// Copias que la app guardó aparte en Drive (cuando había cambios en dos
+// dispositivos a la vez, o antes de actualizar el formato). Se pueden juntar
+// con lo de ahora: lo que solo esté en una se conserva, y en lo que no
+// coincida manda lo que elijas.
+async function verCopiasAparte() {
+  let copias;
+  try {
+    copias = await copiasAparte();
+  } catch (e) {
+    aviso(`No se ha podido mirar Drive: ${e.message}`, { tipo: 'error' });
+    return;
+  }
+  const fecha = (nombre) => {
+    const m = nombre.match(/(\d{4})-(\d{2})-(\d{2})-(\d{2})-(\d{2})/);
+    if (!m) return nombre;
+    const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]));
+    return d.toLocaleString('es-ES', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
+  };
+  const juntar = async (id, gana, cerrar) => {
+    try {
+      await juntarCopia(id, gana);
+      cerrar();
+      aviso('Copia juntada con lo de ahora. Se sube a Drive en un momento.');
+    } catch (e) {
+      aviso(`No se ha podido: ${e.message}`, { tipo: 'error' });
+    }
+  };
+  const cerrar = modal('Copias guardadas aparte', h('div', { class: 'formulario' },
+    copias.length
+      ? [h('p', { class: 'nota' }, 'Al juntar, lo que solo esté en una de las dos se conserva. Si algo está en las dos y no coincide, manda lo que elijas.'),
+        copias.map((c) => h('div', { class: 'tarjeta' },
+          h('strong', {}, `${c.name.includes('conflicto') ? 'Cambios en dos sitios' : 'Antes de actualizar'} · ${fecha(c.name)}`),
+          h('div', { class: 'fila-botones' },
+            h('button', { class: 'boton secundario', onclick: () => juntar(c.id, 'ahora', cerrar) }, 'Juntar: manda lo de ahora'),
+            h('button', { class: 'boton', onclick: () => juntar(c.id, 'copia', cerrar) }, 'Juntar: manda la copia'))))]
+      : h('p', {}, 'No hay ninguna copia guardada aparte.')));
 }

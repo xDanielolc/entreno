@@ -8,6 +8,7 @@
 //     guarda una copia de ellos en Drive. Nunca se pierde nada en silencio.
 //   - Antes de migrar un archivo de una versión antigua, se guarda una copia.
 
+import { fusionar } from './fusion.js';
 import { CONFIG } from './config.js';
 import * as drive from './drive.js';
 import { migrar, necesitaMigrar, validar } from './esquema.js';
@@ -72,7 +73,7 @@ async function ejecutar(interactivo) {
   try {
     const conflicto = await sincronizarArchivo();
     fijar(estado.meta().pendiente ? 'pendiente' : 'al-dia',
-      conflicto ? 'Había cambios en dos sitios: se ha guardado una copia en Drive.' : '');
+      conflicto ? 'Había cambios en dos sitios y se han juntado. Donde no cuadraban, manda lo de este dispositivo; lo de Drive queda en una copia.' : '');
     if (estado.meta().pendiente) programar(1000);
   } catch (e) {
     console.error(e);
@@ -119,9 +120,10 @@ async function sincronizarArchivo() {
       }
     }
     const d = estado.datos();
-    const creado = await drive.crear(CONFIG.nombreArchivoDatos, d, propiedades(d));
-    estado.actualizarMeta({ fileId: creado.id, revisionRemota: d.revision,
-      pendiente: estado.datos().revision !== d.revision });
+    const copia = structuredClone(d);
+    const creado = await drive.crear(CONFIG.nombreArchivoDatos, copia, propiedades(copia));
+    estado.actualizarMeta({ fileId: creado.id, revisionRemota: copia.revision, base: copia,
+      pendiente: estado.datos().revision !== copia.revision });
     return false;
   }
 
@@ -136,13 +138,6 @@ async function sincronizarArchivo() {
 
   if (conocida == null || revisionRemota > conocida) {
     let descargado = validar(await drive.descargar(fileId));
-    const local = estado.datos();
-    const localVacio = !local.ejercicios.length && !local.sesiones.length;
-
-    if (meta.pendiente && !localVacio) {
-      await drive.crear(`entrenamiento-conflicto-${marcaTiempo()}.json`, local, { copia: 'conflicto' });
-      conflicto = true;
-    }
     let migrado = false;
     if (necesitaMigrar(descargado)) {
       await drive.crear(`entrenamiento-v${descargado.version}-copia-${marcaTiempo()}.json`,
@@ -151,15 +146,30 @@ async function sincronizarArchivo() {
       migrado = true;
     }
     if (completarDesdeCatalogo(descargado) > 0) migrado = true;
-    estado.reemplazarDatos(descargado, { fileId, revisionRemota, pendiente: migrado });
+    const local = estado.datos();
+    const localVacio = !local.ejercicios.length && !local.sesiones.length;
+
+    if (meta.pendiente && !localVacio) {
+      // Cambios aquí y en Drive a la vez: se juntan. Antes ganaba siempre
+      // Drive y lo de aquí solo quedaba en una copia aparte.
+      const { datos: juntos, choques } = fusionar(meta.base ?? null, local, descargado);
+      if (choques.length) {
+        // Lo que había cambiado en los dos sitios se queda como aquí; la
+        // versión de Drive se guarda aparte, por si acaso.
+        await drive.crear(`entrenamiento-conflicto-${marcaTiempo()}.json`, descargado, { copia: 'conflicto' });
+        conflicto = true;
+      }
+      estado.reemplazarDatos(juntos, { fileId, revisionRemota, pendiente: true, base: structuredClone(descargado) });
+    } else {
+      estado.reemplazarDatos(descargado, { fileId, revisionRemota, pendiente: migrado, base: structuredClone(descargado) });
+    }
   }
 
   if (estado.meta().pendiente) {
-    const d = estado.datos();
-    const subida = d.revision;
-    await drive.actualizar(fileId, d, propiedades(d));
-    estado.actualizarMeta({ fileId, revisionRemota: subida,
-      pendiente: estado.datos().revision !== subida });
+    const copia = structuredClone(estado.datos());
+    await drive.actualizar(fileId, copia, propiedades(copia));
+    estado.actualizarMeta({ fileId, revisionRemota: copia.revision, base: copia,
+      pendiente: estado.datos().revision !== copia.revision });
   }
   await subirCopiasLegibles();
   return conflicto;
@@ -288,3 +298,23 @@ document.addEventListener('visibilitychange', () => {
   if (tocaAvisar()) avisarDelPase();
 });
 window.addEventListener('focus', () => { if (tocaAvisar()) avisarDelPase(); });
+
+// Copias que la app ha guardado aparte en Drive (conflictos y migraciones),
+// de la más nueva a la más vieja.
+export async function copiasAparte() {
+  const todo = await drive.listarTodo();
+  return todo.filter((f) => /^entrenamiento-(conflicto|v\d+-copia)-.*\.json$/.test(f.name))
+    .sort((a, b) => b.name.localeCompare(a.name));
+}
+
+// Junta una copia con los datos de ahora. `gana`: 'ahora' o 'copia', para lo
+// que esté en los dos y no coincida. Lo que solo esté en uno se conserva.
+export async function juntarCopia(id, gana = 'copia') {
+  let copia = validar(await drive.descargar(id));
+  if (necesitaMigrar(copia)) copia = migrar(copia);
+  const ahora = estado.datos();
+  const { datos } = gana === 'copia' ? fusionar(null, copia, ahora) : fusionar(null, ahora, copia);
+  datos.revision = Math.max(ahora.revision, copia.revision ?? 0) + 1;
+  estado.reemplazarDatos(datos, { pendiente: true });
+  programar(500);
+}

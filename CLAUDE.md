@@ -418,6 +418,18 @@ si estaban abiertos (`apartadoPlegable` en ui.js).
 - Progreso: todo el historial con tendencia del 1RM (mínimos cuadrados, kg/mes)
   o por ciclos.
 
+## Ronda 0.31.0 (28-09-2026): la sincronización ya no pisa lo del móvil
+
+Fallo grave que vio Dan: con cambios sin subir en el móvil (permiso de Google
+caducado) y el ordenador subiendo antes, ganaba Drive y lo del móvil solo
+quedaba en `entrenamiento-conflicto-*.json`. Ahora `fusion.js` hace una
+fusión a tres bandas contra `meta.base` (la última versión compartida, que se
+guarda al subir y al bajar): lo cambiado en un solo lado se queda; si cambió
+en los dos, manda este dispositivo y la versión de Drive va a una copia. Los
+objetos (perfil, factores de recuperación…) se funden por dentro. Ajustes →
+Cuenta → «Recuperar algo de una copia guardada aparte» junta una copia con lo
+de ahora, eligiendo quién manda.
+
 PENDIENTE: nombre e icono con Design («luego ya decoramos»); publicar la app
 en la consola de Google (es cosa suya); repasar las descripciones de las
 progresiones contrastándolas con las fuentes, que él pidió y solo está hecho
