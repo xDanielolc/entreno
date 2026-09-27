@@ -2,7 +2,7 @@ import * as estado from '../estado.js';
 import { sedeInicial } from '../sedes.js';
 import { barraModoPrueba } from '../modo-prueba.js';
 import { seriesDesdePlan } from '../series.js';
-import { anadir, fechaLarga, h, hoyISO, modal, nuevoId } from '../ui.js';
+import { anadir, h, hoyISO, modal, nuevoId } from '../ui.js';
 import { tarjetaRecuperacion, tarjetaSugerenciasAjuste } from './cuerpo.js';
 import { tarjetaInstalar } from './instalar.js';
 import { pista } from './tutorial.js';
@@ -155,7 +155,6 @@ export function vistaInicio(contenedor) {
 
   anadir(contenedor,
     estado.esSinCuenta() && barraModoPrueba(),
-    h('p', { class: 'fecha-hoy' }, fechaLarga(hoyISO())),
     h('h1', {}, saludo(d.perfil.nombre)),
     tarjetaInstalar(),
     pista('hoy', 'Qué toca hoy y cómo va tu recuperación. Si quieres más ayuda, en la pestaña «Aprender» están el tutorial y el glosario.'),
@@ -176,25 +175,26 @@ export function vistaInicio(contenedor) {
           h('p', { class: 'suave' }, `${rutina.nombre} · ${toca.descansoHoy ? 'siguiente' : 'hoy toca'}`
             + (toca.motivo ? ` (${toca.motivo})` : '')),
           h('h2', {}, dia.nombre),
-          h('p', { class: 'suave' }, dia.ejercicios.length
-            ? dia.ejercicios.map((x) => d.ejercicios.find((e) => e.id === x.ejercicioId)?.nombre ?? '—').join(', ')
-            : 'Este día no tiene ejercicios todavía'),
+          !dia.ejercicios.length && h('p', { class: 'suave' }, 'Este día no tiene ejercicios todavía'),
           avisoCuandoToca(d, rutina, dia),
-          h('details', { class: 'explicacion' },
-            h('summary', {}, '¿Por qué esta y no otra?'),
-            h('p', { class: 'nota' }, 'La app mira, por este orden: si alguna rutina activa tiene puesto hoy como día de la semana, '
-              + 'esa; si no, la que tengas mejor recuperada de los músculos que toca; y dentro de la rutina, el día siguiente al '
-              + 'último que hiciste. Los días de la semana se ponen al editar la rutina, y si no pones ninguno manda la recuperación.')),
-          rutina.descripcion && h('details', { class: 'explicacion' },
-            h('summary', {}, 'Por qué esta rutina es así y cómo se hace'),
-            rutina.descripcion.split('\n\n').map((p) => enPuntos(p))),
           h('button', { class: 'boton grande', onclick: () => empezarConRutina(dia) }, toca.descansoHoy ? 'Empezar igualmente' : 'Empezar'),
-          otras.length > 0 && h('p', { class: 'nota' }, 'Otras rutinas activas: ',
-            otras.map((a, i) => [i > 0 && ' · ', h('a', { href: '#/', onclick: (e) => { e.preventDefault(); empezarConRutina(a.dia, a.rutina); } },
-              `${a.rutina.nombre} (${a.dia.nombre})`)])),
-          h('button', { class: 'boton secundario', onclick: elegirDia }, 'Otro día de la rutina'))
+          h('button', { class: 'boton secundario', onclick: elegirDia }, 'Otro día de la rutina'),
+          // Las explicaciones, juntas y plegadas al final.
+          h('details', { class: 'explicacion mas-info' },
+            h('summary', {}, 'Más info'),
+            h('h3', {}, '¿Por qué esta y no otra?'),
+            h('ul', { class: 'nota' },
+              h('li', {}, 'Si una rutina activa tiene hoy como día de la semana, esa.'),
+              h('li', {}, 'Si no, la que tengas mejor recuperada de los músculos que toca.'),
+              h('li', {}, 'Dentro de la rutina, el día siguiente al último que hiciste.')),
+            rutina.descripcion && [
+              h('h3', {}, 'Por qué esta rutina es así y cómo se hace'),
+              rutina.descripcion.split('\n\n').map((p) => enPuntos(p))]))
         : h('button', { class: 'boton grande', onclick: empezarSuelto }, 'Empezar entrenamiento'),
-    !enCurso && dia && h('div', { class: 'fila-botones' },
+    // Debajo del recuadro, lo demás que se puede hacer hoy.
+    !enCurso && dia && h('div', { class: 'acciones-hoy' },
+      otras.map((a) => h('button', { class: 'boton secundario', onclick: () => empezarConRutina(a.dia, a.rutina) },
+        `${a.rutina.nombre}: ${a.dia.nombre}`)),
       h('button', { class: 'boton secundario', onclick: empezarSuelto }, 'Entrenar sin rutina'),
       h('a', { class: 'boton secundario', href: '#/rutinas' }, 'Ver rutinas')),
 

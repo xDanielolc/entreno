@@ -5,7 +5,7 @@ import {
 import { guiaTrasPrueba, pintarGuia, pista } from './tutorial.js';
 import { queEs } from './glosario.js';
 import { abrirCronometro, abrirIntervalos } from './intervalos.js';
-import { modal } from '../ui.js';
+import { modal, selector } from '../ui.js';
 import * as estado from '../estado.js';
 import {
   TIPOS_CARGA, TIPOS_ESFUERZO, TIPOS_SERIE, camposDe, recamaraDe, tipoDeFallo, tramosDe,
@@ -15,7 +15,7 @@ import {
   avisoPrimeraBajada, crearSerieDesdePlan, entradaDeEjercicio, modoCargaDe, origenModoCarga, recalcularTramos, saltoDeTramo,
   serieSuelta,
 } from '../series.js';
-import { anadir, aviso, confirmar, h, formatearTiempo, leerNumero, leerTiempo } from '../ui.js';
+import { anadir, aviso, confirmar, fechaLarga, h, formatearTiempo, leerNumero, leerTiempo } from '../ui.js';
 import { DESCANSO_ESTIRAMIENTOS_POR_DEFECTO, arrancarDescanso, arrancarRespiracion, barraDescanso, descansoDeTramo } from './descanso.js';
 import { cuentaParaFatiga, tipoDeEjercicio } from '../catalogo.js';
 import { ASISTENCIAS, ESCALA_MANO, PROGRAMAS, TECNICAS_ESTIRAMIENTO, extraDeSerie, medidasDe } from '../esquema.js';
@@ -32,6 +32,9 @@ import { selectorTecnicas, textoTecnicas } from './tecnicas.js';
 // esté abierta, y la elección queda en el perfil para la próxima vez.
 const guiado = new Map();     // id de sesión → { modo, pos }
 const preguntandoVista = new Set();   // sesiones con el cartel de vista a punto de salir
+// Entrenamientos ya terminados que has abierto para editar. Sin esto, un día
+// del historial se abre en resumen, sin nada que se pueda tocar sin querer.
+const editando = new Set();
 
 export const MODOS_ENTRENO = {
   serie: { etiqueta: 'Solo la serie que toca', descripcion: 'Al apuntarla aparece la siguiente. Lo más limpio.' },
@@ -47,6 +50,10 @@ export function vistaSesion(contenedor, { id }) {
     return;
   }
   const ejercicioDe = (ejId) => d.ejercicios.find((e) => e.id === ejId);
+  if (sesion.estado === 'terminada' && !editando.has(id)) {
+    resumenDelDia(contenedor, d, sesion);
+    return;
+  }
   // La vista elegida se guarda en la sesión: si el móvil cierra la app y
   // vuelves, sigues donde estabas.
   if (!guiado.has(id) && sesion.vista?.modo) guiado.set(id, { modo: sesion.vista.modo, pos: sesion.vista.pos ?? null });
@@ -77,11 +84,10 @@ export function vistaSesion(contenedor, { id }) {
       h('input', { type: 'date', class: 'fecha', value: sesion.fecha, 'aria-label': 'Fecha',
         onchange: (e) => e.target.value && cambiarSesion((s) => moverFecha(s, e.target.value)) })),
 
-    sedesActivas(d).length > 0 && h('label', { class: 'fila-sede-sesion' },
+    sedesActivas(d).length > 0 && h('div', { class: 'fila-sede-sesion' },
       h('span', { class: 'suave' }, 'Dónde:'),
-      h('select', { onchange: (e) => cambiarSesion((s) => { s.sedeId = e.target.value || null; }) },
-        h('option', { value: '' }, 'Sin indicar'),
-        sedesActivas(d).map((s) => h('option', { value: s.id, selected: s.id === sesion.sedeId }, nombreSede(d, s.id))))),
+      selector([['', 'Sin indicar'], ...sedesActivas(d).map((s) => [s.id, nombreSede(d, s.id)])], sesion.sedeId ?? '',
+        (v) => cambiarSesion((s) => { s.sedeId = v || null; }), { titulo: 'Dónde entrenas hoy', lista: true })),
 
     sesion.diaRutinaId && h('p', { class: 'suave' }, nombreDelDia(d, sesion)),
 
@@ -112,7 +118,8 @@ export function vistaSesion(contenedor, { id }) {
 
     enCurso
       ? h('button', { class: 'boton grande terminar-entreno', onclick: terminar }, 'Terminar entrenamiento')
-      : h('a', { class: 'boton secundario', href: '#/historial' }, 'Volver al historial'),
+      : [h('p', { class: 'nota' }, 'Cada cambio se guarda al momento. Si te equivocas, toca «Deshacer» en el aviso que sale abajo.'),
+        h('button', { class: 'boton grande', onclick: () => { editando.delete(id); dispatchEvent(new HashChangeEvent('hashchange')); } }, 'Hecho, dejar de editar')],
 
     !sesion.borrada && posicion == null
       && h('button', { class: 'boton enlace peligro-texto', onclick: borrar }, 'Mover este entrenamiento a la papelera'));
@@ -401,9 +408,8 @@ export function vistaSesion(contenedor, { id }) {
       const x = s.ejercicios[i].series[j];
       x.estiramiento = { ...ej.estiramiento, ...x.estiramiento, [clave]: valor === '' || valor == null ? null : valor };
     });
-    const desplegable = (clave, catalogo, vacio) => h('select', { 'aria-label': vacio, onchange: (e) => guardar(clave, e.target.value) },
-      h('option', { value: '' }, vacio),
-      Object.entries(catalogo).map(([k, v]) => h('option', { value: k, selected: k === actual[clave] }, v.etiqueta ?? v)));
+    const desplegable = (clave, catalogo, vacio) => selector([['', vacio], ...Object.entries(catalogo).map(([k, v]) => [k, v.etiqueta ?? v])],
+      actual[clave] ?? '', (v) => guardar(clave, v), { titulo: vacio, lista: true });
     // Las ayudas se pueden combinar (cinta y pared, por ejemplo) y se puede
     // medir por varios sitios a la vez: la escala de la mano y centímetros.
     const ayudas = actual.asistencias ?? (actual.asistencia ? [actual.asistencia] : []);
@@ -432,13 +438,11 @@ export function vistaSesion(contenedor, { id }) {
 
   function cabeceraSerie(ej, i, j, serie) {
     return h('div', { class: 'serie-cabecera' },
-      h('select', { class: 'tipo-serie', 'aria-label': 'Tipo de serie',
-        onchange: (e) => cambiarSesion((s) => {
-          const x = s.ejercicios[i].series[j];
-          x.tipo = e.target.value;
-          if (x.tipo !== 'intensidad') { x.tecnicas = []; x.tramos = null; }
-        }) },
-      Object.entries(TIPOS_SERIE).map(([k, v]) => h('option', { value: k, selected: k === serie.tipo }, v))),
+      selector(Object.entries(TIPOS_SERIE), serie.tipo, (v) => cambiarSesion((s) => {
+        const x = s.ejercicios[i].series[j];
+        x.tipo = v;
+        if (x.tipo !== 'intensidad') { x.tecnicas = []; x.tramos = null; }
+      }), { titulo: 'Tipo de serie', lista: true }),
 
       serie.tipo === 'intensidad' && selectorTecnicas(serie.tecnicas, (nuevas) => cambiarSesion((s) => {
         const x = s.ejercicios[i].series[j];
@@ -930,6 +934,35 @@ function horaEnFecha(iso, fecha, minutosMas = 0) {
 
 function planDe(ej, serie) {
   return (ej.series || []).find((p) => p.id === serie.planId) ?? null;
+}
+
+// Un día del historial, para leerlo: qué hiciste, serie a serie, sin nada
+// que se pueda cambiar sin querer. Para cambiarlo, «Editar».
+function resumenDelDia(contenedor, d, sesion) {
+  const duracion = sesion.inicio && sesion.fin
+    ? Math.round((new Date(sesion.fin) - new Date(sesion.inicio)) / 60_000) : null;
+  const series = sesion.ejercicios.reduce((n, e) => n + e.series.filter((s) => s.hecha).length, 0);
+  anadir(contenedor,
+    sesion.borrada && h('p', { class: 'tarjeta aviso-tarjeta' }, 'Este entrenamiento está en la papelera: no cuenta para tu progresión.'),
+    h('h1', {}, fechaLarga(sesion.fecha)),
+    h('p', { class: 'suave' }, [nombreDelDia(d, sesion), sesion.sedeId && nombreSede(d, sesion.sedeId),
+      `${series} ${series === 1 ? 'serie' : 'series'}`, duracion && `${duracion} min`].filter(Boolean).join(' · ')),
+    sesion.ejercicios.map((entrada) => {
+      const ej = d.ejercicios.find((e) => e.id === entrada.ejercicioId);
+      const hechas = entrada.series.filter((s) => s.hecha);
+      return h('section', { class: 'tarjeta resumen-ejercicio' },
+        h('h2', {}, ej?.nombre ?? 'Ejercicio borrado'),
+        hechas.length && ej
+          ? h('ol', { class: 'series-resumen' }, hechas.map((s) => h('li', {}, textoSerie(ej, s),
+            s.tipo === 'calentamiento' && h('small', { class: 'suave' }, ' · calentamiento'))))
+          : h('p', { class: 'suave' }, 'Sin series apuntadas'),
+        entrada.nota && h('p', { class: 'nota' }, entrada.nota));
+    }),
+    sesion.notas && h('p', { class: 'tarjeta nota' }, sesion.notas),
+    h('div', { class: 'acciones-hoy' },
+      h('button', { class: 'boton', onclick: () => { editando.add(sesion.id); dispatchEvent(new HashChangeEvent('hashchange')); } }, 'Editar'),
+      h('button', { class: 'boton secundario', onclick: () => mostrarResumen(estado.datos(), sesion.id) }, 'Estadísticas'),
+      h('a', { class: 'boton secundario', href: '#/historial' }, 'Volver al historial')));
 }
 
 function nombreDelDia(datos, sesion) {

@@ -50,13 +50,14 @@ export function serieDura(serie) {
 
 // Cuántas series vale un drop set (o un rest-pause) según sus tramos. Las
 // dos formas encajan con los estudios pequeños que hay; por defecto va la
-// que clava el de Ozaki 2018 (1 serie + 4 bajadas = 3 series).
+// que clava el de Fink 2018 (1 serie + 3 bajadas = 3 series).
+export const FORMA_DROP_SET_POR_DEFECTO = 'x-1';
 export const FORMAS_DROP_SET = {
-  ozaki: { etiqueta: 'Una serie + media por bajada', descripcion: 'Un drop set de 4 bajadas cuenta como 3 series. Encaja con Ozaki 2018.' },
-  'x-1': { etiqueta: 'Todo menos una', descripcion: 'Un drop set de 4 bajadas cuenta como 4 series (los 5 tramos menos uno). Encaja con Fink 2018.' },
+  'x-1': { etiqueta: 'Todo menos una', descripcion: 'Los tramos menos uno: con 3 bajadas, 3 series. Encaja con Fink 2018.' },
+  ozaki: { etiqueta: 'Una serie + media por bajada', descripcion: 'Con 4 bajadas, 3 series. Encaja con Ozaki 2018.' },
 };
 
-export function seriesDeTramos(hechos, forma = 'ozaki') {
+export function seriesDeTramos(hechos, forma = FORMA_DROP_SET_POR_DEFECTO) {
   if (hechos <= 1) return 1;
   return forma === 'x-1' ? hechos - 1 : 1 + (hechos - 1) * 0.5;
 }
@@ -82,7 +83,7 @@ function cargaDeSesion(datos, sesion) {
     for (const serie of entrada.series) {
       if (!serie.hecha || serie.tipo === 'calentamiento') continue;
       const hechos = (serie.tramos || []).filter((t) => t.esfuerzo != null).length;
-      const series = seriesDeTramos(hechos, datos.perfil?.cuentaDropSet);
+      const series = seriesDeTramos(hechos, datos.perfil?.cuentaDropSet ?? FORMA_DROP_SET_POR_DEFECTO);
       const horas = horasDeSerie(serie);
       const duras = serieDura(serie) ? series : 0;
       for (const m of principales) sumar(m, series, horas, duras);

@@ -1037,3 +1037,45 @@ details.bloque-ciclo.plegable[open] { padding-bottom: 14px; }
 .titulo-con-ayuda .etiqueta-campo { margin: 0; }
 legend .ayuda, summary .ayuda { margin-left: 6px; vertical-align: middle; }
 .ayuda-texto p { margin: 0 0 10px; }
+
+/* Volver arriba: abajo a la derecha, encima de las pestañas. */
+.volver-arriba {
+  position: fixed; right: 14px; bottom: calc(76px + env(safe-area-inset-bottom, 0px)); z-index: 25;
+  width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--borde);
+  background: var(--superficie); color: var(--acento); font-size: 1.3rem; font-weight: 700;
+  box-shadow: 0 3px 12px rgba(0,0,0,.2); cursor: pointer;
+}
+.volver-arriba[hidden] { display: none; }
+
+/* Selector sin desplegable: con muchas opciones, un botón que abre la lista. */
+.selector-abrir { width: 100%; justify-content: space-between; text-align: left; }
+.lista-selector { display: grid; gap: 6px; max-height: 60vh; overflow-y: auto; }
+.lista-selector .boton-marca { width: 100%; text-align: left; }
+.fila-marcas.compacta { gap: 6px; }
+.fila-marcas.compacta .boton-marca { flex: 0 1 auto; min-height: 38px; padding: 6px 10px; }
+
+/* Filtros del buscador, plegados. */
+.filtros-plegables > summary { cursor: pointer; color: var(--texto-suave); padding: 4px 0; min-height: 36px; display: flex; align-items: center; }
+.filtros-plegables[open] > summary { margin-bottom: 6px; }
+.filtros-plegables .fila-filtros { grid-template-columns: 1fr; }
+.filtros-plegables .selector-abrir { min-height: 40px; padding: 6px 10px; }
+.filtros-plegables .modos-vista { margin-top: 8px; }
+
+/* Hoy: los botones de debajo del recuadro, separados de la recuperación. */
+.acciones-hoy { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin: 12px 0 24px; }
+.mas-info h3 { font-size: 1rem; margin: 12px 0 4px; }
+.tarjeta > .boton.secundario { width: 100%; margin-top: 4px; }
+
+/* Recuperación media: una barra bajo el título. */
+.barra-media { position: relative; height: 26px; border-radius: 13px; background: var(--superficie-2, var(--borde)); overflow: hidden; margin: 4px 0 12px; }
+.barra-media .relleno { position: absolute; inset: 0 auto 0 0; border-radius: 13px; }
+.barra-media.listo .relleno { background: var(--bien); }
+.barra-media.medio .relleno { background: var(--aviso); }
+.barra-media.cansado .relleno { background: var(--peligro); }
+.barra-media .texto { position: relative; display: block; line-height: 26px; padding: 0 12px; font-size: .85rem; font-weight: 600; color: var(--texto); }
+.barra-media .relleno { opacity: .45; }
+
+/* Un día del historial, en resumen. */
+.resumen-ejercicio h2 { font-size: 1.05rem; margin: 0 0 6px; }
+.series-resumen { margin: 0; padding-left: 1.4em; }
+.series-resumen li { padding: 2px 0; font-variant-numeric: tabular-nums; }

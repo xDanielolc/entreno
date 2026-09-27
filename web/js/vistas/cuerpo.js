@@ -35,9 +35,11 @@ export function tarjetaRecuperacion(datos, { compacta = false } = {}) {
   const media = Math.round(ORDEN_MUSCULOS.reduce((t, m) => t + rec[m].porcentaje, 0) / ORDEN_MUSCULOS.length);
 
   return h('section', { class: 'tarjeta recuperacion' },
-    h('div', { class: 'cabecera-tarjeta' },
-      h('h2', {}, 'Recuperación'),
-      h('span', { class: `anillo ${claseDeRecuperacion(media)}` }, `${media} %`)),
+    h('h2', {}, 'Recuperación'),
+    // La media, en una barra bajo el título: se lee de un vistazo.
+    h('div', { class: `barra-media ${claseDeRecuperacion(media)}`, role: 'img', 'aria-label': `Recuperación media: ${media} %` },
+      h('span', { class: 'relleno', style: `width: ${media}%` }),
+      h('span', { class: 'texto' }, `${media} % de media`)),
 
     !compacta && h('div', { class: 'cuerpos' },
       siluetaCuerpo({ vista: 'delante', estadoPorMusculo: estados }),

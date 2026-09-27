@@ -10,7 +10,7 @@ import * as estado from '../estado.js';
 import { planPorDefecto } from '../series.js';
 import { imagenDe } from '../imagenes.js';
 import { MUSCULOS, ORDEN_MUSCULOS, TREN_INFERIOR, TREN_SUPERIOR, nombreMusculo } from '../musculos.js';
-import { anadir, h, modal, nuevoId } from '../ui.js';
+import { anadir, h, modal, nuevoId, selector } from '../ui.js';
 
 export const MODOS_VISTA = {
   lista: 'Solo nombre',
@@ -33,14 +33,18 @@ const DIVISIONES = {
 const filtro = { texto: '', musculo: '', division: '', tipo: '' };
 let modo = leerModo();
 
+// Por defecto, solo imagen: se reconoce antes el dibujo que el nombre.
 function leerModo() {
-  try { return localStorage.getItem('entreno-modo-lista') || 'imagen'; } catch { return 'imagen'; }
+  try { return localStorage.getItem('entreno-modo-vista') || 'mosaico'; } catch { return 'mosaico'; }
 }
 
 function guardarModo(nuevo) {
   modo = nuevo;
-  try { localStorage.setItem('entreno-modo-lista', nuevo); } catch { /* sin almacenamiento, da igual */ }
+  try { localStorage.setItem('entreno-modo-vista', nuevo); } catch { /* sin almacenamiento, da igual */ }
 }
+
+// Si dejaste los filtros abiertos, siguen abiertos al volver a pintar.
+let filtrosAbiertos = false;
 
 export function filtrar(items) {
   const texto = normalizar(filtro.texto);
@@ -64,30 +68,42 @@ export function hayFiltro() {
   return Boolean(filtro.texto || filtro.musculo || filtro.division || filtro.tipo);
 }
 
-// Buscador, desplegables y botones de vista. alCambiar() vuelve a pintar.
+// Buscador y, plegados debajo, los filtros y la forma de ver la lista.
+// alCambiar() vuelve a pintar.
 export function barraFiltros(alCambiar, { placeholder = 'Buscar ejercicio' } = {}) {
-  const desplegable = (clave, opciones, etiqueta) => h('select', {
-    'aria-label': etiqueta, class: filtro[clave] ? 'activo' : '',
-    onchange: (e) => { filtro[clave] = e.target.value; e.target.className = filtro[clave] ? 'activo' : ''; alCambiar(); },
-  }, Object.entries(opciones).map(([v, t]) => h('option', { value: v, selected: v === filtro[clave] }, t)));
+  // Los filtros se repintan solos al elegir, para que se vea lo marcado; el
+  // buscador no, para no perder el teclado.
+  const plegable = h('details', { class: 'filtros-plegables', open: filtrosAbiertos,
+    ontoggle: (e) => { filtrosAbiertos = e.target.open; } });
+  const cambio = () => { pintarFiltros(); alCambiar(); };
+  const desplegable = (clave, opciones, etiqueta) => selector(Object.entries(opciones), filtro[clave],
+    (v) => { filtro[clave] = v; cambio(); }, { titulo: etiqueta, lista: true });
 
-  const botonesModo = h('div', { class: 'modos-vista', role: 'radiogroup', 'aria-label': 'Cómo ver la lista' });
-  const pintarModos = () => botonesModo.replaceChildren(...Object.entries(MODOS_VISTA).map(([clave, texto]) => h('button', {
-    type: 'button', role: 'radio', 'aria-checked': String(clave === modo),
-    class: `chip seleccionable ${clave === modo ? 'activo' : ''}`,
-    onclick: () => { guardarModo(clave); pintarModos(); alCambiar(); },
-  }, texto)));
-  pintarModos();
+  function pintarFiltros() {
+    const activos = ['musculo', 'division', 'tipo'].filter((k) => filtro[k]).length;
+    plegable.replaceChildren(
+      h('summary', {}, activos ? `Filtros (${activos})` : 'Filtros'),
+      h('div', { class: 'fila-filtros' },
+        desplegable('musculo', { '': 'Cualquier músculo',
+          ...Object.fromEntries(ORDEN_MUSCULOS.map((m) => [m, MUSCULOS[m].nombre])) }, 'Músculo'),
+        desplegable('division', DIVISIONES, 'Parte del cuerpo'),
+        desplegable('tipo', { '': 'Cualquier tipo', ...TIPOS_EJERCICIO }, 'Tipo')),
+      activos > 0 && h('button', { type: 'button', class: 'boton enlace', onclick: () => {
+        filtro.musculo = ''; filtro.division = ''; filtro.tipo = ''; cambio();
+      } }, 'Quitar filtros'),
+      h('div', { class: 'modos-vista', role: 'radiogroup', 'aria-label': 'Cómo ver la lista' },
+        Object.entries(MODOS_VISTA).map(([clave, texto]) => h('button', {
+          type: 'button', role: 'radio', 'aria-checked': String(clave === modo),
+          class: `chip seleccionable ${clave === modo ? 'activo' : ''}`,
+          onclick: () => { guardarModo(clave); cambio(); },
+        }, texto))));
+  }
+  pintarFiltros();
 
   return h('div', { class: 'filtros-ejercicios' },
     h('input', { type: 'search', class: 'buscador', placeholder, value: filtro.texto,
       oninput: (e) => { filtro.texto = e.target.value; alCambiar(); } }),
-    h('div', { class: 'fila-filtros' },
-      desplegable('musculo', { '': 'Cualquier músculo',
-        ...Object.fromEntries(ORDEN_MUSCULOS.map((m) => [m, MUSCULOS[m].nombre])) }, 'Músculo'),
-      desplegable('division', DIVISIONES, 'Parte del cuerpo'),
-      desplegable('tipo', { '': 'Cualquier tipo', ...TIPOS_EJERCICIO }, 'Tipo')),
-    botonesModo);
+    plegable);
 }
 
 // Contenedor de la lista, con la clase que toca según el modo.

@@ -143,6 +143,25 @@ export function modal(titulo, contenido) {
   return cerrar;
 }
 
+// Elegir una opción sin desplegables: en el móvil, un <select> saca la barra
+// de «Anterior / Siguiente» y se entiende mal. Con pocas opciones salen
+// botones que se quedan marcados; con muchas, un botón con lo elegido que abre
+// la lista en un cartel. `opciones` es una lista de [valor, texto].
+export function selector(opciones, actual, alElegir, { titulo = 'Elige', compacto = false, lista = false } = {}) {
+  const marcar = (v) => (e) => { e?.preventDefault?.(); alElegir(v); };
+  if (!lista && opciones.length <= 5) {
+    return h('div', { class: `fila-marcas${compacto ? ' compacta' : ''}`, role: 'group', 'aria-label': titulo },
+      opciones.map(([v, t]) => h('button', { type: 'button', class: `boton-marca${v === actual ? ' activo' : ''}`,
+        'aria-pressed': String(v === actual), onclick: marcar(v) }, t)));
+  }
+  const texto = opciones.find(([v]) => v === actual)?.[1] ?? titulo;
+  return h('button', { type: 'button', class: 'boton-marca selector-abrir', 'aria-label': titulo, onclick: () => {
+    const cerrar = modal(titulo, h('div', { class: 'lista-selector' },
+      opciones.map(([v, t]) => h('button', { type: 'button', class: `boton-marca${v === actual ? ' activo' : ''}`,
+        onclick: () => { cerrar(); alElegir(v); } }, t))));
+  } }, texto, h('span', { class: 'suave', 'aria-hidden': 'true' }, ' ▾'));
+}
+
 export function confirmar(pregunta, { si = 'Sí', no = 'Cancelar', peligro = false } = {}) {
   return new Promise((resolver) => {
     const cerrar = modal(pregunta, h('div', { class: 'fila-botones' },

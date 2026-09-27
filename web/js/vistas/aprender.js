@@ -5,9 +5,9 @@
 
 import { BIBLIOGRAFIA } from '../bibliografia.js';
 import { calibrar, textoCalibracion } from '../formula1rm.js';
-import { creditosCargados } from '../imagenes.js';
+import { creditosCargados, textoCredito } from '../imagenes.js';
 import { explicaciones1RM, opciones } from './ejercicios.js';
-import { FORMAS_DROP_SET } from '../recuperacion.js';
+import { FORMAS_DROP_SET, FORMA_DROP_SET_POR_DEFECTO } from '../recuperacion.js';
 import { ASISTENCIAS, ESCALA_MANO, TECNICAS_ESTIRAMIENTO } from '../esquema.js';
 import * as estado from '../estado.js';
 import { anadir, apartadoPlegable, aviso, h } from '../ui.js';
@@ -105,7 +105,12 @@ function creditos() {
       + 'lumbares, aductores, abductores, cuello y tibial, y los muñecos de yoga, estiramientos, movilidad y cardio, son dibujos propios de la app.'),
     h('p', { class: 'nota' },
       `Imágenes incluidas: ${Object.keys(creditosCargados()?.ejercicios ?? {}).length} de ejercicios `
-      + `y ${Object.keys(creditosCargados()?.musculos ?? {}).length} capas de músculo.`));
+      + `y ${Object.keys(creditosCargados()?.musculos ?? {}).length} capas de músculo.`),
+    // El autor de cada imagen, aquí y no debajo de cada dibujo.
+    h('details', { class: 'fuente' }, h('summary', {}, 'Autor de cada imagen'),
+      h('ul', { class: 'nota' }, Object.entries(creditosCargados()?.ejercicios ?? {})
+        .sort(([a], [b]) => a.localeCompare(b, 'es'))
+        .map(([nombre, img]) => h('li', {}, `${nombre}: ${textoCredito(img).replace(/^Imagen: /, '')}`)))));
 }
 
 function tutorial(d) {
@@ -153,12 +158,14 @@ export function vistaAprender(contenedor) {
     comoSeEstimaTuRM(d),
     apartado('Cuánto cuenta un drop set',
       h('p', {}, 'Para saber cuánto has trabajado cada músculo, la app convierte los drop sets en series normales.'),
-      h('p', { class: 'nota' }, 'Hay dos estudios pequeños y cada forma acierta en uno: una serie con 4 bajadas rindió como 3 series '
-        + '(Ozaki 2018) y una con 3 bajadas, también como 3 (Fink 2018). Las dos valen; por defecto va la primera.'),
+      h('ul', { class: 'nota' },
+        h('li', {}, 'Por defecto: todos los tramos menos uno. Sale de Fink 2018: una serie con 3 bajadas hizo crecer el músculo como 3 series de 12.'),
+        h('li', {}, 'La otra forma sale de Ozaki 2018: una serie con 4 bajadas rindió como 3 series, o sea una serie más media por bajada.'),
+        h('li', {}, 'Los dos estudios son pequeños y ninguno es mejor que el otro: elige la que prefieras.')),
       h('div', { class: 'campo' },
       h('span', { class: 'etiqueta-campo' }, 'Cuánto cuenta un drop set'),
-      opciones(FORMAS_DROP_SET, d.perfil.cuentaDropSet ?? 'ozaki', (m) => estado.cambiar((x) => { x.perfil.cuentaDropSet = m; }), { compacto: true }),
-      h('small', { class: 'nota' }, FORMAS_DROP_SET[d.perfil.cuentaDropSet ?? 'ozaki'].descripcion))),
+      opciones(FORMAS_DROP_SET, d.perfil.cuentaDropSet ?? FORMA_DROP_SET_POR_DEFECTO, (m) => estado.cambiar((x) => { x.perfil.cuentaDropSet = m; }), { compacto: true }),
+      h('small', { class: 'nota' }, FORMAS_DROP_SET[d.perfil.cuentaDropSet ?? FORMA_DROP_SET_POR_DEFECTO].descripcion))),
     creditos(),
     apartado('De dónde sale cada cosa',
       h('p', { class: 'nota' }, 'Qué recomienda la app, con qué respaldo y dónde falla.'),

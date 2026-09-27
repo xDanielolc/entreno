@@ -6,7 +6,7 @@
 
 import * as estado from '../estado.js';
 import { nombreSede, sedeInicial, sedesActivas } from '../sedes.js';
-import { anadir, aviso, confirmar, h, hoyISO, nuevoId } from '../ui.js';
+import { anadir, aviso, confirmar, h, hoyISO, nuevoId, selector } from '../ui.js';
 import { campo } from './ejercicios.js';
 import { ejercicioDesdeCatalogo, elegirEjercicio as abrirSelector } from './selector-ejercicios.js';
 import { tipoDePlantilla, tipoDeRutina, PLANTILLAS, anadirPlantilla, ejerciciosNuevos } from '../plantillas.js';
@@ -275,10 +275,9 @@ export function vistaFormularioRutina(contenedor, { id }) {
         h('small', { class: 'nota' }, 'Sin días fijos, la app propone esta rutina cuando sus músculos están recuperados. '
           + 'Con días fijos, solo esos días. Sirve para combinar dos rutinas activas: una con días fijos y otra libre, por ejemplo.')),
 
-      sedesActivas(d).length > 0 && campo('Dónde se hace', h('select', {
-        onchange: (e) => { borrador.sedeId = e.target.value || null; } },
-      h('option', { value: '' }, 'En cualquier sitio'),
-      sedesActivas(d).map((s) => h('option', { value: s.id, selected: s.id === borrador.sedeId }, nombreSede(d, s.id))))),
+      sedesActivas(d).length > 0 && campo('Dónde se hace', selector([['', 'En cualquier sitio'],
+        ...sedesActivas(d).map((s) => [s.id, nombreSede(d, s.id)])], borrador.sedeId ?? '',
+      (v) => { borrador.sedeId = v || null; repintar(); }, { titulo: 'Dónde se hace' })),
 
       avisoChoques(),
 
@@ -346,11 +345,9 @@ export function vistaFormularioRutina(contenedor, { id }) {
       dia.ejercicios.map((item, j) => h('div', { class: 'fila-ejercicio' },
         h('span', {}, nombreEj(item.ejercicioId), item.opcional && h('small', { class: 'suave' }, ' (opcional)'),
           item.nota && h('small', { class: 'suave bloque' }, item.nota),
-          tieneDropSet(item.ejercicioId) && h('select', { class: 'modo-carga-item', 'aria-label': 'Pesos del drop set en esta rutina',
-            onchange: (e) => { item.modoCarga = e.target.value || null; persistir(); } },
-          h('option', { value: '', selected: !item.modoCarga }, 'Drop set: como en el ejercicio'),
-          h('option', { value: 'rm', selected: item.modoCarga === 'rm' }, 'Drop set: por % del 1RM'),
-          h('option', { value: 'kg', selected: item.modoCarga === 'kg' }, 'Drop set: kilos a mano'))),
+          tieneDropSet(item.ejercicioId) && selector([['', 'Drop set: como en el ejercicio'], ['rm', 'Drop set: por % del 1RM'],
+            ['kg', 'Drop set: kilos a mano']], item.modoCarga ?? '', (v) => { item.modoCarga = v || null; repintar(); },
+          { titulo: 'Pesos del drop set en esta rutina', lista: true })),
         h('button', { type: 'button', class: 'boton-icono', 'aria-label': 'Subir', disabled: j === 0,
           onclick: () => { dia.ejercicios.splice(j - 1, 0, dia.ejercicios.splice(j, 1)[0]); repintar(); } }, '↑'),
         h('button', { type: 'button', class: 'boton-icono', 'aria-label': 'Bajar', disabled: j === dia.ejercicios.length - 1,

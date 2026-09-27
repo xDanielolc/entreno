@@ -2,7 +2,7 @@ import { creditosCargados } from '../imagenes.js';
 import { formatearNumero } from '../calculos.js';
 import * as estado from '../estado.js';
 import { desconectar, eliminarCuenta, rehacerCopiasLegibles, sincronizar, situacionActual } from '../sincronizacion.js';
-import { apartadoPlegable, modal } from '../ui.js';
+import { apartadoPlegable, modal, selector } from '../ui.js';
 import { VERSION_APP } from '../version.js';
 import { anadir, aviso, confirmar, h, hoyISO, leerNumero } from '../ui.js';
 import { DESCANSO_ESTIRAMIENTOS_POR_DEFECTO, DESCANSO_TRAMOS_POR_DEFECTO, RESPIRACION_POR_DEFECTO } from './descanso.js';
@@ -11,7 +11,7 @@ import { calibrar, textoCalibracion } from '../formula1rm.js';
 import { TEXTO_AVISO, guardarPruebaEnCuenta } from '../modo-prueba.js';
 import { explicaciones1RM, opciones } from './ejercicios.js';
 import { tramosPorDefecto } from '../calculos.js';
-import { FORMAS_DROP_SET } from '../recuperacion.js';
+import { FORMAS_DROP_SET, FORMA_DROP_SET_POR_DEFECTO } from '../recuperacion.js';
 import { MODOS_GLOSARIO, modoGlosario } from './glosario.js';
 import { pista } from './tutorial.js';
 import { MODOS_ENTRENO } from './sesion.js';
@@ -90,7 +90,6 @@ export function vistaAjustes(contenedor) {
       !sinCuenta && h('button', { class: 'boton enlace', onclick: async () => {
         try { await rehacerCopiasLegibles(); aviso('Hojas legibles actualizadas en Google Drive.'); } catch (e) { aviso(`No se ha podido: ${e.message}`, { tipo: 'error' }); }
       } }, 'Rehacer ahora las hojas legibles'),
-      h('p', { class: 'nota' }, h('a', { href: 'privacidad.html', target: '_blank', rel: 'noopener' }, 'Política de privacidad')),
       h('button', { class: 'boton enlace', onclick: salir }, sinCuenta ? 'Salir del modo de prueba' : 'Salir de la cuenta')),
 
     // Los intervalos que guardaste desde el cronómetro de HIIT: aquí se ven
@@ -154,8 +153,8 @@ export function vistaAjustes(contenedor) {
         numeroAjuste('Arranca al (% del 1RM)', d.perfil.dropSet?.inicioPorcentaje ?? 80, (x, v) => { x.perfil.dropSet = { ...x.perfil.dropSet, inicioPorcentaje: v }; })),
       h('div', { class: 'campo' },
         h('span', { class: 'etiqueta-campo' }, 'Cuánto cuenta un drop set'),
-        opciones(FORMAS_DROP_SET, d.perfil.cuentaDropSet ?? 'ozaki', (m) => estado.cambiar((x) => { x.perfil.cuentaDropSet = m; }), { compacto: true }),
-        h('small', { class: 'nota' }, FORMAS_DROP_SET[d.perfil.cuentaDropSet ?? 'ozaki'].descripcion)),
+        opciones(FORMAS_DROP_SET, d.perfil.cuentaDropSet ?? FORMA_DROP_SET_POR_DEFECTO, (m) => estado.cambiar((x) => { x.perfil.cuentaDropSet = m; }), { compacto: true }),
+        h('small', { class: 'nota' }, FORMAS_DROP_SET[d.perfil.cuentaDropSet ?? FORMA_DROP_SET_POR_DEFECTO].descripcion)),
       h('div', { class: 'campo' },
         h('span', { class: 'etiqueta-campo' }, 'Los pesos del drop set, por'),
         opciones({ rm: { etiqueta: '% del 1RM' }, kg: { etiqueta: 'Kilos a mano' } }, d.perfil.dropSet?.modoCarga ?? 'rm',
@@ -201,6 +200,8 @@ export function vistaAjustes(contenedor) {
         ? 'Se borra todo lo de prueba de este dispositivo.'
         : 'Se borran los archivos de la app en tu Google Drive (datos, copias y hojas), la copia de este dispositivo y el permiso '
           + 'que diste a la app. Para volver tendrías que entrar con Google otra vez, desde cero.')),
+
+    h('a', { class: 'boton secundario', href: 'privacidad.html', target: '_blank', rel: 'noopener' }, 'Política de privacidad'),
 
     h('p', { class: 'nota centrado' },
       `Versión ${VERSION_APP} · formato de datos v${d.version} · revisión ${formatearNumero(d.revision)}`));
@@ -265,8 +266,8 @@ function seccionSedes(d, apartado) {
     sedes.map((s) => h('div', { class: 'fila-sede' },
       h('input', { type: 'text', value: s.nombre, 'aria-label': 'Nombre del sitio',
         oninput: (e) => cambiarSede(s.id, (y) => { y.nombre = e.target.value; }, { tecleo: true }) }),
-      h('select', { 'aria-label': 'Tipo de sitio', onchange: (e) => cambiarSede(s.id, (y) => { y.tipo = e.target.value; }) },
-        Object.entries(TIPOS_SEDE).map(([k, v]) => h('option', { value: k, selected: k === s.tipo }, `${v.icono} ${v.etiqueta}`))),
+      selector(Object.entries(TIPOS_SEDE).map(([k, v]) => [k, `${v.icono} ${v.etiqueta}`]), s.tipo,
+        (v) => cambiarSede(s.id, (y) => { y.tipo = v; }), { titulo: 'Tipo de sitio', lista: true }),
       h('label', { class: 'casilla' },
         h('input', { type: 'radio', name: 'sede-defecto', checked: d.perfil.sedePorDefecto === s.id,
           onchange: () => estado.cambiar((x) => { x.perfil.sedePorDefecto = s.id; }) }),

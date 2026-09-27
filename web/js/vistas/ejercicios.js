@@ -17,8 +17,8 @@ import { ORDEN_MUSCULOS, nombreMusculo } from '../musculos.js';
 import { entradaDeEjercicio, planPorDefecto } from '../series.js';
 import { nombreSede, sedesActivas, separarPorSede } from '../sedes.js';
 import { seccionProgreso } from './graficas.js';
-import { imagenDe, textoCredito } from '../imagenes.js';
-import { anadir, aviso, confirmar, h, leerNumero, modal, nuevoId } from '../ui.js';
+import { imagenDe } from '../imagenes.js';
+import { anadir, aviso, confirmar, h, leerNumero, modal, nuevoId, selector } from '../ui.js';
 import { pista } from './tutorial.js';
 import { barraFiltros, cajaLista, ejercicioDesdeCatalogo, elegirEjercicio, filtrar, hayFiltro, pieCatalogo, tarjetaItem } from './selector-ejercicios.js';
 import { selectorTecnicas } from './tecnicas.js';
@@ -187,8 +187,7 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
   anadir(contenedor,
     h('h1', {}, existente ? borrador.nombre || 'Editar ejercicio' : 'Nuevo ejercicio'),
     imagenFicha && h('figure', { class: 'imagen-ejercicio' },
-      h('img', { src: imagenFicha.archivo, alt: `Ilustración de ${existente.nombre}`, loading: 'lazy' }),
-      h('figcaption', { class: 'nota' }, textoCredito(imagenFicha))),
+      h('img', { src: imagenFicha.archivo, alt: `Ilustración de ${existente.nombre}`, loading: 'lazy' })),
     existente && seccionProgreso(d, existente),
     zona);
 
@@ -305,13 +304,13 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
       estira && h('fieldset', {},
         h('legend', {}, '¿Cómo lo haces normalmente?'),
         h('p', { class: 'nota' }, 'Sale así en cada serie; en el entrenamiento puedes cambiarlo ese día. Qué es cada técnica: en Aprender.'),
-        campo('Técnica', h('select', { onchange: (e) => { borrador.estiramiento = { ...borrador.estiramiento, tecnica: e.target.value || null }; repintar(); } },
-          h('option', { value: '' }, 'Sin indicar'),
-          Object.entries(TECNICAS_ESTIRAMIENTO).map(([k, v]) => h('option', { value: k, selected: k === borrador.estiramiento?.tecnica }, v.etiqueta)))),
+        campo('Técnica', selector([['', 'Sin indicar'], ...Object.entries(TECNICAS_ESTIRAMIENTO).map(([k, v]) => [k, v.etiqueta])],
+          borrador.estiramiento?.tecnica ?? '', (v) => { borrador.estiramiento = { ...borrador.estiramiento, tecnica: v || null }; repintar(); },
+          { titulo: 'Técnica' })),
         borrador.estiramiento?.tecnica && h('small', { class: 'nota' }, TECNICAS_ESTIRAMIENTO[borrador.estiramiento.tecnica].descripcion),
-        campo('Ayuda', h('select', { onchange: (e) => { borrador.estiramiento = { ...borrador.estiramiento, asistencia: e.target.value || null }; } },
-          h('option', { value: '' }, 'Sin indicar'),
-          Object.entries(ASISTENCIAS).map(([k, v]) => h('option', { value: k, selected: k === borrador.estiramiento?.asistencia }, v)))),
+        campo('Ayuda', selector([['', 'Sin indicar'], ...Object.entries(ASISTENCIAS).map(([k, v]) => [k, v])],
+          borrador.estiramiento?.asistencia ?? '', (v) => { borrador.estiramiento = { ...borrador.estiramiento, asistencia: v || null }; repintar(); },
+          { titulo: 'Ayuda' })),
         h('small', { class: 'nota' }, 'Con «Apoyo con la mano» apuntas en cada serie en qué punto de la escala estás (surf, pulgar, puño, mano abierta, '
           + 'tres, dos y un dedo, sin mano). Para la altura del ladrillo, elige «Altura» en el peso.')),
 
@@ -328,10 +327,9 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
 
       h('details', { class: 'tarjeta explicacion' },
         h('summary', {}, 'Ajustes finos'),
-        sedesActivas(d).length > 0 && campo('Dónde se hace', h('select', {
-          onchange: (e) => { borrador.sedeId = e.target.value || null; repintar(); } },
-        h('option', { value: '' }, 'Igual en todos los sitios'),
-        sedesActivas(d).map((s) => h('option', { value: s.id, selected: s.id === borrador.sedeId }, `Solo en ${nombreSede(d, s.id)}`))),
+        sedesActivas(d).length > 0 && campo('Dónde se hace', selector([['', 'Igual en todos los sitios'],
+          ...sedesActivas(d).map((s) => [s.id, `Solo en ${nombreSede(d, s.id)}`])], borrador.sedeId ?? '',
+        (v) => { borrador.sedeId = v || null; repintar(); }, { titulo: 'Dónde se hace' }),
         h('small', { class: 'nota' }, 'Si una máquina no pesa igual en dos gimnasios, cada uno debe llevar su propio ejercicio.'),
         existente && !existente.sedeId && sedesActivas(d).length > 1 && h('button', { type: 'button', class: 'boton enlace',
           onclick: separar }, 'Separar en un ejercicio por sitio (reparte su historial)')),
@@ -389,15 +387,13 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
             borrador.pesosMaquina = [...new Set([...pesos, v])].sort((a, b) => a - b);
             repintar();
           } }, '+ Añadir'))),
-      otros.length > 0 && h('select', { 'aria-label': 'Copiar los pesos de otro ejercicio', onchange: (e) => {
-        const elegido = otros[Number(e.target.value)];
-        if (!elegido) return;
-        borrador.pesosMaquina = [...elegido.pesosMaquina];
-        repintar();
-        aviso(`Pesos de ${elegido.nombre} copiados.`);
-      } },
-      h('option', { value: '' }, 'Copiar los pesos de otro ejercicio de la misma máquina…'),
-      otros.map((o, i) => h('option', { value: i }, `${o.nombre}: ${o.pesosMaquina.length} pesos (${formatearNumero(o.pesosMaquina[0])} a ${formatearNumero(o.pesosMaquina.at(-1))} kg)`))),
+      otros.length > 0 && selector(otros.map((o, i) => [i, `${o.nombre}: ${o.pesosMaquina.length} pesos (${formatearNumero(o.pesosMaquina[0])} a ${formatearNumero(o.pesosMaquina.at(-1))} kg)`]),
+        null, (i) => {
+          const elegido = otros[i];
+          borrador.pesosMaquina = [...elegido.pesosMaquina];
+          repintar();
+          aviso(`Pesos de ${elegido.nombre} copiados.`);
+        }, { titulo: 'Copiar los pesos de otro ejercicio de la misma máquina', lista: true }),
       pesos.length > 0 && h('small', { class: 'nota' }, `${pesos.length} pesos, de ${formatearNumero(pesos[0])} a ${formatearNumero(pesos.at(-1))} kg. `
         + 'Los drop sets, las subidas y los ciclos usarán solo estos.'));
   }
@@ -417,22 +413,21 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         : 'Pon tu peso corporal en Ajustes para que la carga salga sola.'));
   }
 
-  // Grupo: un desplegable con los habituales y los tuyos, más «Otro…» para
-  // escribir uno nuevo.
+  // Grupo: los habituales y los tuyos, más «Otro…» para escribir uno nuevo.
+  let grupoOtro = false;
   function campoGrupo() {
     const actual = borrador.grupo || '';
     const enLista = !actual || grupos.includes(actual);
+    const escribir = grupoOtro || !enLista;
     const texto = h('input', { type: 'text', value: enLista ? '' : actual, placeholder: 'Nombre del grupo',
-      hidden: enLista, oninput: (e) => { borrador.grupo = e.target.value.trim(); } });
-    const select = h('select', { onchange: (e) => {
-      if (e.target.value === '__otro') { texto.hidden = false; texto.focus(); return; }
-      texto.hidden = true;
-      borrador.grupo = e.target.value;
-      persistir();
-    } },
-    h('option', { value: '', selected: !actual }, 'Sin grupo'),
-    grupos.map((g) => h('option', { value: g, selected: g === actual }, g.charAt(0).toUpperCase() + g.slice(1))),
-    h('option', { value: '__otro', selected: !enLista }, 'Otro…'));
+      hidden: !escribir, oninput: (e) => { borrador.grupo = e.target.value.trim(); } });
+    const select = selector([['', 'Sin grupo'], ...grupos.map((g) => [g, g.charAt(0).toUpperCase() + g.slice(1)]), ['__otro', 'Otro…']],
+      escribir ? '__otro' : actual, (v) => {
+        grupoOtro = v === '__otro';
+        if (!grupoOtro) borrador.grupo = v;
+        repintar();
+        if (grupoOtro) setTimeout(() => document.querySelector('input[placeholder="Nombre del grupo"]')?.focus(), 0);
+      }, { titulo: 'Grupo' });
     return h('div', { class: 'campo' },
       h('span', { class: 'etiqueta-campo' }, 'Grupo'),
       select, texto,
@@ -784,17 +779,13 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
       .filter((p) => p.tramosFijos?.length)
       .map((p) => ({ nombre: e.nombre, pesos: p.tramosFijos }))));
     if (!otros.length) return null;
-    return h('select', { 'aria-label': 'Traer pesos fijos de otro ejercicio',
-      onchange: (e) => {
-        const elegido = otros[Number(e.target.value)];
-        if (!elegido) return;
-        plan.tramosFijos = [...elegido.pesos];
-        plan.tramosPrevistos = elegido.pesos.length;
-        repintar();
-        aviso(`Pesos de ${elegido.nombre} copiados y guardados.`);
-      } },
-    h('option', { value: '' }, 'Traer los pesos fijos de otro ejercicio…'),
-    otros.map((o, i) => h('option', { value: i }, `${o.nombre}: ${o.pesos.map((x) => formatearNumero(x)).join(' → ')} kg`)));
+    return selector(otros.map((o, i) => [i, `${o.nombre}: ${o.pesos.map((x) => formatearNumero(x)).join(' → ')} kg`]), null, (i) => {
+      const elegido = otros[i];
+      plan.tramosFijos = [...elegido.pesos];
+      plan.tramosPrevistos = elegido.pesos.length;
+      repintar();
+      aviso(`Pesos de ${elegido.nombre} copiados y guardados.`);
+    }, { titulo: 'Traer los pesos fijos de otro ejercicio', lista: true });
   }
 
   function detalleProgresion(plan) {
@@ -1107,9 +1098,8 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
           }))),
 
       h('div', { class: 'fila-botones' },
-        p.ciclos.length > 1 && h('select', { 'aria-label': 'Ciclo mostrado',
-          onchange: (e) => { p.cicloActual = Number(e.target.value); repintar(); } },
-        p.ciclos.map((c) => h('option', { value: c.n, selected: c.n === p.cicloActual }, `Ciclo ${c.n}`))),
+        p.ciclos.length > 1 && selector(p.ciclos.map((c) => [c.n, `Ciclo ${c.n}`]), p.cicloActual,
+          (n) => { p.cicloActual = n; repintar(); }, { titulo: 'Ciclo mostrado', compacto: true }),
         h('button', { type: 'button', class: 'boton secundario', onclick: () => { alargarCiclo(borrador, plan, 5); repintar(); aviso('Ciclo alargado 5 sesiones.'); } }, '+5 sesiones'),
         h('button', { type: 'button', class: 'boton secundario', onclick: () => nuevoCiclo(plan) }, 'Cortar y empezar otro')));
   }
@@ -1284,7 +1274,10 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
 // ---------------------------------------------------------------------------
 
 export function campo(etiqueta, ...control) {
-  return h('label', { class: 'campo' }, h('span', { class: 'etiqueta-campo' }, etiqueta), ...control);
+  // Solo es <label> si envuelve una casilla de texto: con botones dentro, tocar
+  // el título pulsaría el primero.
+  const conCasilla = control.some((c) => c instanceof HTMLElement && c.matches('input, textarea'));
+  return h(conCasilla ? 'label' : 'div', { class: 'campo' }, h('span', { class: 'etiqueta-campo' }, etiqueta), ...control);
 }
 
 export function numeroInput(valor, alCambiar, { onchange, etiqueta } = {}) {
