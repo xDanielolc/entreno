@@ -81,6 +81,7 @@ function renderizar() {
     console.error(e);
     principal.append(h('p', { class: 'tarjeta' }, `Algo ha fallado al mostrar esta pantalla: ${e.message}`));
   }
+  if (['ejercicios', 'historial'].includes(ruta.pestana)) recordarEnPestana(ruta.pestana, location.hash || '#/');
   pintarNavegacion(ruta.pestana);
   pintarIndicador();
   pintarBandaEntreno();
@@ -111,9 +112,22 @@ function pintarBandaEntreno() {
   document.querySelector('.barra-superior').after(banda);
 }
 
+// Cada pestaña recuerda dónde la dejaste: si sales de un ejercicio a medias
+// y vuelves a «Ejercicios», sigues en él. Tocar la pestaña en la que ya
+// estás te lleva a su inicio.
+const CLAVE_PESTANAS = 'entreno-ultima-por-pestana';
+function ultimasPorPestana() {
+  try { return JSON.parse(localStorage.getItem(CLAVE_PESTANAS) || '{}'); } catch { return {}; }
+}
+function recordarEnPestana(pestana, hash) {
+  try { localStorage.setItem(CLAVE_PESTANAS, JSON.stringify({ ...ultimasPorPestana(), [pestana]: hash })); } catch { /* nada */ }
+}
+
 function pintarNavegacion(activa) {
+  const ultimas = ultimasPorPestana();
   navegacion.replaceChildren(...PESTANAS.map((p) => h('a', {
-    href: p.href, class: p.id === activa ? 'activa' : '', 'aria-current': p.id === activa ? 'page' : null,
+    href: p.id === activa ? p.href : (ultimas[p.id] || p.href),
+    class: p.id === activa ? 'activa' : '', 'aria-current': p.id === activa ? 'page' : null,
   }, h('span', { 'aria-hidden': 'true' }, p.icono), h('span', {}, p.texto))));
 }
 

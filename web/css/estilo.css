@@ -1105,3 +1105,53 @@ legend .ayuda, summary .ayuda { margin-left: 6px; vertical-align: middle; }
 /* La papelera de cada serie, siempre en la esquina de arriba a la derecha. */
 .plan-serie > .cabecera-tarjeta { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: nowrap; }
 .plan-serie > .cabecera-tarjeta .boton-icono.papelera { margin-left: auto; flex: 0 0 auto; }
+
+/* La papelera de una serie, siempre en la esquina de arriba a la derecha,
+   aunque la cabecera ocupe dos líneas. */
+.serie { position: relative; }
+.serie-cabecera { flex-wrap: wrap; padding-right: 44px; }
+.serie-cabecera .selector-abrir { width: auto; flex: 0 1 auto; min-height: 40px; padding: 6px 10px; }
+.serie-cabecera .borrar-serie { position: absolute; top: 8px; right: 0; margin: 0; }
+.plan-serie { position: relative; }
+.plan-serie > .cabecera-tarjeta { padding-right: 44px; min-height: 36px; }
+.plan-serie > .cabecera-tarjeta .boton-icono.papelera { position: absolute; top: 6px; right: 6px; margin: 0; }
+
+/* Hoy: los botones de debajo ocupan el ancho que sobre; el último, si va
+   solo en su fila, entero. */
+.acciones-hoy { display: flex; flex-wrap: wrap; gap: 8px; }
+.acciones-hoy > * { flex: 1 1 calc(50% - 4px); }
+.boton-mas-info { display: block; margin: 10px auto 0; background: none; border: 1px solid var(--borde); border-radius: 999px;
+  padding: 6px 18px; font: inherit; font-size: .9rem; color: var(--texto-suave); cursor: pointer; }
+
+/* Cuerpo: los tres modos, en tres columnas iguales. */
+.modos-mapa { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.modos-mapa .boton-marca { text-align: center; font-size: .85rem; padding: 6px 4px; min-height: 44px; line-height: 1.2; }
+.recuperacion .leyenda { justify-content: center; gap: 10px; margin: 8px 0 0; }
+.recuperacion .leyenda-color { width: 10px; height: 10px; border-radius: 50%; }
+/* Lista de músculos en tabla compacta. */
+.tabla-musculos { width: 100%; border-collapse: collapse; font-size: .9rem; margin-top: 8px; }
+.tabla-musculos th { text-align: left; font-weight: 600; color: var(--texto-suave); font-size: .8rem; padding: 4px 6px; }
+.tabla-musculos td { padding: 5px 6px; border-top: 1px solid var(--borde); font-variant-numeric: tabular-nums; }
+.tabla-musculos td:first-child { display: flex; align-items: center; gap: 8px; }
+.tabla-musculos .num { text-align: right; }
+
+/* Resumen al terminar: tres cifras, los récords y una tabla corta. */
+.cifras { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+.cifra { background: var(--superficie-2); border-radius: var(--radio-pequeno); padding: 10px 6px; text-align: center; }
+.cifra strong { display: block; font-size: 1.6rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.cifra span { font-size: .8rem; color: var(--texto-suave); }
+.cifra.destacada { background: var(--acento-suave); }
+.cifra.destacada strong { color: var(--acento); }
+.records { display: grid; gap: 6px; margin-bottom: 12px; }
+.record-nuevo { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 2px 8px; border-left: 3px solid var(--acento); padding: 4px 10px; }
+.record-nuevo small { grid-column: 1 / -1; color: var(--texto-suave); }
+.cambio-sube { color: var(--bien); font-weight: 600; }
+.cambio-baja { color: var(--peligro); font-weight: 600; }
+.resumen-sesion .fila-marcas .boton-marca { flex: 1 1 100%; font-size: .9rem; }
+
+/* Tu 1RM en la ficha: una tarjeta con la pregunta. */
+.tarjeta-1rm { background: var(--superficie-2); border-radius: var(--radio-pequeno); padding: 10px 12px; }
+.tarjeta-1rm p { margin: 6px 0; }
+.resultado-prueba { font-weight: 700; color: var(--acento); min-height: 1.4em; }
+.tarjeta-prueba { background: var(--aviso-fondo); border-left: 3px solid var(--aviso); border-radius: var(--radio-pequeno); padding: 8px 10px; margin-bottom: 8px; font-size: .92rem; }
+.tarjeta-prueba p { margin: 0 0 4px; }

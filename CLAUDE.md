@@ -430,6 +430,20 @@ objetos (perfil, factores de recuperación…) se funden por dentro. Ajustes →
 Cuenta → «Recuperar algo de una copia guardada aparte» junta una copia con lo
 de ahora, eligiendo quién manda.
 
+## Ronda 0.32.0 (28-09-2026): notas de la 0.30
+
+Tu 1RM en la ficha es una pregunta (Sí, ahora con una prueba / a mano / el
+primer día); la prueba ahora calcula con `estimar1RM` al momento. En el
+entrenamiento, una serie que espera prueba sale como tarjeta con «No, lo meto
+a mano» (`ponerRMaMano`, rehace la serie). Paso a paso: pesos de la máquina
+en su propio paso, «¿Cuántas series?» y si son iguales (`igualesFicha`,
+`copiarPrimeraSerie`). Tipo de peso plegado una vez elegido
+(`cambiandoCarga`). Las pestañas Ejercicios e Historial recuerdan su última
+pantalla (`entreno-ultima-por-pestana`). Resumen al terminar rehecho (cifras,
+récords, tabla, consejos plegados, cambios con botones). Cuerpo: modos en tres
+columnas, tablas en vez de frases, «Qué entrenar» colorea todos los músculos.
+Hoy: «Más info» es un botón que abre un cartel. «Distancia/Altura».
+
 PENDIENTE: nombre e icono con Design («luego ya decoramos»); publicar la app
 en la consola de Google (es cosa suya); repasar las descripciones de las
 progresiones contrastándolas con las fuentes, que él pidió y solo está hecho

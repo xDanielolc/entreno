@@ -179,9 +179,8 @@ export function vistaInicio(contenedor) {
           avisoCuandoToca(d, rutina, dia),
           h('button', { class: 'boton grande', onclick: () => empezarConRutina(dia) }, toca.descansoHoy ? 'Empezar igualmente' : 'Empezar'),
           h('button', { class: 'boton secundario', onclick: elegirDia }, 'Otro día de la rutina'),
-          // Las explicaciones, juntas y plegadas al final.
-          h('details', { class: 'explicacion mas-info' },
-            h('summary', {}, 'Más info'),
+          // Las explicaciones, en un cartel aparte.
+          h('button', { class: 'boton-mas-info', onclick: () => modal('Más info', h('div', { class: 'mas-info' },
             h('h3', {}, '¿Por qué esta y no otra?'),
             h('ul', { class: 'nota' },
               h('li', {}, 'Si una rutina activa tiene hoy como día de la semana, esa.'),
@@ -189,7 +188,7 @@ export function vistaInicio(contenedor) {
               h('li', {}, 'Dentro de la rutina, el día siguiente al último que hiciste.')),
             rutina.descripcion && [
               h('h3', {}, 'Por qué esta rutina es así y cómo se hace'),
-              rutina.descripcion.split('\n\n').map((p) => enPuntos(p))]))
+              rutina.descripcion.split('\n\n').map((p) => enPuntos(p))])) }, 'Más info'))
         : h('button', { class: 'boton grande', onclick: empezarSuelto }, 'Empezar entrenamiento'),
     // Debajo del recuadro, lo demás que se puede hacer hoy.
     !enCurso && dia && h('div', { class: 'acciones-hoy' },

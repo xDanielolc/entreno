@@ -11,7 +11,7 @@ export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
   asistida:     { etiqueta: 'Máquina asistida', unidad: 'kg', descripcion: 'La máquina te ayuda: se resta de tu peso corporal (dominadas o fondos asistidos)' },
   pesoCorporal: { etiqueta: 'Peso corporal',   unidad: 'kg', descripcion: 'Tu propio peso, con lastre opcional' },
-  altura:       { etiqueta: 'Altura o distancia', unidad: 'cm', descripcion: 'Una medida de dificultad, como la altura del ladrillo' },
+  altura:       { etiqueta: 'Distancia/Altura', unidad: 'cm', descripcion: 'Una medida de dificultad, como la altura del ladrillo' },
   ninguna:      { etiqueta: 'Sin carga',       unidad: '',   descripcion: 'Estiramientos, cardio, abdominales sin peso' },
 };
 

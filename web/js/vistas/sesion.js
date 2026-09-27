@@ -293,6 +293,16 @@ export function vistaSesion(contenedor, { id }) {
     const uEsf = unidadEsfuerzo(ej);
     const partes = [];
 
+    // Sin 1RM en este ejercicio: esta serie es la prueba, salvo que prefieras
+    // poner el 1RM a mano.
+    if (s.prueba && !serie.hecha) {
+      return h('div', { class: 'tarjeta-prueba' },
+        h('p', {}, h('strong', {}, 'Aún no tienes 1RM en este ejercicio. '),
+          'Esta serie es la prueba: pon un peso cualquiera y haz todas las repeticiones que puedas, hasta el fallo. '
+          + 'Con ella la app calcula tu 1RM.'),
+        h('button', { type: 'button', class: 'boton enlace', onclick: () => ponerRMaMano(ej, serie) }, 'No, lo meto a mano'));
+    }
+
     if (s.modo === 'bilbo') {
       if (s.sinCiclo) partes.push('Primera vez: pon un peso con el que hagas de 5 a 15 y haz todas las que puedas; con eso la app calcula tu fuerza');
       else if (s.cicloTerminado) partes.push(`Ciclo ${s.cicloN} terminado: prepara el siguiente en la ficha (o pon el reinicio en automático)`);
@@ -334,6 +344,35 @@ export function vistaSesion(contenedor, { id }) {
       if (s.modo === 'esfuerzo') partes.push(`hoy intenta ${formatearNumero(s.esfuerzoObjetivo)} ${uEsf}`);
     }
     return h('p', { class: 'sugerencia' }, partes.join(' · '));
+  }
+
+  // El 1RM a mano desde el entrenamiento: se guarda en el ejercicio y la
+  // serie de hoy se rehace con el peso que toca.
+  function ponerRMaMano(ej, serie) {
+    const caja = h('input', { type: 'text', inputmode: 'decimal', 'aria-label': 'Tu 1RM en kilos' });
+    const cerrar = modal('Tu 1RM en este ejercicio', h('div', { class: 'formulario' },
+      h('label', { class: 'campo' }, h('span', { class: 'etiqueta-campo' }, 'Tu 1RM (kg)'), caja),
+      h('button', { class: 'boton', onclick: () => {
+        const rm = leerNumero(caja.value);
+        if (!(rm > 0)) { aviso('Pon un número', { tipo: 'error' }); return; }
+        cerrar();
+        estado.cambiar((datos) => {
+          const e = datos.ejercicios.find((x) => x.id === ej.id);
+          if (!e) return;
+          e.rmManual = rm;
+          const plan = (e.series || []).find((p) => p.id === serie.planId);
+          if (plan?.progresion?.tipo === 'bilbo' && plan.progresion.inicio?.modo === 'prueba') plan.progresion.inicio.modo = 'porcentaje';
+          const s = datos.sesiones.find((x) => x.id === id);
+          for (const entrada of s?.ejercicios ?? []) {
+            if (entrada.ejercicioId !== ej.id) continue;
+            entrada.series = entrada.series.map((x) => (x.id === serie.id && plan ? { ...crearSerieDesdePlan(datos, e, plan, { excluirSesion: id }), id: x.id } : x));
+            const conCiclo = entrada.series.find((x) => x.cicloN != null);
+            if (conCiclo) { entrada.cicloN = conCiclo.cicloN; entrada.diaCiclo = conCiclo.diaCiclo; }
+          }
+        });
+        aviso(`Guardado: 1RM de ${formatearNumero(rm)} kg.`);
+      } }, 'Guardar')));
+    setTimeout(() => caja.focus(), 50);
   }
 
   function bloqueSerie(ej, entrada, i, j, serie) {
@@ -453,7 +492,7 @@ export function vistaSesion(contenedor, { id }) {
 
       marcaObjetivo(serie),
 
-      h('button', { class: 'boton-icono', 'aria-label': 'Borrar serie', onclick: () => borrarSerie(i, j) }, '🗑'));
+      h('button', { class: 'boton-icono borrar-serie', 'aria-label': 'Borrar serie', onclick: () => borrarSerie(i, j) }, '🗑'));
   }
 
   function marcaObjetivo(serie) {
@@ -590,7 +629,7 @@ export function vistaSesion(contenedor, { id }) {
     });
 
     if (ej.carga.tipo === 'altura') {
-      return h('label', { class: 'valor' }, h('span', { class: 'et' }, `Altura (${unidadCarga(ej)})`), kilos);
+      return h('label', { class: 'valor' }, h('span', { class: 'et' }, `Distancia/Altura (${unidadCarga(ej)})`), kilos);
     }
     return h('div', { class: 'carga-con-porcentaje' },
       h('label', { class: 'valor' }, tramo == null && h('span', { class: 'et' }, unidadCarga(ej)), kilos),

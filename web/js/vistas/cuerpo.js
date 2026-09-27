@@ -179,9 +179,6 @@ function tarjetaMapa(d) {
     if (modoMapa === 'recuperacion') {
       estados[m] = { clase: claseDeRecuperacion(rec[m].porcentaje), titulo: textoDeRecuperacion(rec[m]) };
     } else if (modoMapa === 'semana') {
-      // Solo los músculos que entrenas: lo que no tocas en dos meses no
-      // se pinta de rojo cada semana (para eso está «Lo que menos entrenas»).
-      if (!dosMeses[m]) continue;
       estados[m] = { clase: claseSeries(semana[m], objetivo, rec[m].porcentaje),
         titulo: `${nombreMusculo(m)}: ${redondo(semana[m])} de ${objetivo} series esta semana` };
     } else {
@@ -207,12 +204,20 @@ function tarjetaMapa(d) {
     h('div', { class: 'cuerpos' },
       siluetaCuerpo({ vista: 'delante', estadoPorMusculo: estados }),
       siluetaCuerpo({ vista: 'detras', estadoPorMusculo: estados })),
+    // Debajo, lo mismo en una tabla corta en vez de una frase por músculo.
     modoMapa === 'recuperacion' && (tocados.length
-      ? h('ul', { class: 'lista-musculos' }, tocados.map((x) => h('li', {},
-        h('span', { class: `punto ${claseDeRecuperacion(x.porcentaje)}` }), h('span', {}, textoDeRecuperacion(x)))))
+      ? h('table', { class: 'tabla-musculos' },
+        h('thead', {}, h('tr', {}, h('th', {}, 'Músculo'), h('th', { class: 'num' }, 'Recuperado'), h('th', { class: 'num' }, 'Le faltan'))),
+        h('tbody', {}, tocados.map((x) => h('tr', {},
+          h('td', {}, h('span', { class: `punto ${claseDeRecuperacion(x.porcentaje)}` }), nombreMusculo(x.musculo, { corto: true })),
+          h('td', { class: 'num' }, `${x.porcentaje} %`),
+          h('td', { class: 'num' }, x.horasRestantes ? `${x.horasRestantes} h` : '—')))))
       : h('p', { class: 'suave' }, 'Todo recuperado: puedes entrenar lo que quieras.')),
-    modoMapa === 'menos' && h('ul', { class: 'lista-musculos' }, menos.map((x) => h('li', {},
-      h('span', { class: `punto ${estados[x.m].clase}` }), h('span', {}, `${nombreMusculo(x.m)}: ${redondo(x.media)} series por semana`)))),
+    modoMapa === 'menos' && h('table', { class: 'tabla-musculos' },
+      h('thead', {}, h('tr', {}, h('th', {}, 'Los que menos'), h('th', { class: 'num' }, 'Series por semana'))),
+      h('tbody', {}, menos.map((x) => h('tr', {},
+        h('td', {}, h('span', { class: `punto ${estados[x.m].clase}` }), nombreMusculo(x.m, { corto: true })),
+        h('td', { class: 'num' }, redondo(x.media)))))),
     modoMapa === 'recuperacion' && plegable('cuerpo-calculo', 'Cómo se calcula', {},
       h('ul', { class: 'nota' },
         h('li', {}, 'Justo al acabar, el músculo está al 0 % y sube hasta el 100 %.'),

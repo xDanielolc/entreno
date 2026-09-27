@@ -1,21 +1,18 @@
 // Comparaciones serie a serie y resumen al terminar el entrenamiento.
 //
 // Al terminar sale una ventana con:
-//   · los récords del día y cómo te ha ido frente a la última vez y frente al
-//     mismo día del ciclo anterior;
-//   · el volumen de la semana de los músculos que has entrenado hoy, con
-//     ánimo si vas corto y con alguna pulla si te pasas;
-//   · si has cambiado algo respecto a la rutina, la pregunta de si es solo
-//     para hoy o para siempre.
+//   · tres cifras (minutos, series, récords) y los récords del día;
+//   · una fila por ejercicio frente a la última vez, con su flecha;
+//   · los consejos, plegados;
+//   · si has cambiado algo respecto a la rutina, si es solo para hoy o para siempre.
 
-import { esfuerzoTotal, formatearNumero, records, redondear, seriesDeEjercicio, trabajoSerie } from '../calculos.js';
-import { serieNuevaPlantilla, TIPOS_SERIE } from '../esquema.js';
+import { esfuerzoTotal, formatearNumero, records as recordsDe, redondear, seriesDeEjercicio, trabajoSerie } from '../calculos.js';
+import { serieNuevaPlantilla } from '../esquema.js';
 import * as estado from '../estado.js';
 import { rmDeSerie } from '../formula1rm.js';
 import { recomendacionesDeSesion } from '../recomendaciones.js';
 import { aviso, h, modal } from '../ui.js';
 import { listaRecomendaciones } from './cuerpo.js';
-import { conGlosario } from './glosario.js';
 
 
 // ---------------------------------------------------------------------------
@@ -74,13 +71,31 @@ export function mostrarResumen(datos, sesionId) {
   const sesion = datos.sesiones.find((s) => s.id === sesionId);
   if (!sesion) return;
   const cambios = cambiosRespectoARutina(datos, sesion);
+  const lista = recordsDeSesion(datos, sesion);
+  const comparacion = comparacionPorEjercicio(datos, sesion);
+  const consejos = recomendacionesDeSesion(datos, sesion).filter((x) => x.nivel !== 'bien');
+  const series = sesion.ejercicios.reduce((n, e) => n + e.series.filter((s) => s.hecha).length, 0);
+  const minutos = sesion.inicio && sesion.fin ? Math.round((new Date(sesion.fin) - new Date(sesion.inicio)) / 60_000) : null;
 
-  const records = seccionRecords(datos, sesion);
-  const mejoras = seccionMejoras(datos, sesion);
-  const consejos = seccionVolumen(datos, sesion);
-  const cerrar = modal('Estadísticas y consejos', h('div', { class: 'resumen-sesion' },
-    !records && !mejoras && !consejos && h('p', {}, 'Entrenamiento guardado. Hoy no hay récords ni nada que corregir.'),
-    records, mejoras, consejos,
+  // Arriba, tres números grandes; debajo, una fila por ejercicio con su
+  // flecha; lo largo (consejos y serie a serie), plegado.
+  const cerrar = modal('Entrenamiento terminado', h('div', { class: 'resumen-sesion' },
+    h('div', { class: 'cifras' },
+      cifra(minutos != null ? `${minutos}` : '—', 'minutos'),
+      cifra(String(series), series === 1 ? 'serie' : 'series'),
+      cifra(String(lista.length), lista.length === 1 ? 'récord' : 'récords', lista.length > 0)),
+    lista.length > 0 && h('div', { class: 'records' }, lista.map((r) => h('div', { class: 'record-nuevo' },
+      h('span', { class: 'suave' }, r.ej.nombre),
+      h('strong', {}, `${formatearNumero(r.valor)} kg`),
+      h('small', {}, `${r.que} · antes ${formatearNumero(r.antes)}`)))),
+    comparacion.length > 0 && h('table', { class: 'tabla-musculos' },
+      h('thead', {}, h('tr', {}, h('th', {}, 'Frente a la última vez'), h('th', { class: 'num' }, ''))),
+      h('tbody', {}, comparacion.map((c) => h('tr', {},
+        h('td', {}, c.nombre),
+        h('td', { class: `num cambio-${c.clase}` }, c.texto))))),
+    consejos.length > 0 && h('details', { class: 'explicacion' },
+      h('summary', {}, `Consejos (${consejos.length})`),
+      listaRecomendaciones(consejos)),
     cambios.length > 0 && seccionCambios(cambios),
     h('div', { class: 'fila-botones' },
       cambios.length > 0
@@ -89,72 +104,49 @@ export function mostrarResumen(datos, sesionId) {
         : h('button', { class: 'boton', onclick: () => cerrar() }, 'Hecho'))));
 }
 
-function seccionRecords(datos, sesion) {
-  const sin = { ...datos, sesiones: datos.sesiones.filter((s) => s.id !== sesion.id) };
-  const lineas = [];
-  for (const entrada of sesion.ejercicios) {
-    const ej = datos.ejercicios.find((e) => e.id === entrada.ejercicioId);
-    if (!ej || lineas.some((l) => l.ej === ej)) continue;
-    const antes = records(sin, ej.id);
-    const ahora = records(datos, ej.id);
-    if (ahora.mejor1RM && antes.mejor1RM && ahora.mejor1RM.valor > antes.mejor1RM.valor) {
-      lineas.push({ ej, texto: `${ej.nombre}: 1RM estimado de ${formatearNumero(ahora.mejor1RM.valor)} kg `
-        + `(antes ${formatearNumero(antes.mejor1RM.valor)} kg)` });
-    }
-    if (ahora.mejorTrabajo && antes.mejorTrabajo && ahora.mejorTrabajo.valor > antes.mejorTrabajo.valor) {
-      lineas.push({ ej, texto: `${ej.nombre}: ${formatearNumero(ahora.mejorTrabajo.valor)} kg de trabajo en una serie `
-        + `(antes ${formatearNumero(antes.mejorTrabajo.valor)})` });
-    }
-  }
-  const primeras = sesion.ejercicios
-    .map((e) => datos.ejercicios.find((x) => x.id === e.ejercicioId))
-    .filter((ej) => ej && e_primeraVez(datos, ej, sesion));
-  if (!lineas.length && !primeras.length) return null;
-  return h('section', {},
-    lineas.length > 0 && h('h3', {}, lineas.length > 1 ? `¡${lineas.length} récords!` : '¡Récord!'),
-    primeras.length > 0 && h('p', { class: 'nota' }, `Primera vez con ${primeras.map((x) => x.nombre).join(', ')}: `
-      + 'queda apuntado como referencia; los récords salen a partir de la siguiente.'),
-    h('ul', {}, lineas.map((l) => h('li', {}, conGlosario(l.texto)))));
+function cifra(valor, texto, destacada = false) {
+  return h('div', { class: `cifra${destacada ? ' destacada' : ''}` }, h('strong', {}, valor), h('span', {}, texto));
 }
 
-function seccionMejoras(datos, sesion) {
-  const lineas = [];
+// Récords de esta sesión: 1RM estimado y trabajo en una serie.
+function recordsDeSesion(datos, sesion) {
+  const sin = { ...datos, sesiones: datos.sesiones.filter((s) => s.id !== sesion.id) };
+  const lista = [];
+  const vistos = new Set();
+  for (const entrada of sesion.ejercicios) {
+    const ej = datos.ejercicios.find((e) => e.id === entrada.ejercicioId);
+    if (!ej || vistos.has(ej.id)) continue;
+    vistos.add(ej.id);
+    const antes = recordsDe(sin, ej.id);
+    const ahora = recordsDe(datos, ej.id);
+    if (ahora.mejor1RM && antes.mejor1RM && ahora.mejor1RM.valor > antes.mejor1RM.valor) {
+      lista.push({ ej, que: '1RM estimado', valor: ahora.mejor1RM.valor, antes: antes.mejor1RM.valor });
+    } else if (ahora.mejorTrabajo && antes.mejorTrabajo && ahora.mejorTrabajo.valor > antes.mejorTrabajo.valor) {
+      lista.push({ ej, que: 'trabajo en una serie', valor: ahora.mejorTrabajo.valor, antes: antes.mejorTrabajo.valor });
+    }
+  }
+  return lista;
+}
+
+// Una fila por ejercicio: la mejor serie de hoy frente a la de la última vez.
+function comparacionPorEjercicio(datos, sesion) {
+  const filas = [];
   for (const entrada of sesion.ejercicios) {
     const ej = datos.ejercicios.find((e) => e.id === entrada.ejercicioId);
     if (!ej) continue;
-    for (const serie of entrada.series) {
-      const texto = comparacionSerie(datos, ej, serie, { excluirSesion: sesion.id });
-      if (texto && !texto.includes('primera vez')) {
-        lineas.push(`${ej.nombre}${entrada.series.length > 1 ? ` (${TIPOS_SERIE[serie.tipo] ?? 'serie'})` : ''}: ${texto}`);
-      }
-    }
+    const hoy = entrada.series.filter((s) => s.hecha).map((s) => medida(datos, ej, s)).filter(Boolean);
+    if (!hoy.length) continue;
+    const mejorHoy = Math.max(...hoy.map((m) => m.valor));
+    const antes = seriesDeEjercicio(datos, ej.id, { excluirSesion: sesion.id })
+      .filter((x) => x.sesion.fecha <= sesion.fecha);
+    const ultimaFecha = antes.at(-1)?.sesion.id;
+    const deEseDia = antes.filter((x) => x.sesion.id === ultimaFecha).map((x) => medida(datos, ej, x.serie)).filter(Boolean);
+    if (!deEseDia.length) { filas.push({ nombre: ej.nombre, texto: 'primera vez', clase: '' }); continue; }
+    const mejorAntes = Math.max(...deEseDia.map((m) => m.valor));
+    const pct = Math.round(((mejorHoy - mejorAntes) / mejorAntes) * 100);
+    filas.push({ nombre: ej.nombre, texto: pct > 0 ? `▲ ${pct} %` : pct < 0 ? `▼ ${-pct} %` : '= igual', clase: pct > 0 ? 'sube' : pct < 0 ? 'baja' : '' });
   }
-  if (!lineas.length) return null;
-  return h('section', {},
-    h('h3', {}, 'Frente a otras veces'),
-    h('table', { class: 'tabla-comparacion' },
-      h('tbody', {}, lineas.map((l) => {
-        const [nombre, resto] = l.split(/: (.+)/);
-        const partes = (resto || '').split(' · ');
-        const flecha = partes.slice(1).map((p) => p.match(/^(▲|▼|=)/)?.[1] ?? '').find(Boolean) ?? '';
-        const clase = flecha === '▲' ? 'bien' : flecha === '▼' ? 'mal' : '';
-        return h('tr', { class: clase },
-          h('td', {}, nombre),
-          h('td', {}, partes[0]),
-          h('td', {}, partes.slice(1).map((p) => p.replace(' frente al día', ' frente a el día')
-            .replace(/^▲ (\d+) % frente a/, '▲ $1 % más que').replace(/^▼ (\d+) % frente a/, '▼ $1 % menos que')
-            .replace('= igual frente a', '= igual que')).join(' · ')));
-      }))));
-}
-
-// Qué conviene hacer tras esta sesión: volumen de la semana, distancia entre
-// entrenamientos, esfuerzo y duración (ver recomendaciones.js).
-function seccionVolumen(datos, sesion) {
-  const lista = recomendacionesDeSesion(datos, sesion);
-  if (!lista.length) return null;
-  return h('section', {},
-    h('h3', {}, 'Consejos'),
-    listaRecomendaciones(lista));
+  return filas;
 }
 
 // ---------------------------------------------------------------------------
@@ -232,10 +224,13 @@ function e_primeraVez(datos, ej, sesion) {
 function seccionCambios(cambios) {
   return h('section', {},
     h('h3', {}, 'Cambios respecto a lo planeado'),
-    h('p', { class: 'nota' }, 'Marca lo que quieras que se quede para los próximos entrenos. Sin marcar, solo ha sido hoy.'),
-    cambios.map((c) => h('label', { class: 'casilla' },
-      h('input', { type: 'checkbox', onchange: (e) => { c.marcado = e.target.checked; } }),
-      c.texto)));
+    h('p', { class: 'nota' }, 'Toca lo que quieras que se quede para los próximos entrenos.'),
+    h('div', { class: 'fila-marcas' }, cambios.map((c) => h('button', { type: 'button', class: 'boton-marca', 'aria-pressed': 'false',
+      onclick: (e) => {
+        c.marcado = !c.marcado;
+        e.currentTarget.classList.toggle('activo', c.marcado);
+        e.currentTarget.setAttribute('aria-pressed', String(c.marcado));
+      } }, c.texto))));
 }
 
 function aplicarCambios(cambios) {
