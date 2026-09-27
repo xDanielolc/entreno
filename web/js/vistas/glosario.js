@@ -23,7 +23,7 @@ export const GLOSARIO = {
     + 'veces. Cada miniserie se apunta aparte.' },
   miorepeticiones: { pregunta: '¿Qué son las miorrepeticiones?', termino: 'Miorrepeticiones', texto: 'Una serie larga de activación y después varias miniseries cortas (3-5 repeticiones) '
     + 'con el mismo peso, respirando unas pocas veces entre ellas.' },
-  bilbo: { pregunta: '¿Qué es una serie Bilbo?', termino: 'Serie Bilbo', texto: 'Un ciclo de 17 días en el que el peso de cada día está fijado y sube poco a poco. Cada día intentas '
+  bilbo: { pregunta: '¿Qué es una serie Bilbo?', termino: 'Serie Bilbo', texto: 'Un ciclo de unas 20 sesiones en el que el peso de cada día está fijado y sube poco a poco. Cada día intentas '
     + 'superar (en repeticiones, con ese peso) el 1RM del día anterior. Cuando el objetivo baja de 15 repeticiones, el ciclo se ha agotado.' },
   'doble-progresion': { pregunta: '¿Qué es la doble progresión?', termino: 'Doble progresión', texto: 'Trabajas en un rango, por ejemplo de 8 a 12 repeticiones. Con el mismo peso subes '
     + 'repeticiones hasta llegar a 12; entonces subes el peso y vuelves a empezar por 8.' },

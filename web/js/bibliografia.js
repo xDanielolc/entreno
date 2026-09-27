@@ -17,8 +17,8 @@ export const BIBLIOGRAFIA = [
       { texto: 'Marzagao (2026), preprint: fórmula con divisor dependiente del peso, 303 494 series de 388 ejercicios.', url: 'https://arxiv.org/abs/2603.17495' },
       { texto: 'Hoeger et al. (1990): las repeticiones a un mismo % del 1RM cambian mucho entre ejercicios (prensa frente a press de banca).', url: 'https://journals.lww.com/nsca-jscr/abstract/1990/05000/relationship_between_repetitions_and_selected.4.aspx' },
       { texto: 'LeSuer et al. (1997), J Strength Cond Res: exactitud de 7 ecuaciones en press banca, sentadilla y peso muerto.', url: 'https://consensus.app/papers/details/d3b112df359c5e75aa39ba1d70f29c9c/' },
-      { texto: 'Wood et al. (2002): la exactitud mejora claramente por debajo de 10 repeticiones y varía según el ejercicio.', url: 'https://consensus.app/papers/details/8f36cbe0910a597889bd1166837d9592/' },
-      { texto: 'Nuzzo et al. (2023), Sports Medicine: metarregresión de repeticiones por porcentaje del 1RM; cambia entre ejercicios.', url: 'https://consensus.app/papers/details/dfd84b06ab2e576db05dc4b84bf7bb72/' },
+      { texto: 'Wood et al. (2002), Measurement in Physical Education and Exercise Science: exactitud de siete ecuaciones del 1RM en adultos sedentarios con máquinas.', url: 'https://doi.org/10.1207/S15327841MPEE0602_1' },
+      { texto: 'Nuzzo et al. (2024), Sports Medicine: metarregresión de repeticiones por porcentaje del 1RM; cambia entre ejercicios.', url: 'https://consensus.app/papers/details/dfd84b06ab2e576db05dc4b84bf7bb72/' },
     ],
   },
   {
@@ -28,7 +28,7 @@ export const BIBLIOGRAFIA = [
       + 'Ningún estudio compara 3 bajadas contra 4: ese número es una decisión práctica, no una recomendación científica.',
     fuentes: [
       { texto: 'Sødal et al. (2023), Sports Medicine Open: revisión sistemática y metaanálisis de drop sets e hipertrofia.', url: 'https://consensus.app/papers/details/eb3a71bf7d6f542ab96339db59951311/' },
-      { texto: 'Coleman et al. (2022): drop sets y entrenamiento tradicional producen adaptaciones similares.', url: 'https://consensus.app/papers/details/496a65e8ac5856269a293c9669e78ab5/' },
+      { texto: 'Coleman et al. (2022), International Journal of Strength and Conditioning: drop sets y entrenamiento tradicional producen adaptaciones similares.', url: 'https://journal.iusca.org/index.php/Journal/article/view/135' },
       { texto: 'Havers et al. (2026): mismos resultados a largo plazo, con más esfuerzo percibido y más lactato.', url: 'https://consensus.app/papers/details/7ebb8838a4f552f39a1f63c9c6ffb9e6/' },
     ],
   },
@@ -59,7 +59,7 @@ export const BIBLIOGRAFIA = [
     fuentes: [
       { texto: 'Fink et al. (2018), J Sports Med Phys Fitness: un drop set frente a tres series normales (la forma que usa la app por defecto).', url: 'https://pubmed.ncbi.nlm.nih.gov/28474868/' },
       { texto: 'Ozaki et al. (2018), Journal of Sports Sciences: una serie pesada con bajadas hasta el 30 % frente a tres series.', url: 'https://doi.org/10.1080/02640414.2017.1331042' },
-      { texto: 'Coleman et al. (2023), Sports Medicine Open: metaanálisis, drop sets y series normales dan una hipertrofia parecida, en la mitad o un tercio del tiempo.', url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC10390395/' },
+      { texto: 'Sødal et al. (2023), Sports Medicine Open: metaanálisis, drop sets y series normales dan una hipertrofia parecida, en menos tiempo.', url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC10390395/' },
     ],
   },
   {
@@ -96,9 +96,15 @@ export const BIBLIOGRAFIA = [
   },
   {
     tema: 'Método Bilbo',
-    dice: 'Ciclos de 17 días con la carga de cada día fijada de antemano, intentando igualar o superar el 1RM estimado anterior.',
-    matiz: 'Es el método que traías de tus hojas de cálculo. No hay estudios sobre este esquema concreto; lo que sí está estudiado es que lo importante '
-      + 'es acumular volumen cerca del fallo y progresar en el tiempo.',
-    fuentes: [],
+    dice: 'Una serie a la máxima velocidad con todas las repeticiones que puedas: empieza hacia el 50 % del 1RM, cada sesión sube 2,5 kg '
+      + 'y el ciclo se acaba cuando ya no llegas a 15 repeticiones.',
+    matiz: 'No hay ningún estudio sobre el método Bilbo en sí: es un método de entrenadores de press de banca. Lo que sí está estudiado: '
+      + 'mover el peso lo más rápido posible da más fuerza que moverlo despacio (González-Badillo 2014); con pesos ligeros cerca del fallo '
+      + 'el músculo crece como con pesos altos; pero la fuerza máxima (el 1RM) sube más con pesos altos (Schoenfeld 2017; Lopez 2021). '
+      + 'Por eso la app lo trata como un método para ganar músculo y resistencia que también sube la fuerza, no como el que más fuerza da.',
+    fuentes: [
+      { texto: 'González-Badillo et al. (2014), European Journal of Sport Science: entrenar a la máxima velocidad frente a la mitad de velocidad.', url: 'https://doi.org/10.1080/17461391.2014.905987' },
+      { texto: 'Lopez et al. (2021), Medicine & Science in Sports & Exercise: metaanálisis en red de cargas, fuerza e hipertrofia.', url: 'https://doi.org/10.1249/MSS.0000000000002585' },
+    ],
   },
 ];

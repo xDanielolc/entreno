@@ -499,7 +499,7 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
       h('small', { class: 'nota' }, peso
         ? `Con tu peso (${formatearNumero(peso)} kg): ${formatearNumero(Math.round(peso * borrador.fraccionCorporal))} kg, más el lastre que apuntes.`
         : 'Pon tu peso corporal en Ajustes para que la carga salga sola.'),
-      h('div', { class: 'fila-marcas compacta' }, [['Flexiones', 64], ['Flexiones con rodillas', 49], ['Flexiones con pies en alto', 74],
+      h('div', { class: 'fila-marcas compacta' }, [['Flexiones', 64], ['Flexiones con rodillas', 49], ['Flexiones con pies en alto (cajón de 60 cm)', 74],
         ['Dominadas y fondos', 100]].map(([texto, n]) => h('button', { type: 'button', class: `boton-marca${pct === n ? ' activo' : ''}`,
         onclick: () => { borrador.fraccionCorporal = n / 100; repintar(); } }, `${texto}: ${n} %`))),
       h('small', { class: 'nota' }, 'Toca uno para ponerlo. Las flexiones salen de Ebben 2011.'));
