@@ -263,12 +263,28 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
     altura: { etiqueta: 'Distancia/Altura', descripcion: 'La del cajón, la del ladrillo del yoga… Eliges la unidad.' },
     ninguna: { etiqueta: 'Sin peso', descripcion: 'Cardio, estiramientos, abdominales sin carga.' },
   };
-  const MEDIDAS = {
-    repeticiones: { etiqueta: 'Repeticiones', descripcion: 'Cuántas veces.' },
-    tiempo: { etiqueta: 'Tiempo', descripcion: 'Horas, minutos y segundos.' },
-    distancia: { etiqueta: 'Distancia', descripcion: 'Eliges la unidad.' },
-  };
   const cargaActual = () => (borrador.carga.tipo === 'peso' ? (borrador.maquinaPlacas ? 'placas' : 'libre') : borrador.carga.tipo);
+  // Los tipos de peso, para cuando se apunta peso.
+  const TIPOS_PESO = Object.fromEntries(['libre', 'placas', 'pesoCorporal', 'asistida'].map((k) => [k, CARGAS[k]]));
+  const conPeso = () => ['peso', 'pesoCorporal', 'asistida'].includes(borrador.carga.tipo);
+  // Lo que se puede apuntar en cada serie, en una sola lista.
+  const APUNTABLES = [['peso', 'Peso'], ['altura', 'Distancia/Altura'], ['repeticiones', 'Repeticiones'], ['tiempo', 'Tiempo'], ['distancia', 'Distancia']];
+  const apuntaDe = (clave) => (clave === 'peso' ? conPeso() : clave === 'altura' ? borrador.carga.tipo === 'altura' : medidasElegidas().includes(clave));
+  function alternarApunte(clave, poner) {
+    if (clave === 'peso' || clave === 'altura') {
+      // El peso y la distancia/altura son lo que «pesa» la serie: uno u otro.
+      borrador.carga = { tipo: poner ? clave : 'ninguna' };
+      borrador.maquinaPlacas = false;
+      if (clave === 'peso' && poner) cambiandoCarga = true;
+      for (const plan of borrador.series) plan.progresion.sobre = sobrePorDefecto(borrador);
+      repintar();
+      return;
+    }
+    const lista = medidasElegidas().filter((x) => x !== clave);
+    if (poner) lista.push(clave);
+    if (!lista.length) { aviso('Marca al menos repeticiones, tiempo o distancia.'); return; }
+    fijarMedidas(lista);
+  }
   // Se pueden marcar varias: la primera marcada es la principal (la que
   // llevan las reglas) y las demás se apuntan al lado en cada serie.
   const medidasElegidas = () => medidasDe(borrador);
@@ -293,10 +309,25 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
 
       campoGrupo(),
 
+      // Una sola lista con todo lo que se apunta en cada serie (el peso o la
+      // distancia/altura, las repeticiones, el tiempo, la distancia), cada
+      // cosa con su unidad. El ciclo, más abajo, solo pregunta cuáles suben.
       h('fieldset', {},
-        h('legend', {}, '¿Con qué peso se hace?'),
+        h('legend', {}, '¿Qué apuntas en cada serie?'),
+        h('p', { class: 'nota' }, 'Marca todo lo que apuntes. La primera de repeticiones, tiempo o distancia es la que manda en el ciclo.'),
+        h('div', { class: 'fila-marcas' }, APUNTABLES.map(([clave, etiqueta]) => {
+          const puesta = apuntaDe(clave);
+          return h('button', { type: 'button', class: `boton-marca ${puesta ? 'activo' : ''}`, 'aria-pressed': String(puesta),
+            onclick: () => alternarApunte(clave, !puesta) }, etiqueta);
+        })),
+        borrador.carga.tipo === 'altura' && campoUnidad('altura'),
+        medidasElegidas().includes('distancia') && campoUnidad('distancia')),
+
+      // Si apuntas peso: de qué tipo (libre, máquina, tu peso, asistida).
+      conPeso() && h('fieldset', {},
+        h('legend', {}, '¿Qué peso?'),
         // Elegido uno, los demás se pliegan para que no estorben al leer.
-        opciones(cambiandoCarga ? CARGAS : { [cargaActual()]: CARGAS[cargaActual()] }, cargaActual(), (c) => {
+        opciones(cambiandoCarga ? TIPOS_PESO : { [cargaActual()]: TIPOS_PESO[cargaActual()] }, cargaActual(), (c) => {
           if (!cambiandoCarga) { cambiandoCarga = true; repintar(); return; }
           borrador.carga = { tipo: c === 'libre' || c === 'placas' ? 'peso' : c };
           borrador.maquinaPlacas = c === 'placas' || (c === 'asistida' && borrador.maquinaPlacas);
@@ -309,24 +340,7 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         borrador.carga.tipo === 'asistida' && h('p', { class: 'nota' },
           peso ? `Apuntarás los kilos que marca la máquina; la carga real es tu peso (${formatearNumero(peso)} kg) menos esa ayuda.`
             : 'Indica tu peso corporal en Ajustes para calcular la carga real.'),
-        borrador.carga.tipo === 'pesoCorporal' && campoFraccionCorporal(),
-        borrador.carga.tipo === 'altura' && campoUnidad('altura')),
-
-      h('fieldset', {},
-        h('legend', {}, borrador.carga.tipo === 'ninguna' ? '¿Qué apuntas en cada serie?' : '¿Qué apuntas en cada serie además del peso?'),
-        h('p', { class: 'nota' }, 'Marca una o varias. La primera que marques es la que manda en el ciclo.'),
-        h('div', { class: 'fila-marcas' }, Object.entries(MEDIDAS).map(([clave, m]) => h('button', {
-          type: 'button', class: `boton-marca ${medidasElegidas().includes(clave) ? 'activo' : ''}`,
-          'aria-pressed': String(medidasElegidas().includes(clave)),
-          onclick: () => {
-            const puesta = medidasElegidas().includes(clave);
-            const lista = medidasElegidas().filter((x) => x !== clave);
-            if (!puesta) lista.push(clave);
-            if (!lista.length) { aviso('Algo hay que apuntar: deja marcada al menos una.'); return; }
-            fijarMedidas(lista);
-          },
-        }, m.etiqueta))),
-        medidasElegidas().includes('distancia') && campoUnidad('distancia')),
+        borrador.carga.tipo === 'pesoCorporal' && campoFraccionCorporal()),
 
       h('details', { class: 'tarjeta explicacion desplegable-musculos', open: !borrador.musculos.principales.length || undefined },
         h('summary', {}, borrador.musculos.principales.length
@@ -395,17 +409,17 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
     if (vista() !== 'paso') return form(...hijos);
 
     // Paso a paso: una pregunta cada vez, sin nada más a la vista.
-    const [catalogo, nombre, grupo, carga, medidas, musculos, estiramiento, , , nota, botones] = hijos;
+    const [catalogo, nombre, grupo, apuntas, tipoPeso, musculos, estiramiento, , , nota, botones] = hijos;
     if (musculos) musculos.open = true;
-    const maquina = carga?.querySelector?.('.pesos-maquina');
+    const maquina = tipoPeso?.querySelector?.('.pesos-maquina');
     maquina?.remove();
     const n = borrador.series.length;
     const iguales = sonIguales();
     const pasos = [
       ['¿Qué ejercicio es?', [catalogo, nombre, grupo]],
-      ['¿Con qué peso se hace?', [carga]],
+      ['¿Qué apuntas en cada serie?', [apuntas]],
+      tipoPeso && ['¿Qué peso?', [tipoPeso]],
       maquina && ['Los pesos de la máquina', [maquina]],
-      ['¿Qué apuntas?', [medidas]],
       ['¿Qué músculos trabaja?', [musculos]],
       estira && ['¿Cómo lo haces?', [estiramiento]],
       ['¿Cuántas series quieres?', [pasoCuantasSeries()]],
@@ -1132,7 +1146,7 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
     const resumenMejora = () => {
       if (p.sinMejora) return 'nada marcado';
       const partes = [];
-      if (subeCarga) partes.push(`peso +${formatearNumero(gen.incremento ?? 0)} ${unidad}`);
+      if (subeCarga) partes.push(`${borrador.carga.tipo === 'altura' ? 'distancia/altura' : 'peso'} +${formatearNumero(gen.incremento ?? 0)} ${unidad}`);
       if (subeEsfuerzo) partes.push(subeCarga ? `${nEsf} +${formatearNumero(gen.incrementoEsfuerzo ?? 0)}` : `${nEsf} +${formatearNumero(gen.incremento ?? 0)}`);
       for (const [m, x] of Object.entries(gen.extras ?? {})) if (x) partes.push(`${TIPOS_ESFUERZO[m]?.etiqueta.toLowerCase() ?? m} +${formatearNumero(x.incremento ?? 0)}`);
       return partes.join(' · ');

@@ -75,9 +75,11 @@ Ejercicios
 - [x] Peso corporal: referencias de cuánto suele pesar cada cosa, en viñetas.
 - [x] «Qué apuntas en cada serie además del peso» en una línea; la explicación
       corta bajo el título (0.30).
-- [ ] Unificar «qué apuntas» y «qué mejora» del ciclo: propuesta hecha a Dan
-      (una sola lista con peso, altura, repeticiones, tiempo y distancia, cada
-      una con su unidad). Pendiente de que diga sí.
+- [x] Unificar «qué apuntas» (0.33.0, a prueba: si no convence, volver a v0.32.0).
+- [ ] Decidir qué hacer con «Consejos» en Cuerpo (propuesta: quitarlo y llevar
+      los avisos útiles a su sitio).
+- [ ] App independiente del navegador (instalada o en la tienda): explicado a
+      Dan el 28-09-2026, pendiente de que decida.
 - [x] Botones de corte («llegas a tantas» / «te salen tantas»): reescribir como
       máximo o mínimo que corta.
 - [x] Progreso y «cómo suelo programarlo» por separado: poder elegir qué ver.

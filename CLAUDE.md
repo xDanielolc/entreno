@@ -444,6 +444,15 @@ récords, tabla, consejos plegados, cambios con botones). Cuerpo: modos en tres
 columnas, tablas en vez de frases, «Qué entrenar» colorea todos los músculos.
 Hoy: «Más info» es un botón que abre un cartel. «Distancia/Altura».
 
+## Ronda 0.33.0 (28-09-2026): una sola lista de lo que se apunta
+
+Cambio aislado a propósito (Dan: «si no, volvemos»; la 0.32.0 tiene la
+etiqueta `v0.32.0` en Git). «¿Con qué peso se hace?» y «¿Qué apuntas?» son
+una sola lista (`APUNTABLES`: peso, distancia/altura, repeticiones, tiempo,
+distancia); si hay peso, «¿Qué peso?» pregunta el tipo. El modelo de datos
+no cambia (`carga.tipo` + `medidas`). Para volver: `git revert` del commit de
+esta ronda, o volver a publicar desde `v0.32.0` subiendo la versión.
+
 PENDIENTE: nombre e icono con Design («luego ya decoramos»); publicar la app
 en la consola de Google (es cosa suya); repasar las descripciones de las
 progresiones contrastándolas con las fuentes, que él pidió y solo está hecho
