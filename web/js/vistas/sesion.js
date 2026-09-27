@@ -18,9 +18,9 @@ import {
 import { anadir, aviso, confirmar, fechaLarga, h, formatearTiempo, leerNumero, leerTiempo } from '../ui.js';
 import { DESCANSO_ESTIRAMIENTOS_POR_DEFECTO, arrancarDescanso, arrancarRespiracion, barraDescanso, descansoDeTramo } from './descanso.js';
 import { cuentaParaFatiga, tipoDeEjercicio } from '../catalogo.js';
-import { ASISTENCIAS, ESCALA_MANO, PROGRAMAS, TECNICAS_ESTIRAMIENTO, extraDeSerie, medidasDe } from '../esquema.js';
+import { ASISTENCIAS, ESCALA_MANO, PROGRAMAS, TECNICAS_ESTIRAMIENTO, extraDeSerie, medidasDe, unidadMedida } from '../esquema.js';
 import { ORDEN_MUSCULOS, nombreMusculo } from '../musculos.js';
-import { ESCALA_RECUPERACION, puntuacionSentida, recuperacionPorMusculo } from '../recuperacion.js';
+import { ESCALA_RECUPERACION, factorPersonal, puntuacionSentida, recuperacionPorMusculo } from '../recuperacion.js';
 import { comparacionSerie, mostrarResumen } from './resumen-sesion.js';
 import { ejercicioEnSede, nombreSede, sedesActivas } from '../sedes.js';
 import { hoyISO } from '../ui.js';
@@ -156,7 +156,7 @@ export function vistaSesion(contenedor, { id }) {
               onclick: () => {
                 cambiarSesion((x) => {
                   x.sensaciones ??= {};
-                  x.sensaciones[m] = { sentida: n, prevista: previsto[m].porcentaje };
+                  x.sensaciones[m] = { sentida: n, prevista: previsto[m].porcentaje, factor: factorPersonal(d, m) };
                 });
                 estado.cambiar((x) => { x.perfil.comoLlegasSaltos = 0; }, { tecleo: true });
               },
@@ -542,7 +542,7 @@ export function vistaSesion(contenedor, { id }) {
       medidasDe(ej).slice(1).map((tipo) => (tipo === 'tiempo'
         ? campoTiempo('Tiempo', extraDeSerie(serie, tipo), (segundos) => actualizar((x) => { guardarExtra(x, tipo, segundos); }))
         : h('label', { class: 'valor' },
-          h('span', { class: 'et' }, `${TIPOS_ESFUERZO[tipo].etiqueta} (${TIPOS_ESFUERZO[tipo].unidad})`),
+          h('span', { class: 'et' }, `${TIPOS_ESFUERZO[tipo].etiqueta} (${unidadMedida(ej, tipo)})`),
           h('input', { type: 'text', inputmode: 'decimal', value: extraDeSerie(serie, tipo) ?? '',
             'aria-label': TIPOS_ESFUERZO[tipo].etiqueta,
             placeholder: serie.objetivosExtra?.[tipo] != null ? formatearNumero(serie.objetivosExtra[tipo]) : null,
@@ -589,6 +589,9 @@ export function vistaSesion(contenedor, { id }) {
       if (tramo == null) recalcularAbajo(ej, i);
     });
 
+    if (ej.carga.tipo === 'altura') {
+      return h('label', { class: 'valor' }, h('span', { class: 'et' }, `Altura (${unidadCarga(ej)})`), kilos);
+    }
     return h('div', { class: 'carga-con-porcentaje' },
       h('label', { class: 'valor' }, tramo == null && h('span', { class: 'et' }, unidadCarga(ej)), kilos),
       h('label', { class: 'valor' }, tramo == null && h('span', { class: 'et' }, '% 1RM'), porcentaje));
@@ -983,19 +986,19 @@ export function textoSerie(ej, serie) {
   }
   for (const tipo of medidasDe(ej).slice(1)) {
     const v = extraDeSerie(serie, tipo);
-    if (v != null) partes.push(tipo === 'tiempo' ? formatearTiempo(v) : `${formatearNumero(v)} ${TIPOS_ESFUERZO[tipo].unidad}`);
+    if (v != null) partes.push(tipo === 'tiempo' ? formatearTiempo(v) : `${formatearNumero(v)} ${unidadMedida(ej, tipo)}`);
   }
   const tec = textoTecnicas(serie.tecnicas);
   return partes.join(' × ') + (tec ? ` (${tec})` : '');
 }
 
 export function unidadCarga(ej) {
-  return ej.carga.tipo === 'asistida' ? 'kg' : TIPOS_CARGA[ej.carga.tipo]?.unidad ?? '';
+  return ej.carga.tipo === 'asistida' ? 'kg' : unidadMedida(ej, ej.carga.tipo);
 }
 
 export function unidadEsfuerzo(ej) {
   if (esTiempo(ej)) return 'min:s';
-  return TIPOS_ESFUERZO[ej.esfuerzo.tipo]?.unidad ?? '';
+  return unidadMedida(ej, ej.esfuerzo.tipo);
 }
 
 const esTiempo = (ej) => ej.esfuerzo?.tipo === 'tiempo';
@@ -1007,6 +1010,6 @@ const mideTiempo = (ej) => medidasDe(ej).includes('tiempo');
 export function textoEsfuerzo(ej, valor) {
   if (valor == null) return '';
   if (esTiempo(ej)) return valor < 60 ? `${Math.round(valor)} s` : formatearTiempo(valor);
-  return `${formatearNumero(valor)} ${TIPOS_ESFUERZO[ej.esfuerzo.tipo]?.unidad ?? ''}`.trim();
+  return `${formatearNumero(valor)} ${unidadMedida(ej, ej.esfuerzo.tipo)}`.trim();
 }
 

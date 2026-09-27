@@ -204,9 +204,33 @@ export function mejorRMDelCiclo(datos, ejercicio, plan, cicloN) {
   return mejor;
 }
 
+// El 1RM que sale de una prueba: la mejor serie de esta serie del ejercicio
+// hecha desde que empezó el ciclo (o de siempre, si aún no ha empezado).
+export function rmDePrueba(datos, ejercicio, plan, desde, { excluirSesion } = {}) {
+  const rms = seriesDeEjercicio(datos, ejercicio.id, { excluirSesion, planId: plan.id })
+    .filter((x) => !desde || x.sesion.fecha >= desde)
+    .map((x) => rmDeSerie(datos, ejercicio, x.serie, esfuerzoTotal(x.serie))).filter(Boolean);
+  return rms.length ? Math.max(...rms) : null;
+}
+
+// ¿Este ciclo espera a una prueba? Pasa si empieza «con una prueba» y aún no
+// hay ninguna serie de la que sacar el 1RM.
+export function esperaPrueba(datos, ejercicio, plan, { excluirSesion } = {}) {
+  const prog = plan.progresion;
+  if (prog?.tipo !== 'bilbo' || prog.sobre !== 'carga') return false;
+  const ciclo = cicloActual(plan) ?? prog.ciclos?.at(-1);
+  const primero = !ciclo || (prog.ciclos.length === 1 && !ciclo.inicio);
+  const hayRm = Boolean(rmDeReferencia(datos, ejercicio, { excluirSesion }));
+  const modo = primero ? (prog.inicio?.modo ?? (hayRm ? 'porcentaje' : 'prueba')) : (ciclo.pendientePrueba ? 'prueba' : null);
+  if (modo !== 'prueba') return false;
+  if (ciclo && registrosDelCiclo(datos, ejercicio, plan, ciclo.n, { excluirSesion }).length) return false;
+  return !rmDePrueba(datos, ejercicio, plan, primero ? null : ciclo.inicio, { excluirSesion });
+}
+
 function sugerenciaBilbo(datos, ejercicio, plan, { excluirSesion, sobre }) {
   const prog = plan.progresion;
   const ciclo = cicloActual(plan);
+  if (esperaPrueba(datos, ejercicio, plan, { excluirSesion })) return { sinCiclo: true, prueba: true };
   if (!ciclo || !ciclo.escalera?.length) return { sinCiclo: true };
 
   const registros = registrosDelCiclo(datos, ejercicio, plan, ciclo.n, { excluirSesion });

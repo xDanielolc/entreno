@@ -81,7 +81,7 @@ export function barraFiltros(alCambiar, { placeholder = 'Buscar ejercicio' } = {
 
   function pintarFiltros() {
     const activos = ['musculo', 'division', 'tipo'].filter((k) => filtro[k]).length;
-    plegable.replaceChildren(
+    plegable.replaceChildren(); anadir(plegable,
       h('summary', {}, activos ? `Filtros (${activos})` : 'Filtros'),
       h('div', { class: 'fila-filtros' },
         desplegable('musculo', { '': 'Cualquier músculo',

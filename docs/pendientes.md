@@ -33,7 +33,7 @@ que la app funcione en condiciones. Centrémonos en eso»*.
 - [ ] **Más visual, más intuitivo, menos texto.** Repaso general de la ficha
       del ejercicio y del entrenamiento con ese criterio (25-09-2026: «falta
       pulir y que sea más visual, intuitivo, con menos texto, más sencillo»).
-- [ ] Drop set: por defecto X−1 (Fink 2018); Ozaki (1 + media por bajada) queda
+- [x] Drop set: por defecto X−1 (Fink 2018); Ozaki (1 + media por bajada) queda
       como opción en Ajustes y Aprender. Decidido el 27-09-2026.
 - [x] «Máximo trabajo»: suelo del 30 % del 1RM (0.27.0).
 - [x] Ejercicios antiguos en «solo apuntar»: se quedan así (va a borrar sus
@@ -42,66 +42,69 @@ que la app funcione en condiciones. Centrémonos en eso»*.
 ### Lista del 27-09-2026 (mensaje largo tras probar la 0.28)
 
 Hoy
-- [ ] «Entrenar sin rutina» pegado a recuperación: separarlo.
-- [ ] Recuperación de Hoy: el porcentaje a la derecha de la palabra no es estético.
-- [ ] Quitar la fecha de arriba y la lista de ejercicios del día.
-- [ ] «Por qué esta y no otra» y «por qué es así» dentro de un «Más info» plegado, al final.
-- [ ] «Otras rutinas activas»: botón como los demás, debajo del recuadro junto a
+- [x] «Entrenar sin rutina» pegado a recuperación: separarlo.
+- [x] Recuperación de Hoy: el porcentaje a la derecha de la palabra no es estético.
+- [x] Quitar la fecha de arriba y la lista de ejercicios del día.
+- [x] «Por qué esta y no otra» y «por qué es así» dentro de un «Más info» plegado, al final.
+- [x] «Otras rutinas activas»: botón como los demás, debajo del recuadro junto a
       «Entrenar sin rutina» y «Ver rutinas».
 
 Cuerpo
-- [ ] Recomendaciones: hacerlo visual. Tres botones sobre el mismo dibujo del
+- [x] Recomendaciones: hacerlo visual. Tres botones sobre el mismo dibujo del
       cuerpo: recuperación, qué necesita más entrenamiento esta semana, qué
       sueles entrenar menos (dos meses). Minileyenda en el recuadro.
-- [ ] «Mi ritmo de recuperación» → «Ajustar ritmo de recuperación»; en cada
+- [x] «Mi ritmo de recuperación» → «Ajustar ritmo de recuperación»; en cada
       músculo, además del multiplicador, «Automático» con el multiplicador que
       sale de sus entrenamientos. Descripción plegada.
-- [ ] «Series por músculo en los últimos 7 días»: series como x/6, objetivos
+- [x] «Series por músculo en los últimos 7 días»: series como x/6, objetivos
       ajustables a mano; ordenados de más a menos; colores rojo-amarillo-verde,
       y al pasarse vuelve a amarillo y luego rojo (avisar, sobre todo si no se
       recupera). Explicación corta en viñetas y plegada; barras plegadas; sin
       «vas corto» ni «no has entrenado».
-- [ ] «De dónde salen estos números» debe abrir la explicación, no solo Ajustes.
+- [x] «De dónde salen estos números» debe abrir la explicación, no solo Ajustes.
 
 Ejercicios
-- [ ] Abrir por defecto en «solo imagen».
-- [ ] Salir de un ejercicio a medias sin perder lo editado.
-- [ ] Gráfica: quitar «C1» del dibujo (dejarlo en la leyenda). Poder ver solo
+- [x] Abrir por defecto en «solo imagen».
+- [x] Salir de un ejercicio a medias sin perder lo editado.
+- [x] Gráfica: quitar «C1» del dibujo (dejarlo en la leyenda). Poder ver solo
       ciclos o todo el historial, informes y tendencia del 1RM.
-- [ ] «Altura o distancia»: no llamarlo salto; unidad elegible (km, m, cm).
+- [x] «Altura o distancia»: no llamarlo salto; unidad elegible (km, m, cm).
       Si marca altura, que no salga el peso en cm: opciones propias por medida.
-- [ ] Pesos de máquina: avisar de que sin «Generar lista» se usa primero-último
+- [x] Pesos de máquina: avisar de que sin «Generar lista» se usa primero-último
       con los saltos.
-- [ ] Peso corporal: referencias de cuánto suele pesar cada cosa, en viñetas.
-- [ ] «Qué apuntas en cada serie además del peso» en una línea; la explicación
-      corta bajo el título. Se repite con lo del ciclo: unificarlo.
-- [ ] Botones de corte («llegas a tantas» / «te salen tantas»): reescribir como
+- [x] Peso corporal: referencias de cuánto suele pesar cada cosa, en viñetas.
+- [x] «Qué apuntas en cada serie además del peso» en una línea; la explicación
+      corta bajo el título (0.30).
+- [ ] Unificar «qué apuntas» y «qué mejora» del ciclo: propuesta hecha a Dan
+      (una sola lista con peso, altura, repeticiones, tiempo y distancia, cada
+      una con su unidad). Pendiente de que diga sí.
+- [x] Botones de corte («llegas a tantas» / «te salen tantas»): reescribir como
       máximo o mínimo que corta.
-- [ ] Progreso y «cómo suelo programarlo» por separado: poder elegir qué ver.
-- [ ] Grupo del ejercicio: sigue saliendo «Anterior / Siguiente» (desplegables:
+- [x] Progreso y «cómo suelo programarlo» por separado: poder elegir qué ver.
+- [x] Grupo del ejercicio: sigue saliendo «Anterior / Siguiente» (desplegables:
       revisarlo en toda la app).
-- [ ] Papelera de la serie: en el móvil sale debajo del título, no en la esquina.
-- [ ] Al modificar un ejercicio: ver todo, ver el informe de progreso o que la
+- [x] Papelera de la serie: en el móvil sale debajo del título, no en la esquina.
+- [x] Al modificar un ejercicio: ver todo, ver el informe de progreso o que la
       app guíe pregunta a pregunta.
-- [ ] Drop set: no deja marcar solo pesos fijos de máquina.
-- [ ] Tarjeta la primera vez: «Marca lo que quieres que suba sesión a sesión…».
-- [ ] Por dónde empieza la primera serie: opción «No lo sé» (prueba de 1RM), y
+- [x] Drop set: no deja marcar solo pesos fijos de máquina.
+- [x] Tarjeta la primera vez: «Marca lo que quieres que suba sesión a sesión…».
+- [x] Por dónde empieza la primera serie: opción «No lo sé» (prueba de 1RM), y
       mismas opciones para la primera y para las siguientes. Quitar «% del
       último valor».
-- [ ] Botón «hacer prueba» para dejar el 1RM apuntado.
-- [ ] Explicar fuerza (técnica y repeticiones con carga) e hipertrofia (carga
+- [x] Botón «hacer prueba» para dejar el 1RM apuntado.
+- [x] Explicar fuerza (técnica y repeticiones con carga) e hipertrofia (carga
       mecánica con poca fatiga) con un metaanálisis; una línea en el «?» y más
       en Aprender.
-- [ ] Filtros plegados en el buscador.
+- [x] Filtros plegados en el buscador.
 
 Historial
-- [ ] Al abrir un día, resumen; editar solo con un botón.
-- [ ] Buscador y filtros: día, rutina, tipo, ejercicio, músculo.
+- [x] Al abrir un día, resumen; editar solo con un botón.
+- [x] Buscador y filtros: día, rutina, tipo, ejercicio, músculo.
 
 Ajustes y general
-- [ ] Política de privacidad en un botón aparte.
-- [ ] Flecha de volver arriba abajo a la derecha, sin tapar pestañas ni botones.
-- [ ] Créditos solo en Aprender, no bajo cada imagen.
+- [x] Política de privacidad en un botón aparte.
+- [x] Flecha de volver arriba abajo a la derecha, sin tapar pestañas ni botones.
+- [x] Créditos solo en Aprender, no bajo cada imagen.
 
 ## 2. Tutorial y explicaciones
 

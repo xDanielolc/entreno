@@ -14,7 +14,7 @@
 //     valor) | 'manual', porcentaje }.
 // Además se puede cortar o alargar a mano desde la ficha.
 
-import { aPesoDisponible, formatearNumero, generarEscalera, mejorRMDelCiclo, modeloDeEjercicio, rmDeReferencia } from './calculos.js';
+import { aPesoDisponible, esperaPrueba, formatearNumero, generarEscalera, mejorRMDelCiclo, modeloDeEjercicio, rmDePrueba, rmDeReferencia } from './calculos.js';
 import { pesoParaReps } from './formula1rm.js';
 
 export const PRESETS_CICLO = {
@@ -57,10 +57,65 @@ export const MODOS_REINICIO = {
   'rm-ciclo': { etiqueta: 'Al % del mejor 1RM de este ciclo', descripcion: 'Se mira la mejor serie de este ciclo, se calcula el 1RM que sale de ella y el siguiente ciclo empieza a ese porcentaje. Es lo de Bilbo: cada vuelta parte de lo que acabas de demostrar.' },
   porcentaje: { etiqueta: 'Al % de tu 1RM de siempre', descripcion: 'El siguiente ciclo empieza a un porcentaje de tu mejor 1RM estimado en todo el historial.' },
   reps: { etiqueta: 'Al peso con el que harías X repeticiones', descripcion: 'Dices con cuántas repeticiones quieres empezar y la app calcula el peso con la fórmula del ejercicio, a partir del mejor 1RM de este ciclo. Es lo más parecido a decir «quiero empezar haciendo series de 20».' },
-  ultimo: { etiqueta: 'Al % del último valor', descripcion: 'Empieza un poco por debajo de donde se cortó.' },
+  ultimo: { etiqueta: 'Al % del último valor', descripcion: 'Empieza un poco por debajo de donde se cortó.', antiguo: true },
   mismo: { etiqueta: 'Como el anterior', descripcion: 'Vuelve al mismo valor inicial.' },
+  prueba: { etiqueta: 'Con una prueba', descripcion: 'El primer día del ciclo pones un peso con el que hagas de 5 a 15 repeticiones y haces todas las que puedas; con esa serie la app calcula de dónde partir.' },
   manual: { etiqueta: 'A mano', descripcion: 'La app avisa y tú lo preparas en la ficha.' },
 };
+
+// Por dónde empieza el primer ciclo: lo mismo que los siguientes, más
+// «No lo sé», que hace una prueba el primer día.
+export const MODOS_INICIO = {
+  porcentaje: { etiqueta: 'Al % de tu 1RM', descripcion: 'Empieza a un porcentaje del 1RM que hayas puesto o que salga de tus series.' },
+  reps: { etiqueta: 'Al peso con el que harías X repeticiones', descripcion: 'Dices con cuántas repeticiones quieres empezar y la app calcula el peso con la fórmula del ejercicio.' },
+  mismo: { etiqueta: 'Un peso que pones tú', descripcion: 'Empieza en el peso que escribas.' },
+  prueba: { etiqueta: 'No lo sé: con una prueba', descripcion: 'El primer día pones un peso con el que hagas de 5 a 15 repeticiones y haces todas las que puedas. Con esa serie la app calcula tu 1RM y desde el día siguiente te dice qué toca.' },
+};
+
+// Cómo empieza el primer ciclo si no se ha elegido: con 1RM, a su porcentaje;
+// sin él, con una prueba.
+export function inicioDe(prog, hayRm) {
+  return prog.inicio ?? { modo: hayRm ? 'porcentaje' : 'prueba' };
+}
+
+function valorDeInicio(datos, ejercicio, inicio, rm) {
+  if (inicio.modo === 'mismo' || !rm) return null;
+  if (inicio.modo === 'reps') return pesoParaReps(modeloDeEjercicio(datos, ejercicio), rm, inicio.reps ?? 20, 0);
+  return rm * ((inicio.porcentaje ?? datos.perfil.bilboInicioPorcentaje ?? 50) / 100);
+}
+
+// Antes de la primera sesión de un ciclo, su peso de partida sale de cómo
+// quieras empezar y del 1RM de ese momento (el que pusiste o el de la
+// prueba). Se llama al crear la serie del entrenamiento. Devuelve true si
+// ese día toca la prueba.
+export function prepararCiclo(datos, ejercicio, plan, { excluirSesion } = {}) {
+  const prog = plan.progresion;
+  if (prog?.tipo !== 'bilbo' || prog.sobre !== 'carga') return false;
+  if (esperaPrueba(datos, ejercicio, plan, { excluirSesion })) return true;
+  const ciclo = prog.ciclos?.find((c) => c.n === prog.cicloActual) ?? prog.ciclos?.at(-1);
+  const primero = !ciclo || (prog.ciclos.length === 1 && !ciclo.inicio);
+  if (!primero && !ciclo.pendientePrueba) return false;
+  if (ciclo && ultimaSesionHecha(datos, ejercicio, plan, ciclo.n) > 0) return false;
+  const referencia = rmDeReferencia(datos, ejercicio, { excluirSesion });
+  const inicio = primero ? inicioDe(prog, Boolean(referencia)) : { modo: 'prueba', porcentaje: prog.reinicio?.porcentaje };
+  const rm = inicio.modo === 'prueba'
+    ? rmDePrueba(datos, ejercicio, plan, primero ? null : ciclo.inicio, { excluirSesion })
+    : referencia?.valor;
+  const valor = valorDeInicio(datos, ejercicio, inicio, rm);
+  if (valor == null) {
+    if (!ciclo && referencia) empezarCicloNuevo(datos, ejercicio, plan);
+    return false;
+  }
+  const inicial = aPesoDisponible(ejercicio, valor);
+  if (!ciclo) {
+    empezarCicloNuevo(datos, ejercicio, plan, { inicial });
+  } else {
+    ciclo.generador = { ...ciclo.generador, inicial };
+    ciclo.escalera = escaleraDe(ejercicio, ciclo.generador, prog.corte?.sesiones ?? prog.diasPorCiclo ?? 20);
+    ciclo.pendientePrueba = false;
+  }
+  return false;
+}
 
 // Rellena lo que falte en una progresión de ciclo antigua.
 export function completarCiclo(prog, perfil = {}) {
@@ -129,6 +184,8 @@ export function empezarCicloNuevo(datos, ejercicio, plan, { inicial = null } = {
   if (anterior) anterior.fin = new Date().toISOString().slice(0, 10);
   const ciclo = { n, inicio: new Date().toISOString().slice(0, 10), fin: null, generador,
     escalera: escaleraDe(ejercicio, generador, prog.corte.sesiones) };
+  // «Con una prueba»: el primer día del ciclo es la prueba y el peso sale de ella.
+  if (anterior && prog.reinicio?.modo === 'prueba' && inicial == null) ciclo.pendientePrueba = true;
   prog.ciclos.push(ciclo);
   prog.cicloActual = n;
   return ciclo;
@@ -195,6 +252,7 @@ export function describirCiclo(prog, unidad, nombreEsfuerzo = 'repeticiones') {
   if (cortes.length) partes.push(`se corta ${cortes.join(' o ')}`);
   const r = prog.reinicio ?? {};
   partes.push(r.modo === 'manual' ? 'y avisa para que prepares el siguiente'
+    : r.modo === 'prueba' ? 'y empieza otro con una prueba'
     : r.modo === 'mismo' ? 'y vuelve a empezar igual'
       : r.modo === 'ultimo' ? `y empieza otro al ${r.porcentaje} % del último valor`
         : r.modo === 'reps' ? `y empieza otro por el peso al que harías ${r.reps ?? 20} repeticiones`

@@ -519,3 +519,9 @@ la vez, a veces sin cobertura):
 
 - **0.28.** `perfil.cuentaDropSet` ('ozaki' | 'x-1'): cuántas series vale
   un drop set o rest-pause al contar el volumen por músculo.
+
+- **0.29-0.30.** `perfil.objetivoSeries` ({músculo: series}); `perfil.recuperacion.factores[m]`
+  ausente = automático; `sesion.sensaciones[m].factor` (factor en vigor ese día);
+  `ej.unidades` ({distancia: 'km'|'m'|'cm', altura: 'cm'|'m'});
+  `progresion.inicio` ({modo, porcentaje, reps}); `reinicio.modo = 'prueba'`;
+  `ciclo.pendientePrueba`.

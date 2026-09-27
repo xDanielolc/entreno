@@ -102,8 +102,48 @@ export function horasDesdeSesion(sesion, ahora = new Date()) {
   return horasDesde(sesion, ahora);
 }
 
+// El ritmo de cada músculo: el que pongas a mano o, si no pones ninguno, el
+// automático, que sale de tus respuestas a «¿Cómo llegas?».
 export function factorPersonal(datos, musculo) {
-  return datos.perfil.recuperacion?.factores?.[musculo] ?? 1;
+  const manual = datos.perfil.recuperacion?.factores?.[musculo];
+  if (manual != null) return manual;
+  return factorAutomatico(datos, musculo) ?? 1;
+}
+
+export function esAutomatico(datos, musculo) {
+  return datos.perfil.recuperacion?.factores?.[musculo] == null;
+}
+
+// Factor automático. Cada respuesta compara cómo llegabas con lo que
+// calculaba la app con el factor de ese día: si llegabas peor, hacen falta
+// más horas (el factor sube); si llegabas mejor, menos. 30 puntos de
+// diferencia mueven el factor un 40 %. Se usan tus 10 últimas respuestas y
+// hacen falta al menos 3. Es una aproximación de la app, no sale de un estudio.
+let cacheAuto = { clave: null, tabla: {} };
+export function factorAutomatico(datos, musculo) {
+  const clave = `${datos.revision}:${datos.sesiones.length}`;
+  if (cacheAuto.clave !== clave) cacheAuto = { clave, tabla: calcularAutomaticos(datos) };
+  return cacheAuto.tabla[musculo] ?? null;
+}
+
+function calcularAutomaticos(datos) {
+  const por = {};
+  for (const s of datos.sesiones) {
+    if (s.borrada || !s.sensaciones) continue;
+    for (const [m, x] of Object.entries(s.sensaciones)) {
+      const sentida = puntuacionSentida(x);
+      if (sentida == null || x.prevista == null) continue;
+      (por[m] ??= []).push({ fecha: s.fecha, dif: sentida * 10 - x.prevista, factor: x.factor ?? 1 });
+    }
+  }
+  const salida = {};
+  for (const [m, lista] of Object.entries(por)) {
+    if (lista.length < MINIMO_RESPUESTAS) continue;
+    const ultimas = lista.sort((a, b) => a.fecha.localeCompare(b.fecha)).slice(-10);
+    const media = ultimas.reduce((t, x) => t + x.factor * (1 - x.dif / 75), 0) / ultimas.length;
+    salida[m] = Math.round(Math.min(1.6, Math.max(0.6, media)) * 20) / 20;
+  }
+  return salida;
 }
 
 // Horas que necesita un músculo tras una sesión: la dureza media y la de la
@@ -175,12 +215,17 @@ export function textoDeRecuperacion(e) {
 
 // Series por músculo en los últimos 7 días, para los avisos de volumen.
 export function seriesSemanales(datos, ahora = new Date()) {
+  return seriesEnDias(datos, 7, ahora);
+}
+
+// Series por músculo en los últimos tantos días.
+export function seriesEnDias(datos, dias, ahora = new Date()) {
   const total = {};
   for (const m of ORDEN_MUSCULOS) total[m] = 0;
   for (const sesion of datos.sesiones) {
     if (sesion.borrada || sesion.estado !== 'terminada') continue;
     const horas = horasDesde(sesion, ahora);
-    if (horas == null || horas > 24 * 7) continue;
+    if (horas == null || horas > 24 * dias) continue;
     for (const [musculo, carga] of cargaDeSesion(datos, sesion)) {
       if (total[musculo] != null) total[musculo] += carga.series;
     }
@@ -251,7 +296,8 @@ export function sugerenciasDeAjuste(datos) {
   }
   const sugerencias = [];
   for (const [m, lista] of porMusculo) {
-    if (lista.length < MINIMO_RESPUESTAS || !MUSCULOS[m]) continue;
+    // En automático no hace falta proponer nada: se ajusta solo.
+    if (lista.length < MINIMO_RESPUESTAS || !MUSCULOS[m] || esAutomatico(datos, m)) continue;
     const diferencias = lista.map((s) => puntuacionSentida(s) * 10 - s.prevista).filter((x) => !Number.isNaN(x));
     const lento = diferencias.filter((x) => x <= -DESAJUSTE).length;
     const rapido = diferencias.filter((x) => x >= DESAJUSTE).length;

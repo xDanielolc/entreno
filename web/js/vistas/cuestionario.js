@@ -14,8 +14,8 @@ export const PREGUNTAS = [
     avanzado: { etiqueta: 'Bastante', descripcion: 'Conozco el 1RM, la recámara, los drop sets, las progresiones y los programas. Solo dime dónde está cada cosa.' },
   } },
   { clave: 'objetivo', titulo: '¿Qué buscas?', opciones: {
-    musculo: { etiqueta: 'Ganar músculo', descripcion: 'Hipertrofia: que el músculo crezca.' },
-    fuerza: { etiqueta: 'Ganar fuerza', descripcion: 'Levantar más peso en los básicos.' },
+    musculo: { etiqueta: 'Ganar músculo', descripcion: 'Hipertrofia: series cerca del fallo, con el peso que sea, sin cansarte de más.' },
+    fuerza: { etiqueta: 'Ganar fuerza', descripcion: 'Pesos altos y mucha práctica del mismo movimiento, para levantar más.' },
     salud: { etiqueta: 'Salud y forma física', descripcion: 'Moverme, estar bien y no lesionarme.' },
     movilidad: { etiqueta: 'Movilidad y flexibilidad', descripcion: 'Estiramientos, yoga, articulaciones.' },
   } },

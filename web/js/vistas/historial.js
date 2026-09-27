@@ -87,7 +87,7 @@ export function vistaHistorial(contenedor) {
 
   function pintarFiltros() {
     const activos = ['rutina', 'tipo', 'musculo', 'mes'].filter((k) => filtro[k]).length;
-    plegable.replaceChildren(
+    plegable.replaceChildren(); anadir(plegable,
       h('summary', {}, activos ? `Filtros (${activos})` : 'Filtros'),
       h('div', { class: 'fila-filtros' },
         opcion('mes', [['', 'Cualquier mes'], ...meses.map((m) => [m, nombreMes(m)])], 'Mes'),

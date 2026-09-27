@@ -10,7 +10,7 @@ import { explicaciones1RM, opciones } from './ejercicios.js';
 import { FORMAS_DROP_SET, FORMA_DROP_SET_POR_DEFECTO } from '../recuperacion.js';
 import { ASISTENCIAS, ESCALA_MANO, TECNICAS_ESTIRAMIENTO } from '../esquema.js';
 import * as estado from '../estado.js';
-import { anadir, apartadoPlegable, aviso, h } from '../ui.js';
+import { anadir, apartadoPlegable, aviso, h, idApartado, llevarAlDestino } from '../ui.js';
 import { hacerCuestionario } from './cuestionario.js';
 import { listaGlosario, queEs } from './glosario.js';
 import { GUIAS, NIVELES, fijarNivel, iniciarGuia, nivelTutorial, reiniciarPistas } from './tutorial.js';
@@ -169,11 +169,12 @@ export function vistaAprender(contenedor) {
     creditos(),
     apartado('De dónde sale cada cosa',
       h('p', { class: 'nota' }, 'Qué recomienda la app, con qué respaldo y dónde falla.'),
-      BIBLIOGRAFIA.map((x) => h('details', { class: 'fuente' },
+      BIBLIOGRAFIA.map((x) => h('details', { class: 'fuente', id: idApartado(x.tema) },
         h('summary', {}, x.tema),
         h('p', {}, x.dice),
         h('p', { class: 'nota' }, x.matiz),
         x.fuentes.length
           ? h('ul', {}, x.fuentes.map((f) => h('li', {}, h('a', { href: f.url, target: '_blank', rel: 'noopener' }, f.texto))))
           : h('p', { class: 'nota' }, 'Sin respaldo científico directo: es una decisión práctica.')))));
+  llevarAlDestino();
 }

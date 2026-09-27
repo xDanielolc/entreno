@@ -1079,3 +1079,29 @@ legend .ayuda, summary .ayuda { margin-left: 6px; vertical-align: middle; }
 .resumen-ejercicio h2 { font-size: 1.05rem; margin: 0 0 6px; }
 .series-resumen { margin: 0; padding-left: 1.4em; }
 .series-resumen li { padding: 2px 0; font-variant-numeric: tabular-nums; }
+
+/* Cuerpo: modos del mapa, leyenda y objetivos de series. */
+.modos-mapa { margin-bottom: 8px; }
+.leyenda-color.listo { background: var(--bien); }
+.leyenda-color.medio { background: var(--aviso); }
+.leyenda-color.cansado { background: var(--peligro); }
+.barra-musculo { grid-template-columns: 90px 1fr auto; }
+.boton-objetivo { font: inherit; font-variant-numeric: tabular-nums; background: none; border: 1px solid var(--borde); border-radius: var(--radio-pequeno); padding: 4px 8px; min-height: 32px; color: var(--texto); cursor: pointer; }
+.boton-objetivo.manual { border-color: var(--acento); }
+.barra-musculo .barra.listo span { background: var(--bien); }
+.barra-musculo .barra.medio span { background: var(--aviso); }
+.barra-musculo .barra.cansado span { background: var(--peligro); }
+.fila-ajuste .selector-abrir { min-height: 40px; padding: 6px 10px; }
+
+/* Progreso: tendencia del 1RM y línea discontinua. */
+.grafica .linea.discontinua { stroke-dasharray: 6 5; stroke-width: 1.5; }
+.tendencia { font-weight: 600; margin: 8px 0; }
+.tendencia.sube { color: var(--bien); }
+.tendencia.baja { color: var(--peligro); }
+
+/* Ficha: formas de verla y paso a paso. */
+.vistas-ficha { margin: 4px 0 14px; }
+.paso-de { margin: 0; }
+/* La papelera de cada serie, siempre en la esquina de arriba a la derecha. */
+.plan-serie > .cabecera-tarjeta { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: nowrap; }
+.plan-serie > .cabecera-tarjeta .boton-icono.papelera { margin-left: auto; flex: 0 0 auto; }

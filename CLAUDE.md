@@ -393,6 +393,31 @@ parábola (U invertida) a sus series y va a la cima; el suelo solo actúa si la
 cima cae por debajo del 30 %. Los apartados de Ajustes y Aprender recuerdan
 si estaban abiertos (`apartadoPlegable` en ui.js).
 
+## Rondas 0.29.0 y 0.30.0 (27-09-2026): la lista larga de Dan
+
+- Drop set por defecto X−1 (Fink 2018), Ozaki como opción.
+- Sin `<select>` en toda la app: `selector()` en ui.js (botones que se quedan
+  marcados; con muchas opciones, un botón que abre la lista). `campo()` solo
+  es `<label>` si envuelve una casilla de texto.
+- `plegable()` y `apartadoPlegable()` recuerdan lo abierto; `abrirAlLlegar()`
+  + `llevarAlDestino()` abren una explicación desde otra pantalla.
+- Historial: un día terminado se abre en resumen (`resumenDelDia` en
+  sesion.js); «Editar» lo pasa al set `editando`. Buscador y filtros.
+- Cuerpo: mapa con tres modos (recuperación, semana, dos meses), objetivos de
+  series por músculo (`perfil.objetivoSeries`), colores `claseSeries()`.
+  Ritmo de recuperación automático (`factorAutomatico`, sale de «¿Cómo
+  llegas?»; cada sensación guarda el `factor` de ese día); a mano sigue en
+  `perfil.recuperacion.factores`.
+- Ficha: vistas Progreso / Ficha completa / Paso a paso; borrador nuevo a
+  medias (`borradorNuevo`); bloques abiertos por ejercicio. Unidades por
+  ejercicio (`ej.unidades`, `unidadMedida()`).
+- Inicio de ciclo: `prog.inicio` ({modo: porcentaje | reps | mismo | prueba})
+  y reinicio 'prueba' (`ciclo.pendientePrueba`). `prepararCiclo()` fija el
+  peso del primer día al crear la serie; `esperaPrueba()` hace que la
+  sugerencia pida la prueba. «% del último valor» queda solo para datos viejos.
+- Progreso: todo el historial con tendencia del 1RM (mínimos cuadrados, kg/mes)
+  o por ciclos.
+
 PENDIENTE: nombre e icono con Design («luego ya decoramos»); publicar la app
 en la consola de Google (es cosa suya); repasar las descripciones de las
 progresiones contrastándolas con las fuentes, que él pidió y solo está hecho

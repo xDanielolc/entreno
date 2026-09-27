@@ -6,11 +6,11 @@ import * as estado from '../estado.js';
 import { cuentaParaFatiga } from '../catalogo.js';
 import { ORDEN_MUSCULOS, nombreMusculo, siluetaCuerpo } from '../musculos.js';
 import {
-  FACTORES, claseDeRecuperacion, detalleDeRecuperacion, factorPersonal, recuperacionPorMusculo, seriesSemanales,
-  sugerenciasDeAjuste, textoDeRecuperacion, durezaSemanal,
+  FACTORES, claseDeRecuperacion, detalleDeRecuperacion, esAutomatico, factorAutomatico, factorPersonal, recuperacionPorMusculo,
+  seriesEnDias, seriesSemanales, sugerenciasDeAjuste, textoDeRecuperacion, durezaSemanal,
 } from '../recuperacion.js';
 import { recomendacionesGenerales } from '../recomendaciones.js';
-import { anadir, aviso, h, hoyISO } from '../ui.js';
+import { abrirAlLlegar, anadir, aviso, h, hoyISO, modal, plegable, selector } from '../ui.js';
 import { conGlosario } from './glosario.js';
 import { pista } from './tutorial.js';
 
@@ -117,96 +117,209 @@ function tarjetaSugerencia(d, s) {
         `Ajustar a «${FACTORES.find((f) => f.valor === s.nuevo)?.texto.toLowerCase()}»`)));
 }
 
-export function vistaCuerpo(contenedor) {
-  const d = estado.datos();
-  const semana = seriesSemanales(d);
-  const conDatos = ORDEN_MUSCULOS.filter((m) => semana[m] > 0)
-    .sort((a, b) => semana[b] - semana[a]);
-  // El minimo baja a 6 en los musculos que entrenas al fallo o con bajadas.
-  const dureza = durezaSemanal(d);
-  const minimoDe = (m) => (dureza[m]?.series > 0 && dureza[m].duras / dureza[m].series >= 0.5 ? 6 : SERIES_MINIMAS);
-  const flojos = ORDEN_MUSCULOS.filter((m) => semana[m] > 0 && semana[m] < minimoDe(m));
-  const pasados = ORDEN_MUSCULOS.filter((m) => semana[m] > SERIES_MAXIMAS);
-  const sinTocar = ORDEN_MUSCULOS.filter((m) => !semana[m]);
+// ---------------------------------------------------------------------------
+// Pestaña Cuerpo: un mapa con tres formas de verlo, las series de la semana,
+// el ritmo de recuperación y los consejos, todo lo largo plegado.
+// ---------------------------------------------------------------------------
 
-  anadir(contenedor,
-    h('h1', {}, 'Tu cuerpo'),
-    pista('cuerpo', 'Verde: listo. Naranja: a medias. Rojo: aún tocado. Debajo, las series de la semana y consejos.'),
-    tarjetaRecuperacion(d),
-    tarjetaRecomendaciones(d),
-    tarjetaAjustePersonal(d),
+// Qué enseña el mapa. Se recuerda mientras la app esté abierta.
+const MODOS_MAPA = {
+  recuperacion: 'Recuperación',
+  semana: 'Qué entrenar esta semana',
+  menos: 'Lo que menos entrenas',
+};
+let modoMapa = 'recuperacion';
 
-    h('section', { class: 'tarjeta' },
-      h('h2', {}, 'Series de los últimos 7 días'),
-      conDatos.length
-        ? h('div', { class: 'barras-musculo' }, conDatos.map((m) => {
-          const n = Math.round(semana[m] * 10) / 10;
-          const ancho = Math.min(100, (n / (SERIES_MAXIMAS + 5)) * 100);
-          const clase = n < SERIES_MINIMAS ? 'poco' : n > SERIES_MAXIMAS ? 'mucho' : 'bien';
-          return h('div', { class: 'barra-musculo' },
-            h('span', { class: 'nombre' }, nombreMusculo(m, { corto: true })),
-            h('span', { class: `barra ${clase}` }, h('span', { style: `width:${ancho}%` })),
-            h('span', { class: 'valor' }, formatearNumero(n)));
-        }))
-        : h('p', { class: 'suave' }, 'Aún no hay series registradas esta semana.'),
+const LEYENDAS = {
+  recuperacion: [['listo', 'Listo'], ['medio', 'A medias'], ['cansado', 'Aún tocado']],
+  semana: [['cansado', 'Le falta mucho o te pasas mucho'], ['medio', 'Le falta algo o te pasas'], ['listo', 'En su sitio']],
+  menos: [['cansado', 'Casi nada'], ['medio', 'Por debajo'], ['listo', 'Bien']],
+};
 
-      h('p', { class: 'nota' },
-        `La referencia son ${SERIES_MINIMAS} a ${SERIES_MAXIMAS} series semanales por músculo, repartidas en dos sesiones, `
-        + 'contando series en las que te dejas 2 o 3 repeticiones. Si las llevas al fallo o con bajadas, con unas 6 ya basta: '
-        + 'la app lo tiene en cuenta y deja de pedirte más. Las series de un músculo secundario cuentan la mitad y, en un drop set, '
-        + 'cada bajada de más cuenta media serie. Estiramientos, movilidad y yoga no cuentan.'),
-
-      flojos.length > 0 && h('p', { class: 'aviso-texto' },
-        `Vas corto en: ${flojos.map((m) => nombreMusculo(m)).join(', ')}. Si esas series las haces al fallo o con bajadas, no pasa nada; `
-        + 'si te dejas repeticiones, reparte las que faltan entre tus próximas sesiones.'),
-      pasados.length > 0 && h('p', { class: 'aviso-texto' },
-        `Te pasas de ${SERIES_MAXIMAS} series en: ${pasados.map((m) => nombreMusculo(m)).join(', ')}. `
-        + 'No es un problema si lo recuperas bien, pero vigila cómo llegas a la siguiente sesión.'),
-      sinTocar.length > 0 && h('p', { class: 'suave' },
-        `Sin entrenar esta semana: ${sinTocar.map((m) => nombreMusculo(m)).join(', ')}.`),
-
-      h('a', { class: 'boton enlace', href: '#/ajustes' }, 'De dónde salen estos números')));
+// Objetivo de series semanales de un músculo: el tuyo si lo has puesto; si
+// no, 10, o 6 si la mitad o más de sus series van al fallo o con bajadas.
+export function objetivoSeries(d, m, dureza = durezaSemanal(d)) {
+  const manual = d.perfil.objetivoSeries?.[m];
+  if (manual != null) return { n: manual, manual: true };
+  const x = dureza[m];
+  return { n: x?.series > 0 && x.duras / x.series >= 0.5 ? 6 : SERIES_MINIMAS, manual: false };
 }
 
+// Colores de las series frente al objetivo: rojo si falta mucho, amarillo si
+// falta algo, verde en su sitio; al pasarse, amarillo y luego rojo, y rojo
+// también si te pasas y el músculo no se ha recuperado.
+export function claseSeries(n, objetivo, recuperado = 100) {
+  const maximo = Math.max(SERIES_MAXIMAS, objetivo * 2);
+  if (n < objetivo * 0.5) return 'cansado';
+  if (n < objetivo) return 'medio';
+  if (n <= maximo) return 'listo';
+  if (n > maximo * 1.3 || recuperado < 60) return 'cansado';
+  return 'medio';
+}
+
+export function vistaCuerpo(contenedor) {
+  const d = estado.datos();
+  anadir(contenedor,
+    h('h1', {}, 'Tu cuerpo'),
+    tarjetaMapa(d),
+    tarjetaSeries(d),
+    tarjetaAjustePersonal(d),
+    tarjetaRecomendaciones(d));
+}
+
+function tarjetaMapa(d) {
+  const rec = recuperacionPorMusculo(d);
+  const dureza = durezaSemanal(d);
+  const semana = seriesSemanales(d);
+  const dosMeses = seriesEnDias(d, 60);
+  const redondo = (n) => formatearNumero(Math.round(n * 10) / 10);
+  const estados = {};
+  for (const m of ORDEN_MUSCULOS) {
+    const objetivo = objetivoSeries(d, m, dureza).n;
+    if (modoMapa === 'recuperacion') {
+      estados[m] = { clase: claseDeRecuperacion(rec[m].porcentaje), titulo: textoDeRecuperacion(rec[m]) };
+    } else if (modoMapa === 'semana') {
+      // Solo los músculos que entrenas: lo que no tocas en dos meses no
+      // se pinta de rojo cada semana (para eso está «Lo que menos entrenas»).
+      if (!dosMeses[m]) continue;
+      estados[m] = { clase: claseSeries(semana[m], objetivo, rec[m].porcentaje),
+        titulo: `${nombreMusculo(m)}: ${redondo(semana[m])} de ${objetivo} series esta semana` };
+    } else {
+      // Media semanal de los dos últimos meses frente al objetivo.
+      const media = dosMeses[m] / (60 / 7);
+      estados[m] = { clase: media < objetivo * 0.5 ? 'cansado' : media < objetivo ? 'medio' : 'listo',
+        titulo: `${nombreMusculo(m)}: ${redondo(media)} series por semana de media` };
+    }
+  }
+  const tocados = ORDEN_MUSCULOS.map((m) => rec[m]).filter((x) => x.porcentaje < 90)
+    .sort((a, b) => a.porcentaje - b.porcentaje);
+  const menos = ORDEN_MUSCULOS.map((m) => ({ m, media: dosMeses[m] / (60 / 7) }))
+    .sort((a, b) => a.media - b.media).slice(0, 5);
+
+  return h('section', { class: 'tarjeta recuperacion' },
+    h('div', { class: 'fila-marcas compacta modos-mapa', role: 'group', 'aria-label': 'Qué enseña el mapa' },
+      Object.entries(MODOS_MAPA).map(([clave, texto]) => h('button', { type: 'button',
+        class: `boton-marca${clave === modoMapa ? ' activo' : ''}`, 'aria-pressed': String(clave === modoMapa),
+        onclick: () => { modoMapa = clave; dispatchEvent(new HashChangeEvent('hashchange')); } }, texto))),
+    h('div', { class: 'leyenda' }, LEYENDAS[modoMapa].map(([clase, texto]) => h('span', { class: 'leyenda-item' },
+      h('span', { class: `leyenda-color ${clase}` }), texto)),
+    modoMapa === 'menos' && h('span', { class: 'leyenda-item' }, 'Media de los dos últimos meses')),
+    h('div', { class: 'cuerpos' },
+      siluetaCuerpo({ vista: 'delante', estadoPorMusculo: estados }),
+      siluetaCuerpo({ vista: 'detras', estadoPorMusculo: estados })),
+    modoMapa === 'recuperacion' && (tocados.length
+      ? h('ul', { class: 'lista-musculos' }, tocados.map((x) => h('li', {},
+        h('span', { class: `punto ${claseDeRecuperacion(x.porcentaje)}` }), h('span', {}, textoDeRecuperacion(x)))))
+      : h('p', { class: 'suave' }, 'Todo recuperado: puedes entrenar lo que quieras.')),
+    modoMapa === 'menos' && h('ul', { class: 'lista-musculos' }, menos.map((x) => h('li', {},
+      h('span', { class: `punto ${estados[x.m].clase}` }), h('span', {}, `${nombreMusculo(x.m)}: ${redondo(x.media)} series por semana`)))),
+    modoMapa === 'recuperacion' && plegable('cuerpo-calculo', 'Cómo se calcula', {},
+      h('ul', { class: 'nota' },
+        h('li', {}, 'Justo al acabar, el músculo está al 0 % y sube hasta el 100 %.'),
+        h('li', {}, 'Lo que más pesa es lo cerca del fallo que acabaste: de 24 h (3 o más en recámara) a 60 h (al fallo con drop set o más de 15 repeticiones).'),
+        h('li', {}, 'Más series alargan algo el tiempo, cada vez menos.'),
+        h('li', {}, 'Tu ritmo de recuperación (abajo) lo alarga o lo acorta.'),
+        h('li', {}, 'Respaldo: Morán-Navarro 2017 y Pareja-Blanco 2019 y 2020. La forma exacta de la curva es una aproximación de la app.'))));
+}
+
+// Series de la semana por músculo, de más a menos, como «8/10».
+function tarjetaSeries(d) {
+  const semana = seriesSemanales(d);
+  const dureza = durezaSemanal(d);
+  const rec = recuperacionPorMusculo(d);
+  const dosMeses = seriesEnDias(d, 60);
+  const filas = ORDEN_MUSCULOS.filter((m) => dosMeses[m] > 0).map((m) => ({ m, n: Math.round(semana[m] * 10) / 10, objetivo: objetivoSeries(d, m, dureza) }))
+    .sort((a, b) => b.n - a.n);
+  const pasados = filas.filter((x) => claseSeries(x.n, x.objetivo.n, rec[x.m].porcentaje) === 'cansado' && x.n >= x.objetivo.n);
+
+  const cambiarObjetivo = (m) => {
+    const actual = d.perfil.objetivoSeries?.[m] ?? null;
+    const cerrar = modal(`Objetivo de ${nombreMusculo(m)}`, h('div', {},
+      h('p', { class: 'nota' }, 'Series por semana que quieres hacer de este músculo.'),
+      selector([[null, `Lo que calcule la app (${objetivoSeries({ ...d, perfil: { ...d.perfil, objetivoSeries: {} } }, m, dureza).n})`],
+        ...[4, 6, 8, 10, 12, 15, 20].map((n) => [n, String(n)])], actual, (v) => {
+        cerrar();
+        estado.cambiar((x) => {
+          x.perfil.objetivoSeries ??= {};
+          if (v == null) delete x.perfil.objetivoSeries[m]; else x.perfil.objetivoSeries[m] = v;
+        });
+      }, { titulo: 'Objetivo', botones: true })));
+  };
+
+  return h('section', { class: 'tarjeta' },
+    h('h2', {}, 'Series por músculo en los últimos 7 días'),
+    pasados.length > 0 && h('p', { class: 'aviso-texto' },
+      `Te pasas en ${pasados.map((x) => nombreMusculo(x.m, { corto: true })).join(', ')}: vigila que se recuperen antes de volver a cargarlos.`),
+    plegable('cuerpo-series', 'Ver las series', {},
+      h('div', { class: 'barras-musculo' }, filas.map((x) => {
+        const clase = claseSeries(x.n, x.objetivo.n, rec[x.m].porcentaje);
+        const ancho = Math.min(100, (x.n / Math.max(x.objetivo.n * 2, SERIES_MAXIMAS)) * 100);
+        return h('div', { class: 'barra-musculo' },
+          h('span', { class: 'nombre' }, nombreMusculo(x.m, { corto: true })),
+          h('span', { class: `barra ${clase}` }, h('span', { style: `width:${ancho}%` })),
+          h('button', { type: 'button', class: `valor boton-objetivo${x.objetivo.manual ? ' manual' : ''}`,
+            'aria-label': `Cambiar el objetivo de ${nombreMusculo(x.m)}`, onclick: () => cambiarObjetivo(x.m) },
+          `${formatearNumero(x.n)}/${x.objetivo.n}`));
+      })),
+      filas.length
+        ? h('p', { class: 'nota' }, 'Toca el número para cambiar el objetivo. Solo salen los músculos que has entrenado en los dos últimos meses.')
+        : h('p', { class: 'suave' }, 'Aún no hay series en los dos últimos meses.')),
+    plegable('cuerpo-como', 'Cómo funciona', { id: 'como-cuentan-las-series' },
+      h('ul', { class: 'nota' },
+        h('li', {}, `Objetivo: ${SERIES_MINIMAS} series por semana, o 6 si la mitad o más van al fallo o con bajadas.`),
+        h('li', {}, 'Puedes poner el tuyo tocando el número.'),
+        h('li', {}, 'Rojo: te falta mucho. Amarillo: te falta algo. Verde: en su sitio.'),
+        h('li', {}, `Pasado el máximo (${SERIES_MAXIMAS}, o el doble de tu objetivo) vuelve a amarillo, y a rojo si te pasas mucho o si el músculo no se ha recuperado.`),
+        h('li', {}, 'Un músculo secundario cuenta media serie. Un drop set, según lo que elijas en Ajustes.'),
+        h('li', {}, 'Estiramientos, movilidad y yoga no cuentan.')),
+      h('a', { class: 'boton enlace', href: '#/aprender', onclick: () => abrirAlLlegar('ap-de-donde-sale-cada-cosa', 'ap-series-por-musculo-y-semana') },
+        'De dónde salen estos números')));
+}
 
 // ---------------------------------------------------------------------------
-// Ajuste personal: te recuperas más rápido o más despacio de lo normal
+// Ajustar ritmo de recuperación: automático o a mano, músculo a músculo
 // ---------------------------------------------------------------------------
 
 function tarjetaAjustePersonal(d) {
   const sugerencias = sugerenciasDeAjuste(d);
-  const conAjuste = ORDEN_MUSCULOS.filter((m) => factorPersonal(d, m) !== 1);
-
-  const aplicar = (m, factor, { callado = false } = {}) => estado.cambiar((x) => {
+  const aplicar = (m, factor) => estado.cambiar((x) => {
     x.perfil.recuperacion ??= { factores: {}, desde: {} };
     x.perfil.recuperacion.factores ??= {};
     x.perfil.recuperacion.desde ??= {};
-    if (factor === 1) delete x.perfil.recuperacion.factores[m];
+    if (factor == null) delete x.perfil.recuperacion.factores[m];
     else x.perfil.recuperacion.factores[m] = factor;
     // Las sensaciones de antes ya se han tenido en cuenta.
     x.perfil.recuperacion.desde[m] = hoyISO();
-    if (!callado) aviso(`${nombreMusculo(m)}: ajuste guardado`);
+    aviso(`${nombreMusculo(m)}: ajuste guardado`);
   });
-  const descartar = (m) => estado.cambiar((x) => {
-    x.perfil.recuperacion ??= { factores: {}, desde: {} };
-    x.perfil.recuperacion.desde ??= {};
-    x.perfil.recuperacion.desde[m] = hoyISO();
-  });
+  const coma = (n) => String(n).replace('.', ',');
 
   return h('section', { class: 'tarjeta' },
-    h('h2', {}, 'Tu ritmo de recuperación'),
+    h('h2', {}, 'Ajustar ritmo de recuperación'),
     sugerencias.map((s) => tarjetaSugerencia(d, s)),
-    h('p', { class: 'nota' }, 'Al empezar cada entrenamiento puedes puntuar de 0 a 10 cómo de recuperado llega cada músculo. '
-      + 'Con tres respuestas o más por músculo, la app te dirá si te recuperas antes o después de lo que calcula. '
-      + 'También puedes ajustarlo a mano:'),
-    conAjuste.length > 0 && h('p', {}, `Ajustados: ${conAjuste.map((m) => `${nombreMusculo(m)} ×${String(factorPersonal(d, m)).replace('.', ',')}`).join(', ')}.`),
-    h('details', { class: 'explicacion' },
-      h('summary', {}, 'Ajustar a mano'),
-      h('div', { class: 'ajustes-musculo' }, ORDEN_MUSCULOS.map((m) => h('label', { class: 'fila-ajuste' },
-        h('span', {}, nombreMusculo(m)),
-        h('select', { onchange: (e) => aplicar(m, Number(e.target.value)) },
-          FACTORES.map((f) => h('option', { value: f.valor, selected: f.valor === factorPersonal(d, m) },
-            `${f.texto} (×${String(f.valor).replace('.', ',')})`))))))));
+    plegable('cuerpo-ritmo-que', 'Qué es', {},
+      h('ul', { class: 'nota' },
+        h('li', {}, 'Cada persona se recupera a su ritmo. Este número multiplica las horas que calcula la app: ×1,2 son un 20 % más.'),
+        h('li', {}, 'En automático, la app lo saca de lo que contestas en «¿Cómo llegas hoy?» al empezar a entrenar (hacen falta 3 respuestas).'),
+        h('li', {}, 'También puedes fijarlo a mano.'))),
+    plegable('cuerpo-ritmo-musculo', 'Por músculo', {},
+      h('div', { class: 'ajustes-musculo' }, ORDEN_MUSCULOS.map((m) => {
+        const auto = factorAutomatico(d, m);
+        return h('div', { class: 'fila-ajuste' },
+          h('span', {}, nombreMusculo(m)),
+          selector([[null, `Automático (×${coma(auto ?? 1)}${auto == null ? ', aún sin datos' : ''})`],
+            ...FACTORES.map((f) => [f.valor, `${f.texto} (×${coma(f.valor)})`])],
+          esAutomatico(d, m) ? null : factorPersonal(d, m), (v) => aplicar(m, v), { titulo: nombreMusculo(m), lista: true }));
+      }))));
+}
+
+function tarjetaRecomendaciones(d) {
+  const lista = recomendacionesGenerales(d);
+  if (!lista.length) return null;
+  const avisos = lista.filter((x) => x.nivel === 'aviso').length;
+  return plegable('cuerpo-consejos', avisos ? `Consejos (${lista.length}, ${avisos} importantes)` : `Consejos (${lista.length})`,
+    { class: 'tarjeta explicacion' },
+    listaRecomendaciones(lista));
 }
 
 // Qué conviene cambiar, según tus últimos entrenamientos.
@@ -215,12 +328,4 @@ export function listaRecomendaciones(lista) {
   return h('ul', { class: 'recomendaciones' }, lista.map((x) => h('li', { class: x.nivel },
     h('span', { class: 'icono-rec', 'aria-hidden': 'true' }, icono[x.nivel]),
     x.enlace ? h('a', { href: x.enlace }, conGlosario(x.texto)) : h('span', {}, conGlosario(x.texto)))));
-}
-
-function tarjetaRecomendaciones(d) {
-  const lista = recomendacionesGenerales(d);
-  return h('section', { class: 'tarjeta' },
-    h('h2', {}, 'Recomendaciones'),
-    lista.length ? listaRecomendaciones(lista)
-      : h('p', { class: 'suave' }, 'Nada que corregir por ahora: volumen, frecuencia y esfuerzo están en rango.'));
 }

@@ -6,6 +6,31 @@
 // Apartado plegable que recuerda si lo dejaste abierto: al tocar algo dentro
 // la pantalla se repinta, y sin esto se cerraría solo.
 const apartadosAbiertos = new Set();
+
+// Para enlazar a una explicación desde otra pantalla: se deja abierto el
+// apartado (y, dentro, el detalle) y, al llegar, se pone a la vista.
+let destino = null;
+export function abrirAlLlegar(apartado, detalle = null) {
+  apartadosAbiertos.add(apartado);
+  destino = { apartado, detalle };
+}
+// Un <details> que recuerda si lo dejaste abierto, por su clave.
+export function plegable(clave, resumen, props, ...contenido) {
+  return h('details', { class: 'explicacion', ...props, open: apartadosAbiertos.has(clave),
+    ontoggle: (e) => { if (e.target.open) apartadosAbiertos.add(clave); else apartadosAbiertos.delete(clave); } },
+  h('summary', {}, resumen), ...contenido);
+}
+
+export function llevarAlDestino() {
+  if (!destino) return;
+  const { apartado, detalle } = destino;
+  destino = null;
+  setTimeout(() => {
+    const d = detalle && document.getElementById(detalle);
+    if (d) d.open = true;
+    (d ?? document.getElementById(apartado))?.scrollIntoView({ block: 'start' });
+  }, 60);
+}
 export function apartadoPlegable(titulo, ...contenido) {
   const id = idApartado(titulo);
   return h('details', { class: 'tarjeta formulario apartado', id, open: apartadosAbiertos.has(id),
@@ -147,9 +172,9 @@ export function modal(titulo, contenido) {
 // de «Anterior / Siguiente» y se entiende mal. Con pocas opciones salen
 // botones que se quedan marcados; con muchas, un botón con lo elegido que abre
 // la lista en un cartel. `opciones` es una lista de [valor, texto].
-export function selector(opciones, actual, alElegir, { titulo = 'Elige', compacto = false, lista = false } = {}) {
+export function selector(opciones, actual, alElegir, { titulo = 'Elige', compacto = false, lista = false, botones = false } = {}) {
   const marcar = (v) => (e) => { e?.preventDefault?.(); alElegir(v); };
-  if (!lista && opciones.length <= 5) {
+  if (botones || (!lista && opciones.length <= 5)) {
     return h('div', { class: `fila-marcas${compacto ? ' compacta' : ''}`, role: 'group', 'aria-label': titulo },
       opciones.map(([v, t]) => h('button', { type: 'button', class: `boton-marca${v === actual ? ' activo' : ''}`,
         'aria-pressed': String(v === actual), onclick: marcar(v) }, t)));

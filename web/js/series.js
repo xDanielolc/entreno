@@ -9,7 +9,7 @@ import {
 import { recamaraDe, tramosDe } from './esquema.js';
 import { modeloDe, repsParaIgualar, rmDeSerie } from './formula1rm.js';
 import { nuevoId } from './ui.js';
-import { aplicarPreset, empezarCicloNuevo, renovarSiToca } from './ciclos.js';
+import { aplicarPreset, empezarCicloNuevo, prepararCiclo, renovarSiToca } from './ciclos.js';
 import { progresionPorDefecto, serieNuevaPlantilla } from './esquema.js';
 
 // La regla de un ejercicio que aún no tiene ninguna: si en el cuestionario
@@ -33,10 +33,7 @@ export function crearSerieDesdePlan(datos, ejercicio, plan, { excluirSesion } = 
   // Un ciclo sin montar (Bilbo puesto por defecto, por ejemplo) se monta en
   // cuanto hay un 1RM del que partir. La primera vez no lo hay: haces lo que
   // puedas y con eso queda montado para la siguiente.
-  if (plan.progresion?.tipo === 'bilbo' && !plan.progresion.ciclos?.length
-    && rmDeReferencia(datos, ejercicio, { excluirSesion })) {
-    empezarCicloNuevo(datos, ejercicio, plan);
-  }
+  prepararCiclo(datos, ejercicio, plan, { excluirSesion });
   let s = sugerenciaSerie(datos, ejercicio, plan, { excluirSesion });
   // Un ciclo terminado o agotado empieza el siguiente solo (si no es manual).
   if (renovarSiToca(datos, ejercicio, plan, s)) s = sugerenciaSerie(datos, ejercicio, plan, { excluirSesion });

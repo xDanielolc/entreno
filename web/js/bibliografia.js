@@ -63,6 +63,21 @@ export const BIBLIOGRAFIA = [
     ],
   },
   {
+    tema: 'Fuerza e hipertrofia: no se entrenan igual',
+    dice: 'Para ganar fuerza, pesos altos y practicar mucho el mismo movimiento. Para ganar músculo, bastantes series cerca del '
+      + 'fallo con casi cualquier peso, sin acumular más fatiga de la necesaria.',
+    matiz: 'Fuerza: en el metaanálisis de Schoenfeld 2017 (estudios que comparan pesos altos, más del 60 % del 1RM, con pesos '
+      + 'bajos), los pesos altos dan más fuerza máxima; en parte porque la fuerza es muy específica: mejoras en lo que practicas, '
+      + 'y levantar pesado también es técnica. Por eso el ciclo de fuerza (Bilbo) acaba en pesos altos. '
+      + 'Músculo: en ese mismo metaanálisis, pesos bajos y altos dan un crecimiento parecido si las series se llevan cerca del fallo. '
+      + 'Y según Refalo 2023, acercarse al fallo ayuda a crecer, pero llegar siempre a él no añade casi nada y cansa más: la '
+      + 'fatiga de más puede restar en las series y sesiones siguientes. De ahí el rango de 6 a 10 dejando una o dos en recámara.',
+    fuentes: [
+      { texto: 'Schoenfeld et al. (2017), J Strength Cond Res: metaanálisis de pesos altos frente a bajos, en fuerza e hipertrofia.', url: 'https://pubmed.ncbi.nlm.nih.gov/28834797/' },
+      { texto: 'Refalo et al. (2023), Sports Medicine: metaanálisis de la cercanía al fallo y la hipertrofia.', url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC9935748/' },
+    ],
+  },
+  {
     tema: 'Frecuencia',
     dice: 'La app avisa si llevas más de una semana sin tocar un músculo, y sugiere repartirlo en dos días.',
     matiz: 'A igualdad de volumen semanal, la frecuencia no cambia gran cosa para la hipertrofia; el reparto en dos sesiones sí ayuda cuando el volumen es alto, '

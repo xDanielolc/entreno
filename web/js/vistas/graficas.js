@@ -4,11 +4,11 @@
 // serie, con los ciclos superpuestos para comparar unos con otros.
 //
 // Los colores de las series están validados para daltonismo en claro y en
-// oscuro; además cada ciclo lleva su etiqueta al final de la línea, así que
-// nunca hay que distinguirlos solo por el color.
+// oscuro. El nombre de cada ciclo va en la leyenda y en la tabla de números
+// (Dan prefirió quitar la etiqueta del final de cada línea).
 
 import {
-  esfuerzoTotal, formatearNumero, records, registrosDelCiclo, trabajoSerie,
+  esfuerzoTotal, formatearNumero, records, registrosDelCiclo, seriesDeEjercicio, trabajoSerie,
 } from '../calculos.js';
 import { rmDeSerie } from '../formula1rm.js';
 import { fechaCorta, h } from '../ui.js';
@@ -85,12 +85,11 @@ export function graficaLineas({ titulo, series, unidad, etiquetaX = 'Día del ci
   // Una línea por ciclo, con sus puntos y su etiqueta al final
   conDatos.map((s) => {
     const d = s.puntos.map((p, i) => `${i ? 'L' : 'M'}${px(p.x).toFixed(1)},${py(p.y).toFixed(1)}`).join(' ');
-    const ultimo = s.puntos.at(-1);
     return nodo('g', { class: 'serie-grafica', style: `--color:${s.color}` },
-      nodo('path', { d, class: 'linea' }),
-      s.puntos.map((p) => nodo('circle', { cx: px(p.x), cy: py(p.y), r: 4, class: 'punto' },
-        etiquetaEmergente(`${s.nombre} · día ${p.x}: ${formatearNumero(p.y)} ${unidad}`))),
-      texto(s.etiquetaCorta ?? s.nombre, { x: px(ultimo.x) + 6, y: py(ultimo.y) + 3, class: 'etiqueta-serie' }));
+      !s.discontinua && nodo('path', { d, class: 'linea' }),
+      !s.discontinua && s.puntos.map((p) => nodo('circle', { cx: px(p.x), cy: py(p.y), r: 4, class: 'punto' },
+        etiquetaEmergente(`${s.nombre} · ${etiquetaX.toLowerCase()} ${p.x}: ${formatearNumero(p.y)} ${unidad}`))),
+      s.discontinua && nodo('path', { d, class: 'linea discontinua' }));
   }));
 
   return h('figure', { class: 'figura' },
@@ -99,7 +98,7 @@ export function graficaLineas({ titulo, series, unidad, etiquetaX = 'Día del ci
     h('p', { class: 'nota centrado' }, etiquetaX),
     h('div', { class: 'leyenda' }, conDatos.map((s) => h('span', { class: 'leyenda-item' },
       h('span', { class: 'leyenda-color', style: `background:${s.color}` }), s.nombre))),
-    tablaDeDatos(conDatos, unidad, etiquetaX));
+    tablaDeDatos(conDatos.filter((s) => !s.discontinua), unidad, etiquetaX));
 }
 
 // Los mismos datos en forma de tabla: para leerlos exactos y para quien no
@@ -128,14 +127,63 @@ function colores() {
   return oscuro ? COLORES_OSCURO : COLORES_CLARO;
 }
 
+// Qué se ve en el progreso: los ciclos por separado o todo seguido.
+let vistaProgreso = 'historial';
+
+// Tendencia del 1RM: recta de mínimos cuadrados sobre el mejor 1RM de cada
+// día, en kilos por mes. Con menos de 4 días no se dice nada.
+function tendencia(puntos) {
+  if (puntos.length < 4) return null;
+  const n = puntos.length;
+  const mx = puntos.reduce((t, p) => t + p.dias, 0) / n;
+  const my = puntos.reduce((t, p) => t + p.y, 0) / n;
+  const sxx = puntos.reduce((t, p) => t + (p.dias - mx) ** 2, 0);
+  if (!sxx) return null;
+  const pendiente = puntos.reduce((t, p) => t + (p.dias - mx) * (p.y - my), 0) / sxx;
+  return { porMes: pendiente * 30, en: (dias) => my + pendiente * (dias - mx) };
+}
+
+function graficaHistorial(datos, ejercicio, paleta) {
+  const porDia = new Map();
+  for (const x of seriesDeEjercicio(datos, ejercicio.id)) {
+    if (x.serie.tramos?.length || x.serie.tipo === 'calentamiento') continue;
+    const v = rmDeSerie(datos, ejercicio, x.serie, esfuerzoTotal(x.serie));
+    if (v != null) porDia.set(x.sesion.fecha, Math.max(porDia.get(x.sesion.fecha) ?? 0, v));
+  }
+  const fechas = [...porDia.keys()].sort();
+  if (fechas.length < 2) return null;
+  const t0 = new Date(fechas[0]).getTime();
+  const puntos = fechas.map((f, i) => ({ x: i + 1, y: Math.round(porDia.get(f) * 10) / 10, dias: (new Date(f).getTime() - t0) / 86_400_000 }));
+  const t = tendencia(puntos);
+  const texto = !t ? 'Con 4 días o más verás si tu 1RM va a mejor.'
+    : Math.abs(t.porMes) < 0.5 ? 'Tu 1RM está estable.'
+      : t.porMes > 0 ? `Tu 1RM sube unos ${formatearNumero(Math.round(t.porMes * 10) / 10)} kg al mes.`
+        : `Tu 1RM baja unos ${formatearNumero(Math.round(-t.porMes * 10) / 10)} kg al mes: revisa descanso y recuperación.`;
+  return [
+    h('p', { class: `tendencia ${t && t.porMes >= 0.5 ? 'sube' : t && t.porMes <= -0.5 ? 'baja' : ''}` }, texto),
+    graficaLineas({
+      titulo: 'Tu mejor 1RM estimado de cada día',
+      unidad: 'kg',
+      etiquetaX: 'Entrenamiento',
+      series: [
+        { nombre: 'Mejor 1RM del día', color: paleta[0], puntos: puntos.map(({ x, y }) => ({ x, y })) },
+        t && { nombre: 'Tendencia', color: paleta[1], discontinua: true,
+          puntos: [puntos[0], puntos.at(-1)].map((p) => ({ x: p.x, y: Math.round(t.en(p.dias) * 10) / 10 })) },
+      ].filter(Boolean),
+    })];
+}
+
 export function seccionProgreso(datos, ejercicio) {
   const planes = (ejercicio.series || []).filter((p) => p.progresion?.tipo === 'bilbo');
   const paleta = colores();
   const r = records(datos, ejercicio.id);
   if (!r.mejorTrabajo && !r.mejor1RM) return null;
+  const conCiclos = planes.some((p) => (p.progresion.ciclos || []).some((c) => registrosDelCiclo(datos, ejercicio, p, c.n).length > 1));
+  const vista = conCiclos ? vistaProgreso : 'historial';
 
   const graficas = [];
-  for (const plan of planes) {
+  if (vista === 'historial' && ejercicio.carga?.tipo !== 'ninguna') graficas.push(...(graficaHistorial(datos, ejercicio, paleta) ?? []));
+  for (const plan of vista === 'ciclos' ? planes : []) {
     const ciclos = (plan.progresion.ciclos || [])
       .map((c) => ({ c, registros: registrosDelCiclo(datos, ejercicio, plan, c.n) }))
       .filter((x) => x.registros.length > 1)
@@ -172,6 +220,9 @@ export function seccionProgreso(datos, ejercicio) {
 
   return h('section', { class: 'progreso' },
     h('h2', {}, 'Progreso'),
+    conCiclos && h('div', { class: 'fila-marcas compacta' }, [['historial', 'Todo el historial'], ['ciclos', 'Por ciclos']].map(([k, texto]) =>
+      h('button', { type: 'button', class: `boton-marca${vista === k ? ' activo' : ''}`, 'aria-pressed': String(vista === k),
+        onclick: () => { vistaProgreso = k; dispatchEvent(new HashChangeEvent('hashchange')); } }, texto))),
     h('div', { class: 'tarjetas-record' },
       r.mejor1RM && h('div', { class: 'tarjeta record' },
         h('span', { class: 'suave' }, 'Récord de 1RM estimado'),
@@ -183,5 +234,5 @@ export function seccionProgreso(datos, ejercicio) {
         h('span', { class: 'suave' }, fechaCorta(r.mejorTrabajo.fecha)))),
     graficas.filter(Boolean),
     !graficas.filter(Boolean).length && h('p', { class: 'suave' },
-      'Cuando tengas dos días registrados en un ciclo aparecerán aquí las gráficas.'));
+      'Cuando tengas dos días registrados aparecerán aquí las gráficas.'));
 }

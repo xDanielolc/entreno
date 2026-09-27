@@ -60,11 +60,13 @@ export function reiniciarPistas() {
 
 // Una pista, o null si no toca enseñarla. En el nivel «solo dónde está
 // cada cosa» solo sale la de la recámara.
-export function pista(clave, texto) {
+// `siempre`: sale aunque hayas quitado el tutorial, hasta que la cierres
+// (para lo que conviene leer una vez sí o sí).
+export function pista(clave, texto, { siempre = false } = {}) {
   const t = config();
   const nivel = t.nivel ?? 'basico';
-  if (nivel === 'ninguno') return null;
-  if (nivel === 'avanzado' && clave !== 'sesion-datos') return null;
+  if (!siempre && nivel === 'ninguno') return null;
+  if (!siempre && nivel === 'avanzado' && clave !== 'sesion-datos') return null;
   if (t.vistos?.[clave]) return null;
   const caja = h('div', { class: 'pista', role: 'note' },
     h('span', { class: 'pista-icono', 'aria-hidden': 'true' }, '💡'),
