@@ -11,6 +11,24 @@ import { PLANTILLAS } from '../plantillas.js';
 import { cuentaParaFatiga } from '../catalogo.js';
 import { nombreMusculo } from '../musculos.js';
 import { recuperacionPorMusculo } from '../recuperacion.js';
+import { recomendacionesGenerales } from '../recomendaciones.js';
+
+// Lo que ya enseña el muñeco de Cuerpo (series por músculo) no se repite aquí.
+const YA_SE_VE = new Set(['volumen-bajo', 'volumen-bien']);
+
+function avisosDeHoy(d) {
+  const semana = (() => {
+    const f = new Date(); f.setHours(0, 0, 0, 0); f.setDate(f.getDate() + 3 - ((f.getDay() + 6) % 7));
+    const enero = new Date(f.getFullYear(), 0, 4);
+    return `${f.getFullYear()}-${1 + Math.round(((f - enero) / 86_400_000 - 3 + ((enero.getDay() + 6) % 7)) / 7)}`;
+  })();
+  return recomendacionesGenerales(d)
+    .filter((r) => r.nivel !== 'bien' && !YA_SE_VE.has(r.clave))
+    .map((r) => pista(`aviso-${r.clave}-${r.texto.split(/[:.]/)[0]}-${semana}`, r.texto,
+      { siempre: true, icono: r.nivel === 'aviso' ? '⚠' : '→', clase: 'pista-aviso' }))
+    .filter(Boolean)
+    .slice(0, 2);
+}
 
 let preguntandoTutorial = false;
 import { masRecienteAntes, resumenSesion } from './historial.js';
@@ -192,8 +210,8 @@ export function vistaInicio(contenedor) {
         : h('button', { class: 'boton grande', onclick: empezarSuelto }, 'Empezar entrenamiento'),
     // Debajo del recuadro, lo demás que se puede hacer hoy.
     !enCurso && dia && h('div', { class: 'acciones-hoy' },
-      otras.map((a) => h('button', { class: 'boton secundario', onclick: () => empezarConRutina(a.dia, a.rutina) },
-        `${a.rutina.nombre}: ${a.dia.nombre}`)),
+      otras.map((a) => h('button', { class: 'boton secundario boton-otra-rutina', onclick: () => empezarConRutina(a.dia, a.rutina) },
+        h('span', {}, a.dia.nombre), h('small', {}, a.rutina.nombre))),
       h('button', { class: 'boton secundario', onclick: empezarSuelto }, 'Entrenar sin rutina'),
       h('a', { class: 'boton secundario', href: '#/rutinas' }, 'Ver rutinas')),
 
@@ -209,6 +227,7 @@ export function vistaInicio(contenedor) {
       'Elegir o crear una rutina para que te diga qué toca cada día'),
 
     tarjetaSugerenciasAjuste(d),
+    avisosDeHoy(d),
     tarjetaRecuperacion(d, { compacta: true }),
 
     recientes.length > 0 && h('section', {},

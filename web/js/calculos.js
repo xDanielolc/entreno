@@ -530,6 +530,16 @@ export function tramosPorDefecto(perfil, tecnica) {
 //   · 'ajustes'   con los valores generales de Ajustes;
 //   · 'plantilla' con lo guardado en el propio ejercicio.
 // Si el ejercicio tiene pesos fijos (máquina de placas), mandan esos.
+// Lo que baja cada tramo, sin pasarse: con poco peso, 10 kg por bajada
+// llegarían a 0 kg. La última bajada no pasa del 30 % del peso de partida
+// (hasta ahí bajaba Ozaki 2018), así que el salto se recorta si hace falta.
+export function saltoAjustado(salto, inicio, tramos) {
+  if (!(salto > 0) || !(inicio > 0) || tramos < 2) return salto;
+  const tope = (inicio * 0.7) / (tramos - 1);
+  // Recortado, en múltiplos de 1,25 kg (el disco más pequeño habitual).
+  return salto <= tope ? salto : Math.max(1.25, Math.floor(tope / 1.25) * 1.25);
+}
+
 export function tramosPropuestos(serie, plan, ultima, perfil) {
   const config = tramosDe(serie.tecnicas);
   if (!config) return null;
@@ -553,7 +563,7 @@ export function tramosPropuestos(serie, plan, ultima, perfil) {
   const tramos = [];
   for (let i = 0; i < n; i++) {
     let carga = fijos?.[i] ?? (modo === 'ultima' ? ultima?.tramos?.[i]?.carga : null);
-    if (carga == null && serie.carga != null) carga = Math.max(0, redondear(serie.carga - salto * i, 2));
+    if (carga == null && serie.carga != null) carga = Math.max(0, redondear(serie.carga - saltoAjustado(salto, serie.carga, n) * i, 2));
     // En miorrepeticiones, el primer tramo es la serie de activación (sin objetivo).
     const objetivo = config.tecnica === 'miorepeticiones' && i === 0 ? null : reps;
     tramos.push({ carga: Number.isFinite(carga) ? carga : null, esfuerzo: null, objetivo: objetivo ?? null });

@@ -62,14 +62,14 @@ export function reiniciarPistas() {
 // cada cosa» solo sale la de la recámara.
 // `siempre`: sale aunque hayas quitado el tutorial, hasta que la cierres
 // (para lo que conviene leer una vez sí o sí).
-export function pista(clave, texto, { siempre = false } = {}) {
+export function pista(clave, texto, { siempre = false, icono = '💡', clase = '' } = {}) {
   const t = config();
   const nivel = t.nivel ?? 'basico';
   if (!siempre && nivel === 'ninguno') return null;
   if (!siempre && nivel === 'avanzado' && clave !== 'sesion-datos') return null;
   if (t.vistos?.[clave]) return null;
-  const caja = h('div', { class: 'pista', role: 'note' },
-    h('span', { class: 'pista-icono', 'aria-hidden': 'true' }, '💡'),
+  const caja = h('div', { class: `pista ${clase}`, role: 'note' },
+    h('span', { class: 'pista-icono', 'aria-hidden': 'true' }, icono),
     h('span', { class: 'pista-texto' }, texto),
     h('button', { class: 'pista-cerrar', 'aria-label': 'Entendido, no volver a enseñar',
       onclick: () => { marcarVista(clave); caja.remove(); } }, '✕'));

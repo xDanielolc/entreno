@@ -453,6 +453,14 @@ distancia); si hay peso, «¿Qué peso?» pregunta el tipo. El modelo de datos
 no cambia (`carga.tipo` + `medidas`). Para volver: `git revert` del commit de
 esta ronda, o volver a publicar desde `v0.32.0` subiendo la versión.
 
+## Ronda 0.33.2 (28-09-2026): fotos del móvil
+
+Bajadas del drop set con `saltoAjustado()` (la última no baja del 30 % del
+peso de partida, en múltiplos de 1,25 kg). Técnicas en su propia fila en la
+cabecera de la serie. Flecha de volver arriba solo al deslizar hacia arriba,
+dos segundos. Consejos: fuera de Cuerpo; `avisosDeHoy()` en inicio.js (dos
+como mucho, `pista` con clave por semana). Barra de recuperación fina.
+
 PENDIENTE: nombre e icono con Design («luego ya decoramos»); publicar la app
 en la consola de Google (es cosa suya); repasar las descripciones de las
 progresiones contrastándolas con las fuentes, que él pidió y solo está hecho

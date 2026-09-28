@@ -76,10 +76,11 @@ Ejercicios
 - [x] «Qué apuntas en cada serie además del peso» en una línea; la explicación
       corta bajo el título (0.30).
 - [x] Unificar «qué apuntas» (0.33.0, a prueba: si no convence, volver a v0.32.0).
-- [ ] Decidir qué hacer con «Consejos» en Cuerpo (propuesta: quitarlo y llevar
-      los avisos útiles a su sitio).
-- [ ] App independiente del navegador (instalada o en la tienda): explicado a
-      Dan el 28-09-2026, pendiente de que decida.
+- [x] «Consejos» fuera de Cuerpo: como mucho dos avisos en Hoy, que se
+      cierran con la ✕ (vuelven la semana siguiente si siguen pasando); el
+      estancamiento de un ejercicio sale en su Progreso (0.33.2).
+- [ ] Google Play: cuando a Dan le guste la estética y estén los pendientes.
+      De momento, instalada desde Ecosia.
 - [x] Botones de corte («llegas a tantas» / «te salen tantas»): reescribir como
       máximo o mínimo que corta.
 - [x] Progreso y «cómo suelo programarlo» por separado: poder elegir qué ver.

@@ -11,6 +11,7 @@ import {
   esfuerzoTotal, formatearNumero, records, registrosDelCiclo, seriesDeEjercicio, trabajoSerie,
 } from '../calculos.js';
 import { rmDeSerie } from '../formula1rm.js';
+import { recomendacionesGenerales } from '../recomendaciones.js';
 import { fechaCorta, h } from '../ui.js';
 
 const CICLOS_A_MOSTRAR = 4;
@@ -218,8 +219,10 @@ export function seccionProgreso(datos, ejercicio) {
     }));
   }
 
+  const avisos = recomendacionesGenerales(datos).filter((x) => x.enlace === `#/ejercicio/${ejercicio.id}` && x.clave !== 'ciclo-terminado');
   return h('section', { class: 'progreso' },
     h('h2', {}, 'Progreso'),
+    avisos.map((x) => h('p', { class: 'aviso-texto' }, x.texto)),
     conCiclos && h('div', { class: 'fila-marcas compacta' }, [['historial', 'Todo el historial'], ['ciclos', 'Por ciclos']].map(([k, texto]) =>
       h('button', { type: 'button', class: `boton-marca${vista === k ? ' activo' : ''}`, 'aria-pressed': String(vista === k),
         onclick: () => { vistaProgreso = k; dispatchEvent(new HashChangeEvent('hashchange')); } }, texto))),

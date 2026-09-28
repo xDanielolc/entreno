@@ -92,11 +92,24 @@ function renderizar() {
 }
 
 // Flecha para volver arriba: abajo a la derecha, a mano del pulgar y por
-// encima de las pestañas, solo cuando ya has bajado bastante.
+// encima de las pestañas. Solo sale al deslizar hacia arriba, cuando ya has
+// bajado bastante, y se va a los dos segundos: así no tapa botones mientras
+// apuntas.
 const flechaArriba = h('button', { type: 'button', class: 'volver-arriba', hidden: true, 'aria-label': 'Volver arriba',
-  onclick: () => window.scrollTo({ top: 0, behavior: 'smooth' }) }, '↑');
+  onclick: () => { window.scrollTo({ top: 0, behavior: 'smooth' }); flechaArriba.hidden = true; } }, '↑');
 document.body.append(flechaArriba);
-window.addEventListener('scroll', () => { flechaArriba.hidden = window.scrollY < 600; }, { passive: true });
+let ultimoScroll = 0;
+let temporizadorFlecha = null;
+window.addEventListener('scroll', () => {
+  const y = window.scrollY;
+  const subiendo = y < ultimoScroll - 4;
+  ultimoScroll = y;
+  if (y < 600) { flechaArriba.hidden = true; return; }
+  if (!subiendo) return;
+  flechaArriba.hidden = false;
+  clearTimeout(temporizadorFlecha);
+  temporizadorFlecha = setTimeout(() => { flechaArriba.hidden = true; }, 2000);
+}, { passive: true });
 
 // Si hay un entrenamiento a medias y estás en otra pantalla, una banda fija
 // arriba te lleva de vuelta: el entrenamiento no se pierde por cambiar de

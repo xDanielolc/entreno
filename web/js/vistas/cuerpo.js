@@ -9,7 +9,6 @@ import {
   FACTORES, claseDeRecuperacion, detalleDeRecuperacion, esAutomatico, factorAutomatico, factorPersonal, recuperacionPorMusculo,
   seriesEnDias, seriesSemanales, sugerenciasDeAjuste, textoDeRecuperacion, durezaSemanal,
 } from '../recuperacion.js';
-import { recomendacionesGenerales } from '../recomendaciones.js';
 import { abrirAlLlegar, anadir, aviso, h, hoyISO, modal, plegable, selector } from '../ui.js';
 import { conGlosario } from './glosario.js';
 import { pista } from './tutorial.js';
@@ -38,8 +37,8 @@ export function tarjetaRecuperacion(datos, { compacta = false } = {}) {
     h('h2', {}, 'Recuperación'),
     // La media, en una barra bajo el título: se lee de un vistazo.
     h('div', { class: `barra-media ${claseDeRecuperacion(media)}`, role: 'img', 'aria-label': `Recuperación media: ${media} %` },
-      h('span', { class: 'relleno', style: `width: ${media}%` }),
-      h('span', { class: 'texto' }, `${media} % de media`)),
+      h('span', { class: 'texto' }, `${media} % de media`),
+      h('span', { class: 'carril' }, h('span', { class: 'relleno', style: `width: ${media}%` }))),
 
     !compacta && h('div', { class: 'cuerpos' },
       siluetaCuerpo({ vista: 'delante', estadoPorMusculo: estados }),
@@ -163,8 +162,7 @@ export function vistaCuerpo(contenedor) {
     h('h1', {}, 'Tu cuerpo'),
     tarjetaMapa(d),
     tarjetaSeries(d),
-    tarjetaAjustePersonal(d),
-    tarjetaRecomendaciones(d));
+    tarjetaAjustePersonal(d));
 }
 
 function tarjetaMapa(d) {
@@ -316,15 +314,6 @@ function tarjetaAjustePersonal(d) {
             ...FACTORES.map((f) => [f.valor, `${f.texto} (×${coma(f.valor)})`])],
           esAutomatico(d, m) ? null : factorPersonal(d, m), (v) => aplicar(m, v), { titulo: nombreMusculo(m), lista: true }));
       }))));
-}
-
-function tarjetaRecomendaciones(d) {
-  const lista = recomendacionesGenerales(d);
-  if (!lista.length) return null;
-  const avisos = lista.filter((x) => x.nivel === 'aviso').length;
-  return plegable('cuerpo-consejos', avisos ? `Consejos (${lista.length}, ${avisos} importantes)` : `Consejos (${lista.length})`,
-    { class: 'tarjeta explicacion' },
-    listaRecomendaciones(lista));
 }
 
 // Qué conviene cambiar, según tus últimos entrenamientos.
