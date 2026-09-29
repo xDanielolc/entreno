@@ -254,67 +254,55 @@ estado.suscribir((motivo) => {
 });
 window.addEventListener('online', () => programar(500));
 
-// El pase de Google dura una hora. Renovarlo obliga a abrir la ventana de
-// Google, aunque no pida nada: en el móvil sale un parpadeo y el navegador
-// la bloquea si no viene de un toque. Así que la app NO la abre nunca sola.
-// Cuando al pase le quedan quince minutos, sale un cartel con un botón; el
-// toque en ese botón es lo que permite abrir la ventana sin que la bloqueen.
-let ultimoAvisoPase = 0;
-
-function tocaAvisar() {
-  if (!estado.usuario() || estado.esSinCuenta() || !navigator.onLine) return false;
+// El pase de Google dura una hora y, sin un servidor propio, no se puede
+// alargar sin abrir un instante la ventana de Google; el navegador solo lo
+// deja si viene de un toque. Así que no hay avisos: se renueva solo cuando
+// tocas algo que de todas formas conviene guardar (Empezar y Terminar
+// entrenamiento). Mientras tanto todo se guarda en el móvil.
+export function renovarAlTocar() {
+  if (!estado.usuario() || estado.esSinCuenta() || !navigator.onLine) return;
   const minutos = minutosDeToken();
-  if (minutos == null || minutos > 15) return false;
-  return Date.now() - ultimoAvisoPase >= 10 * 60_000;
+  if (minutos != null && minutos > 20) return;
+  pedirToken({ silencioso: true, forzar: true, pista: estado.usuario() })
+    .then(() => sincronizar())
+    .catch(() => { /* el indicador de arriba sigue sirviendo para reintentar */ });
 }
 
-async function renovarPase() {
-  try {
-    await pedirToken({ silencioso: true, forzar: true, pista: estado.usuario() });
-    await sincronizar();
-    const { aviso } = await import('./ui.js');
-    aviso('Permiso renovado: otra hora por delante.');
-  } catch {
-    const { aviso } = await import('./ui.js');
-    aviso('Google no ha dejado renovar el permiso. Se reintenta con el indicador de arriba.', { tipo: 'error' });
-  }
-}
-
-async function avisarDelPase() {
-  ultimoAvisoPase = Date.now();
-  const minutos = Math.max(0, Math.round(minutosDeToken() ?? 0));
-  const { aviso } = await import('./ui.js');
-  aviso(`El permiso de Google caduca en ${minutos} min. Mientras tanto se sigue guardando en el móvil.`,
-    { accion: { texto: 'Renovar', fn: renovarPase } });
-}
-
-// El aviso sale al volver a la app, no a mitad de una serie.
+// Al salir de la app se guarda en el móvil y, si hay pase, se sube.
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') {
     estado.guardarYa();
     if (estado.meta()?.pendiente && tokenVigente()) sincronizar();
-    return;
+  } else if (estado.meta()?.pendiente && tokenVigente()) {
+    sincronizar();
   }
-  if (tocaAvisar()) avisarDelPase();
 });
-window.addEventListener('focus', () => { if (tocaAvisar()) avisarDelPase(); });
 
 // Copias que la app ha guardado aparte en Drive (conflictos y migraciones),
 // de la más nueva a la más vieja.
 export async function copiasAparte() {
   const todo = await drive.listarTodo();
-  return todo.filter((f) => /^entrenamiento-(conflicto|v\d+-copia)-.*\.json$/.test(f.name))
+  return todo.filter((f) => /^entrenamiento-(conflicto|v\d+-copia)-.*\.json$/.test(f.name) && f.appProperties?.juntada !== 'si')
     .sort((a, b) => b.name.localeCompare(a.name));
 }
 
-// Junta una copia con los datos de ahora. `gana`: 'ahora' o 'copia', para lo
-// que esté en los dos y no coincida. Lo que solo esté en uno se conserva.
-export async function juntarCopia(id, gana = 'copia') {
+// Quita una copia de la lista sin juntarla (sigue en Drive).
+export async function apartarCopia(id) {
+  await drive.marcar(id, { juntada: 'si' });
+}
+
+// Junta una copia con los datos de ahora: todo lo que esté en una sola se
+// añade (entrenamientos, ejercicios, ajustes…). Si un mismo entrenamiento o
+// ajuste está en las dos y no coincide, se queda el de la copia, que es lo
+// que se quiere recuperar. Después la copia se marca como juntada y deja de
+// salir en la lista (sigue en Drive, por si acaso).
+export async function juntarCopia(id) {
   let copia = validar(await drive.descargar(id));
   if (necesitaMigrar(copia)) copia = migrar(copia);
   const ahora = estado.datos();
-  const { datos } = gana === 'copia' ? fusionar(null, copia, ahora) : fusionar(null, ahora, copia);
+  const { datos } = fusionar(null, copia, ahora);
   datos.revision = Math.max(ahora.revision, copia.revision ?? 0) + 1;
   estado.reemplazarDatos(datos, { pendiente: true });
+  await drive.marcar(id, { juntada: 'si' }).catch(() => {});
   programar(500);
 }

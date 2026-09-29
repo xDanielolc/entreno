@@ -12,6 +12,17 @@ import { nuevoId } from './ui.js';
 import { aplicarPreset, empezarCicloNuevo, prepararCiclo, renovarSiToca } from './ciclos.js';
 import { progresionPorDefecto, serieNuevaPlantilla } from './esquema.js';
 
+// Las series de un ejercicio que aún no tiene ninguna. Con «fuerza» en el
+// cuestionario: una serie Bilbo (técnica y volumen que acaba en pesado) y
+// detrás tres series de cinco con peso alto. Si no, una sola serie.
+export function planesPorDefecto(datos, ejercicio) {
+  const primera = planPorDefecto(datos, ejercicio);
+  if (primera.progresion?.tipo !== 'bilbo') return [primera];
+  const pesada = serieNuevaPlantilla(ejercicio, { tipo: 'libre', progresion: 'programa' });
+  pesada.progresion.series = 3;
+  return [primera, pesada];
+}
+
 // La regla de un ejercicio que aún no tiene ninguna: si en el cuestionario
 // dijiste que buscas fuerza, Bilbo; si no, el rango de hipertrofia (6-10).
 // Los que no llevan peso y repeticiones se quedan en «solo apuntar».
@@ -106,7 +117,7 @@ export function entradaDeEjercicio(datos, ej, { excluirSesion } = {}) {
   // en un entrenamiento, y se queda guardada en su ficha.
   if (!ej.series?.length) {
     const propio = datos.ejercicios?.find((x) => x.id === ej.id) ?? ej;
-    propio.series = [planPorDefecto(datos, propio)];
+    propio.series = planesPorDefecto(datos, propio);
     ej = propio;
   }
   const planes = ej.series?.length ? ej.series : [];

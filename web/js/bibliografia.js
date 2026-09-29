@@ -95,13 +95,26 @@ export const BIBLIOGRAFIA = [
     fuentes: [],
   },
   {
+    tema: 'Periodizar: de volumen a peso',
+    dice: 'Ir cambiando a lo largo del tiempo de más repeticiones y menos peso a menos repeticiones y más peso sube el 1RM algo más '
+      + 'que entrenar siempre igual. Es lo que hace un ciclo Bilbo, y lo que hace Bilbo seguido de un 3×5.',
+    matiz: 'Williams 2017 lo encontró para la fuerza máxima, sobre todo con programas que cambian a menudo. Moesgaard 2022, igualando '
+      + 'el volumen, vio que periodizar da algo más de fuerza pero el mismo crecimiento muscular. Las diferencias son pequeñas: lo '
+      + 'que más cuenta sigue siendo entrenar con constancia y progresar.',
+    fuentes: [
+      { texto: 'Williams et al. (2017), Sports Medicine: metaanálisis de entrenamiento periodizado frente a no periodizado, en fuerza máxima.', url: 'https://link.springer.com/article/10.1007/s40279-017-0734-y' },
+      { texto: 'Moesgaard et al. (2022), Sports Medicine: periodización con el mismo volumen, en fuerza e hipertrofia.', url: 'https://www.researchgate.net/publication/357932732_Effects_of_Periodization_on_Strength_and_Muscle_Hypertrophy_in_Volume-Equated_Resistance_Training_Programs_A_Systematic_Review_and_Meta-analysis' },
+    ],
+  },
+  {
     tema: 'Método Bilbo',
     dice: 'Una serie a la máxima velocidad con todas las repeticiones que puedas: empieza hacia el 50 % del 1RM, cada sesión sube 2,5 kg '
       + 'y el ciclo se acaba cuando ya no llegas a 15 repeticiones.',
     matiz: 'No hay ningún estudio sobre el método Bilbo en sí: es un método de entrenadores de press de banca. Lo que sí está estudiado: '
       + 'mover el peso lo más rápido posible da más fuerza que moverlo despacio (González-Badillo 2014); con pesos ligeros cerca del fallo '
       + 'el músculo crece como con pesos altos; pero la fuerza máxima (el 1RM) sube más con pesos altos (Schoenfeld 2017; Lopez 2021). '
-      + 'Por eso la app lo trata como un método para ganar músculo y resistencia que también sube la fuerza, no como el que más fuerza da.',
+      + 'Bilbo empieza con técnica y mucho volumen y acaba en pesos de fuerza: es una forma de periodizar, y periodizar sube algo más '
+      + 'el 1RM (Williams 2017). Seguido de unas series pesadas (3×5), cubre las dos cosas: por eso es lo que propone la app si buscas fuerza.',
     fuentes: [
       { texto: 'González-Badillo et al. (2014), European Journal of Sport Science: entrenar a la máxima velocidad frente a la mitad de velocidad.', url: 'https://doi.org/10.1080/17461391.2014.905987' },
       { texto: 'Lopez et al. (2021), Medicine & Science in Sports & Exercise: metaanálisis en red de cargas, fuerza e hipertrofia.', url: 'https://doi.org/10.1249/MSS.0000000000002585' },

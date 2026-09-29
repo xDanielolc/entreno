@@ -7,7 +7,7 @@
 
 import { CATALOGO, TIPOS_EJERCICIO, esMaquinaDePlacas, normalizar, tipoDeEjercicio } from '../catalogo.js';
 import * as estado from '../estado.js';
-import { planPorDefecto } from '../series.js';
+import { planesPorDefecto } from '../series.js';
 import { imagenDe } from '../imagenes.js';
 import { MUSCULOS, ORDEN_MUSCULOS, TREN_INFERIOR, TREN_SUPERIOR, nombreMusculo } from '../musculos.js';
 import { anadir, h, modal, nuevoId, selector } from '../ui.js';
@@ -170,7 +170,7 @@ export function ejercicioDesdeCatalogo(x) {
   };
   // La regla sale de tu objetivo del cuestionario: fuerza, Bilbo; si no, el
   // rango de hipertrofia. Las rutinas prehechas la cambian por la suya.
-  nuevo.series = [planPorDefecto(estado.datos() ?? { perfil: {} }, nuevo)];
+  nuevo.series = planesPorDefecto(estado.datos() ?? { perfil: {} }, nuevo);
   return nuevo;
 }
 

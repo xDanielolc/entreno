@@ -131,7 +131,7 @@ let modoMapa = 'recuperacion';
 
 const LEYENDAS = {
   recuperacion: [['listo', 'Listo'], ['medio', 'A medias'], ['cansado', 'Aún tocado']],
-  semana: [['cansado', 'Le falta mucho o te pasas mucho'], ['medio', 'Le falta algo o te pasas'], ['listo', 'En su sitio']],
+  semana: [['cansado', 'Poco'], ['medio', 'Algo'], ['listo', 'En su sitio'], ['pasado', 'Te pasas'], ['muy-pasado', 'Te pasas mucho']],
   menos: [['cansado', 'Casi nada'], ['medio', 'Por debajo'], ['listo', 'Bien']],
 };
 
@@ -144,16 +144,16 @@ export function objetivoSeries(d, m, dureza = durezaSemanal(d)) {
   return { n: x?.series > 0 && x.duras / x.series >= 0.5 ? 6 : SERIES_MINIMAS, manual: false };
 }
 
-// Colores de las series frente al objetivo: rojo si falta mucho, amarillo si
-// falta algo, verde en su sitio; al pasarse, amarillo y luego rojo, y rojo
-// también si te pasas y el músculo no se ha recuperado.
+// Colores de las series frente al objetivo: rojo si falta mucho, ámbar si
+// falta algo, verde en su sitio, azul si te pasas y morado si te pasas mucho
+// (o te pasas y el músculo aún no se ha recuperado).
 export function claseSeries(n, objetivo, recuperado = 100) {
   const maximo = Math.max(SERIES_MAXIMAS, objetivo * 2);
   if (n < objetivo * 0.5) return 'cansado';
   if (n < objetivo) return 'medio';
   if (n <= maximo) return 'listo';
-  if (n > maximo * 1.3 || recuperado < 60) return 'cansado';
-  return 'medio';
+  if (n > maximo * 1.3 || recuperado < 60) return 'muy-pasado';
+  return 'pasado';
 }
 
 export function vistaCuerpo(contenedor) {
@@ -233,7 +233,7 @@ function tarjetaSeries(d) {
   const dosMeses = seriesEnDias(d, 60);
   const filas = ORDEN_MUSCULOS.filter((m) => dosMeses[m] > 0).map((m) => ({ m, n: Math.round(semana[m] * 10) / 10, objetivo: objetivoSeries(d, m, dureza) }))
     .sort((a, b) => b.n - a.n);
-  const pasados = filas.filter((x) => claseSeries(x.n, x.objetivo.n, rec[x.m].porcentaje) === 'cansado' && x.n >= x.objetivo.n);
+  const pasados = filas.filter((x) => ['pasado', 'muy-pasado'].includes(claseSeries(x.n, x.objetivo.n, rec[x.m].porcentaje)));
 
   const cambiarObjetivo = (m) => {
     const actual = d.perfil.objetivoSeries?.[m] ?? null;
@@ -271,8 +271,8 @@ function tarjetaSeries(d) {
       h('ul', { class: 'nota' },
         h('li', {}, `Objetivo: ${SERIES_MINIMAS} series por semana, o 6 si la mitad o más van al fallo o con bajadas.`),
         h('li', {}, 'Puedes poner el tuyo tocando el número.'),
-        h('li', {}, 'Rojo: te falta mucho. Amarillo: te falta algo. Verde: en su sitio.'),
-        h('li', {}, `Pasado el máximo (${SERIES_MAXIMAS}, o el doble de tu objetivo) vuelve a amarillo, y a rojo si te pasas mucho o si el músculo no se ha recuperado.`),
+        h('li', {}, 'Rojo: te falta mucho. Ámbar: te falta algo. Verde: en su sitio. Azul: te pasas. Morado: te pasas mucho.'),
+        h('li', {}, `El máximo es ${SERIES_MAXIMAS} series, o el doble de tu objetivo. Si te pasas y el músculo no se ha recuperado, sale en morado.`),
         h('li', {}, 'Un músculo secundario cuenta media serie. Un drop set, según lo que elijas en Ajustes.'),
         h('li', {}, 'Estiramientos, movilidad y yoga no cuentan.')),
       h('a', { class: 'boton enlace', href: '#/aprender', onclick: () => abrirAlLlegar('ap-de-donde-sale-cada-cosa', 'ap-series-por-musculo-y-semana') },

@@ -78,18 +78,14 @@ export function recomendacionesDeSesion(datos, sesion) {
     // 3 y 4. Volumen de la semana (solo de lo que ha sido principal hoy).
     if (nHoy < 1 || sesionesSemana < 3) continue;
     const n = Math.round((semana[m] ?? 0) * 10) / 10;
-    const { minimo, duro } = minimoDe(dureza, m);
+    const { minimo } = minimoDe(dureza, m);
     if (n < minimo) {
-      lista.push(r('volumen-bajo', 'consejo', `${nombre}: ${series(n)} esta semana. `
-        + (duro
-          ? `Como las llevas al fallo o con bajadas, con unas ${MINIMO_DURO} a la semana basta.`
-          : `Lo recomendado son de ${MINIMO} a ${MAXIMO} series dejándote 2 o 3 repeticiones; te faltan unas ${Math.ceil(minimo - n)}.`)));
+      lista.push(r('volumen-bajo', 'consejo', `${nombre}: llevas ${formatearNumero(n)} de ${minimo} series esta semana; te faltan unas ${Math.ceil(minimo - n)}.`));
     } else if (n > MAXIMO) {
       lista.push(r('volumen-alto', 'aviso', `${nombre}: ${series(n)} en siete días. Por encima de ${MAXIMO} no se gana más `
         + 'músculo y la fatiga sube: recorta series o reparte la carga en más días.'));
     } else {
-      lista.push(r('volumen-bien', 'bien', `${nombre}: ${series(n)} esta semana`
-        + (duro ? ', y duras: suficiente.' : ', dentro del rango recomendado.')));
+      lista.push(r('volumen-bien', 'bien', `${nombre}: ${series(n)} esta semana, en su sitio.`));
     }
   }
 

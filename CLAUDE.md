@@ -461,6 +461,25 @@ cabecera de la serie. Flecha de volver arriba solo al deslizar hacia arriba,
 dos segundos. Consejos: fuera de Cuerpo; `avisosDeHoy()` en inicio.js (dos
 como mucho, `pista` con clave por semana). Barra de recuperación fina.
 
+## Ronda 0.34.0 (29-09-2026): notas de la 0.33
+
+- Google: sin avisos de «caduca en X min»; `renovarAlTocar()` renueva al
+  tocar Empezar o Terminar. Sin servidor propio no se puede más (el pase dura
+  una hora). Indicador tranquilo: «En el móvil · toca para subir».
+- Imágenes sin conexión: almacén `entreno-imagenes` que no se borra al
+  actualizar, primero la copia; `guardarImagenesParaSinConexion()` en app.js.
+- Copias aparte: un solo «Juntar» (manda la copia) y se marcan
+  `juntada: 'si'` en Drive (`drive.marcar`), o «Ya está: quitar».
+- Resumen al terminar: compara 1RM con 1RM (trabajo solo si no hay 1RM, sin
+  color); cambios agrupados por tipo con botones.
+- Mapa: tokens `--mapa-*`; en «Qué entrenar», azul (te pasas) y morado (te
+  pasas mucho). Tablas en cebra.
+- Prehechos por grupos (Hipertrofia, Fuerza, Aguante). `planesPorDefecto()`:
+  con «fuerza», Bilbo + 3×5 (`progresion.series` en el 5×5).
+- Gemelo y sóleo por separado (capas propias en dibujar_capas_extra.py).
+- Catálogo de la lista general por grupos plegados. Hasta 20 series en el
+  paso a paso; «Ajustes finos» como último paso. Tu peso desde Hoy.
+
 PENDIENTE: nombre e icono con Design («luego ya decoramos»); publicar la app
 en la consola de Google (es cosa suya); repasar las descripciones de las
 progresiones contrastándolas con las fuentes, que él pidió y solo está hecho

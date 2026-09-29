@@ -89,9 +89,10 @@ export function mostrarResumen(datos, sesionId) {
       h('strong', {}, `${formatearNumero(r.valor)} kg`),
       h('small', {}, `${r.que} · antes ${formatearNumero(r.antes)}`)))),
     comparacion.length > 0 && h('table', { class: 'tabla-musculos' },
-      h('thead', {}, h('tr', {}, h('th', {}, 'Frente a la última vez'), h('th', { class: 'num' }, ''))),
+      h('thead', {}, h('tr', {}, h('th', {}, 'Ejercicio'), h('th', { class: 'num' }, 'Hoy'), h('th', { class: 'num' }, 'Frente a la última vez'))),
       h('tbody', {}, comparacion.map((c) => h('tr', {},
         h('td', {}, c.nombre),
+        h('td', { class: 'num' }, c.que === '1RM' ? `1RM ${c.valor}` : `${c.que} ${c.valor}`),
         h('td', { class: `num cambio-${c.clase}` }, c.texto))))),
     consejos.length > 0 && h('details', { class: 'explicacion' },
       h('summary', {}, `Consejos (${consejos.length})`),
@@ -134,17 +135,25 @@ function comparacionPorEjercicio(datos, sesion) {
   for (const entrada of sesion.ejercicios) {
     const ej = datos.ejercicios.find((e) => e.id === entrada.ejercicioId);
     if (!ej) continue;
-    const hoy = entrada.series.filter((s) => s.hecha).map((s) => medida(datos, ej, s)).filter(Boolean);
-    if (!hoy.length) continue;
-    const mejorHoy = Math.max(...hoy.map((m) => m.valor));
+    // Se compara lo mismo con lo mismo: el 1RM si lo hay; si no (solo drop
+    // sets, o sin peso), el trabajo o lo que midas, sin colores.
+    const medidas = (series) => series.map((s) => medida(datos, ej, s)).filter(Boolean);
+    const hoyTodas = medidas(entrada.series.filter((s) => s.hecha));
+    if (!hoyTodas.length) continue;
+    const nombre = hoyTodas.some((m) => m.nombre === '1RM') ? '1RM' : hoyTodas[0].nombre;
+    const hoy = hoyTodas.filter((m) => m.nombre === nombre);
     const antes = seriesDeEjercicio(datos, ej.id, { excluirSesion: sesion.id })
       .filter((x) => x.sesion.fecha <= sesion.fecha);
     const ultimaFecha = antes.at(-1)?.sesion.id;
-    const deEseDia = antes.filter((x) => x.sesion.id === ultimaFecha).map((x) => medida(datos, ej, x.serie)).filter(Boolean);
-    if (!deEseDia.length) { filas.push({ nombre: ej.nombre, texto: 'primera vez', clase: '' }); continue; }
+    const deEseDia = medidas(antes.filter((x) => x.sesion.id === ultimaFecha).map((x) => x.serie)).filter((m) => m.nombre === nombre);
+    const mejorHoy = Math.max(...hoy.map((m) => m.valor));
+    const valor = `${formatearNumero(redondear(mejorHoy, 1))}${nombre === '1RM' ? ' kg' : ''}`;
+    if (!deEseDia.length) { filas.push({ nombre: ej.nombre, que: nombre, valor, texto: 'primera vez', clase: '' }); continue; }
     const mejorAntes = Math.max(...deEseDia.map((m) => m.valor));
     const pct = Math.round(((mejorHoy - mejorAntes) / mejorAntes) * 100);
-    filas.push({ nombre: ej.nombre, texto: pct > 0 ? `▲ ${pct} %` : pct < 0 ? `▼ ${-pct} %` : '= igual', clase: pct > 0 ? 'sube' : pct < 0 ? 'baja' : '' });
+    const color = nombre === '1RM';
+    filas.push({ nombre: ej.nombre, que: nombre, valor, texto: pct > 0 ? `▲ ${pct} %` : pct < 0 ? `▼ ${-pct} %` : '=',
+      clase: !color ? '' : pct > 0 ? 'sube' : pct < 0 ? 'baja' : '' });
   }
   return filas;
 }
@@ -205,13 +214,14 @@ function cambiosRespectoARutina(datos, sesion) {
     const texto = `En ${ej.nombre} has hecho ${n} ${n > 1 ? 'series' : 'serie'} menos de lo planeado. ¿${n > 1 ? 'Las' : 'La'} quito de los próximos entrenos?`;
     if (n && n < previstos.length) {
       if (item) {
-        cambios.push({ tipo: 'quitar-series', rutinaId: rutina.id, diaId: dia.id, ejercicioId: ej.id,
+        cambios.push({ tipo: 'quitar-series', rutinaId: rutina.id, diaId: dia.id, ejercicioId: ej.id, n,
           quedan: previstos.filter((p) => hechas.has(p.id)).map((p) => p.id), texto });
       } else {
-        cambios.push({ tipo: 'quitar-planes', ejercicioId: ej.id, ids: quitados.map((p) => p.id), texto });
+        cambios.push({ tipo: 'quitar-planes', ejercicioId: ej.id, n, ids: quitados.map((p) => p.id), texto });
       }
     }
   }
+  for (const c of cambios) c.nombre = nombreEj(c.ejercicioId);
   return cambios;
 }
 
@@ -221,16 +231,30 @@ function e_primeraVez(datos, ej, sesion) {
     && s.ejercicios.some((e) => e.ejercicioId === ej.id && e.series.some((x) => x.hecha)));
 }
 
+// Los cambios, agrupados: una frase por tipo y, debajo, los ejercicios como
+// botones que se quedan marcados. Sin repetir la misma frase en cada uno.
 function seccionCambios(cambios) {
+  const grupos = [
+    ['anadir-al-dia', 'Hechos hoy sin estar en el día de la rutina. ¿Los añado?', (c) => c.nombre],
+    ['quitar-del-dia', 'No los has hecho hoy. ¿Los quito del día de la rutina?', (c) => c.nombre],
+    ['anadir-series', 'Series de más. ¿Las dejo para los próximos entrenos?', (c) => `${c.nombre} (+${c.series.length})`],
+    ['quitar-', 'Series de menos. ¿Las quito de los próximos entrenos?', (c) => `${c.nombre} (−${c.n})`],
+  ];
   return h('section', {},
     h('h3', {}, 'Cambios respecto a lo planeado'),
-    h('p', { class: 'nota' }, 'Toca lo que quieras que se quede para los próximos entrenos.'),
-    h('div', { class: 'fila-marcas' }, cambios.map((c) => h('button', { type: 'button', class: 'boton-marca', 'aria-pressed': 'false',
-      onclick: (e) => {
-        c.marcado = !c.marcado;
-        e.currentTarget.classList.toggle('activo', c.marcado);
-        e.currentTarget.setAttribute('aria-pressed', String(c.marcado));
-      } }, c.texto))));
+    h('p', { class: 'nota' }, 'Toca lo que quieras que se quede. Lo que no toques, solo ha sido hoy.'),
+    grupos.map(([tipo, frase, etiqueta]) => {
+      const lista = cambios.filter((c) => (tipo.endsWith('-') ? c.tipo.startsWith(tipo) && c.tipo !== 'quitar-del-dia' : c.tipo === tipo));
+      if (!lista.length) return null;
+      return h('div', { class: 'grupo-cambios' },
+        h('p', {}, frase),
+        h('div', { class: 'fila-marcas compacta' }, lista.map((c) => h('button', { type: 'button', class: 'boton-marca', 'aria-pressed': 'false',
+          onclick: (e) => {
+            c.marcado = !c.marcado;
+            e.currentTarget.classList.toggle('activo', c.marcado);
+            e.currentTarget.setAttribute('aria-pressed', String(c.marcado));
+          } }, etiqueta(c)))));
+    }));
 }
 
 function aplicarCambios(cambios) {

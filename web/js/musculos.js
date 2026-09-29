@@ -2,8 +2,8 @@
 //
 // El cuerpo y la mayoría de capas vienen de wger (licencia Creative Commons
 // BY-SA, atribución en Ajustes). Las capas que wger no trae (antebrazo, hombro
-// posterior, lumbares, aductores, abductores, cuello y tibial) son dibujos
-// propios, hechos con herramientas/dibujar_capas_extra.py.
+// posterior, lumbares, aductores, abductores, cuello, tibial, gemelo y sóleo)
+// son dibujos propios, hechos con herramientas/dibujar_capas_extra.py.
 //
 // Cada capa se pinta del color que toque usando una máscara, así que sigue
 // los temas de la app. `vistas` dice en qué cara del cuerpo se ve cada una;
@@ -27,7 +27,10 @@ export const MUSCULOS = {
   cuadriceps:      { nombre: 'Cuádriceps',       grupo: 'pierna', tamano: 'grande',  vistas: ['delante'] },
   aductores:       { nombre: 'Aductores',        grupo: 'pierna', tamano: 'medio',   vistas: ['delante'], propia: true },
   isquios:         { nombre: 'Isquios',          grupo: 'pierna', tamano: 'grande',  vistas: ['detras'] },
-  gemelo:          { nombre: 'Gemelos',          grupo: 'pierna', tamano: 'pequeno', vistas: ['detras'] },
+  // El gemelo se entrena con la rodilla estirada (de pie); el sóleo, con la
+  // rodilla doblada (sentado). Por eso van por separado.
+  gemelo:          { nombre: 'Gemelos',          grupo: 'pierna', tamano: 'pequeno', vistas: ['detras'], propia: true },
+  soleo:           { nombre: 'Sóleo',            grupo: 'pierna', tamano: 'pequeno', vistas: ['detras'], propia: true },
   tibial:          { nombre: 'Tibial',           grupo: 'pierna', tamano: 'pequeno', vistas: ['delante'], propia: true },
 };
 
@@ -35,7 +38,7 @@ export const ORDEN_MUSCULOS = Object.keys(MUSCULOS);
 
 // Músculos del tren superior e inferior, para los filtros del catálogo.
 export const TREN_SUPERIOR = ['cuello', 'trapecio', 'hombro', 'hombroPosterior', 'pecho', 'biceps', 'triceps', 'antebrazo', 'dorsal'];
-export const TREN_INFERIOR = ['gluteo', 'abductores', 'cuadriceps', 'aductores', 'isquios', 'gemelo', 'tibial'];
+export const TREN_INFERIOR = ['gluteo', 'abductores', 'cuadriceps', 'aductores', 'isquios', 'gemelo', 'soleo', 'tibial'];
 
 export function nombreMusculo(clave, { corto = false } = {}) {
   const info = MUSCULOS[clave];
@@ -43,7 +46,7 @@ export function nombreMusculo(clave, { corto = false } = {}) {
   return corto ? info.corto ?? info.nombre : info.nombre;
 }
 
-function archivoCapa(clave, vista) {
+export function archivoCapa(clave, vista) {
   return MUSCULOS[clave].propia ? `imagenes/musculos/${clave}-${vista}.svg` : `imagenes/musculos/${clave}.svg`;
 }
 

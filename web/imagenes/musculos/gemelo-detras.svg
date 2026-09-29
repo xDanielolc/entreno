@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="369" viewBox="0 0 200 369">
+  <!-- gemelo (detras): capa propia de la app -->
+  <g fill="#000" stroke="#000" stroke-width="1.5" stroke-linejoin="round">
+    <path d="M 97.1 292.8 L 95.2 310.2 L 92.5 317 L 84 318 L 74.1 312.2 L 71.6 296.1 L 72.8 283 L 82.2 264.4 L 88.8 262.8 L 93.4 266.8 Z"/>
+    <path d="M 102.9 292.8 L 104.8 310.2 L 107.5 317 L 116 318 L 125.9 312.2 L 128.4 296.1 L 127.2 283 L 117.8 264.4 L 111.2 262.8 L 106.6 266.8 Z"/>
+  </g>
+</svg>

@@ -126,8 +126,8 @@ export const CATALOGO = [
   ej('Curl femoral tumbado', 'pierna', 'máquina', ['isquios'], []),
   ej('Curl femoral sentado', 'pierna', 'máquina', ['isquios'], []),
   ej('Curl nórdico', 'pierna', 'peso corporal', ['isquios'], [], corporal),
-  ej('Elevación de gemelos', 'pierna', 'máquina', ['gemelo'], []),
-  ej('Elevación de gemelos sentado', 'pierna', 'máquina', ['gemelo'], []),
+  ej('Elevación de gemelos', 'pierna', 'máquina', ['gemelo'], ['soleo']),
+  ej('Elevación de gemelos sentado', 'pierna', 'máquina', ['soleo'], ['gemelo']),
   ej('Elevación de tibiales', 'pierna', 'pared', ['tibial'], [], corporal),
   ej('Tibial con disco', 'pierna', 'disco', ['tibial'], []),
   ej('Abductores en máquina', 'pierna', 'máquina', ['abductores'], ['gluteo']),
@@ -206,9 +206,9 @@ export const CATALOGO = [
   ej('Pull through en polea', 'pierna', 'polea', ['gluteo'], ['isquios', 'lumbar']),
 
   // --- Gemelo -------------------------------------------------------------
-  ej('Elevación de gemelos en multipower', 'pierna', 'multipower', ['gemelo'], []),
-  ej('Elevación de gemelos en prensa', 'pierna', 'máquina', ['gemelo'], []),
-  ej('Elevación de gemelos tipo burro', 'pierna', 'máquina', ['gemelo'], []),
+  ej('Elevación de gemelos en multipower', 'pierna', 'multipower', ['gemelo'], ['soleo']),
+  ej('Elevación de gemelos en prensa', 'pierna', 'máquina', ['gemelo'], ['soleo']),
+  ej('Elevación de gemelos tipo burro', 'pierna', 'máquina', ['gemelo'], ['soleo']),
 
   // --- Abdomen y oblicuos -------------------------------------------------
   ej('Crunch en suelo', 'core', 'suelo', ['abdomen'], [], corporal),

@@ -6,6 +6,7 @@ import { guiaTrasPrueba, pintarGuia, pista } from './tutorial.js';
 import { queEs } from './glosario.js';
 import { abrirCronometro, abrirIntervalos } from './intervalos.js';
 import { modal, selector } from '../ui.js';
+import { renovarAlTocar } from '../sincronizacion.js';
 import * as estado from '../estado.js';
 import {
   TIPOS_CARGA, TIPOS_ESFUERZO, TIPOS_SERIE, camposDe, recamaraDe, tipoDeFallo, tramosDe,
@@ -922,6 +923,7 @@ export function vistaSesion(contenedor, { id }) {
   // mejoras, volumen de la semana y, si has cambiado algo respecto a la
   // rutina, si lo quieres solo para hoy o para siempre.
   function terminar() {
+    renovarAlTocar();
     cambiarSesion((s) => {
       s.estado = 'terminada';
       // Un entrenamiento de otro día (pasado a mano) acaba ese día, no hoy.

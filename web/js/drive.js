@@ -149,9 +149,17 @@ export async function buscarPorNombre(nombre) {
 
 // Todo lo que la app ha creado en Drive: archivos y su carpeta.
 export async function listarTodo() {
-  const campos = encodeURIComponent('files(id,name,mimeType,parents)');
+  const campos = encodeURIComponent('files(id,name,mimeType,parents,appProperties)');
   const r = await peticion(`${API}/files?q=${encodeURIComponent('trashed = false')}&fields=${campos}&pageSize=200&spaces=drive`);
   return (await r.json()).files;
+}
+
+// Cambia solo las etiquetas de un archivo, sin tocar su contenido.
+export async function marcar(id, propiedades) {
+  const r = await peticion(`${API}/files/${id}?fields=id,appProperties`, {
+    method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ appProperties: propiedades }),
+  });
+  return r.json();
 }
 
 // Borrado definitivo (no va a la papelera de Drive).

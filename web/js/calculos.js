@@ -343,15 +343,17 @@ export function seriesDelPrograma(ejercicio, prog, n, historial = []) {
     const carga = p(maximos[bloque] * (0.75 + 0.05 * paso));
     return { nombre: `bloque de ${reps}, sesión ${paso + 1} de 6`, series: [{ carga, reps }, { carga, reps }] };
   }
-  // 5×5: sube cuando completas las cinco; tres fallos seguidos, baja un 10 %.
+  // 5×5: sube cuando completas todas; tres fallos seguidos, baja un 10 %.
+  // Las series pueden ser menos de cinco (3×5 detrás de una Bilbo, por ejemplo).
+  const cuantas = Math.max(1, Math.round(prog.series ?? 5));
   let carga = prog.inicial ?? 0;
   let fallos = 0;
   for (const series of historial) {
-    const completa = series.length >= 5 && series.every((s) => (esfuerzoTotal(s) ?? 0) >= 5);
+    const completa = series.length >= cuantas && series.every((s) => (esfuerzoTotal(s) ?? 0) >= 5);
     if (completa) { carga = redondear(carga + inc); fallos = 0; }
     else if (++fallos >= 3) { carga = p(carga * 0.9); fallos = 0; }
   }
-  return { nombre: `sesión ${n + 1}`, series: Array.from({ length: 5 }, () => ({ carga: p(carga), reps: 5 })) };
+  return { nombre: `sesión ${n + 1}`, series: Array.from({ length: cuantas }, () => ({ carga: p(carga), reps: 5 })) };
 }
 
 // Peso de partida de un programa, calculado con la fórmula del ejercicio a

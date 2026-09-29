@@ -15,11 +15,11 @@ import { MODOS_INICIO, MODOS_REINICIO, PRESETS_CICLO, inicioDe, alargarCiclo, ap
 import { ayuda, hoyISO } from '../ui.js';
 import { CATALOGO, esMaquinaDePlacas, normalizar, tipoDeEjercicio } from '../catalogo.js';
 import { ORDEN_MUSCULOS, nombreMusculo } from '../musculos.js';
-import { entradaDeEjercicio, planPorDefecto } from '../series.js';
+import { entradaDeEjercicio, planesPorDefecto } from '../series.js';
 import { nombreSede, sedesActivas, separarPorSede } from '../sedes.js';
 import { seccionProgreso } from './graficas.js';
 import { imagenDe } from '../imagenes.js';
-import { anadir, aviso, confirmar, h, leerNumero, modal, nuevoId, selector } from '../ui.js';
+import { anadir, aviso, confirmar, h, leerNumero, modal, nuevoId, plegable, selector } from '../ui.js';
 import { pista } from './tutorial.js';
 import { barraFiltros, cajaLista, ejercicioDesdeCatalogo, elegirEjercicio, filtrar, hayFiltro, pieCatalogo, tarjetaItem } from './selector-ejercicios.js';
 import { selectorTecnicas } from './tecnicas.js';
@@ -81,12 +81,26 @@ export function vistaEjercicios(contenedor) {
       [...grupos].map(([grupo, ejercicios]) => h('section', {},
         h('h2', {}, grupo.charAt(0).toUpperCase() + grupo.slice(1)),
         anadir(cajaLista(), ejercicios.map((e) => tarjetaEjercicio(d, e))))),
+      // Los de la lista general, también por grupos y plegados: así no sale
+      // un montón sin orden debajo de los tuyos.
       deLista.length > 0 && h('section', {},
         h('h2', {}, 'De la lista general'),
         h('p', { class: 'nota' }, 'Aún no son tuyos. Toca uno y se añade con sus músculos puestos.'),
-        anadir(cajaLista(), deLista.map((x) => tarjetaCatalogo(x)))));
+        [...agruparPorGrupo(deLista)].map(([grupo, xs]) => plegable(`catalogo-${grupo}`,
+          `${grupo.charAt(0).toUpperCase() + grupo.slice(1)} (${xs.length})`, { class: 'explicacion grupo-catalogo' },
+          anadir(cajaLista(), xs.map((x) => tarjetaCatalogo(x)))))));
   }
   pintarLista();
+}
+
+function agruparPorGrupo(lista) {
+  const grupos = new Map();
+  for (const x of [...lista].sort((a, b) => (a.grupo || '~').localeCompare(b.grupo || '~') || a.nombre.localeCompare(b.nombre))) {
+    const g = (x.grupo || 'otros').trim().toLowerCase();
+    if (!grupos.has(g)) grupos.set(g, []);
+    grupos.get(g).push(x);
+  }
+  return grupos;
 }
 
 // Un ejercicio de la lista general, para añadirlo desde el buscador.
@@ -149,7 +163,7 @@ function ejercicioVacio() {
   // Un ejercicio nuevo arranca con la regla que recomendamos: la doble
   // progresion. Sube repeticiones y, al llegar arriba, sube el peso; no
   // necesita ni 1RM ni ciclo montado. Se cambia en un toque.
-  base.series = [planPorDefecto(estado.datos(), base)];
+  base.series = planesPorDefecto(estado.datos(), base);
   return base;
 }
 
@@ -409,7 +423,8 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
     if (vista() !== 'paso') return form(...hijos);
 
     // Paso a paso: una pregunta cada vez, sin nada más a la vista.
-    const [catalogo, nombre, grupo, apuntas, tipoPeso, musculos, estiramiento, , , nota, botones] = hijos;
+    const [catalogo, nombre, grupo, apuntas, tipoPeso, musculos, estiramiento, , finos, nota, botones] = hijos;
+    if (finos) finos.open = true;
     if (musculos) musculos.open = true;
     const maquina = tipoPeso?.querySelector?.('.pesos-maquina');
     maquina?.remove();
@@ -426,6 +441,7 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
       ...(iguales || n === 1
         ? [[n > 1 ? `¿Cómo progresan las ${n} series?` : '¿Cómo quieres progresar?', [tarjetaPlan(borrador.series[0], 0)]]]
         : borrador.series.map((plan, k) => [`Serie ${k + 1} de ${n}: ¿cómo progresa?`, [tarjetaPlan(plan, k)]])),
+      finos && ['Ajustes finos (opcional)', [finos]],
     ].filter(Boolean);
     const i = Math.min(pasoFicha.get(clave) ?? 0, pasos.length - 1);
     const ir = (n) => {
@@ -620,8 +636,21 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
       repintar();
     };
     return h('div', {},
-      h('div', { class: 'fila-marcas compacta cuantas-series' }, [1, 2, 3, 4, 5, 6].map((k) => h('button', { type: 'button',
-        class: `boton-marca${k === n ? ' activo' : ''}`, 'aria-pressed': String(k === n), onclick: () => fijar(k) }, String(k)))),
+      h('div', { class: 'fila-marcas compacta cuantas-series' },
+        [1, 2, 3, 4, 5, 6].map((k) => h('button', { type: 'button',
+          class: `boton-marca${k === n ? ' activo' : ''}`, 'aria-pressed': String(k === n), onclick: () => fijar(k) }, String(k))),
+        h('button', { type: 'button', class: `boton-marca${n > 6 ? ' activo' : ''}`, 'aria-label': 'Otro número de series', onclick: () => {
+          const caja = h('input', { type: 'text', inputmode: 'numeric', value: n > 6 ? String(n) : '', 'aria-label': 'Número de series' });
+          const cerrar = modal('¿Cuántas series?', h('div', { class: 'formulario' },
+            h('label', { class: 'campo' }, h('span', { class: 'etiqueta-campo' }, 'Series (hasta 20)'), caja),
+            h('button', { class: 'boton', onclick: () => {
+              const m = Math.round(leerNumero(caja.value) ?? 0);
+              if (!(m >= 1 && m <= 20)) { aviso('Entre 1 y 20', { tipo: 'error' }); return; }
+              cerrar();
+              fijar(m);
+            } }, 'Hecho')));
+          setTimeout(() => caja.focus(), 50);
+        } }, n > 6 ? String(n) : '+')),
       n > 1 && h('p', {}, '¿Todas iguales o cada una a su manera?'),
       n > 1 && h('div', { class: 'fila-marcas compacta' }, [[true, 'Todas iguales'], [false, 'Distintas']].map(([v, texto]) =>
         h('button', { type: 'button', class: `boton-marca${sonIguales() === v ? ' activo' : ''}`, 'aria-pressed': String(sonIguales() === v),
@@ -736,23 +765,23 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
     lista.mia = { etiqueta: 'Personalizar', tipo: 'bilbo', preset: 'personalizado',
       explica: 'En blanco: pones tú qué mejora, cuándo se acaba el ciclo y por dónde empieza el siguiente.' };
     if (conCarga && reps) {
-      lista.doble = { etiqueta: 'Rango de hipertrofia (músculo) · recomendado', tipo: 'carga', rango: [6, 10],
+      lista.doble = { etiqueta: 'De 6 a 10 · recomendado', grupo: 'Hipertrofia', tipo: 'carga', rango: [6, 10],
         explica: 'Entre 6 y 10 repeticiones con el mismo peso. Cuando llegas a 10 en todas las series, la app sube el peso y vuelves a 6. '
           + 'El músculo crece con series cerca del fallo, sin necesidad de llegar a él (metaanálisis de Refalo 2023).' };
-      lista.bilbo = { etiqueta: 'Bilbo / incremento de peso lineal (fuerza)', tipo: 'bilbo', preset: 'bilbo',
-        explica: 'Cada sesión 2,5 kg más y haces todas las repeticiones que puedas. Cuando ya solo te salen 15, el ciclo se acaba '
-          + 'y el siguiente empieza al 50 % del mejor 1RM que hiciste en él. La fuerza sube más con pesos altos y practicando el '
-          + 'mismo movimiento (metaanálisis de Schoenfeld 2017).' };
+      lista.bilbo = { etiqueta: 'Bilbo / incremento lineal', grupo: 'Fuerza', tipo: 'bilbo', preset: 'bilbo',
+        explica: 'Empieza ligero, con muchas repeticiones rápidas (técnica y músculo), y cada sesión sube 2,5 kg hasta pesos de fuerza. '
+          + 'Cuando ya no llegas a 15, el ciclo se acaba y el siguiente empieza al 50 % del mejor 1RM que hiciste en él. '
+          + 'Ir de más volumen a más peso es periodizar, y periodizar sube más el 1RM (metaanálisis de Williams 2017).' };
       if (!cardio) {
-        lista.cincoPorCinco = { etiqueta: '5×5', tipo: 'programa', programa: '5x5',
+        lista.cincoPorCinco = { etiqueta: '5×5', grupo: 'Fuerza', tipo: 'programa', programa: '5x5',
           explica: 'Cinco series de cinco con el mismo peso. Si las completas, sube; si fallas tres sesiones seguidas, baja un 10 %.' };
-        lista.cincoTresUno = { etiqueta: '5/3/1', tipo: 'programa', programa: '531',
+        lista.cincoTresUno = { etiqueta: '5/3/1', grupo: 'Fuerza', tipo: 'programa', programa: '531',
           explica: 'Cuatro «semanas»: de 5, de 3, de 5/3/1 y descarga, con porcentajes del 90 % de tu 1RM, que sube cada vuelta.' };
-        lista.hst = { etiqueta: 'HST', tipo: 'programa', programa: 'hst',
+        lista.hst = { etiqueta: 'HST', grupo: 'Hipertrofia', tipo: 'programa', programa: 'hst',
           explica: 'Tres bloques de seis sesiones, a 15, a 10 y a 5 repeticiones, con el peso subiendo dentro de cada bloque.' };
       }
     }
-    if (borrador.esfuerzo.tipo === 'tiempo') lista.tiempo = { etiqueta: 'Más tiempo', tipo: 'bilbo', preset: 'tiempo',
+    if (borrador.esfuerzo.tipo === 'tiempo') lista.tiempo = { etiqueta: 'Más tiempo', grupo: 'Aguante', tipo: 'bilbo', preset: 'tiempo',
       explica: 'Diez segundos más cada sesión hasta llegar a dos minutos. Para planchas, isométricos y estiramientos.' };
     return lista;
   }
@@ -862,10 +891,13 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         h('div', { class: 'titulo-con-ayuda' }, h('span', { class: 'etiqueta-campo' }, 'Prehechos'),
           ayuda('Los prehechos', 'Cada uno deja puestos los números de los bloques de abajo; luego cambias lo que quieras.', {
             lista: Object.values(prehechos).filter((x) => x.explica).map((x) => [x.etiqueta, x.explica]) })),
-        h('div', { class: 'chips prehechos' }, Object.entries(prehechos).map(([k, x]) => h('button', {
-          type: 'button', class: `chip seleccionable ${puesto === k ? 'activo' : ''}`, 'aria-pressed': String(puesto === k),
-          onclick: () => aplicarPrehecho(plan, k),
-        }, x.etiqueta))),
+        // Por grupos: hipertrofia, fuerza y aguante; «Personalizar» aparte.
+        [...new Set(Object.values(prehechos).map((x) => x.grupo ?? ''))].map((grupo) => h('div', { class: 'grupo-prehechos' },
+          grupo && h('span', { class: 'titulo-grupo' }, grupo),
+          h('div', { class: 'chips prehechos' }, Object.entries(prehechos).filter(([, x]) => (x.grupo ?? '') === grupo).map(([k, x]) => h('button', {
+            type: 'button', class: `chip seleccionable ${puesto === k ? 'activo' : ''}`, 'aria-pressed': String(puesto === k),
+            onclick: () => aplicarPrehecho(plan, k),
+          }, x.etiqueta))))),
         detalleProgresion(plan)),
 
       // Cómo es la serie: las técnicas valen para cualquier regla, también
@@ -1041,6 +1073,8 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         campo(`${info.inicial} (kg)`, numeroInput(p.inicial, (v) => { p.inicial = v; }, { onchange: repintar }),
           calculado != null && h('small', { class: 'nota' }, `Vacío: ${formatearNumero(calculado)} kg`)),
         campo('Incremento (kg)', numeroInput(p.incremento ?? 2.5, (v) => { p.incremento = v; })),
+        p.programa === '5x5' && campo('Series de 5', numeroInput(p.series ?? 5,
+          (v) => { p.series = Math.max(1, Math.min(10, Math.round(v ?? 5))); }, { onchange: repintar })),
         p.programa === '531' && campo('Veces a la semana que haces este ejercicio',
           numeroInput(p.porSemana ?? 1, (v) => { p.porSemana = Math.max(1, Math.round(v ?? 1)); }, { onchange: repintar }))),
       muestra && h('p', { class: 'nota' }, `Primera sesión: ${muestra.series.map((s) => `${formatearNumero(s.carga)} × ${s.reps}${s.amrap ? '+' : ''}`).join(' · ')}.`),

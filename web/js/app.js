@@ -2,7 +2,8 @@
 
 import * as local from './almacen-local.js';
 import * as estado from './estado.js';
-import { cargarCreditos } from './imagenes.js';
+import { cargarCreditos, imagenDe } from './imagenes.js';
+import { MUSCULOS, archivoCapa } from './musculos.js';
 import { sincronizar, situacionActual } from './sincronizacion.js';
 import { aviso, h } from './ui.js';
 import { textoSituacion, vistaAjustes } from './vistas/ajustes.js';
@@ -148,7 +149,9 @@ function pintarIndicador() {
   const { situacion, detalle } = situacionActual();
   const pulsable = ['desconectada', 'pendiente', 'error'].includes(situacion);
   indicador.className = `indicador ${situacion}`;
-  indicador.textContent = situacion === 'desconectada' ? 'Sin guardar en Google Drive: toca para conectar' : textoSituacion(situacion);
+  // Sin pase de Google no es un error: todo está guardado en el móvil.
+  indicador.textContent = ['desconectada', 'pendiente'].includes(situacion) ? 'En el móvil · toca para subir'
+    : textoSituacion(situacion);
   indicador.title = detalle || '';
   indicador.disabled = !pulsable;
 }
@@ -211,3 +214,25 @@ function registrarServiceWorker() {
 }
 
 arrancar();
+
+// Imágenes sin conexión: al abrir la app con internet se guardan las de tus
+// ejercicios y las capas del cuerpo (el service worker las conserva entre
+// versiones). Las demás del catálogo se guardan en cuanto se ven una vez.
+async function guardarImagenesParaSinConexion() {
+  if (!navigator.onLine || !('caches' in window)) return;
+  try {
+    await cargarCreditos();
+    const d = estado.datos();
+    const mios = new Set((d?.ejercicios ?? []).filter((e) => !e.borrado).map((e) => imagenDe(e.nombre)?.archivo).filter(Boolean));
+    const capas = Object.entries(MUSCULOS).flatMap(([clave, m]) => m.vistas.map((v) => archivoCapa(clave, v)));
+    const cuerpo = ['imagenes/musculos/cuerpo-delante.svg', 'imagenes/musculos/cuerpo-detras.svg'];
+    const cache = await caches.open('entreno-imagenes');
+    for (const ruta of [...cuerpo, ...capas, ...mios]) {
+      if (!(await cache.match(ruta, { ignoreSearch: true }))) {
+        const r = await fetch(ruta).catch(() => null);
+        if (r?.ok) await cache.put(ruta, r);
+      }
+    }
+  } catch { /* sin almacenamiento: se verán con conexión */ }
+}
+setTimeout(guardarImagenesParaSinConexion, 5000);

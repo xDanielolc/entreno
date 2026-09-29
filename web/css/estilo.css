@@ -181,9 +181,9 @@ a { color: var(--acento); }
 
 .indicador:disabled { cursor: default; }
 .indicador.al-dia { color: var(--bien); }
-.indicador.desconectada, .indicador.pendiente, .indicador.sin-internet, .indicador.error {
-  color: var(--peligro); border-color: var(--peligro); font-weight: 600;
-}
+.indicador.error { color: var(--peligro); border-color: var(--peligro); font-weight: 600; }
+/* Guardado en el móvil y pendiente de subir: aviso tranquilo, no de error. */
+.indicador.desconectada, .indicador.pendiente, .indicador.sin-internet { color: var(--texto-suave); border-color: var(--borde); }
 
 /* --------------------------------------------------------------------------
    Botones
@@ -1170,3 +1170,71 @@ legend .ayuda, summary .ayuda { margin-left: 6px; vertical-align: middle; }
 .boton-otra-rutina { flex-direction: column; gap: 0; line-height: 1.2; }
 .boton-otra-rutina small { font-weight: 400; color: var(--texto-suave); font-size: .78rem; }
 .pista-aviso { margin: 8px 0; }
+.fila-copia { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 0; border-top: 1px solid var(--borde); }
+.grupo-cambios { margin: 8px 0; } .grupo-cambios p { margin: 0 0 6px; }
+
+/* Colores del mapa del cuerpo: más vivos que los de los textos, para que se
+   distingan bien sobre el dibujo. Ámbar en vez de amarillo pálido; azul y
+   morado para «te pasas» y «te pasas mucho». */
+:root {
+  --mapa-verde: #2e9e62; --mapa-ambar: #f0a202; --mapa-rojo: #d9453b;
+  --mapa-azul: #2f7de1; --mapa-morado: #8b5cf6;
+}
+:root[data-tema="oscuro"] {
+  --mapa-verde: #4cc885; --mapa-ambar: #ffb627; --mapa-rojo: #ff6b61;
+  --mapa-azul: #5a9cf8; --mapa-morado: #a88bfa;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema]) {
+    --mapa-verde: #4cc885; --mapa-ambar: #ffb627; --mapa-rojo: #ff6b61;
+    --mapa-azul: #5a9cf8; --mapa-morado: #a88bfa;
+  }
+}
+.capa-musculo.listo, .leyenda-color.listo { background: var(--mapa-verde); }
+.capa-musculo.medio, .leyenda-color.medio { background: var(--mapa-ambar); }
+.capa-musculo.cansado, .leyenda-color.cansado { background: var(--mapa-rojo); }
+.capa-musculo.pasado, .leyenda-color.pasado { background: var(--mapa-azul); }
+.capa-musculo.muy-pasado, .leyenda-color.muy-pasado { background: var(--mapa-morado); }
+.punto.listo { color: var(--mapa-verde); }
+.punto.medio { color: var(--mapa-ambar); }
+.punto.cansado { color: var(--mapa-rojo); }
+.punto.pasado { color: var(--mapa-azul); }
+.punto.muy-pasado { color: var(--mapa-morado); }
+.barra-musculo .barra.listo span { background: var(--mapa-verde); }
+.barra-musculo .barra.medio span { background: var(--mapa-ambar); }
+.barra-musculo .barra.cansado span { background: var(--mapa-rojo); }
+.barra-musculo .barra.pasado span { background: var(--mapa-azul); }
+.barra-musculo .barra.muy-pasado span { background: var(--mapa-morado); }
+
+/* Tablas: cabecera y números alineados en su columna, y filas en cebra. */
+.tabla-musculos th, .tabla-musculos td { vertical-align: middle; }
+.tabla-musculos th.num, .tabla-musculos td.num { text-align: center; width: 30%; }
+.tabla-musculos tbody tr:nth-child(even) td { background: var(--superficie-2); }
+.tabla-musculos td:first-child { display: table-cell; }
+.tabla-musculos td:first-child .punto { display: inline-block; margin-right: 8px; vertical-align: middle; }
+
+/* Papeleras: sin recuadro, solo el icono (el sitio y el dibujo ya lo dicen). */
+.boton-icono.papelera, .boton-icono.borrar-serie { border: none; color: var(--texto-suave); background: transparent; }
+
+/* Cabecera de una serie al entrenar: tipo, marca y papelera en una fila, y
+   las técnicas debajo. Nada se monta encima de nada. */
+.serie-cabecera { display: grid; grid-template-columns: auto 1fr auto; align-items: center; column-gap: 8px; padding-right: 0; }
+.serie-cabecera .borrar-serie { position: static; grid-column: 3; grid-row: 1; }
+.serie-cabecera .tecnicas { grid-column: 1 / -1; grid-row: 2; margin-top: 6px; }
+.serie-cabecera .marca { grid-column: 2; grid-row: 1; }
+
+/* Aire entre una fila de botones y lo que va debajo. */
+.fila-marcas + *, .opciones + *, .vistas-ficha + * { margin-top: 14px; }
+.vistas-ficha { margin-bottom: 18px; }
+.fila-aviso { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.fila-aviso > span { flex: 1 1 200px; }
+
+/* Casillas en fila (drop set, ciclo…): los títulos ocupan lo mismo y las
+   casillas quedan todas a la misma altura, aunque un título tenga dos líneas. */
+.fila-campos { align-items: end; }
+.fila-campos > .campo { display: flex; flex-direction: column; justify-content: flex-end; margin-bottom: 8px; }
+.fila-campos > .campo > .etiqueta-campo { min-height: 2.6em; display: flex; align-items: flex-end; line-height: 1.25; font-size: .9rem; }
+
+/* Prehechos por grupos. */
+.grupo-prehechos { margin: 6px 0; }
+.grupo-prehechos .titulo-grupo { display: block; font-size: .8rem; font-weight: 600; color: var(--texto-suave); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; }

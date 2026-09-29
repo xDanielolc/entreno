@@ -1,7 +1,7 @@
 import { creditosCargados } from '../imagenes.js';
 import { formatearNumero } from '../calculos.js';
 import * as estado from '../estado.js';
-import { copiasAparte, desconectar, eliminarCuenta, juntarCopia, rehacerCopiasLegibles, sincronizar, situacionActual } from '../sincronizacion.js';
+import { apartarCopia, copiasAparte, desconectar, eliminarCuenta, juntarCopia, rehacerCopiasLegibles, sincronizar, situacionActual } from '../sincronizacion.js';
 import { apartadoPlegable, modal, selector } from '../ui.js';
 import { VERSION_APP } from '../version.js';
 import { anadir, aviso, confirmar, h, hoyISO, leerNumero } from '../ui.js';
@@ -307,9 +307,8 @@ export function textoSituacion(situacion) {
 }
 
 // Copias que la app guardó aparte en Drive (cuando había cambios en dos
-// dispositivos a la vez, o antes de actualizar el formato). Se pueden juntar
-// con lo de ahora: lo que solo esté en una se conserva, y en lo que no
-// coincida manda lo que elijas.
+// dispositivos a la vez, o antes de actualizar el formato). Se juntan con lo
+// de ahora y dejan de salir en la lista.
 async function verCopiasAparte() {
   let copias;
   try {
@@ -324,22 +323,25 @@ async function verCopiasAparte() {
     const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]));
     return d.toLocaleString('es-ES', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
   };
-  const juntar = async (id, gana, cerrar) => {
-    try {
-      await juntarCopia(id, gana);
-      cerrar();
-      aviso('Copia juntada con lo de ahora. Se sube a Drive en un momento.');
-    } catch (e) {
-      aviso(`No se ha podido: ${e.message}`, { tipo: 'error' });
-    }
-  };
   const cerrar = modal('Copias guardadas aparte', h('div', { class: 'formulario' },
     copias.length
-      ? [h('p', { class: 'nota' }, 'Al juntar, lo que solo esté en una de las dos se conserva. Si algo está en las dos y no coincide, manda lo que elijas.'),
-        copias.map((c) => h('div', { class: 'tarjeta' },
-          h('strong', {}, `${c.name.includes('conflicto') ? 'Cambios en dos sitios' : 'Antes de actualizar'} · ${fecha(c.name)}`),
-          h('div', { class: 'fila-botones' },
-            h('button', { class: 'boton secundario', onclick: () => juntar(c.id, 'ahora', cerrar) }, 'Juntar: manda lo de ahora'),
-            h('button', { class: 'boton', onclick: () => juntar(c.id, 'copia', cerrar) }, 'Juntar: manda la copia'))))]
-      : h('p', {}, 'No hay ninguna copia guardada aparte.')));
+      ? [h('ul', { class: 'nota' },
+        h('li', {}, 'Son versiones de tus datos que la app guardó por seguridad: cuando dos dispositivos cambiaron cosas a la vez, o antes de actualizarse.'),
+        h('li', {}, '«Juntar» añade a lo de ahora todo lo que tenga la copia: no se borra nada.'),
+        h('li', {}, 'Si un mismo entrenamiento o ajuste está en las dos y no coincide, se queda el de la copia.')),
+        copias.map((c) => h('div', { class: 'fila-copia' },
+          h('span', {}, fecha(c.name)),
+          h('button', { class: 'boton', onclick: async () => {
+            try {
+              await juntarCopia(c.id);
+              cerrar();
+              aviso('Copia juntada con lo de ahora.');
+            } catch (e) {
+              aviso(`No se ha podido: ${e.message}`, { tipo: 'error' });
+            }
+          } }, 'Juntar'),
+          h('button', { class: 'boton enlace', onclick: async (e) => {
+            try { await apartarCopia(c.id); e.target.closest('.fila-copia').remove(); } catch (err) { aviso(`No se ha podido: ${err.message}`, { tipo: 'error' }); }
+          } }, 'Ya está: quitar')))]
+      : h('p', {}, 'No hay ninguna copia por juntar.')));
 }

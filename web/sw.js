@@ -7,8 +7,11 @@
 // Solo se ocupa del CÓDIGO de la app. Los datos del usuario nunca pasan por
 // aquí: viven en el dispositivo (IndexedDB) y en su Google Drive.
 
-const VERSION = '0.33.2';
+const VERSION = '0.34.0';
 const CACHE = `entreno-${VERSION}`;
+// Las imágenes van en un almacén aparte que NO se borra al actualizar la app:
+// así se ven sin conexión aunque haya salido una versión nueva.
+const CACHE_IMAGENES = 'entreno-imagenes';
 
 const ARCHIVOS = [
   './',
@@ -74,7 +77,7 @@ self.addEventListener('install', (evento) => {
 self.addEventListener('activate', (evento) => {
   evento.waitUntil(
     caches.keys()
-      .then((claves) => Promise.all(claves.filter((c) => c !== CACHE).map((c) => caches.delete(c))))
+      .then((claves) => Promise.all(claves.filter((c) => c !== CACHE && c !== CACHE_IMAGENES).map((c) => caches.delete(c))))
       .then(() => self.clients.claim()));
 });
 
@@ -83,6 +86,20 @@ self.addEventListener('fetch', (evento) => {
   const url = new URL(peticion.url);
   // Google (inicio de sesión y Drive) y cualquier otro dominio: sin tocar.
   if (peticion.method !== 'GET' || url.origin !== self.location.origin) return;
+
+  // Imágenes: primero la copia guardada (no cambian) y, si no está, se
+  // descarga y se guarda para siempre.
+  if (url.pathname.includes('/imagenes/') && !url.pathname.endsWith('.json')) {
+    evento.respondWith((async () => {
+      const cache = await caches.open(CACHE_IMAGENES);
+      const guardada = await cache.match(peticion, { ignoreSearch: true });
+      if (guardada) return guardada;
+      const respuesta = await fetch(peticion);
+      if (respuesta.ok) cache.put(peticion, respuesta.clone());
+      return respuesta;
+    })());
+    return;
+  }
 
   evento.respondWith((async () => {
     try {

@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 r"""
 Capas de músculo que wger no trae (antebrazo, hombro posterior, lumbares,
-aductores, abductores, cuello y tibial), dibujadas encima de su silueta.
+aductores, abductores, cuello, tibial y sóleo, más el gemelo partido del
+sóleo), dibujadas encima de su silueta.
 
 Las coordenadas son las del dibujo del cuerpo (200 × 369). Solo se dibuja el
 lado izquierdo de la imagen: el derecho se obtiene reflejando en x = 100.
@@ -41,6 +42,16 @@ CAPAS = {
     "cuello": {
         "delante": [[(88, 47), (93, 50), (98, 62), (98, 66), (94, 66), (87, 56)]],
         "detras": [[(90, 42), (97, 43), (98, 56), (93, 58), (88, 52)]],
+    },
+    # El gemelo de wger ocupa toda la pantorrilla. Se parte en dos: arriba el
+    # gemelo (gastrocnemio, que se trabaja con la rodilla estirada, de pie) y
+    # abajo el sóleo (que se trabaja con la rodilla doblada, sentado).
+    "gemelo": {
+        "detras": [[(97.1, 292.8), (95.2, 310.2), (92.5, 317), (84, 318), (74.1, 312.2), (71.6, 296.1),
+                    (72.8, 283.0), (82.2, 264.4), (88.8, 262.8), (93.4, 266.8)]],
+    },
+    "soleo": {
+        "detras": [[(92.5, 320), (91.4, 346), (89, 346), (84, 331.3), (76.5, 316.5), (84, 321)]],
     },
     "tibial": {
         "delante": [[(75, 270), (81, 266), (85, 280), (84, 305), (81, 328), (77, 322),

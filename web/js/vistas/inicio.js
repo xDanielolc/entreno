@@ -2,7 +2,7 @@ import * as estado from '../estado.js';
 import { sedeInicial } from '../sedes.js';
 import { barraModoPrueba } from '../modo-prueba.js';
 import { seriesDesdePlan } from '../series.js';
-import { anadir, h, hoyISO, modal, nuevoId } from '../ui.js';
+import { anadir, aviso, h, hoyISO, leerNumero, modal, nuevoId } from '../ui.js';
 import { tarjetaRecuperacion, tarjetaSugerenciasAjuste } from './cuerpo.js';
 import { tarjetaInstalar } from './instalar.js';
 import { pista } from './tutorial.js';
@@ -12,6 +12,7 @@ import { cuentaParaFatiga } from '../catalogo.js';
 import { nombreMusculo } from '../musculos.js';
 import { recuperacionPorMusculo } from '../recuperacion.js';
 import { recomendacionesGenerales } from '../recomendaciones.js';
+import { renovarAlTocar } from '../sincronizacion.js';
 
 // Lo que ya enseña el muñeco de Cuerpo (series por músculo) no se repite aquí.
 const YA_SE_VE = new Set(['volumen-bajo', 'volumen-bien']);
@@ -142,6 +143,7 @@ export function vistaInicio(contenedor) {
   }
 
   function empezarSuelto() {
+    renovarAlTocar();
     const id = nuevoId('ses');
     estado.cambiar((datos) => {
       datos.sesiones.push({
@@ -153,6 +155,7 @@ export function vistaInicio(contenedor) {
   }
 
   function empezarConRutina(elegido, deRutina = rutina) {
+    renovarAlTocar();
     const id = empezarDia(deRutina, elegido, (datos, ej, plan) => seriesDesdePlan(datos, ej, plan));
     location.hash = `#/sesion/${id}`;
   }
@@ -177,8 +180,22 @@ export function vistaInicio(contenedor) {
     tarjetaInstalar(),
     pista('hoy', 'Qué toca hoy y cómo va tu recuperación. Si quieres más ayuda, en la pestaña «Aprender» están el tutorial y el glosario.'),
 
-    necesitaPeso && h('a', { class: 'tarjeta aviso-tarjeta', href: '#/ajustes' },
-      'Indica tu peso corporal en Ajustes: lo necesitan tus ejercicios con máquina asistida.'),
+    // Tu peso, aquí mismo: sin mandarte a Ajustes.
+    necesitaPeso && h('div', { class: 'tarjeta aviso-tarjeta fila-aviso' },
+      h('span', {}, 'Tus ejercicios con tu peso o con máquina asistida necesitan saber cuánto pesas.'),
+      h('button', { class: 'boton', onclick: () => {
+        const caja = h('input', { type: 'text', inputmode: 'decimal', 'aria-label': 'Tu peso en kilos' });
+        const cerrar = modal('Tu peso corporal', h('div', { class: 'formulario' },
+          h('label', { class: 'campo' }, h('span', { class: 'etiqueta-campo' }, 'Peso (kg)'), caja),
+          h('p', { class: 'nota' }, 'Solo para calcular la carga de flexiones, dominadas y máquinas asistidas.'),
+          h('button', { class: 'boton', onclick: () => {
+            const kg = leerNumero(caja.value);
+            if (!(kg > 0)) { aviso('Pon un número', { tipo: 'error' }); return; }
+            cerrar();
+            estado.cambiar((x) => { x.perfil.pesoCorporalKg = kg; });
+          } }, 'Guardar')));
+        setTimeout(() => caja.focus(), 50);
+      } }, 'Poner mi peso')),
 
     enCurso?.tutorial
       ? h('section', { class: 'tarjeta' },
