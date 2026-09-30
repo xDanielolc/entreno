@@ -78,10 +78,22 @@ export function inicioDe(prog, hayRm) {
   return prog.inicio ?? { modo: hayRm ? 'porcentaje' : 'prueba' };
 }
 
-function valorDeInicio(datos, ejercicio, inicio, rm) {
+function valorDeInicio(datos, ejercicio, inicio, rm, prog = null) {
   if (inicio.modo === 'mismo' || !rm) return null;
   if (inicio.modo === 'reps') return pesoParaReps(modeloDeEjercicio(datos, ejercicio), rm, inicio.reps ?? 20, 0);
-  return rm * ((inicio.porcentaje ?? datos.perfil.bilboInicioPorcentaje ?? 50) / 100);
+  return conMargen(datos, ejercicio, prog, rm, rm * ((inicio.porcentaje ?? datos.perfil.bilboInicioPorcentaje ?? 50) / 100));
+}
+
+// Un ciclo no puede empezar tan pesado que el primer día ya no llegues al
+// mínimo de repeticiones (se acabaría nada más empezar). En ejercicios en
+// los que se aguantan pocas repeticiones con el 50 % (cruces en polea, por
+// ejemplo), el inicio baja hasta el peso con el que harías el doble del
+// mínimo (30 si el mínimo es 15).
+function conMargen(datos, ejercicio, prog, rm, valor) {
+  if (!(valor > 0) || !(rm > 0) || prog?.sobre === 'esfuerzo') return valor;
+  const minimo = prog?.corte?.esfuerzoMin ?? datos.perfil.bilboMinReps ?? 15;
+  const techo = pesoParaReps(modeloDeEjercicio(datos, ejercicio), rm, minimo * 2, 0);
+  return techo ? Math.min(valor, techo) : valor;
 }
 
 // Antes de la primera sesión de un ciclo, su peso de partida sale de cómo
@@ -101,7 +113,7 @@ export function prepararCiclo(datos, ejercicio, plan, { excluirSesion } = {}) {
   const rm = inicio.modo === 'prueba'
     ? rmDePrueba(datos, ejercicio, plan, primero ? null : ciclo.inicio, { excluirSesion })
     : referencia?.valor;
-  const valor = valorDeInicio(datos, ejercicio, inicio, rm);
+  const valor = valorDeInicio(datos, ejercicio, inicio, rm, prog);
   if (valor == null) {
     if (!ciclo && referencia) empezarCicloNuevo(datos, ejercicio, plan);
     return false;
@@ -164,11 +176,11 @@ export function inicialSiguiente(datos, ejercicio, prog, ultimoValor, plan = nul
     // Lo de Bilbo: el ciclo que acaba deja un 1RM nuevo, y el siguiente
     // arranca a un porcentaje de ese, no del de todo el historial.
     const rm = mejorRMDelCiclo(datos, ejercicio, plan, prog.cicloActual);
-    if (rm) return aPesoDisponible(ejercicio, rm * ((r.porcentaje ?? 50) / 100));
+    if (rm) return aPesoDisponible(ejercicio, conMargen(datos, ejercicio, prog, rm, rm * ((r.porcentaje ?? 50) / 100)));
   }
   if (r.modo === 'porcentaje' || r.modo === 'rm-ciclo') {
     const rm = rmDeReferencia(datos, ejercicio)?.valor;
-    if (rm) return aPesoDisponible(ejercicio, rm * ((r.porcentaje ?? 50) / 100));
+    if (rm) return aPesoDisponible(ejercicio, conMargen(datos, ejercicio, prog, rm, rm * ((r.porcentaje ?? 50) / 100)));
   }
   return anterior;
 }

@@ -55,6 +55,14 @@ export function comparacionSerie(datos, ej, serie, { excluirSesion } = {}) {
     : null;
 
   const partes = [`${hoy.nombre} ${formatearNumero(redondear(hoy.valor, 1))}${hoy.unidad ? ` ${hoy.unidad}` : ''}`];
+  // ¿Error al teclear? Una serie que da un 1RM muy por encima de tu récord.
+  if (hoy.nombre === '1RM') {
+    const previos = historial.map((x) => medida(datos, ej, x.serie)).filter((m) => m?.nombre === '1RM').map((m) => m.valor);
+    const record = previos.length ? Math.max(...previos) : null;
+    if (record && hoy.valor > record * 1.5) {
+      return `⚠ ¿Está bien escrito? Da un 1RM de ${formatearNumero(Math.round(hoy.valor))} kg y tu récord es ${formatearNumero(Math.round(record))}. Revisa el peso y las repeticiones.`;
+    }
+  }
   const mAnterior = anterior && medida(datos, ej, anterior.serie);
   if (mAnterior) partes.push(`${diferencia(hoy.valor, mAnterior.valor)} frente a la última vez`);
   const mCiclo = delCicloAnterior && medida(datos, ej, delCicloAnterior.serie);
@@ -83,7 +91,7 @@ export function mostrarResumen(datos, sesionId) {
     h('div', { class: 'cifras' },
       cifra(minutos != null ? `${minutos}` : '—', 'minutos'),
       cifra(String(series), series === 1 ? 'serie' : 'series'),
-      cifra(String(lista.length), lista.length === 1 ? 'récord' : 'récords', lista.length > 0)),
+      cifra(String(lista.filter((r) => !r.raro).length), lista.filter((r) => !r.raro).length === 1 ? 'récord' : 'récords', lista.some((r) => !r.raro))),
     lista.length > 0 && h('div', { class: 'records' }, lista.map((r) => h('div', { class: 'record-nuevo' },
       h('span', { class: 'suave' }, r.ej.nombre),
       h('strong', {}, `${formatearNumero(r.valor)} kg`),
@@ -121,7 +129,9 @@ function recordsDeSesion(datos, sesion) {
     const antes = recordsDe(sin, ej.id);
     const ahora = recordsDe(datos, ej.id);
     if (ahora.mejor1RM && antes.mejor1RM && ahora.mejor1RM.valor > antes.mejor1RM.valor) {
-      lista.push({ ej, que: '1RM estimado', valor: ahora.mejor1RM.valor, antes: antes.mejor1RM.valor });
+      // Más de un 50 % de golpe no es un récord: casi seguro es un error al teclear.
+      const raro = ahora.mejor1RM.valor > antes.mejor1RM.valor * 1.5;
+      lista.push({ ej, que: raro ? '⚠ ¿error al teclear? Revisa la serie' : '1RM estimado', valor: ahora.mejor1RM.valor, antes: antes.mejor1RM.valor, raro });
     } else if (ahora.mejorTrabajo && antes.mejorTrabajo && ahora.mejorTrabajo.valor > antes.mejorTrabajo.valor) {
       lista.push({ ej, que: 'trabajo en una serie', valor: ahora.mejorTrabajo.valor, antes: antes.mejorTrabajo.valor });
     }

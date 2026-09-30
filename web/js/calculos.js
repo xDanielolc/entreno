@@ -290,9 +290,10 @@ function sugerenciaBilbo(datos, ejercicio, plan, { excluirSesion, sobre }) {
   const piden = corte.cuantas === 'todas' ? condiciones.length : Math.max(1, Number(corte.cuantas) || 1);
   // Sin ninguna condición marcada se sigue usando el mínimo de siempre, que
   // es lo que hace Bilbo.
-  const agotado = condiciones.length
+  // El primer día de un ciclo nunca lo da por acabado: se acaba de empezar.
+  const agotado = dia > 1 && (condiciones.length
     ? cumplidas >= Math.min(piden, condiciones.length)
-    : Boolean(objetivoSuperar != null && minimo && objetivoSuperar < minimo);
+    : Boolean(objetivoSuperar != null && minimo && objetivoSuperar < minimo));
   return { ...resultado, carga: valor, objetivoSuperar, objetivosExtra: objetivosExtra(gen, dia), fase,
     pesoBajo: reps != null && reps > 40, cicloAgotado: agotado };
 }
