@@ -30,7 +30,11 @@ const DIVISIONES = {
 
 // El filtro se recuerda mientras la app esté abierta; la forma de ver la
 // lista, también entre visitas (solo en este móvil).
-const filtro = { texto: '', musculo: '', division: '', tipo: '' };
+const filtro = { texto: '', musculo: '', division: '', tipo: '', orden: 'alfabetico' };
+
+// Cómo se ordena la lista: por defecto, alfabético; o agrupada.
+export const ORDENES = { alfabetico: 'Alfabético', grupo: 'Por grupo (empuje, tirón…)', musculo: 'Por músculo principal' };
+export const ordenActual = () => filtro.orden;
 let modo = leerModo();
 
 // Por defecto, solo imagen: se reconoce antes el dibujo que el nombre.
@@ -71,23 +75,27 @@ export function hayFiltro() {
 // Buscador y, plegados debajo, los filtros y la forma de ver la lista.
 // alCambiar() vuelve a pintar.
 export function barraFiltros(alCambiar, { placeholder = 'Buscar ejercicio' } = {}) {
-  // Los filtros se repintan solos al elegir, para que se vea lo marcado; el
-  // buscador no, para no perder el teclado.
-  const plegable = h('details', { class: 'filtros-plegables', open: filtrosAbiertos,
-    ontoggle: (e) => { filtrosAbiertos = e.target.open; } });
+  // El buscador y, a su derecha, el botón de filtros; los filtros se abren
+  // debajo. Se repintan solos al elegir; el buscador no, para no perder el teclado.
+  const panel = h('div', { class: 'panel-filtros', hidden: !filtrosAbiertos });
+  const boton = h('button', { type: 'button', class: 'boton-filtros', 'aria-expanded': String(filtrosAbiertos),
+    onclick: () => { filtrosAbiertos = !filtrosAbiertos; panel.hidden = !filtrosAbiertos; boton.setAttribute('aria-expanded', String(filtrosAbiertos)); } });
   const cambio = () => { pintarFiltros(); alCambiar(); };
   const desplegable = (clave, opciones, etiqueta) => selector(Object.entries(opciones), filtro[clave],
     (v) => { filtro[clave] = v; cambio(); }, { titulo: etiqueta, lista: true });
 
   function pintarFiltros() {
     const activos = ['musculo', 'division', 'tipo'].filter((k) => filtro[k]).length;
-    plegable.replaceChildren(); anadir(plegable,
-      h('summary', {}, activos ? `Filtros (${activos})` : 'Filtros'),
+    boton.textContent = activos ? `Filtros (${activos})` : 'Filtros';
+    boton.classList.toggle('activo', activos > 0);
+    panel.replaceChildren();
+    anadir(panel,
       h('div', { class: 'fila-filtros' },
         desplegable('musculo', { '': 'Cualquier músculo',
           ...Object.fromEntries(ORDEN_MUSCULOS.map((m) => [m, MUSCULOS[m].nombre])) }, 'Músculo'),
         desplegable('division', DIVISIONES, 'Parte del cuerpo'),
-        desplegable('tipo', { '': 'Cualquier tipo', ...TIPOS_EJERCICIO }, 'Tipo')),
+        desplegable('tipo', { '': 'Cualquier tipo', ...TIPOS_EJERCICIO }, 'Tipo'),
+        desplegable('orden', ORDENES, 'Orden')),
       activos > 0 && h('button', { type: 'button', class: 'boton enlace', onclick: () => {
         filtro.musculo = ''; filtro.division = ''; filtro.tipo = ''; cambio();
       } }, 'Quitar filtros'),
@@ -101,9 +109,11 @@ export function barraFiltros(alCambiar, { placeholder = 'Buscar ejercicio' } = {
   pintarFiltros();
 
   return h('div', { class: 'filtros-ejercicios' },
-    h('input', { type: 'search', class: 'buscador', placeholder, value: filtro.texto,
-      oninput: (e) => { filtro.texto = e.target.value; alCambiar(); } }),
-    plegable);
+    h('div', { class: 'fila-buscador' },
+      h('input', { type: 'search', class: 'buscador', placeholder, value: filtro.texto,
+        oninput: (e) => { filtro.texto = e.target.value; alCambiar(); } }),
+      boton),
+    panel);
 }
 
 // Contenedor de la lista, con la clase que toca según el modo.

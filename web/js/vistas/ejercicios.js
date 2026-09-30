@@ -21,7 +21,7 @@ import { seccionProgreso } from './graficas.js';
 import { imagenDe } from '../imagenes.js';
 import { anadir, aviso, confirmar, h, leerNumero, modal, nuevoId, plegable, selector } from '../ui.js';
 import { pista } from './tutorial.js';
-import { barraFiltros, cajaLista, ejercicioDesdeCatalogo, elegirEjercicio, filtrar, hayFiltro, pieCatalogo, tarjetaItem } from './selector-ejercicios.js';
+import { barraFiltros, cajaLista, ejercicioDesdeCatalogo, elegirEjercicio, filtrar, hayFiltro, ordenActual, pieCatalogo, tarjetaItem } from './selector-ejercicios.js';
 import { selectorTecnicas } from './tecnicas.js';
 import { TECNICAS } from '../esquema.js';
 
@@ -53,16 +53,10 @@ export function vistaEjercicios(contenedor) {
       verArchivados ? 'Ocultar archivados' : 'Ver archivados'));
 
   function pintarLista() {
-    const lista = filtrar(d.ejercicios.filter((e) => !e.borrado && (verArchivados || !e.archivado)))
-      .sort((a, b) => (a.grupo || '~').localeCompare(b.grupo || '~') || a.nombre.localeCompare(b.nombre));
-
-    const grupos = new Map();
-    for (const e of lista) {
-      // «Empuje» y «empuje» son el mismo grupo.
-      const g = (e.grupo || 'Sin grupo').trim().toLowerCase();
-      if (!grupos.has(g)) grupos.set(g, []);
-      grupos.get(g).push(e);
-    }
+    const lista = filtrar(d.ejercicios.filter((e) => !e.borrado && (verArchivados || !e.archivado)));
+    // Por defecto, en orden alfabético y sin grupos; en Filtros se elige
+    // agrupar por grupo o por músculo.
+    const grupos = agruparPorGrupo(lista, ordenActual());
 
     // Si estás buscando, también salen los de la lista general que aún no
     // tienes: así «peso muerto con mancuernas» o la pliometría aparecen
@@ -79,24 +73,30 @@ export function vistaEjercicios(contenedor) {
     }
     anadir(zona,
       [...grupos].map(([grupo, ejercicios]) => h('section', {},
-        h('h2', {}, grupo.charAt(0).toUpperCase() + grupo.slice(1)),
+        grupo && h('h2', {}, grupo.charAt(0).toUpperCase() + grupo.slice(1)),
         anadir(cajaLista(), ejercicios.map((e) => tarjetaEjercicio(d, e))))),
       // Los de la lista general, también por grupos y plegados: así no sale
       // un montón sin orden debajo de los tuyos.
       deLista.length > 0 && h('section', {},
         h('h2', {}, 'De la lista general'),
         h('p', { class: 'nota' }, 'Aún no son tuyos. Toca uno y se añade con sus músculos puestos.'),
-        [...agruparPorGrupo(deLista)].map(([grupo, xs]) => plegable(`catalogo-${grupo}`,
-          `${grupo.charAt(0).toUpperCase() + grupo.slice(1)} (${xs.length})`, { class: 'explicacion grupo-catalogo' },
-          anadir(cajaLista(), xs.map((x) => tarjetaCatalogo(x)))))));
+        ordenActual() === 'alfabetico'
+          ? anadir(cajaLista(), [...deLista].sort((a, b) => a.nombre.localeCompare(b.nombre, 'es')).map((x) => tarjetaCatalogo(x)))
+          : [...agruparPorGrupo(deLista, ordenActual())].map(([grupo, xs]) => plegable(`catalogo-${grupo}`,
+            `${grupo.charAt(0).toUpperCase() + grupo.slice(1)} (${xs.length})`, { class: 'explicacion grupo-catalogo' },
+            anadir(cajaLista(), xs.map((x) => tarjetaCatalogo(x)))))));
   }
   pintarLista();
 }
 
-function agruparPorGrupo(lista) {
+// Agrupa según el orden elegido: nada (un solo grupo sin título, en orden
+// alfabético), por grupo o por músculo principal.
+function agruparPorGrupo(lista, orden = 'grupo') {
+  const clave = orden === 'musculo' ? (x) => nombreMusculo(x.musculos?.principales?.[0] ?? '') || 'otros'
+    : orden === 'grupo' ? (x) => (x.grupo || 'otros').trim().toLowerCase() : () => '';
   const grupos = new Map();
-  for (const x of [...lista].sort((a, b) => (a.grupo || '~').localeCompare(b.grupo || '~') || a.nombre.localeCompare(b.nombre))) {
-    const g = (x.grupo || 'otros').trim().toLowerCase();
+  for (const x of [...lista].sort((a, b) => clave(a).localeCompare(clave(b), 'es') || a.nombre.localeCompare(b.nombre, 'es'))) {
+    const g = clave(x).toLowerCase();
     if (!grupos.has(g)) grupos.set(g, []);
     grupos.get(g).push(x);
   }
@@ -642,10 +642,10 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         h('button', { type: 'button', class: `boton-marca${n > 6 ? ' activo' : ''}`, 'aria-label': 'Otro número de series', onclick: () => {
           const caja = h('input', { type: 'text', inputmode: 'numeric', value: n > 6 ? String(n) : '', 'aria-label': 'Número de series' });
           const cerrar = modal('¿Cuántas series?', h('div', { class: 'formulario' },
-            h('label', { class: 'campo' }, h('span', { class: 'etiqueta-campo' }, 'Series (hasta 20)'), caja),
+            h('label', { class: 'campo' }, h('span', { class: 'etiqueta-campo' }, 'Series'), caja),
             h('button', { class: 'boton', onclick: () => {
               const m = Math.round(leerNumero(caja.value) ?? 0);
-              if (!(m >= 1 && m <= 20)) { aviso('Entre 1 y 20', { tipo: 'error' }); return; }
+              if (!(m >= 1)) { aviso('Pon un número', { tipo: 'error' }); return; }
               cerrar();
               fijar(m);
             } }, 'Hecho')));

@@ -255,8 +255,10 @@ function sugerenciaBilbo(datos, ejercicio, plan, { excluirSesion, sobre }) {
   // El primer día de un ciclo nuevo se compara con la última serie del anterior.
   const referencia = ultimaDelCiclo?.serie ?? seriesDeEjercicio(datos, ejercicio.id, { excluirSesion, planId: plan.id }).at(-1)?.serie ?? null;
   // Sin ninguna serie todavía, vale el 1RM que hayas puesto en la ficha.
+  // Sin series de esta serie todavía: el 1RM del ejercicio (de otras series
+  // o el que pusiste a mano).
   const rmAnterior = referencia ? rmDeSerie(datos, ejercicio, referencia, esfuerzoTotal(referencia))
-    : (ejercicio.rmManual > 0 ? ejercicio.rmManual : null);
+    : (rmDeReferencia(datos, ejercicio, { excluirSesion })?.valor ?? null);
   const recamara = recamaraDe(plan.tecnicas, ejercicio.recamaraPorDefecto ?? datos.perfil.recamaraPorDefecto ?? 1);
   const reps = rmAnterior && valor > 0 ? repsParaIgualar(modeloDe(datos, ejercicio), rmAnterior, valor, recamara) : null;
   // Repeticiones enteras y con tope: por encima de 40 el peso es demasiado bajo.

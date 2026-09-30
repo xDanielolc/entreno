@@ -480,6 +480,25 @@ como mucho, `pista` con clave por semana). Barra de recuperación fina.
 - Catálogo de la lista general por grupos plegados. Hasta 20 series en el
   paso a paso; «Ajustes finos» como último paso. Tu peso desde Hoy.
 
+## Rondas 0.34.1-0.35.0 (1-10-2026)
+
+- Sin tope del 1RM ni «récords sospechosos»: Dan lo rechazó (si mejoras mucho,
+  la app no se mete). Se quedan: `conMargen()` (un ciclo empieza como mucho
+  en el peso de 2 × el mínimo de repeticiones, 30 si el mínimo es 15; es el
+  «indicador universal» de Bilbo) y que el día 1 nunca agote el ciclo.
+- Renovador de Google en Cloudflare listo (`herramientas/cloudflare/`,
+  `docs/cloudflare.md`, `CONFIG.urlRenovador` vacío hasta que Dan lo cree).
+- Las capas de wger tenían opacidad 0,52: se pusieron a 1 (todas iguales).
+  Almacén de imágenes `entreno-imagenes-2`: subir el número si cambian.
+- Resumen al terminar: «Frente a la última vez» con insignias (más fuerte, más
+  aguante…), sin consejos; cambios «Toca los cambios de hoy que quieras
+  hacer permanentes» con botones cortos.
+- Tipo de serie con explicación; «Ciclo» en vez de «Bilbo»; si el ejercicio
+  no tiene ciclo, `elegirCiclo()` pregunta.
+- Buscadores: botón «Filtros» a la derecha, orden alfabético por defecto (o
+  por grupo o músculo). Bajadas en rejilla con la cabecera alineada.
+- Navegación entre ejercicios también abajo. Series sin tope.
+
 PENDIENTE: nombre e icono con Design («luego ya decoramos»); publicar la app
 en la consola de Google (es cosa suya); repasar las descripciones de las
 progresiones contrastándolas con las fuentes, que él pidió y solo está hecho

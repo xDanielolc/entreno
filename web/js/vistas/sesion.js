@@ -6,10 +6,11 @@ import { guiaTrasPrueba, pintarGuia, pista } from './tutorial.js';
 import { queEs } from './glosario.js';
 import { abrirCronometro, abrirIntervalos } from './intervalos.js';
 import { modal, selector } from '../ui.js';
+import { aplicarPreset } from '../ciclos.js';
 import { renovarAlTocar } from '../sincronizacion.js';
 import * as estado from '../estado.js';
 import {
-  TIPOS_CARGA, TIPOS_ESFUERZO, TIPOS_SERIE, camposDe, recamaraDe, tipoDeFallo, tramosDe,
+  TIPOS_CARGA, TIPOS_ESFUERZO, TIPOS_SERIE, camposDe, recamaraDe, serieNuevaPlantilla, tipoDeFallo, tramosDe,
 } from '../esquema.js';
 import { imagenDe } from '../imagenes.js';
 import {
@@ -41,6 +42,14 @@ export const MODOS_ENTRENO = {
   serie: { etiqueta: 'Solo la serie que toca', descripcion: 'Al apuntarla aparece la siguiente. Lo más limpio.' },
   ejercicio: { etiqueta: 'Solo el ejercicio en el que estoy', descripcion: 'Con todas sus series; pasas al siguiente cuando acabas.' },
   todo: { etiqueta: 'Todos los ejercicios', descripcion: 'La lista entera, para moverte libremente.' },
+};
+
+// Qué es cada tipo de serie, en una línea (sale al elegirlo).
+const EXPLICA_TIPO = {
+  bilbo: 'La app te dice el peso y el objetivo, según el ciclo del ejercicio.',
+  intensidad: 'Con una técnica: drop set, rest-pause, miorrepeticiones…',
+  calentamiento: 'No cuenta para la recuperación ni para las series de la semana.',
+  libre: 'Cuenta como una serie normal, pero sin objetivo: apuntas lo que hagas.',
 };
 
 export function vistaSesion(contenedor, { id }) {
@@ -96,14 +105,12 @@ export function vistaSesion(contenedor, { id }) {
 
     barraDescanso(),
 
-    posicion != null && h('div', { class: 'guiado-cabecera' },
-      h('button', { class: 'boton-paso', 'aria-label': 'Ejercicio anterior', disabled: posicion === 0,
-        onclick: () => irA(posicion - 1) }, '‹'),
-      h('button', { class: 'boton enlace', onclick: () => irA(null) }, `Ejercicio ${posicion + 1} de ${sesion.ejercicios.length}`),
-      h('button', { class: 'boton-paso', 'aria-label': 'Ejercicio siguiente',
-        disabled: posicion >= sesion.ejercicios.length - 1, onclick: () => irA(posicion + 1) }, '›')),
+    posicion != null && pasoEntreEjercicios(),
 
     visibles.map(([entrada, i]) => tarjetaEjercicio(entrada, i)),
+
+    // Los mismos botones abajo: al acabar el ejercicio no hace falta subir.
+    posicion != null && pasoEntreEjercicios(),
 
     h('button', { class: 'boton secundario grande', onclick: elegirEjercicio }, '+ Añadir ejercicio'),
 
@@ -124,6 +131,41 @@ export function vistaSesion(contenedor, { id }) {
 
     !sesion.borrada && posicion == null
       && h('button', { class: 'boton enlace peligro-texto', onclick: borrar }, 'Mover este entrenamiento a la papelera'));
+
+  // El ejercicio no tiene ciclo: se elige uno aquí mismo (queda en su ficha)
+  // o se abre la ficha para montarlo paso a paso.
+  function elegirCiclo(ej, i, j) {
+    const crear = (preset) => {
+      cerrar();
+      estado.cambiar((datos) => {
+        const e = datos.ejercicios.find((x) => x.id === ej.id);
+        if (!e) return;
+        const plan = serieNuevaPlantilla(e, { tipo: 'bilbo', progresion: 'bilbo' });
+        plan.progresion.preset = preset;
+        aplicarPreset(plan.progresion, preset, e);
+        e.series = [...(e.series || []), plan];
+        const s = datos.sesiones.find((x) => x.id === id);
+        const vieja = s.ejercicios[i].series[j];
+        s.ejercicios[i].series[j] = { ...crearSerieDesdePlan(datos, e, plan, { excluirSesion: id }), id: vieja.id };
+      });
+      aviso('Ciclo añadido a la ficha del ejercicio.');
+    };
+    const cerrar = modal('¿Qué ciclo?', h('div', { class: 'lista-selector' },
+      h('p', { class: 'nota' }, `${ej.nombre} aún no tiene ciclo. Elige uno y se queda en su ficha:`),
+      h('button', { type: 'button', class: 'boton-marca', onclick: () => crear('bilbo') },
+        h('strong', {}, 'Bilbo'), h('small', { class: 'bloque suave' }, 'Fuerza: empieza ligero con muchas repeticiones y sube 2,5 kg cada sesión.')),
+      h('button', { type: 'button', class: 'boton-marca', onclick: () => { cerrar(); location.hash = `#/ejercicio/${ej.id}`; } },
+        h('strong', {}, 'Otro: montarlo en la ficha'), h('small', { class: 'bloque suave' }, 'Se abre el ejercicio para elegirlo paso a paso.'))));
+  }
+
+  function pasoEntreEjercicios() {
+    return h('div', { class: 'guiado-cabecera' },
+      h('button', { class: 'boton-paso', 'aria-label': 'Ejercicio anterior', disabled: posicion === 0,
+        onclick: () => { irA(posicion - 1); window.scrollTo(0, 0); } }, '‹'),
+      h('button', { class: 'boton enlace', onclick: () => irA(null) }, `Ejercicio ${posicion + 1} de ${sesion.ejercicios.length}`),
+      h('button', { class: 'boton-paso', 'aria-label': 'Ejercicio siguiente',
+        disabled: posicion >= sesion.ejercicios.length - 1, onclick: () => { irA(posicion + 1); window.scrollTo(0, 0); } }, '›'));
+  }
 
   // «¿Cómo llegas?»: tu sensación de cada músculo que vas a entrenar, junto a
   // lo que calcula la app. Con varias respuestas, la app te dirá si te
@@ -478,11 +520,15 @@ export function vistaSesion(contenedor, { id }) {
 
   function cabeceraSerie(ej, i, j, serie) {
     return h('div', { class: 'serie-cabecera' },
-      selector(Object.entries(TIPOS_SERIE), serie.tipo, (v) => cambiarSesion((s) => {
-        const x = s.ejercicios[i].series[j];
-        x.tipo = v;
-        if (x.tipo !== 'intensidad') { x.tecnicas = []; x.tramos = null; }
-      }), { titulo: 'Tipo de serie', lista: true }),
+      selector(Object.entries(TIPOS_SERIE).map(([k, t]) => [k, t, EXPLICA_TIPO[k]]), serie.tipo, (v) => {
+        // «Ciclo» en un ejercicio que aún no tiene ninguno: la app pregunta cuál.
+        if (v === 'bilbo' && !(ej.series || []).some((p) => p.progresion?.tipo === 'bilbo')) { elegirCiclo(ej, i, j); return; }
+        cambiarSesion((s) => {
+          const x = s.ejercicios[i].series[j];
+          x.tipo = v;
+          if (x.tipo !== 'intensidad') { x.tecnicas = []; x.tramos = null; }
+        });
+      }, { titulo: 'Tipo de serie', lista: true }),
 
       serie.tipo === 'intensidad' && selectorTecnicas(serie.tecnicas, (nuevas) => cambiarSesion((s) => {
         const x = s.ejercicios[i].series[j];
@@ -674,12 +720,14 @@ export function vistaSesion(contenedor, { id }) {
       anterior?.tramos?.length && h('p', { class: 'nota' }, `La otra vez: ${textoSerie(ej, anterior)}`
         + ` (${textoEsfuerzo(ej, esfuerzoTotal(anterior))}`
         + `${trabajoSerie(anterior) ? `, ${formatearNumero(trabajoSerie(anterior))} kg de trabajo` : ''}).`),
-      h('div', { class: 'tramo cabecera-tramos', 'aria-hidden': 'true' },
-        h('span', { class: 'tramo-n vacio' }),
-        conCarga && h('span', { class: 'crece' }, 'kg'),
+      // Cabecera y filas en la misma rejilla: cada título queda justo encima
+      // de su columna (y un hueco encima de las ✕).
+      h('div', { class: `tramo cabecera-tramos${conCarga ? '' : ' sin-carga'}`, 'aria-hidden': 'true' },
+        conCarga && h('span', { class: 'crece' }, unidadCarga(ej)),
         conCarga && h('span', { class: 'crece' }, '% 1RM'),
-        h('span', { class: 'crece' }, unidadEsfuerzo(ej))),
-      serie.tramos.map((tramo, k) => h('div', { class: 'tramo', 'data-tramo': k },
+        h('span', { class: 'crece' }, unidadEsfuerzo(ej)),
+        h('span', {})),
+      serie.tramos.map((tramo, k) => h('div', { class: `tramo${conCarga ? '' : ' sin-carga'}`, 'data-tramo': k },
         h('span', { class: 'tramo-n', title: `${tramos.nombre} ${k + 1}` }, k + 1),
         conCarga && campoCargaConPorcentaje(ej, i, j, serie, k),
         h('label', { class: 'valor' },
@@ -707,8 +755,8 @@ export function vistaSesion(contenedor, { id }) {
                 } else descansoEntreSeries(ej);
               }
             }) })),
-        serie.tramos.length > 1 && h('button', { class: 'boton-icono', 'aria-label': `Quitar ${tramos.nombre.toLowerCase()} ${k + 1}`,
-          onclick: () => cambiarSesion((s) => { s.ejercicios[i].series[j].tramos.splice(k, 1); }) }, '✕'))),
+        serie.tramos.length > 1 ? h('button', { class: 'boton-icono', 'aria-label': `Quitar ${tramos.nombre.toLowerCase()} ${k + 1}`,
+          onclick: () => cambiarSesion((s) => { s.ejercicios[i].series[j].tramos.splice(k, 1); }) }, '✕') : h('span', {}))),
 
       h('button', { class: 'boton enlace', onclick: () => cambiarSesion((s) => {
         const x = s.ejercicios[i].series[j];

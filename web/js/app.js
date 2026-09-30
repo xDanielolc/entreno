@@ -226,7 +226,7 @@ async function guardarImagenesParaSinConexion() {
     const mios = new Set((d?.ejercicios ?? []).filter((e) => !e.borrado).map((e) => imagenDe(e.nombre)?.archivo).filter(Boolean));
     const capas = Object.entries(MUSCULOS).flatMap(([clave, m]) => m.vistas.map((v) => archivoCapa(clave, v)));
     const cuerpo = ['imagenes/musculos/cuerpo-delante.svg', 'imagenes/musculos/cuerpo-detras.svg'];
-    const cache = await caches.open('entreno-imagenes');
+    const cache = await caches.open('entreno-imagenes-2');
     for (const ruta of [...cuerpo, ...capas, ...mios]) {
       if (!(await cache.match(ruta, { ignoreSearch: true }))) {
         const r = await fetch(ruta).catch(() => null);

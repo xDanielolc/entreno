@@ -61,7 +61,7 @@ export const TIPOS_PROGRESION = {
 };
 
 export const TIPOS_SERIE = {
-  bilbo:         'Bilbo',
+  bilbo:         'Ciclo',
   intensidad:    'Intensidad',
   calentamiento: 'Calentamiento',
   libre:         'Libre',

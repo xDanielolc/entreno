@@ -9,10 +9,9 @@
 import { esfuerzoTotal, formatearNumero, records as recordsDe, redondear, seriesDeEjercicio, trabajoSerie } from '../calculos.js';
 import { serieNuevaPlantilla } from '../esquema.js';
 import * as estado from '../estado.js';
+import { tipoDeEjercicio } from '../catalogo.js';
 import { rmDeSerie } from '../formula1rm.js';
-import { recomendacionesDeSesion } from '../recomendaciones.js';
 import { aviso, h, modal } from '../ui.js';
-import { listaRecomendaciones } from './cuerpo.js';
 
 
 // ---------------------------------------------------------------------------
@@ -55,14 +54,7 @@ export function comparacionSerie(datos, ej, serie, { excluirSesion } = {}) {
     : null;
 
   const partes = [`${hoy.nombre} ${formatearNumero(redondear(hoy.valor, 1))}${hoy.unidad ? ` ${hoy.unidad}` : ''}`];
-  // ¿Error al teclear? Una serie que da un 1RM muy por encima de tu récord.
-  if (hoy.nombre === '1RM') {
-    const previos = historial.map((x) => medida(datos, ej, x.serie)).filter((m) => m?.nombre === '1RM').map((m) => m.valor);
-    const record = previos.length ? Math.max(...previos) : null;
-    if (record && hoy.valor > record * 1.5) {
-      return `⚠ ¿Está bien escrito? Da un 1RM de ${formatearNumero(Math.round(hoy.valor))} kg y tu récord es ${formatearNumero(Math.round(record))}. Revisa el peso y las repeticiones.`;
-    }
-  }
+
   const mAnterior = anterior && medida(datos, ej, anterior.serie);
   if (mAnterior) partes.push(`${diferencia(hoy.valor, mAnterior.valor)} frente a la última vez`);
   const mCiclo = delCicloAnterior && medida(datos, ej, delCicloAnterior.serie);
@@ -81,30 +73,26 @@ export function mostrarResumen(datos, sesionId) {
   const cambios = cambiosRespectoARutina(datos, sesion);
   const lista = recordsDeSesion(datos, sesion);
   const comparacion = comparacionPorEjercicio(datos, sesion);
-  const consejos = recomendacionesDeSesion(datos, sesion).filter((x) => x.nivel !== 'bien');
   const series = sesion.ejercicios.reduce((n, e) => n + e.series.filter((s) => s.hecha).length, 0);
   const minutos = sesion.inicio && sesion.fin ? Math.round((new Date(sesion.fin) - new Date(sesion.inicio)) / 60_000) : null;
 
-  // Arriba, tres números grandes; debajo, una fila por ejercicio con su
-  // flecha; lo largo (consejos y serie a serie), plegado.
+  // Arriba, tres números grandes; debajo, cómo vas en cada ejercicio (más
+  // fuerte, igual…) y los cambios de hoy como botones. Sin consejos: lo que
+  // te falta por entrenar ya lo enseña el muñeco de Cuerpo.
   const cerrar = modal('Entrenamiento terminado', h('div', { class: 'resumen-sesion' },
     h('div', { class: 'cifras' },
       cifra(minutos != null ? `${minutos}` : '—', 'minutos'),
       cifra(String(series), series === 1 ? 'serie' : 'series'),
-      cifra(String(lista.filter((r) => !r.raro).length), lista.filter((r) => !r.raro).length === 1 ? 'récord' : 'récords', lista.some((r) => !r.raro))),
+      cifra(String(lista.length), lista.length === 1 ? 'récord' : 'récords', lista.length > 0)),
     lista.length > 0 && h('div', { class: 'records' }, lista.map((r) => h('div', { class: 'record-nuevo' },
       h('span', { class: 'suave' }, r.ej.nombre),
       h('strong', {}, `${formatearNumero(r.valor)} kg`),
       h('small', {}, `${r.que} · antes ${formatearNumero(r.antes)}`)))),
-    comparacion.length > 0 && h('table', { class: 'tabla-musculos' },
-      h('thead', {}, h('tr', {}, h('th', {}, 'Ejercicio'), h('th', { class: 'num' }, 'Hoy'), h('th', { class: 'num' }, 'Frente a la última vez'))),
-      h('tbody', {}, comparacion.map((c) => h('tr', {},
-        h('td', {}, c.nombre),
-        h('td', { class: 'num' }, c.que === '1RM' ? `1RM ${c.valor}` : `${c.que} ${c.valor}`),
-        h('td', { class: `num cambio-${c.clase}` }, c.texto))))),
-    consejos.length > 0 && h('details', { class: 'explicacion' },
-      h('summary', {}, `Consejos (${consejos.length})`),
-      listaRecomendaciones(consejos)),
+    comparacion.length > 0 && h('div', { class: 'como-vas' },
+      h('h3', {}, 'Frente a la última vez'),
+      comparacion.map((c) => h('div', { class: `fila-como-vas ${c.clase}` },
+        h('span', { class: 'nombre' }, c.nombre),
+        h('span', { class: `insignia ${c.clase}` }, c.insignia)))),
     cambios.length > 0 && seccionCambios(cambios),
     h('div', { class: 'fila-botones' },
       cambios.length > 0
@@ -129,9 +117,7 @@ function recordsDeSesion(datos, sesion) {
     const antes = recordsDe(sin, ej.id);
     const ahora = recordsDe(datos, ej.id);
     if (ahora.mejor1RM && antes.mejor1RM && ahora.mejor1RM.valor > antes.mejor1RM.valor) {
-      // Más de un 50 % de golpe no es un récord: casi seguro es un error al teclear.
-      const raro = ahora.mejor1RM.valor > antes.mejor1RM.valor * 1.5;
-      lista.push({ ej, que: raro ? '⚠ ¿error al teclear? Revisa la serie' : '1RM estimado', valor: ahora.mejor1RM.valor, antes: antes.mejor1RM.valor, raro });
+      lista.push({ ej, que: '1RM estimado', valor: ahora.mejor1RM.valor, antes: antes.mejor1RM.valor });
     } else if (ahora.mejorTrabajo && antes.mejorTrabajo && ahora.mejorTrabajo.valor > antes.mejorTrabajo.valor) {
       lista.push({ ej, que: 'trabajo en una serie', valor: ahora.mejorTrabajo.valor, antes: antes.mejorTrabajo.valor });
     }
@@ -158,12 +144,15 @@ function comparacionPorEjercicio(datos, sesion) {
     const deEseDia = medidas(antes.filter((x) => x.sesion.id === ultimaFecha).map((x) => x.serie)).filter((m) => m.nombre === nombre);
     const mejorHoy = Math.max(...hoy.map((m) => m.valor));
     const valor = `${formatearNumero(redondear(mejorHoy, 1))}${nombre === '1RM' ? ' kg' : ''}`;
-    if (!deEseDia.length) { filas.push({ nombre: ej.nombre, que: nombre, valor, texto: 'primera vez', clase: '' }); continue; }
+    if (!deEseDia.length) { filas.push({ nombre: ej.nombre, que: nombre, valor, insignia: 'primera vez', clase: '' }); continue; }
     const mejorAntes = Math.max(...deEseDia.map((m) => m.valor));
     const pct = Math.round(((mejorHoy - mejorAntes) / mejorAntes) * 100);
-    const color = nombre === '1RM';
-    filas.push({ nombre: ej.nombre, que: nombre, valor, texto: pct > 0 ? `▲ ${pct} %` : pct < 0 ? `▼ ${-pct} %` : '=',
-      clase: !color ? '' : pct > 0 ? 'sube' : pct < 0 ? 'baja' : '' });
+    const mejora = nombre === '1RM' ? 'más fuerte'
+      : ej.esfuerzo?.tipo === 'tiempo' ? (tipoDeEjercicio(ej) === 'estiramiento' ? 'más elástico' : 'más aguante')
+        : ej.esfuerzo?.tipo === 'distancia' ? 'más lejos' : 'más repeticiones';
+    filas.push({ nombre: ej.nombre, que: nombre, valor,
+      insignia: pct > 0 ? `▲ ${mejora} (+${pct} %)` : pct < 0 ? `▼ algo menos (${pct} %)` : '= igual',
+      clase: pct > 0 ? 'sube' : pct < 0 ? 'baja' : '' });
   }
   return filas;
 }
@@ -243,28 +232,21 @@ function e_primeraVez(datos, ej, sesion) {
 
 // Los cambios, agrupados: una frase por tipo y, debajo, los ejercicios como
 // botones que se quedan marcados. Sin repetir la misma frase en cada uno.
+// Los cambios de hoy, en una frase y botones cortos: «Curl: −1 serie».
 function seccionCambios(cambios) {
-  const grupos = [
-    ['anadir-al-dia', 'Hechos hoy sin estar en el día de la rutina. ¿Los añado?', (c) => c.nombre],
-    ['quitar-del-dia', 'No los has hecho hoy. ¿Los quito del día de la rutina?', (c) => c.nombre],
-    ['anadir-series', 'Series de más. ¿Las dejo para los próximos entrenos?', (c) => `${c.nombre} (+${c.series.length})`],
-    ['quitar-', 'Series de menos. ¿Las quito de los próximos entrenos?', (c) => `${c.nombre} (−${c.n})`],
-  ];
+  const etiqueta = (c) => ({
+    'anadir-al-dia': `${c.nombre}: al día de la rutina`,
+    'quitar-del-dia': `${c.nombre}: fuera del día`,
+    'anadir-series': `${c.nombre}: +${c.series?.length} ${c.series?.length === 1 ? 'serie' : 'series'}`,
+  }[c.tipo] ?? `${c.nombre}: −${c.n} ${c.n === 1 ? 'serie' : 'series'}`);
   return h('section', {},
-    h('h3', {}, 'Cambios respecto a lo planeado'),
-    h('p', { class: 'nota' }, 'Toca lo que quieras que se quede. Lo que no toques, solo ha sido hoy.'),
-    grupos.map(([tipo, frase, etiqueta]) => {
-      const lista = cambios.filter((c) => (tipo.endsWith('-') ? c.tipo.startsWith(tipo) && c.tipo !== 'quitar-del-dia' : c.tipo === tipo));
-      if (!lista.length) return null;
-      return h('div', { class: 'grupo-cambios' },
-        h('p', {}, frase),
-        h('div', { class: 'fila-marcas compacta' }, lista.map((c) => h('button', { type: 'button', class: 'boton-marca', 'aria-pressed': 'false',
-          onclick: (e) => {
-            c.marcado = !c.marcado;
-            e.currentTarget.classList.toggle('activo', c.marcado);
-            e.currentTarget.setAttribute('aria-pressed', String(c.marcado));
-          } }, etiqueta(c)))));
-    }));
+    h('h3', {}, 'Toca los cambios de hoy que quieras hacer permanentes'),
+    h('div', { class: 'fila-marcas compacta' }, cambios.map((c) => h('button', { type: 'button', class: 'boton-marca', 'aria-pressed': 'false',
+      onclick: (e) => {
+        c.marcado = !c.marcado;
+        e.currentTarget.classList.toggle('activo', c.marcado);
+        e.currentTarget.setAttribute('aria-pressed', String(c.marcado));
+      } }, etiqueta(c)))));
 }
 
 function aplicarCambios(cambios) {

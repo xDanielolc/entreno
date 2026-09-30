@@ -181,9 +181,10 @@ export function selector(opciones, actual, alElegir, { titulo = 'Elige', compact
   }
   const texto = opciones.find(([v]) => v === actual)?.[1] ?? titulo;
   return h('button', { type: 'button', class: 'boton-marca selector-abrir', 'aria-label': titulo, onclick: () => {
+    // Cada opción puede llevar una línea que la explica: [valor, texto, explicación].
     const cerrar = modal(titulo, h('div', { class: 'lista-selector' },
-      opciones.map(([v, t]) => h('button', { type: 'button', class: `boton-marca${v === actual ? ' activo' : ''}`,
-        onclick: () => { cerrar(); alElegir(v); } }, t))));
+      opciones.map(([v, t, explica]) => h('button', { type: 'button', class: `boton-marca${v === actual ? ' activo' : ''}`,
+        onclick: () => { cerrar(); alElegir(v); } }, explica ? [h('strong', {}, t), h('small', { class: 'bloque suave' }, explica)] : t))));
   } }, texto, h('span', { class: 'suave', 'aria-hidden': 'true' }, ' ▾'));
 }
 

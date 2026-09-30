@@ -202,7 +202,7 @@ export function vistaAjustes(contenedor) {
         : 'Se borran los archivos de la app en tu Google Drive (datos, copias y hojas), la copia de este dispositivo y el permiso '
           + 'que diste a la app. Para volver tendrías que entrar con Google otra vez, desde cero.')),
 
-    h('a', { class: 'boton secundario', href: 'privacidad.html', target: '_blank', rel: 'noopener' }, 'Política de privacidad'),
+    h('a', { class: 'boton secundario boton-privacidad', href: 'privacidad.html', target: '_blank', rel: 'noopener' }, 'Política de privacidad'),
 
     h('p', { class: 'nota centrado' },
       `Versión ${VERSION_APP} · formato de datos v${d.version} · revisión ${formatearNumero(d.revision)}`));

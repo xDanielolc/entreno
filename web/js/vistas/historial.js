@@ -77,8 +77,8 @@ export function vistaHistorial(contenedor) {
 
   // Buscador y filtros: solo se repinta la lista, para no perder el teclado.
   const lista = h('div', {});
-  const plegable = h('details', { class: 'filtros-plegables', open: filtrosAbiertos,
-    ontoggle: (e) => { filtrosAbiertos = e.target.open; } });
+  const plegable = h('div', { class: 'panel-filtros', hidden: !filtrosAbiertos });
+  const boton = h('button', { type: 'button', class: 'boton-filtros', onclick: () => { filtrosAbiertos = !filtrosAbiertos; plegable.hidden = !filtrosAbiertos; } });
   const cambio = () => { pintarFiltros(); pintarLista(); };
   const opcion = (clave, opciones, titulo) => selector(opciones, filtro[clave], (v) => { filtro[clave] = v; cambio(); },
     { titulo, lista: true });
@@ -87,8 +87,9 @@ export function vistaHistorial(contenedor) {
 
   function pintarFiltros() {
     const activos = ['rutina', 'tipo', 'musculo', 'mes'].filter((k) => filtro[k]).length;
+    boton.textContent = activos ? `Filtros (${activos})` : 'Filtros';
+    boton.classList.toggle('activo', activos > 0);
     plegable.replaceChildren(); anadir(plegable,
-      h('summary', {}, activos ? `Filtros (${activos})` : 'Filtros'),
       h('div', { class: 'fila-filtros' },
         opcion('mes', [['', 'Cualquier mes'], ...meses.map((m) => [m, nombreMes(m)])], 'Mes'),
         rutinasUsadas.length > 0 && opcion('rutina', [['', 'Cualquier rutina'], ...rutinasUsadas.map((r) => [r.id, r.nombre])], 'Rutina'),
@@ -113,8 +114,10 @@ export function vistaHistorial(contenedor) {
       h('h1', {}, 'Historial'),
       h('button', { class: 'boton secundario', onclick: anadirPasado }, '+ De otro día')),
     sesiones.length > 3 && h('div', { class: 'filtros-ejercicios' },
-      h('input', { type: 'search', class: 'buscador', placeholder: 'Buscar: día, rutina, ejercicio…', value: filtro.texto,
-        oninput: (e) => { filtro.texto = e.target.value; pintarLista(); } }),
+      h('div', { class: 'fila-buscador' },
+        h('input', { type: 'search', class: 'buscador', placeholder: 'Buscar: día, rutina, ejercicio…', value: filtro.texto,
+          oninput: (e) => { filtro.texto = e.target.value; pintarLista(); } }),
+        boton),
       plegable),
     lista,
     papelera.length > 0 && h('details', { class: 'papelera' },

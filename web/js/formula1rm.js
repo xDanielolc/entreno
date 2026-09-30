@@ -51,11 +51,7 @@ export function estimar1RM(modelo, peso, reps, recamara = 0) {
   if (modelo.tipo === 'epley') return peso * (1 + r * 0.03);
   const k = modelo.divisor ?? divisorSegunPeso(peso) * (modelo.factor ?? 1);
   const g = modelo.exponente ?? EXPONENTE_ESTUDIO;
-  // Con muchas repeticiones o poco peso la curva se dispara (un error al
-  // teclear, 100 repeticiones en vez de 10, daba 1RM de 400 o 700 kg). Por
-  // encima de 2,5 veces el peso no se cree: con el 40 % del 1RM ya se hacen
-  // unas 30-40 repeticiones, y más allá la fórmula no se probó.
-  return Math.min(peso * (1 + (r - 1) ** g / k), peso * 2.5);
+  return peso * (1 + (r - 1) ** g / k);
 }
 
 // Repeticiones que hay que hacer con un peso para igualar un 1RM. Devuelve
