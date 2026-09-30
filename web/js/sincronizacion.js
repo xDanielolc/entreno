@@ -14,7 +14,7 @@ import * as drive from './drive.js';
 import { migrar, necesitaMigrar, validar } from './esquema.js';
 import * as estado from './estado.js';
 import { completarDesdeCatalogo } from './catalogo.js';
-import { minutosDeToken, olvidarToken, pedirToken, tokenVigente } from './google-auth.js';
+import { hayPase, minutosDeToken, olvidarToken, pedirToken, renovarConPase, tokenVigente } from './google-auth.js';
 import { NOMBRES_CSV, csvEjerciciosYRutinas, csvEntrenamientos } from './exportar.js';
 import * as local from './almacen-local.js';
 
@@ -58,6 +58,8 @@ async function ejecutar(interactivo) {
   if (estado.esSinCuenta()) return fijar('sin-cuenta');
   if (!navigator.onLine) return fijar('sin-internet');
 
+  // Con el renovador, el permiso caducado se renueva solo, sin ventanas.
+  if (!tokenVigente() && hayPase()) await renovarConPase();
   if (!tokenVigente()) {
     if (!interactivo) {
       return fijar(estado.meta().pendiente ? 'pendiente' : 'desconectada');
@@ -261,6 +263,7 @@ window.addEventListener('online', () => programar(500));
 // entrenamiento). Mientras tanto todo se guarda en el móvil.
 export function renovarAlTocar() {
   if (!estado.usuario() || estado.esSinCuenta() || !navigator.onLine) return;
+  if (hayPase()) { if (!tokenVigente()) renovarConPase().then(() => sincronizar()); return; }
   const minutos = minutosDeToken();
   if (minutos != null && minutos > 20) return;
   pedirToken({ silencioso: true, forzar: true, pista: estado.usuario() })

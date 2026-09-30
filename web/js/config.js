@@ -14,4 +14,8 @@ export const CONFIG = Object.freeze({
   googleScopes: 'https://www.googleapis.com/auth/drive.file',
 
   nombreArchivoDatos: 'entrenamiento.json',
+
+  // Renovador del permiso (Cloudflare Worker, ver docs/cloudflare.md). Con él,
+  // Google no hay que volver a conectarlo cada hora. Vacío: sin renovador.
+  urlRenovador: '',
 });
