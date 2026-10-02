@@ -12,7 +12,7 @@ import { inicialDelPrograma, tramosPorDefecto } from '../calculos.js';
 import { EXPLICACIONES_1RM, FORMULAS, calibrar, estimar1RM, modeloDe, pesoParaReps, textoCalibracion } from '../formula1rm.js';
 import { FRACCION_CORPORAL_POR_NOMBRE, PROGRAMAS } from '../esquema.js';
 import { MODOS_INICIO, MODOS_REINICIO, PRESETS_CICLO, inicioDe, alargarCiclo, aplicarPreset, completarCiclo, describirCiclo, empezarCicloNuevo, escaleraDe } from '../ciclos.js';
-import { ayuda, hoyISO } from '../ui.js';
+import { ayuda, hoyISO, confirmarEscribiendo } from '../ui.js';
 import { CATALOGO, esMaquinaDePlacas, normalizar, tipoDeEjercicio } from '../catalogo.js';
 import { ORDEN_MUSCULOS, nombreMusculo } from '../musculos.js';
 import { entradaDeEjercicio, planesPorDefecto } from '../series.js';
@@ -792,6 +792,11 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
           explica: 'Tres bloques de seis sesiones, a 15, a 10 y a 5 repeticiones, con el peso subiendo dentro de cada bloque.' };
       }
     }
+    // Con tu peso: tú eliges si el ciclo sube lastre (los de arriba) o repeticiones.
+    if (borrador.carga.tipo === 'pesoCorporal' && reps) lista.repeticiones = { etiqueta: 'Más repeticiones (sin lastre)', grupo: 'Hipertrofia',
+      tipo: 'bilbo', preset: 'repeticiones',
+      explica: 'Con tu peso, una repetición más cada sesión hasta llegar a 20; entonces pon lastre o pasa a una variante más difícil. '
+        + 'Llegando cerca del fallo, muchas repeticiones también hacen crecer el músculo (Kikuchi 2017: flexiones frente a press de banca).' };
     if (borrador.esfuerzo.tipo === 'tiempo') lista.tiempo = { etiqueta: 'Más tiempo', grupo: 'Aguante', tipo: 'bilbo', preset: 'tiempo',
       explica: 'Diez segundos más cada sesión hasta llegar a dos minutos. Para planchas, isométricos y estiramientos.' };
     return lista;
@@ -1522,9 +1527,9 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
   // conservan sus series. Se recupera desde Ajustes.
   async function borrarEjercicio() {
     const usado = d.sesiones.some((s) => s.ejercicios.some((x) => x.ejercicioId === borrador.id));
-    const si = await confirmar(usado
+    const si = await confirmarEscribiendo(usado
       ? `¿Borrar «${borrador.nombre}»? Desaparece de tus listas y rutinas; los entrenamientos pasados conservan sus series. Se puede recuperar en Ajustes.`
-      : `¿Borrar «${borrador.nombre}»? No tiene historial, así que se elimina del todo.`, { si: 'Borrar', peligro: true });
+      : `¿Borrar «${borrador.nombre}»? No tiene historial, así que se elimina del todo.`, 'borrar');
     if (!si) return;
     estado.cambiar((datos) => {
       if (!usado) { datos.ejercicios = datos.ejercicios.filter((e) => e.id !== borrador.id); return; }

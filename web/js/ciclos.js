@@ -102,6 +102,7 @@ function conMargen(datos, ejercicio, prog, rm, valor) {
 // ese día toca la prueba.
 export function prepararCiclo(datos, ejercicio, plan, { excluirSesion } = {}) {
   const prog = plan.progresion;
+  if (prog?.tipo === 'bilbo' && prog.sobre === 'esfuerzo') return prepararCicloDeEsfuerzo(datos, ejercicio, plan, { excluirSesion });
   if (prog?.tipo !== 'bilbo' || prog.sobre !== 'carga') return false;
   if (esperaPrueba(datos, ejercicio, plan, { excluirSesion })) return true;
   const ciclo = prog.ciclos?.find((c) => c.n === prog.cicloActual) ?? prog.ciclos?.at(-1);
@@ -129,6 +130,28 @@ export function prepararCiclo(datos, ejercicio, plan, { excluirSesion } = {}) {
   return false;
 }
 
+// Ciclos que suben repeticiones o tiempo (no peso): el primer día haces todo
+// lo que puedas y el ciclo arranca desde ahí.
+function prepararCicloDeEsfuerzo(datos, ejercicio, plan, { excluirSesion } = {}) {
+  const prog = plan.progresion;
+  if (prog.ciclos?.length) return false;
+  let mejor = null;
+  for (const s of datos.sesiones) {
+    if (s.borrada || s.id === excluirSesion) continue;
+    for (const e of s.ejercicios) {
+      if (e.ejercicioId !== ejercicio.id) continue;
+      for (const x of e.series) if (x.hecha && x.tipo !== 'calentamiento' && x.esfuerzo > (mejor ?? 0)) mejor = x.esfuerzo;
+    }
+  }
+  if (mejor == null) return false;
+  // El primer escalón ya es uno más que tu mejor marca.
+  const g = PRESETS_CICLO[prog.preset]?.generador;
+  const ciclo = empezarCicloNuevo(datos, ejercicio, plan, { inicial: mejor + (g?.incremento ?? 1) });
+  if (g) ciclo.generador = { ...ciclo.generador, incremento: g.incremento, cada: g.cada };
+  ciclo.escalera = escaleraDe(null, ciclo.generador, prog.corte?.sesiones ?? 20);
+  return false;
+}
+
 // Rellena lo que falte en una progresión de ciclo antigua.
 export function completarCiclo(prog, perfil = {}) {
   prog.corte ??= { sesiones: prog.diasPorCiclo ?? 17, esfuerzoMin: perfil.bilboMinReps ?? 15, esfuerzoMax: null };
@@ -142,6 +165,8 @@ export function completarCiclo(prog, perfil = {}) {
 export function aplicarPreset(prog, clave, ejercicio) {
   const p = PRESETS_CICLO[clave];
   prog.preset = clave;
+  // Los que suben repeticiones o tiempo no tocan el peso.
+  if (p.sobre === 'esfuerzo') prog.sobre = 'esfuerzo';
   if (!p.generador) return prog;
   prog.corte = { ...p.corte };
   prog.reinicio = { ...p.reinicio };

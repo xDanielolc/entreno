@@ -196,6 +196,20 @@ export function confirmar(pregunta, { si = 'Sí', no = 'Cancelar', peligro = fal
   });
 }
 
+// Para lo que no se puede deshacer sin querer: hay que escribir una palabra.
+export function confirmarEscribiendo(pregunta, palabra, { si = 'Borrar' } = {}) {
+  return new Promise((resolver) => {
+    const boton = h('button', { class: 'boton peligro', disabled: true, onclick: () => { cerrar(); resolver(true); } }, si);
+    const caja = h('input', { type: 'text', autocomplete: 'off', 'aria-label': `Escribe ${palabra}`, placeholder: palabra,
+      oninput: (e) => { boton.disabled = e.target.value.trim().toLowerCase() !== palabra; } });
+    const cerrar = modal(pregunta, h('div', {},
+      h('p', { class: 'nota' }, `Para confirmar, escribe «${palabra}»:`), caja,
+      h('div', { class: 'fila-botones' },
+        h('button', { class: 'boton secundario', onclick: () => { cerrar(); resolver(false); } }, 'Cancelar'), boton)));
+    setTimeout(() => caja.focus(), 50);
+  });
+}
+
 // Un id estable a partir de un título, para poder señalar un apartado desde
 // la guía o enlazarlo: «Entrenamiento y series» → «ap-entrenamiento-y-series».
 export function idApartado(titulo) {

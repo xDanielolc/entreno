@@ -1294,3 +1294,12 @@ html, body { overflow-x: hidden; }
 a.boton-privacidad { justify-content: flex-start; padding-left: 18px; }
 /* Cancelar entrenamiento, en rojo. */
 .boton.cancelar-entreno { background: transparent; color: var(--peligro); border-color: var(--peligro); width: 100%; margin-top: 8px; }
+
+/* Músculos algo transparentes (se intuye el dibujo debajo) pero con el color
+   claro: se ve el semáforo sin tapar el cuerpo. */
+.capa-musculo { opacity: .78; }
+
+/* Comentario de cada serie. */
+.comentario-serie .boton-comentario { padding: 2px 0; font-size: .85rem; }
+.comentario-serie .nota-serie { width: 100%; margin-top: 4px; }
+.comentario-serie .nota-serie[hidden] { display: none; }

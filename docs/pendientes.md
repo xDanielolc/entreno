@@ -129,7 +129,9 @@ hecho; se retoma entero cuando toque.
       trabajados en rojo. Hay 97 imágenes para 300 ejercicios del catálogo. Las
       que faltan hay que encargarlas a Claude Design (ver
       `encargo-para-design.md`). Ojo con la licencia: las de wger y Everkinetic
-      son CC-BY-SA y se citan; las nuevas serían propias.
+      son CC-BY-SA y se citan; las nuevas serían propias. Gemelos en
+      multipower, prensa y burro: sin imagen, la que tomaban prestada no
+      se correspondía (2-10-2026).
 - [ ] **Nombre e icono de la app**, y los seis temas del encargo de Design
       («luego ya decoramos»).
 

@@ -95,6 +95,15 @@ export const BIBLIOGRAFIA = [
     fuentes: [],
   },
   {
+    tema: 'Ejercicios con tu peso',
+    dice: 'Puedes progresar con lastre o con más repeticiones: si llegas cerca del fallo, los dos hacen crecer el músculo.',
+    matiz: 'En Kikuchi y Nakazato 2017, flexiones y press de banca ligero, ambos hasta el fallo, dieron un crecimiento y una ganancia de fuerza parecidos. '
+      + 'Para fuerza máxima, el lastre (más peso) sigue siendo mejor.',
+    fuentes: [
+      { texto: 'Kikuchi y Nakazato (2017), Journal of Exercise Science & Fitness: press de banca ligero y flexiones.', url: 'https://pubmed.ncbi.nlm.nih.gov/29541130/' },
+    ],
+  },
+  {
     tema: 'Gemelo y sóleo',
     dice: 'Elevación de gemelos de pie: trabaja el gemelo y el sóleo. Sentado: sobre todo el sóleo.',
     matiz: 'En Kinoshita 2023, con una pierna de pie y la otra sentada durante 12 semanas, el gemelo creció mucho más de pie '

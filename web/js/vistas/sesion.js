@@ -137,8 +137,8 @@ export function vistaSesion(contenedor, { id }) {
     enCurso && sesion.ejercicios.length > 0 && h('button', { class: 'boton enlace cambiar-vista', onclick: () => elegirVista() },
       `Vista: ${MODOS_ENTRENO[modo]?.etiqueta.toLowerCase() ?? 'todos los ejercicios'} · cambiar`),
 
-    posicion == null && h('label', { class: 'campo' },
-      h('span', { class: 'etiqueta-campo' }, 'Notas del entrenamiento'),
+    h('label', { class: 'campo' },
+      h('span', { class: 'etiqueta-campo' }, 'Comentarios del entrenamiento'),
       h('textarea', { rows: 2, value: sesion.notas || '',
         oninput: (e) => cambiarSesion((s) => { s.notas = e.target.value; }, { tecleo: true }) })),
 
@@ -169,10 +169,16 @@ export function vistaSesion(contenedor, { id }) {
       });
       aviso('Ciclo añadido a la ficha del ejercicio.');
     };
+    const corporal = ej.carga?.tipo === 'pesoCorporal' && ej.esfuerzo?.tipo === 'repeticiones';
     const cerrar = modal('¿Qué ciclo?', h('div', { class: 'lista-selector' },
       h('p', { class: 'nota' }, `${ej.nombre} aún no tiene ciclo. Elige uno y se queda en su ficha:`),
       h('button', { type: 'button', class: 'boton-marca', onclick: () => crear('bilbo') },
-        h('strong', {}, 'Bilbo'), h('small', { class: 'bloque suave' }, 'Fuerza: empieza ligero con muchas repeticiones y sube 2,5 kg cada sesión.')),
+        h('strong', {}, corporal ? 'Bilbo con lastre' : 'Bilbo'),
+        h('small', { class: 'bloque suave' }, corporal ? 'Fuerza: empieza con poco lastre y sube 2,5 kg cada sesión.'
+          : 'Fuerza: empieza ligero con muchas repeticiones y sube 2,5 kg cada sesión.')),
+      corporal && h('button', { type: 'button', class: 'boton-marca', onclick: () => crear('repeticiones') },
+        h('strong', {}, 'Más repeticiones (sin lastre)'),
+        h('small', { class: 'bloque suave' }, 'Con tu peso: una repetición más cada sesión hasta llegar a 20.')),
       h('button', { type: 'button', class: 'boton-marca', onclick: () => { cerrar(); cicloPendiente = { sesion: id, ej: ej.id, i, j }; abrirFichaEnProgresion(ej.id); } },
         h('strong', {}, 'Otro: montarlo en la ficha'), h('small', { class: 'bloque suave' }, 'Se abre el ejercicio para elegirlo paso a paso.'))));
   }
@@ -366,7 +372,9 @@ export function vistaSesion(contenedor, { id }) {
     }
 
     if (s.modo === 'bilbo') {
-      if (s.sinCiclo) partes.push('Primera vez: pon un peso con el que hagas de 5 a 15 y haz todas las que puedas; con eso la app calcula tu fuerza');
+      if (s.sinCiclo) partes.push(planDe(ej, serie)?.progresion?.sobre === 'esfuerzo'
+        ? 'Primera vez: haz todas las que puedas; desde ahí el ciclo irá subiendo'
+        : 'Primera vez: pon un peso con el que hagas de 5 a 15 y haz todas las que puedas; con eso la app calcula tu fuerza');
       else if (s.cicloTerminado) partes.push(`Ciclo ${s.cicloN} terminado: prepara el siguiente en la ficha (o pon el reinicio en automático)`);
       else {
         partes.push(`Ciclo ${s.cicloN} · sesión ${serie.diaCiclo ?? s.dia}`);
@@ -447,7 +455,25 @@ export function vistaSesion(contenedor, { id }) {
       tramos ? tramosSerie(ej, i, j, serie, tramos) : valoresSerie(ej, i, j, serie),
       camposTecnicas(ej, i, j, serie),
       camposEstiramiento(ej, i, j, serie),
-      h('p', { class: 'comparacion' }, comparacionSerie(d, ej, serie, { excluirSesion: id })));
+      h('p', { class: 'comparacion' }, comparacionSerie(d, ej, serie, { excluirSesion: id })),
+      comentarioSerie(ej, i, j, serie));
+  }
+
+  // Un comentario por serie («agarre cerrado», «me molestó el hombro»…), y el
+  // de la última vez en esa misma serie, para tenerlo delante.
+  function comentarioSerie(ej, i, j, serie) {
+    const plan = planDe(ej, serie);
+    const antes = plan ? sugerenciaSerie(d, ej, plan, { excluirSesion: id }).ultima?.serie?.nota : null;
+    const caja = h('textarea', { rows: 2, class: 'nota-serie', placeholder: 'Comentario de esta serie', value: serie.nota ?? '', hidden: !serie.nota,
+      oninput: (e) => cambiarSesion((s) => {
+        const x = s.ejercicios[i].series[j];
+        if (e.target.value.trim()) x.nota = e.target.value; else delete x.nota;
+      }, { tecleo: true }) });
+    return h('div', { class: 'comentario-serie' },
+      antes && h('p', { class: 'nota' }, `💬 La otra vez: ${antes}`),
+      !serie.nota && h('button', { type: 'button', class: 'boton enlace boton-comentario',
+        onclick: (e) => { caja.hidden = false; e.currentTarget.remove(); caja.focus(); } }, '💬 Comentar'),
+      caja);
   }
 
   // Lo apuntado en una medida que no es la principal. Se guarda por nombre,
@@ -1083,7 +1109,8 @@ function resumenDelDia(contenedor, d, sesion) {
         h('h2', {}, ej?.nombre ?? 'Ejercicio borrado'),
         hechas.length && ej
           ? h('ol', { class: 'series-resumen' }, hechas.map((s) => h('li', {}, textoSerie(ej, s),
-            s.tipo === 'calentamiento' && h('small', { class: 'suave' }, ' · calentamiento'))))
+            s.tipo === 'calentamiento' && h('small', { class: 'suave' }, ' · calentamiento'),
+            s.nota && h('small', { class: 'bloque suave' }, `💬 ${s.nota}`))))
           : h('p', { class: 'suave' }, 'Sin series apuntadas'),
         entrada.nota && h('p', { class: 'nota' }, entrada.nota));
     }),

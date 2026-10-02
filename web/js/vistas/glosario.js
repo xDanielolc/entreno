@@ -25,6 +25,9 @@ export const GLOSARIO = {
     + 'con el mismo peso, respirando unas pocas veces entre ellas.' },
   bilbo: { pregunta: '¿Qué es una serie Bilbo?', termino: 'Serie Bilbo', texto: 'Un ciclo de unas 20 sesiones en el que el peso de cada día está fijado y sube poco a poco. Cada día intentas '
     + 'superar (en repeticiones, con ese peso) el 1RM del día anterior. Cuando el objetivo baja de 15 repeticiones, el ciclo se ha agotado.' },
+  sobrecarga: { pregunta: '¿Qué es la sobrecarga progresiva?', termino: 'Sobrecarga progresiva', texto: 'Para seguir mejorando, el cuerpo necesita que '
+    + 'cada cierto tiempo le pidas un poco más que la vez anterior: más peso, más repeticiones o más tiempo. Si siempre haces lo mismo, se '
+    + 'acostumbra y deja de mejorar. La progresión de cargas es el plan que decide cuánto y cuándo sube: en la app, el ciclo de cada ejercicio.' },
   'doble-progresion': { pregunta: '¿Qué es la doble progresión?', termino: 'Doble progresión', texto: 'Trabajas en un rango, por ejemplo de 8 a 12 repeticiones. Con el mismo peso subes '
     + 'repeticiones hasta llegar a 12; entonces subes el peso y vuelves a empezar por 8.' },
   volumen: { pregunta: '¿Qué es el volumen?', termino: 'Volumen', texto: 'Cuántas series haces de cada músculo a la semana. Entre 10 y 20 por músculo es lo que más '
@@ -52,6 +55,7 @@ export const GLOSARIO = {
 const TERMINOS = [
   ['1RM', 'rm'], ['recámara', 'recamara'], ['fallo', 'fallo'], ['repeticiones', 'repeticion'], ['drop set', 'drop-set'], ['rest-pause', 'rest-pause'],
   ['volumen', 'volumen'], ['trabajo', 'trabajo'], ['Bilbo', 'bilbo'], ['descarga', 'descarga'], ['doble progresión', 'doble-progresion'], ['HIIT', 'hiit'],
+  ['sobrecarga progresiva', 'sobrecarga'], ['progresión de cargas', 'sobrecarga'],
 ];
 const RE_TERMINOS = new RegExp(`(^|[^\\p{L}\\d])(${TERMINOS.map(([t]) => t).join('|')})(?![\\p{L}\\d])`, 'iu');
 

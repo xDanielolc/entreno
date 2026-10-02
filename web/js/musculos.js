@@ -30,7 +30,7 @@ export const MUSCULOS = {
   // El gemelo se entrena con la rodilla estirada (de pie); el sóleo, con la
   // rodilla doblada (sentado). Por eso van por separado.
   gemelo:          { nombre: 'Gemelo (gastrocnemio)', corto: 'Gemelo',          grupo: 'pierna', tamano: 'pequeno', vistas: ['detras'], propia: true },
-  soleo:           { nombre: 'Sóleo',            grupo: 'pierna', tamano: 'pequeno', vistas: ['detras'], propia: true },
+  soleo:           { nombre: 'Gemelo (sóleo)', corto: 'Sóleo', grupo: 'pierna', tamano: 'pequeno', vistas: ['detras'], propia: true },
   tibial:          { nombre: 'Tibial',           grupo: 'pierna', tamano: 'pequeno', vistas: ['delante'], propia: true },
 };
 
