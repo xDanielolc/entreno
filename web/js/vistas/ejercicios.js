@@ -176,6 +176,13 @@ const igualesFicha = new Map();  // id del ejercicio → ¿todas sus series igua
 // Un ejercicio nuevo que dejaste a medias: al volver a «+ Nuevo» sigues con él.
 let borradorNuevo = null;
 
+// Abre la ficha en «Paso a paso», directamente en la pregunta de cómo progresa.
+export function abrirFichaEnProgresion(id) {
+  vistaFicha.set(id, 'paso');
+  pasoFicha.set(id, 'progresion');
+  location.hash = `#/ejercicio/${id}`;
+}
+
 export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) {
   const d = estado.datos();
   const existente = id !== 'nuevo' ? d.ejercicios.find((e) => e.id === id) : null;
@@ -445,7 +452,9 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         : borrador.series.map((plan, k) => [`Serie ${k + 1} de ${n}: ¿cómo progresa?`, [tarjetaPlan(plan, k)]])),
       finos && ['Ajustes finos (opcional)', [finos]],
     ].filter(Boolean);
-    const i = Math.min(pasoFicha.get(clave) ?? 0, pasos.length - 1);
+    const guardado = pasoFicha.get(clave);
+    const i = guardado === 'progresion' ? Math.max(0, pasos.findIndex(([t]) => /progres/.test(t)))
+      : Math.min(guardado ?? 0, pasos.length - 1);
     const ir = (n) => {
       if (n > i && i === 0 && !borrador.nombre.trim()) { aviso('Ponle un nombre al ejercicio', { tipo: 'error' }); return; }
       pasoFicha.set(clave, n); repintar(); window.scrollTo(0, 0);

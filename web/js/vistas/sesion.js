@@ -1,3 +1,4 @@
+import { abrirFichaEnProgresion } from './ejercicios.js';
 import {
   aPesoDisponible, cargaCorporal, cargaDesdeLectura, esfuerzoTotal, formatearNumero,
   redondear, rmDeReferencia, sugerenciaSerie, trabajoSerie, tramosPropuestos, usaTramos,
@@ -172,7 +173,7 @@ export function vistaSesion(contenedor, { id }) {
       h('p', { class: 'nota' }, `${ej.nombre} aún no tiene ciclo. Elige uno y se queda en su ficha:`),
       h('button', { type: 'button', class: 'boton-marca', onclick: () => crear('bilbo') },
         h('strong', {}, 'Bilbo'), h('small', { class: 'bloque suave' }, 'Fuerza: empieza ligero con muchas repeticiones y sube 2,5 kg cada sesión.')),
-      h('button', { type: 'button', class: 'boton-marca', onclick: () => { cerrar(); cicloPendiente = { sesion: id, ej: ej.id, i, j }; location.hash = `#/ejercicio/${ej.id}`; } },
+      h('button', { type: 'button', class: 'boton-marca', onclick: () => { cerrar(); cicloPendiente = { sesion: id, ej: ej.id, i, j }; abrirFichaEnProgresion(ej.id); } },
         h('strong', {}, 'Otro: montarlo en la ficha'), h('small', { class: 'bloque suave' }, 'Se abre el ejercicio para elegirlo paso a paso.'))));
   }
 
