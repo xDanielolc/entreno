@@ -37,6 +37,8 @@ const preguntandoVista = new Set();   // sesiones con el cartel de vista a punto
 // Entrenamientos ya terminados que has abierto para editar. Sin esto, un día
 // del historial se abre en resumen, sin nada que se pueda tocar sin querer.
 const editando = new Set();
+// Serie que espera a que montes su ciclo en la ficha: al volver se rehace.
+let cicloPendiente = null;
 
 export const MODOS_ENTRENO = {
   serie: { etiqueta: 'Solo la serie que toca', descripcion: 'Al apuntarla aparece la siguiente. Lo más limpio.' },
@@ -46,7 +48,7 @@ export const MODOS_ENTRENO = {
 
 // Qué es cada tipo de serie, en una línea (sale al elegirlo).
 const EXPLICA_TIPO = {
-  bilbo: 'La app te dice el peso y el objetivo, según el ciclo del ejercicio.',
+  bilbo: 'Sobrecarga progresiva: la app te dice el peso y el objetivo, según la progresión de cargas.',
   intensidad: 'Con una técnica: drop set, rest-pause, miorrepeticiones…',
   calentamiento: 'No cuenta para la recuperación ni para las series de la semana.',
   libre: 'Cuenta como una serie normal, pero sin objetivo: apuntas lo que hagas.',
@@ -60,6 +62,21 @@ export function vistaSesion(contenedor, { id }) {
     return;
   }
   const ejercicioDe = (ejId) => d.ejercicios.find((e) => e.id === ejId);
+  if (cicloPendiente?.sesion === id) {
+    const { ej: ejId, i, j } = cicloPendiente;
+    const plan = (ejercicioDe(ejId)?.series || []).find((p) => p.progresion?.tipo === 'bilbo');
+    const vieja = sesion.ejercicios[i]?.series[j];
+    if (plan && vieja && !vieja.hecha) {
+      cicloPendiente = null;
+      estado.cambiar((datos) => {
+        const s = datos.sesiones.find((x) => x.id === id);
+        const e = datos.ejercicios.find((x) => x.id === ejId);
+        s.ejercicios[i].series[j] = { ...crearSerieDesdePlan(datos, e, e.series.find((p) => p.id === plan.id), { excluirSesion: id }), id: vieja.id };
+      });
+      return;
+    }
+    if (!plan) cicloPendiente = null;
+  }
   if (sesion.estado === 'terminada' && !editando.has(id)) {
     resumenDelDia(contenedor, d, sesion);
     return;
@@ -125,11 +142,12 @@ export function vistaSesion(contenedor, { id }) {
         oninput: (e) => cambiarSesion((s) => { s.notas = e.target.value; }, { tecleo: true }) })),
 
     enCurso
-      ? h('button', { class: 'boton grande terminar-entreno', onclick: terminar }, 'Terminar entrenamiento')
+      ? [h('button', { class: 'boton grande terminar-entreno', onclick: terminar }, 'Terminar entrenamiento'),
+        h('button', { class: 'boton cancelar-entreno', onclick: cancelar }, 'Cancelar entrenamiento')]
       : [h('p', { class: 'nota' }, 'Cada cambio se guarda al momento. Si te equivocas, toca «Deshacer» en el aviso que sale abajo.'),
         h('button', { class: 'boton grande', onclick: () => { editando.delete(id); dispatchEvent(new HashChangeEvent('hashchange')); } }, 'Hecho, dejar de editar')],
 
-    !sesion.borrada && posicion == null
+    !sesion.borrada && posicion == null && !enCurso
       && h('button', { class: 'boton enlace peligro-texto', onclick: borrar }, 'Mover este entrenamiento a la papelera'));
 
   // El ejercicio no tiene ciclo: se elige uno aquí mismo (queda en su ficha)
@@ -154,7 +172,7 @@ export function vistaSesion(contenedor, { id }) {
       h('p', { class: 'nota' }, `${ej.nombre} aún no tiene ciclo. Elige uno y se queda en su ficha:`),
       h('button', { type: 'button', class: 'boton-marca', onclick: () => crear('bilbo') },
         h('strong', {}, 'Bilbo'), h('small', { class: 'bloque suave' }, 'Fuerza: empieza ligero con muchas repeticiones y sube 2,5 kg cada sesión.')),
-      h('button', { type: 'button', class: 'boton-marca', onclick: () => { cerrar(); location.hash = `#/ejercicio/${ej.id}`; } },
+      h('button', { type: 'button', class: 'boton-marca', onclick: () => { cerrar(); cicloPendiente = { sesion: id, ej: ej.id, i, j }; location.hash = `#/ejercicio/${ej.id}`; } },
         h('strong', {}, 'Otro: montarlo en la ficha'), h('small', { class: 'bloque suave' }, 'Se abre el ejercicio para elegirlo paso a paso.'))));
   }
 
@@ -970,6 +988,24 @@ export function vistaSesion(contenedor, { id }) {
   // Al terminar se cierra el entrenamiento y sale un resumen: récords,
   // mejoras, volumen de la semana y, si has cambiado algo respecto a la
   // rutina, si lo quieres solo para hoy o para siempre.
+  // Cancelar: por si has entrado sin querer. Sin nada apuntado se borra; con
+  // algo apuntado, va a la papelera (recuperable desde el historial).
+  async function cancelar() {
+    const algo = sesion.ejercicios.some((e) => e.series.some((s) => s.hecha));
+    if (!await confirmar(algo ? '¿Cancelar el entrenamiento? Lo apuntado irá a la papelera del historial.'
+      : '¿Cancelar el entrenamiento? No has apuntado nada.', { si: 'Cancelar entrenamiento', no: 'Seguir', peligro: true })) return;
+    guiado.delete(id);
+    estado.cambiar((datos) => {
+      if (algo) {
+        const s = datos.sesiones.find((x) => x.id === id);
+        if (s) { s.estado = 'terminada'; s.fin = new Date().toISOString(); s.borrada = new Date().toISOString(); }
+      } else {
+        datos.sesiones = datos.sesiones.filter((x) => x.id !== id);
+      }
+    });
+    location.hash = '#/';
+  }
+
   function terminar() {
     renovarAlTocar();
     cambiarSesion((s) => {

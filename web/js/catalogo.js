@@ -126,8 +126,10 @@ export const CATALOGO = [
   ej('Curl femoral tumbado', 'pierna', 'máquina', ['isquios'], []),
   ej('Curl femoral sentado', 'pierna', 'máquina', ['isquios'], []),
   ej('Curl nórdico', 'pierna', 'peso corporal', ['isquios'], [], corporal),
-  ej('Elevación de gemelos', 'pierna', 'máquina', ['gemelo'], ['soleo']),
-  ej('Elevación de gemelos sentado', 'pierna', 'máquina', ['soleo'], ['gemelo']),
+  // Kinoshita 2023: de pie crecen el gemelo y el sóleo (este, igual que
+  // sentado); sentado, el gemelo apenas crece.
+  ej('Elevación de gemelos', 'pierna', 'máquina', ['gemelo', 'soleo'], []),
+  ej('Elevación de gemelos sentado', 'pierna', 'máquina', ['soleo'], []),
   ej('Elevación de tibiales', 'pierna', 'pared', ['tibial'], [], corporal),
   ej('Tibial con disco', 'pierna', 'disco', ['tibial'], []),
   ej('Abductores en máquina', 'pierna', 'máquina', ['abductores'], ['gluteo']),
@@ -206,9 +208,9 @@ export const CATALOGO = [
   ej('Pull through en polea', 'pierna', 'polea', ['gluteo'], ['isquios', 'lumbar']),
 
   // --- Gemelo -------------------------------------------------------------
-  ej('Elevación de gemelos en multipower', 'pierna', 'multipower', ['gemelo'], ['soleo']),
-  ej('Elevación de gemelos en prensa', 'pierna', 'máquina', ['gemelo'], ['soleo']),
-  ej('Elevación de gemelos tipo burro', 'pierna', 'máquina', ['gemelo'], ['soleo']),
+  ej('Elevación de gemelos en multipower', 'pierna', 'multipower', ['gemelo', 'soleo'], []),
+  ej('Elevación de gemelos en prensa', 'pierna', 'máquina', ['gemelo', 'soleo'], []),
+  ej('Elevación de gemelos tipo burro', 'pierna', 'máquina', ['gemelo', 'soleo'], []),
 
   // --- Abdomen y oblicuos -------------------------------------------------
   ej('Crunch en suelo', 'core', 'suelo', ['abdomen'], [], corporal),
@@ -438,6 +440,16 @@ export function completarDesdeCatalogo(datos) {
   let n = 0;
   const usados = new Set((datos.sesiones ?? []).flatMap((s) => (s.ejercicios ?? []).map((x) => x.ejercicioId)));
   for (const ej of datos.ejercicios ?? []) {
+    // Las elevaciones de gemelos de antes solo llevaban «gemelo»: se ponen como
+    // en el catálogo (de pie, gemelo y sóleo; sentado, sóleo), una sola vez.
+    if (!ej.borrado && /elevaci[oó]n de gemelos/i.test(ej.nombre ?? '')
+      && JSON.stringify(ej.musculos?.principales ?? []) === '["gemelo"]' && !(ej.musculos?.secundarios ?? []).includes('soleo')) {
+      const igual = CATALOGO.find((c) => normalizar(c.nombre) === normalizar(ej.nombre));
+      if (igual) {
+        ej.musculos = { principales: [...igual.musculos.principales], secundarios: [...igual.musculos.secundarios] };
+        n += 1;
+      }
+    }
     if (ej.borrado || ej.grupo || ej.musculos?.principales?.length) continue;
     const base = CATALOGO.find((c) => normalizar(c.nombre) === normalizar(ej.nombre));
     if (!base) continue;

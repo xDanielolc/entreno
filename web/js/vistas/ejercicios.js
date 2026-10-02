@@ -188,6 +188,8 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
   const retomado = !existente && !paraSesion && Boolean(borradorNuevo);
   const borrador = existente ? structuredClone(existente) : paraSesion ? ejercicioVacio() : (borradorNuevo ??= ejercicioVacio());
   borrador.series ??= [];
+  // Más de 50 series no tiene sentido y bloquea el móvil al pintarlas.
+  if (borrador.series.length > 50) borrador.series.length = 50;
   borrador.musculos ??= { principales: [], secundarios: [] };
   const grupos = [...new Set([...GRUPOS, ...d.ejercicios.map((e) => e.grupo).filter(Boolean)])];
   const peso = d.perfil.pesoCorporalKg;
@@ -642,10 +644,10 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         h('button', { type: 'button', class: `boton-marca${n > 6 ? ' activo' : ''}`, 'aria-label': 'Otro número de series', onclick: () => {
           const caja = h('input', { type: 'text', inputmode: 'numeric', value: n > 6 ? String(n) : '', 'aria-label': 'Número de series' });
           const cerrar = modal('¿Cuántas series?', h('div', { class: 'formulario' },
-            h('label', { class: 'campo' }, h('span', { class: 'etiqueta-campo' }, 'Series'), caja),
+            h('label', { class: 'campo' }, h('span', { class: 'etiqueta-campo' }, 'Series (hasta 50)'), caja),
             h('button', { class: 'boton', onclick: () => {
               const m = Math.round(leerNumero(caja.value) ?? 0);
-              if (!(m >= 1)) { aviso('Pon un número', { tipo: 'error' }); return; }
+              if (!(m >= 1 && m <= 50)) { aviso('Entre 1 y 50', { tipo: 'error' }); return; }
               cerrar();
               fijar(m);
             } }, 'Hecho')));

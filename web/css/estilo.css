@@ -1265,7 +1265,6 @@ legend .ayuda, summary .ayuda { margin-left: 6px; vertical-align: middle; }
 
 /* Política de privacidad: un botón como los demás, a lo ancho. */
 .vista-ajustes > a.boton.secundario, a.boton-privacidad { display: flex; width: 100%; margin: 12px 0; }
-.capa-musculo { opacity: .82; }
 
 /* Nada se sale por la derecha: los textos largos parten línea. */
 html, body { overflow-x: hidden; }
@@ -1282,3 +1281,16 @@ html, body { overflow-x: hidden; }
 .panel-filtros .fila-filtros { grid-template-columns: 1fr; }
 .panel-filtros .selector-abrir { min-height: 40px; padding: 6px 10px; }
 .panel-filtros .modos-vista { margin-top: 8px; }
+
+/* Colores del cuerpo, opacos: con transparencia, el ámbar sobre el gris del
+   dibujo se volvía marrón. Ámbar de verdad. */
+.capa-musculo { opacity: 1; }
+:root { --mapa-ambar: #f5b800; }
+:root[data-tema="oscuro"] { --mapa-ambar: #ffc61a; }
+@media (prefers-color-scheme: dark) { :root:not([data-tema]) { --mapa-ambar: #ffc61a; } }
+/* Cebra bien visible. */
+.tabla-musculos tbody tr:nth-child(even) td { background: rgba(127, 127, 127, .24); }
+/* Política de privacidad: texto a la izquierda, como los apartados. */
+a.boton-privacidad { justify-content: flex-start; padding-left: 18px; }
+/* Cancelar entrenamiento, en rojo. */
+.boton.cancelar-entreno { background: transparent; color: var(--peligro); border-color: var(--peligro); width: 100%; margin-top: 8px; }

@@ -95,6 +95,15 @@ export const BIBLIOGRAFIA = [
     fuentes: [],
   },
   {
+    tema: 'Gemelo y sóleo',
+    dice: 'Elevación de gemelos de pie: trabaja el gemelo y el sóleo. Sentado: sobre todo el sóleo.',
+    matiz: 'En Kinoshita 2023, con una pierna de pie y la otra sentada durante 12 semanas, el gemelo creció mucho más de pie '
+      + '(9-12 % frente a 1-2 %) y el sóleo creció igual en las dos. Con la rodilla doblada, el gemelo queda corto y casi no trabaja.',
+    fuentes: [
+      { texto: 'Kinoshita et al. (2023), Frontiers in Physiology: elevación de gemelos de pie frente a sentado e hipertrofia.', url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC10753835/' },
+    ],
+  },
+  {
     tema: 'Periodizar: de volumen a peso',
     dice: 'Ir cambiando a lo largo del tiempo de más repeticiones y menos peso a menos repeticiones y más peso sube el 1RM algo más '
       + 'que entrenar siempre igual. Es lo que hace un ciclo Bilbo, y lo que hace Bilbo seguido de un 3×5.',

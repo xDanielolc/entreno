@@ -121,6 +121,9 @@ hecho; se retoma entero cuando toque.
 
 ## 3. Imágenes y estética
 
+- [ ] Los botones ‹ Ejercicio x de y › de abajo, al entrenar: funcionan pero no
+      convencen de aspecto (2-10-2026).
+
 - [ ] **Dibujos de técnica para todos los ejercicios**, del estilo del que hay
       en «Prensa de piernas»: figura anatómica en 3D, fondo blanco, músculos
       trabajados en rojo. Hay 97 imágenes para 300 ejercicios del catálogo. Las
