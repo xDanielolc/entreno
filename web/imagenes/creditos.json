@@ -340,6 +340,24 @@
    "autor": "clafal",
    "nombreEnWger": "Elevación de talón de pie"
   },
+  "Elevación de gemelos en prensa": {
+   "archivo": "imagenes/ejercicios/elevacion-de-gemelos-en-prensa.jpeg",
+   "autor": "wger",
+   "nombreEnWger": "Gemelos en prensa"
+  },
+  "Elevación de gemelos tipo burro": {
+   "archivo": "imagenes/ejercicios/elevacion-de-gemelos-tipo-burro.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "donkey-calf-raises"
+  },
+  "Elevación de gemelos en multipower": {
+   "archivo": "imagenes/ejercicios/elevacion-de-gemelos-en-multipower.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "standing-barbell-calf-raise",
+   "nota": "Provisional: con barra libre, no en multipower."
+  },
   "Elevación de gemelos sentado": {
    "archivo": "imagenes/ejercicios/elevacion-de-gemelos-sentado.jpeg",
    "autor": "AlucardEvil40",

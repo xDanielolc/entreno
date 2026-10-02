@@ -169,7 +169,7 @@ export function vistaSesion(contenedor, { id }) {
       });
       aviso('Ciclo añadido a la ficha del ejercicio.');
     };
-    const corporal = ej.carga?.tipo === 'pesoCorporal' && ej.esfuerzo?.tipo === 'repeticiones';
+    const corporal = ej.carga?.tipo === 'pesoCorporal' && medidasDe(ej)[0] === 'repeticiones';
     const cerrar = modal('¿Qué ciclo?', h('div', { class: 'lista-selector' },
       h('p', { class: 'nota' }, `${ej.nombre} aún no tiene ciclo. Elige uno y se queda en su ficha:`),
       h('button', { type: 'button', class: 'boton-marca', onclick: () => crear('bilbo') },

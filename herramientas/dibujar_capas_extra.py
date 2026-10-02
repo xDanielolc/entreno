@@ -54,8 +54,10 @@ CAPAS = {
         "detras": [[(92.5, 320), (91.4, 346), (89, 346), (84, 331.3), (76.5, 316.5), (84, 321)]],
     },
     "tibial": {
-        "delante": [[(75, 270), (81, 266), (85, 280), (84, 305), (81, 328), (77, 322),
-                     (73, 296)]],
+        # El vientre, bajo la rodilla y por fuera de la tibia; el tendón cruza
+        # por delante del tobillo hasta el pie (antes se quedaba corto).
+        "delante": [[(74, 274), (80, 270), (84, 282), (83, 304), (82, 318), (85, 332),
+                     (87, 341), (84, 342), (80, 330), (76, 318), (73, 298)]],
     },
 }
 

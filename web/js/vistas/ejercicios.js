@@ -21,6 +21,7 @@ import { seccionProgreso } from './graficas.js';
 import { imagenDe } from '../imagenes.js';
 import { anadir, aviso, confirmar, h, leerNumero, modal, nuevoId, plegable, selector } from '../ui.js';
 import { pista } from './tutorial.js';
+import { explicar } from './glosario.js';
 import { barraFiltros, cajaLista, ejercicioDesdeCatalogo, elegirEjercicio, filtrar, hayFiltro, ordenActual, pieCatalogo, tarjetaItem } from './selector-ejercicios.js';
 import { selectorTecnicas } from './tecnicas.js';
 import { TECNICAS } from '../esquema.js';
@@ -233,7 +234,17 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         vistas.map(([k, texto]) => h('button', { type: 'button', class: `boton-marca${vista() === k ? ' activo' : ''}`,
           'aria-pressed': String(vista() === k), onclick: () => { vistaFicha.set(clave, k); pintarCabecera(); repintar(); } }, texto))),
       vista() === 'progreso' && (seccionProgreso(d, existente) ?? h('p', { class: 'suave' }, 'Aún no hay progreso que enseñar.')),
+      vista() === 'progreso' && accionesEjercicio(),
     ].filter(Boolean));
+  }
+
+  // Archivar y borrar: en las tres vistas (en paso a paso, en el último paso).
+  function accionesEjercicio() {
+    if (!existente) return null;
+    return h('div', { class: 'acciones-ejercicio' },
+      h('button', { type: 'button', class: 'boton secundario', onclick: archivar },
+        borrador.archivado ? 'Recuperar ejercicio' : 'Archivar ejercicio'),
+      h('button', { type: 'button', class: 'boton peligro-contorno', onclick: borrarEjercicio }, 'Borrar ejercicio'));
   }
   pintarCabecera();
   anadir(contenedor,
@@ -425,9 +436,7 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         !existente && h('button', { type: 'button', class: 'boton secundario', onclick: descartar }, 'Descartar'),
         h('button', { class: 'boton', type: 'submit' }, 'Listo')),
 
-      existente && h('button', { type: 'button', class: 'boton enlace', onclick: archivar },
-        borrador.archivado ? 'Recuperar ejercicio' : 'Archivar ejercicio'),
-      existente && h('button', { type: 'button', class: 'boton enlace peligro-texto', onclick: borrarEjercicio }, 'Borrar ejercicio')];
+      accionesEjercicio()];
     const form = (...contenido) => h('form', { class: 'formulario', onsubmit: (e) => { e.preventDefault(); guardar(); } }, ...contenido);
     if (vista() !== 'paso') return form(...hijos);
 
@@ -467,7 +476,8 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
       ultimo && nota,
       h('div', { class: 'fila-botones' },
         i > 0 && h('button', { type: 'button', class: 'boton secundario', onclick: () => ir(i - 1) }, '‹ Atrás'),
-        ultimo ? botones.querySelector('[type=submit]') : h('button', { type: 'button', class: 'boton', onclick: () => ir(i + 1) }, 'Siguiente ›')));
+        ultimo ? botones.querySelector('[type=submit]') : h('button', { type: 'button', class: 'boton', onclick: () => ir(i + 1) }, 'Siguiente ›')),
+      ultimo && accionesEjercicio());
   }
 
   // Máquina con sus pesos: la app solo propone pesos que existen (drop sets,
@@ -770,7 +780,7 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
   // cambia lo que quieras.
   function prehechosPara() {
     const conCarga = borrador.carga.tipo !== 'ninguna';
-    const reps = borrador.esfuerzo.tipo === 'repeticiones';
+    const reps = medidasDe(borrador)[0] === 'repeticiones';
     const cardio = tipoDeEjercicio(borrador) === 'cardio';
     const lista = {};
     lista.mia = { etiqueta: 'Personalizar', tipo: 'bilbo', preset: 'personalizado',
@@ -900,6 +910,10 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
           } }, '🗑')),
 
       opciones(REGLAS, regla, (r) => fijarRegla(plan, r), { compacto: true }),
+      // Donde se presenta el ciclo, su «?»: qué es la sobrecarga progresiva.
+      regla === 'ciclo' && h('p', { class: 'nota centrado' }, '¿Qué es la sobrecarga progresiva? ',
+        h('button', { type: 'button', class: 'que-es', 'aria-label': 'Qué es la sobrecarga progresiva',
+          onclick: (e) => { e.preventDefault(); explicar('sobrecarga'); } }, '?')),
 
       regla !== 'libre' && regla !== 'calentamiento' && sinHistorial() && !['ninguna', 'altura'].includes(borrador.carga.tipo) && campo1RM(),
 

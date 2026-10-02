@@ -25,6 +25,15 @@ la estructura y `docs/esquema-datos.md` para el formato de los datos.
   modifica una migración publicada.
 - Colores solo mediante variables CSS: el diseño y los temas (claro, oscuro y
   4 o 5 más) se harán después en Claude Design.
+- **Botones y centrado por defecto**: toda acción es un botón (nunca un enlace
+  de texto suelto) y todo va centrado (títulos, botones, tablas con cebra),
+  como en una app del móvil. Dan lo ha tenido que corregir muchas veces.
+- **Colores**: el navegador de su móvil (Ecosia) oscurece la página e invierte
+  imágenes. Probar los cambios de color con Chrome en oscuro forzado
+  (`--blink-settings=forceDarkModeEnabled=true`) y no darlos por buenos sin
+  su captura. El mapa del cuerpo se pinta en un `<canvas>` por eso.
+- Pendientes en dos listas: `docs/pendientes.md` (código, Claude Code) y
+  `docs/pendientes-design.md` (dibujos y estética, Claude Design).
 - Repositorio **público** (GitHub Pages gratis): nada personal en el código,
   la documentación ni los commits. El autor de Git es la dirección noreply.
 

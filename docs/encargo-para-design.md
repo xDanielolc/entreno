@@ -49,9 +49,11 @@ abajo la explicación de por qué pide lo que pide, por si quieres cambiarlo.
 
 ---
 
-## Texto para pegar (dibujo del cuerpo, solo si hace falta)
+## Texto para pegar (dibujo del cuerpo)
 
-> Necesito una ilustración del cuerpo humano en SVG, de frente y de espaldas,
+> Necesito una ilustración del cuerpo humano en SVG, de frente, de espaldas y
+> **de lado** (para los ejercicios a una pierna o un brazo, el hombro lateral
+> y el cuello),
 > pensada para colorear cada músculo por separado según lo recuperado que esté.
 > Estilo limpio y plano, de app moderna, no una lámina de anatomía.
 >
@@ -62,7 +64,8 @@ abajo la explicación de por qué pide lo que pide, por si quieres cambiarlo.
 >   `cuello`, `trapecio`, `hombro` (deltoides anterior y lateral),
 >   `hombroPosterior`, `pecho`, `biceps`, `triceps`, `antebrazo`, `abdomen`,
 >   `oblicuos`, `dorsal`, `lumbar`, `gluteo`, `abductores` (glúteo medio),
->   `cuadriceps`, `aductores`, `isquios`, `gemelo`, `tibial`.
+>   `cuadriceps`, `aductores`, `isquios`, `gemelo`, `soleo`, `tibial`
+>   (y el antebrazo partido, ver abajo).
 > - Los músculos simétricos incluyen los dos lados dentro del mismo grupo.
 > - Sin colores fijos: los rellenos deben usar `fill="currentColor"` o una
 >   variable CSS, para poder pintarlos desde la app.
@@ -72,7 +75,21 @@ abajo la explicación de por qué pide lo que pide, por si quieres cambiarlo.
 > Defectos del dibujo actual (wger) que conviene evitar: la silueta de frente
 > tiene un hueco claro en el centro del pecho, y no está centrada exactamente
 > (el cuello queda 1,5 px a la derecha del eje), lo que obliga a desplazar
-> capas a mano.
+> capas a mano. Además:
+> - La línea alba (el surco del centro del abdomen) es demasiado ancha.
+> - El hombro anterior está demasiado bajo.
+> - El tibial debe ir de justo bajo la rodilla, por fuera de la tibia, y su
+>   tendón cruzar por delante del tobillo hasta el pie.
+> - El antebrazo, en dos músculos: `antebrazoFlexor` (cara de la palma) y
+>   `antebrazoExtensor` (cara de los nudillos).
+> - El gemelo, en dos: `gemelo` (gastrocnemio, las dos cabezas de arriba) y
+>   `soleo` (debajo y a los lados).
+>
+> Importante para los colores: algunos navegadores del móvil oscurecen la web
+> por su cuenta e **invierten las imágenes**. El dibujo tiene que seguir
+> leyéndose si se invierte: la silueta en un gris medio (ni blanco ni negro),
+> líneas finas y sin depender del color para separar zonas. La app pinta los
+> colores encima, en un lienzo, así que el SVG no debe llevar ninguno.
 
 ---
 

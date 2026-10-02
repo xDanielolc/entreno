@@ -80,5 +80,61 @@ export function siluetaCuerpo({ vista = 'delante', estadoPorMusculo = {}, alPuls
     }
     caja.append(capa);
   }
+  pintarEnLienzo(caja, fondo, vista);
   return caja;
+}
+
+// Algunos navegadores del móvil (Ecosia, Samsung Internet…) oscurecen la
+// página por su cuenta aunque la app ya tenga tema oscuro, y de paso invierten
+// las imágenes: el cuerpo salía gris claro y el ámbar, marrón. Lo que se pinta
+// en un <canvas> no lo tocan. Por eso el mapa se dibuja ahí; las capas siguen
+// encima, invisibles, para el título de cada músculo. Si algo falla, se
+// quedan las capas de siempre.
+const cargarImagen = (src) => new Promise((ok, mal) => {
+  const img = new Image();
+  img.onload = () => ok(img);
+  img.onerror = mal;
+  img.src = src;
+});
+
+async function pintarEnLienzo(caja, fondo, vista) {
+  try {
+    const base = await cargarImagen(fondo.src);
+    // Los colores salen del CSS (temas): hay que esperar a que esté en pantalla.
+    for (let i = 0; !caja.isConnected && i < 50; i++) await new Promise((r) => requestAnimationFrame(r));
+    if (!caja.isConnected) return;
+    const escala = Math.min(4, Math.max(2, window.devicePixelRatio || 1));
+    const ancho = Math.round((base.naturalWidth || 200) * escala);
+    const alto = Math.round((base.naturalHeight || 369) * escala);
+    const lienzo = document.createElement('canvas');
+    lienzo.width = ancho;
+    lienzo.height = alto;
+    lienzo.className = 'lienzo-cuerpo';
+    lienzo.setAttribute('aria-hidden', 'true');
+    const ctx = lienzo.getContext('2d');
+    ctx.globalAlpha = Number(getComputedStyle(fondo).opacity) || 1;
+    ctx.drawImage(base, 0, 0, ancho, alto);
+    // Cada músculo: su dibujo hace de molde y se rellena con su color.
+    const molde = document.createElement('canvas');
+    molde.width = ancho;
+    molde.height = alto;
+    const m = molde.getContext('2d');
+    for (const capa of caja.querySelectorAll('.capa-musculo:not(.sin-datos)')) {
+      const estilo = getComputedStyle(capa);
+      const ruta = new URL(archivoCapa(capa.dataset.musculo, vista), document.baseURI).href;
+      const img = await cargarImagen(ruta);
+      m.globalCompositeOperation = 'source-over';
+      m.clearRect(0, 0, ancho, alto);
+      m.drawImage(img, 0, 0, ancho, alto);
+      m.globalCompositeOperation = 'source-in';
+      m.fillStyle = estilo.backgroundColor;
+      m.fillRect(0, 0, ancho, alto);
+      ctx.globalAlpha = Number(estilo.opacity) || 1;
+      ctx.drawImage(molde, 0, 0);
+    }
+    fondo.after(lienzo);
+    caja.classList.add('con-lienzo');
+  } catch {
+    // Sin lienzo: se ven las capas de siempre.
+  }
 }

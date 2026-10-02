@@ -237,5 +237,40 @@ export function seccionProgreso(datos, ejercicio) {
         h('span', { class: 'suave' }, fechaCorta(r.mejorTrabajo.fecha)))),
     graficas.filter(Boolean),
     !graficas.filter(Boolean).length && h('p', { class: 'suave' },
-      'Cuando tengas dos días registrados aparecerán aquí las gráficas.'));
+      'Cuando tengas dos días registrados aparecerán aquí las gráficas.'),
+    tablaEntrenamientos(datos, ejercicio));
+}
+
+// Todos los días del ejercicio en una tabla, como en las hojas de cálculo:
+// fecha, ciclo, lo que hiciste, el 1RM del día y tus comentarios.
+function tablaEntrenamientos(datos, ejercicio) {
+  const dias = new Map();
+  for (const x of seriesDeEjercicio(datos, ejercicio.id)) {
+    if (x.serie.tipo === 'calentamiento') continue;
+    if (!dias.has(x.sesion.id)) dias.set(x.sesion.id, { sesion: x.sesion, entrada: x.entrada, series: [] });
+    dias.get(x.sesion.id).series.push(x.serie);
+  }
+  if (!dias.size) return null;
+  const conCarga = ejercicio.carga?.tipo !== 'ninguna';
+  const texto = (s) => (s.tramos?.length
+    ? s.tramos.map((t) => `${formatearNumero(t.carga)}×${formatearNumero(t.esfuerzo)}`).join(' → ')
+    : [s.carga != null && formatearNumero(s.carga), s.esfuerzo != null && `${formatearNumero(s.esfuerzo)}${s.recamara ? `+${s.recamara}` : ''}`]
+      .filter(Boolean).join('×'));
+  const filas = [...dias.values()].reverse();
+  return h('details', { class: 'tabla-datos' },
+    h('summary', {}, 'Ver los entrenamientos'),
+    h('div', { class: 'tabla-scroll' }, h('table', {},
+      h('thead', {}, h('tr', {}, h('th', {}, 'Día'), h('th', {}, 'Ciclo'), h('th', {}, conCarga ? 'kg × reps' : 'Hecho'),
+        conCarga && h('th', {}, '1RM'), h('th', {}, 'Comentarios'))),
+      h('tbody', {}, filas.map(({ sesion, entrada, series }) => {
+        const rm = conCarga ? Math.max(...series.map((s) => rmDeSerie(datos, ejercicio, s, esfuerzoTotal(s)) ?? 0)) : 0;
+        const notas = [...series.map((s) => s.nota), entrada.nota].filter(Boolean);
+        return h('tr', {},
+          h('th', {}, fechaCorta(sesion.fecha)),
+          h('td', {}, entrada.cicloN ? `${entrada.cicloN}·${entrada.diaCiclo ?? '—'}` : '—'),
+          h('td', {}, series.map(texto).join(' · ')),
+          conCarga && h('td', {}, rm ? formatearNumero(Math.round(rm * 10) / 10) : '—'),
+          h('td', { class: 'comentario' }, notas.join(' · ') || ''));
+      })))),
+    h('p', { class: 'nota centrado' }, 'Ciclo: número de ciclo · día. Calentamientos fuera.'));
 }

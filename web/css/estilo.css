@@ -1303,3 +1303,35 @@ a.boton-privacidad { justify-content: flex-start; padding-left: 18px; }
 .comentario-serie .boton-comentario { padding: 2px 0; font-size: .85rem; }
 .comentario-serie .nota-serie { width: 100%; margin-top: 4px; }
 .comentario-serie .nota-serie[hidden] { display: none; }
+
+/* Mapa del cuerpo pintado en un lienzo (ver musculos.js): el navegador no lo
+   oscurece. Las capas quedan encima, invisibles. */
+.lienzo-cuerpo { position: absolute; inset: 0; width: 100%; height: 100%; }
+.cuerpo.con-lienzo > img { visibility: hidden; }
+.cuerpo.con-lienzo .capa-musculo { background: transparent !important; }
+
+/* Cebra en todas las listas de filas: tablas, «Ver los números» y las barras
+   de series por músculo (que no son una tabla: por eso no salía). */
+.barras-musculo { gap: 0; }
+.barra-musculo { padding: 6px 8px; border-radius: 6px; }
+.barras-musculo .barra-musculo:nth-child(even),
+.tabla-datos tbody tr:nth-child(even) > *,
+.tabla-cebra tbody tr:nth-child(even) > * { background: rgba(127, 127, 127, .24); }
+
+/* «Ver los números» y «Ver los entrenamientos»: botón centrado y tabla centrada. */
+.tabla-datos summary { justify-content: center; margin: 8px auto 0; width: fit-content; padding: 0 18px;
+  border: 1px solid var(--borde); border-radius: var(--radio-pequeno); color: var(--texto); font-weight: 600; list-style: none; }
+.tabla-datos summary::-webkit-details-marker { display: none; }
+.tabla-datos[open] summary { background: var(--acento-suave); border-color: var(--acento); }
+.tabla-datos table { margin-top: 8px; }
+.tabla-datos th, .tabla-datos td, .tabla-datos tbody th { text-align: center; }
+.tabla-datos .tabla-scroll { overflow-x: auto; }
+.tabla-datos td.comentario { text-align: left; min-width: 9em; }
+
+/* Archivar y borrar: botones, no enlaces sueltos. */
+.acciones-ejercicio { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 16px; }
+.acciones-ejercicio .boton { flex: 1 1 140px; }
+.boton.peligro-contorno { background: transparent; color: var(--peligro); border-color: var(--peligro); }
+/* Progreso del ejercicio, centrado como el resto de la app. */
+.progreso > h2, .progreso > p, .progreso .figura figcaption { text-align: center; }
+.progreso > .fila-marcas { justify-content: center; }

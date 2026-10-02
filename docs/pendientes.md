@@ -1,4 +1,6 @@
-# Pendientes
+# Pendientes de código (Claude Code)
+
+Lo de dibujo y estética está aparte, en `pendientes-design.md`.
 
 Todo lo que está hablado y aún no está hecho. Se anota aquí en cuanto se
 decide, aunque no toque hacerlo ahora: es la memoria del proyecto, para que
@@ -23,6 +25,24 @@ que la app funcione en condiciones. Centrémonos en eso»*.
 - [x] Ventana de Google: ya no se abre sola nunca (0.24.1). Queda comprobar en
       el móvil que el cartel con el botón «Renovar» sí la deja abrir.
 - [x] Borrar los intervalos guardados (0.24.0).
+
+### Lista del 3-10-2026 (tras probar la 0.37)
+
+- [ ] **Probar borrar un ejercicio** (Dan): que no desaparezca de los
+      entrenamientos pasados, recuperarlo en Ajustes y ver que vuelve bien.
+- [ ] **Confirmar en su móvil los colores del cuerpo** pintados en lienzo
+      (0.38.0). Si siguen saliendo marrones, el lienzo tampoco se libra del
+      oscurecido de Ecosia y habrá que buscar otra vía.
+- [ ] **Antebrazo en dos** (flexores, cara de la palma; extensores, cara de
+      los nudillos): músculos nuevos en `musculos.js`, repartir los ejercicios
+      del catálogo y migrar los que digan «antebrazo». Espera a decidirlo con
+      Dan y al dibujo de Design.
+- [ ] **Opción unilateral** en «Ajustes finos» del ejercicio (a una pierna o
+      un brazo), cuando exista el muñeco de lado.
+- [ ] Exportar a las hojas de Drive los comentarios por serie y del
+      entrenamiento (pendiente de que Dan diga si los quiere).
+- [ ] Renovador de Cloudflare: Dan lo crea con `docs/cloudflare.md` y me pasa
+      la dirección; antes, pasar la app a «En producción» en Google.
 
 - [ ] **Revisar cómo se apuntan las demás técnicas de alta intensidad**
       (rest-pause, miorrepeticiones, isométrico final, excéntricas lentas,
@@ -120,6 +140,8 @@ hecho; se retoma entero cuando toque.
 - [ ] Decidir si los «?» del glosario quedan como están.
 
 ## 3. Imágenes y estética
+
+Pasado a `pendientes-design.md`. Se deja aquí lo que ya había, como historia.
 
 - [ ] Los botones ‹ Ejercicio x de y › de abajo, al entrenar: funcionan pero no
       convencen de aspecto (2-10-2026).
