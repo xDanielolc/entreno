@@ -104,12 +104,14 @@ export function explicar(clave) {
   if (!g) return;
   const cerrar = modal(g.termino, h('div', {},
     h('p', {}, g.texto),
-    h('button', { class: 'boton', onclick: () => cerrar() }, 'Entendido'),
-    h('button', { class: 'boton enlace', onclick: () => {
-      estado.cambiar((x) => { x.perfil.glosario = 'ninguno'; });
-      cerrar();
-      aviso('Quitados los «?». Para recuperarlos, Ajustes → Entrenamiento y series.');
-    } }, 'No me pongas más «?»')));
+    // Los dos botones, uno al lado del otro.
+    h('div', { class: 'fila-botones' },
+      h('button', { class: 'boton secundario', onclick: () => {
+        estado.cambiar((x) => { x.perfil.glosario = 'ninguno'; });
+        cerrar();
+        aviso('Quitados los «?». Para recuperarlos, Ajustes → Entrenamiento y series.');
+      } }, 'No me pongas más «?»'),
+      h('button', { class: 'boton', onclick: () => cerrar() }, 'Entendido'))));
 }
 
 // Lista completa, para Aprender.

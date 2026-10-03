@@ -12,6 +12,7 @@ import {
 import { abrirAlLlegar, anadir, aviso, h, hoyISO, modal, plegable, selector } from '../ui.js';
 import { conGlosario } from './glosario.js';
 import { pista } from './tutorial.js';
+import { tarjetaEquilibrio } from './equilibrio.js';
 
 // Referencias de volumen semanal por músculo (ver Ajustes → De dónde sale cada cosa).
 const SERIES_MINIMAS = 10;
@@ -161,6 +162,7 @@ export function vistaCuerpo(contenedor) {
   anadir(contenedor,
     h('h1', {}, 'Tu cuerpo'),
     tarjetaMapa(d),
+    tarjetaEquilibrio(d),
     tarjetaSeries(d),
     tarjetaAjustePersonal(d));
 }

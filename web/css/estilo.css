@@ -1308,7 +1308,7 @@ a.boton-privacidad { justify-content: flex-start; padding-left: 18px; }
    oscurece. Las capas quedan encima, invisibles. */
 .lienzo-cuerpo { position: absolute; inset: 0; width: 100%; height: 100%; }
 .cuerpo.con-lienzo > img { visibility: hidden; }
-.cuerpo.con-lienzo .capa-musculo { background: transparent !important; }
+.cuerpo:not(.sin-lienzo) .capa-musculo { background: transparent !important; }
 
 /* Cebra en todas las listas de filas: tablas, «Ver los números» y las barras
    de series por músculo (que no son una tabla: por eso no salía). */
@@ -1335,3 +1335,56 @@ a.boton-privacidad { justify-content: flex-start; padding-left: 18px; }
 /* Progreso del ejercicio, centrado como el resto de la app. */
 .progreso > h2, .progreso > p, .progreso .figura figcaption { text-align: center; }
 .progreso > .fila-marcas { justify-content: center; }
+
+/* Colores del mapa (0.39): rojo sangre, ámbar y verde oscuro, como pidió Dan;
+   en el lienzo van algo transparentes sobre el dibujo. */
+:root, :root[data-tema="oscuro"] {
+  --mapa-rojo: #b3261e; --mapa-ambar: #e8a317; --mapa-verde: #23824a;
+  --mapa-azul: #2f6fd0; --mapa-morado: #7c4dd8;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-tema]) {
+  --mapa-rojo: #b3261e; --mapa-ambar: #e8a317; --mapa-verde: #23824a;
+  --mapa-azul: #2f6fd0; --mapa-morado: #7c4dd8;
+} }
+.tabla-prueba { width: 100%; border-collapse: collapse; }
+.tabla-prueba td { padding: 6px 8px; text-align: center; }
+
+/* Cebra (0.39): el color de fondo liso no aguantaba el oscurecido del
+   navegador del móvil; se prueba con un degradado gris, que se pinta como
+   una imagen. En #/prueba-colores hay otras formas para comparar. */
+.tabla-musculos tbody tr:nth-child(even) td,
+.barras-musculo .barra-musculo:nth-child(even),
+.tabla-datos tbody tr:nth-child(even) > *,
+.tabla-cebra tbody tr:nth-child(even) > * {
+  background-color: transparent;
+  background-image: linear-gradient(rgba(128, 128, 128, .28), rgba(128, 128, 128, .28));
+}
+
+/* Nada de enlaces verdes sueltos (Dan, 3-10-2026): lo que antes era un
+   «botón enlace» ahora es un botón de verdad, con borde y centrado. */
+.boton.enlace {
+  background: var(--superficie);
+  color: var(--texto);
+  border: 1px solid var(--borde);
+  width: fit-content;
+  max-width: 100%;
+  min-width: min(100%, 14em);
+  margin: 8px auto;
+  align-self: center;
+  display: flex;
+  font-weight: 600;
+}
+.boton.enlace.peligro-texto { border-color: var(--peligro); background: transparent; }
+.fila-botones > .boton.enlace, .acciones-hoy > .boton.enlace { margin: 0; min-width: 0; width: auto; }
+/* La línea de comentario de la serie y la de «Ejercicio x de y» siguen siendo discretas. */
+.comentario-serie .boton.enlace, .guiado-cabecera .boton.enlace { min-width: 0; margin: 4px auto; }
+
+/* Equilibrio: gráfico de araña (idea de Lyfta). */
+.equilibrio .fila-marcas.centrada { justify-content: center; flex-wrap: wrap; margin-top: 8px; }
+.arana { display: block; width: 100%; max-width: 360px; margin: 8px auto; overflow: visible; }
+.arana-red { fill: none; stroke: var(--borde); stroke-width: 1; }
+.arana-objetivo { fill: none; stroke: var(--texto-suave); stroke-width: 1.5; stroke-dasharray: 5 4; }
+.arana-valor { fill: color-mix(in srgb, var(--mapa-rojo) 35%, transparent); stroke: var(--mapa-rojo); stroke-width: 2; }
+.arana-punto { fill: var(--mapa-rojo); }
+.arana-etiqueta { fill: var(--texto); font-size: 12px; }
+.lista-equilibrio { padding-left: 18px; }

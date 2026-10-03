@@ -777,7 +777,8 @@ export function vistaSesion(contenedor, { id }) {
         conCarga && campoCargaConPorcentaje(ej, i, j, serie, k),
         h('label', { class: 'valor' },
           h('input', { type: 'text', inputmode: 'decimal', value: tramo.esfuerzo ?? '', 'aria-label': `Repeticiones de la bajada ${k + 1}`,
-            placeholder: anterior?.tramos?.[k]?.esfuerzo ?? tramo.objetivo ?? '',
+            // Sin números de la otra vez dentro de la casilla: parecían ya escritos.
+            placeholder: '—',
             oninput: (e) => actualizar((x) => {
               const antes = x.tramos[k].esfuerzo;
               x.tramos[k].esfuerzo = leerNumero(e.target.value);

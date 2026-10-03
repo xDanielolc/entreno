@@ -47,7 +47,7 @@ export function csvEntrenamientos(datos) {
   const MAX = 8;
   const cabecera = ['Fecha', 'Rutina', 'Día', 'Sitio', 'Ejercicio'];
   for (let i = 1; i <= MAX; i++) cabecera.push(`Serie ${i}`);
-  cabecera.push('Mejor 1RM del día', 'Notas');
+  cabecera.push('Mejor 1RM del día', 'Comentarios de las series', 'Comentarios del entrenamiento');
   const lineas = [['Cada serie: peso × repeticiones + las que te quedaban. Un drop set: 60×8 → 50×6.'], cabecera];
   const sesiones = [...datos.sesiones].filter((s) => !s.borrada)
     .sort((a, b) => (a.fecha + (a.inicio || '')).localeCompare(b.fecha + (b.inicio || '')));
@@ -65,7 +65,10 @@ export function csvEntrenamientos(datos) {
       const rms = ej.carga?.tipo !== 'ninguna'
         ? hechas.filter((x) => !x.tramos?.length).map((x) => rmDeSerie(datos, ej, x, esfuerzoTotal(x))).filter(Boolean) : [];
       lineas.push([s.fecha, rutina?.nombre ?? '', dia?.nombre ?? '', s.sedeId ? nombreSede(datos, s.sedeId) : '', ej.nombre,
-        ...celdas, rms.length ? Math.round(Math.max(...rms) * 10) / 10 : '', entrada.notas || s.notas || '']);
+        ...celdas, rms.length ? Math.round(Math.max(...rms) * 10) / 10 : '',
+        // «Serie 2: me costó» por cada serie comentada, y lo del ejercicio.
+        [...hechas.map((x, k) => x.nota && `Serie ${k + 1}: ${x.nota}`), entrada.nota].filter(Boolean).join(' · '),
+        s.notas || '']);
     }
   }
   return filas(lineas);

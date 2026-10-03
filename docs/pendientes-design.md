@@ -12,13 +12,13 @@ Dan lo dijo así: «luego ya decoramos». Se hace cuando la app funcione bien.
 
 - [ ] **Muñeco de lado**, además de frente y espalda: para los ejercicios a
       una pierna o un brazo, el hombro lateral y el cuello (3-10-2026).
-- [ ] Línea alba más fina: ahora es demasiado ancha.
-- [ ] Hombro anterior más alto: ahora está demasiado bajo.
-- [ ] Tibial bien colocado. Arreglado a mano en la 0.38.0 (ahora llega al
-      tobillo); Design lo dibujará bien.
-- [ ] Antebrazo partido en dos: cara de la palma (flexores) y cara de los
-      nudillos (extensores). Necesita también un cambio de código (ver
-      `pendientes.md`).
+- [ ] Abdomen en cuadraditos con la línea alba fina, hombro anterior más
+      alto y tibial en lágrima: hechos a mano en la 0.39.0, provisionales.
+      La línea clara del centro del tronco es del dibujo de wger: solo se va
+      con un cuerpo nuevo.
+- [ ] Antebrazo en dos (palma y nudillos): capas provisionales en la 0.39.0.
+- [ ] Iconos pequeños del cuerpo para cada eje del gráfico «Equilibrio»,
+      como los de Lyfta (cada uno con su zona en rojo).
 - [ ] Gemelo y sóleo ya están separados con capas propias provisionales; que
       Design los dibuje bien.
 - [ ] Que el dibujo aguante que el navegador lo invierta (ver «Lección» abajo).

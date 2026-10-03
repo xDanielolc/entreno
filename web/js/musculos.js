@@ -12,13 +12,17 @@
 export const MUSCULOS = {
   cuello:          { nombre: 'Cuello',           grupo: 'core',   tamano: 'pequeno', vistas: ['delante', 'detras'], propia: true },
   trapecio:        { nombre: 'Trapecio',         grupo: 'tirón',  tamano: 'medio',   vistas: ['detras'] },
-  hombro:          { nombre: 'Hombro anterior y lateral', corto: 'Hombros', grupo: 'empuje', tamano: 'pequeno', vistas: ['delante'] },
+  hombro:          { nombre: 'Hombro anterior y lateral', corto: 'Hombros', grupo: 'empuje', tamano: 'pequeno', vistas: ['delante'], propia: true },
   hombroPosterior: { nombre: 'Hombro posterior', grupo: 'tirón',  tamano: 'pequeno', vistas: ['detras'], propia: true },
   pecho:           { nombre: 'Pecho',            grupo: 'empuje', tamano: 'grande',  vistas: ['delante'] },
   biceps:          { nombre: 'Bíceps',           grupo: 'tirón',  tamano: 'pequeno', vistas: ['delante'] },
   triceps:         { nombre: 'Tríceps',          grupo: 'empuje', tamano: 'pequeno', vistas: ['detras'] },
-  antebrazo:       { nombre: 'Antebrazo',        grupo: 'tirón',  tamano: 'pequeno', vistas: ['delante', 'detras'], propia: true },
-  abdomen:         { nombre: 'Abdomen',          grupo: 'core',   tamano: 'medio',   vistas: ['delante'] },
+  // El antebrazo, en dos: la cara de la palma (flexores de la muñeca y los
+  // dedos: agarre, curl de muñeca) y la de los nudillos (extensores: curl
+  // invertido, extensión de muñeca).
+  antebrazoFlexor:   { nombre: 'Antebrazo (flexores, cara de la palma)', corto: 'Antebrazo palma', grupo: 'tirón', tamano: 'pequeno', vistas: ['delante'], propia: true },
+  antebrazoExtensor: { nombre: 'Antebrazo (extensores, cara de los nudillos)', corto: 'Antebrazo nudillos', grupo: 'tirón', tamano: 'pequeno', vistas: ['detras'], propia: true },
+  abdomen:         { nombre: 'Abdomen',          grupo: 'core',   tamano: 'medio',   vistas: ['delante'], propia: true },
   oblicuos:        { nombre: 'Oblicuos',         grupo: 'core',   tamano: 'pequeno', vistas: ['delante'] },
   dorsal:          { nombre: 'Dorsal',           grupo: 'tirón',  tamano: 'grande',  vistas: ['detras'] },
   lumbar:          { nombre: 'Lumbares',         grupo: 'core',   tamano: 'medio',   vistas: ['detras'], propia: true },
@@ -37,7 +41,7 @@ export const MUSCULOS = {
 export const ORDEN_MUSCULOS = Object.keys(MUSCULOS);
 
 // Músculos del tren superior e inferior, para los filtros del catálogo.
-export const TREN_SUPERIOR = ['cuello', 'trapecio', 'hombro', 'hombroPosterior', 'pecho', 'biceps', 'triceps', 'antebrazo', 'dorsal'];
+export const TREN_SUPERIOR = ['cuello', 'trapecio', 'hombro', 'hombroPosterior', 'pecho', 'biceps', 'triceps', 'antebrazoFlexor', 'antebrazoExtensor', 'dorsal'];
 export const TREN_INFERIOR = ['gluteo', 'abductores', 'cuadriceps', 'aductores', 'isquios', 'gemelo', 'soleo', 'tibial'];
 
 export function nombreMusculo(clave, { corto = false } = {}) {
@@ -102,7 +106,13 @@ async function pintarEnLienzo(caja, fondo, vista) {
     const base = await cargarImagen(fondo.src);
     // Los colores salen del CSS (temas): hay que esperar a que esté en pantalla.
     for (let i = 0; !caja.isConnected && i < 50; i++) await new Promise((r) => requestAnimationFrame(r));
-    if (!caja.isConnected) return;
+    if (!caja.isConnected) { caja.classList.add('sin-lienzo'); return; }
+    // Las capas no se pintan (así no asoman un instante los colores viejos);
+    // su color se lee un momento con «sin-lienzo», sin llegar a pintarse.
+    caja.classList.add('sin-lienzo');
+    const colores = new Map([...caja.querySelectorAll('.capa-musculo:not(.sin-datos)')]
+      .map((capa) => [capa, getComputedStyle(capa).backgroundColor]));
+    caja.classList.remove('sin-lienzo');
     const escala = Math.min(4, Math.max(2, window.devicePixelRatio || 1));
     const ancho = Math.round((base.naturalWidth || 200) * escala);
     const alto = Math.round((base.naturalHeight || 369) * escala);
@@ -119,22 +129,29 @@ async function pintarEnLienzo(caja, fondo, vista) {
     molde.width = ancho;
     molde.height = alto;
     const m = molde.getContext('2d');
-    for (const capa of caja.querySelectorAll('.capa-musculo:not(.sin-datos)')) {
-      const estilo = getComputedStyle(capa);
+    for (const [capa, color] of colores) {
       const ruta = new URL(archivoCapa(capa.dataset.musculo, vista), document.baseURI).href;
       const img = await cargarImagen(ruta);
       m.globalCompositeOperation = 'source-over';
       m.clearRect(0, 0, ancho, alto);
       m.drawImage(img, 0, 0, ancho, alto);
       m.globalCompositeOperation = 'source-in';
-      m.fillStyle = estilo.backgroundColor;
+      m.fillStyle = color;
       m.fillRect(0, 0, ancho, alto);
-      ctx.globalAlpha = Number(estilo.opacity) || 1;
+      // Primero el color algo transparente y después solo su tono sobre el
+      // dibujo: se ven el color y las formas del músculo debajo.
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.globalAlpha = 0.5;
+      ctx.drawImage(molde, 0, 0);
+      ctx.globalCompositeOperation = 'color';
+      ctx.globalAlpha = 0.6;
       ctx.drawImage(molde, 0, 0);
     }
+    ctx.globalCompositeOperation = 'source-over';
     fondo.after(lienzo);
     caja.classList.add('con-lienzo');
   } catch {
     // Sin lienzo: se ven las capas de siempre.
+    caja.classList.add('sin-lienzo');
   }
 }

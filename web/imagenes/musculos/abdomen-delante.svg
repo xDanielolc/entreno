@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="369" viewBox="0 0 200 369">
+  <!-- abdomen (delante): capa propia de la app -->
+  <g fill="#000" stroke="#000" stroke-width="1.5" stroke-linejoin="round">
+    <path d="M 86.5 119 L 97 119 L 97 131 L 86.5 131 Z"/>
+    <path d="M 86.5 133.5 L 97 133.5 L 97 145.5 L 86.5 145.5 Z"/>
+    <path d="M 86.5 148 L 97 148 L 97 160 L 86.5 160 Z"/>
+    <path d="M 86.5 162.5 L 97 162.5 L 97 182 L 92 180 L 87.5 172 Z"/>
+    <path d="M 110.5 119 L 100 119 L 100 131 L 110.5 131 Z"/>
+    <path d="M 110.5 133.5 L 100 133.5 L 100 145.5 L 110.5 145.5 Z"/>
+    <path d="M 110.5 148 L 100 148 L 100 160 L 110.5 160 Z"/>
+    <path d="M 110.5 162.5 L 100 162.5 L 100 182 L 105 180 L 109.5 172 Z"/>
+  </g>
+</svg>

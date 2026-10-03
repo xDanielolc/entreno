@@ -33,14 +33,15 @@ que la app funcione en condiciones. Centrémonos en eso»*.
 - [ ] **Confirmar en su móvil los colores del cuerpo** pintados en lienzo
       (0.38.0). Si siguen saliendo marrones, el lienzo tampoco se libra del
       oscurecido de Ecosia y habrá que buscar otra vía.
-- [ ] **Antebrazo en dos** (flexores, cara de la palma; extensores, cara de
-      los nudillos): músculos nuevos en `musculos.js`, repartir los ejercicios
-      del catálogo y migrar los que digan «antebrazo». Espera a decidirlo con
-      Dan y al dibujo de Design.
+- [x] Antebrazo en dos: flexores (palma) y extensores (nudillos), con
+      migración de datos v11 (0.39.0).
+- [ ] **Cebra en su móvil**: la 0.39 la pinta con un degradado; si tampoco
+      sale, mirar qué letras ve en `#/prueba-colores` y usar esa forma.
 - [ ] **Opción unilateral** en «Ajustes finos» del ejercicio (a una pierna o
       un brazo), cuando exista el muñeco de lado.
-- [ ] Exportar a las hojas de Drive los comentarios por serie y del
-      entrenamiento (pendiente de que Dan diga si los quiere).
+- [x] Comentarios por serie y del entrenamiento en las hojas de Drive (0.39.0).
+- [x] Gráfico de araña «Equilibrio» en Cuerpo, idea de Lyfta (0.39.0).
+- [ ] Equilibrio: dibujitos del cuerpo en cada eje, como Lyfta (Design).
 - [ ] Renovador de Cloudflare: Dan lo crea con `docs/cloudflare.md` y me pasa
       la dirección; antes, pasar la app a «En producción» en Google.
 

@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 10;
+export const VERSION_ACTUAL = 11;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -410,6 +410,33 @@ const MIGRACIONES = {
       for (const entrada of sesion.ejercicios) for (const serie of entrada.series) serie.lastre ??= null;
     }
     datos.version = 10;
+    return datos;
+  },
+  // v11: el antebrazo se parte en flexores (cara de la palma) y extensores
+  // (cara de los nudillos). Cada ejercicio va a la suya según su nombre; lo
+  // que dependía del músculo (objetivos, ritmo, sensaciones) se copia a los dos.
+  10: (datos) => {
+    const cara = (nombre = '') => (/invertido|inverso|extensi[oó]n de mu[ñn]eca|martillo|reverse/i.test(nombre) ? ['antebrazoExtensor']
+      : /estiramiento de antebrazo|movilidad de mu[ñn]eca|neural/i.test(nombre) ? ['antebrazoFlexor', 'antebrazoExtensor']
+        : ['antebrazoFlexor']);
+    const cambiar = (lista, nombre) => (lista?.includes('antebrazo')
+      ? [...new Set(lista.flatMap((m) => (m === 'antebrazo' ? cara(nombre) : [m])))] : lista);
+    for (const ej of datos.ejercicios) {
+      if (!ej.musculos) continue;
+      ej.musculos.principales = cambiar(ej.musculos.principales, ej.nombre);
+      ej.musculos.secundarios = cambiar(ej.musculos.secundarios, ej.nombre)
+        ?.filter((m) => !ej.musculos.principales?.includes(m));
+    }
+    const duplicar = (obj) => {
+      if (!obj || !('antebrazo' in obj)) return;
+      obj.antebrazoFlexor ??= obj.antebrazo;
+      obj.antebrazoExtensor ??= obj.antebrazo;
+      delete obj.antebrazo;
+    };
+    duplicar(datos.perfil?.objetivoSeries);
+    duplicar(datos.perfil?.recuperacion?.factores);
+    for (const s of datos.sesiones) duplicar(s.sensaciones);
+    datos.version = 11;
     return datos;
   },
 };

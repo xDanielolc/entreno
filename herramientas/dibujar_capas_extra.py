@@ -19,11 +19,28 @@ ANCHO, ALTO = 200, 369
 
 # músculo → vista → lista de polígonos (lado izquierdo de la imagen)
 CAPAS = {
-    "antebrazo": {
+    # El antebrazo, en dos: de frente se ve la cara de la palma (flexores) y
+    # de espaldas, la de los nudillos (extensores).
+    "antebrazoFlexor": {
         "delante": [[(47, 137), (55, 141), (54, 152), (47, 165), (38, 178), (31, 184), (26, 181),
                      (30, 168), (37, 152)]],
+    },
+    "antebrazoExtensor": {
         "detras": [[(48, 135), (58, 139), (56, 152), (48, 168), (38, 186), (29, 188),
                     (32, 172), (40, 152)]],
+    },
+    # Abdomen y hombro, propios desde la 0.39 (los de wger no gustaban):
+    # abdominales en cuadraditos con la línea alba fina, y el hombro anterior
+    # cubriendo la cabeza del hombro, más arriba.
+    "abdomen": {
+        "delante": [[(86.5, 119), (97, 119), (97, 131), (86.5, 131)],
+                    [(86.5, 133.5), (97, 133.5), (97, 145.5), (86.5, 145.5)],
+                    [(86.5, 148), (97, 148), (97, 160), (86.5, 160)],
+                    [(86.5, 162.5), (97, 162.5), (97, 182), (92, 180), (87.5, 172)]],
+    },
+    "hombro": {
+        "delante": [[(58, 66), (52, 68), (47, 74), (45, 82), (46, 92), (50, 101), (55, 104),
+                     (59, 98), (62, 88), (66, 78), (68, 72), (64, 67)]],
     },
     "hombroPosterior": {
         "detras": [[(47, 76), (55, 70), (64, 71), (70, 77), (64, 86), (55, 96), (46, 101),
@@ -54,16 +71,19 @@ CAPAS = {
         "detras": [[(92.5, 320), (91.4, 346), (89, 346), (84, 331.3), (76.5, 316.5), (84, 321)]],
     },
     "tibial": {
-        # El vientre, bajo la rodilla y por fuera de la tibia; el tendón cruza
-        # por delante del tobillo hasta el pie (antes se quedaba corto).
-        "delante": [[(74, 274), (80, 270), (84, 282), (83, 304), (82, 318), (85, 332),
-                     (87, 341), (84, 342), (80, 330), (76, 318), (73, 298)]],
+        # Lágrima invertida bajo la rodilla, esquemática (como el pecho).
+        "delante": [[(75, 273), (79, 270), (83, 274), (84, 284), (83, 296), (80, 308),
+                     (78, 318), (76, 308), (73, 294), (73, 282)]],
     },
 }
 
 
-def reflejar(poligono):
-    return [(ANCHO - x, y) for x, y in poligono]
+# Eje de simetría: el cuerpo de wger tiene el centro del tronco en x = 98,5.
+EJE = {("abdomen", "delante"): 98.5}
+
+
+def reflejar(poligono, eje=ANCHO / 2):
+    return [(2 * eje - x, y) for x, y in poligono]
 
 
 # El cuerpo de wger no está centrado exactamente en x = 100: el cuello, visto
@@ -79,7 +99,7 @@ def trazado(poligono):
 def main():
     for musculo, vistas in CAPAS.items():
         for vista, poligonos in vistas.items():
-            todos = poligonos + [reflejar(p) for p in poligonos]
+            todos = poligonos + [reflejar(p, EJE.get((musculo, vista), ANCHO / 2)) for p in poligonos]
             dx = DESPLAZAMIENTO.get((musculo, vista), 0)
             transform = f' transform="translate({dx:g} 0)"' if dx else ""
             svg = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{ANCHO}" height="{ALTO}" '
