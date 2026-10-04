@@ -5,7 +5,7 @@
 // Separador «;» y coma decimal, como espera Excel en español. Empiezan con
 // la marca UTF-8 para que las tildes salgan bien.
 
-import { esfuerzoTotal } from './calculos.js';
+import { esfuerzoTotal, seriesDeEjercicio, trabajoSerie } from './calculos.js';
 import { TIPOS_CARGA, TIPOS_PROGRESION, TIPOS_SERIE } from './esquema.js';
 import { rmDeSerie } from './formula1rm.js';
 import { nombreMusculo } from './musculos.js';
@@ -112,7 +112,50 @@ export function csvEjerciciosYRutinas(datos) {
   return filas(lineas);
 }
 
+// Como las hojas de Dan: un bloque por ejercicio, uno debajo de otro; dentro,
+// cada ciclo en su grupo de columnas (Fecha, Día, Peso, Reps, Trabajo, 1RM,
+// Comentario) y una fila por día del ciclo. Se lee por columnas.
+export function csvProgresion(datos) {
+  const fecha = (iso) => (iso ? iso.split('-').reverse().join('/') : '');
+  const rm = (ej, s) => (ej.carga?.tipo !== 'ninguna' && !s.tramos?.length ? rmDeSerie(datos, ej, s, esfuerzoTotal(s)) : null);
+  const lineas = [['Una hoja por ejercicio, como tus Excel: cada ciclo en sus columnas y una fila por día.']];
+  for (const ej of [...datos.ejercicios].filter((e) => !e.borrado).sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'))) {
+    const todas = seriesDeEjercicio(datos, ej.id).filter((x) => x.serie.tipo !== 'calentamiento');
+    if (!todas.length) continue;
+    lineas.push([], [ej.nombre.toUpperCase()]);
+    // Bloques: uno por ciclo; lo que no va en ciclo, en «Historial» (lo mejor de cada día).
+    const bloques = new Map();
+    for (const x of todas) {
+      const clave = x.entrada.cicloN ? `Ciclo ${x.entrada.cicloN}` : 'Historial';
+      if (!bloques.has(clave)) bloques.set(clave, new Map());
+      const dias = bloques.get(clave);
+      const dia = `${x.sesion.id}`;
+      if (!dias.has(dia)) dias.set(dia, { x, series: [] });
+      dias.get(dia).series.push(x.serie);
+    }
+    const CABECERA = ['Fecha', 'Día', 'Peso', 'Reps', 'Trabajo', '1RM', 'Comentario'];
+    const columnas = [...bloques.entries()].map(([titulo, dias]) => ({
+      titulo,
+      filas: [...dias.values()].map(({ x, series }, k) => {
+        // La serie del día que manda: la de mayor 1RM (o la primera).
+        const s = [...series].sort((a, b) => (rm(ej, b) ?? 0) - (rm(ej, a) ?? 0))[0];
+        const notas = [...series.map((y) => y.nota), x.entrada.nota].filter(Boolean).join(' · ');
+        return [fecha(x.sesion.fecha), x.entrada.diaCiclo ?? k + 1,
+          s.tramos?.length ? textoSerieCorto(ej, s) : s.carga ?? '', s.tramos?.length ? '' : s.esfuerzo ?? '',
+          trabajoSerie(s) || '', rm(ej, s) != null ? Math.round(rm(ej, s) * 10) / 10 : '', notas];
+      }),
+    }));
+    const hueco = Array(CABECERA.length).fill('');
+    lineas.push(columnas.flatMap((c) => [c.titulo, ...hueco.slice(1), '']));
+    lineas.push(columnas.flatMap(() => [...CABECERA, '']));
+    const alto = Math.max(...columnas.map((c) => c.filas.length));
+    for (let i = 0; i < alto; i++) lineas.push(columnas.flatMap((c) => [...(c.filas[i] ?? hueco), '']));
+  }
+  return filas(lineas);
+}
+
 export const NOMBRES_CSV = {
+  progresion: 'Progresión por ejercicio (como tus Excel).csv',
   entrenamientos: 'Entrenamientos (legible).csv',
   ejercicios: 'Ejercicios y rutinas (legible).csv',
 };

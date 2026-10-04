@@ -104,6 +104,14 @@ export const BIBLIOGRAFIA = [
     ],
   },
   {
+    tema: 'Cuánto de tu peso levantas',
+    dice: 'En las flexiones levantas un 64 % de tu peso; con rodillas, un 49 %; con los pies en alto, hasta un 74 %. En dominadas y fondos, tu peso entero.',
+    matiz: 'Medido con plataformas de fuerza en Ebben 2011. Varía algo con la longitud de brazos y piernas de cada persona.',
+    fuentes: [
+      { texto: 'Ebben et al. (2011), J Strength Cond Res: análisis de fuerzas en variantes de flexiones.', url: 'https://pubmed.ncbi.nlm.nih.gov/21873902/' },
+    ],
+  },
+  {
     tema: 'Gemelo y sóleo',
     dice: 'Elevación de gemelos de pie: trabaja el gemelo y el sóleo. Sentado: sobre todo el sóleo.',
     matiz: 'En Kinoshita 2023, con una pierna de pie y la otra sentada durante 12 semanas, el gemelo creció mucho más de pie '

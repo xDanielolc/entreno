@@ -126,7 +126,8 @@ function arana(valores, anilloObjetivo) {
     return [C + Math.cos(a) * R * r, C + Math.sin(a) * R * r];
   };
   const poligono = (r) => valores.map((_, i) => punto(i, typeof r === 'function' ? r(i) : r).map((x) => x.toFixed(1)).join(',')).join(' ');
-  return nodo('svg', { viewBox: `0 0 ${T} ${T}`, class: 'arana', role: 'img',
+  // Márgenes anchos a los lados para que las etiquetas quepan en el móvil.
+  return nodo('svg', { viewBox: `-60 -10 ${T + 120} ${T + 20}`, class: 'arana', role: 'img',
     'aria-label': valores.map((v) => `${v.nombre}: ${formatearNumero(Math.round(v.hechas * 10) / 10)} series`).join('. ') },
   [0.25, 0.5, 0.75, 1].map((r) => nodo('polygon', { points: poligono(r), class: 'arana-red' })),
   valores.map((_, i) => { const [x, y] = punto(i, 1); return nodo('line', { x1: C, y1: C, x2: x, y2: y, class: 'arana-red' }); }),

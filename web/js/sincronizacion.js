@@ -15,7 +15,7 @@ import { migrar, necesitaMigrar, validar } from './esquema.js';
 import * as estado from './estado.js';
 import { completarDesdeCatalogo } from './catalogo.js';
 import { hayPase, minutosDeToken, olvidarToken, pedirToken, renovarConPase, tokenVigente } from './google-auth.js';
-import { NOMBRES_CSV, csvEjerciciosYRutinas, csvEntrenamientos } from './exportar.js';
+import { NOMBRES_CSV, csvEjerciciosYRutinas, csvEntrenamientos, csvProgresion } from './exportar.js';
 import * as local from './almacen-local.js';
 
 // 'sin-cuenta' | 'desconectada' | 'sincronizando' | 'al-dia' | 'pendiente' | 'sin-internet' | 'error'
@@ -185,7 +185,7 @@ async function subirCopiasLegibles({ forzar = false } = {}) {
   const d = estado.datos();
   if (!forzar && (meta.csvRevision === d.revision || Date.now() - (meta.csvHora ?? 0) < MEDIA_HORA)) return;
   const ids = { ...(meta.csvIds || {}) };
-  const hojas = { entrenamientos: csvEntrenamientos(d), ejercicios: csvEjerciciosYRutinas(d) };
+  const hojas = { progresion: csvProgresion(d), entrenamientos: csvEntrenamientos(d), ejercicios: csvEjerciciosYRutinas(d) };
   for (const [clave, texto] of Object.entries(hojas)) {
     const nombre = NOMBRES_CSV[clave];
     try {

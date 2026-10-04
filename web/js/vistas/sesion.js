@@ -6,7 +6,7 @@ import {
 import { guiaTrasPrueba, pintarGuia, pista } from './tutorial.js';
 import { queEs } from './glosario.js';
 import { abrirCronometro, abrirIntervalos } from './intervalos.js';
-import { modal, selector } from '../ui.js';
+import { ayuda, modal, selector } from '../ui.js';
 import { aplicarPreset } from '../ciclos.js';
 import { renovarAlTocar } from '../sincronizacion.js';
 import * as estado from '../estado.js';
@@ -735,12 +735,16 @@ export function vistaSesion(contenedor, { id }) {
     const plan = planDe(ej, serie);
     const anterior = plan ? sugerenciaSerie(d, ej, plan, { excluirSesion: id }).ultima?.serie : null;
     const modoCarga = modoCargaDe(d, ej, serie, sesion);
-    const total = h('p', { class: 'nota' });
+    // Lo de la otra vez va en su columna, a la izquierda; abajo, la fila de total.
+    const conAntes = Boolean(anterior?.tramos?.length);
+    const antes = (t) => (t ? `${t.carga != null ? `${formatearNumero(t.carga)}×` : ''}${formatearNumero(t.esfuerzo) || '—'}` : '');
+    const totalReps = h('span', { class: 'total-reps' });
+    const totalTexto = h('span', { class: 'total-etiqueta' });
     const pintarTotal = () => {
       const t = trabajoSerie(serie);
       const reps = esfuerzoTotal(serie);
-      total.textContent = reps ? `Hoy: ${serie.tramos.length} ${tramos.nombre.toLowerCase()}s · ${textoEsfuerzo(ej, reps)}`
-        + (t ? ` · ${formatearNumero(t)} kg de trabajo` : '') : '';
+      totalReps.textContent = reps ? textoEsfuerzo(ej, reps) : '—';
+      totalTexto.textContent = t ? `Total · ${formatearNumero(t)} kg de trabajo` : 'Total';
     };
     pintarTotal();
     const actualizar = (fn) => { cambiarSesion((s) => fn(s.ejercicios[i].series[j]), { tecleo: true }); if (sesion.tutorial) pintarGuia(); };
@@ -749,7 +753,7 @@ export function vistaSesion(contenedor, { id }) {
     return h('div', { class: 'tramos' },
       conCarga && !plan?.tramosFijos?.length && h('div', { class: 'modo-carga' },
         h('span', { class: 'suave' }, 'Elegir carga por:'),
-        [['kg', 'kg'], ['rm', '% del 1RM (automático)']].map(([clave, texto]) => h('button', {
+        [['kg', 'A mano'], ['rm', (d.perfil.dropSet?.modoCarga ?? 'rm') === 'rm' ? '% del 1RM (automático)' : '% del 1RM']].map(([clave, texto]) => h('button', {
           class: `chip seleccionable ${modoCarga === clave ? 'activo' : ''}`, 'aria-pressed': String(modoCarga === clave),
           onclick: () => {
             cambiarSesion((s) => {
@@ -759,21 +763,23 @@ export function vistaSesion(contenedor, { id }) {
             });
             if (clave === 'rm') recalcularAbajo(ej, i, { repintar: true });
           },
-        }, texto))),
-      conCarga && h('p', { class: 'nota nota-relleno' }, textoRelleno(ej, serie)),
+        }, texto)),
+        // Qué hace cada modo y de dónde salen hoy los kilos, solo si se pide.
+        ayuda('Elegir carga por', [textoRelleno(ej, serie),
+          'A mano: escribes los kilos tú y no cambian aunque cambie tu 1RM.',
+          '% del 1RM: la app pone los kilos según tu 1RM, y los recalcula al apuntar la serie de arriba.'])),
       h('p', { class: 'aviso-texto aviso-bajada' }, avisoPrimeraBajada(d, ej, serie) ?? ''),
-      anterior?.tramos?.length && h('p', { class: 'nota' }, `La otra vez: ${textoSerie(ej, anterior)}`
-        + ` (${textoEsfuerzo(ej, esfuerzoTotal(anterior))}`
-        + `${trabajoSerie(anterior) ? `, ${formatearNumero(trabajoSerie(anterior))} kg de trabajo` : ''}).`),
       // Cabecera y filas en la misma rejilla: cada título queda justo encima
       // de su columna (y un hueco encima de las ✕).
-      h('div', { class: `tramo cabecera-tramos${conCarga ? '' : ' sin-carga'}`, 'aria-hidden': 'true' },
+      h('div', { class: `tramo cabecera-tramos${conCarga ? '' : ' sin-carga'}${conAntes ? ' con-antes' : ''}`, 'aria-hidden': 'true' },
+        conAntes && h('span', { class: 'crece' }, 'La otra vez'),
         conCarga && h('span', { class: 'crece' }, unidadCarga(ej)),
         conCarga && h('span', { class: 'crece' }, '% 1RM'),
         h('span', { class: 'crece' }, unidadEsfuerzo(ej)),
         h('span', {})),
-      serie.tramos.map((tramo, k) => h('div', { class: `tramo${conCarga ? '' : ' sin-carga'}`, 'data-tramo': k },
+      serie.tramos.map((tramo, k) => h('div', { class: `tramo${conCarga ? '' : ' sin-carga'}${conAntes ? ' con-antes' : ''}`, 'data-tramo': k },
         h('span', { class: 'tramo-n', title: `${tramos.nombre} ${k + 1}` }, k + 1),
+        conAntes && h('span', { class: 'tramo-antes' }, antes(anterior.tramos[k])),
         conCarga && campoCargaConPorcentaje(ej, i, j, serie, k),
         h('label', { class: 'valor' },
           h('input', { type: 'text', inputmode: 'decimal', value: tramo.esfuerzo ?? '', 'aria-label': `Repeticiones de la bajada ${k + 1}`,
@@ -803,6 +809,10 @@ export function vistaSesion(contenedor, { id }) {
             }) })),
         serie.tramos.length > 1 ? h('button', { class: 'boton-icono', 'aria-label': `Quitar ${tramos.nombre.toLowerCase()} ${k + 1}`,
           onclick: () => cambiarSesion((s) => { s.ejercicios[i].series[j].tramos.splice(k, 1); }) }, '✕') : h('span', {}))),
+      h('div', { class: `tramo fila-total${conCarga ? '' : ' sin-carga'}${conAntes ? ' con-antes' : ''}` },
+        conAntes && h('span', { class: 'tramo-antes' }, textoEsfuerzo(ej, esfuerzoTotal(anterior))),
+        conCarga ? totalTexto : h('span', { class: 'oculto' }),
+        totalReps, h('span', {})),
 
       h('button', { class: 'boton enlace', onclick: () => cambiarSesion((s) => {
         const x = s.ejercicios[i].series[j];
@@ -814,8 +824,7 @@ export function vistaSesion(contenedor, { id }) {
       }) }, `+ ${tramos.nombre}`),
       tramos.tecnica === 'drop-set' && serie.planId && ej.maquinaPlacas
         && h('button', { class: 'boton enlace', onclick: () => fijarPesos(ej, serie) },
-          plan?.tramosFijos?.length ? 'Cambiar los pesos fijos por estos' : 'Fijar estos pesos para siempre (máquina de placas)'),
-      total);
+          plan?.tramosFijos?.length ? 'Cambiar los pesos fijos por estos' : 'Fijar estos pesos para siempre (máquina de placas)'));
   }
 
   // Máquinas de placas: la secuencia de pesos siempre es la misma. Se guarda

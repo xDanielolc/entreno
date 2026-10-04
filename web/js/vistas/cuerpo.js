@@ -132,7 +132,7 @@ let modoMapa = 'recuperacion';
 
 const LEYENDAS = {
   recuperacion: [['listo', 'Listo'], ['medio', 'A medias'], ['cansado', 'Aún tocado']],
-  semana: [['cansado', 'Poco'], ['medio', 'Algo'], ['listo', 'En su sitio'], ['pasado', 'Te pasas'], ['muy-pasado', 'Te pasas mucho']],
+  semana: [['cansado', 'Falta mucho'], ['medio', 'Falta un poco'], ['listo', 'Perfecto'], ['pasado', 'Te pasas'], ['muy-pasado', 'Te pasas mucho']],
   menos: [['cansado', 'Casi nada'], ['medio', 'Por debajo'], ['listo', 'Bien']],
 };
 

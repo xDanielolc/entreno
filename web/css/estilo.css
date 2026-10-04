@@ -1388,3 +1388,21 @@ a.boton-privacidad { justify-content: flex-start; padding-left: 18px; }
 .arana-punto { fill: var(--mapa-rojo); }
 .arana-etiqueta { fill: var(--texto); font-size: 12px; }
 .lista-equilibrio { padding-left: 18px; }
+
+/* Drop set: columna «La otra vez» a la izquierda y fila de total. */
+.tramo.con-antes { grid-template-columns: minmax(0, .9fr) repeat(3, minmax(0, 1fr)) 40px; }
+.tramo.sin-carga.con-antes { grid-template-columns: minmax(0, .9fr) minmax(0, 1fr) 40px; }
+.tramo-antes { text-align: center; font-size: .85rem; color: var(--texto-suave); font-variant-numeric: tabular-nums; }
+.tramo.fila-total { border-top: 1px solid var(--borde); padding-top: 6px; margin-top: 2px; font-weight: 600; }
+.fila-total .total-etiqueta { grid-column: span 2; text-align: center; font-size: .9rem; }
+.fila-total .total-reps { text-align: center; }
+.fila-total .oculto { display: none; }
+.modo-carga { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; }
+
+/* Móvil primero: ningún texto se sale de su botón; siempre centrado y, si
+   no cabe, en dos líneas. */
+.boton, .boton-marca, .chip, .boton-filtros, .selector-abrir {
+  text-align: center; white-space: normal; overflow-wrap: anywhere; min-width: 0; max-width: 100%;
+}
+.boton-marca { justify-content: center; }
+.fila-marcas > .boton-marca { flex: 1 1 auto; }

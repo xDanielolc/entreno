@@ -12,7 +12,7 @@ import { inicialDelPrograma, tramosPorDefecto } from '../calculos.js';
 import { EXPLICACIONES_1RM, FORMULAS, calibrar, estimar1RM, modeloDe, pesoParaReps, textoCalibracion } from '../formula1rm.js';
 import { FRACCION_CORPORAL_POR_NOMBRE, PROGRAMAS } from '../esquema.js';
 import { MODOS_INICIO, MODOS_REINICIO, PRESETS_CICLO, inicioDe, alargarCiclo, aplicarPreset, completarCiclo, describirCiclo, empezarCicloNuevo, escaleraDe } from '../ciclos.js';
-import { ayuda, hoyISO, confirmarEscribiendo } from '../ui.js';
+import { abrirAlLlegar, ayuda, hoyISO, confirmarEscribiendo, idApartado } from '../ui.js';
 import { CATALOGO, esMaquinaDePlacas, normalizar, tipoDeEjercicio } from '../catalogo.js';
 import { ORDEN_MUSCULOS, nombreMusculo } from '../musculos.js';
 import { entradaDeEjercicio, planesPorDefecto } from '../series.js';
@@ -386,7 +386,8 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         h('p', { class: 'nota' }, 'Sirve para el mapa de recuperación y para los avisos de volumen. Los secundarios cuentan la mitad.'),
         sugerenciaDelCatalogo(),
         selectorMusculos('Principales', borrador.musculos.principales, borrador.musculos.secundarios),
-        selectorMusculos('Secundarios', borrador.musculos.secundarios, borrador.musculos.principales)),
+        selectorMusculos('Secundarios', borrador.musculos.secundarios, borrador.musculos.principales),
+        conAgarre() && campoAgarre()),
 
       estira && h('fieldset', {},
         h('legend', {}, '¿Cómo lo haces normalmente?'),
@@ -525,6 +526,32 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         + 'Los drop sets, las subidas y los ciclos usarán solo estos.'));
   }
 
+  // Agarre: en los ejercicios donde agarras (tirones, peso muerto, curls),
+  // cambia qué cara del antebrazo trabaja. Con las palmas hacia abajo (prono)
+  // o enfrentadas (neutro) entra la cara de los nudillos (extensores y
+  // braquiorradial); con las palmas hacia arriba (supino), sobre todo la de
+  // la palma. Se marca solo como secundario; lo principal no se toca.
+  function conAgarre() {
+    const m = [...borrador.musculos.principales, ...borrador.musculos.secundarios];
+    return borrador.grupo === 'tirón' || m.some((x) => x.startsWith('antebrazo'));
+  }
+  function campoAgarre() {
+    const AGARRES = [['prono', 'Prono (palmas abajo)'], ['supino', 'Supino (palmas arriba)'], ['neutro', 'Neutro (palmas enfrentadas)'], ['mixto', 'Mixto (una y una)']];
+    return h('div', { class: 'campo' },
+      h('span', { class: 'etiqueta-campo' }, 'Agarre ', ayuda('Agarre', 'Con las palmas hacia abajo o enfrentadas trabaja también la cara de los nudillos del antebrazo; '
+        + 'con las palmas hacia arriba, sobre todo la de la palma. La app lo añade solo a los músculos secundarios.')),
+      selector([[null, 'Sin indicar'], ...AGARRES], borrador.agarre ?? null, (v) => {
+        borrador.agarre = v;
+        const sec = borrador.musculos.secundarios.filter((x) => x !== 'antebrazoExtensor' && x !== 'antebrazoFlexor');
+        const pri = borrador.musculos.principales;
+        const anadirSi = (m, si) => { if (si && !pri.includes(m)) sec.push(m); };
+        anadirSi('antebrazoFlexor', v != null);
+        anadirSi('antebrazoExtensor', v === 'prono' || v === 'neutro' || v === 'mixto');
+        borrador.musculos.secundarios = sec;
+        repintar();
+      }, { titulo: 'Agarre', botones: true }));
+  }
+
   // Peso corporal: qué parte de tu peso levantas. En cada serie solo se
   // apunta el lastre; la carga sale sola.
   function campoFraccionCorporal() {
@@ -539,7 +566,9 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
       h('div', { class: 'fila-marcas compacta' }, [['Flexiones', 64], ['Flexiones con rodillas', 49], ['Flexiones con pies en alto (cajón de 60 cm)', 74],
         ['Dominadas y fondos', 100]].map(([texto, n]) => h('button', { type: 'button', class: `boton-marca${pct === n ? ' activo' : ''}`,
         onclick: () => { borrador.fraccionCorporal = n / 100; repintar(); } }, `${texto}: ${n} %`))),
-      h('small', { class: 'nota' }, 'Toca uno para ponerlo. Las flexiones salen de Ebben 2011.'));
+      h('small', { class: 'nota' }, 'Pesos sacados de Ebben (2011) ',
+        h('button', { type: 'button', class: 'que-es', 'aria-label': 'Ver la fuente',
+          onclick: (e) => { e.preventDefault(); abrirAlLlegar('ap-de-donde-sale-cada-cosa', idApartado('Cuánto de tu peso levantas')); location.hash = '#/aprender'; } }, '?')));
   }
 
   // La unidad de una medida: km, m o cm en la distancia; cm o m en la altura.

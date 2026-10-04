@@ -28,6 +28,8 @@ la estructura y `docs/esquema-datos.md` para el formato de los datos.
 - **Botones y centrado por defecto**: toda acción es un botón (nunca un enlace
   de texto suelto) y todo va centrado (títulos, botones, tablas con cebra),
   como en una app del móvil. Dan lo ha tenido que corregir muchas veces.
+- **Móvil primero**: todo se diseña para 375 px de ancho; ningún texto se
+  sale de su botón; las explicaciones largas, detrás de un «?».
 - **Colores**: el navegador de su móvil (Ecosia) oscurece la página e invierte
   imágenes. Probar los cambios de color con Chrome en oscuro forzado
   (`--blink-settings=forceDarkModeEnabled=true`) y no darlos por buenos sin

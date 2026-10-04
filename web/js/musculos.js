@@ -122,7 +122,43 @@ async function pintarEnLienzo(caja, fondo, vista) {
     lienzo.className = 'lienzo-cuerpo';
     lienzo.setAttribute('aria-hidden', 'true');
     const ctx = lienzo.getContext('2d');
-    ctx.globalAlpha = Number(getComputedStyle(fondo).opacity) || 1;
+    const opacidad = Number(getComputedStyle(fondo).opacity) || 1;
+    // Silueta para recortar los colores: el cuerpo con sus huecos interiores
+    // tapados (se ensancha y luego se estrecha lo mismo), para que el color no
+    // se salga por fuera ni deje agujeros por dentro.
+    const silueta = document.createElement('canvas');
+    silueta.width = ancho;
+    silueta.height = alto;
+    const sc = silueta.getContext('2d');
+    const r = 2.5 * escala;
+    const vueltas = [...Array(16)].map((_, k) => [Math.cos((k * Math.PI) / 8) * r, Math.sin((k * Math.PI) / 8) * r]);
+    sc.drawImage(base, 0, 0, ancho, alto);
+    for (const [dx, dy] of vueltas) sc.drawImage(base, dx, dy, ancho, alto);
+    const ancha = document.createElement('canvas');
+    ancha.width = ancho;
+    ancha.height = alto;
+    ancha.getContext('2d').drawImage(silueta, 0, 0);
+    sc.globalCompositeOperation = 'destination-in';
+    for (const [dx, dy] of vueltas) sc.drawImage(ancha, dx, dy);
+    // Debajo del dibujo, la silueta en gris: tapa los agujeros del dibujo de
+    // wger (el del centro del pecho, por ejemplo).
+    const relleno = document.createElement('canvas');
+    relleno.width = ancho;
+    relleno.height = alto;
+    const rc = relleno.getContext('2d');
+    rc.drawImage(silueta, 0, 0);
+    rc.globalCompositeOperation = 'source-in';
+    rc.fillStyle = '#4a4a4a';
+    rc.fillRect(0, 0, ancho, alto);
+    ctx.globalAlpha = opacidad;
+    ctx.drawImage(relleno, 0, 0);
+    // El hueco grande del centro del pecho, a mano.
+    if (vista === 'delante') {
+      ctx.fillStyle = '#4a4a4a';
+      ctx.beginPath();
+      ctx.ellipse(98.5 * escala, 92 * escala, 5 * escala, 22 * escala, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
     ctx.drawImage(base, 0, 0, ancho, alto);
     // Cada músculo: su dibujo hace de molde y se rellena con su color.
     const molde = document.createElement('canvas');
@@ -138,6 +174,9 @@ async function pintarEnLienzo(caja, fondo, vista) {
       m.globalCompositeOperation = 'source-in';
       m.fillStyle = color;
       m.fillRect(0, 0, ancho, alto);
+      // Recortado con la silueta: ningún color se sale del cuerpo.
+      m.globalCompositeOperation = 'destination-in';
+      m.drawImage(silueta, 0, 0);
       // Primero el color algo transparente y después solo su tono sobre el
       // dibujo: se ven el color y las formas del músculo debajo.
       ctx.globalCompositeOperation = 'source-over';
