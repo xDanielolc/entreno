@@ -42,8 +42,16 @@ que la app funcione en condiciones. Centrémonos en eso»*.
 - [x] Comentarios por serie y del entrenamiento en las hojas de Drive (0.39.0).
 - [x] Gráfico de araña «Equilibrio» en Cuerpo, idea de Lyfta (0.39.0).
 - [ ] Equilibrio: dibujitos del cuerpo en cada eje, como Lyfta (Design).
-- [ ] Renovador de Cloudflare: Dan lo crea con `docs/cloudflare.md` y me pasa
-      la dirección; antes, pasar la app a «En producción» en Google.
+- [x] Worker `entreno-renovador` creado en la cuenta profesional de Cloudflare
+      con el código y las dos variables normales (4-10-2026).
+- [ ] Dan: poner en el Worker los dos secretos (`GOOGLE_CLIENT_SECRET` y
+      `CLAVE_CIFRADO`), pasos 3 y 4 de `cloudflare.md`.
+- [ ] Dan: aceptar la invitación de propietaria del proyecto de Google en la
+      cuenta profesional, cambiar el correo de asistencia, «Publicar app» →
+      «Confirmar» y quitar la cuenta personal.
+- [ ] Después: poner la dirección del Worker en `web/js/config.js`
+      (`urlRenovador`) y publicar. Ojo: la dirección lleva el nombre de la
+      cuenta; se puede cambiar el subdominio en Cloudflare antes.
 
 - [ ] **Revisar cómo se apuntan las demás técnicas de alta intensidad**
       (rest-pause, miorrepeticiones, isométrico final, excéntricas lentas,
