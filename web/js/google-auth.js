@@ -93,6 +93,9 @@ async function pedirConRenovador(pista) {
       client_id: CONFIG.googleClientId,
       scope: CONFIG.googleScopes,
       ux_mode: 'popup',
+      // Solo se llega aquí si no hay pase: «consent» hace que Google dé
+      // siempre el pase de larga duración (si ya diste permiso, a veces no).
+      prompt: 'consent',
       login_hint: pista || undefined,
       callback: async (respuesta) => {
         if (respuesta.error) { rechazar(new ErrorAcceso(respuesta.error_description || respuesta.error)); return; }

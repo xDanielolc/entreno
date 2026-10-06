@@ -44,15 +44,14 @@ que la app funcione en condiciones. Centrémonos en eso»*.
 - [ ] Equilibrio: dibujitos del cuerpo en cada eje, como Lyfta (Design).
 - [x] Worker `entreno-renovador` creado en la cuenta profesional de Cloudflare
       con el código y las dos variables normales (4-10-2026).
-- [ ] Dan: poner en el Worker los dos secretos (`GOOGLE_CLIENT_SECRET` y
-      `CLAVE_CIFRADO`), pasos 3 y 4 de `cloudflare.md`.
+- [x] Secretos puestos por Dan y comprobados (6-10-2026).
 - [ ] Dan: aceptar la invitación de propietaria del proyecto de Google en la
       cuenta profesional, cambiar el correo de asistencia, «Publicar app» →
       «Confirmar» y quitar la cuenta personal.
 - [x] Subdominio cambiado a `entreno-app.workers.dev` (6-10-2026): el Worker
       está en https://entreno-renovador.entreno-app.workers.dev y responde.
-- [ ] Después de los secretos: poner esa dirección en `web/js/config.js`
-      (`urlRenovador`) y publicar. Antes no: sin secretos, entrar fallaría.
+- [x] App conectada al renovador (0.41.0). Falta que Dan entre una vez en el
+      móvil y en el ordenador (Google pide permiso una última vez).
 - [ ] Ecosia en el móvil oscurece la app (colores apagados, cuerpo invertido,
       sin cebra); en Chrome se ve perfecta (capturas del 6-10-2026). Solución
       para Dan: instalarla desde Chrome. Mirar si se puede avisar a quien

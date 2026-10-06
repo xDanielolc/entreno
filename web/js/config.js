@@ -17,5 +17,7 @@ export const CONFIG = Object.freeze({
 
   // Renovador del permiso (Cloudflare Worker, ver docs/cloudflare.md). Con él,
   // Google no hay que volver a conectarlo cada hora. Vacío: sin renovador.
-  urlRenovador: '',
+  // Solo desde la web publicada: el renovador no acepta otras direcciones
+  // (en el ordenador, localhost, se entra como antes).
+  urlRenovador: location.hostname.endsWith('github.io') ? 'https://entreno-renovador.entreno-app.workers.dev' : '',
 });
