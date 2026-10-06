@@ -360,6 +360,7 @@ export function vistaSesion(contenedor, { id }) {
     const uCarga = unidadCarga(ej);
     const uEsf = unidadEsfuerzo(ej);
     const partes = [];
+    const lineas = [];
 
     // Sin 1RM en este ejercicio: esta serie es la prueba, salvo que prefieras
     // poner el 1RM a mano.
@@ -382,8 +383,16 @@ export function vistaSesion(contenedor, { id }) {
         if (s.pesoBajo) partes.push('peso muy bajo para tu 1RM: revisa el ciclo en la ficha');
         if (s.cicloAgotado) partes.push('el ciclo se acaba aquí: la próxima vez empieza el siguiente, más ligero');
         if (serie.carga != null && s.sobre === 'carga') partes.push(`${formatearNumero(serie.carga)} ${uCarga}`);
-        if (serie.objetivo != null) {
-          partes.push(`objetivo ${formatearNumero(serie.objetivo)} ${uEsf}`);
+        // El objetivo va en la primera de las dos comparaciones de abajo.
+        // Las dos comparaciones de las hojas de cálculo, cada una en su línea.
+        const ult = s.ultimaDelCiclo ?? (s.refAnterior ? { serie: s.refAnterior } : null);
+        lineas.push(h('span', { class: 'compara' }, '↑ Para superar la última vez',
+          ult ? ` (${textoSerie(ej, ult.serie)})` : '', ': ',
+          h('strong', {}, serie.objetivo != null ? `${formatearNumero(serie.objetivo)} ${uEsf}` : '—')));
+        if (s.cicloPrevio) {
+          const p = s.cicloPrevio;
+          lineas.push(h('span', { class: 'compara' }, `↑ Ciclo ${p.cicloN} ${p.mismoPeso ? `con ${formatearNumero(p.carga)} ${uCarga}` : `en la sesión ${p.dia} (${formatearNumero(p.carga)} ${uCarga})`}: `,
+            h('strong', {}, `${formatearNumero(p.esfuerzo)} ${uEsf}`), p.mismoPeso ? ' · para superarlo, una más' : ''));
         }
       }
     } else if (s.modo === 'programa') {
@@ -413,7 +422,8 @@ export function vistaSesion(contenedor, { id }) {
       if (s.modo === 'carga' && !s.sube && s.rango) partes.push(`objetivo ${s.rango[1]} ${uEsf}: al llegar, sube el peso`);
       if (s.modo === 'esfuerzo') partes.push(`hoy intenta ${formatearNumero(s.esfuerzoObjetivo)} ${uEsf}`);
     }
-    return h('p', { class: 'sugerencia' }, partes.join(' · '));
+    if (!lineas.length) return h('p', { class: 'sugerencia' }, partes.join(' · '));
+    return h('div', { class: 'sugerencia' }, h('span', {}, partes.join(' · ')), h('span', { class: 'comparativas' }, lineas));
   }
 
   // El 1RM a mano desde el entrenamiento: se guarda en el ejercicio y la

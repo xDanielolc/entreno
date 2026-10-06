@@ -296,8 +296,20 @@ function sugerenciaBilbo(datos, ejercicio, plan, { excluirSesion, sobre }) {
   const agotado = dia > 1 && (condiciones.length
     ? cumplidas >= Math.min(piden, condiciones.length)
     : Boolean(objetivoSuperar != null && minimo && objetivoSuperar < minimo));
+  // Como en las hojas de Dan: lo que hiciste en el ciclo anterior con este
+  // mismo peso (o, si no lo usaste, en la misma sesión del ciclo), para ver
+  // si te superas también frente a él y no solo frente a la última vez.
+  let cicloPrevio = null;
+  for (const c of [...(prog.ciclos || [])].filter((x) => x.n < ciclo.n).sort((a, b) => b.n - a.n)) {
+    const regs = registrosDelCiclo(datos, ejercicio, plan, c.n, { excluirSesion });
+    if (!regs.length) continue;
+    const r = regs.find((x) => x.serie.carga != null && Math.abs(x.serie.carga - valor) < 0.01)
+      ?? regs.find((x) => x.dia === dia);
+    if (r) cicloPrevio = { cicloN: c.n, dia: r.dia, carga: r.serie.carga, esfuerzo: esfuerzoTotal(r.serie), mismoPeso: Math.abs((r.serie.carga ?? -1) - valor) < 0.01 };
+    break;
+  }
   return { ...resultado, carga: valor, objetivoSuperar, objetivosExtra: objetivosExtra(gen, dia), fase,
-    pesoBajo: reps != null && reps > 40, cicloAgotado: agotado };
+    pesoBajo: reps != null && reps > 40, cicloAgotado: agotado, cicloPrevio, refAnterior: referencia };
 }
 
 // ---------------------------------------------------------------------------
