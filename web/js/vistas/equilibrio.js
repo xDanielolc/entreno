@@ -30,7 +30,7 @@ const deGrupo = (g) => Object.keys(MUSCULOS).filter((m) => MUSCULOS[m].grupo ===
 const CORE = deGrupo('core');
 
 const MODOS = {
-  zonas: { texto: 'Zonas', ejes: ZONAS, porObjetivo: true },
+  zonas: { texto: 'Músculos', ejes: ZONAS, porObjetivo: true },
   grupos: { texto: 'Empuje · tirón · pierna', ejes: [['Empuje', deGrupo('empuje')], ['Tirón', deGrupo('tirón')], ['Pierna', deGrupo('pierna')], ['Core', CORE]] },
   tren: { texto: 'Arriba · abajo', ejes: [['Tren superior', TREN_SUPERIOR], ['Tren inferior', TREN_INFERIOR], ['Core', CORE.filter((m) => m !== 'cuello')]] },
   cadena: { texto: 'Delante · detrás', ejes: [
@@ -40,10 +40,11 @@ const MODOS = {
     ['Delante, abajo', DELANTE.filter((m) => TREN_INFERIOR.includes(m))],
   ] },
 };
-const PERIODOS = { 7: 'Esta semana', 30: 'Este mes' };
+const PERIODOS = { 7: 'Esta semana', 30: 'Este mes', propio: 'Otro…' };
 
 let modo = 'zonas';
 let dias = 7;
+let periodo = '7';       // '7', '30' o 'propio' (los días que elijas)
 
 export function tarjetaEquilibrio(d) {
   const caja = h('section', { class: 'tarjeta equilibrio' });
@@ -67,11 +68,21 @@ export function tarjetaEquilibrio(d) {
     caja.replaceChildren(
       h('h2', { class: 'centrado' }, 'Equilibrio'),
       h('p', { class: 'nota centrado' }, 'Qué entrenas más y qué tienes descompensado.'),
-      filaBotones(Object.entries(MODOS).map(([k, x]) => [k, x.texto]), modo, (k) => { modo = k; pintar(); }),
-      filaBotones(Object.entries(PERIODOS), String(dias), (k) => { dias = Number(k); pintar(); }),
+      h('div', { class: 'grupo-botones' }, h('span', { class: 'etiqueta-grupo' }, 'Ver por'),
+        filaBotones(Object.entries(MODOS).map(([k, x]) => [k, x.texto]), modo, (k) => { modo = k; pintar(); })),
+      h('div', { class: 'grupo-botones' }, h('span', { class: 'etiqueta-grupo' }, 'Periodo'),
+        filaBotones(Object.entries(PERIODOS), periodo, (k) => {
+          periodo = k;
+          if (k !== 'propio') dias = Number(k);
+          pintar();
+        }),
+        periodo === 'propio' && h('label', { class: 'periodo-propio' }, 'Últimos',
+          h('input', { type: 'text', inputmode: 'numeric', value: String(dias), 'aria-label': 'Días',
+            onchange: (e) => { const n = Math.round(Number(e.target.value)); dias = n >= 1 && n <= 365 ? n : dias; pintar(); } }),
+          'días')),
       total
         ? arana(valores.map((v) => ({ ...v, r: radio(v) })), porObjetivo ? 1 / 1.5 : null)
-        : h('p', { class: 'suave centrado' }, `Sin series ${dias === 7 ? 'esta semana' : 'este mes'}.`),
+        : h('p', { class: 'suave centrado' }, `Sin series ${dias === 7 ? 'esta semana' : dias === 30 ? 'este mes' : `en los últimos ${dias} días`}.`),
       total > 0 && h('ul', { class: 'nota lista-equilibrio' }, conclusiones(valores, porObjetivo).map((t) => h('li', {}, t))));
   };
   pintar();
@@ -119,7 +130,7 @@ function arana(valores, anilloObjetivo) {
     for (const x of hijos.flat()) if (x != null && x !== false) e.append(x);
     return e;
   };
-  const T = 320; const C = T / 2; const R = 100;
+  const T = 320; const C = T / 2; const R = 120;
   const k = valores.length;
   const punto = (i, r) => {
     const a = -Math.PI / 2 + (2 * Math.PI * i) / k;
@@ -127,7 +138,7 @@ function arana(valores, anilloObjetivo) {
   };
   const poligono = (r) => valores.map((_, i) => punto(i, typeof r === 'function' ? r(i) : r).map((x) => x.toFixed(1)).join(',')).join(' ');
   // Márgenes anchos a los lados para que las etiquetas quepan en el móvil.
-  return nodo('svg', { viewBox: `-60 -10 ${T + 120} ${T + 20}`, class: 'arana', role: 'img',
+  return nodo('svg', { viewBox: `-100 -30 ${T + 200} ${T + 60}`, class: 'arana', role: 'img',
     'aria-label': valores.map((v) => `${v.nombre}: ${formatearNumero(Math.round(v.hechas * 10) / 10)} series`).join('. ') },
   [0.25, 0.5, 0.75, 1].map((r) => nodo('polygon', { points: poligono(r), class: 'arana-red' })),
   valores.map((_, i) => { const [x, y] = punto(i, 1); return nodo('line', { x1: C, y1: C, x2: x, y2: y, class: 'arana-red' }); }),
@@ -135,7 +146,7 @@ function arana(valores, anilloObjetivo) {
   nodo('polygon', { points: poligono((i) => valores[i].r), class: 'arana-valor' }),
   valores.map((v, i) => { const [x, y] = punto(i, v.r); return nodo('circle', { cx: x, cy: y, r: 3.5, class: 'arana-punto' }); }),
   valores.map((v, i) => {
-    const [x, y] = punto(i, 1.22);
+    const [x, y] = punto(i, 1.1);
     const ancla = Math.abs(x - C) < 8 ? 'middle' : x > C ? 'start' : 'end';
     return nodo('text', { x, y: y + 4, 'text-anchor': ancla, class: 'arana-etiqueta' }, v.nombre);
   }));

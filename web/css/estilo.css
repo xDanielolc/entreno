@@ -1402,7 +1402,17 @@ a.boton-privacidad { justify-content: flex-start; padding-left: 18px; }
 /* Móvil primero: ningún texto se sale de su botón; siempre centrado y, si
    no cabe, en dos líneas. */
 .boton, .boton-marca, .chip, .boton-filtros, .selector-abrir {
-  text-align: center; white-space: normal; overflow-wrap: anywhere; min-width: 0; max-width: 100%;
+  text-align: center; white-space: normal; overflow-wrap: break-word; hyphens: auto; min-width: 0; max-width: 100%;
 }
 .boton-marca { justify-content: center; }
 .fila-marcas > .boton-marca { flex: 1 1 auto; }
+
+/* Los tres modos del mapa caben en 375 px sin partir «Recuperación». */
+.modos-mapa .boton-marca { font-size: .8rem; padding: 6px 2px; overflow-wrap: normal; hyphens: auto; }
+/* Equilibrio: grupos de botones separados y con su título. */
+.equilibrio .grupo-botones { margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--borde); }
+.equilibrio .grupo-botones > .etiqueta-grupo { display: block; text-align: center; font-size: .8rem; color: var(--texto-suave); margin-bottom: 4px; }
+.equilibrio .periodo-propio { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 6px; }
+.equilibrio .periodo-propio input { width: 5em; text-align: center; }
+.arana-etiqueta { font-size: 21px; font-weight: 600; }
+.arana { max-width: 420px; }

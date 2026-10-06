@@ -64,7 +64,7 @@ export function vistaBienvenida(contenedor) {
       botonGoogle,
       h('p', { class: 'nota' },
         'Tus datos se guardan en tu propio Google Drive: la app crea la carpeta «App de entrenamiento» y mete ahí ',
-        'su archivo de datos y dos hojas de cálculo legibles. Si alguna vez ves alguno suelto, lo recoge sola al abrirse. ',
+        'su archivo de datos y tres hojas de cálculo legibles. Si alguna vez ves alguno suelto, lo recoge sola al abrirse. ',
         'La app no puede ver nada más de tu Drive. ',
         h('a', { href: 'privacidad.html', target: '_blank', rel: 'noopener' }, 'Política de privacidad'), '.'),
       h('button', { class: 'boton enlace', onclick: probarSinCuenta }, 'Probar sin cuenta (no se guarda en ninguna cuenta)')),

@@ -84,12 +84,14 @@ export function vistaAjustes(contenedor) {
           h('button', { class: 'boton secundario', onclick: () => sincronizar({ interactivo: true }) }, 'Sincronizar ahora'),
         ],
       h('button', { class: 'boton secundario', onclick: descargarCopia }, 'Descargar una copia de mis datos'),
-      !sinCuenta && h('p', { class: 'nota' }, 'En tu Google Drive, en la carpeta «App de entrenamiento», están el archivo de datos y dos hojas de cálculo '
-        + 'legibles (entrenamientos; ejercicios y rutinas) que se rehacen solas como mucho cada media hora. '
+      !sinCuenta && h('p', { class: 'nota' }, 'En tu Google Drive, en la carpeta «App de entrenamiento», están el archivo de datos y tres hojas de cálculo '
+        + 'legibles (la de progresión como tus Excel, la de entrenamientos y la de ejercicios y rutinas) que se rehacen solas como mucho cada media hora. '
         + 'Si alguno queda suelto en «Mi unidad», la app lo recoge al abrirse.'),
       !sinCuenta && h('button', { class: 'boton enlace', onclick: async () => {
         try { await rehacerCopiasLegibles(); aviso('Hojas legibles actualizadas en Google Drive.'); } catch (e) { aviso(`No se ha podido: ${e.message}`, { tipo: 'error' }); }
       } }, 'Rehacer ahora las hojas legibles'),
+      !sinCuenta && estado.meta().csvIds?.progresion && h('a', { class: 'boton secundario', target: '_blank', rel: 'noopener',
+        href: `https://drive.google.com/file/d/${estado.meta().csvIds.progresion}/view` }, 'Abrir la hoja de progresión (como tus Excel)'),
       !sinCuenta && h('button', { class: 'boton enlace', onclick: verCopiasAparte }, 'Recuperar algo de una copia guardada aparte'),
       h('button', { class: 'boton enlace', onclick: salir }, sinCuenta ? 'Salir del modo de prueba' : 'Salir de la cuenta')),
 

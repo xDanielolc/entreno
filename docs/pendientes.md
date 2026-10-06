@@ -40,7 +40,7 @@ que la app funcione en condiciones. Centrémonos en eso»*.
 - [ ] **Opción unilateral** en «Ajustes finos» del ejercicio (a una pierna o
       un brazo), cuando exista el muñeco de lado.
 - [x] Comentarios por serie y del entrenamiento en las hojas de Drive (0.39.0).
-- [x] Gráfico de araña «Equilibrio» en Cuerpo, idea de Lyfta (0.39.0).
+- [x] Gráfico de araña «Equilibrio» en Cuerpo, idea de Lyfta (0.39.0); periodo a elegir y letra mayor (0.40.1).
 - [ ] Equilibrio: dibujitos del cuerpo en cada eje, como Lyfta (Design).
 - [x] Worker `entreno-renovador` creado en la cuenta profesional de Cloudflare
       con el código y las dos variables normales (4-10-2026).
@@ -49,9 +49,14 @@ que la app funcione en condiciones. Centrémonos en eso»*.
 - [ ] Dan: aceptar la invitación de propietaria del proyecto de Google en la
       cuenta profesional, cambiar el correo de asistencia, «Publicar app» →
       «Confirmar» y quitar la cuenta personal.
-- [ ] Después: poner la dirección del Worker en `web/js/config.js`
-      (`urlRenovador`) y publicar. Ojo: la dirección lleva el nombre de la
-      cuenta; se puede cambiar el subdominio en Cloudflare antes.
+- [x] Subdominio cambiado a `entreno-app.workers.dev` (6-10-2026): el Worker
+      está en https://entreno-renovador.entreno-app.workers.dev y responde.
+- [ ] Después de los secretos: poner esa dirección en `web/js/config.js`
+      (`urlRenovador`) y publicar. Antes no: sin secretos, entrar fallaría.
+- [ ] Ecosia en el móvil oscurece la app (colores apagados, cuerpo invertido,
+      sin cebra); en Chrome se ve perfecta (capturas del 6-10-2026). Solución
+      para Dan: instalarla desde Chrome. Mirar si se puede avisar a quien
+      use un navegador que oscurece.
 
 - [ ] **Revisar cómo se apuntan las demás técnicas de alta intensidad**
       (rest-pause, miorrepeticiones, isométrico final, excéntricas lentas,
