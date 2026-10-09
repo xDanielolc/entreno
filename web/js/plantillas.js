@@ -37,7 +37,8 @@ export const PLANTILLAS = [
     autor: 'Dan (la rutina con la que se hizo esta app)',
     resumen: 'Cuatro días: empuje, pierna, tirón, pierna. En cada ejercicio, una serie Bilbo y una serie de intensidad.',
     porQue: 'Junta dos ideas. El método Bilbo sube la carga un poco cada día dentro de un ciclo y te pide superar el 1RM del día '
-      + 'anterior, con series largas (20-30 repeticiones) que construyen resistencia y fuerza sin cargar demasiado las articulaciones. '
+      + 'anterior, con series largas (20-30 repeticiones) y rápidas. Un ensayo muestra que una serie así no perjudica el 1RM '
+      + '(González-Alcázar 2025); que cargue menos las articulaciones es una opinión, sin estudio. '
       + 'Detrás va una sola serie muy intensa al estilo Heavy Duty (drop set, isométrico final o excéntricas lentas), que da el '
       + 'estímulo de alta intensidad con poco volumen. Alternar empuje, pierna y tirón deja descansar cada grupo varios días. Filosofía: poco volumen, mucha intención. Cada serie tiene un porqué y un número que superar; no hay series de relleno. Si una sesión no mejora nada, es que faltó descanso, no series.',
     comoSeHace: 'Rota los cuatro días en orden, entrenando en días alternos o cuando el mapa de recuperación lo permita. En cada '

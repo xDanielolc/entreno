@@ -48,6 +48,7 @@ function repsDeSerie(modelo, reps, recamara) {
 export function estimar1RM(modelo, peso, reps, recamara = 0) {
   if (!(peso > 0) || !(reps > 0)) return null;
   const r = repsDeSerie(modelo, reps, recamara);
+  // 'epley' es la de las hojas de cálculo: variante de Epley con 0,03 (Epley usa 1/30).
   if (modelo.tipo === 'epley') return peso * (1 + r * 0.03);
   const k = modelo.divisor ?? divisorSegunPeso(peso) * (modelo.factor ?? 1);
   const g = modelo.exponente ?? EXPONENTE_ESTUDIO;

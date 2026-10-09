@@ -33,7 +33,10 @@ function comoDecideLaApp() {
         + 'arriba en todas las series, la app sube el peso y vuelves abajo.'),
       h('dt', {}, 'Bilbo / incremento de peso lineal (fuerza)'),
       h('dd', {}, 'El peso sube 2,5 kg cada sesión y tú haces todas las repeticiones que puedas. Cuando ya solo te salen 15, '
-        + 'el ciclo se acaba y el siguiente empieza al 50 % del mejor 1RM que hayas hecho en él.'),
+        + 'el ciclo se acaba y el siguiente empieza al 50 % del mejor 1RM que hayas hecho en él. Respaldo: un solo ensayo '
+        + '(González-Alcázar 2025) muestra que una serie ligera y rápida no perjudica el 1RM en entrenados; no que sea mejor ni que '
+        + 'el ciclo completo funcione. Las cifras (50 %, 2,5 kg, 15) son decisiones prácticas, y juntarlo con un 3×5 también: '
+        + 'la parte que sube el 1RM con más respaldo es la pesada.'),
       h('dt', {}, '5×5'),
       h('dd', {}, 'Cinco series de cinco con el mismo peso. Si las completas, la próxima sesión sube; si fallas tres seguidas, '
         + 'baja un 10 %. El primer peso lo calcula la app: el que te dejaría 3 repeticiones en recámara haciendo 5.'),

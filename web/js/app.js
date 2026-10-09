@@ -152,7 +152,7 @@ function pintarIndicador() {
   const pulsable = ['desconectada', 'pendiente', 'error'].includes(situacion);
   indicador.className = `indicador ${situacion}`;
   // Sin pase de Google no es un error: todo está guardado en el móvil.
-  indicador.textContent = ['desconectada', 'pendiente'].includes(situacion) ? 'En el móvil · toca para subir'
+  indicador.textContent = ['desconectada', 'pendiente'].includes(situacion) ? 'Sin subir · toca para subir'
     : textoSituacion(situacion);
   indicador.title = detalle || '';
   indicador.disabled = !pulsable;
@@ -215,6 +215,7 @@ function registrarServiceWorker() {
   });
 }
 
+import('./google-auth.js').then((m) => m.precargarGoogle());
 arrancar();
 
 // Imágenes sin conexión: al abrir la app con internet se guardan las de tus

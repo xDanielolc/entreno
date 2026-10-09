@@ -53,7 +53,8 @@ https://xdanielolc.github.io/entreno/.
   Chrome.
 - Los cálculos Bilbo deben coincidir con las hojas de cálculo originales:
   1RM = carga × reps × 0,03 + carga; objetivo del día siguiente =
-  (1RM anterior − carga de hoy) / (carga de hoy × 0,03).
+  (1RM anterior − carga de hoy) / (carga de hoy × 0,03). Es una **variante de
+  Epley con 0,03**: Epley de verdad es carga × (1 + reps / 30), es decir 0,0333.
 
 ## Pendiente
 
@@ -90,8 +91,8 @@ pesos fijos de drop set, técnica y ayuda en estiramientos, imagen para todo
 recomendaciones con ~20 situaciones, «elegir carga por kg o % 1RM» en tramos,
 lo de la última vez en los tramos, máquina de placas, sitios (gimnasio, casa,
 calle) con «separar por sitio», entrenamientos de otro día. OJO: los objetivos
-Bilbo solo coinciden con los Excel si el ejercicio usa Epley.
-0.12.0: se quita Epley (decisión suya: mejor la fórmula buena más ajuste). El
+Bilbo solo coinciden con los Excel si el ejercicio usa la variante de Epley con 0,03.
+0.12.0: se quita la variante de Epley con 0,03 (decisión suya: mejor la fórmula buena más ajuste). El
 ajuste personal es UN factor sobre el divisor de Marzagao, buscado por
 consistencia en quincenas y encogido hacia 1 (confianza n/(n+3)).
 Explicaciones plegables en Ajustes y en la ficha. Rutinas prehechas

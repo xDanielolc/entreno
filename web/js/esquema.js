@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 11;
+export const VERSION_ACTUAL = 12;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -439,6 +439,18 @@ const MIGRACIONES = {
     datos.version = 11;
     return datos;
   },
+  // v12: flexiones con las manos en alto o inclinadas, del 41 % al 55 % de tu
+  // peso (Ebben 2011: 55 % con un cajón de 30 cm; el 41 % era el de 61 cm).
+  // Solo si seguían en el valor que puso la app; las series pasadas no cambian.
+  11: (datos) => {
+    for (const ej of datos.ejercicios) {
+      const n = (ej.nombre || '').toLowerCase();
+      if (ej.carga?.tipo === 'pesoCorporal' && ej.fraccionCorporal === 0.41
+        && /flexion/.test(n) && /inclinad|manos en alto/.test(n) && !/pared/.test(n)) ej.fraccionCorporal = 0.55;
+    }
+    datos.version = 12;
+    return datos;
+  },
 };
 
 // Programas clásicos. Cada uno dice qué series (peso y repeticiones) tocan en
@@ -468,15 +480,25 @@ export const PROGRAMAS = {
 };
 
 // Qué parte del peso corporal se levanta en cada ejercicio, según su nombre.
-// Flexiones: 64 % del peso (Ebben 2011); con rodillas, 49 %; con los pies en
-// alto, 74 %; con las manos en alto, 41 %. Lo demás, el peso entero.
+// Flexiones (Ebben 2011, medido con plataformas de fuerza): normal 64 %; con
+// rodillas, 49 %; pies en un cajón de 30 cm, 70 %, de 61 cm, 74 %; manos en
+// un cajón de 30 cm, 55 %, de 61 cm, 41 %. La pared, la pica y el pino no se
+// midieron: son aproximaciones (ver `fraccionSinDato`). Lo demás, el peso entero.
 export function FRACCION_CORPORAL_POR_NOMBRE(nombre = '') {
   const n = nombre.toLowerCase();
   if (!/flexion/.test(n)) return 1;
   if (/rodilla/.test(n)) return 0.49;
-  if (/pica|declinad|pies en alto|pino/.test(n)) return 0.74;
-  if (/inclinad|manos en alto|pared/.test(n)) return 0.41;
+  if (/pica|pino/.test(n)) return 0.74;
+  if (/declinad|pies en alto/.test(n)) return 0.74;
+  if (/pared/.test(n)) return 0.41;
+  if (/inclinad|manos en alto/.test(n)) return 0.55;
   return 0.64;
+}
+
+// Variantes de flexión que el estudio no midió: su porcentaje es una suposición.
+export function fraccionSinDato(nombre = '') {
+  const n = nombre.toLowerCase();
+  return /flexion/.test(n) && /pica|pino|pared/.test(n);
 }
 
 export function necesitaMigrar(datos) {

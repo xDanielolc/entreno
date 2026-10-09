@@ -1,10 +1,33 @@
-// De dónde sale cada número que propone la app.
+// PROPUESTA de bibliografía para web/js/bibliografia.js. Mismo formato que la app.
+// Hecha el 09-10-2026 a partir de la auditoría (3_Evidencia/05 Auditoría) y de la investigación
+// «Fuerza e hipertrofia». Dan decide qué entra. Todos los DOI se han comprobado en Crossref.
 //
-// Todo lo que la app recomienda debería poder rastrearse hasta un estudio o
-// hasta una decisión tuya. Lo que no tiene respaldo se dice claramente.
-//
-// Revisada el 9-10-2026 (auditoría aprobada por Dan): enlaces por DOI, diez
-// matices corregidos y 15 temas nuevos. Todos los DOI comprobados en Crossref.
+// LISTA DE CAMBIOS PROPUESTOS (frente a bibliografia.js actual)
+//  A. Enlaces: los 12 de consensus.app, LWW y ResearchGate pasan a https://doi.org/<DOI>.
+//  B. «1RM estimado»: Wood 2002 sale (no respalda lo de las 10 repeticiones) y entra Mayhew 2008;
+//     Marzagao con dos avisos (no validado contra 1RM medidos; el autor trabaja en Fitbod) y copia con DOI;
+//     Nuzzo 2024 no dice «más fiable por debajo de 10»: se cita por lo que sí dice.
+//  C. «Series por músculo y semana»: el 10 es de Schoenfeld 2017 y el 12-20 de Baz-Valle 2022;
+//     «por encima de 20 no se gana más» pasa a «se gana poco más y sube la fatiga» (Pelland 2026);
+//     «y sí más fatiga» ya no se atribuye a Refalo 2023 (no la mide) sino a Morán-Navarro 2017 y Pareja-Blanco 2020.
+//  D. «Cómo cuenta un drop set»: Fink 2018 dio +10 % con drop set y +5 % con tres series (sin diferencia
+//     estadística, 16 personas), no «como tres series»; la última bajada de Ozaki llega al 30 % del 1RM, no del peso de partida.
+//  E. «Fuerza e hipertrofia»: «de ahí el rango de 6 a 10» pasa a decisión práctica (ningún estudio lo señala);
+//     se añaden Lopez 2021, Grgic 2022 y Robinson 2024.
+//  F. «Frecuencia»: se añade Grgic 2018 (más días ayuda a la fuerza) y Pelland 2026.
+//  G. «Máximo trabajo»: el suelo del 30 % se apoya en Lasevicius 2018 (el 20 % rinde menos), no en Schoenfeld/Lopez.
+//  H. «Cuánto de tu peso levantas»: manos en alto vale 55 % a 30 cm y 41 % a 61 cm; pica y pino no se midieron;
+//     la estatura no influyó (fuera «varía con la longitud de brazos y piernas»).
+//  I. «Método Bilbo»: reescrita: un solo ensayo publicado (González-Alcázar 2025, un componente del método, equivalente al tradicional); mecanismos plausibles
+//     con su fuente; sus cifras son decisiones prácticas; Bilbo + 3×5 es combinación práctica sin estudio.
+//  J. Entradas NUEVAS (huecos): rango 6-10, cercanía al fallo y recámara, descanso entre series, velocidad y tempo,
+//     recorrido y posición estirada, orden de ejercicios, programas con nombre (5×5, 5/3/1, HST, Heavy Duty),
+//     recuperación entre sesiones (las horas del mapa), novatos y avanzados, variabilidad entre personas,
+//     descargas, calentamiento, progresión, técnicas de intensidad, proteína (una sola entrada), fuerza para la salud (OMS).
+//  K. Pelland: la app dice 2025 y el índice 2026; aquí se unifica a 2026 (número impreso 56(2)); la fórmula de los
+//     Excel (× 0,03) no es Epley (1/30 = 0,0333): donde la app diga «Epley», «variante de Epley con 0,03».
+//  L. Faltaban en bibliografia.js tres fuentes que la app ya usa en el código: Grgic 2022 (fallo), Laurent 2011
+//     (escala de recuperación) y Grgic 2018 (frecuencia y fuerza). Van en sus entradas.
 
 export const BIBLIOGRAFIA = [
   {

@@ -11,6 +11,25 @@ y al final lo que es decoración o depende de terceros.
 
 ---
 
+## 0. Encargo de la investigación «Fuerza e hipertrofia» (9-10-2026)
+
+- [x] Aplicado `docs/encargo-bibliografia.md` (0.42.0): bibliografía de 27
+      temas, textos de Bilbo, fracciones de Ebben (esquema v12) y «variante de
+      Epley con 0,03».
+- [ ] Punto 4 del encargo, pendiente de que Dan lo apruebe: frase de
+      Morán-Navarro y horas interpoladas en recuperacion.js; «por encima de 20
+      series no se gana más» en glosario y recomendaciones; última bajada de
+      Ozaki al 30 % del 1RM; prueba del 1RM de 3 a 10 repeticiones; aviso de
+      la OMS con la fuerza 2 días.
+- [ ] **Aviso del 1RM estimado con muchas repeticiones** (aprobado por Dan
+      el 9-10-2026). Cuando el 1RM de un ejercicio salga sobre todo de series
+      de más de 10 repeticiones (las Bilbo de 20-30), la app debe avisar de
+      que es una estimación poco fiable: las fórmulas aciertan más por debajo
+      de 10 (Mayhew 2008, DOI 10.1519/JSC.0b013e31817b02ad) y, con series
+      largas, lo que mejora la resistencia con ese peso se lee como «más 1RM».
+      Proponer cómo (marca en la gráfica, frase en el resumen, sugerencia de
+      comprobarlo con una serie de 3-5) y preguntar a Dan antes de hacerlo.
+
 ## 1. La app funcionando en condiciones
 
 Es lo primero. Dan lo dijo así el 23-09-2026: *«Me rindo con el tutorial hasta

@@ -271,7 +271,7 @@ cada día) y el `generador` con el que se rellenó, para poder repetirlo:
 
 ### 6.5 `formula1RM`
 
-`epley` reproduce exactamente tu Excel: `1RM = peso × reps × 0,03 + peso`.
+`epley` reproduce exactamente tu Excel: `1RM = peso × reps × 0,03 + peso` (variante de Epley con 0,03; Epley de verdad usa 1/30 = 0,0333).
 Se guarda el nombre de la fórmula, no el resultado, para poder recalcular
 todo el historial si algún día cambias de criterio.
 

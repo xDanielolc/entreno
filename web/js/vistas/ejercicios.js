@@ -10,7 +10,7 @@ import {
 } from '../esquema.js';
 import { inicialDelPrograma, tramosPorDefecto } from '../calculos.js';
 import { EXPLICACIONES_1RM, FORMULAS, calibrar, estimar1RM, modeloDe, pesoParaReps, textoCalibracion } from '../formula1rm.js';
-import { FRACCION_CORPORAL_POR_NOMBRE, PROGRAMAS } from '../esquema.js';
+import { FRACCION_CORPORAL_POR_NOMBRE, PROGRAMAS, fraccionSinDato } from '../esquema.js';
 import { MODOS_INICIO, MODOS_REINICIO, PRESETS_CICLO, inicioDe, alargarCiclo, aplicarPreset, completarCiclo, describirCiclo, empezarCicloNuevo, escaleraDe } from '../ciclos.js';
 import { abrirAlLlegar, ayuda, hoyISO, confirmarEscribiendo, idApartado } from '../ui.js';
 import { CATALOGO, esMaquinaDePlacas, normalizar, tipoDeEjercicio } from '../catalogo.js';
@@ -569,8 +569,11 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
       h('small', { class: 'nota' }, peso
         ? `Con tu peso (${formatearNumero(peso)} kg): ${formatearNumero(Math.round(peso * borrador.fraccionCorporal))} kg, más el lastre que apuntes.`
         : 'Pon tu peso corporal en Ajustes para que la carga salga sola.'),
-      h('div', { class: 'fila-marcas compacta' }, [['Flexiones', 64], ['Flexiones con rodillas', 49], ['Flexiones con pies en alto (cajón de 60 cm)', 74],
-        ['Dominadas y fondos', 100]].map(([texto, n]) => h('button', { type: 'button', class: `boton-marca${pct === n ? ' activo' : ''}`,
+      fraccionSinDato(borrador.nombre) && h('p', { class: 'aviso-texto' },
+        'Esta variante no se ha medido en ningún estudio: el porcentaje es una aproximación. Cámbialo si te parece que no cuadra.'),
+      h('div', { class: 'fila-marcas compacta' }, [['Flexiones', 64], ['Flexiones con rodillas', 49], ['Flexiones con pies en alto (cajón de 30 cm)', 70],
+        ['Flexiones con pies en alto (cajón de 60 cm)', 74], ['Flexiones con manos en alto (cajón de 30 cm)', 55],
+        ['Flexiones con manos en alto (cajón de 60 cm)', 41], ['Dominadas y fondos', 100]].map(([texto, n]) => h('button', { type: 'button', class: `boton-marca${pct === n ? ' activo' : ''}`,
         onclick: () => { borrador.fraccionCorporal = n / 100; repintar(); } }, `${texto}: ${n} %`))),
       h('small', { class: 'nota' }, 'Pesos sacados de Ebben (2011) ',
         h('button', { type: 'button', class: 'que-es', 'aria-label': 'Ver la fuente',
@@ -825,9 +828,9 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         explica: 'Entre 6 y 10 repeticiones con el mismo peso. Cuando llegas a 10 en todas las series, la app sube el peso y vuelves a 6. '
           + 'El músculo crece con series cerca del fallo, sin necesidad de llegar a él (metaanálisis de Refalo 2023).' };
       lista.bilbo = { etiqueta: 'Bilbo / incremento lineal', grupo: 'Fuerza', tipo: 'bilbo', preset: 'bilbo',
-        explica: 'Empieza ligero, con muchas repeticiones rápidas (técnica y músculo), y cada sesión sube 2,5 kg hasta pesos de fuerza. '
+        explica: 'Empieza ligero, con muchas repeticiones rápidas, y cada sesión sube 2,5 kg hasta pesos de fuerza. '
           + 'Cuando ya no llegas a 15, el ciclo se acaba y el siguiente empieza al 50 % del mejor 1RM que hiciste en él. '
-          + 'Ir de más volumen a más peso es periodizar, y periodizar sube más el 1RM (metaanálisis de Williams 2017).' };
+          + 'Un ensayo (González-Alcázar 2025) muestra que una serie así no perjudica el 1RM; las cifras son decisiones prácticas del método.' };
       if (!cardio) {
         lista.cincoPorCinco = { etiqueta: '5×5', grupo: 'Fuerza', tipo: 'programa', programa: '5x5',
           explica: 'Cinco series de cinco con el mismo peso. Si las completas, sube; si fallas tres sesiones seguidas, baja un 10 %.' };

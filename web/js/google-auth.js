@@ -16,6 +16,13 @@ const almacen = () => { try { return localStorage; } catch { return null; } };
 
 let cargaScript;
 
+// Se carga al abrir la app: si se cargara al tocar «Entrar», la espera haría
+// que el navegador del móvil bloqueara la ventana de Google (había que tocar
+// dos veces).
+export function precargarGoogle() {
+  cargarScript().catch(() => { /* sin conexión: se reintenta al tocar */ });
+}
+
 function cargarScript() {
   cargaScript ??= new Promise((resolver, rechazar) => {
     const s = document.createElement('script');

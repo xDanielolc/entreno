@@ -24,7 +24,9 @@ export const GLOSARIO = {
   miorepeticiones: { pregunta: '¿Qué son las miorrepeticiones?', termino: 'Miorrepeticiones', texto: 'Una serie larga de activación y después varias miniseries cortas (3-5 repeticiones) '
     + 'con el mismo peso, respirando unas pocas veces entre ellas.' },
   bilbo: { pregunta: '¿Qué es una serie Bilbo?', termino: 'Serie Bilbo', texto: 'Un ciclo de unas 20 sesiones en el que el peso de cada día está fijado y sube poco a poco. Cada día intentas '
-    + 'superar (en repeticiones, con ese peso) el 1RM del día anterior. Cuando el objetivo baja de 15 repeticiones, el ciclo se ha agotado.' },
+    + 'superar (en repeticiones, con ese peso) el 1RM del día anterior. Cuando el objetivo baja de 15 repeticiones, el ciclo se ha agotado. '
+    + 'Hay un solo ensayo publicado (González-Alcázar 2025): una serie ligera y rápida sin llegar al fallo no empeoró el 1RM en entrenados. '
+    + 'Prueba que no perjudica, no que sea mejor, ni el ciclo completo. El 50 %, los 2,5 kg y el corte en 15 son decisiones prácticas del método.' },
   sobrecarga: { pregunta: '¿Qué es la sobrecarga progresiva?', termino: 'Sobrecarga progresiva', texto: 'Para seguir mejorando, el cuerpo necesita que '
     + 'cada cierto tiempo le pidas un poco más que la vez anterior: más peso, más repeticiones o más tiempo. Si siempre haces lo mismo, se '
     + 'acostumbra y deja de mejorar. La progresión de cargas es el plan que decide cuánto y cuándo sube: en la app, el ciclo de cada ejercicio.' },

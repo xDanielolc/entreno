@@ -38,6 +38,12 @@ CAPAS = {
                     [(86.5, 148), (97, 148), (97, 160), (86.5, 160)],
                     [(86.5, 162.5), (97, 162.5), (97, 182), (92, 180), (87.5, 172)]],
     },
+    # Pecho propio desde la 0.41.1: el de wger tenía los dos lados distintos;
+    # este es un pectoral limpio y su espejo.
+    "pecho": {
+        "delante": [[(97, 86), (92, 77), (84, 75), (74, 76), (64, 79), (58, 84), (55, 92),
+                     (56, 100), (61, 106), (70, 110), (82, 111), (92, 109), (97, 104)]],
+    },
     "hombro": {
         "delante": [[(58, 66), (52, 68), (47, 74), (45, 82), (46, 92), (50, 101), (55, 104),
                      (59, 98), (62, 88), (66, 78), (68, 72), (64, 67)]],
@@ -79,7 +85,7 @@ CAPAS = {
 
 
 # Eje de simetría: el cuerpo de wger tiene el centro del tronco en x = 98,5.
-EJE = {("abdomen", "delante"): 98.5}
+EJE = {("abdomen", "delante"): 98.5, ("pecho", "delante"): 98.5}
 
 
 def reflejar(poligono, eje=ANCHO / 2):
