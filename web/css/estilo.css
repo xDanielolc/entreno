@@ -1434,3 +1434,12 @@ div.sugerencia > span { display: block; }
 .como-llegas.apuntado { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 /* Lo de la otra vez dentro de la casilla: gris muy tenue, que no parezca escrito. */
 .tramo input::placeholder { color: var(--texto-suave); opacity: .35; }
+
+/* Cabecera de la serie en una fila: tipo, técnica a su derecha, y al final
+   el bocadillo y la papelera. El objetivo, debajo. */
+.serie-cabecera { display: flex !important; flex-wrap: wrap; align-items: center; gap: 6px; }
+.serie-cabecera > .selector-abrir { flex: 0 1 auto; width: auto; margin: 0; }
+.serie-cabecera > .boton-bocadillo { margin-left: auto; }
+.serie-cabecera > .borrar-serie { margin-left: 0; }
+.serie-cabecera > .marca { order: 10; flex: 1 1 100%; }
+.boton-tecnicas { background: var(--superficie); border: 1px solid var(--borde); color: var(--texto); border-radius: var(--radio-pequeno); padding: 8px 12px; min-height: 44px; }
