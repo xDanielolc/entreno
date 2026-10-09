@@ -252,7 +252,7 @@ export function recalcularTramos(datos, ejercicio, entrada, { excluirSesion, ses
     const base = aPesoDisponible(ejercicio, (rm.valor * primero) / 100);
     serie.tramos.forEach((tramo, k) => {
       if (tramo.pct == null) {
-        const kilos = tramo.carga ?? Math.max(0, base - saltoAjustado(salto, base, serie.tramos.length) * k);
+        const kilos = tramo.carga ?? Math.max(0, base - saltoAjustado(salto, base, serie.tramos.length, rm.valor) * k);
         tramo.pct = redondear((kilos / rm.valor) * 100, 1);
       }
       tramo.carga = aPesoDisponible(ejercicio, (rm.valor * tramo.pct) / 100);

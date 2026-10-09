@@ -16,11 +16,10 @@ y al final lo que es decoración o depende de terceros.
 - [x] Aplicado `docs/encargo-bibliografia.md` (0.42.0): bibliografía de 27
       temas, textos de Bilbo, fracciones de Ebben (esquema v12) y «variante de
       Epley con 0,03».
-- [ ] Punto 4 del encargo, pendiente de que Dan lo apruebe: frase de
-      Morán-Navarro y horas interpoladas en recuperacion.js; «por encima de 20
-      series no se gana más» en glosario y recomendaciones; última bajada de
-      Ozaki al 30 % del 1RM; prueba del 1RM de 3 a 10 repeticiones; aviso de
-      la OMS con la fuerza 2 días.
+- [x] Punto 4 del encargo (aprobado por Dan, 0.42.1): Morán-Navarro y horas
+      estimadas en la recuperación; «se gana poco más y sube la fatiga» por
+      encima de 20 series; última bajada al 30 % del 1RM; prueba del 1RM de 3
+      a 10 repeticiones; OMS con fuerza 2 o más días.
 - [ ] **Aviso del 1RM estimado con muchas repeticiones** (aprobado por Dan
       el 9-10-2026). Cuando el 1RM de un ejercicio salga sobre todo de series
       de más de 10 repeticiones (las Bilbo de 20-30), la app debe avisar de

@@ -3,7 +3,8 @@
 // hacer.
 //
 // Respaldo de los umbrales:
-//   · 10-20 series semanales por músculo (Schoenfeld 2017; Pelland 2024).
+//   · 10-20 series semanales por músculo (Schoenfeld 2017; Pelland 2026):
+//     por encima se gana poco más y sube la fatiga.
 //   · Dos sesiones por músculo y semana rinden algo más que una con el mismo
 //     volumen (Schoenfeld 2016).
 //   · Entrenar al fallo no es necesario para ganar músculo y fatiga más;
@@ -82,8 +83,8 @@ export function recomendacionesDeSesion(datos, sesion) {
     if (n < minimo) {
       lista.push(r('volumen-bajo', 'consejo', `${nombre}: llevas ${formatearNumero(n)} de ${minimo} series esta semana; te faltan unas ${Math.ceil(minimo - n)}.`));
     } else if (n > MAXIMO) {
-      lista.push(r('volumen-alto', 'aviso', `${nombre}: ${series(n)} en siete días. Por encima de ${MAXIMO} no se gana más `
-        + 'músculo y la fatiga sube: recorta series o reparte la carga en más días.'));
+      lista.push(r('volumen-alto', 'aviso', `${nombre}: ${series(n)} en siete días. Por encima de ${MAXIMO} se gana poco más y sube la fatiga: `
+        + 'recorta series o reparte la carga en más días.'));
     } else {
       lista.push(r('volumen-bien', 'bien', `${nombre}: ${series(n)} esta semana, en su sitio.`));
     }
@@ -132,7 +133,7 @@ export function recomendacionesGenerales(datos, ahora = new Date()) {
           ? `Como las llevas al fallo o con bajadas, con unas ${MINIMO_DURO} a la semana basta.`
           : `Sube hasta al menos ${MINIMO}.`)));
     } else if (n > MAXIMO) {
-      lista.push(r('volumen-alto', 'aviso', `${nombre}: ${series(n)} en 7 días. Por encima de ${MAXIMO} no se gana más y la fatiga sube.`));
+      lista.push(r('volumen-alto', 'aviso', `${nombre}: ${series(n)} en 7 días. Por encima de ${MAXIMO} se gana poco más y sube la fatiga (Pelland 2026).`));
     }
     // 6. Toda la semana en una sola sesión.
     const semanaEste = recientes.filter((s) => seriesPorMusculoDeSesion(datos, s).get(m) >= 1);
@@ -190,7 +191,7 @@ export function recomendacionesGenerales(datos, ahora = new Date()) {
   const haceCardio = sesiones.some((s) => s.ejercicios.some((e) => tipoDeEjercicio(datos.ejercicios.find((x) => x.id === e.ejercicioId)) === 'cardio'));
   if (haceCardio && minutosCardio < 150) {
     lista.push(r('cardio', 'consejo', `Esta semana llevas ${Math.round(minutosCardio)} minutos de cardio. La OMS recomienda `
-      + 'de 150 a 300 minutos semanales de actividad moderada.'));
+      + 'de 150 a 300 minutos semanales de actividad moderada, y fuerza 2 o más días por semana.'));
   }
 
   // 20. Ciclos Bilbo terminados sin preparar el siguiente.

@@ -69,7 +69,7 @@ export function tarjetaRecuperacion(datos, { compacta = false } = {}) {
       h('ul', {},
         h('li', {}, 'Lo cerca del fallo que acabaste las series, que es lo que más pesa: con 3 o más en recámara, 24 h; '
           + 'con 1 o 2, 36 h; al fallo, 48 h; al fallo con más de 15 repeticiones o con drop set, 60 h. '
-          + 'Se hace la media de tus series con la más dura.'),
+          + 'Se hace la media de tus series con la más dura. Los estudios miden a las 24 y 48 h; las 36 y 60 h son estimaciones de la app.'),
         h('li', {}, 'El volumen, que pesa cada vez menos: una serie se queda en el 57 % de esas horas, '
           + 'dos en el 69 %, tres en el 78 %, cinco en el 89 %, ocho en el 96 % y a partir de ahí casi no cambia.'),
         h('li', {}, 'Tu ajuste personal por músculo, si lo has puesto (abajo).')),
@@ -224,7 +224,7 @@ function tarjetaMapa(d) {
         h('li', {}, 'Lo que más pesa es lo cerca del fallo que acabaste: de 24 h (3 o más en recámara) a 60 h (al fallo con drop set o más de 15 repeticiones).'),
         h('li', {}, 'Más series alargan algo el tiempo, cada vez menos.'),
         h('li', {}, 'Tu ritmo de recuperación (abajo) lo alarga o lo acorta.'),
-        h('li', {}, 'Respaldo: Morán-Navarro 2017 y Pareja-Blanco 2019 y 2020. La forma exacta de la curva es una aproximación de la app.'))));
+        h('li', {}, 'Respaldo: Morán-Navarro 2017 y Pareja-Blanco 2019 y 2020 (miden a las 24 y 48 h; las 36 y 60 h son estimaciones de la app). La forma exacta de la curva es una aproximación de la app.'))));
 }
 
 // Series de la semana por músculo, de más a menos, como «8/10».

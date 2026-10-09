@@ -5,8 +5,9 @@
 //     series, más que el número de series. Con 3 o más repeticiones en
 //     recámara, la fuerza vuelve en unas 24 h; al fallo, tarda hasta 48 h, y
 //     más si el fallo llega con muchas repeticiones (Morán-Navarro 2017,
-//     Pareja-Blanco 2019 y 2020). De ahí salen las 24, 36, 48 y 60 horas.
-//   · El volumen total apenas cambia ese tiempo (Pareja-Blanco 2019): cada
+//     Pareja-Blanco 2019 y 2020). Los estudios miden a 6, 24, 48 y 72 h: las
+//     24 y 48 horas salen de ahí; las 36 y 60 son estimaciones de la app.
+//   · El volumen total apenas cambia ese tiempo (Morán-Navarro 2017): cada
 //     serie de más añade cada vez menos. Eso se modela con una curva que se
 //     aplana (una serie cuenta el 57 %; tres, el 78 %; ocho, el 96 %). Una
 //     serie suelta al fallo no puede dejar un músculo tocado dos días.

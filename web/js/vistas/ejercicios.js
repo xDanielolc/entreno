@@ -1209,7 +1209,7 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         inicio.modo === 'mismo' && campo(`Empieza en (${unidad})`, numeroInput(gen.inicial,
           (v) => { gen.inicial = v ?? 0; toca(); }, { onchange: regenerar })),
         inicio.modo === 'prueba'
-          ? h('small', { class: 'nota' }, 'El primer día: pon un peso con el que hagas de 5 a 15 repeticiones y haz todas las que puedas. Desde el día siguiente, la app te dice qué toca.')
+          ? h('small', { class: 'nota' }, 'El primer día: pon un peso con el que hagas de 3 a 10 repeticiones y haz todas las que puedas. Desde el día siguiente, la app te dice qué toca.')
           : inicio.modo !== 'mismo' && (rm
             ? h('small', { class: 'nota' }, `Con tu 1RM de ${formatearNumero(Math.round(rm))} kg, empieza en ${formatearNumero(gen.inicial)} ${unidad}.`)
             : h('small', { class: 'aviso-error-texto' }, 'Para esto hace falta tu 1RM: ponlo arriba o elige «No lo sé».')));

@@ -313,7 +313,7 @@ export const PLANTILLAS = [
     autor: 'Propuesta de la app',
     resumen: 'Tres días a la semana: uno suave y largo (caminar o bici), uno de intervalos cortos (Tabata) y uno de carrera continua. '
       + 'Para llegar a los 150 minutos semanales que recomienda la OMS sin aburrirse.',
-    porQue: 'La OMS recomienda de 150 a 300 minutos de actividad moderada a la semana, o de 75 a 150 de intensa. Mezclar un día '
+    porQue: 'La OMS recomienda de 150 a 300 minutos de actividad moderada a la semana, o de 75 a 150 de intensa, y fuerza 2 o más días por semana. Mezclar un día '
       + 'largo y suave con uno corto e intenso da lo mismo con menos tiempo y cansa menos que hacer siempre igual. Los intervalos '
       + '(HIIT) mejoran la capacidad cardíaca en pocos minutos; el suave se recupera rápido y suma minutos.',
     comoSeHace: 'El día suave, a un ritmo en el que puedas hablar. El día de intervalos, abre el cronómetro de la app (⏱ Intervalos) '

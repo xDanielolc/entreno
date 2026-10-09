@@ -375,7 +375,7 @@ export function vistaSesion(contenedor, { id }) {
     if (s.modo === 'bilbo') {
       if (s.sinCiclo) partes.push(planDe(ej, serie)?.progresion?.sobre === 'esfuerzo'
         ? 'Primera vez: haz todas las que puedas; desde ahí el ciclo irá subiendo'
-        : 'Primera vez: pon un peso con el que hagas de 5 a 15 y haz todas las que puedas; con eso la app calcula tu fuerza');
+        : 'Primera vez: pon un peso con el que hagas de 3 a 10 y haz todas las que puedas; con eso la app calcula tu fuerza');
       else if (s.cicloTerminado) partes.push(`Ciclo ${s.cicloN} terminado: prepara el siguiente en la ficha (o pon el reinicio en automático)`);
       else {
         partes.push(`Ciclo ${s.cicloN} · sesión ${serie.diaCiclo ?? s.dia}`);
@@ -413,7 +413,7 @@ export function vistaSesion(contenedor, { id }) {
       }
     } else if (s.primeraVez) {
       partes.push(ej.carga?.tipo !== 'ninguna' && ej.esfuerzo?.tipo === 'repeticiones'
-        ? 'Primera vez: pon un peso con el que hagas de 5 a 15 y haz todas las que puedas; con eso la app calcula tu fuerza'
+        ? 'Primera vez: pon un peso con el que hagas de 3 a 10 y haz todas las que puedas; con eso la app calcula tu fuerza'
         : 'Primera vez con esta serie');
     } else {
       const u = (s.ultima ?? s.referencia).serie;

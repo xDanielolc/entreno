@@ -59,7 +59,7 @@ export const MODOS_REINICIO = {
   reps: { etiqueta: 'Al peso con el que harías X repeticiones', descripcion: 'Dices con cuántas repeticiones quieres empezar y la app calcula el peso con la fórmula del ejercicio, a partir del mejor 1RM de este ciclo. Es lo más parecido a decir «quiero empezar haciendo series de 20».' },
   ultimo: { etiqueta: 'Al % del último valor', descripcion: 'Empieza un poco por debajo de donde se cortó.', antiguo: true },
   mismo: { etiqueta: 'Como el anterior', descripcion: 'Vuelve al mismo valor inicial.' },
-  prueba: { etiqueta: 'Con una prueba', descripcion: 'El primer día del ciclo pones un peso con el que hagas de 5 a 15 repeticiones y haces todas las que puedas; con esa serie la app calcula de dónde partir.' },
+  prueba: { etiqueta: 'Con una prueba', descripcion: 'El primer día del ciclo pones un peso con el que hagas de 3 a 10 repeticiones y haces todas las que puedas; con esa serie la app calcula de dónde partir.' },
   manual: { etiqueta: 'A mano', descripcion: 'La app avisa y tú lo preparas en la ficha.' },
 };
 
@@ -69,7 +69,7 @@ export const MODOS_INICIO = {
   porcentaje: { etiqueta: 'Al % de tu 1RM', descripcion: 'Empieza a un porcentaje del 1RM que hayas puesto o que salga de tus series.' },
   reps: { etiqueta: 'Al peso con el que harías X repeticiones', descripcion: 'Dices con cuántas repeticiones quieres empezar y la app calcula el peso con la fórmula del ejercicio.' },
   mismo: { etiqueta: 'Un peso que pones tú', descripcion: 'Empieza en el peso que escribas.' },
-  prueba: { etiqueta: 'No lo sé: con una prueba', descripcion: 'El primer día pones un peso con el que hagas de 5 a 15 repeticiones y haces todas las que puedas. Con esa serie la app calcula tu 1RM y desde el día siguiente te dice qué toca.' },
+  prueba: { etiqueta: 'No lo sé: con una prueba', descripcion: 'El primer día pones un peso con el que hagas de 3 a 10 repeticiones y haces todas las que puedas. Con esa serie la app calcula tu 1RM y desde el día siguiente te dice qué toca.' },
 };
 
 // Cómo empieza el primer ciclo si no se ha elegido: con 1RM, a su porcentaje;

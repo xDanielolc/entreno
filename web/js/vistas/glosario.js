@@ -32,8 +32,8 @@ export const GLOSARIO = {
     + 'acostumbra y deja de mejorar. La progresión de cargas es el plan que decide cuánto y cuándo sube: en la app, el ciclo de cada ejercicio.' },
   'doble-progresion': { pregunta: '¿Qué es la doble progresión?', termino: 'Doble progresión', texto: 'Trabajas en un rango, por ejemplo de 8 a 12 repeticiones. Con el mismo peso subes '
     + 'repeticiones hasta llegar a 12; entonces subes el peso y vuelves a empezar por 8.' },
-  volumen: { pregunta: '¿Qué es el volumen?', termino: 'Volumen', texto: 'Cuántas series haces de cada músculo a la semana. Entre 10 y 20 por músculo es lo que más '
-    + 'músculo da; por encima cansa más sin ganar más.' },
+  volumen: { pregunta: '¿Qué es el volumen?', termino: 'Volumen', texto: 'Cuántas series haces de cada músculo a la semana. Entre 10 y 20 por músculo es lo que mejor '
+    + 'rinde; por encima se gana poco más y sube la fatiga.' },
   recuperacion: { pregunta: '¿Cómo va la recuperación?', termino: 'Recuperación', texto: 'El tiempo que un músculo tarda en estar listo otra vez. Depende de lo dura que fue la '
     + 'sesión (lo cerca del fallo), de cuántas series hiciste y de tu genética. La app lo estima y tú puedes ajustar tu ritmo.' },
   'peso-corporal': { pregunta: '¿Para qué pido tu peso?', termino: 'Peso corporal', texto: 'Tu peso se usa para calcular la carga de las flexiones, dominadas o fondos, y para '
