@@ -58,6 +58,9 @@ que la app funcione en condiciones. Centrémonos en eso»*.
 - [ ] **Opción unilateral** en «Ajustes finos» del ejercicio (a una pierna o
       un brazo), cuando exista el muñeco de lado.
 - [x] Comentarios por serie y del entrenamiento en las hojas de Drive (0.39.0).
+- [x] Hoja de progresión como sus Excel: un .xlsx de verdad (colores, bordes,
+      una pestaña por ejercicio, cada ciclo en su bloque), generado sin
+      librerías en `web/js/xlsx.js` (0.43.0). Se puede descargar desde Ajustes.
 - [x] Gráfico de araña «Equilibrio» en Cuerpo, idea de Lyfta (0.39.0); periodo a elegir y letra mayor (0.40.1).
 - [ ] Equilibrio: dibujitos del cuerpo en cada eje, como Lyfta (Design).
 - [x] Worker `entreno-renovador` creado en la cuenta profesional de Cloudflare

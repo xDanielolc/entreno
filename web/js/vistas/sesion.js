@@ -28,7 +28,7 @@ import { comparacionSerie, mostrarResumen } from './resumen-sesion.js';
 import { ejercicioEnSede, nombreSede, sedesActivas } from '../sedes.js';
 import { hoyISO } from '../ui.js';
 import { ejercicioDesdeCatalogo, elegirEjercicio as abrirSelector } from './selector-ejercicios.js';
-import { selectorTecnicas, textoTecnicas } from './tecnicas.js';
+import { desplegableTecnicas, textoTecnicas } from './tecnicas.js';
 
 // Cómo se va por el entrenamiento: 'serie' (una serie cada vez), 'ejercicio'
 // (un ejercicio cada vez) o 'todo'. Se recuerda por sesión mientras la app
@@ -102,20 +102,25 @@ export function vistaSesion(contenedor, { id }) {
     ? sesion.ejercicios.map((entrada, i) => [entrada, i])
     : sesion.ejercicios.slice(posicion, posicion + 1).map((entrada) => [entrada, posicion]);
 
+  const notasSesion = h('label', { class: 'campo notas-sesion', hidden: enCurso && !sesion.notas },
+    h('span', { class: 'etiqueta-campo' }, 'Comentarios del entrenamiento'),
+    h('textarea', { rows: 2, value: sesion.notas || '',
+      oninput: (e) => cambiarSesion((s) => { s.notas = e.target.value; }, { tecleo: true }) }));
+
   anadir(contenedor,
     sesion.borrada && h('div', { class: 'tarjeta aviso-tarjeta' },
       h('p', {}, 'Este entrenamiento está en la papelera: no cuenta para tu progresión.'),
       h('button', { class: 'boton', onclick: recuperar }, 'Recuperar entrenamiento')),
 
-    h('div', { class: 'cabecera-vista' },
-      h('h1', {}, enCurso ? 'Entrenando' : 'Entrenamiento'),
+    !enCurso && h('h1', {}, 'Entrenamiento'),
+    h('div', { class: 'fila-cabecera-entreno' },
       h('input', { type: 'date', class: 'fecha', value: sesion.fecha, 'aria-label': 'Fecha',
-        onchange: (e) => e.target.value && cambiarSesion((s) => moverFecha(s, e.target.value)) })),
-
-    sedesActivas(d).length > 0 && h('div', { class: 'fila-sede-sesion' },
-      h('span', { class: 'suave' }, 'Dónde:'),
-      selector([['', 'Sin indicar'], ...sedesActivas(d).map((s) => [s.id, nombreSede(d, s.id)])], sesion.sedeId ?? '',
-        (v) => cambiarSesion((s) => { s.sedeId = v || null; }), { titulo: 'Dónde entrenas hoy', lista: true })),
+        onchange: (e) => e.target.value && cambiarSesion((s) => moverFecha(s, e.target.value)) }),
+      sedesActivas(d).length > 0 && selector([['', 'Lugar sin indicar'], ...sedesActivas(d).map((s) => [s.id, nombreSede(d, s.id)])], sesion.sedeId ?? '',
+        (v) => cambiarSesion((s) => { s.sedeId = v || null; }), { titulo: 'Dónde entrenas hoy', lista: true }),
+      enCurso && sesion.ejercicios.length > 0 && h('button', { type: 'button', class: 'boton-icono boton-vista',
+        'aria-label': `Cómo ver el entrenamiento (ahora: ${MODOS_ENTRENO[modo]?.etiqueta.toLowerCase() ?? 'todos los ejercicios'})`,
+        title: 'Cómo verlo', onclick: () => elegirVista() }, '👁')),
 
     sesion.diaRutinaId && h('p', { class: 'suave' }, nombreDelDia(d, sesion)),
 
@@ -132,19 +137,16 @@ export function vistaSesion(contenedor, { id }) {
 
     h('button', { class: 'boton secundario grande', onclick: elegirEjercicio }, '+ Añadir ejercicio'),
 
-    // Cómo se ve el entrenamiento: solo aquí abajo, que arriba ya están las
-    // flechas para pasar de ejercicio.
-    enCurso && sesion.ejercicios.length > 0 && h('button', { class: 'boton enlace cambiar-vista', onclick: () => elegirVista() },
-      `Vista: ${MODOS_ENTRENO[modo]?.etiqueta.toLowerCase() ?? 'todos los ejercicios'} · cambiar`),
-
-    h('label', { class: 'campo' },
-      h('span', { class: 'etiqueta-campo' }, 'Comentarios del entrenamiento'),
-      h('textarea', { rows: 2, value: sesion.notas || '',
-        oninput: (e) => cambiarSesion((s) => { s.notas = e.target.value; }, { tecleo: true }) })),
+    // Comentarios del entrenamiento: tras el bocadillo (abiertos si ya hay).
+    notasSesion,
 
     enCurso
       ? [h('button', { class: 'boton grande terminar-entreno', onclick: terminar }, 'Terminar entrenamiento'),
-        h('button', { class: 'boton cancelar-entreno', onclick: cancelar }, 'Cancelar entrenamiento')]
+        h('div', { class: 'fila-iconos-entreno' },
+          h('button', { type: 'button', class: 'boton-icono boton-bocadillo', 'aria-label': 'Comentarios del entrenamiento',
+            title: 'Comentarios del entrenamiento', onclick: () => { notasSesion.hidden = !notasSesion.hidden; if (!notasSesion.hidden) notasSesion.querySelector('textarea').focus(); } }, '💬'),
+          h('button', { type: 'button', class: 'boton-icono boton-cancelar-x', 'aria-label': 'Cancelar entrenamiento',
+            title: 'Cancelar entrenamiento', onclick: cancelar }, '✕'))]
       : [h('p', { class: 'nota' }, 'Cada cambio se guarda al momento. Si te equivocas, toca «Deshacer» en el aviso que sale abajo.'),
         h('button', { class: 'boton grande', onclick: () => { editando.delete(id); dispatchEvent(new HashChangeEvent('hashchange')); } }, 'Hecho, dejar de editar')],
 
@@ -207,7 +209,24 @@ export function vistaSesion(contenedor, { id }) {
     const respuestas = sesion.sensaciones ?? {};
     const lista = ORDEN_MUSCULOS.filter((m) => musculos.has(m));
     const todas = lista.every((m) => respuestas[m]);
-    return h('details', { class: 'tarjeta como-llegas', open: !todas },
+    if (todas) {
+      const quedan = Math.ceil(10 - (Date.now() - (sesion.sensacionesListas ?? 0)) / 1000);
+      if (quedan <= 0) return null;
+      const texto = h('span', {}, `Cómo llegas: apuntado. Se quita en ${quedan} s`);
+      const caja = h('div', { class: 'tarjeta como-llegas apuntado' }, texto,
+        h('button', { type: 'button', class: 'boton secundario', onclick: () => cambiarSesion((x) => {
+          delete x.sensaciones; delete x.sensacionesListas;
+        }) }, 'Deshacer'));
+      let n = quedan;
+      const reloj = setInterval(() => {
+        n -= 1;
+        if (!caja.isConnected) { clearInterval(reloj); return; }
+        if (n <= 0) { clearInterval(reloj); caja.remove(); return; }
+        texto.textContent = `Cómo llegas: apuntado. Se quita en ${n} s`;
+      }, 1000);
+      return caja;
+    }
+    return h('details', { class: 'tarjeta como-llegas', open: true },
       h('summary', {}, todas ? 'Cómo llegas: apuntado' : '¿Cómo llegas hoy? (opcional)'),
       h('p', { class: 'nota' }, 'Puntúa de 0 a 10 cómo de recuperado notas cada músculo: 0, nada; 5, a medias; 10, del todo. '
         + 'Sirve para ajustar el mapa de recuperación a tu ritmo.'),
@@ -225,6 +244,7 @@ export function vistaSesion(contenedor, { id }) {
                 cambiarSesion((x) => {
                   x.sensaciones ??= {};
                   x.sensaciones[m] = { sentida: n, prevista: previsto[m].porcentaje, factor: factorPersonal(d, m) };
+                  if (lista.every((y) => x.sensaciones[y])) x.sensacionesListas = Date.now();
                 });
                 estado.cambiar((x) => { x.perfil.comoLlegasSaltos = 0; }, { tecleo: true });
               },
@@ -481,8 +501,6 @@ export function vistaSesion(contenedor, { id }) {
       }, { tecleo: true }) });
     return h('div', { class: 'comentario-serie' },
       antes && h('p', { class: 'nota' }, `💬 La otra vez: ${antes}`),
-      !serie.nota && h('button', { type: 'button', class: 'boton enlace boton-comentario',
-        onclick: (e) => { caja.hidden = false; e.currentTarget.remove(); caja.focus(); } }, '💬 Comentar'),
       caja);
   }
 
@@ -585,7 +603,7 @@ export function vistaSesion(contenedor, { id }) {
         });
       }, { titulo: 'Tipo de serie', lista: true }),
 
-      serie.tipo === 'intensidad' && selectorTecnicas(serie.tecnicas, (nuevas) => cambiarSesion((s) => {
+      serie.tipo === 'intensidad' && desplegableTecnicas(serie.tecnicas, (nuevas) => cambiarSesion((s) => {
         const x = s.ejercicios[i].series[j];
         x.tecnicas = nuevas;
         x.recamara = recamaraDe(nuevas, ej.recamaraPorDefecto ?? d.perfil.recamaraPorDefecto ?? 1);
@@ -594,6 +612,13 @@ export function vistaSesion(contenedor, { id }) {
 
       marcaObjetivo(serie),
 
+      h('button', { type: 'button', class: 'boton-icono boton-bocadillo', 'aria-label': 'Comentario de esta serie', title: 'Comentar',
+        onclick: (e) => {
+          const caja = e.currentTarget.closest('.serie')?.querySelector('.nota-serie');
+          if (!caja) return;
+          caja.hidden = !caja.hidden;
+          if (!caja.hidden) caja.focus();
+        } }, '💬'),
       h('button', { class: 'boton-icono borrar-serie', 'aria-label': 'Borrar serie', onclick: () => borrarSerie(i, j) }, '🗑'));
   }
 
@@ -746,7 +771,7 @@ export function vistaSesion(contenedor, { id }) {
     const anterior = plan ? sugerenciaSerie(d, ej, plan, { excluirSesion: id }).ultima?.serie : null;
     const modoCarga = modoCargaDe(d, ej, serie, sesion);
     // Lo de la otra vez va en su columna, a la izquierda; abajo, la fila de total.
-    const conAntes = Boolean(anterior?.tramos?.length);
+    const conAntes = false;
     const antes = (t) => (t ? `${t.carga != null ? `${formatearNumero(t.carga)}×` : ''}${formatearNumero(t.esfuerzo) || '—'}` : '');
     const totalReps = h('span', { class: 'total-reps' });
     const totalTexto = h('span', { class: 'total-etiqueta' });
@@ -763,12 +788,22 @@ export function vistaSesion(contenedor, { id }) {
     return h('div', { class: 'tramos' },
       conCarga && !plan?.tramosFijos?.length && h('div', { class: 'modo-carga' },
         h('span', { class: 'suave' }, 'Elegir carga por:'),
-        [['kg', 'A mano'], ['rm', (d.perfil.dropSet?.modoCarga ?? 'rm') === 'rm' ? '% del 1RM (automático)' : '% del 1RM']].map(([clave, texto]) => h('button', {
-          class: `chip seleccionable ${modoCarga === clave ? 'activo' : ''}`, 'aria-pressed': String(modoCarga === clave),
+        [['kg', 'A mano'], ['rm', (d.perfil.dropSet?.modoCarga ?? 'rm') === 'rm' ? '% del 1RM (automático)' : '% del 1RM'],
+          ...(anterior?.tramos?.length ? [['ultima', 'Como la última vez']] : [])].map(([clave, texto]) => h('button', {
+          class: `chip seleccionable ${(serie.cargaComoUltima ? 'ultima' : modoCarga) === clave ? 'activo' : ''}`,
+          'aria-pressed': String((serie.cargaComoUltima ? 'ultima' : modoCarga) === clave),
           onclick: () => {
             cambiarSesion((s) => {
               const x = s.ejercicios[i].series[j];
+              if (clave === 'ultima') {
+                // Los mismos pesos que la otra vez, y desde ahí, a mano.
+                x.modoCarga = 'kg';
+                x.tramos = anterior.tramos.map((t, k) => ({ ...(x.tramos[k] ?? {}), carga: t.carga, pct: null, esfuerzo: x.tramos[k]?.esfuerzo ?? null }));
+                x.cargaComoUltima = true;
+                return;
+              }
               x.modoCarga = clave;
+              delete x.cargaComoUltima;
               if (clave === 'rm') for (const tr of x.tramos) tr.pct = null;
             });
             if (clave === 'rm') recalcularAbajo(ej, i, { repintar: true });
@@ -793,8 +828,8 @@ export function vistaSesion(contenedor, { id }) {
         conCarga && campoCargaConPorcentaje(ej, i, j, serie, k),
         h('label', { class: 'valor' },
           h('input', { type: 'text', inputmode: 'decimal', value: tramo.esfuerzo ?? '', 'aria-label': `Repeticiones de la bajada ${k + 1}`,
-            // Sin números de la otra vez dentro de la casilla: parecían ya escritos.
-            placeholder: '—',
+            // Lo de la otra vez, dentro de la casilla en gris muy tenue.
+            placeholder: anterior?.tramos?.[k]?.esfuerzo != null ? formatearNumero(anterior.tramos[k].esfuerzo) : '—',
             oninput: (e) => actualizar((x) => {
               const antes = x.tramos[k].esfuerzo;
               x.tramos[k].esfuerzo = leerNumero(e.target.value);
@@ -901,7 +936,9 @@ export function vistaSesion(contenedor, { id }) {
       if (seg) arrancarDescanso(seg, { texto: 'entre estiramientos' });
       return;
     }
-    if (d.perfil.descansoSegundos) arrancarDescanso(d.perfil.descansoSegundos);
+    // Cada ejercicio puede tener su descanso (ficha, Ajustes finos).
+    const seg = ej.descansoSegundos ?? d.perfil.descansoSegundos;
+    if (seg) arrancarDescanso(seg, { ejercicio: { id: ej.id, nombre: ej.nombre } });
   }
 
   // Tras tocar una serie normal (peso, porcentaje, repeticiones o recámara),

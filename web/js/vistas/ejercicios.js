@@ -429,6 +429,9 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         borrador.esfuerzo.tipo === 'repeticiones' && campo('Repeticiones en recámara por defecto en este ejercicio',
           numeroInput(borrador.recamaraPorDefecto, (v) => { borrador.recamaraPorDefecto = v; }),
           h('small', { class: 'nota' }, `Vacío = lo de Ajustes (${d.perfil.recamaraPorDefecto ?? 1}).`)),
+        campo('Descanso entre series en este ejercicio (segundos)',
+          numeroInput(borrador.descansoSegundos, (v) => { borrador.descansoSegundos = v ?? undefined; }),
+          h('small', { class: 'nota' }, `Vacío = lo de Ajustes (${d.perfil.descansoSegundos ?? 'sin descanso'} s). Al saltar o alargar un descanso, la app te ofrece guardarlo aquí.`)),
         campo('Notas', h('textarea', { rows: 3, value: borrador.notas || '',
           oninput: (e) => { borrador.notas = e.target.value; } }))),
 

@@ -90,8 +90,15 @@ export function vistaAjustes(contenedor) {
       !sinCuenta && h('button', { class: 'boton enlace', onclick: async () => {
         try { await rehacerCopiasLegibles(); aviso('Hojas legibles actualizadas en Google Drive.'); } catch (e) { aviso(`No se ha podido: ${e.message}`, { tipo: 'error' }); }
       } }, 'Rehacer ahora las hojas legibles'),
-      !sinCuenta && estado.meta().csvIds?.progresion && h('a', { class: 'boton secundario', target: '_blank', rel: 'noopener',
-        href: `https://drive.google.com/file/d/${estado.meta().csvIds.progresion}/view` }, 'Abrir la hoja de progresión (como tus Excel)'),
+      !sinCuenta && estado.meta().csvIds?.progresionXlsx && h('a', { class: 'boton secundario', target: '_blank', rel: 'noopener',
+        href: `https://drive.google.com/file/d/${estado.meta().csvIds.progresionXlsx}/view` }, 'Abrir el Excel de progresión'),
+      h('button', { class: 'boton secundario', onclick: async () => {
+        const { xlsxProgresion } = await import('../exportar.js');
+        const url = URL.createObjectURL(new Blob([xlsxProgresion(estado.datos())], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+        const a = h('a', { href: url, download: 'Progresión por ejercicio.xlsx' });
+        document.body.append(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
+      } }, 'Descargar el Excel de progresión'),
       !sinCuenta && h('button', { class: 'boton enlace', onclick: verCopiasAparte }, 'Recuperar algo de una copia guardada aparte'),
       h('button', { class: 'boton enlace', onclick: salir }, sinCuenta ? 'Salir del modo de prueba' : 'Salir de la cuenta')),
 

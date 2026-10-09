@@ -11,6 +11,7 @@ import { rmDeSerie } from './formula1rm.js';
 import { nombreMusculo } from './musculos.js';
 import { nombreSede } from './sedes.js';
 import { textoTecnicas } from './vistas/tecnicas.js';
+import { xlsx } from './xlsx.js';
 
 const BOM = '﻿';
 
@@ -112,50 +113,87 @@ export function csvEjerciciosYRutinas(datos) {
   return filas(lineas);
 }
 
-// Como las hojas de Dan: un bloque por ejercicio, uno debajo de otro; dentro,
-// cada ciclo en su grupo de columnas (Fecha, Día, Peso, Reps, Trabajo, 1RM,
-// Comentario) y una fila por día del ciclo. Se lee por columnas.
-export function csvProgresion(datos) {
+// Como las hojas de Dan: un Excel con una pestaña por ejercicio; dentro, cada
+// ciclo en su bloque de columnas de color (Fecha, Día, Peso, Reps, Trabajo,
+// 1RM, Comentario) y una fila por día. Las repeticiones, en amarillo.
+const COLORES_BLOQUE = [['00B0F0', 'DDEBF7'], ['ED7D31', 'FCE4D6'], ['70AD47', 'E2EFDA'], ['7030A0', 'E4DFEC'], ['C00000', 'F8CBAD'], ['00B050', 'D9F2E6']];
+const ESTILOS_XLSX = [
+  {},                                                                  // 0 normal
+  { negrita: true, tamano: 16 },                                       // 1 título
+  { color: '595959', tamano: 9 },                                      // 2 nota
+  { centro: true, borde: true, fondo: 'F2F2F2' },                      // 3 fecha
+  { negrita: true, centro: true, borde: true, fondo: 'FFFF66' },       // 4 repeticiones
+  { borde: true, ajustar: true },                                      // 5 comentario
+  { centro: true, borde: true },                                       // 6 número
+  ...COLORES_BLOQUE.flatMap(([fuerte, suave]) => [
+    { negrita: true, color: 'FFFFFF', fondo: fuerte, centro: true, borde: true },   // cabecera del bloque
+    { centro: true, borde: true, fondo: suave },                                   // trabajo y 1RM
+  ]),
+];
+
+function bloquesDeProgresion(datos, ej) {
   const fecha = (iso) => (iso ? iso.split('-').reverse().join('/') : '');
-  const rm = (ej, s) => (ej.carga?.tipo !== 'ninguna' && !s.tramos?.length ? rmDeSerie(datos, ej, s, esfuerzoTotal(s)) : null);
-  const lineas = [['Una hoja por ejercicio, como tus Excel: cada ciclo en sus columnas y una fila por día.']];
-  for (const ej of [...datos.ejercicios].filter((e) => !e.borrado).sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'))) {
-    const todas = seriesDeEjercicio(datos, ej.id).filter((x) => x.serie.tipo !== 'calentamiento');
-    if (!todas.length) continue;
-    lineas.push([], [ej.nombre.toUpperCase()]);
-    // Bloques: uno por ciclo; lo que no va en ciclo, en «Historial» (lo mejor de cada día).
-    const bloques = new Map();
-    for (const x of todas) {
-      const clave = x.entrada.cicloN ? `Ciclo ${x.entrada.cicloN}` : 'Historial';
-      if (!bloques.has(clave)) bloques.set(clave, new Map());
-      const dias = bloques.get(clave);
-      const dia = `${x.sesion.id}`;
-      if (!dias.has(dia)) dias.set(dia, { x, series: [] });
-      dias.get(dia).series.push(x.serie);
-    }
-    const CABECERA = ['Fecha', 'Día', 'Peso', 'Reps', 'Trabajo', '1RM', 'Comentario'];
-    const columnas = [...bloques.entries()].map(([titulo, dias]) => ({
-      titulo,
-      filas: [...dias.values()].map(({ x, series }, k) => {
-        // La serie del día que manda: la de mayor 1RM (o la primera).
-        const s = [...series].sort((a, b) => (rm(ej, b) ?? 0) - (rm(ej, a) ?? 0))[0];
-        const notas = [...series.map((y) => y.nota), x.entrada.nota].filter(Boolean).join(' · ');
-        return [fecha(x.sesion.fecha), x.entrada.diaCiclo ?? k + 1,
-          s.tramos?.length ? textoSerieCorto(ej, s) : s.carga ?? '', s.tramos?.length ? '' : s.esfuerzo ?? '',
-          trabajoSerie(s) || '', rm(ej, s) != null ? Math.round(rm(ej, s) * 10) / 10 : '', notas];
-      }),
-    }));
-    const hueco = Array(CABECERA.length).fill('');
-    lineas.push(columnas.flatMap((c) => [c.titulo, ...hueco.slice(1), '']));
-    lineas.push(columnas.flatMap(() => [...CABECERA, '']));
-    const alto = Math.max(...columnas.map((c) => c.filas.length));
-    for (let i = 0; i < alto; i++) lineas.push(columnas.flatMap((c) => [...(c.filas[i] ?? hueco), '']));
+  const rm = (s) => (ej.carga?.tipo !== 'ninguna' && !s.tramos?.length ? rmDeSerie(datos, ej, s, esfuerzoTotal(s)) : null);
+  const todas = seriesDeEjercicio(datos, ej.id).filter((x) => x.serie.tipo !== 'calentamiento');
+  const bloques = new Map();
+  for (const x of todas) {
+    const clave = x.entrada.cicloN ? `Ciclo ${x.entrada.cicloN}` : 'Historial';
+    if (!bloques.has(clave)) bloques.set(clave, new Map());
+    const dias = bloques.get(clave);
+    if (!dias.has(x.sesion.id)) dias.set(x.sesion.id, { x, series: [] });
+    dias.get(x.sesion.id).series.push(x.serie);
   }
-  return filas(lineas);
+  return [...bloques.entries()].map(([titulo, dias]) => ({
+    titulo,
+    filas: [...dias.values()].map(({ x, series }, k) => {
+      // La serie del día que manda: la de mayor 1RM (o la primera).
+      const s = [...series].sort((p, q) => (rm(q) ?? 0) - (rm(p) ?? 0))[0];
+      const r = rm(s);
+      return {
+        fecha: fecha(x.sesion.fecha), dia: x.entrada.diaCiclo ?? k + 1,
+        peso: s.tramos?.length ? textoSerieCorto(ej, s) : (s.carga ?? null),
+        reps: s.tramos?.length ? null : (s.esfuerzo ?? null),
+        trabajo: trabajoSerie(s) || null, rm: r != null ? Math.round(r * 10) / 10 : null,
+        nota: [...series.map((y) => y.nota), x.entrada.nota].filter(Boolean).join(' · '),
+      };
+    }),
+  }));
+}
+
+export function xlsxProgresion(datos) {
+  const ancho = [12, 6, 9, 8, 10, 9, 28, 2];
+  const col = (n) => { let s = ''; for (let x = n + 1; x > 0; x = Math.floor((x - 1) / 26)) s = String.fromCharCode(65 + ((x - 1) % 26)) + s; return s; };
+  const hojas = [];
+  for (const ej of [...datos.ejercicios].filter((e) => !e.borrado).sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'))) {
+    const bloques = bloquesDeProgresion(datos, ej);
+    if (!bloques.length) continue;
+    const filas = [[{ v: ej.nombre, e: 1 }], [{ v: 'Cada ciclo en su bloque de columnas; una fila por día. Las repeticiones, en amarillo.', e: 2 }], []];
+    const titulos = []; const cabecera = []; const uniones = ['A1:G1'];
+    bloques.forEach((b, k) => {
+      const e = 7 + (k % COLORES_BLOQUE.length) * 2;
+      titulos.push({ v: b.titulo, e }, ...Array(6).fill({ v: '', e }), null);
+      cabecera.push(...['Fecha', 'Día', 'Peso', 'Reps', 'Trabajo', '1RM', 'Comentario'].map((v) => ({ v, e })), null);
+      uniones.push(`${col(k * 8)}4:${col(k * 8 + 6)}4`);
+    });
+    filas.push(titulos, cabecera);
+    const alto = Math.max(...bloques.map((b) => b.filas.length));
+    for (let i = 0; i < alto; i++) {
+      filas.push(bloques.flatMap((b, k) => {
+        const f = b.filas[i];
+        const tinte = 8 + (k % COLORES_BLOQUE.length) * 2;
+        if (!f) return [null, null, null, null, null, null, null, null];
+        return [{ v: f.fecha, e: 3 }, { v: f.dia, e: 6 }, { v: f.peso, e: 6 }, { v: f.reps, e: 4 },
+          { v: f.trabajo, e: tinte }, { v: f.rm, e: tinte }, { v: f.nota, e: 5 }, null];
+      }));
+    }
+    hojas.push({ nombre: ej.nombre, columnas: bloques.flatMap(() => ancho), filas, uniones });
+  }
+  if (!hojas.length) hojas.push({ nombre: 'Sin datos', filas: [[{ v: 'Aún no hay entrenamientos apuntados.', e: 2 }]] });
+  return xlsx(hojas, ESTILOS_XLSX);
 }
 
 export const NOMBRES_CSV = {
-  progresion: 'Progresión por ejercicio (como tus Excel).csv',
+  progresionXlsx: 'Progresión por ejercicio (como tus Excel).xlsx',
   entrenamientos: 'Entrenamientos (legible).csv',
   ejercicios: 'Ejercicios y rutinas (legible).csv',
 };

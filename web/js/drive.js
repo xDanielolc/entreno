@@ -114,6 +114,14 @@ export async function descargar(id) {
 // contenido: un objeto (se guarda como JSON) o un texto ya hecho (CSV…).
 function cuerpoMultiparte(metadatosArchivo, contenido, mime = 'application/json') {
   const limite = `limite${crypto.getRandomValues(new Uint32Array(1))[0]}`;
+  // Archivos binarios (el Excel): el cuerpo va como Blob, sin pasar a texto.
+  if (contenido instanceof Uint8Array) {
+    const cuerpo = new Blob([
+      `--${limite}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(metadatosArchivo)}\r\n`
+        + `--${limite}\r\nContent-Type: ${mime}\r\n\r\n`,
+      contenido, `\r\n--${limite}--`]);
+    return { cuerpo, tipo: `multipart/related; boundary=${limite}` };
+  }
   const texto = typeof contenido === 'string' ? contenido : JSON.stringify(contenido);
   const cuerpo =
     `--${limite}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n` +

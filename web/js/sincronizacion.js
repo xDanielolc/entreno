@@ -15,7 +15,7 @@ import { migrar, necesitaMigrar, validar } from './esquema.js';
 import * as estado from './estado.js';
 import { completarDesdeCatalogo } from './catalogo.js';
 import { hayPase, minutosDeToken, olvidarToken, pedirToken, renovarConPase, tokenVigente } from './google-auth.js';
-import { NOMBRES_CSV, csvEjerciciosYRutinas, csvEntrenamientos, csvProgresion } from './exportar.js';
+import { NOMBRES_CSV, csvEjerciciosYRutinas, csvEntrenamientos, xlsxProgresion } from './exportar.js';
 import * as local from './almacen-local.js';
 
 // 'sin-cuenta' | 'desconectada' | 'sincronizando' | 'al-dia' | 'pendiente' | 'sin-internet' | 'error'
@@ -185,16 +185,19 @@ async function subirCopiasLegibles({ forzar = false } = {}) {
   const d = estado.datos();
   if (!forzar && (meta.csvRevision === d.revision || Date.now() - (meta.csvHora ?? 0) < MEDIA_HORA)) return;
   const ids = { ...(meta.csvIds || {}) };
-  const hojas = { progresion: csvProgresion(d), entrenamientos: csvEntrenamientos(d), ejercicios: csvEjerciciosYRutinas(d) };
+  const hojas = { progresionXlsx: xlsxProgresion(d), entrenamientos: csvEntrenamientos(d), ejercicios: csvEjerciciosYRutinas(d) };
+  // La hoja de progresión fue un CSV unos días (0.40): ahora es un Excel de verdad.
+  if (ids.progresion) { try { await drive.borrar(ids.progresion); } catch { /* ya no estaba */ } delete ids.progresion; }
   for (const [clave, texto] of Object.entries(hojas)) {
     const nombre = NOMBRES_CSV[clave];
+    const mime = clave === 'progresionXlsx' ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : 'text/csv';
     try {
       if (ids[clave]) {
-        await drive.actualizar(ids[clave], texto, {}, 'text/csv');
+        await drive.actualizar(ids[clave], texto, {}, mime);
       } else {
         const existente = await drive.buscarPorNombre(nombre);
-        if (existente) { await drive.actualizar(existente.id, texto, {}, 'text/csv'); ids[clave] = existente.id; }
-        else ids[clave] = (await drive.crear(nombre, texto, { copia: 'legible' }, 'text/csv')).id;
+        if (existente) { await drive.actualizar(existente.id, texto, {}, mime); ids[clave] = existente.id; }
+        else ids[clave] = (await drive.crear(nombre, texto, { copia: 'legible' }, mime)).id;
       }
     } catch (e) {
       if (e.estado === 404) { delete ids[clave]; continue; }

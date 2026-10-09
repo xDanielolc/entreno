@@ -7,7 +7,7 @@
 // Solo se ocupa del CÓDIGO de la app. Los datos del usuario nunca pasan por
 // aquí: viven en el dispositivo (IndexedDB) y en su Google Drive.
 
-const VERSION = '0.42.1';
+const VERSION = '0.43.0';
 const CACHE = `entreno-${VERSION}`;
 // Las imágenes van en un almacén aparte que NO se borra al actualizar la app:
 // así se ven sin conexión aunque haya salido una versión nueva.
@@ -34,6 +34,7 @@ const ARCHIVOS = [
   './js/drive.js',
   './js/esquema.js',
   './js/exportar.js',
+  './js/xlsx.js',
   './js/formula1rm.js',
   './js/recomendaciones.js',
   './js/sedes.js',

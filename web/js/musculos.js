@@ -20,8 +20,8 @@ export const MUSCULOS = {
   // El antebrazo, en dos: la cara de la palma (flexores de la muñeca y los
   // dedos: agarre, curl de muñeca) y la de los nudillos (extensores: curl
   // invertido, extensión de muñeca).
-  antebrazoFlexor:   { nombre: 'Antebrazo (flexores, cara de la palma)', corto: 'Antebrazo palma', grupo: 'tirón', tamano: 'pequeno', vistas: ['delante'], propia: true },
-  antebrazoExtensor: { nombre: 'Antebrazo (extensores, cara de los nudillos)', corto: 'Antebrazo nudillos', grupo: 'tirón', tamano: 'pequeno', vistas: ['detras'], propia: true },
+  antebrazoFlexor:   { nombre: 'Antebrazo, lado de la palma (flexores)', corto: 'Antebrazo (palma)', grupo: 'tirón', tamano: 'pequeno', vistas: ['delante'], propia: true },
+  antebrazoExtensor: { nombre: 'Antebrazo, lado de los nudillos (extensores)', corto: 'Antebrazo (nudillos)', grupo: 'tirón', tamano: 'pequeno', vistas: ['detras'], propia: true },
   abdomen:         { nombre: 'Abdomen',          grupo: 'core',   tamano: 'medio',   vistas: ['delante'], propia: true },
   oblicuos:        { nombre: 'Oblicuos',         grupo: 'core',   tamano: 'pequeno', vistas: ['delante'] },
   dorsal:          { nombre: 'Dorsal',           grupo: 'tirón',  tamano: 'grande',  vistas: ['detras'] },

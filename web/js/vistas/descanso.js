@@ -46,8 +46,13 @@ export function descansoDeTramo(perfil, tecnica) {
   return perfil.descansoTramos?.[tecnica] ?? DESCANSO_TRAMOS_POR_DEFECTO[tecnica] ?? 20;
 }
 
-export function arrancarDescanso(segundos, { texto = 'de descanso' } = {}) {
+// El ejercicio del descanso entre series: si lo saltas o lo alargas, la
+// propuesta de cambiarlo es para ese ejercicio (no para todos).
+let ejercicioDescanso = null;
+
+export function arrancarDescanso(segundos, { texto = 'de descanso', ejercicio = null } = {}) {
   if (!segundos) return;
+  ejercicioDescanso = ejercicio;
   respiracion = null;
   motivo = texto;
   totalSeg = segundos;
@@ -141,9 +146,13 @@ const entreSeries = () => motivo === 'de descanso' && !respiracion;
 function proponer(segundos, texto) {
   if (ofrecido === segundos) return;
   ofrecido = segundos;
-  aviso(texto, { accion: { texto: `Sí, ${segundos} s`, fn: () => {
-    estado.cambiar((x) => { x.perfil.descansoSegundos = segundos; });
-    aviso(`Descanso entre series: ${segundos} s.`);
+  const ej = ejercicioDescanso;
+  aviso(ej ? texto.replace('el descanso entre series', `el descanso de ${ej.nombre}`) : texto, { accion: { texto: `Sí, ${segundos} s`, fn: () => {
+    estado.cambiar((x) => {
+      const e = ej && x.ejercicios.find((y) => y.id === ej.id);
+      if (e) e.descansoSegundos = segundos; else x.perfil.descansoSegundos = segundos;
+    });
+    aviso(ej ? `Descanso de ${ej.nombre}: ${segundos} s. Se cambia en su ficha (Ajustes finos).` : `Descanso entre series: ${segundos} s.`);
   } } });
 }
 
@@ -171,7 +180,7 @@ function alargar() {
   intervalo = setInterval(pintar, 1000);
   pintar();
   if (entreSeries() && totalSeg) {
-    proponer(totalSeg + alargadoSeg, `Un minuto más. ¿Subir el descanso entre series a ${totalSeg + alargadoSeg} s?`);
+    proponer(totalSeg + alargadoSeg, `Un minuto más. ¿Dejar el descanso entre series en ${totalSeg + alargadoSeg} s?`);
   }
 }
 

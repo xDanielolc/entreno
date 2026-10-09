@@ -1421,3 +1421,16 @@ a.boton-privacidad { justify-content: flex-start; padding-left: 18px; }
 div.sugerencia > span { display: block; }
 .sugerencia .comparativas { margin-top: 6px; display: grid; gap: 2px; font-size: .9rem; }
 .sugerencia .compara { display: block; }
+
+/* Entreno: fecha, lugar y el ojo de la vista en una fila; abajo, bocadillo y ✕ roja. */
+.fila-cabecera-entreno { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.fila-cabecera-entreno .fecha { flex: 0 1 auto; }
+.fila-cabecera-entreno > .fila-marcas, .fila-cabecera-entreno > .selector-abrir { flex: 1 1 8em; margin: 0; }
+.boton-vista, .boton-bocadillo { font-size: 1.2rem; }
+.fila-iconos-entreno { display: flex; justify-content: center; gap: 16px; margin: 8px 0 16px; }
+.boton-cancelar-x { color: var(--peligro); border: 1px solid var(--peligro); font-weight: 700; }
+.notas-sesion[hidden] { display: none; }
+.boton-tecnicas { margin: 0; }
+.como-llegas.apuntado { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+/* Lo de la otra vez dentro de la casilla: gris muy tenue, que no parezca escrito. */
+.tramo input::placeholder { color: var(--texto-suave); opacity: .35; }
