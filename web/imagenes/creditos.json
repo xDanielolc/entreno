@@ -1661,6 +1661,43 @@
    "autor": "Settebello",
    "nombreEnWger": "Push-Up",
    "aliasDe": "Flexiones"
+  },
+  "Fondos en paralelas con lastre": {
+   "archivo": "imagenes/ejercicios/fondos-de-triceps.png",
+   "autor": "Franpol",
+   "nombreEnWger": "Fondos",
+   "aliasDe": "Fondos de tríceps"
+  },
+  "Fondos en paralelas negativos": {
+   "archivo": "imagenes/ejercicios/fondos-de-triceps.png",
+   "autor": "Franpol",
+   "nombreEnWger": "Fondos",
+   "aliasDe": "Fondos de tríceps"
+  },
+  "Dominadas con lastre": {
+   "archivo": "imagenes/ejercicios/dominadas.jpg",
+   "autor": "Imobard",
+   "nombreEnWger": "Dominadas",
+   "aliasDe": "Dominadas"
+  },
+  "Dominadas negativas": {
+   "archivo": "imagenes/ejercicios/dominadas.jpg",
+   "autor": "Imobard",
+   "nombreEnWger": "Dominadas",
+   "aliasDe": "Dominadas"
+  },
+  "Flexiones con lastre": {
+   "archivo": "imagenes/ejercicios/flexiones.png",
+   "autor": "Settebello",
+   "nombreEnWger": "Push-Up",
+   "aliasDe": "Flexiones"
+  },
+  "Pájaro a una mano": {
+   "archivo": "imagenes/ejercicios/pajaros-con-mancuernas.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "bent-over-rear-deltoid-raise-with-head-on-bench",
+   "aliasDe": "Pájaros con mancuernas"
   }
  }
 }

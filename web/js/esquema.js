@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 12;
+export const VERSION_ACTUAL = 13;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -449,6 +449,16 @@ const MIGRACIONES = {
         && /flexion/.test(n) && /inclinad|manos en alto/.test(n) && !/pared/.test(n)) ej.fraccionCorporal = 0.55;
     }
     datos.version = 12;
+    return datos;
+  },
+  // v13: una serie puede ser solo de una rutina (`soloRutina` = su id): la
+  // pones desde la rutina para un día concreto y no entra al entrenar sin
+  // rutina ni en otras rutinas.
+  12: (datos) => {
+    for (const ej of datos.ejercicios) for (const plan of ej.series || []) plan.soloRutina ??= null;
+    // Y una variante partida de otro ejercicio guarda de quién es la foto.
+    for (const ej of datos.ejercicios) ej.fotoDe ??= null;
+    datos.version = 13;
     return datos;
   },
 };

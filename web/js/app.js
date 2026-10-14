@@ -2,7 +2,7 @@
 
 import * as local from './almacen-local.js';
 import * as estado from './estado.js';
-import { cargarCreditos, imagenDe } from './imagenes.js';
+import { cargarCreditos, imagenDeEjercicio } from './imagenes.js';
 import { MUSCULOS, archivoCapa } from './musculos.js';
 import { sincronizar, situacionActual } from './sincronizacion.js';
 import { aviso, h } from './ui.js';
@@ -226,7 +226,7 @@ async function guardarImagenesParaSinConexion() {
   try {
     await cargarCreditos();
     const d = estado.datos();
-    const mios = new Set((d?.ejercicios ?? []).filter((e) => !e.borrado).map((e) => imagenDe(e.nombre)?.archivo).filter(Boolean));
+    const mios = new Set((d?.ejercicios ?? []).filter((e) => !e.borrado).map((e) => imagenDeEjercicio(e)?.archivo).filter(Boolean));
     const capas = Object.entries(MUSCULOS).flatMap(([clave, m]) => m.vistas.map((v) => archivoCapa(clave, v)));
     const cuerpo = ['imagenes/musculos/cuerpo-delante.svg', 'imagenes/musculos/cuerpo-detras.svg'];
     const cache = await caches.open('entreno-imagenes-2');

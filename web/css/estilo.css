@@ -1450,3 +1450,35 @@ div.sugerencia > span { display: block; }
 .boton-tecnicas, .modo-carga .selector-abrir { background: var(--superficie); border: 1px solid var(--borde); color: var(--texto);
   border-radius: var(--radio-pequeno); padding: 8px 14px; min-height: 44px; font-weight: 600; }
 .modo-carga { gap: 8px; }
+
+/* Editor de rutinas: cada ejercicio con su foto, desplegable. */
+.dia-rutina { display: grid; gap: 8px; }
+.ej-rutina { border: 1px solid var(--borde); border-radius: var(--radio); background: var(--superficie); overflow: hidden; }
+.ej-rutina.abierto { border-color: var(--acento); }
+.ej-rutina-cabecera { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px; background: none; border: 0;
+  color: var(--texto); font: inherit; text-align: left; cursor: pointer; min-height: 64px; }
+.ej-rutina-texto { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.ej-rutina-texto strong { overflow-wrap: anywhere; }
+.ej-rutina-flecha { color: var(--texto-suave); font-size: 1.1rem; }
+.ej-rutina-detalle { display: grid; gap: 10px; padding: 4px 10px 12px; border-top: 1px solid var(--borde); }
+.ej-rutina-detalle .etiqueta-campo { margin: 6px 0 0; text-align: center; }
+.anadir-rapido { display: grid; gap: 8px; padding: 10px; border-radius: var(--radio-pequeno); background: var(--superficie-2); }
+.fila-rapida { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; }
+.fila-rapida .numero-corto { width: 3.2em; text-align: center; min-height: 44px; font-size: 16px; }
+.ej-rutina-orden .boton, .ej-rutina-detalle .fila-botones .boton { flex: 1 1 0; }
+.fila-rapida .sin-cortar { white-space: nowrap; }
+.dia-rutina .cabecera-tarjeta { display: flex; align-items: center; gap: 8px; }
+.dia-rutina .cabecera-tarjeta input { flex: 1; min-width: 0; }
+.fila-rapida { gap: 4px; }
+.fila-rapida .numero-corto { width: 2.6em; padding: 4px; }
+/* ¿Voy hoy? */
+.voy-hoy { display: grid; gap: 14px; }
+.voy-hoy .lo-que-se { padding: 10px; border-radius: var(--radio-pequeno); background: var(--superficie-2); text-align: center; }
+.voy-hoy .lo-que-se p { margin: 2px 0; }
+.pregunta-voy p { text-align: center; margin: 0 0 6px; }
+.veredicto { padding: 12px 14px; border-radius: var(--radio); border: 2px solid var(--borde); }
+.veredicto h3 { margin: 0 0 6px; text-align: center; }
+.veredicto ul { margin: 0; padding-left: 1.1em; }
+.veredicto.ve { border-color: var(--mapa-verde, #23824a); }
+.veredicto.calienta { border-color: var(--mapa-ambar, #e8a317); }
+.veredicto.descansa { border-color: var(--mapa-rojo, #b3261e); }

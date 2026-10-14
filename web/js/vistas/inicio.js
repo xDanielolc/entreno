@@ -13,6 +13,7 @@ import { nombreMusculo } from '../musculos.js';
 import { recuperacionPorMusculo } from '../recuperacion.js';
 import { recomendacionesGenerales } from '../recomendaciones.js';
 import { renovarAlTocar } from '../sincronizacion.js';
+import { voyHoy } from './voy-hoy.js';
 
 // Lo que ya enseña el muñeco de Cuerpo (series por músculo) no se repite aquí.
 const YA_SE_VE = new Set(['volumen-bajo', 'volumen-bien']);
@@ -55,15 +56,15 @@ function avisoCuandoToca(d, rutina, dia) {
     lineas.push(`${nombreMusculo(peor.musculo)} está al ${peor.porcentaje} %: le faltan unas ${peor.horasRestantes} h. `
       + `Mejor ${cuandoTexto(listo, ahora)}` + (tocados.length > 1 ? ` (también ${tocados.slice(1).map((x) => nombreMusculo(x.musculo, { corto: true })).join(', ')}).` : '.'));
   }
-  // Días parado respecto a tu ritmo con esta rutina.
+  // Días parado con esta rutina: a partir de 4, se avisa (las rutinas sin
+  // días fijos se hacen cuando estás recuperado, y más de 3 o 4 días ya es
+  // dejarla enfriar).
   const fechas = [...new Set(d.sesiones.filter((s) => !s.borrada && s.estado === 'terminada' && s.rutinaId === rutina.id).map((s) => s.fecha))].sort();
-  if (fechas.length >= 3) {
-    const dias = (a, b) => Math.round((new Date(b) - new Date(a)) / 86_400_000);
-    const huecos = fechas.slice(1).map((f, i) => dias(fechas[i], f)).sort((a, b) => a - b);
-    const habitual = huecos[Math.floor(huecos.length / 2)];
-    const desdeUltima = dias(fechas.at(-1), hoyISO());
-    if (desdeUltima >= Math.max(4, habitual * 2)) {
-      lineas.push(`Llevas ${desdeUltima} días sin esta rutina y sueles dejar ${habitual}. Toca ya: si te cuesta, empieza con algo menos de peso.`);
+  if (fechas.length) {
+    const desdeUltima = Math.round((new Date(hoyISO()) - new Date(fechas.at(-1))) / 86_400_000);
+    if (desdeUltima >= 4) {
+      lineas.push(`Llevas ${desdeUltima} días sin esta rutina: toca ya.`
+        + (desdeUltima >= 10 ? ' Si te cuesta, empieza con algo menos de peso.' : ''));
     }
   }
   if (!lineas.length) return null;
@@ -214,6 +215,7 @@ export function vistaInicio(contenedor) {
           avisoCuandoToca(d, rutina, dia),
           h('button', { class: 'boton grande', onclick: () => empezarConRutina(dia) }, toca.descansoHoy ? 'Empezar igualmente' : 'Empezar'),
           h('button', { class: 'boton secundario', onclick: elegirDia }, 'Otro día de la rutina'),
+          h('button', { class: 'boton secundario', onclick: () => voyHoy(d, dia) }, '¿Voy hoy? ¿Cansancio o pereza?'),
           // Las explicaciones, en un cartel aparte.
           h('button', { class: 'boton-mas-info', onclick: () => modal('Más info', h('div', { class: 'mas-info' },
             h('h3', {}, '¿Por qué esta y no otra?'),

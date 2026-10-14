@@ -8,7 +8,7 @@
 import { CATALOGO, TIPOS_EJERCICIO, esMaquinaDePlacas, normalizar, tipoDeEjercicio } from '../catalogo.js';
 import * as estado from '../estado.js';
 import { planesPorDefecto } from '../series.js';
-import { imagenDe } from '../imagenes.js';
+import { imagenDeEjercicio } from '../imagenes.js';
 import { MUSCULOS, ORDEN_MUSCULOS, TREN_INFERIOR, TREN_SUPERIOR, nombreMusculo } from '../musculos.js';
 import { anadir, h, modal, nuevoId, selector } from '../ui.js';
 
@@ -128,7 +128,7 @@ export function modoActual() {
 // Una tarjeta de ejercicio. `pie` es texto o nodo bajo el nombre; `extra`, lo
 // que va a la derecha (una etiqueta, por ejemplo).
 export function tarjetaItem(x, { href, onclick, pie, extra, clase = '' } = {}) {
-  const imagen = imagenDe(x.nombre);
+  const imagen = imagenDeEjercicio(x);
   const etiqueta = href ? 'a' : 'button';
   const props = { class: `tarjeta fila-enlace item-ejercicio ${clase}`, href, onclick };
   if (!href) props.type = 'button';

@@ -376,4 +376,17 @@ export const BIBLIOGRAFIA = [
       { texto: 'OMS (2020): directrices sobre actividad física y hábitos sedentarios.', url: 'https://iris.who.int/handle/10665/336656' },
     ],
   },
+  {
+    tema: '¿Voy hoy? (cansancio o pereza)',
+    dice: 'Suma solo señales de cansancio: sueño, dolor, estrés, cuerpo que no responde, días seguidos y recuperación de los músculos '
+      + 'del día. Con muchas, descansa; con algunas, ve y decide al calentar; sin ellas, ve.',
+    matiz: 'Los puntos y los cortes son una decisión de la app, no salen de un estudio. Que la pereza se vaya al calentar y el '
+      + 'cansancio no es una regla práctica sin estudios que la midan. El pulso en reposo se quitó por poco fiable.',
+    fuentes: [
+      { texto: 'Saw et al. (2016), Br J Sports Med: revisión de 56 estudios; las preguntas de cómo te sientes reflejan la carga mejor que medidas como el pulso.', url: 'https://doi.org/10.1136/bjsports-2015-094758' },
+      { texto: 'Bosquet et al. (2008), Br J Sports Med: el pulso no es una herramienta cómoda ni fiable para ver si estás pasado de carga.', url: 'https://doi.org/10.1136/bjsm.2007.042200' },
+      { texto: 'Craven et al. (2022), Sports Medicine: metaanálisis de 77 estudios; dormir 6 h o menos baja el rendimiento (en fuerza máxima, alrededor de un 3 %).', url: 'https://doi.org/10.1007/s40279-022-01706-y' },
+      { texto: 'Stults-Kolehmainen et al. (2014), J Strength Cond Res: con mucho estrés, la fuerza tarda más en recuperarse (31 universitarios).', url: 'https://doi.org/10.1519/JSC.0000000000000335' },
+    ],
+  },
 ];

@@ -6,6 +6,7 @@
 //   · los consejos, plegados;
 //   · si has cambiado algo respecto a la rutina, si es solo para hoy o para siempre.
 
+import { planesDeItem } from '../series.js';
 import { esfuerzoTotal, formatearNumero, records as recordsDe, redondear, seriesDeEjercicio, trabajoSerie } from '../calculos.js';
 import { serieNuevaPlantilla } from '../esquema.js';
 import * as estado from '../estado.js';
@@ -207,7 +208,7 @@ function cambiosRespectoARutina(datos, sesion) {
     // En un programa (5×5, 5/3/1…) las series las fija el programa: no se ofrece quitarlas.
     if ((ej.series || []).every((p) => p.progresion?.tipo === 'programa')) continue;
     const item = dia?.ejercicios.find((x) => x.ejercicioId === ej.id);
-    const previstos = (ej.series || []).filter((p) => !item?.series || item.series.includes(p.id));
+    const previstos = planesDeItem(ej, item);
     const quitados = previstos.filter((p) => !hechas.has(p.id));
     const n = quitados.length;
     const texto = `En ${ej.nombre} has hecho ${n} ${n > 1 ? 'series' : 'serie'} menos de lo planeado. ¿${n > 1 ? 'Las' : 'La'} quito de los próximos entrenos?`;

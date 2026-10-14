@@ -34,6 +34,12 @@ export function imagenDe(nombre) {
   return null;
 }
 
+// La de un ejercicio tuyo: por su nombre o, si es una variante que has
+// partido de otro (y se llama distinto), la foto del original.
+export function imagenDeEjercicio(ej) {
+  return imagenDe(ej?.nombre) ?? imagenDe(ej?.fotoDe);
+}
+
 function normalizar(texto) {
   return texto.normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
 }

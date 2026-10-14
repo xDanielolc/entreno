@@ -525,3 +525,10 @@ la vez, a veces sin cobertura):
   `ej.unidades` ({distancia: 'km'|'m'|'cm', altura: 'cm'|'m'});
   `progresion.inicio` ({modo, porcentaje, reps}); `reinicio.modo = 'prueba'`;
   `ciclo.pendientePrueba`.
+
+- **v13 (0.44.0).** `plan.soloRutina`: id de la rutina en la que se creó la
+  serie desde el editor de rutinas (o 'retirada' si se quitó y ya tenía
+  historial); null = serie del ejercicio. Un día de rutina con
+  `item.series = null` usa las del ejercicio (las que no son `soloRutina`), y
+  «entrenar sin rutina» también. `ej.fotoDe`: nombre del ejercicio del que
+  sale la foto (las variantes partidas de otro se llaman distinto).

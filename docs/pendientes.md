@@ -73,6 +73,29 @@ y al final lo que es decoración o depende de terceros.
       `listaRecomendaciones`, `rutinaActiva`, `elegirNivel`.
 - [ ] Intervalos propios: la ✕ es un span dentro de un botón (teclado).
 
+## 0c. Ronda 0.44 (15-10-2026)
+
+- [x] Editor de rutinas: cada ejercicio con foto y resumen, desplegable;
+      series por día (marcar cuáles) y «añadir series» rápido (n × de-a,
+      normales / drop set en la última / Bilbo / serie máxima), solo en esta
+      rutina o en el ejercicio.
+- [x] «¿Voy hoy?» en Hoy (árbol de Dan revisado; v5 en su carpeta original).
+- [x] Aviso de días sin la rutina a partir de 4.
+- [x] Variantes en la lista general: fondos en paralelas con lastre y
+      negativos, dominadas con lastre y negativas, flexiones con lastre,
+      pájaro a una mano. Las variantes partidas conservan la foto del original.
+- [ ] Superseries (dos ejercicios alternados): Dan no las usará, pero las
+      quiere como opción.
+- [ ] Programar los consejos aprobados en v044 (quitar c20 y c30; c16 solo
+      días de fuerza; récord en el ejercicio como Hevy; calentamiento en
+      Aprender; lista larga de palabras de dolor; comprobar las fuentes «por
+      comprobar»).
+- [ ] Registro del peso corporal (como en las apps de dieta, sin comidas).
+- [ ] Foto según el material elegido (barra / mancuernas / peso corporal):
+      hace falta una imagen por variante; con Design.
+- [ ] Que el 1RM de las series de pocas repeticiones pese más que el de las
+      de 20-30 (la calibración personal lo corrige en parte, no del todo).
+
 ## 1. La app funcionando en condiciones
 
 Es lo primero. Dan lo dijo así el 23-09-2026: *«Me rindo con el tutorial hasta

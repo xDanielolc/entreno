@@ -18,7 +18,7 @@ import { ORDEN_MUSCULOS, nombreMusculo } from '../musculos.js';
 import { entradaDeEjercicio, planesPorDefecto } from '../series.js';
 import { nombreSede, sedesActivas, separarPorSede } from '../sedes.js';
 import { seccionProgreso } from './graficas.js';
-import { imagenDe } from '../imagenes.js';
+import { imagenDeEjercicio } from '../imagenes.js';
 import { anadir, aviso, confirmar, h, leerNumero, modal, nuevoId, plegable, selector } from '../ui.js';
 import { pista } from './tutorial.js';
 import { explicar } from './glosario.js';
@@ -197,6 +197,14 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
   const retomado = !existente && !paraSesion && Boolean(borradorNuevo);
   const borrador = existente ? structuredClone(existente) : paraSesion ? ejercicioVacio() : (borradorNuevo ??= ejercicioVacio());
   borrador.series ??= [];
+  // Las series que solo usa alguna rutina se cambian desde la rutina: aquí
+  // no salen, pero se guardan con el resto.
+  const deRutinas = borrador.series.filter((p) => p.soloRutina);
+  borrador.series = borrador.series.filter((p) => !p.soloRutina);
+  const vivasDeRutinas = deRutinas.filter((p) => p.soloRutina !== 'retirada').length;
+  // Si solo tenía series de rutinas, sin rutina usa las de por defecto: se
+  // enseñan aquí para poder cambiarlas.
+  if (existente && !borrador.series.length) borrador.series = planesPorDefecto(d, borrador);
   // Más de 50 series no tiene sentido y bloquea el móvil al pintarlas.
   if (borrador.series.length > 50) borrador.series.length = 50;
   borrador.musculos ??= { principales: [], secundarios: [] };
@@ -209,6 +217,7 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
     estado.cambiar((datos) => {
       const copia = structuredClone(borrador);
       copia.nombre = copia.nombre.trim();
+      copia.series = [...copia.series, ...structuredClone(deRutinas)];
       const i = datos.ejercicios.findIndex((e) => e.id === borrador.id);
       if (i >= 0) datos.ejercicios[i] = copia;
       else datos.ejercicios.push(copia);
@@ -219,7 +228,7 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
 
   const zona = h('div');
   zona.addEventListener('input', () => persistir());
-  const imagenFicha = existente ? imagenDe(existente.nombre) : null;
+  const imagenFicha = existente ? imagenDeEjercicio(existente) : null;
   // Tres formas de ver la ficha: el progreso, la ficha entera o paso a paso.
   // Se recuerda la elegida (y el paso) mientras la app esté abierta.
   const clave = existente?.id ?? 'nuevo';
@@ -255,6 +264,8 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         borradorNuevo = null; pasoFicha.delete('nuevo'); abiertosFicha.delete('nuevo');
         dispatchEvent(new HashChangeEvent('hashchange'));
       } }, 'Empezar otro')),
+    vivasDeRutinas > 0 && h('p', { class: 'nota centrado' },
+      `Además tiene ${vivasDeRutinas === 1 ? 'una serie' : `${vivasDeRutinas} series`} «solo aquí» de alguna rutina: se cambian desde la rutina.`),
     imagenFicha && h('figure', { class: 'imagen-ejercicio' },
       h('img', { src: imagenFicha.archivo, alt: `Ilustración de ${existente.nombre}`, loading: 'lazy' })),
     cabecera,
@@ -1555,6 +1566,8 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
             const copia = structuredClone(base);
             copia.id = nuevoIdEj;
             copia.nombre = nombre;
+            // Con otro nombre se quedaría sin foto: se queda la del original.
+            copia.fotoDe = base.fotoDe ?? base.nombre;
             copia.borrado = null;
             copia.archivado = false;
             // Series nuevas: si compartieran identificador, los dos ejercicios

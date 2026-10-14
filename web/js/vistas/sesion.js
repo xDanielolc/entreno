@@ -13,7 +13,7 @@ import * as estado from '../estado.js';
 import {
   TIPOS_CARGA, TIPOS_ESFUERZO, TIPOS_SERIE, camposDe, recamaraDe, serieNuevaPlantilla, tipoDeFallo, tramosDe,
 } from '../esquema.js';
-import { imagenDe } from '../imagenes.js';
+import { imagenDeEjercicio } from '../imagenes.js';
 import {
   avisoPrimeraBajada, crearSerieDesdePlan, entradaDeEjercicio, modoCargaDe, origenModoCarga, recalcularTramos, saltoDeTramo,
   serieSuelta,
@@ -328,7 +328,7 @@ export function vistaSesion(contenedor, { id }) {
     const ocultas = entrada.series.filter((s, j) => oculta(j)).length;
     return h('article', { class: `tarjeta ejercicio-sesion ${modo === 'serie' ? 'de-una-en-una' : ''}`, 'data-entrada': indice },
       h('div', { class: 'cabecera-tarjeta' },
-        imagenDe(ej.nombre) && h('img', { class: 'miniatura', src: imagenDe(ej.nombre).archivo, alt: '', loading: 'lazy' }),
+        imagenDeEjercicio(ej) && h('img', { class: 'miniatura', src: imagenDeEjercicio(ej).archivo, alt: '', loading: 'lazy' }),
         h('h2', { class: 'crece' }, ej.nombre),
         h('button', { class: 'boton-icono', 'aria-label': `Quitar ${ej.nombre}`,
           onclick: () => quitarEjercicio(indice, ej) }, '✕')),

@@ -515,3 +515,15 @@ PENDIENTE: nombre e icono con Design («luego ya decoramos»); publicar la app
 en la consola de Google (es cosa suya); repasar las descripciones de las
 progresiones contrastándolas con las fuentes, que él pidió y solo está hecho
 lo de Bilbo.
+
+## Ronda 0.44.0 (15-10-2026): rutinas por día y «¿Voy hoy?»
+
+Esquema v13. Editor de rutinas rehecho (`filaEjercicio`, `detalleEjercicio`,
+`anadirRapido` en rutinas.js): foto y resumen (`resumenPlanes`/`textoPlan`
+en series.js), series del día marcables y «añadir series» rápido. Las que
+se añaden «solo en esta rutina» llevan `plan.soloRutina` y no salen en la
+ficha del ejercicio ni al entrenar sin rutina (`planesDeItem`). «¿Voy hoy?»
+(`vistas/voy-hoy.js`): solo suma cansancio; la pereza es «sin ganas con el
+cuerpo bien»; sin pulso. Su árbol original v5 está en la carpeta «Test y
+árboles de decisión HTML», al lado del proyecto. `imagenDeEjercicio(ej)`
+usa `ej.fotoDe` en las variantes partidas.

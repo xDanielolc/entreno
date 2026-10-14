@@ -40,6 +40,36 @@ export function planPorDefecto(datos, ejercicio) {
   return plan;
 }
 
+// Las series de un ejercicio que entran en un día de rutina. Sin elección
+// en la rutina, las del propio ejercicio (no las que solo usa alguna rutina).
+export function planesDeItem(ejercicio, item) {
+  return (ejercicio.series || []).filter((p) => (item?.series ? item.series.includes(p.id) : !p.soloRutina));
+}
+
+// Resumen corto de unas series: «Bilbo + 2 × 8-10 + 1 × 8-10 con drop set».
+export function textoPlan(plan) {
+  const prog = plan.progresion;
+  if (plan.calentamiento || plan.tipo === 'calentamiento') return 'calentamiento';
+  if (prog?.tipo === 'bilbo') return 'Bilbo';
+  if (prog?.tipo === 'programa') return { '5x5': `${prog.series ?? 5} × 5`, '531': '5/3/1', hst: 'HST' }[prog.programa] ?? 'programa';
+  if (prog?.tipo === 'maximo-trabajo') return 'máximo trabajo';
+  const r = prog?.objetivoEsfuerzo ?? plan.objetivoEsfuerzo;
+  let t = r ? (r[0] === r[1] ? `${r[0]}` : `${r[0]}-${r[1]}`) : 'libre';
+  if (plan.tecnicas?.includes('drop-set')) t += ' con drop set';
+  else if (plan.tecnicas?.length) t += ` con ${plan.tecnicas.join(' y ')}`;
+  return t;
+}
+
+export function resumenPlanes(planes) {
+  const grupos = [];
+  for (const p of planes) {
+    const t = textoPlan(p);
+    if (grupos.at(-1)?.t === t) grupos.at(-1).n += 1;
+    else grupos.push({ t, n: 1 });
+  }
+  return grupos.map(({ t, n }) => (/^\d/.test(t) ? `${n} × ${t}` : n > 1 ? `${n} × ${t}` : t)).join(' + ');
+}
+
 export function crearSerieDesdePlan(datos, ejercicio, plan, { excluirSesion } = {}) {
   // Un ciclo sin montar (Bilbo puesto por defecto, por ejemplo) se monta en
   // cuanto hay un 1RM del que partir. La primera vez no lo hay: haces lo que
@@ -115,12 +145,14 @@ export function serieSuelta({ tipo = 'libre', carga = null, tecnicas = [], recam
 export function entradaDeEjercicio(datos, ej, { excluirSesion } = {}) {
   // Un ejercicio sin regla recibe la de por defecto la primera vez que entra
   // en un entrenamiento, y se queda guardada en su ficha.
-  if (!ej.series?.length) {
+  // Las series que solo usa alguna rutina no cuentan: sin rutina, mandan
+  // las del ejercicio.
+  if (!(ej.series || []).some((p) => !p.soloRutina)) {
     const propio = datos.ejercicios?.find((x) => x.id === ej.id) ?? ej;
-    propio.series = planesPorDefecto(datos, propio);
+    propio.series = [...(propio.series || []), ...planesPorDefecto(datos, propio)];
     ej = propio;
   }
-  const planes = ej.series?.length ? ej.series : [];
+  const planes = ej.series.filter((p) => !p.soloRutina);
   const entrada = {
     ejercicioId: ej.id, cicloN: null, diaCiclo: null, notas: '',
     series: planes.flatMap((plan) => seriesDesdePlan(datos, ej, plan, { excluirSesion })),
