@@ -28,6 +28,31 @@ y al final lo que es decoración o depende de terceros.
       largas, lo que mejora la resistencia con ese peso se lee como «más 1RM».
       Proponer cómo (marca en la gráfica, frase en el resumen, sugerencia de
       comprobarlo con una serie de 3-5) y preguntar a Dan antes de hacerlo.
+- [ ] **Técnica «Negativas»** (pedida por Dan el 10-10-2026, para dominadas y
+      fondos sin gomas ni máquina asistida). Solo la bajada: se sube con
+      ayuda (salto, cajón o pies) y se baja lo más lento posible. Apuntar por
+      serie las repeticiones y los segundos de bajada (o el tiempo medio por
+      repetición), y que se pueda combinar en la misma serie con repeticiones
+      completas primero («2 limpias + 3 negativas»), igual que se combinan las
+      técnicas de intensidad. Valorar también un «colgado isométrico» (segundos
+      colgado o sujetando arriba) como medida. Progresión propuesta: más
+      segundos de bajada o más repeticiones; cuando haya 3 series de 5
+      negativas de 5 s, avisar de que toca probar repeticiones completas.
+      Distinguirla de «Excéntricas lentas», que hoy es bajar despacio una
+      repetición completa. No hay estudio sobre negativas para aprender a hacer
+      dominadas: es una decisión práctica; el excéntrico con carga alta da
+      fuerza muy específica del excéntrico (Roig 2009, DOI
+      10.1136/bjsm.2008.051417) y suele dar más agujetas al principio.
+      Preguntar a Dan cómo lo quiere ver antes de hacerlo.
+      **Actualización del 10-10-2026:** en su rutina nueva las negativas
+      se han sustituido por dominadas con los pies apoyados en un banco
+      (las piernas ayudan lo justo), dominadas en racimo (5-6 series de 1-2
+      con 45-60 s) y fondos en banco o flexiones cerradas con pies en alto.
+      Las negativas bajan de prioridad. Lo que sí le hará falta: apuntar
+      cuánto ayudan las piernas en las dominadas con pies apoyados (una
+      escala sencilla, como la de la mano en estiramientos) y la altura de
+      los pies en flexiones (30 o 61 cm, Ebben 2011). Preguntar a Dan cuando
+      pruebe a meter la rutina a mano.
 
 ## 1. La app funcionando en condiciones
 

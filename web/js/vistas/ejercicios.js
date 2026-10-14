@@ -542,13 +542,14 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
   }
   function campoAgarre() {
     // Dicho como se ve al hacerlo: hacia dónde miran las palmas o los nudillos.
-    const AGARRES = [['supino', 'Palmas hacia ti'], ['prono', 'Nudillos hacia ti'], ['neutro', 'Palmas una frente a otra'], ['mixto', 'Una palma y unos nudillos']];
+    const AGARRES = [['supino', 'Palmas hacia arriba (como en un curl)'], ['prono', 'Palmas hacia abajo (como en una dominada)'],
+      ['neutro', 'Palmas enfrentadas (como en un curl martillo)'], ['mixto', 'Una hacia arriba y otra hacia abajo (mixto)']];
     return h('div', { class: 'campo' },
       h('span', { class: 'etiqueta-campo' }, 'Agarre ', ayuda('Agarre', [
-        'Mira tus manos cogiendo la barra o el agarre: ¿qué ves, las palmas o los nudillos?',
-        'Palmas hacia ti (supino, como en un curl de bíceps): trabaja sobre todo la cara de la palma del antebrazo.',
-        'Nudillos hacia ti (prono, como en un peso muerto normal) o palmas una frente a otra (neutro, como en un curl martillo): trabaja también la cara de los nudillos.',
-        'Una palma y unos nudillos (mixto): lo de los dos. La app lo añade solo a los secundarios.'])),
+        'Piensa en el ejercicio con los brazos por delante, cogiendo la barra o el agarre.',
+        'Palmas hacia arriba (supino), como en un curl de bíceps: trabaja sobre todo el antebrazo interior.',
+        'Palmas hacia abajo (prono), como en una dominada normal, o enfrentadas (neutro), como en un curl martillo: trabaja también el antebrazo exterior.',
+        'Mixto, una de cada: lo de los dos. La app lo añade solo a los músculos secundarios.'])),
       selector([[null, 'Sin indicar'], ...AGARRES], borrador.agarre ?? null, (v) => {
         borrador.agarre = v;
         const sec = borrador.musculos.secundarios.filter((x) => x !== 'antebrazoExtensor' && x !== 'antebrazoFlexor');

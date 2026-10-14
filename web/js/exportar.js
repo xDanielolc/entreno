@@ -131,62 +131,96 @@ const ESTILOS_XLSX = [
   ]),
 ];
 
+// Bloques de una hoja: uno por ciclo (Fecha, Día, Peso, Reps, Trabajo, 1RM,
+// Comentario) y, si entrenas también fuera de ciclos (un 3×5, series de
+// hipertrofia…), uno «Otras series» con todas las series de cada día.
 function bloquesDeProgresion(datos, ej) {
   const fecha = (iso) => (iso ? iso.split('-').reverse().join('/') : '');
   const rm = (s) => (ej.carga?.tipo !== 'ninguna' && !s.tramos?.length ? rmDeSerie(datos, ej, s, esfuerzoTotal(s)) : null);
+  const redondo = (n) => (n != null ? Math.round(n * 10) / 10 : null);
+  const planDe = (s) => (ej.series || []).find((p) => p.id === s.planId);
+  const cicloDe = (x) => x.serie.cicloN ?? (planDe(x.serie)?.progresion?.tipo === 'bilbo' ? x.entrada.cicloN : null) ?? null;
   const todas = seriesDeEjercicio(datos, ej.id).filter((x) => x.serie.tipo !== 'calentamiento');
-  const bloques = new Map();
+  const porCiclo = new Map();
+  const otras = new Map();
   for (const x of todas) {
-    const clave = x.entrada.cicloN ? `Ciclo ${x.entrada.cicloN}` : 'Historial';
-    if (!bloques.has(clave)) bloques.set(clave, new Map());
-    const dias = bloques.get(clave);
-    if (!dias.has(x.sesion.id)) dias.set(x.sesion.id, { x, series: [] });
-    dias.get(x.sesion.id).series.push(x.serie);
+    const n = cicloDe(x);
+    const destino = n != null ? (porCiclo.get(n) ?? porCiclo.set(n, new Map()).get(n)) : otras;
+    if (!destino.has(x.sesion.id)) destino.set(x.sesion.id, { x, series: [] });
+    destino.get(x.sesion.id).series.push(x.serie);
   }
-  return [...bloques.entries()].map(([titulo, dias]) => ({
-    titulo,
+  const ciclos = [...porCiclo.entries()].sort((p, q) => p[0] - q[0]).map(([n, dias]) => ({
+    titulo: `Ciclo ${n}`,
+    columnas: [['Fecha', 12, 'fecha'], ['Día', 6, 'num'], ['Peso', 9, 'num'], ['Reps', 8, 'reps'], ['Trabajo', 10, 'tinte'], ['1RM', 9, 'tinte'], ['Comentario', 28, 'nota']],
     filas: [...dias.values()].map(({ x, series }, k) => {
-      // La serie del día que manda: la de mayor 1RM (o la primera).
       const s = [...series].sort((p, q) => (rm(q) ?? 0) - (rm(p) ?? 0))[0];
-      const r = rm(s);
-      return {
-        fecha: fecha(x.sesion.fecha), dia: x.entrada.diaCiclo ?? k + 1,
-        peso: s.tramos?.length ? textoSerieCorto(ej, s) : (s.carga ?? null),
-        reps: s.tramos?.length ? null : (s.esfuerzo ?? null),
-        trabajo: trabajoSerie(s) || null, rm: r != null ? Math.round(r * 10) / 10 : null,
-        nota: [...series.map((y) => y.nota), x.entrada.nota].filter(Boolean).join(' · '),
-      };
+      return [fecha(x.sesion.fecha), x.entrada.diaCiclo ?? s.diaCiclo ?? k + 1,
+        s.tramos?.length ? textoSerieCorto(ej, s) : (s.carga ?? null), s.tramos?.length ? null : (s.esfuerzo ?? null),
+        trabajoSerie(s) || null, redondo(rm(s)), [...series.map((y) => y.nota), x.entrada.nota].filter(Boolean).join(' · ')];
     }),
   }));
+  const bloques = [];
+  if (otras.size) {
+    const dias = [...otras.values()];
+    const maxSeries = Math.min(8, Math.max(...dias.map((d) => d.series.length)));
+    bloques.push({
+      titulo: porCiclo.size ? 'Otras series' : 'Series',
+      columnas: [['Fecha', 12, 'fecha'], ...Array.from({ length: maxSeries }, (_, i) => [`Serie ${i + 1}`, 10, 'reps']),
+        ['Mejor 1RM', 10, 'tinte'], ['Comentario', 28, 'nota']],
+      filas: dias.map(({ x, series }) => {
+        const celdas = series.slice(0, maxSeries).map((s) => textoSerieCorto(ej, s));
+        while (celdas.length < maxSeries) celdas.push(null);
+        const mejor = Math.max(0, ...series.map((s) => rm(s) ?? 0));
+        return [fecha(x.sesion.fecha), ...celdas, mejor ? redondo(mejor) : null,
+          [...series.map((y) => y.nota), x.entrada.nota].filter(Boolean).join(' · ')];
+      }),
+    });
+  }
+  return { otras: bloques, ciclos };
 }
 
 export function xlsxProgresion(datos) {
-  const ancho = [12, 6, 9, 8, 10, 9, 28, 2];
   const col = (n) => { let s = ''; for (let x = n + 1; x > 0; x = Math.floor((x - 1) / 26)) s = String.fromCharCode(65 + ((x - 1) % 26)) + s; return s; };
-  const hojas = [];
-  for (const ej of [...datos.ejercicios].filter((e) => !e.borrado).sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'))) {
-    const bloques = bloquesDeProgresion(datos, ej);
-    if (!bloques.length) continue;
-    const filas = [[{ v: ej.nombre, e: 1 }], [{ v: 'Cada ciclo en su bloque de columnas; una fila por día. Las repeticiones, en amarillo.', e: 2 }], []];
-    const titulos = []; const cabecera = []; const uniones = ['A1:G1'];
+  // Cada ciclo hace de bloque; cuando hay muchos (un macrociclo entero), se
+  // abren más pestañas: «Press de banca», «Press de banca (2)»…
+  const POR_PESTANA = 6;
+  const pintarHoja = (nombre, titulo, bloques) => {
+    const filas = [[{ v: titulo, e: 1 }], [{ v: 'Cada bloque, un ciclo (o tus otras series); una fila por día. Las repeticiones, en amarillo.', e: 2 }], []];
+    const titulos = []; const cabecera = []; const uniones = ['A1:G1']; const anchos = [];
+    let c = 0;
     bloques.forEach((b, k) => {
       const e = 7 + (k % COLORES_BLOQUE.length) * 2;
-      titulos.push({ v: b.titulo, e }, ...Array(6).fill({ v: '', e }), null);
-      cabecera.push(...['Fecha', 'Día', 'Peso', 'Reps', 'Trabajo', '1RM', 'Comentario'].map((v) => ({ v, e })), null);
-      uniones.push(`${col(k * 8)}4:${col(k * 8 + 6)}4`);
+      const n = b.columnas.length;
+      titulos.push({ v: b.titulo, e }, ...Array(n - 1).fill({ v: '', e }), null);
+      cabecera.push(...b.columnas.map(([v]) => ({ v, e })), null);
+      anchos.push(...b.columnas.map(([, w]) => w), 2);
+      if (n > 1) uniones.push(`${col(c)}4:${col(c + n - 1)}4`);
+      c += n + 1;
     });
     filas.push(titulos, cabecera);
-    const alto = Math.max(...bloques.map((b) => b.filas.length));
+    const alto = Math.max(0, ...bloques.map((b) => b.filas.length));
     for (let i = 0; i < alto; i++) {
       filas.push(bloques.flatMap((b, k) => {
-        const f = b.filas[i];
         const tinte = 8 + (k % COLORES_BLOQUE.length) * 2;
-        if (!f) return [null, null, null, null, null, null, null, null];
-        return [{ v: f.fecha, e: 3 }, { v: f.dia, e: 6 }, { v: f.peso, e: 6 }, { v: f.reps, e: 4 },
-          { v: f.trabajo, e: tinte }, { v: f.rm, e: tinte }, { v: f.nota, e: 5 }, null];
+        const f = b.filas[i];
+        if (!f) return [...b.columnas.map(() => null), null];
+        const estilo = { fecha: 3, num: 6, reps: 4, tinte, nota: 5 };
+        return [...f.map((v, j) => ({ v, e: estilo[b.columnas[j][2]] ?? 6 })), null];
       }));
     }
-    hojas.push({ nombre: ej.nombre, columnas: bloques.flatMap(() => ancho), filas, uniones });
+    return { nombre, columnas: anchos, filas, uniones };
+  };
+  const hojas = [];
+  for (const ej of [...datos.ejercicios].filter((e) => !e.borrado).sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'))) {
+    const { otras, ciclos } = bloquesDeProgresion(datos, ej);
+    if (!otras.length && !ciclos.length) continue;
+    const tandas = [];
+    for (let i = 0; i < Math.max(1, ciclos.length); i += POR_PESTANA) tandas.push(ciclos.slice(i, i + POR_PESTANA));
+    tandas.forEach((tanda, k) => {
+      const nombre = k ? `${ej.nombre} (${k + 1})` : ej.nombre;
+      hojas.push(pintarHoja(nombre, k ? `${ej.nombre}, ciclos ${tanda[0].titulo.replace('Ciclo ', '')} en adelante` : ej.nombre,
+        k ? tanda : [...otras, ...tanda]));
+    });
   }
   if (!hojas.length) hojas.push({ nombre: 'Sin datos', filas: [[{ v: 'Aún no hay entrenamientos apuntados.', e: 2 }]] });
   return xlsx(hojas, ESTILOS_XLSX);

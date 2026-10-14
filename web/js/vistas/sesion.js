@@ -35,6 +35,7 @@ import { desplegableTecnicas, textoTecnicas } from './tecnicas.js';
 // esté abierta, y la elección queda en el perfil para la próxima vez.
 const guiado = new Map();     // id de sesión → { modo, pos }
 const preguntandoVista = new Set();   // sesiones con el cartel de vista a punto de salir
+const vistaPreguntada = new Set();    // sesiones a las que ya se les preguntó: no se insiste
 // Entrenamientos ya terminados que has abierto para editar. Sin esto, un día
 // del historial se abre en resumen, sin nada que se pueda tocar sin querer.
 const editando = new Set();
@@ -212,7 +213,7 @@ export function vistaSesion(contenedor, { id }) {
     if (todas) {
       const quedan = Math.ceil(10 - (Date.now() - (sesion.sensacionesListas ?? 0)) / 1000);
       if (quedan <= 0) return null;
-      const texto = h('span', {}, `Cómo llegas: apuntado. Se quita en ${quedan} s`);
+      const texto = h('span', {}, `Cómo llegas: apuntado. Esto se cierra en ${quedan} s`);
       const caja = h('div', { class: 'tarjeta como-llegas apuntado' }, texto,
         h('button', { type: 'button', class: 'boton secundario', onclick: () => cambiarSesion((x) => {
           delete x.sensaciones; delete x.sensacionesListas;
@@ -222,7 +223,7 @@ export function vistaSesion(contenedor, { id }) {
         n -= 1;
         if (!caja.isConnected) { clearInterval(reloj); return; }
         if (n <= 0) { clearInterval(reloj); caja.remove(); return; }
-        texto.textContent = `Cómo llegas: apuntado. Se quita en ${n} s`;
+        texto.textContent = `Cómo llegas: apuntado. Esto se cierra en ${n} s`;
       }, 1000);
       return caja;
     }
@@ -299,8 +300,9 @@ export function vistaSesion(contenedor, { id }) {
   // ejemplo, al llegar datos), no se abre dos veces.
   // En el entrenamiento de prueba del tutorial no se pregunta: ya hay bastante en pantalla.
   if (enCurso && !eleccion && d.perfil.preguntarVista !== false && sesion.ejercicios.length > 0 && !algoHecho && !sesion.tutorial
-    && !document.querySelector('.modal-fondo') && !preguntandoVista.has(id)) {
+    && !document.querySelector('.modal-fondo') && !preguntandoVista.has(id) && !vistaPreguntada.has(id)) {
     preguntandoVista.add(id);
+    vistaPreguntada.add(id);
     setTimeout(() => {
       preguntandoVista.delete(id);
       if (!guiado.has(id) && !document.querySelector('.modal-fondo')) elegirVista();
@@ -787,28 +789,26 @@ export function vistaSesion(contenedor, { id }) {
 
     return h('div', { class: 'tramos' },
       conCarga && !plan?.tramosFijos?.length && h('div', { class: 'modo-carga' },
-        h('span', { class: 'suave' }, 'Elegir carga por:'),
-        [['kg', 'A mano'], ['rm', (d.perfil.dropSet?.modoCarga ?? 'rm') === 'rm' ? '% del 1RM (automático)' : '% del 1RM'],
-          ...(anterior?.tramos?.length ? [['ultima', 'Como la última vez']] : [])].map(([clave, texto]) => h('button', {
-          class: `chip seleccionable ${(serie.cargaComoUltima ? 'ultima' : modoCarga) === clave ? 'activo' : ''}`,
-          'aria-pressed': String((serie.cargaComoUltima ? 'ultima' : modoCarga) === clave),
-          onclick: () => {
-            cambiarSesion((s) => {
-              const x = s.ejercicios[i].series[j];
-              if (clave === 'ultima') {
-                // Los mismos pesos que la otra vez, y desde ahí, a mano.
-                x.modoCarga = 'kg';
-                x.tramos = anterior.tramos.map((t, k) => ({ ...(x.tramos[k] ?? {}), carga: t.carga, pct: null, esfuerzo: x.tramos[k]?.esfuerzo ?? null }));
-                x.cargaComoUltima = true;
-                return;
-              }
-              x.modoCarga = clave;
-              delete x.cargaComoUltima;
-              if (clave === 'rm') for (const tr of x.tramos) tr.pct = null;
-            });
-            if (clave === 'rm') recalcularAbajo(ej, i, { repintar: true });
-          },
-        }, texto)),
+        h('span', { class: 'suave' }, 'Carga:'),
+        // Un desplegable, como el de la técnica: no tres botones a la vista.
+        selector([['kg', 'A mano'], ['rm', (d.perfil.dropSet?.modoCarga ?? 'rm') === 'rm' ? '% del 1RM (automático)' : '% del 1RM'],
+          ...(anterior?.tramos?.length ? [['ultima', 'Como la última vez']] : [])],
+        serie.cargaComoUltima ? 'ultima' : modoCarga, (clave) => {
+          cambiarSesion((s) => {
+            const x = s.ejercicios[i].series[j];
+            if (clave === 'ultima') {
+              // Los mismos pesos que la otra vez, y desde ahí, a mano.
+              x.modoCarga = 'kg';
+              x.tramos = anterior.tramos.map((t, k) => ({ ...(x.tramos[k] ?? {}), carga: t.carga, pct: null, esfuerzo: x.tramos[k]?.esfuerzo ?? null }));
+              x.cargaComoUltima = true;
+              return;
+            }
+            x.modoCarga = clave;
+            delete x.cargaComoUltima;
+            if (clave === 'rm') for (const tr of x.tramos) tr.pct = null;
+          });
+          if (clave === 'rm') recalcularAbajo(ej, i, { repintar: true });
+        }, { titulo: 'Carga de las bajadas', lista: true }),
         // Qué hace cada modo y de dónde salen hoy los kilos, solo si se pide.
         ayuda('Elegir carga por', [textoRelleno(ej, serie),
           'A mano: escribes los kilos tú y no cambian aunque cambie tu 1RM.',

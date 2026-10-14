@@ -144,9 +144,10 @@ function avisar() {
 const entreSeries = () => motivo === 'de descanso' && !respiracion;
 
 function proponer(segundos, texto) {
-  if (ofrecido === segundos) return;
-  ofrecido = segundos;
   const ej = ejercicioDescanso;
+  const clave = `${ej?.id ?? 'todos'}-${segundos}`;
+  if (ofrecido === clave) return;
+  ofrecido = clave;
   aviso(ej ? texto.replace('el descanso entre series', `el descanso de ${ej.nombre}`) : texto, { accion: { texto: `Sí, ${segundos} s`, fn: () => {
     estado.cambiar((x) => {
       const e = ej && x.ejercicios.find((y) => y.id === ej.id);
@@ -163,7 +164,8 @@ function saltar() {
   pararDescanso();
   if (!era || !totalSeg) return;
   const propuesto = Math.max(15, Math.round(usado / 15) * 15);
-  if (usado >= 20 && quedaban >= 15 && propuesto < totalSeg) {
+  // Se ofrece siempre que lo cortes con margen (10 s o más antes de acabar).
+  if (usado >= 10 && quedaban >= 10 && propuesto < totalSeg) {
     proponer(propuesto, `Descanso saltado a los ${usado} s de ${totalSeg}. ¿Dejar el descanso entre series en ${propuesto} s?`);
   }
 }

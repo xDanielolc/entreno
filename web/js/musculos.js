@@ -20,8 +20,8 @@ export const MUSCULOS = {
   // El antebrazo, en dos: la cara de la palma (flexores de la muñeca y los
   // dedos: agarre, curl de muñeca) y la de los nudillos (extensores: curl
   // invertido, extensión de muñeca).
-  antebrazoFlexor:   { nombre: 'Antebrazo, lado de la palma (flexores)', corto: 'Antebrazo (palma)', grupo: 'tirón', tamano: 'pequeno', vistas: ['delante'], propia: true },
-  antebrazoExtensor: { nombre: 'Antebrazo, lado de los nudillos (extensores)', corto: 'Antebrazo (nudillos)', grupo: 'tirón', tamano: 'pequeno', vistas: ['detras'], propia: true },
+  antebrazoFlexor:   { nombre: 'Antebrazo interior (flexores)', corto: 'Antebrazo interior', grupo: 'tirón', tamano: 'pequeno', vistas: ['delante'], propia: true },
+  antebrazoExtensor: { nombre: 'Antebrazo exterior (extensores)', corto: 'Antebrazo exterior', grupo: 'tirón', tamano: 'pequeno', vistas: ['detras'], propia: true },
   abdomen:         { nombre: 'Abdomen',          grupo: 'core',   tamano: 'medio',   vistas: ['delante'], propia: true },
   oblicuos:        { nombre: 'Oblicuos',         grupo: 'core',   tamano: 'pequeno', vistas: ['delante'] },
   dorsal:          { nombre: 'Dorsal',           grupo: 'tirón',  tamano: 'grande',  vistas: ['detras'] },
@@ -116,6 +116,22 @@ async function pintarEnLienzo(caja, fondo, vista) {
     const escala = Math.min(4, Math.max(2, window.devicePixelRatio || 1));
     const ancho = Math.round((base.naturalWidth || 200) * escala);
     const alto = Math.round((base.naturalHeight || 369) * escala);
+    // De frente, el dibujo de wger no es simétrico (el pecho sobre todo): se
+    // usa su mitad izquierda y su espejo, como si estuviera completo.
+    const cuerpo = document.createElement('canvas');
+    cuerpo.width = ancho;
+    cuerpo.height = alto;
+    const cc = cuerpo.getContext('2d');
+    if (vista === 'delante') {
+      const eje = Math.round(98.5 * escala);
+      // La mitad izquierda, dibujada a escala (el origen va en píxeles del SVG).
+      cc.drawImage(base, 0, 0, 98.5, base.naturalHeight || 369, 0, 0, eje, alto);
+      cc.save();
+      cc.translate(2 * eje, 0);
+      cc.scale(-1, 1);
+      cc.drawImage(cuerpo, 0, 0, eje, alto, 0, 0, eje, alto);
+      cc.restore();
+    } else cc.drawImage(base, 0, 0, ancho, alto);
     const lienzo = document.createElement('canvas');
     lienzo.width = ancho;
     lienzo.height = alto;
@@ -132,8 +148,8 @@ async function pintarEnLienzo(caja, fondo, vista) {
     const sc = silueta.getContext('2d');
     const r = 2.5 * escala;
     const vueltas = [...Array(16)].map((_, k) => [Math.cos((k * Math.PI) / 8) * r, Math.sin((k * Math.PI) / 8) * r]);
-    sc.drawImage(base, 0, 0, ancho, alto);
-    for (const [dx, dy] of vueltas) sc.drawImage(base, dx, dy, ancho, alto);
+    sc.drawImage(cuerpo, 0, 0);
+    for (const [dx, dy] of vueltas) sc.drawImage(cuerpo, dx, dy);
     const ancha = document.createElement('canvas');
     ancha.width = ancho;
     ancha.height = alto;
@@ -159,7 +175,7 @@ async function pintarEnLienzo(caja, fondo, vista) {
       ctx.ellipse(98.5 * escala, 92 * escala, 5 * escala, 22 * escala, 0, 0, Math.PI * 2);
       ctx.fill();
     }
-    ctx.drawImage(base, 0, 0, ancho, alto);
+    ctx.drawImage(cuerpo, 0, 0);
     // Cada músculo: su dibujo hace de molde y se rellena con su color.
     const molde = document.createElement('canvas');
     molde.width = ancho;
