@@ -91,6 +91,7 @@ export async function ordenarCarpeta() {
   let movidos = 0;
   for (const a of archivos) {
     if (a.id === padre || a.mimeType === TIPO_CARPETA) continue;
+    if (a.parents?.includes(padre)) continue;   // ya está dentro: sin preguntar a Drive
     if (await asegurarEnCarpeta(a.id)) movidos += 1;
   }
   return movidos;
@@ -157,9 +158,17 @@ export async function buscarPorNombre(nombre) {
 
 // Todo lo que la app ha creado en Drive: archivos y su carpeta.
 export async function listarTodo() {
-  const campos = encodeURIComponent('files(id,name,mimeType,parents,appProperties)');
-  const r = await peticion(`${API}/files?q=${encodeURIComponent('trashed = false')}&fields=${campos}&pageSize=200&spaces=drive`);
-  return (await r.json()).files;
+  const campos = encodeURIComponent('nextPageToken,files(id,name,mimeType,parents,appProperties)');
+  const todos = [];
+  let pagina = null;
+  do {
+    const r = await peticion(`${API}/files?q=${encodeURIComponent('trashed = false')}&fields=${campos}&pageSize=200&spaces=drive`
+      + (pagina ? `&pageToken=${encodeURIComponent(pagina)}` : ''));
+    const json = await r.json();
+    todos.push(...(json.files || []));
+    pagina = json.nextPageToken;
+  } while (pagina);
+  return todos;
 }
 
 // Cambia solo las etiquetas de un archivo, sin tocar su contenido.

@@ -17,6 +17,13 @@
 import { aPesoDisponible, esperaPrueba, formatearNumero, generarEscalera, mejorRMDelCiclo, modeloDeEjercicio, rmDePrueba, rmDeReferencia } from './calculos.js';
 import { pesoParaReps } from './formula1rm.js';
 
+// La fecha de hoy en hora local (no UTC): entre las 0:00 y las 2:00 en España
+// el ciclo «empezaba ayer» y la prueba contaba las series de ayer.
+const hoyLocal = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
+
 export const PRESETS_CICLO = {
   bilbo: {
     etiqueta: 'Bilbo / incremento de peso lineal (fuerza)',
@@ -218,8 +225,8 @@ export function empezarCicloNuevo(datos, ejercicio, plan, { inicial = null } = {
   const generador = { ...(anterior?.generador ?? { inicial: 20, incremento: 2.5, cada: 1 }) };
   const ultimoValor = anterior?.escalera?.length ? anterior.escalera[Math.max(0, Math.min(anterior.escalera.length, ultimaSesionHecha(datos, ejercicio, plan, anterior.n)) - 1)] : null;
   generador.inicial = inicial ?? (prog.sobre === 'carga' ? inicialSiguiente(datos, ejercicio, prog, ultimoValor, plan) : generador.inicial);
-  if (anterior) anterior.fin = new Date().toISOString().slice(0, 10);
-  const ciclo = { n, inicio: new Date().toISOString().slice(0, 10), fin: null, generador,
+  if (anterior) anterior.fin = hoyLocal();
+  const ciclo = { n, inicio: hoyLocal(), fin: null, generador,
     escalera: escaleraDe(ejercicio, generador, prog.corte.sesiones) };
   // «Con una prueba»: el primer día del ciclo es la prueba y el peso sale de ella.
   if (anterior && prog.reinicio?.modo === 'prueba' && inicial == null) ciclo.pendientePrueba = true;

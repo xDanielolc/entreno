@@ -155,13 +155,13 @@ async function sincronizarArchivo() {
       // Cambios aquí y en Drive a la vez: se juntan. Antes ganaba siempre
       // Drive y lo de aquí solo quedaba en una copia aparte.
       const { datos: juntos, choques } = fusionar(meta.base ?? null, local, descargado);
+      estado.reemplazarDatos(juntos, { fileId, revisionRemota, pendiente: true, base: structuredClone(descargado) });
       if (choques.length) {
         // Lo que había cambiado en los dos sitios se queda como aquí; la
         // versión de Drive se guarda aparte, por si acaso.
         await drive.crear(`entrenamiento-conflicto-${marcaTiempo()}.json`, descargado, { copia: 'conflicto' });
         conflicto = true;
       }
-      estado.reemplazarDatos(juntos, { fileId, revisionRemota, pendiente: true, base: structuredClone(descargado) });
     } else {
       estado.reemplazarDatos(descargado, { fileId, revisionRemota, pendiente: migrado, base: structuredClone(descargado) });
     }

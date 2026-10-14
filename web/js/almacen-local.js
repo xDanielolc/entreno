@@ -34,6 +34,7 @@ async function operacion(modo, fn) {
     const peticion = fn(tx.objectStore(ALMACEN));
     tx.oncomplete = () => resolver(peticion?.result);
     tx.onerror = () => rechazar(tx.error);
+    tx.onabort = () => rechazar(tx.error ?? new Error('No se ha podido guardar en el móvil (¿sin espacio?)'));
   });
 }
 

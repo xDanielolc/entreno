@@ -195,10 +195,17 @@ function objetivosExtra(gen, dia) {
 // usa el reinicio «al % del mejor 1RM de este ciclo».
 export const modeloDeEjercicio = (datos, ejercicio) => modeloDe(datos, ejercicio);
 
+// El 1RM de una serie, sin las de tramos (drop set, rest-pause…): su peso es
+// el del primer tramo y sus repeticiones, la suma de todos; el 1RM saldría
+// inflado y el siguiente drop set arrancaría cada vez más alto.
+function rmSinTramos(datos, ejercicio, serie) {
+  return serie.tramos?.length ? null : rmDeSerie(datos, ejercicio, serie, esfuerzoTotal(serie));
+}
+
 export function mejorRMDelCiclo(datos, ejercicio, plan, cicloN) {
   let mejor = null;
   for (const r of registrosDelCiclo(datos, ejercicio, plan, cicloN)) {
-    const rm = rmDeSerie(datos, ejercicio, r.serie, esfuerzoTotal(r.serie));
+    const rm = rmSinTramos(datos, ejercicio, r.serie);
     if (rm && (mejor == null || rm > mejor)) mejor = rm;
   }
   return mejor;
@@ -209,7 +216,7 @@ export function mejorRMDelCiclo(datos, ejercicio, plan, cicloN) {
 export function rmDePrueba(datos, ejercicio, plan, desde, { excluirSesion } = {}) {
   const rms = seriesDeEjercicio(datos, ejercicio.id, { excluirSesion, planId: plan.id })
     .filter((x) => !desde || x.sesion.fecha >= desde)
-    .map((x) => rmDeSerie(datos, ejercicio, x.serie, esfuerzoTotal(x.serie))).filter(Boolean);
+    .map((x) => rmSinTramos(datos, ejercicio, x.serie)).filter(Boolean);
   return rms.length ? Math.max(...rms) : null;
 }
 
@@ -435,7 +442,7 @@ export function rmDeReferencia(datos, ejercicio, { cicloN, excluirSesion } = {})
   const series = seriesDeEjercicio(datos, ejercicio.id, { excluirSesion });
   const delCiclo = cicloN != null ? series.filter((x) => x.entrada.cicloN === cicloN) : [];
   const candidatas = delCiclo.length ? delCiclo : series;
-  const rms = candidatas.map((x) => rmDeSerie(datos, ejercicio, x.serie, esfuerzoTotal(x.serie))).filter(Boolean);
+  const rms = candidatas.map((x) => rmSinTramos(datos, ejercicio, x.serie)).filter(Boolean);
   // Sin series todavía, vale el 1RM que hayas puesto tú en la ficha. En
   // cuanto hay una serie apuntada, manda lo que sale de tus series.
   if (!rms.length) return ejercicio.rmManual > 0 ? { valor: ejercicio.rmManual, delCiclo: false, manual: true } : null;

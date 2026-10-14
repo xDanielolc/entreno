@@ -54,6 +54,25 @@ y al final lo que es decoración o depende de terceros.
       los pies en flexiones (30 o 61 cm, Ebben 2011). Preguntar a Dan cuando
       pruebe a meter la rutina a mano.
 
+## 0b. Revisión general del código (14-10-2026)
+
+- [x] Arreglado en la 0.43.3: el 1RM de referencia ya no cuenta drop sets ni
+      rest-pause (salía inflado y se realimentaba), la fusión guarda antes de
+      subir la copia de conflicto, Drive se lista página a página (borrar la
+      cuenta lo borra todo), aviso si el móvil se queda sin espacio, fechas de
+      ciclo en hora local, medidas del catálogo coherentes, «?» con nombre.
+- [ ] Limpiar el CSS que se pisa (colores del mapa, cabecera de la serie,
+      cuatro cebras): ronda aparte, probando con oscuro forzado.
+- [ ] Rendimiento del entreno: `sugerenciaSerie` se calcula hasta tres veces
+      por serie y la calibración del 1RM se rehace con cada cambio.
+- [ ] Los tramos de un drop set se crean al pintar (`sesion.js`), sin pasar
+      por `estado.cambiar`: crearlos al crear la serie.
+- [ ] Preguntar a Dan: las medidas se ordenan solas (reps → tiempo →
+      distancia); ¿debería mandar la primera que marque?
+- [ ] Código muerto: `buscarEnCatalogo`, `recomendacionesDeSesion`,
+      `listaRecomendaciones`, `rutinaActiva`, `elegirNivel`.
+- [ ] Intervalos propios: la ✕ es un span dentro de un botón (teclado).
+
 ## 1. La app funcionando en condiciones
 
 Es lo primero. Dan lo dijo así el 23-09-2026: *«Me rindo con el tutorial hasta

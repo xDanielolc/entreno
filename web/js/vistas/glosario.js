@@ -97,7 +97,7 @@ export function conGlosario(texto, usadas = new Set()) {
 export function queEs(clave, texto = null) {
   const g = GLOSARIO[clave];
   if (!g || modoGlosario() === 'ninguno') return null;
-  return h('button', { type: 'button', class: 'que-es', onclick: (e) => { e.preventDefault(); e.stopPropagation(); explicar(clave); } },
+  return h('button', { type: 'button', class: 'que-es', 'aria-label': g.pregunta, onclick: (e) => { e.preventDefault(); e.stopPropagation(); explicar(clave); } },
     texto ?? g.pregunta);
 }
 

@@ -460,7 +460,10 @@ export function completarDesdeCatalogo(datos) {
     // Cómo se mide solo se cambia si nunca se ha apuntado nada con él.
     if (!usados.has(ej.id)) {
       if (base.carga) ej.carga = { ...ej.carga, tipo: base.carga };
-      if (base.esfuerzo) ej.esfuerzo = { ...ej.esfuerzo, tipo: base.esfuerzo };
+      if (base.esfuerzo) {
+        ej.esfuerzo = { ...ej.esfuerzo, tipo: base.esfuerzo };
+        ej.medidas = [base.esfuerzo];
+      }
       if (base.carga === 'pesoCorporal') ej.fraccionCorporal = base.fraccion ?? 1;
     }
     n += 1;
