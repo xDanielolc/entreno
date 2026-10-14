@@ -1443,3 +1443,10 @@ div.sugerencia > span { display: block; }
 .serie-cabecera > .borrar-serie { margin-left: 0; }
 .serie-cabecera > .marca { order: 10; flex: 1 1 100%; }
 .boton-tecnicas { background: var(--superficie); border: 1px solid var(--borde); color: var(--texto); border-radius: var(--radio-pequeno); padding: 8px 12px; min-height: 44px; }
+
+/* Listas de los desplegables (técnica, carga…): más aire y el «Listo» separado. */
+.lista-selector { display: grid; gap: 8px; }
+.lista-selector + .boton, .modal .lista-selector ~ .boton { margin-top: 16px; width: 100%; }
+.boton-tecnicas, .modo-carga .selector-abrir { background: var(--superficie); border: 1px solid var(--borde); color: var(--texto);
+  border-radius: var(--radio-pequeno); padding: 8px 14px; min-height: 44px; font-weight: 600; }
+.modo-carga { gap: 8px; }

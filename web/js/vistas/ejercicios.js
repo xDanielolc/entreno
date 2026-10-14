@@ -542,14 +542,15 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
   }
   function campoAgarre() {
     // Dicho como se ve al hacerlo: hacia dónde miran las palmas o los nudillos.
-    const AGARRES = [['supino', 'Palmas hacia arriba (como en un curl)'], ['prono', 'Palmas hacia abajo (como en una dominada)'],
-      ['neutro', 'Palmas enfrentadas (como en un curl martillo)'], ['mixto', 'Una hacia arriba y otra hacia abajo (mixto)']];
+    // Dicho como lo ves con los brazos colgando y la barra delante de los muslos.
+    const AGARRES = [['prono', 'Palmas hacia las rodillas (como en un peso muerto)'], ['supino', 'Nudillos hacia las rodillas (como en un curl)'],
+      ['neutro', 'Palmas enfrentadas (como en un curl martillo)'], ['mixto', 'Una de cada (mixto)']];
     return h('div', { class: 'campo' },
       h('span', { class: 'etiqueta-campo' }, 'Agarre ', ayuda('Agarre', [
-        'Piensa en el ejercicio con los brazos por delante, cogiendo la barra o el agarre.',
-        'Palmas hacia arriba (supino), como en un curl de bíceps: trabaja sobre todo el antebrazo interior.',
-        'Palmas hacia abajo (prono), como en una dominada normal, o enfrentadas (neutro), como en un curl martillo: trabaja también el antebrazo exterior.',
-        'Mixto, una de cada: lo de los dos. La app lo añade solo a los músculos secundarios.'])),
+        'Imagina la barra cogida con los brazos colgando, delante de los muslos.',
+        'Palmas hacia las rodillas (prono), como en un peso muerto, o enfrentadas (neutro), como en un curl martillo: trabaja también el antebrazo exterior.',
+        'Nudillos hacia las rodillas (supino), como en un curl de bíceps: trabaja sobre todo el antebrazo interior.',
+        'Una de cada (mixto): lo de los dos. La app lo añade solo a los músculos secundarios.'])),
       selector([[null, 'Sin indicar'], ...AGARRES], borrador.agarre ?? null, (v) => {
         borrador.agarre = v;
         const sec = borrador.musculos.secundarios.filter((x) => x !== 'antebrazoExtensor' && x !== 'antebrazoFlexor');

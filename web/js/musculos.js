@@ -122,16 +122,22 @@ async function pintarEnLienzo(caja, fondo, vista) {
     cuerpo.width = ancho;
     cuerpo.height = alto;
     const cc = cuerpo.getContext('2d');
+    cc.drawImage(base, 0, 0, ancho, alto);
     if (vista === 'delante') {
+      // Del cuello para abajo: la cara en espejo quedaba rarísima.
       const eje = Math.round(98.5 * escala);
-      // La mitad izquierda, dibujada a escala (el origen va en píxeles del SVG).
-      cc.drawImage(base, 0, 0, 98.5, base.naturalHeight || 369, 0, 0, eje, alto);
+      const cuello = Math.round(58 * escala);
+      const izquierda = document.createElement('canvas');
+      izquierda.width = eje;
+      izquierda.height = alto - cuello;
+      izquierda.getContext('2d').drawImage(cuerpo, 0, cuello, eje, alto - cuello, 0, 0, eje, alto - cuello);
+      cc.clearRect(eje, cuello, ancho - eje, alto - cuello);
       cc.save();
       cc.translate(2 * eje, 0);
       cc.scale(-1, 1);
-      cc.drawImage(cuerpo, 0, 0, eje, alto, 0, 0, eje, alto);
+      cc.drawImage(izquierda, 0, cuello);
       cc.restore();
-    } else cc.drawImage(base, 0, 0, ancho, alto);
+    }
     const lienzo = document.createElement('canvas');
     lienzo.width = ancho;
     lienzo.height = alto;

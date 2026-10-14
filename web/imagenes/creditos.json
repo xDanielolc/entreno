@@ -265,9 +265,10 @@
    "nombreEnWger": "Curl De Muñeca Con Barra"
   },
   "Sentadilla": {
-   "archivo": "imagenes/ejercicios/sentadilla.jpeg",
-   "autor": "philip",
-   "nombreEnWger": "Sentadilla con disco"
+   "archivo": "imagenes/ejercicios/sentadilla-con-barra.png",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "barbell-squat"
   },
   "Sentadilla frontal": {
    "archivo": "imagenes/ejercicios/sentadilla-frontal.png",

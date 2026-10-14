@@ -209,6 +209,10 @@ function tarjetaPlantilla(d, plantilla) {
 // Editor
 // ---------------------------------------------------------------------------
 
+// Rutina nueva a medias (sin nombre todavía): se conserva al repintar, para
+// que no se pierda lo añadido (un ejercicio de la lista general, por ejemplo).
+let rutinaNueva = null;
+
 export function vistaFormularioRutina(contenedor, { id }) {
   const d = estado.datos();
   const existente = id !== 'nueva' ? d.rutinas.find((r) => r.id === id) : null;
@@ -216,9 +220,9 @@ export function vistaFormularioRutina(contenedor, { id }) {
     anadir(contenedor, h('p', {}, 'Esta rutina no existe.'));
     return;
   }
-  const borrador = existente ? structuredClone(existente) : {
+  const borrador = existente ? structuredClone(existente) : (rutinaNueva ??= {
     id: nuevoId('rut'), nombre: '', activa: true, dias: [], diasSemana: null,
-  };
+  });
   const nombreEj = (ejId) => d.ejercicios.find((e) => e.id === ejId)?.nombre ?? 'Ejercicio borrado';
   let creada = Boolean(existente);
 
@@ -379,33 +383,42 @@ export function vistaFormularioRutina(contenedor, { id }) {
     repintar();
   }
 
-  async function desdeCatalogo(dia, x) {
-    const si = await confirmar(
-      `«${x.nombre}» no está en tus ejercicios. ¿Lo añado tal y como viene en la lista? `
-      + 'Luego puedes cambiarle la progresión y las series.',
-      { si: 'Añadir a mis ejercicios' });
-    if (!si) return;
+  // Un ejercicio de la lista general: va a tus ejercicios y al día a la vez.
+  // Antes se guardaba el ejercicio, la pantalla se repintaba y el día se
+  // quedaba sin él.
+  function desdeCatalogo(dia, x) {
     const nuevo = ejercicioDesdeCatalogo(x);
-    estado.cambiar((datos) => { datos.ejercicios.push(nuevo); });
-    aviso(`${x.nombre} añadido a tus ejercicios`);
-    anadirAlDia(dia, nuevo.id);
+    dia.ejercicios.push({ ejercicioId: nuevo.id, opcional: false, series: null });
+    estado.cambiar((datos) => {
+      datos.ejercicios.push(nuevo);
+      if (borrador.nombre.trim()) {
+        const copia = structuredClone(borrador);
+        copia.nombre = copia.nombre.trim();
+        const i = datos.rutinas.findIndex((r) => r.id === copia.id);
+        if (i >= 0) datos.rutinas[i] = copia; else datos.rutinas.push(copia);
+      }
+    });
+    aviso(`${x.nombre} añadido al día y a tus ejercicios`);
   }
 
   function guardar() {
     borrador.nombre = borrador.nombre.trim();
     if (!borrador.nombre) { aviso('Ponle un nombre a la rutina', { tipo: 'error' }); return; }
     persistir();
+    rutinaNueva = null;
     location.hash = '#/rutinas';
   }
 
   function descartar() {
     if (creada) estado.cambiar((datos) => { datos.rutinas = datos.rutinas.filter((r) => r.id !== borrador.id); });
+    rutinaNueva = null;
     location.hash = '#/rutinas';
   }
 
   async function borrar() {
     if (!await confirmar('¿Borrar esta rutina? Los entrenamientos ya hechos se conservan.', { si: 'Borrar', peligro: true })) return;
     estado.cambiar((datos) => { datos.rutinas = datos.rutinas.filter((r) => r.id !== borrador.id); });
+    rutinaNueva = null;
     location.hash = '#/rutinas';
   }
 
