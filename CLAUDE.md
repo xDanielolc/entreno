@@ -610,3 +610,13 @@ tabulares. Token nuevo `--acento-fuerte` y `--sombra-alta`. Los temas de
 fantasía (Fallout, pixel art…) siguen pendientes para Design. El service
 worker tenía sin listar `peso.js`, `voy-hoy.js`, `rapidas.js`,
 `rutina-texto.js` e `iconos.js` (sin conexión habrían fallado): ya están.
+
+## Ronda 0.47.1 (16-10-2026): fuente y presentación
+
+Fuente Manrope (OFL, variable, `web/fuentes/Manrope.ttf`, 165 KB, en el
+service worker; Dan autorizó la descarga). Presentación al abrir
+(`#presentacion` en index.html, CSS al final de estilo.css): la pesa entra a
+saltos desde la izquierda aplastándose al caer (origen de transformación
+abajo, por eso al encoger se sube 24 px), la caja del logo se cierra sobre
+ella y aparece el nombre; dura 1,85 s, un toque la quita y con «reducir
+movimiento» solo hay un fundido. Pidió «rollo Pixar, como la lámpara».

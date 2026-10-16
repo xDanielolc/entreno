@@ -57,6 +57,15 @@ const PESTANAS = [
 ];
 
 document.querySelector('.marca-app')?.prepend(icono('marca'));
+// La presentación se quita sola al acabar (o antes, con un toque).
+{
+  const presentacion = document.getElementById('presentacion');
+  if (presentacion) {
+    const quitar = () => presentacion.remove();
+    presentacion.addEventListener('click', quitar, { once: true });
+    setTimeout(quitar, 2000);
+  }
+}
 const principal = document.getElementById('vista');
 const navegacion = document.getElementById('navegacion');
 const indicador = document.getElementById('estado-sincronizacion');
