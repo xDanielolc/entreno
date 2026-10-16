@@ -594,3 +594,19 @@ ejercicio. Las notas entre paréntesis de cada línea van a `item.nota` (y la
 columna «cómo» de una tabla también). «Gemelo de pie con barra» en el
 catálogo con la foto de la elevación de gemelos. El redondeo es un número
 libre (0,25 con microdiscos), 2,5 por defecto.
+
+## Ronda 0.47.0 (16-10-2026): identidad visual
+
+Dan pidió «hacerla más bonita, como un diseñador con rienda suelta». Hecho
+en CSS, sin Design: papel cálido de fondo en claro y azul noche en oscuro,
+acento azul cobalto (no se confunde con el verde, ámbar y rojo de los
+estados), tarjetas sin borde con sombra suave, botones píldora con un poco
+de relieve, campos con fondo suave y anillo de foco, barra superior y
+navegación translúcidas con desenfoque, iconos de trazo propios
+(`web/js/iconos.js`, antes emojis) con la pestaña activa en una píldora, la
+marca con su icono, carteles como hoja que sube desde abajo en el móvil
+(centrados en pantalla grande), números de las series más grandes y
+tabulares. Token nuevo `--acento-fuerte` y `--sombra-alta`. Los temas de
+fantasía (Fallout, pixel art…) siguen pendientes para Design. El service
+worker tenía sin listar `peso.js`, `voy-hoy.js`, `rapidas.js`,
+`rutina-texto.js` e `iconos.js` (sin conexión habrían fallado): ya están.

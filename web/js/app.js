@@ -1,5 +1,6 @@
 // Punto de entrada: arranque, navegación y barra de estado.
 
+import { icono } from './iconos.js';
 import * as local from './almacen-local.js';
 import * as estado from './estado.js';
 import { cargarCreditos, imagenDeEjercicio } from './imagenes.js';
@@ -47,14 +48,15 @@ const RUTAS = [
 ];
 
 const PESTANAS = [
-  { id: 'inicio', texto: 'Hoy', icono: '🏠', href: '#/' },
-  { id: 'cuerpo', texto: 'Cuerpo', icono: '🧍', href: '#/cuerpo' },
-  { id: 'ejercicios', texto: 'Ejercicios', icono: '🏋️', href: '#/ejercicios' },
-  { id: 'historial', texto: 'Historial', icono: '📅', href: '#/historial' },
-  { id: 'aprender', texto: 'Aprender', icono: '📖', href: '#/aprender' },
-  { id: 'ajustes', texto: 'Ajustes', icono: '⚙️', href: '#/ajustes' },
+  { id: 'inicio', texto: 'Hoy', href: '#/' },
+  { id: 'cuerpo', texto: 'Cuerpo', href: '#/cuerpo' },
+  { id: 'ejercicios', texto: 'Ejercicios', href: '#/ejercicios' },
+  { id: 'historial', texto: 'Historial', href: '#/historial' },
+  { id: 'aprender', texto: 'Aprender', href: '#/aprender' },
+  { id: 'ajustes', texto: 'Ajustes', href: '#/ajustes' },
 ];
 
+document.querySelector('.marca-app')?.prepend(icono('marca'));
 const principal = document.getElementById('vista');
 const navegacion = document.getElementById('navegacion');
 const indicador = document.getElementById('estado-sincronizacion');
@@ -144,7 +146,7 @@ function pintarNavegacion(activa) {
   navegacion.replaceChildren(...PESTANAS.map((p) => h('a', {
     href: p.id === activa ? p.href : (ultimas[p.id] || p.href),
     class: p.id === activa ? 'activa' : '', 'aria-current': p.id === activa ? 'page' : null,
-  }, h('span', { 'aria-hidden': 'true' }, p.icono), h('span', {}, p.texto))));
+  }, icono(p.id), h('span', {}, p.texto))));
 }
 
 function pintarIndicador() {
