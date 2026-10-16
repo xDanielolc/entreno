@@ -132,7 +132,9 @@ export const CATALOGO = [
   ej('Extensión de cuádriceps', 'pierna', 'máquina', ['cuadriceps'], []),
   ej('Curl femoral tumbado', 'pierna', 'máquina', ['isquios'], []),
   ej('Curl femoral sentado', 'pierna', 'máquina', ['isquios'], []),
-  ej('Curl nórdico', 'pierna', 'peso corporal', ['isquios'], [], corporal),
+  // Curl nórdico: el tronco y los muslos (un 88 % del peso) actúan con una palanca corta; se cuenta como un 65 %
+  // del peso corporal (estimación de la app, sin estudio).
+  ej('Curl nórdico', 'pierna', 'peso corporal', ['isquios'], [], flexion(0.65)),
   // Kinoshita 2023: de pie crecen el gemelo y el sóleo (este, igual que
   // sentado); sentado, el gemelo apenas crece.
   ej('Elevación de gemelos', 'pierna', 'máquina', ['gemelo', 'soleo'], []),
@@ -160,7 +162,10 @@ export const CATALOGO = [
   ej('Leñador en polea', 'core', 'polea', ['oblicuos'], ['abdomen']),
   ej('Giros rusos', 'core', 'disco', ['oblicuos'], ['abdomen']),
   ej('Press pallof', 'core', 'polea', ['oblicuos'], ['abdomen'], { esfuerzo: 'tiempo' }),
-  ej('Elevaciones de piernas', 'core', 'barra fija', ['abdomen'], ['oblicuos'], corporal),
+  // Elevaciones de piernas: se levantan las dos piernas, un 32 % del peso (Winter 2009, tablas de Dempster).
+  ej('Elevación de piernas colgado', 'core', 'barra fija', ['abdomen'], ['oblicuos', 'antebrazoFlexor'], flexion(0.32)),
+  ej('Elevación de rodillas colgado', 'core', 'barra fija', ['abdomen'], ['oblicuos', 'antebrazoFlexor'], flexion(0.32)),
+  ej('Elevación de piernas en el suelo', 'core', 'libre', ['abdomen'], ['oblicuos'], flexion(0.32)),
   ej('Elevaciones de rodillas en paralelas', 'core', 'paralelas', ['abdomen'], [], corporal),
   ej('Bandera del dragón', 'core', 'banco', ['abdomen'], ['oblicuos', 'lumbar'], corporal),
 

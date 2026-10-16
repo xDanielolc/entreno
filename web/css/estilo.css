@@ -18,18 +18,19 @@
 
 :root {
   color-scheme: light;
-  /* Papel cálido de fondo, blanco para las tarjetas y un azul cobalto como
-     acento: no se confunde con el verde, el ámbar y el rojo de los estados. */
+  /* Papel cálido de fondo, blanco para las tarjetas y tinta (negro) como
+     acento: así el verde, el ámbar y el rojo quedan solo para el cuerpo y
+     los estados, sin pelearse con otro color. */
   --fondo: #f3f2ed;
   --superficie: #ffffff;
   --superficie-2: #ebe9e3;
   --borde: #e1dfd8;
   --texto: #15171c;
   --texto-suave: #5f6470;
-  --acento: #1f5fd1;
+  --acento: #15171c;
   --acento-texto: #ffffff;
-  --acento-suave: #e3ebfb;
-  --acento-fuerte: #174ba8;
+  --acento-suave: #e8e6e0;
+  --acento-fuerte: #000000;
   --peligro: #c0392b;
   --bien: #1e8f57;
   --mal: #c0392b;
@@ -56,10 +57,10 @@
   --borde: #2b303a;
   --texto: #eef0f4;
   --texto-suave: #9aa1ad;
-  --acento: #8db3ff;
-  --acento-texto: #0a1a3a;
-  --acento-suave: #1c2740;
-  --acento-fuerte: #a9c5ff;
+  --acento: #f2f3f6;
+  --acento-texto: #0e1014;
+  --acento-suave: #2a2f39;
+  --acento-fuerte: #ffffff;
   --peligro: #ff8a7e;
   --bien: #5fd38e;
   --mal: #ff8a7e;
@@ -81,10 +82,10 @@
     --borde: #2b303a;
     --texto: #eef0f4;
     --texto-suave: #9aa1ad;
-    --acento: #8db3ff;
-    --acento-texto: #0a1a3a;
-    --acento-suave: #1c2740;
-    --acento-fuerte: #a9c5ff;
+    --acento: #f2f3f6;
+    --acento-texto: #0e1014;
+    --acento-suave: #2a2f39;
+    --acento-fuerte: #ffffff;
     --peligro: #ff8a7e;
     --bien: #5fd38e;
     --mal: #ff8a7e;
@@ -121,7 +122,7 @@ h2 { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.01em; margin: 1.2em
 h3 { font-weight: 700; letter-spacing: -0.01em; }
 strong { font-weight: 700; }
 body { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
-a { color: var(--acento); }
+a { color: var(--acento); text-decoration-thickness: 1.5px; text-underline-offset: 2px; }
 [hidden] { display: none !important; }
 
 .suave { color: var(--texto-suave); }
@@ -1601,7 +1602,7 @@ div.sugerencia > span { display: block; }
   position: fixed; inset: 0; z-index: 100;
   display: flex; align-items: center; justify-content: center;
   background: var(--fondo); color: var(--texto);
-  animation: presentacion-fuera .3s ease-in 1.55s forwards;
+  animation: presentacion-fuera .3s ease-in 2s forwards;
 }
 #presentacion .escena { position: relative; width: 240px; height: 120px; display: flex; align-items: center; justify-content: center; }
 #presentacion .caja {
@@ -1617,9 +1618,9 @@ div.sugerencia > span { display: block; }
 }
 #presentacion .pesa svg { width: 100%; height: 100%; display: block; }
 #presentacion .nombre {
-  position: absolute; left: 50%; top: 50%; margin: -16px 0 0 42px; font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em;
-  opacity: 0; transform: translateX(-10px);
-  animation: nombre-entrar .35s ease-out 1.2s forwards;
+  position: absolute; left: 0; right: 0; top: 50%; margin-top: 44px; text-align: center; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em;
+  opacity: 0; transform: translateY(8px);
+  animation: nombre-entrar .35s ease-out 1.45s forwards;
 }
 /* Los saltos: avanza desde la izquierda con tres botes, aplastándose al
    caer y estirándose al subir, con un poco de inclinación hacia donde va. */
@@ -1655,3 +1656,12 @@ div.sugerencia > span { display: block; }
   #presentacion .caja { animation: none; transform: none; opacity: 1; }
   #presentacion .nombre { animation: none; opacity: 1; transform: none; }
 }
+
+/* Entreno de uno en uno: abajo, el botón que toca (siguiente o terminar). */
+.paso-grande { display: grid; gap: 4px; margin: 8px 0 4px; }
+.paso-grande-fila { display: flex; gap: 10px; align-items: stretch; }
+.paso-grande-fila .boton.grande { flex: 1; margin: 0; flex-direction: column; gap: 0; line-height: 1.15; }
+.paso-grande-fila .boton-siguiente small { font-weight: 500; opacity: .8; font-size: 0.8rem; overflow-wrap: anywhere; }
+.boton-paso-grande { flex: 0 0 60px; min-height: 60px; font-size: 1.6rem; padding: 0; }
+.terminar-entreno.secundario { margin-top: 20px; }
+.descanso-campana { width: auto; min-width: 44px; font-size: 1.1rem; }

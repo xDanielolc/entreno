@@ -170,6 +170,11 @@ MUNECOS = {
     "Paseo del granjero": P(DE_PIE, a1=(90, 90), l1=(70, 100, 0), l2=(110, 80, 0), objetos=[("mancuerna", "mano1"), ("mancuerna", "mano2")]),
     "Sentadilla a una pierna": P(t=-55, a1=(10, 10), l1=(15, 115, 0), l2=(-8, -2, -60)),
     "Curl nórdico": P(t=-45, a1=(20, 30), l1=(135, 180, 90), l2=(130, 180, 90)),
+    # Colgado de la barra: piernas estiradas hasta la horizontal, o rodillas al pecho.
+    "Elevación de piernas colgado": P(DE_PIE, a1=(-90, -90), a2=(-95, -92), l1=(-5, -5, -60), l2=(-2, -2, -60), suelo=False,
+                                     objetos=[("linea", (-14, -64), (14, -64))]),
+    "Elevación de rodillas colgado": P(DE_PIE, a1=(-90, -90), a2=(-95, -92), l1=(-20, 75, 0), l2=(-16, 78, 0), suelo=False,
+                                      objetos=[("linea", (-14, -64), (14, -64))]),
     "Elevación de tibiales": P(DE_PIE, t=-95, l1=(100, 95, -35), objetos=[("linea", (-9, -45), (-9, 44))]),
     "Tibial con disco": P(DE_PIE, l1=(0, 90, -25), a1=(70, 40), objetos=[("caja", -12, 2, 24, 8), ("disco", "pie1", 5)]),
     "Plancha Copenhague": P(t=-165, a1=(90, 180), l1=(8, 8, 0), l2=(15, 10, 0), objetos=[("caja", 30, 2, 18, 12)]),

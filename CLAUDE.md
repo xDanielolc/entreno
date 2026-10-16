@@ -620,3 +620,35 @@ saltos desde la izquierda aplastándose al caer (origen de transformación
 abajo, por eso al encoger se sube 24 px), la caja del logo se cierra sobre
 ella y aparece el nombre; dura 1,85 s, un toque la quita y con «reducir
 movimiento» solo hay un fundido. Pidió «rollo Pixar, como la lámpara».
+
+## Ronda 0.48.0 (16-10-2026): su primer día real
+
+Esquema v16. Lo que vio Dan en el gimnasio y cómo quedó:
+- La rutina «entraba sin progresión»: una serie de doble progresión sin
+  historial no proponía peso. Ahora `sugerenciaSerie` (carga) sin historial
+  calcula el peso con el 1RM (`pesoParaReps(rm, máximo del rango,
+  recamaraMin)`) y, sin 1RM, la **primera serie del día es la prueba**
+  (tarjeta como la de Bilbo, una sola vez); las demás dicen «espera a la
+  prueba» y, al apuntarla (`onchange` del peso o las repeticiones,
+  `rellenarDesdePrueba` en sesion.js), cogen su peso del 1RM de hoy
+  (`rmDeHoy`: mejor serie hecha arriba, si no el historial).
+- El descanso arranca solo cuando están el peso y las repeticiones
+  (`serieCompleta`), en el orden que sea.
+- Notificación del descanso (`descanso.js`: `activarNotificaciones`,
+  `notificar` por `showNotification` del service worker con `tag:
+  'descanso'`, actualizada cada 15 s en silencio y con vibración al acabar;
+  `notificationclick` en sw.js vuelve a la app). Se activa en Ajustes →
+  Descansos o con la campana de la barra; requiere un toque (permiso).
+- Botones del entreno de uno en uno: abajo, «Siguiente ejercicio › nombre»
+  grande (o «Terminar» en el último); «Terminar entrenamiento» pasa a
+  secundario mientras queden ejercicios.
+- Colores: el azul chocaba con el verde. Acento **tinta** (negro en claro,
+  blanco en oscuro); verde, ámbar y rojo solo para estados y cuerpo.
+- Presentación: el nombre sale debajo de la caja y después de que la pesa
+  entre (2,3 s en total).
+- Catálogo: «Elevación de piernas colgado» (por defecto, piernas estiradas,
+  muñeco propio), «Elevación de rodillas colgado» (muñeco) y «Elevación de
+  piernas en el suelo» (foto de Everkinetic); el nombre viejo «Elevaciones
+  de piernas» conserva su foto por alias. Fracciones del peso corporal:
+  piernas 0,32 (Winter 2009), curl nórdico 0,65 (estimación);
+  `FRACCION_CORPORAL_POR_NOMBRE` y migración v16 para los ya creados.

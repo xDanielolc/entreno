@@ -545,3 +545,9 @@ la vez, a veces sin cobertura):
   que viene de una lleva `progresion.deMio` con su id. `progresion.recamaraMin`
   en la doble progresión («carga»): el peso solo sube si la última serie
   dejó al menos esas en recámara.
+
+- **v16 (0.48.0).** `ej.fraccionCorporal` de los ejercicios con tu peso que
+  no levantan el cuerpo entero (elevaciones de piernas y rodillas 0,32; curl
+  nórdico 0,65) deja de ser 1. `perfil.avisarDescanso`: notificación con
+  vibración al acabar el descanso. `serie.rmUsado` también en series
+  normales cuyo peso salió del 1RM de hoy (`deHoy: true`).

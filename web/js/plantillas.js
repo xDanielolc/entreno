@@ -88,7 +88,7 @@ Peso muerto sumo: máxima 1-2 + 3 × 3-4 con 2 en recámara (máxima a un 90 %; 
 Sentadilla: 3 × 6-8 con 2 en recámara (70-75 %)
 Gemelo de pie con barra: 3 × 10-15 (justo después de la sentadilla, con la barra en la espalda)
 Curl nórdico: 3 × 5-8 con 1 en recámara
-Elevaciones de piernas: 2 × 8-12 (colgado de la barra)
+Elevación de piernas colgado: 2 × 8-12 (piernas estiradas)
 Cardio: 15 min (opcional) (suave: bici, cinta o andar rápido)`),
   },
   {

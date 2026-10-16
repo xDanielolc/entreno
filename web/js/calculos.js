@@ -126,7 +126,22 @@ export function sugerenciaSerie(datos, ejercicio, plan, { excluirSesion } = {}) 
 
   if (prog.tipo === 'carga') {
     const [, max] = prog.objetivoEsfuerzo || [];
-    if (!ultima) return { ...base, rango: prog.objetivoEsfuerzo, recamaraMin: prog.recamaraMin ?? null, carga: referencia?.serie.carga ?? null };
+    if (!ultima) {
+      // Sin historial de esta serie: si hay un 1RM (de otras series o puesto
+      // a mano), el peso es el que da el máximo del rango con la recámara
+      // pedida. Si no hay 1RM, la primera serie del día hace de prueba.
+      const conPeso = sobre === 'carga' && !['ninguna', 'altura'].includes(ejercicio.carga?.tipo);
+      const rm = conPeso ? rmDeReferencia(datos, ejercicio, { excluirSesion }) : null;
+      let carga = referencia?.serie.carga ?? null;
+      let porFormula = false;
+      if (rm && max > 0) {
+        const recamara = prog.recamaraMin ?? ejercicio.recamaraPorDefecto ?? datos.perfil?.recamaraPorDefecto ?? 1;
+        const peso = pesoParaReps(modeloDe(datos, ejercicio), rm.valor, max, recamara);
+        if (peso > 0) { carga = aPesoDisponible(ejercicio, peso); porFormula = true; }
+      }
+      return { ...base, rango: prog.objetivoEsfuerzo, recamaraMin: prog.recamaraMin ?? null, carga, porFormula,
+        rmUsado: rm?.valor ?? null, sinRM: conPeso && !rm };
+    }
     const valorUltimo = sobre === 'carga' ? ultima.serie.carga : esfuerzoTotal(ultima.serie);
     // Sube al llegar al máximo del rango. Si la regla pide recámara (fuerza:
     // «5 con 2 en recámara»), llegar al máximo apurando no cuenta.

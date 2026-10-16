@@ -61,6 +61,7 @@ export function arrancarDescanso(segundos, { texto = 'de descanso', ejercicio = 
   pintar();
   clearInterval(intervalo);
   intervalo = setInterval(pintar, 1000);
+  if (texto === 'de descanso') notificar(`Descanso: ${formatear(segundos)}`, 'Te aviso cuando acabe.', { silencio: true });
 }
 
 export function pararDescanso() {
@@ -69,6 +70,46 @@ export function pararDescanso() {
   clearInterval(intervalo);
   intervalo = null;
   pintar();
+  cerrarNotificacion();
+}
+
+// ---------------------------------------------------------------------------
+// Notificaciones del descanso: con el permiso dado y el ajuste activado, una
+// notificación (la misma, que se actualiza) dice cuánto queda y, al acabar,
+// avisa y hace vibrar el móvil aunque la app esté detrás. Van por el service
+// worker, que es como el móvil deja enseñarlas desde una app instalada.
+// ---------------------------------------------------------------------------
+export const puedeNotificar = () => 'Notification' in window && 'serviceWorker' in navigator;
+export const notificacionesActivas = () => puedeNotificar() && Notification.permission === 'granted'
+  && estado.datos()?.perfil?.avisarDescanso === true;
+
+// Pide el permiso (hay que llamarlo desde un toque) y deja el ajuste puesto.
+export async function activarNotificaciones() {
+  if (!puedeNotificar()) { aviso('Este navegador no admite notificaciones.', { tipo: 'error' }); return false; }
+  const permiso = Notification.permission === 'granted' ? 'granted' : await Notification.requestPermission();
+  if (permiso !== 'granted') { aviso('El móvil no ha dado permiso para avisar. Se cambia en los ajustes del navegador.', { tipo: 'error' }); return false; }
+  estado.cambiar((x) => { x.perfil.avisarDescanso = true; });
+  aviso('Te avisaré con una notificación (y vibración) cuando acabe cada descanso.');
+  return true;
+}
+
+async function notificar(titulo, cuerpo, { silencio = false, vibrar = null } = {}) {
+  if (!notificacionesActivas()) return;
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    await reg.showNotification(titulo, {
+      body: cuerpo, tag: 'descanso', renotify: !silencio, silent: silencio, icon: './iconos/icono-192.png', badge: './iconos/icono-192.png',
+      vibrate: vibrar ?? (silencio ? [] : [300, 100, 300, 100, 500]), data: { url: location.href },
+    });
+  } catch { /* sin service worker (navegador de escritorio sin instalar): nada */ }
+}
+
+async function cerrarNotificacion() {
+  if (!puedeNotificar()) return;
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    for (const n of await reg.getNotifications({ tag: 'descanso' })) n.close();
+  } catch { /* nada */ }
 }
 
 function restante() {
@@ -81,6 +122,10 @@ function pintar() {
     clearInterval(intervalo);
     intervalo = null;
     avisar();
+    if (entreSeries()) notificar('¡Descanso terminado!', 'A por la siguiente serie.');
+  } else if (finMs && entreSeries() && segundos % 15 === 0) {
+    // Cada 15 s se actualiza la misma notificación con lo que queda.
+    notificar(`Descanso: ${formatear(segundos)}`, 'Te aviso cuando acabe.', { silencio: true });
   }
   for (const caja of cajas) {
     if (!caja.isConnected) { cajas.delete(caja); continue; }
@@ -194,7 +239,10 @@ export function barraDescanso() {
       h('span', { class: 'circulo-respira', 'aria-hidden': 'true' }),
       h('span', { class: 'texto-respira' })),
     h('button', { class: 'boton enlace descanso-alargar', onclick: alargar }, pasoAlargar() === 30 ? '+30 s' : '+1 min'),
-    h('button', { class: 'boton enlace', onclick: saltar }, 'Saltar'));
+    h('button', { class: 'boton enlace', onclick: saltar }, 'Saltar'),
+    puedeNotificar() && Notification.permission !== 'denied' && !estado.datos()?.perfil?.avisarDescanso
+      && h('button', { class: 'boton enlace descanso-campana', 'aria-label': 'Avisarme con una notificación al acabar', title: 'Avisarme al acabar',
+        onclick: async (ev) => { if (await activarNotificaciones()) ev.target.remove(); } }, '🔔'));
   cajas.add(caja);
   return caja;
 }

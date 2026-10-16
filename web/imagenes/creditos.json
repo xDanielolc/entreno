@@ -380,9 +380,10 @@
    "nombreEnWger": "Pallof Press"
   },
   "Elevaciones de piernas": {
-   "archivo": "imagenes/ejercicios/elevaciones-de-piernas.png",
-   "autor": "Everkinetic",
-   "nombreEnWger": "Elevaciones de piernas tumbado"
+   "archivo": "imagenes/munecos/elevacion-de-piernas-colgado.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia",
+   "aliasDe": "Elevación de piernas colgado"
   },
   "Elevaciones de rodillas en paralelas": {
    "archivo": "imagenes/ejercicios/elevaciones-de-rodillas-en-paralelas.png",
@@ -1704,6 +1705,21 @@
    "autor": "clafal",
    "nombreEnWger": "Elevación de talón de pie",
    "aliasDe": "Elevación de gemelos"
+  },
+  "Elevación de piernas colgado": {
+   "archivo": "imagenes/munecos/elevacion-de-piernas-colgado.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Elevación de rodillas colgado": {
+   "archivo": "imagenes/munecos/elevacion-de-rodillas-colgado.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Elevación de piernas en el suelo": {
+   "archivo": "imagenes/ejercicios/elevaciones-de-piernas.png",
+   "autor": "Everkinetic",
+   "nombreEnWger": "Elevaciones de piernas tumbado"
   }
  }
 }

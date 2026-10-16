@@ -7,7 +7,7 @@
 // Solo se ocupa del CÓDIGO de la app. Los datos del usuario nunca pasan por
 // aquí: viven en el dispositivo (IndexedDB) y en su Google Drive.
 
-const VERSION = '0.47.1';
+const VERSION = '0.48.0';
 const CACHE = `entreno-${VERSION}`;
 // Las imágenes van en un almacén aparte que NO se borra al actualizar la app:
 // así se ven sin conexión aunque haya salido una versión nueva.
@@ -126,5 +126,15 @@ self.addEventListener('fetch', (evento) => {
       if (peticion.mode === 'navigate') return caches.match('./index.html');
       throw new Error('Sin conexión y sin copia guardada');
     }
+  })());
+});
+
+// Al tocar la notificación del descanso, se vuelve a la app (o se abre).
+self.addEventListener('notificationclick', (evento) => {
+  evento.notification.close();
+  evento.waitUntil((async () => {
+    const ventanas = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    if (ventanas.length) return ventanas[0].focus();
+    return self.clients.openWindow(evento.notification.data?.url ?? './');
   })());
 });

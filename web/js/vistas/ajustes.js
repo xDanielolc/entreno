@@ -6,7 +6,7 @@ import { apartarCopia, copiasAparte, desconectar, eliminarCuenta, juntarCopia, r
 import { apartadoPlegable, modal, selector } from '../ui.js';
 import { VERSION_APP } from '../version.js';
 import { anadir, aviso, confirmar, h, hoyISO, leerNumero } from '../ui.js';
-import { DESCANSO_ESTIRAMIENTOS_POR_DEFECTO, DESCANSO_TRAMOS_POR_DEFECTO, RESPIRACION_POR_DEFECTO } from './descanso.js';
+import { DESCANSO_ESTIRAMIENTOS_POR_DEFECTO, DESCANSO_TRAMOS_POR_DEFECTO, RESPIRACION_POR_DEFECTO, activarNotificaciones, puedeNotificar } from './descanso.js';
 import { TIPOS_SEDE, nuevaSede, sedesActivas } from '../sedes.js';
 import { calibrar, textoCalibracion } from '../formula1rm.js';
 import { TEXTO_AVISO, guardarPruebaEnCuenta } from '../modo-prueba.js';
@@ -121,8 +121,17 @@ export function vistaAjustes(contenedor) {
       numeroAjuste('Entre series (segundos)', d.perfil.descansoSegundos, (x, v) => { x.perfil.descansoSegundos = v; }),
       numeroAjuste('Entre estiramientos (segundos)', d.perfil.descansoEstiramientos ?? DESCANSO_ESTIRAMIENTOS_POR_DEFECTO,
         (x, v) => { x.perfil.descansoEstiramientos = v; }),
-      h('small', { class: 'nota' }, 'El cronómetro arranca solo al apuntar una serie, y al apuntar la última bajada de un drop set. '
+      h('small', { class: 'nota' }, 'El cronómetro arranca solo al apuntar el peso y las repeticiones de una serie, y al apuntar la última bajada de un drop set. '
         + 'Ponlo a 0 para desactivarlo. Si lo saltas o le añades tiempo, la app te ofrece cambiarlo desde allí.'),
+      h('div', { class: 'fila-marcas compacta' },
+        h('button', { type: 'button', class: `boton-marca${d.perfil.avisarDescanso ? ' activo' : ''}`, 'aria-pressed': String(Boolean(d.perfil.avisarDescanso)),
+          onclick: async () => {
+            if (d.perfil.avisarDescanso) { estado.cambiar((x) => { x.perfil.avisarDescanso = false; }); return; }
+            await activarNotificaciones();
+          } }, d.perfil.avisarDescanso ? '🔔 Avisando al acabar el descanso' : '🔔 Avisar con notificación y vibración al acabar')),
+      h('small', { class: 'nota' }, puedeNotificar()
+        ? 'Con la app instalada: mientras dura el descanso, la notificación va diciendo cuánto queda; al acabar, suena y vibra aunque tengas la pantalla apagada.'
+        : 'Este navegador no admite notificaciones; en el móvil, con la app instalada, sí.'),
       h('div', { class: 'fila-campos' },
         [['drop-set', 'Entre bajadas (s)'], ['rest-pause', 'Rest-pause (s)']]
           .map(([clave, texto]) => numeroAjuste(texto, d.perfil.descansoTramos?.[clave] ?? DESCANSO_TRAMOS_POR_DEFECTO[clave],

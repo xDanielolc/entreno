@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 15;
+export const VERSION_ACTUAL = 16;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -483,6 +483,18 @@ const MIGRACIONES = {
     datos.version = 15;
     return datos;
   },
+  // v15 → v16: los ejercicios con tu peso que no levantan el cuerpo entero
+  // (elevaciones de piernas, curl nórdico) pasan de contar el 100 % a su
+  // fracción; solo los que aún tenían el 100 %.
+  15: (datos) => {
+    for (const ej of datos.ejercicios) {
+      if (ej.carga?.tipo !== 'pesoCorporal') continue;
+      const f = FRACCION_CORPORAL_POR_NOMBRE(ej.nombre);
+      if (f < 1 && (ej.fraccionCorporal == null || ej.fraccionCorporal === 1)) ej.fraccionCorporal = f;
+    }
+    datos.version = 16;
+    return datos;
+  },
 };
 
 // Programas clásicos. Cada uno dice qué series (peso y repeticiones) tocan en
@@ -517,7 +529,11 @@ export const PROGRAMAS = {
 // un cajón de 30 cm, 55 %, de 61 cm, 41 %. La pared, la pica y el pino no se
 // midieron: son aproximaciones (ver `fraccionSinDato`). Lo demás, el peso entero.
 export function FRACCION_CORPORAL_POR_NOMBRE(nombre = '') {
-  const n = nombre.toLowerCase();
+  const n = nombre.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  // Con tu peso pero sin levantarlo entero: las piernas son un 32 % del peso
+  // (Winter 2009); el curl nórdico se cuenta como un 65 % (estimación).
+  if (/elevaci[oó]n(es)? de (piernas|rodillas)/.test(n)) return 0.32;
+  if (/curl nordico|nordic/.test(n)) return 0.65;
   if (!/flexion/.test(n)) return 1;
   if (/rodilla/.test(n)) return 0.49;
   if (/pica|pino/.test(n)) return 0.74;
