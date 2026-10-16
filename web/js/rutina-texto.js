@@ -125,7 +125,7 @@ export function analizarRutina(texto) {
       if (!ejercicio) continue;
       const { formas, opcional, superserie } = analizarSeries(series, tipo, como);
       if (!formas.length) avisos.push(`«${ejercicio}»: no entiendo las series «${series}»; entra sin series.`);
-      diaActual().ejercicios.push({ nombre: ejercicio, formas, opcional, superserie, linea });
+      diaActual().ejercicios.push({ nombre: ejercicio, formas, opcional, superserie, linea, nota: como || null });
       continue;
     }
     const rutina = linea.match(/^rutina\s*:\s*(.+)$/i);
@@ -138,10 +138,18 @@ export function analizarRutina(texto) {
       else avisos.push(`No entiendo la línea «${linea}».`);
       continue;
     }
-    const [, nombreEj, resto] = partes;
+    const [, nombreEj, conParentesis] = partes;
+    // Lo que va entre paréntesis es una nota («en racimo: 45 s entre series»),
+    // salvo «opcional» y «superserie», que son marcas.
+    const notas = [];
+    const resto = conParentesis.replace(/\(([^)]*)\)/g, (_, dentro) => {
+      if (/^\s*(opcional|superserie)\s*$/i.test(dentro)) return ` ${dentro} `;
+      notas.push(dentro.trim());
+      return ' ';
+    });
     const { formas, opcional, superserie } = analizarSeries(resto);
     if (!formas.length) avisos.push(`«${nombreEj}»: no entiendo las series «${resto}»; entra sin series.`);
-    diaActual().ejercicios.push({ nombre: nombreEj.replace(/^[-•*]\s*/, ''), formas, opcional, superserie, linea });
+    diaActual().ejercicios.push({ nombre: nombreEj.replace(/^[-•*]\s*/, ''), formas, opcional, superserie, linea, nota: notas.join('; ') || null });
   }
   return { nombre, dias: dias.filter((x) => x.ejercicios.length), avisos };
 }
@@ -225,7 +233,7 @@ export function crearRutinaDesdeTexto(datos, analisis, { nombre, activa = true, 
       const propias = !(ej.series || []).some((p) => !p.soloRutina);
       for (const p of planes) { p.soloRutina = propias ? null : rutina.id; ej.series.push(p); }
       nuevoDia.ejercicios.push({ ejercicioId: ej.id, opcional: Boolean(item.opcional), superserie: Boolean(item.superserie),
-        series: propias ? null : planes.map((p) => p.id), nota: null });
+        series: propias ? null : planes.map((p) => p.id), nota: item.nota ?? null });
     }
     rutina.dias.push(nuevoDia);
   }

@@ -10,6 +10,7 @@ import { CATALOGO, normalizar } from './catalogo.js';
 import { DIAS_CICLO_POR_DEFECTO, serieNuevaPlantilla } from './esquema.js';
 import { ejercicioDesdeCatalogo } from './vistas/selector-ejercicios.js';
 import { nuevoId } from './ui.js';
+import { analizarRutina, crearRutinaDesdeTexto } from './rutina-texto.js';
 
 // Formas de serie que usan las plantillas.
 const bilbo = { tipo: 'bilbo' };
@@ -30,7 +31,66 @@ const t = (seg) => ({ tipo: 'libre', progresion: 'libre', objetivo: [seg, seg] }
 
 const e = (nombre, series, extra = {}) => ({ nombre, series, ...extra });
 
+// Una rutina prehecha escrita como texto (el mismo formato que «Pegar una
+// rutina escrita»): permite series distintas del mismo ejercicio según el día.
+const deTexto = (texto) => ({ texto, dias: analizarRutina(texto).dias.map((d) => ({ nombre: d.nombre,
+  ejercicios: d.ejercicios.map((x) => ({ nombre: x.nombre, series: [], opcional: x.opcional, nota: x.nota })) })) });
+
 export const PLANTILLAS = [
+  {
+    id: 'fuerza-sin-maquinas',
+    nombre: 'Fuerza sin máquinas: cuatro días',
+    autor: 'Dan (su rutina de 10-2026)',
+    resumen: 'Dos días de torso y dos de pierna, solo con barra, mancuernas y tu peso. Cada básico tiene un día pesado '
+      + '(una serie máxima de 1-2 y series de 4 con 2 en recámara) y otro moderado (una serie Bilbo y dos normales).',
+    porQue: 'La fuerza máxima se gana sobre todo con cargas altas y varias series (Lopez 2021; Currier 2023), alternando sesiones '
+      + 'pesadas y moderadas (Moesgaard 2022) y quedándose a 2 del fallo en lo pesado, que rinde igual y cansa menos (Pareja-Blanco '
+      + '2017; Robinson 2024). La serie máxima de 1-2 repeticiones es la que mejor mide el 1RM (Mayhew 2008) y practicarlo también '
+      + 'se entrena (Mattocks 2017). La serie Bilbo, ligera y rápida como primera serie, no perjudica el 1RM (González-Alcázar 2025). '
+      + 'Tríceps estirado (Maeo 2023), gemelo de pie (Kinoshita 2023) y un drop set al final para ahorrar tiempo (Sødal 2023). '
+      + 'Las dominadas se aprenden con negativas y racimos de 1-2 con pausas (Cuevas-Aburto 2021 muestra que repartir las '
+      + 'repeticiones da el mismo rendimiento). El 4 × 4, las negativas, el curl nórdico y el 90 % de la serie máxima son decisiones '
+      + 'prácticas sin estudio propio.',
+    comoSeHace: 'Sigue los cuatro días en orden cuando estés recuperado, sin dejar pasar más de 3 o 4 días entre sesiones. Calienta '
+      + 'el primer básico con 2 o 3 series de aproximación. En la serie máxima pon un peso con el que hagas 1 o 2 dejándote 1 o 2 en '
+      + 'recámara: de ahí sale tu 1RM. En las series de 4, el peso sube solo cuando las sacas con 2 en recámara. Descansa 3 minutos '
+      + 'en lo pesado y 45-60 s entre las dominadas en racimo. El cardio del final es opcional. Sesiones de 60 a 70 minutos.',
+    ...deTexto(`Día 1: Torso, banca pesada
+Press de banca: máxima 1-2 + 4 × 4 con 2 en recámara (máxima a un 90 %; después 80-85 %, 3 min de descanso)
+Remo con barra: Bilbo + 2 × 8-10 con 2 en recámara
+Press militar: Bilbo + 2 × 8-10 con 2 en recámara
+Dominadas negativas: 3 × 3-5 (bajada de 3-5 s; sube con salto o desde un banco)
+Curl martillo: 2 × 8-12 con 1 en recámara, drop set en la última (alterno, con mancuernas)
+Extensión de tríceps sobre la cabeza: 2 × 8-12 con 1 en recámara, drop set en la última (con mancuerna)
+Elevaciones laterales: 2 × 12-15 con 1 en recámara
+Pájaro a una mano: 2 × 12-15 con 1 en recámara (por brazo)
+
+Día 2: Pierna, sentadilla pesada
+Sentadilla: máxima 1-2 + 4 × 4 con 2 en recámara (máxima a un 90 %; después 80-85 %)
+Gemelo de pie con barra: 3 × 10-15 (justo después de la sentadilla, con la barra en la espalda)
+Peso muerto rumano: 3 × 6-8 con 2 en recámara (desde arriba, rodillas algo flexionadas)
+Curl nórdico: 3 × 5-8 con 1 en recámara
+Rueda abdominal: 2 × 8-12
+Cardio: 15 min (opcional) (suave: bici, cinta o andar rápido)
+
+Día 3: Torso, remo pesado
+Remo con barra: máxima 1-2 + 4 × 4-5 con 2 en recámara (máxima a un 90 %; después 80-85 %)
+Press militar: máxima 1-2 + 3 × 5-6 con 2 en recámara (máxima a un 90 %; después pesado)
+Press de banca: Bilbo + 2 × 6-8 con 2 en recámara
+Dominadas: 6 × 1-2 (en racimo: 45-60 s entre series; cuando salgan 3 seguidas, pasa a 5 × 3)
+Curl martillo: 2 × 8-12 con 1 en recámara, drop set en la última (alterno, con mancuernas)
+Fondos de tríceps: 2 × 6-10 (en paralelas; si no salen 6, negativos 2 × 3-5; al pasar de 10, con lastre)
+Elevaciones laterales: 2 × 12-15 con 1 en recámara
+Pájaro a una mano: 2 × 12-15 con 1 en recámara (por brazo)
+
+Día 4: Pierna, peso muerto pesado
+Peso muerto sumo: máxima 1-2 + 3 × 3-4 con 2 en recámara (máxima a un 90 %; después 80-85 %)
+Sentadilla: 3 × 6-8 con 2 en recámara (70-75 %)
+Gemelo de pie con barra: 3 × 10-15 (justo después de la sentadilla, con la barra en la espalda)
+Curl nórdico: 3 × 5-8 con 1 en recámara
+Elevaciones de piernas: 2 × 8-12 (colgado de la barra)
+Cardio: 15 min (opcional) (suave: bici, cinta o andar rápido)`),
+  },
   {
     id: 'plpl-bilbo-heavy-duty',
     nombre: 'PLPL Bilbo + Heavy Duty',
@@ -488,6 +548,13 @@ export function ejerciciosNuevos(datos, plantilla) {
 // Añade la rutina y los ejercicios que falten. Cambia `datos` (dentro de
 // estado.cambiar) y devuelve el id de la rutina nueva.
 export function anadirPlantilla(datos, plantilla) {
+  if (plantilla.texto) {
+    const id = crearRutinaDesdeTexto(datos, analizarRutina(plantilla.texto), { nombre: plantilla.nombre });
+    const rutina = datos.rutinas.find((r) => r.id === id);
+    rutina.plantilla = plantilla.id;
+    rutina.descripcion = `${plantilla.porQue}\n\n${plantilla.comoSeHace}`;
+    return id;
+  }
   const porNombre = new Map(datos.ejercicios.filter((x) => !x.archivado).map((x) => [normalizar(x.nombre), x]));
   const idDe = (item) => {
     const clave = normalizar(item.nombre);

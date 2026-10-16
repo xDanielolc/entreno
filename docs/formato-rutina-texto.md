@@ -18,6 +18,8 @@ Cardio suave: 15 min (opcional)
 - Un día empieza con «Día …», «Sesión …», una línea que empiece por «#» o
   una línea sin números ni dos puntos («Torso A»).
 - Las series van separadas por «+»: «3 × 8-10», «1 × 20-30», «15 min», «45 s».
+- Lo que va entre paréntesis es una nota del ejercicio para ese día («(en
+  racimo: 45 s entre series)»), salvo «(opcional)» y «(superserie)».
 - Palabras que cambian la serie: **Bilbo**, **máxima** (1-2 pesadas, 1 en
   recámara), **fuerza** (2 en recámara), **drop** (set en la última),
   **calentamiento**, **N en recámara**, **opcional**, **superserie**.

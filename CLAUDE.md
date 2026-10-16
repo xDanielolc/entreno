@@ -584,3 +584,13 @@ Lo que cambió para que eso sea fácil:
 - Hoy: «¿Voy hoy?» dentro de la tarjeta Recuperación, una pregunta cada vez
   con barra de progreso; últimos entrenamientos en breve (fecha y día) con
   «Con detalle» recordado en localStorage.
+
+## Ronda 0.46.1 (16-10-2026): su rutina como prehecha
+
+«Fuerza sin máquinas: cuatro días» en `plantillas.js`, escrita en el formato
+de texto (`deTexto()`; `anadirPlantilla` usa `crearRutinaDesdeTexto` si la
+plantilla trae `texto`): así cada día lleva sus propias series del mismo
+ejercicio. Las notas entre paréntesis de cada línea van a `item.nota` (y la
+columna «cómo» de una tabla también). «Gemelo de pie con barra» en el
+catálogo con la foto de la elevación de gemelos. El redondeo es un número
+libre (0,25 con microdiscos), 2,5 por defecto.

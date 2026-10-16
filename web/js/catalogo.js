@@ -136,6 +136,7 @@ export const CATALOGO = [
   // Kinoshita 2023: de pie crecen el gemelo y el sóleo (este, igual que
   // sentado); sentado, el gemelo apenas crece.
   ej('Elevación de gemelos', 'pierna', 'máquina', ['gemelo', 'soleo'], []),
+  ej('Gemelo de pie con barra', 'pierna', 'barra', ['gemelo'], ['soleo']),
   ej('Elevación de gemelos sentado', 'pierna', 'máquina', ['soleo'], []),
   ej('Elevación de tibiales', 'pierna', 'pared', ['tibial'], [], corporal),
   ej('Tibial con disco', 'pierna', 'disco', ['tibial'], []),

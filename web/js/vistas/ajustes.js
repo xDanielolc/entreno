@@ -1,6 +1,6 @@
 import { apuntarPeso } from '../peso.js';
 import { creditosCargados } from '../imagenes.js';
-import { REDONDEOS, REDONDEO_POR_DEFECTO, formatearNumero } from '../calculos.js';
+import { REDONDEO_POR_DEFECTO, formatearNumero } from '../calculos.js';
 import * as estado from '../estado.js';
 import { apartarCopia, copiasAparte, desconectar, eliminarCuenta, juntarCopia, rehacerCopiasLegibles, sincronizar, situacionActual } from '../sincronizacion.js';
 import { apartadoPlegable, modal, selector } from '../ui.js';
@@ -145,12 +145,11 @@ export function vistaAjustes(contenedor) {
       numeroAjuste('Repeticiones en recámara por defecto', d.perfil.recamaraPorDefecto, (x, v) => { x.perfil.recamaraPorDefecto = v; }),
       h('small', { class: 'nota' }, 'Las que sueles dejarte sin hacer al acabar una serie. Viene puesto 1 porque es lo que recomendamos '
         + '(quedarse a una del fallo rinde casi igual y cansa menos). Aparece ya puesto y se apunta aparte: «45 kg × 12 + 1».'),
-      h('div', { class: 'campo' },
-        h('span', { class: 'etiqueta-campo' }, 'Los pesos que propone la app van de (kg)'),
-        selector(REDONDEOS.map((r) => [r, formatearNumero(r)]), d.perfil.redondeoKg ?? REDONDEO_POR_DEFECTO,
-          (v) => estado.cambiar((x) => { x.perfil.redondeoKg = v; }), { titulo: 'Redondeo de los pesos', botones: true }),
-        h('small', { class: 'nota' }, 'El disco más pequeño que tengas, por los dos lados: con discos de 1,25 kg, 2,5. '
-          + 'Cada ejercicio puede llevar el suyo en «Ajustes finos» de su ficha (mancuernas de 2 en 2, por ejemplo).')),
+      numeroAjuste('Los pesos que propone la app van de (kg)', d.perfil.redondeoKg ?? REDONDEO_POR_DEFECTO,
+        (x, v) => { x.perfil.redondeoKg = v > 0 ? v : REDONDEO_POR_DEFECTO; }),
+      h('small', { class: 'nota' }, `Viene puesto ${formatearNumero(REDONDEO_POR_DEFECTO)}: el disco más pequeño habitual (1,25 kg) por los dos lados. `
+        + 'Pon 0,25 si tienes microdiscos, 5 si en tu gimnasio no hay menos. Cada ejercicio puede llevar el suyo en «Ajustes finos» '
+        + 'de su ficha (mancuernas de 2 en 2, por ejemplo).'),
       (d.perfil.prehechos ?? []).length > 0 && h('div', { class: 'campo' },
         h('span', { class: 'etiqueta-campo' }, 'Mis prehechos (reglas guardadas)'),
         h('ul', { class: 'lista-prehechos' }, d.perfil.prehechos.map((m) => h('li', {},

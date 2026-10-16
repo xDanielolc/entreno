@@ -1,5 +1,5 @@
 import {
-  REDONDEOS, REDONDEO_POR_DEFECTO, aPesoDisponible, cicloActual, formatearNumero, generarEscalera, lecturaDesdeCarga, pesosDeMaquina, registrosDelCiclo,
+  REDONDEO_POR_DEFECTO, aPesoDisponible, cicloActual, formatearNumero, generarEscalera, lecturaDesdeCarga, pesosDeMaquina, registrosDelCiclo,
   modeloDeEjercicio, rmDeReferencia, seriesDelPrograma,
 } from '../calculos.js';
 import * as estado from '../estado.js';
@@ -441,10 +441,10 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
           numeroInput(borrador.recamaraPorDefecto, (v) => { borrador.recamaraPorDefecto = v; }),
           h('small', { class: 'nota' }, `Vacío = lo de Ajustes (${d.perfil.recamaraPorDefecto ?? 1}).`)),
         !['ninguna', 'altura'].includes(borrador.carga.tipo) && !borrador.pesosMaquina?.length
-        && campo('Los pesos que propone la app, de (kg)', selector([['', `Como en Ajustes (${formatearNumero(d.perfil.redondeoKg ?? REDONDEO_POR_DEFECTO)})`],
-          ...REDONDEOS.map((r) => [r, formatearNumero(r)])], borrador.redondeoKg ?? '',
-        (v) => { borrador.redondeoKg = v || null; repintar(); }, { titulo: 'Redondeo de los pesos', botones: true }),
-        h('small', { class: 'nota' }, 'Mancuernas de 2 en 2 kg, discos de 1,25 por lado (2,5), máquinas de 5 en 5…')),
+        && campo('Los pesos que propone la app en este ejercicio van de (kg)',
+          numeroInput(borrador.redondeoKg, (v) => { borrador.redondeoKg = v > 0 ? v : null; }),
+          h('small', { class: 'nota' }, `Vacío = lo de Ajustes (${formatearNumero(d.perfil.redondeoKg ?? REDONDEO_POR_DEFECTO)}). `
+            + 'Mancuernas de 2 en 2, microdiscos de 0,25, máquinas de 5 en 5…')),
         campo('Descanso entre series en este ejercicio (segundos)',
           numeroInput(borrador.descansoSegundos, (v) => { borrador.descansoSegundos = v ?? undefined; }),
           h('small', { class: 'nota' }, `Vacío = lo de Ajustes (${d.perfil.descansoSegundos ?? 'sin descanso'} s). Al saltar o alargar un descanso, la app te ofrece guardarlo aquí.`)),

@@ -1698,6 +1698,12 @@
    "fuente": "everkinetic",
    "nombreEnFuente": "bent-over-rear-deltoid-raise-with-head-on-bench",
    "aliasDe": "Pájaros con mancuernas"
+  },
+  "Gemelo de pie con barra": {
+   "archivo": "imagenes/ejercicios/elevacion-de-gemelos.jpeg",
+   "autor": "clafal",
+   "nombreEnWger": "Elevación de talón de pie",
+   "aliasDe": "Elevación de gemelos"
   }
  }
 }
