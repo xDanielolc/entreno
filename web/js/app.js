@@ -229,7 +229,8 @@ async function guardarImagenesParaSinConexion() {
     const mios = new Set((d?.ejercicios ?? []).filter((e) => !e.borrado).map((e) => imagenDeEjercicio(e)?.archivo).filter(Boolean));
     const capas = Object.entries(MUSCULOS).flatMap(([clave, m]) => m.vistas.map((v) => archivoCapa(clave, v)));
     const cuerpo = ['imagenes/musculos/cuerpo-delante.svg', 'imagenes/musculos/cuerpo-detras.svg'];
-    const cache = await caches.open('entreno-imagenes-2');
+    // El mismo nombre que CACHE_IMAGENES en sw.js: si no, el service worker lo borra.
+    const cache = await caches.open('entreno-imagenes-7');
     for (const ruta of [...cuerpo, ...capas, ...mios]) {
       if (!(await cache.match(ruta, { ignoreSearch: true }))) {
         const r = await fetch(ruta).catch(() => null);

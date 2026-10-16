@@ -539,3 +539,15 @@ usa `serie.hechaA`; `tecnicasDeMas`, `calentamiento`, `dolor` con la lista
 Cuerpo). Superserie: `item.superserie`; tras una serie del primero no hay
 descanso y se avisa del segundo. Las preguntas a Dan, siempre con la
 herramienta de test (AskUserQuestion), no en lista de texto.
+
+## Ronda 0.45.1 (16-10-2026): capas del cuerpo repasadas
+
+Todas las capas propias de `herramientas/dibujar_capas_extra.py` se
+redibujaron sobre el dibujo ampliado (pecho bajo la clavícula, por el
+esternón y hasta la línea del hombro; aductores sin meterse entre las
+piernas; abdomen, antebrazos, tibial, abductores y sóleo ajustados) e
+isquios pasa a capa propia (wger solo pintaba el bíceps femoral). Para
+repasar una capa: renderizar el SVG del cuerpo ampliado con rejilla y las
+capas encima (Chrome sin ventana) y trazar sobre las líneas que se ven.
+Almacén de imágenes `entreno-imagenes-7`, el mismo nombre en `sw.js` y en
+`app.js` (antes app.js usaba otro y el service worker lo borraba).

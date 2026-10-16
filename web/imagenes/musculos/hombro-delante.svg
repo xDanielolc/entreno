@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="200" height="369" viewBox="0 0 200 369">
   <!-- hombro (delante): capa propia de la app -->
   <g fill="#000" stroke="#000" stroke-width="1.5" stroke-linejoin="round">
-    <path d="M 58 66 L 52 68 L 47 74 L 45 82 L 46 92 L 50 101 L 55 104 L 59 98 L 62 88 L 66 78 L 68 72 L 64 67 Z"/>
-    <path d="M 142 66 L 148 68 L 153 74 L 155 82 L 154 92 L 150 101 L 145 104 L 141 98 L 138 88 L 134 78 L 132 72 L 136 67 Z"/>
+    <path d="M 62 66 L 57.5 65.8 L 53 67.6 L 50 71 L 48.4 77 L 48.2 84 L 48.9 91 L 51 96 L 53.5 99 L 56.5 95 L 59.3 90.5 L 60.6 87.4 L 64.4 80.6 L 68.2 73.6 L 67 69 Z"/>
+    <path d="M 138 66 L 142.5 65.8 L 147 67.6 L 150 71 L 151.6 77 L 151.8 84 L 151.1 91 L 149 96 L 146.5 99 L 143.5 95 L 140.7 90.5 L 139.4 87.4 L 135.6 80.6 L 131.8 73.6 L 133 69 Z"/>
   </g>
 </svg>

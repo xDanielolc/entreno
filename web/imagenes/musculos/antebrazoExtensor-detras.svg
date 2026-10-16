@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="200" height="369" viewBox="0 0 200 369">
   <!-- antebrazoExtensor (detras): capa propia de la app -->
   <g fill="#000" stroke="#000" stroke-width="1.5" stroke-linejoin="round">
-    <path d="M 48 135 L 58 139 L 56 152 L 48 168 L 38 186 L 29 188 L 32 172 L 40 152 Z"/>
-    <path d="M 152 135 L 142 139 L 144 152 L 152 168 L 162 186 L 171 188 L 168 172 L 160 152 Z"/>
+    <path d="M 47.5 139 L 57.3 141.5 L 56.3 151 L 51.5 161.5 L 46.5 170 L 41.5 178.3 L 38 185 L 29.5 186 L 32 172 L 40 152 Z"/>
+    <path d="M 152.5 139 L 142.7 141.5 L 143.7 151 L 148.5 161.5 L 153.5 170 L 158.5 178.3 L 162 185 L 170.5 186 L 168 172 L 160 152 Z"/>
   </g>
 </svg>

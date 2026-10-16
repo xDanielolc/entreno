@@ -30,7 +30,7 @@ export const MUSCULOS = {
   abductores:      { nombre: 'Abductores',       grupo: 'pierna', tamano: 'medio',   vistas: ['detras'], propia: true },
   cuadriceps:      { nombre: 'Cuádriceps',       grupo: 'pierna', tamano: 'grande',  vistas: ['delante'] },
   aductores:       { nombre: 'Aductores',        grupo: 'pierna', tamano: 'medio',   vistas: ['delante'], propia: true },
-  isquios:         { nombre: 'Isquios',          grupo: 'pierna', tamano: 'grande',  vistas: ['detras'] },
+  isquios:         { nombre: 'Isquios',          grupo: 'pierna', tamano: 'grande',  vistas: ['detras'], propia: true },
   // El gemelo se entrena con la rodilla estirada (de pie); el sóleo, con la
   // rodilla doblada (sentado). Por eso van por separado.
   gemelo:          { nombre: 'Gemelo (gastrocnemio)', corto: 'Gemelo',          grupo: 'pierna', tamano: 'pequeno', vistas: ['detras'], propia: true },
