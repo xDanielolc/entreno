@@ -4,6 +4,7 @@
 // se guarda en el dispositivo y avisa a quien esté escuchando (la interfaz
 // para redibujarse y la sincronización para subirlo a Drive).
 
+import { fijarRedondeo } from './calculos.js';
 import * as local from './almacen-local.js';
 import { archivoNuevo, migrar, necesitaMigrar, validar } from './esquema.js';
 import { completarDesdeCatalogo } from './catalogo.js';
@@ -26,6 +27,7 @@ export function suscribir(fn) {
 }
 
 export function emitir(motivo) {
+  if (registro?.datos) fijarRedondeo(registro.datos.perfil?.redondeoKg);
   for (const fn of oyentes) fn(motivo);
 }
 

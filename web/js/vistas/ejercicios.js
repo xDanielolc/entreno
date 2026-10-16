@@ -1,5 +1,5 @@
 import {
-  aPesoDisponible, cicloActual, formatearNumero, generarEscalera, lecturaDesdeCarga, pesosDeMaquina, registrosDelCiclo,
+  REDONDEOS, REDONDEO_POR_DEFECTO, aPesoDisponible, cicloActual, formatearNumero, generarEscalera, lecturaDesdeCarga, pesosDeMaquina, registrosDelCiclo,
   modeloDeEjercicio, rmDeReferencia, seriesDelPrograma,
 } from '../calculos.js';
 import * as estado from '../estado.js';
@@ -440,6 +440,11 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         borrador.esfuerzo.tipo === 'repeticiones' && campo('Repeticiones en recámara por defecto en este ejercicio',
           numeroInput(borrador.recamaraPorDefecto, (v) => { borrador.recamaraPorDefecto = v; }),
           h('small', { class: 'nota' }, `Vacío = lo de Ajustes (${d.perfil.recamaraPorDefecto ?? 1}).`)),
+        !['ninguna', 'altura'].includes(borrador.carga.tipo) && !borrador.pesosMaquina?.length
+        && campo('Los pesos que propone la app, de (kg)', selector([['', `Como en Ajustes (${formatearNumero(d.perfil.redondeoKg ?? REDONDEO_POR_DEFECTO)})`],
+          ...REDONDEOS.map((r) => [r, formatearNumero(r)])], borrador.redondeoKg ?? '',
+        (v) => { borrador.redondeoKg = v || null; repintar(); }, { titulo: 'Redondeo de los pesos', botones: true }),
+        h('small', { class: 'nota' }, 'Mancuernas de 2 en 2 kg, discos de 1,25 por lado (2,5), máquinas de 5 en 5…')),
         campo('Descanso entre series en este ejercicio (segundos)',
           numeroInput(borrador.descansoSegundos, (v) => { borrador.descansoSegundos = v ?? undefined; }),
           h('small', { class: 'nota' }, `Vacío = lo de Ajustes (${d.perfil.descansoSegundos ?? 'sin descanso'} s). Al saltar o alargar un descanso, la app te ofrece guardarlo aquí.`)),
@@ -843,11 +848,17 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
       lista.doble = { etiqueta: 'De 6 a 10 · recomendado', grupo: 'Hipertrofia', tipo: 'carga', rango: [6, 10],
         explica: 'Entre 6 y 10 repeticiones con el mismo peso. Cuando llegas a 10 en todas las series, la app sube el peso y vuelves a 6. '
           + 'El músculo crece con series cerca del fallo, sin necesidad de llegar a él (metaanálisis de Refalo 2023).' };
-      lista.bilbo = { etiqueta: 'Bilbo / incremento lineal', grupo: 'Fuerza', tipo: 'bilbo', preset: 'bilbo',
-        explica: 'Empieza ligero, con muchas repeticiones rápidas, y cada sesión sube 2,5 kg hasta pesos de fuerza. '
+      lista.bilbo = { etiqueta: 'Bilbo (series largas)', grupo: 'Hipertrofia', tipo: 'bilbo', preset: 'bilbo',
+        explica: 'Empieza ligero, con muchas repeticiones rápidas, y cada sesión sube 2,5 kg. '
           + 'Cuando ya no llegas a 15, el ciclo se acaba y el siguiente empieza al 50 % del mejor 1RM que hiciste en él. '
-          + 'Un ensayo (González-Alcázar 2025) muestra que una serie así no perjudica el 1RM; las cifras son decisiones prácticas del método.' };
+          + 'Va en hipertrofia porque casi todo el ciclo son series de 15 a 30 repeticiones cerca del fallo, que hacen crecer el músculo '
+          + 'igual que las de 6 a 10 (Schoenfeld 2017, metaanálisis). Un ensayo (González-Alcázar 2025) muestra que una serie así '
+          + 'no perjudica el 1RM; las cifras son decisiones prácticas del método.' };
       if (!cardio) {
+        lista.fuerza = { etiqueta: 'De 3 a 5 con 2 en recámara · fuerza', grupo: 'Fuerza', tipo: 'carga', rango: [3, 5], recamaraMin: 2,
+          explica: 'Doble progresión de fuerza: el mismo peso hasta que haces 5 dejándote 2 en recámara; entonces la app sube el peso y '
+            + 'vuelves a 3. La fuerza máxima se gana sobre todo con cargas altas, de 1 a 5 repeticiones (Schoenfeld 2017, metaanálisis), '
+            + 'y quedarse a 2 del fallo rinde igual que ir al fallo con menos fatiga (Pareja-Blanco 2017; Robinson 2024).' };
         lista.cincoPorCinco = { etiqueta: '5×5', grupo: 'Fuerza', tipo: 'programa', programa: '5x5',
           explica: 'Cinco series de cinco con el mismo peso. Si las completas, sube; si fallas tres sesiones seguidas, baja un 10 %.' };
         lista.cincoTresUno = { etiqueta: '5/3/1', grupo: 'Fuerza', tipo: 'programa', programa: '531',
@@ -863,6 +874,11 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         + 'Llegando cerca del fallo, muchas repeticiones también hacen crecer el músculo (Kikuchi 2017: flexiones frente a press de banca).' };
     if (borrador.esfuerzo.tipo === 'tiempo') lista.tiempo = { etiqueta: 'Más tiempo', grupo: 'Aguante', tipo: 'bilbo', preset: 'tiempo',
       explica: 'Diez segundos más cada sesión hasta llegar a dos minutos. Para planchas, isométricos y estiramientos.' };
+    // Los que has guardado tú («Guardar como prehecho mío»).
+    for (const m of d.perfil.prehechos ?? []) {
+      if (m.progresion?.sobre === 'carga' && !conCarga) continue;
+      lista[`mio:${m.id}`] = { etiqueta: m.nombre, grupo: 'Míos', tipo: 'mio', mio: m, explica: m.descripcion };
+    }
     return lista;
   }
 
@@ -870,10 +886,14 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
   function prehechoActual(plan) {
     const p = plan.progresion;
     const lista = prehechosPara();
+    if (p.deMio && lista[`mio:${p.deMio}`]) return `mio:${p.deMio}`;
     for (const [clave, x] of Object.entries(lista)) {
       if (x.tipo !== p.tipo) continue;
       if (x.tipo === 'programa' && x.programa !== p.programa) continue;
       if (x.tipo === 'bilbo' && x.preset !== p.preset) continue;
+      // Dos prehechos de doble progresión se distinguen por el rango y la recámara.
+      if (x.tipo === 'carga' && (x.rango?.join('-') !== (p.objetivoEsfuerzo ?? []).join('-')
+        || (x.recamaraMin ?? null) !== (p.recamaraMin ?? null))) continue;
       return clave;
     }
     return null;
@@ -882,8 +902,19 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
   function aplicarPrehecho(plan, clave) {
     const x = prehechosPara()[clave];
     if (!x) return;
+    if (x.tipo === 'mio') {
+      // Un prehecho tuyo: su regla entera, con el ciclo sin empezar.
+      plan.progresion = structuredClone(x.mio.progresion);
+      if (plan.progresion.tipo === 'bilbo') { plan.progresion.cicloActual = 1; plan.progresion.ciclos = []; }
+      plan.progresion.deMio = x.mio.id;
+      plan.tecnicas = [...(x.mio.tecnicas ?? [])];
+      plan.tipo = tipoDePlan(plan);
+      repintar();
+      return;
+    }
     plan.progresion = progresionPorDefecto(x.tipo, borrador);
     if (x.rango) plan.progresion.objetivoEsfuerzo = [...x.rango];
+    if (x.recamaraMin != null) plan.progresion.recamaraMin = x.recamaraMin;
     if (x.tipo === 'programa') plan.progresion.programa = x.programa;
     if (x.tipo === 'bilbo') {
       plan.progresion.preset = x.preset;
@@ -891,6 +922,46 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
     }
     plan.tipo = tipoDePlan(plan);
     repintar();
+  }
+
+  // Guarda la regla de esta serie (ciclo, rango, técnicas) con un nombre, para
+  // elegirla en cualquier ejercicio y en el editor de rutinas.
+  function guardarPrehechoMio(plan) {
+    const caja = h('input', { type: 'text', 'aria-label': 'Nombre del prehecho', placeholder: 'Fuerza 4 × 4', maxlength: 40 });
+    const cerrar = modal('Guardar como prehecho mío', h('div', { class: 'formulario' },
+      h('p', { class: 'nota' }, `Se guarda: ${describirPlanCorto(plan)}. Luego sale en «Míos» en todos los ejercicios y en las rutinas.`),
+      campo('Nombre', caja),
+      h('button', { class: 'boton', onclick: () => {
+        const nombre = caja.value.trim();
+        if (!nombre) { aviso('Ponle un nombre', { tipo: 'error' }); return; }
+        const progresion = structuredClone(plan.progresion);
+        delete progresion.deMio;
+        if (progresion.tipo === 'bilbo') { progresion.cicloActual = 1; progresion.ciclos = []; }
+        const mio = { id: nuevoId('pre'), nombre, progresion, tecnicas: [...(plan.tecnicas ?? [])], descripcion: describirPlanCorto(plan) };
+        plan.progresion.deMio = mio.id;
+        // Sin repintar toda la app (tecleo): la ficha sigue con su borrador.
+        estado.cambiar((x) => { x.perfil.prehechos = [...(x.perfil.prehechos ?? []), mio]; }, { tecleo: true });
+        persistir();
+        cerrar();
+        aviso(`Guardado «${nombre}» en tus prehechos.`);
+        repintar();
+      } }, 'Guardar')));
+    setTimeout(() => caja.focus(), 50);
+  }
+
+  function describirPlanCorto(plan) {
+    const p = plan.progresion ?? {};
+    let texto;
+    if (p.tipo === 'carga') {
+      const [a, b] = p.objetivoEsfuerzo ?? [];
+      texto = `de ${a} a ${b} repeticiones, sube ${formatearNumero(p.incremento ?? 2.5)} ${unidadMedida(borrador, borrador.carga.tipo)} al llegar`
+        + (p.recamaraMin != null ? ` con ${p.recamaraMin} en recámara` : '');
+    } else if (p.tipo === 'programa') texto = PROGRAMAS[p.programa]?.etiqueta ?? 'programa';
+    else if (p.tipo === 'bilbo') texto = p.preset && p.preset !== 'personalizado' ? (PRESETS_CICLO[p.preset]?.etiqueta ?? 'ciclo') : 'ciclo a tu manera';
+    else if (p.tipo === 'maximo-trabajo') texto = 'máximo trabajo';
+    else texto = 'solo apuntar';
+    if (plan.tecnicas?.length) texto += ` + ${plan.tecnicas.map((k) => TECNICAS[k]?.etiqueta ?? k).join(' + ')}`;
+    return texto;
   }
 
   // ¿Aún no hay ninguna serie apuntada de este ejercicio?
@@ -982,7 +1053,9 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
             type: 'button', class: `chip seleccionable ${puesto === k ? 'activo' : ''}`, 'aria-pressed': String(puesto === k),
             onclick: () => aplicarPrehecho(plan, k),
           }, x.etiqueta))))),
-        detalleProgresion(plan)),
+        detalleProgresion(plan),
+        h('button', { type: 'button', class: 'boton enlace', onclick: () => guardarPrehechoMio(plan) },
+          'Guardar esta regla como prehecho mío')),
 
       // Cómo es la serie: las técnicas valen para cualquier regla, también
       // dentro de un ciclo. Un drop set es una forma de hacer la serie, no
@@ -1114,7 +1187,10 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         h('div', { class: 'fila-campos' },
           campo('De (reps)', numeroInput(p.objetivoEsfuerzo[0], (v) => { p.objetivoEsfuerzo[0] = v; })),
           campo('A (reps)', numeroInput(p.objetivoEsfuerzo[1], (v) => { p.objetivoEsfuerzo[1] = v; })),
-          campo(`Y entonces sube (${unidad})`, numeroInput(p.incremento, (v) => { p.incremento = v; }))));
+          campo(`Y entonces sube (${unidad})`, numeroInput(p.incremento, (v) => { p.incremento = v; }))),
+        borrador.esfuerzo.tipo === 'repeticiones' && campo('Sube solo si dejaste en recámara al menos',
+          numeroInput(p.recamaraMin, (v) => { p.recamaraMin = v ?? null; }),
+          h('small', { class: 'nota' }, 'Vacío: basta con llegar al máximo. Con 2, llegar apurando no cuenta (es lo de fuerza).')));
     }
     if (p.tipo === 'esfuerzo') {
       const conCarga = borrador.carga.tipo !== 'ninguna';

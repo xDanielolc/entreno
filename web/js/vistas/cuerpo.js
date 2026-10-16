@@ -19,7 +19,7 @@ import { tarjetaEquilibrio } from './equilibrio.js';
 const SERIES_MINIMAS = 10;
 const SERIES_MAXIMAS = 20;
 
-export function tarjetaRecuperacion(datos, { compacta = false } = {}) {
+export function tarjetaRecuperacion(datos, { compacta = false, extra = null } = {}) {
   // El cardio general (correr, HIIT) no tiene músculo principal a propósito.
   const sinMusculos = datos.ejercicios.filter((e) => !e.archivado && !e.borrado && cuentaParaFatiga(e)
     && e.grupo !== 'cardio' && !e.musculos?.principales?.length);
@@ -78,6 +78,7 @@ export function tarjetaRecuperacion(datos, { compacta = false } = {}) {
         + 'Morán-Navarro (2017) y Pareja-Blanco (2019 y 2020). La forma de la curva del volumen y la media con la serie más dura '
         + 'son aproximaciones de la app. No hay estudios que den un tiempo fijo por músculo; por eso existe el ajuste personal.')),
 
+    extra,
     compacta && h('a', { class: 'boton enlace', href: '#/cuerpo' }, 'Ver el mapa del cuerpo y el volumen'));
 }
 

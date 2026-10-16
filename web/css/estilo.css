@@ -1489,3 +1489,36 @@ div.sugerencia > span { display: block; }
 .fila-peso .numero-peso { width: 6em; text-align: center; min-height: 44px; font-size: 16px; }
 .grafica-peso { width: 100%; max-width: 360px; margin: 0 auto; color: var(--acento); }
 .tarjeta-peso table { margin: 0 auto; }
+
+/* 0.46: Hoy en breve y «¿Voy hoy?» paso a paso */
+.cabecera-seccion { display: flex; flex-direction: column; align-items: center; gap: 2px; margin-bottom: 8px; }
+.cabecera-seccion h2 { margin: 0; }
+.cabecera-seccion .boton-detalle { padding: 4px 8px; min-height: 0; font-size: 0.85rem; }
+.lista-recientes { display: grid; gap: 8px; }
+.fila-enlace.breve { padding: 8px 12px; }
+.progreso-voy { height: 10px; border-radius: 5px; background: var(--superficie-2, var(--borde)); overflow: hidden; }
+.progreso-voy .relleno { display: block; height: 100%; border-radius: 5px; background: var(--acento); transition: width .25s; }
+.paso-voy { margin: -6px 0 0; }
+.opciones-voy { display: grid; gap: 8px; }
+.opciones-voy .boton-marca { min-height: 48px; }
+.lista-prehechos { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.lista-prehechos li { display: flex; align-items: center; justify-content: space-between; gap: 8px; text-align: left; }
+
+/* 0.46: editor de rutinas */
+.lineas-series { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.lineas-series li { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 4px 6px 10px;
+  border-radius: var(--radio-pequeno); background: var(--superficie-2); }
+.lineas-series li span { text-align: left; }
+.lineas-series .boton-icono { min-width: 40px; min-height: 40px; }
+.sin-usar { display: grid; gap: 6px; justify-items: center; }
+.contador-series { display: grid; gap: 4px; justify-items: center; }
+.paso-a-paso { display: flex; align-items: center; justify-content: center; gap: 12px; }
+.paso-a-paso .boton { min-width: 56px; font-size: 1.4rem; padding: 4px 0; }
+.numero-grande { font-size: 1.8rem; min-width: 2ch; text-align: center; }
+.chips.rangos { justify-content: center; margin-bottom: 4px; }
+.anadir-rapido .donde .boton-marca { flex: 1 1 0; }
+.anadir-rapido .etiqueta-campo { text-align: center; margin: 4px 0 2px; }
+.pegar-rutina textarea { width: 100%; font-size: 14px; font-family: ui-monospace, Consolas, monospace; }
+.dia-previo { text-align: left; }
+.dia-previo > strong { display: block; text-align: center; margin-bottom: 6px; }
+.aviso-color { color: var(--aviso); }

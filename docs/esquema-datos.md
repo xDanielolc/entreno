@@ -537,3 +537,11 @@ la vez, a veces sin cobertura):
   manda en `pesoCorporalKg`, ver `web/js/peso.js`). `serie.hechaA`: hora a
   la que se acabó la serie (para los descansos). `item.superserie`: ese
   ejercicio de la rutina se alterna con el siguiente sin descanso.
+
+- **v15 (0.46.0).** `perfil.redondeoKg` (a qué salto se redondean los pesos
+  que propone la app; 2,5 por defecto) y `ej.redondeoKg` (el del ejercicio,
+  manda sobre el de Ajustes). `perfil.prehechos`: reglas guardadas por el
+  usuario ([{ id, nombre, progresion, tecnicas, descripcion }]); una serie
+  que viene de una lleva `progresion.deMio` con su id. `progresion.recamaraMin`
+  en la doble progresión («carga»): el peso solo sube si la última serie
+  dejó al menos esas en recámara.

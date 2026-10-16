@@ -85,6 +85,8 @@ export function voyHoy(datos, dia) {
   const respuestas = {};
   const app = datosDeLaApp(datos, dia);
   const zona = h('div', { class: 'voy-hoy' });
+  // Qué pregunta se ve: una cada vez. Al contestar se pasa a la siguiente.
+  let paso = 0;
 
   function veredicto() {
     let puntos = app.puntos;
@@ -116,21 +118,41 @@ export function voyHoy(datos, dia) {
   }
 
   function pintar() {
-    const completas = PREGUNTAS.every((p) => respuestas[p.clave]);
+    const n = PREGUNTAS.length;
+    const contestadas = PREGUNTAS.filter((p) => respuestas[p.clave]).length;
+    const barra = h('div', { class: 'progreso-voy', role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': String(n),
+      'aria-valuenow': String(contestadas), 'aria-label': `${contestadas} de ${n} contestadas` },
+    h('span', { class: 'relleno', style: `width: ${(contestadas / n) * 100}%` }));
+    if (paso >= n) {
+      zona.replaceChildren(...[
+        barra,
+        veredicto(),
+        h('div', { class: 'lo-que-se' },
+          h('p', { class: 'etiqueta-campo' }, 'Lo que ya sabía la app'),
+          app.lineas.map((l) => h('p', { class: 'nota' }, l))),
+        h('div', { class: 'fila-botones' },
+          h('button', { type: 'button', class: 'boton secundario', onclick: () => { paso = n - 1; pintar(); } }, '← Atrás'),
+          h('button', { type: 'button', class: 'boton secundario', onclick: () => {
+            for (const p of PREGUNTAS) delete respuestas[p.clave];
+            paso = 0; pintar();
+          } }, 'Otra vez')),
+        h('p', { class: 'nota centrado' }, 'De dónde sale ', ayuda('¿Voy hoy?', 'Solo cuentan las señales de cansancio. '
+          + 'No tener síntomas no es pereza; la pereza es no tener ganas con el cuerpo bien.', { lista: FUENTES })),
+      ].flat().filter(Boolean));
+      return;
+    }
+    const p = PREGUNTAS[paso];
     zona.replaceChildren(...[
-      h('div', { class: 'lo-que-se' },
-        h('p', { class: 'etiqueta-campo' }, 'Lo que ya sé'),
-        app.lineas.map((l) => h('p', { class: 'nota' }, l))),
-      PREGUNTAS.map((p) => h('div', { class: 'pregunta-voy' },
+      barra,
+      h('p', { class: 'nota centrado paso-voy' }, `${paso + 1} de ${n}`),
+      h('div', { class: 'pregunta-voy' },
         h('p', {}, h('strong', {}, p.texto)),
-        h('div', { class: 'fila-marcas compacta' }, p.opciones.map(([k, texto]) => h('button', {
+        h('div', { class: 'opciones-voy' }, p.opciones.map(([k, texto]) => h('button', {
           type: 'button', class: `boton-marca${respuestas[p.clave] === k ? ' activo' : ''}`, 'aria-pressed': String(respuestas[p.clave] === k),
-          onclick: () => { respuestas[p.clave] = k; pintar(); if (PREGUNTAS.every((q) => respuestas[q.clave])) zona.querySelector('.veredicto')?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); },
-        }, texto))))),
-      completas ? veredicto() : h('p', { class: 'nota centrado' }, 'Contesta las cuatro y te digo.'),
-      h('p', { class: 'nota centrado' }, 'De dónde sale ', ayuda('¿Voy hoy?', 'Solo cuentan las señales de cansancio. '
-        + 'No tener síntomas no es pereza; la pereza es no tener ganas con el cuerpo bien.', { lista: FUENTES })),
-    ].flat());
+          onclick: () => { respuestas[p.clave] = k; paso += 1; pintar(); },
+        }, texto)))),
+      paso > 0 && h('button', { type: 'button', class: 'boton enlace', onclick: () => { paso -= 1; pintar(); } }, '← Atrás'),
+    ].flat().filter(Boolean));
   }
   pintar();
   modal('¿Voy hoy?', zona);

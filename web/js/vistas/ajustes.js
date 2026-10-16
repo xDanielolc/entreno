@@ -1,6 +1,6 @@
 import { apuntarPeso } from '../peso.js';
 import { creditosCargados } from '../imagenes.js';
-import { formatearNumero } from '../calculos.js';
+import { REDONDEOS, REDONDEO_POR_DEFECTO, formatearNumero } from '../calculos.js';
 import * as estado from '../estado.js';
 import { apartarCopia, copiasAparte, desconectar, eliminarCuenta, juntarCopia, rehacerCopiasLegibles, sincronizar, situacionActual } from '../sincronizacion.js';
 import { apartadoPlegable, modal, selector } from '../ui.js';
@@ -145,6 +145,21 @@ export function vistaAjustes(contenedor) {
       numeroAjuste('Repeticiones en recámara por defecto', d.perfil.recamaraPorDefecto, (x, v) => { x.perfil.recamaraPorDefecto = v; }),
       h('small', { class: 'nota' }, 'Las que sueles dejarte sin hacer al acabar una serie. Viene puesto 1 porque es lo que recomendamos '
         + '(quedarse a una del fallo rinde casi igual y cansa menos). Aparece ya puesto y se apunta aparte: «45 kg × 12 + 1».'),
+      h('div', { class: 'campo' },
+        h('span', { class: 'etiqueta-campo' }, 'Los pesos que propone la app van de (kg)'),
+        selector(REDONDEOS.map((r) => [r, formatearNumero(r)]), d.perfil.redondeoKg ?? REDONDEO_POR_DEFECTO,
+          (v) => estado.cambiar((x) => { x.perfil.redondeoKg = v; }), { titulo: 'Redondeo de los pesos', botones: true }),
+        h('small', { class: 'nota' }, 'El disco más pequeño que tengas, por los dos lados: con discos de 1,25 kg, 2,5. '
+          + 'Cada ejercicio puede llevar el suyo en «Ajustes finos» de su ficha (mancuernas de 2 en 2, por ejemplo).')),
+      (d.perfil.prehechos ?? []).length > 0 && h('div', { class: 'campo' },
+        h('span', { class: 'etiqueta-campo' }, 'Mis prehechos (reglas guardadas)'),
+        h('ul', { class: 'lista-prehechos' }, d.perfil.prehechos.map((m) => h('li', {},
+          h('span', {}, h('strong', {}, m.nombre), h('small', { class: 'bloque suave' }, m.descripcion)),
+          h('button', { type: 'button', class: 'boton-icono papelera', 'aria-label': `Quitar ${m.nombre}`, onclick: async () => {
+            if (!await confirmar(`¿Quitar el prehecho «${m.nombre}»? Las series que ya lo usan no cambian.`, { si: 'Quitar', peligro: true })) return;
+            estado.cambiar((x) => { x.perfil.prehechos = x.perfil.prehechos.filter((y) => y.id !== m.id); });
+          } }, '🗑')))),
+        h('small', { class: 'nota' }, 'Se guardan desde la ficha de un ejercicio, con «Guardar esta regla como prehecho mío».')),
       h('div', { class: 'campo' },
         h('span', { class: 'etiqueta-campo' }, 'Los «?» que explican las palabras'),
         opciones(MODOS_GLOSARIO, modoGlosario(d), (m) => estado.cambiar((x) => { x.perfil.glosario = m; }), { compacto: true }),

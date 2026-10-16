@@ -6,10 +6,12 @@
 
 import * as estado from '../estado.js';
 import { nombreSede, sedeInicial, sedesActivas } from '../sedes.js';
-import { anadir, aviso, confirmar, h, hoyISO, leerNumero, nuevoId, selector } from '../ui.js';
+import { anadir, aviso, confirmar, h, hoyISO, leerNumero, modal, nuevoId, selector } from '../ui.js';
 import { imagenDeEjercicio } from '../imagenes.js';
-import { planPorDefecto, planesDeItem, resumenPlanes, textoPlan } from '../series.js';
-import { progresionPorDefecto, serieNuevaPlantilla } from '../esquema.js';
+import { planesDeItem, resumenPlanes, serieSuelta, textoPlan } from '../series.js';
+import { RANGOS_REPS, TIEMPOS, crearPlanesRapidos, formaInicial, formasPara, mideTiempo, textoForma, textoTiempo } from '../rapidas.js';
+import { EJEMPLO, analizarRutina, crearRutinaDesdeTexto, cuadrarEjercicio, textoFormas } from '../rutina-texto.js';
+import { ayuda } from '../ui.js';
 import { campo } from './ejercicios.js';
 import { ejercicioDesdeCatalogo, elegirEjercicio as abrirSelector } from './selector-ejercicios.js';
 import { tipoDePlantilla, tipoDeRutina, PLANTILLAS, anadirPlantilla, ejerciciosNuevos } from '../plantillas.js';
@@ -107,6 +109,7 @@ export function empezarDia(rutina, dia, crearSerie) {
       const planes = planesDeItem(ej, item);
       const entrada = { ejercicioId: ej.id, cicloN: null, diaCiclo: null, notas: '',
         series: planes.flatMap((plan) => { const s = crearSerie(datos, ej, plan, id); return Array.isArray(s) ? s : [s]; }) };
+      if (!entrada.series.length) entrada.series.push(serieSuelta());
       const bilbo = entrada.series.find((x) => x.cicloN != null);
       if (bilbo) { entrada.cicloN = bilbo.cicloN; entrada.diaCiclo = bilbo.diaCiclo; }
       sesion.ejercicios.push(entrada);
@@ -151,6 +154,7 @@ export function vistaRutinas(contenedor) {
     h('div', { class: 'cabecera-vista' },
       h('h1', {}, 'Rutinas'),
       h('a', { class: 'boton', href: '#/rutina/nueva' }, '+ Nueva')),
+    h('button', { type: 'button', class: 'boton secundario', onclick: () => pegarRutina(d) }, 'Pegar una rutina escrita (texto o tabla)'),
     pista('rutinas', 'Tus días de entrenamiento en orden. Las activas son las que te propone Hoy. Abajo, prehechas para empezar ya.'),
     !d.rutinas.length && h('p', { class: 'suave' },
       'Una rutina son tus días de entrenamiento en orden. La app te propondrá el siguiente cada vez que entrenes.'),
@@ -206,6 +210,81 @@ function tarjetaPlantilla(d, plantilla) {
         h('p', {}, h('strong', {}, dia.nombre)),
         h('ul', {}, dia.ejercicios.map((x) => h('li', {}, x.nombre + (x.opcional ? ' (opcional)' : '') + (x.nota ? ` · ${x.nota}` : ''))))))),
     h('button', { class: 'boton secundario anadir-plantilla', onclick: anadir }, yaEsta ? 'Añadir otra copia' : 'Añadir a mis rutinas'));
+}
+
+// ---------------------------------------------------------------------------
+// Pegar una rutina escrita
+// ---------------------------------------------------------------------------
+
+const AYUDA_PEGAR = [
+  'Pega la rutina tal y como la tengas escrita: una línea por ejercicio («Press de banca: máxima 1-2 + 4 × 4 fuerza») con los '
+    + 'días como cabecera («Día 1: Torso»), o una tabla con columnas sesión, ejercicio, series × repeticiones y tipo (la que suelen '
+    + 'escribir las IA). Antes de crear nada te enseño lo que he entendido.',
+  'Palabras que entiendo en las series: Bilbo, máxima (1-2 pesadas), fuerza (2 en recámara), drop (set en la última), '
+    + 'calentamiento, min o s (tiempo), opcional y superserie. Las series van con «×» o «x»: «3 × 8-10», «1 × 20-30», «15 min».',
+  'Los ejercicios que ya tienes se usan tal cual; los de la lista general se crean con su foto y sus músculos; el resto se crean '
+    + 'en blanco y los completas en su ficha.',
+];
+
+function pegarRutina(d) {
+  const caja = h('textarea', { rows: 10, placeholder: EJEMPLO, 'aria-label': 'Rutina escrita', spellcheck: 'false' });
+  const nombre = h('input', { type: 'text', placeholder: 'Nombre de la rutina', 'aria-label': 'Nombre de la rutina' });
+  const zona = h('div', { class: 'formulario pegar-rutina' });
+  const cerrar = modal('Pegar una rutina', zona);
+
+  function pintarEntrada() {
+    zona.replaceChildren(...[
+      h('p', { class: 'nota centrado' }, 'Una línea por ejercicio o una tabla. Cómo se escribe ', ayuda('Pegar una rutina', AYUDA_PEGAR)),
+      campo('Nombre', nombre),
+      caja,
+      h('div', { class: 'fila-botones' },
+        h('button', { type: 'button', class: 'boton secundario', onclick: () => { caja.value = EJEMPLO; } }, 'Poner un ejemplo'),
+        h('button', { type: 'button', class: 'boton', onclick: () => {
+          const analisis = analizarRutina(caja.value);
+          if (!analisis.dias.length) { aviso('No he encontrado ningún ejercicio. Mira el «?» para ver cómo se escribe.', { tipo: 'error' }); return; }
+          pintarVistaPrevia(analisis);
+        } }, 'Ver qué he entendido')),
+    ]);
+    setTimeout(() => caja.focus(), 50);
+  }
+
+  function pintarVistaPrevia(analisis) {
+    const cuadres = new Map();
+    const cuadreDe = (item) => {
+      const clave = normalizar(item.nombre);
+      if (!cuadres.has(clave)) cuadres.set(clave, cuadrarEjercicio(d, item.nombre, item.formas));
+      return cuadres.get(clave);
+    };
+    const etiqueta = (c) => (c.tuyo ? (c.parecido ? `tuyo: ${c.tuyo.nombre}` : 'tuyo')
+      : c.catalogo ? (c.parecido ? `de la lista: ${c.catalogo.nombre}` : 'de la lista general') : 'nuevo, en blanco');
+    const nuevos = [...cuadres.values()].filter((c) => c.nuevo).length;
+    zona.replaceChildren(...[
+      h('p', { class: 'nota centrado' }, `${analisis.dias.length} ${analisis.dias.length === 1 ? 'día' : 'días'} y `
+        + `${analisis.dias.reduce((n, x) => n + x.ejercicios.length, 0)} ejercicios. Si algo no cuadra, vuelve atrás y corrige el texto.`),
+      analisis.avisos.length > 0 && h('div', { class: 'aviso-texto' }, analisis.avisos.map((a) => h('p', {}, a))),
+      analisis.dias.map((dia) => h('div', { class: 'tarjeta dia-previo' },
+        h('strong', {}, dia.nombre),
+        h('ul', { class: 'lineas-series' }, dia.ejercicios.map((item) => {
+          const c = cuadreDe(item);
+          return h('li', {}, h('span', {},
+            h('strong', {}, item.nombre), h('small', { class: `bloque ${c.nuevo ? 'aviso-color' : 'suave'}` }, etiqueta(c)),
+            h('small', { class: 'bloque' }, textoFormas(item.formas, c.tuyo ?? null)
+              + (item.opcional ? ' · opcional' : '') + (item.superserie ? ' · superserie' : ''))));
+        })))),
+      nuevos > 0 && h('p', { class: 'nota centrado' }, `${nuevos} ${nuevos === 1 ? 'ejercicio se creará' : 'ejercicios se crearán'} en blanco `
+        + '(con peso y repeticiones, o tiempo si son minutos): luego pon su tipo y sus músculos en la ficha.'),
+      h('div', { class: 'fila-botones' },
+        h('button', { type: 'button', class: 'boton secundario', onclick: pintarEntrada }, '← Corregir'),
+        h('button', { type: 'button', class: 'boton', onclick: () => {
+          let id;
+          estado.cambiar((datos) => { id = crearRutinaDesdeTexto(datos, analisis, { nombre: nombre.value.trim() || analisis.nombre || 'Rutina pegada' }); });
+          cerrar();
+          aviso('Rutina creada. Revisa cada día y toca un ejercicio para cambiar sus series.');
+          location.hash = `#/rutina/${id}`;
+        } }, 'Crear la rutina')),
+    ].flat().filter(Boolean));
+  }
+  pintarEntrada();
 }
 
 // ---------------------------------------------------------------------------
@@ -364,7 +443,7 @@ export function vistaFormularioRutina(contenedor, { id }) {
     const clave = `${dia.id}:${item.ejercicioId}`;
     const abierto = abiertosRutina.has(clave);
     const imagen = ej && imagenDeEjercicio(ej);
-    const resumen = ej ? resumenPlanes(planesDeItem(ej, item)) : '';
+    const resumen = ej ? resumenPlanes(planesDeItem(ej, item), ej) : '';
     const nombre = ej?.nombre ?? 'Ejercicio borrado';
     return h('div', { class: `ej-rutina${abierto ? ' abierto' : ''}` },
       h('button', { type: 'button', class: 'ej-rutina-cabecera', 'aria-expanded': String(abierto),
@@ -388,23 +467,27 @@ export function vistaFormularioRutina(contenedor, { id }) {
       h('button', { type: 'button', class: 'boton secundario', disabled: j === 0, onclick: () => mover(-1) }, '↑ Subir'),
       h('button', { type: 'button', class: 'boton secundario', disabled: j === dia.ejercicios.length - 1, onclick: () => mover(1) }, '↓ Bajar'));
     if (!ej) return h('div', { class: 'ej-rutina-detalle' }, orden, quitar);
-    const visibles = (ej.series || []).filter((p) => !p.soloRutina || p.soloRutina === borrador.id);
-    const usadas = new Set(planesDeItem(ej, item).map((p) => p.id));
-    const sueltas = visibles.filter((p) => p.soloRutina && !borrador.dias.some((x) => x.ejercicios
-      .some((y) => y.ejercicioId === ej.id && y.series?.includes(p.id))));
+    const usadas = planesDeItem(ej, item);
+    const usadasIds = new Set(usadas.map((p) => p.id));
+    // Las que podrían entrar en este día y hoy no están: las del ejercicio
+    // y las «solo aquí» de esta rutina que ningún día usa.
+    const sinUsar = (ej.series || []).filter((p) => !usadasIds.has(p.id) && (!p.soloRutina || p.soloRutina === borrador.id))
+      .filter((p) => !p.soloRutina || !borrador.dias.some((x) => x.ejercicios.some((y) => y.ejercicioId === ej.id && y.series?.includes(p.id))));
     return h('div', { class: 'ej-rutina-detalle' },
       h('p', { class: 'etiqueta-campo' }, 'Series de este día'),
-      visibles.length
-        ? h('div', { class: 'fila-marcas compacta planes-dia' }, visibles.map((p) => h('button', {
-          type: 'button', class: `boton-marca${usadas.has(p.id) ? ' activo' : ''}`, 'aria-pressed': String(usadas.has(p.id)),
-          onclick: () => { alternarPlan(item, ej, visibles, usadas, p); repintar(); },
-        }, textoPlan(p) + (p.soloRutina ? ' · solo aquí' : ''))))
-        : h('p', { class: 'suave' }, 'Este ejercicio aún no tiene series: añádelas aquí abajo.'),
-      visibles.length > 0 && h('small', { class: 'nota' }, 'Toca una serie para ponerla o quitarla este día. Al entrenar sin rutina se usan las que no dicen «solo aquí».'),
-      sueltas.length > 0 && h('button', { type: 'button', class: 'boton secundario', onclick: () => quitarSueltas(ej, sueltas) },
-        `Borrar ${sueltas.length === 1 ? 'la serie «solo aquí» que no usa' : `las ${sueltas.length} series «solo aquí» que no usa`} ningún día`),
-      anadirRapido(item, ej, clave),
-      planesDeItem(ej, item).some((p) => (p.tecnicas || []).includes('drop-set')) && campo('Pesos del drop set', selector([
+      usadas.length
+        ? h('ul', { class: 'lineas-series' }, agrupar(usadas, ej).map((g) => h('li', {},
+          h('span', {}, g.texto, g.planes[0].soloRutina ? '' : h('small', { class: 'suave' }, ' · del ejercicio')),
+          h('button', { type: 'button', class: 'boton-icono', 'aria-label': `Quitar ${g.texto} de este día`,
+            onclick: () => quitarDelDia(item, ej, g.planes) }, '✕'))))
+        : h('p', { class: 'suave centrado' }, 'Aún sin series: añade las de este día.'),
+      h('button', { type: 'button', class: 'boton', onclick: () => abrirAnadir(item, ej) }, '+ Añadir series'),
+      sinUsar.length > 0 && h('div', { class: 'sin-usar' },
+        h('small', { class: 'nota' }, 'Sin usar este día (toca para ponerla):'),
+        h('div', { class: 'fila-marcas compacta' }, agrupar(sinUsar, ej).map((g) => h('button', { type: 'button', class: 'boton-marca',
+          onclick: () => { item.series = [...usadasIds, ...g.planes.map((p) => p.id)]; normalizarItem(item, ej); repintar(); } },
+        `+ ${g.texto}`)))),
+      usadas.some((p) => (p.tecnicas || []).includes('drop-set')) && campo('Pesos del drop set', selector([
         ['', 'Como en el ejercicio'], ['rm', 'Automáticos (% de tu 1RM)'], ['kg', 'Los pongo yo']],
       item.modoCarga ?? '', (v) => { item.modoCarga = v || null; repintar(); }, { titulo: 'Pesos del drop set en esta rutina' })),
       h('div', { class: 'fila-marcas compacta' },
@@ -422,79 +505,109 @@ export function vistaFormularioRutina(contenedor, { id }) {
         quitar));
   }
 
-  // Pone o quita una serie del día. Si queda igual que las del ejercicio,
-  // el día vuelve a «las del ejercicio» (y sigue sus cambios).
-  function alternarPlan(item, ej, visibles, usadas, plan) {
-    if (usadas.has(plan.id)) usadas.delete(plan.id); else usadas.add(plan.id);
-    const elegidas = visibles.filter((p) => usadas.has(p.id)).map((p) => p.id);
+  // Series iguales seguidas, en una línea: «4 × 4 (2 en recámara)».
+  function agrupar(planes, ej) {
+    const grupos = [];
+    for (const p of planes) {
+      const t = textoPlan(p, ej);
+      const ultimo = grupos.at(-1);
+      if (ultimo && ultimo.t === t && Boolean(ultimo.planes[0].soloRutina) === Boolean(p.soloRutina)) ultimo.planes.push(p);
+      else grupos.push({ t, planes: [p] });
+    }
+    return grupos.map((g) => ({ ...g, texto: resumenPlanes(g.planes, ej) }));
+  }
+
+  // Si el día usa exactamente las series del ejercicio, vuelve a «las del
+  // ejercicio» (null) y así sigue sus cambios.
+  function normalizarItem(item, ej) {
     const delEjercicio = (ej.series || []).filter((p) => !p.soloRutina).map((p) => p.id);
+    const elegidas = item.series ?? delEjercicio;
     const iguales = elegidas.length === delEjercicio.length && elegidas.every((id) => delEjercicio.includes(id));
     item.series = iguales ? null : elegidas;
   }
 
-  function quitarSueltas(ej, sueltas) {
+  // Quitar unas series del día: las del ejercicio solo se desmarcan; las
+  // «solo aquí» que ningún otro día usa se borran del ejercicio (si ya
+  // tienen historial, se retiran sin borrarlas).
+  function quitarDelDia(item, ej, planes) {
+    const ids = new Set(planes.map((p) => p.id));
+    item.series = planesDeItem(ej, item).filter((p) => !ids.has(p.id)).map((p) => p.id);
+    const sueltas = planes.filter((p) => p.soloRutina === borrador.id && !borrador.dias.some((x) => x.ejercicios
+      .some((y) => y !== item && y.ejercicioId === ej.id && y.series?.includes(p.id))));
+    normalizarItem(item, ej);
+    if (!sueltas.length) { repintar(); return; }
     const conHistorial = new Set(d.sesiones.flatMap((s) => s.ejercicios.flatMap((x) => x.series.map((y) => y.planId))));
     cambiarConRutina((datos) => {
       const propio = datos.ejercicios.find((e) => e.id === ej.id);
-      // Las que ya tienen series hechas se quedan (sin salir en ningún día).
       propio.series = propio.series.filter((p) => !sueltas.some((x) => x.id === p.id) || conHistorial.has(p.id));
       for (const p of propio.series) if (sueltas.some((x) => x.id === p.id)) p.soloRutina = 'retirada';
     });
     repintar();
   }
 
-  // «3 × 6-8» y el tipo: lo más rápido para montar un día.
-  function anadirRapido(item, ej, clave) {
-    const tiempo = ej.esfuerzo?.tipo === 'tiempo';
-    const f = formasRapidas.get(clave) ?? { n: 3, de: tiempo ? 30 : 8, a: tiempo ? 60 : 10, tipo: 'normal', donde: 'rutina' };
+  // «Añadir series»: un cartel con la forma (normales, fuerza, Bilbo…), cuántas
+  // y de cuántas a cuántas, todo con un toque. Lo elegido se recuerda por
+  // ejercicio mientras montas la rutina.
+  function abrirAnadir(item, ej) {
+    const clave = `${ej.id}`;
+    const f = formasRapidas.get(clave) ?? { ...formaInicial(ej), donde: (ej.series || []).some((p) => !p.soloRutina) ? 'rutina' : 'ejercicio' };
     formasRapidas.set(clave, f);
-    const conPeso = ej.carga?.tipo !== 'ninguna' && ej.esfuerzo?.tipo === 'repeticiones';
-    const tipos = [['normal', 'Normales'], ['ultima-drop', 'Drop set en la última'],
-      ...(conPeso ? [['bilbo', 'Bilbo'], ['maxima', 'Serie máxima']] : [])];
-    const numero = (valor, etiqueta, alCambiar) => h('input', { type: 'text', inputmode: 'numeric', class: 'numero-corto', value: String(valor),
-      'aria-label': etiqueta, oninput: (e) => { const v = leerNumero(e.target.value); if (v != null) alCambiar(Math.round(v)); } });
-    const unidad = tiempo ? 's' : 'reps';
-    return h('div', { class: 'anadir-rapido' },
-      h('p', { class: 'etiqueta-campo' }, 'Añadir series'),
-      h('div', { class: 'fila-marcas compacta' }, tipos.map(([k, texto]) => h('button', {
-        type: 'button', class: `boton-marca${f.tipo === k ? ' activo' : ''}`, 'aria-pressed': String(f.tipo === k),
-        onclick: () => {
-          if (k === 'maxima') Object.assign(f, { n: 1, de: 1, a: 2 });
-          else if (f.tipo === 'maxima') Object.assign(f, { n: 3, de: 8, a: 10 });
-          f.tipo = k; repintar();
-        } }, texto))),
-      f.tipo !== 'bilbo' && h('div', { class: 'fila-rapida' },
-        numero(f.n, 'Número de series', (v) => { f.n = v; }), h('span', {}, 'series de'),
-        numero(f.de, 'Mínimo', (v) => { f.de = v; }), h('span', {}, 'a'),
-        h('span', { class: 'sin-cortar' }, numero(f.a, 'Máximo', (v) => { f.a = v; }), ` ${unidad}`)),
-      h('small', { class: 'nota' }, {
-        normal: 'Doble progresión: con el mismo peso subes repeticiones; cuando llegas al máximo en todas, sube el peso.',
-        'ultima-drop': 'Igual que las normales, y la última sigue bajando el peso sin descansar (drop set).',
-        bilbo: 'Una serie Bilbo: 20-30 repeticiones al principio y el peso sube cada sesión.',
-        maxima: 'Una serie pesada de pocas repeticiones (1-2 con 1 o 2 en recámara): tu 1RM sale de aquí.',
-      }[f.tipo]),
-      h('div', { class: 'fila-marcas compacta' }, [['rutina', 'Solo en esta rutina'], ['ejercicio', 'En el ejercicio (siempre)']]
-        .map(([k, texto]) => h('button', { type: 'button', class: `boton-marca${f.donde === k ? ' activo' : ''}`,
-          'aria-pressed': String(f.donde === k), onclick: () => { f.donde = k; repintar(); } }, texto))),
-      h('button', { type: 'button', class: 'boton', onclick: () => crearRapidas(item, ej, f) }, 'Añadir'));
+    const formas = formasPara(ej, d.perfil);
+    const tiempo = mideTiempo(ej);
+    const zona = h('div', { class: 'anadir-rapido' });
+    const cerrar = modal(`Añadir series: ${ej.nombre}`, zona);
+
+    const elegirForma = (k) => {
+      const base = formas[k];
+      f.tipo = k;
+      if (base.de != null) { f.n = base.n ?? 1; f.de = base.de; f.a = base.a; }
+      else if (k === 'bilbo') f.n = 1;
+      pintar();
+    };
+    const pintar = () => {
+      const base = formas[f.tipo] ?? formas.normal;
+      const texto = textoForma(f, ej);
+      zona.replaceChildren(...[
+        h('div', { class: 'fila-marcas compacta' }, Object.entries(formas).map(([k, x]) => h('button', {
+          type: 'button', class: `boton-marca${f.tipo === k ? ' activo' : ''}`, 'aria-pressed': String(f.tipo === k),
+          onclick: () => elegirForma(k) }, x.etiqueta))),
+        h('small', { class: 'nota centrado' }, base.explica),
+        f.tipo !== 'bilbo' && h('div', { class: 'contador-series' },
+          h('span', { class: 'etiqueta-campo' }, 'Cuántas'),
+          h('div', { class: 'paso-a-paso' },
+            h('button', { type: 'button', class: 'boton secundario', 'aria-label': 'Una menos', disabled: f.n <= 1,
+              onclick: () => { f.n = Math.max(1, f.n - 1); pintar(); } }, '−'),
+            h('strong', { class: 'numero-grande' }, String(f.n)),
+            h('button', { type: 'button', class: 'boton secundario', 'aria-label': 'Una más', disabled: f.n >= 20,
+              onclick: () => { f.n = Math.min(20, f.n + 1); pintar(); } }, '+'))),
+        f.tipo !== 'bilbo' && h('div', {},
+          h('span', { class: 'etiqueta-campo' }, tiempo ? 'Cuánto tiempo' : 'Repeticiones'),
+          h('div', { class: 'chips rangos' }, (tiempo ? TIEMPOS.map((s) => [s, s]) : RANGOS_REPS).map(([de, a]) => h('button', {
+            type: 'button', class: `chip seleccionable${f.de === de && f.a === a ? ' activo' : ''}`, 'aria-pressed': String(f.de === de && f.a === a),
+            onclick: () => { f.de = de; f.a = a; pintar(); } }, tiempo ? textoTiempo(de) : de === a ? String(de) : `${de}-${a}`))),
+          h('div', { class: 'fila-rapida' },
+            h('span', {}, 'o de'),
+            numero(f.de, 'Mínimo', (v) => { f.de = v; }),
+            h('span', {}, 'a'),
+            h('span', { class: 'sin-cortar' }, numero(f.a, 'Máximo', (v) => { f.a = v; }), tiempo ? ' s' : ' reps'))),
+        h('div', { class: 'fila-marcas compacta donde' }, [['rutina', 'Solo en esta rutina'], ['ejercicio', 'También sin rutina']]
+          .map(([k, texto]) => h('button', { type: 'button', class: `boton-marca${f.donde === k ? ' activo' : ''}`,
+            'aria-pressed': String(f.donde === k), onclick: () => { f.donde = k; pintar(); } }, texto))),
+        h('button', { type: 'button', class: 'boton grande', onclick: () => { if (crearRapidas(item, ej, f)) cerrar(); } },
+          `Añadir ${texto}`),
+      ].flat().filter(Boolean));
+    };
+    const numero = (valor, etiqueta, alCambiar) => h('input', { type: 'text', inputmode: 'numeric', class: 'numero-corto', value: String(valor ?? ''),
+      'aria-label': etiqueta, oninput: (e) => { const v = leerNumero(e.target.value); if (v != null) { alCambiar(Math.round(v)); actualizarBoton(); } } });
+    const actualizarBoton = () => { const b = zona.querySelector('.boton.grande'); if (b) b.textContent = `Añadir ${textoForma(f, ej)}`; };
+    pintar();
   }
 
   function crearRapidas(item, ej, f) {
-    const de = Math.min(f.de, f.a), a = Math.max(f.de, f.a);
-    if (f.tipo !== 'bilbo' && !(f.n >= 1 && f.n <= 20 && de >= 1)) { aviso('Pon de 1 a 20 series y un número de repeticiones', { tipo: 'error' }); return; }
-    const normal = () => {
-      const plan = serieNuevaPlantilla(ej, { tipo: 'libre', progresion: 'carga' });
-      plan.progresion = { ...progresionPorDefecto('carga', ej), objetivoEsfuerzo: [de, a] };
-      plan.objetivoEsfuerzo = [de, a];
-      return plan;
-    };
-    let nuevos;
-    if (f.tipo === 'bilbo') {
-      nuevos = [planPorDefecto({ perfil: { cuestionario: { objetivo: 'fuerza' } } }, ej)];
-    } else {
-      nuevos = Array.from({ length: f.n }, normal);
-      if (f.tipo === 'ultima-drop') { nuevos.at(-1).tecnicas = ['drop-set']; nuevos.at(-1).tipo = 'intensidad'; }
+    if (f.tipo !== 'bilbo' && !(f.n >= 1 && f.n <= 20 && Math.min(f.de, f.a) >= 1)) {
+      aviso('Pon de 1 a 20 series y un número de repeticiones', { tipo: 'error' }); return false;
     }
+    const nuevos = crearPlanesRapidos(d, ej, f);
     const antes = planesDeItem(ej, item).map((p) => p.id);
     cambiarConRutina((datos) => {
       const propio = datos.ejercicios.find((e) => e.id === ej.id);
@@ -502,8 +615,9 @@ export function vistaFormularioRutina(contenedor, { id }) {
       // El día se queda con lo que tenía más lo nuevo.
       if (f.donde === 'rutina' || item.series) item.series = [...antes, ...nuevos.map((p) => p.id)];
     });
-    aviso(`Añadido: ${resumenPlanes(nuevos)}`);
+    aviso(`Añadido: ${resumenPlanes(nuevos, ej)}`);
     repintar();
+    return true;
   }
 
   // Cambia ejercicios y, a la vez, guarda la rutina (si ya tiene nombre):
@@ -544,6 +658,9 @@ export function vistaFormularioRutina(contenedor, { id }) {
   // quedaba sin él.
   function desdeCatalogo(dia, x) {
     const nuevo = ejercicioDesdeCatalogo(x);
+    // Sin series de por defecto: las de cada día se ponen aquí. Si alguna
+    // vez se entrena sin rutina, entonces sí recibe las de por defecto.
+    nuevo.series = [];
     dia.ejercicios.push({ ejercicioId: nuevo.id, opcional: false, series: null });
     abiertosRutina.add(`${dia.id}:${nuevo.id}`);
     cambiarConRutina((datos) => { datos.ejercicios.push(nuevo); });

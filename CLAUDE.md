@@ -551,3 +551,36 @@ repasar una capa: renderizar el SVG del cuerpo ampliado con rejilla y las
 capas encima (Chrome sin ventana) y trazar sobre las líneas que se ven.
 Almacén de imágenes `entreno-imagenes-7`, el mismo nombre en `sw.js` y en
 `app.js` (antes app.js usaba otro y el service worker lo borraba).
+
+## Ronda 0.46.0 (16-10-2026): meter una rutina sin sufrir
+
+Esquema v15. Dan va a meter su rutina nueva de fuerza (cuatro días, series
+máxima + 4 × 4 con 2 en recámara, Bilbo + normales, drop set en la última).
+Lo que cambió para que eso sea fácil:
+- `web/js/rapidas.js`: las «formas» de serie (normales, fuerza con 2 en
+  recámara, drop set en la última, Bilbo, serie máxima, calentamiento y los
+  prehechos del usuario) y `crearPlanesRapidos()`, que usan el editor de
+  rutinas y la rutina pegada.
+- Editor de rutinas: las series del día son una lista con ✕ (`quitarDelDia`:
+  las del ejercicio solo se desmarcan; las «solo aquí» sin otro día se
+  borran) y «+ Añadir series» abre un cartel con un toque por cosa (forma,
+  cuántas con − y +, rango de repeticiones o tiempo en chips). Un ejercicio
+  de la lista general entra en la rutina **sin series** (`nuevo.series = []`);
+  las primeras que se le añaden son las suyas y las demás, «solo aquí».
+- `web/js/rutina-texto.js`: «Pegar una rutina escrita»: líneas
+  «Ejercicio: 1 × 1-2 máxima + 4 × 4 fuerza» o una tabla con sesión,
+  ejercicio, series, tipo y cómo (la que escriben las IA); entiende Bilbo,
+  máxima, fuerza, drop, calentamiento, min/s, opcional, superserie y «N en
+  recámara». Cuadra nombres con los tuyos y el catálogo por palabras
+  (`parecidoDeNombres`); el resto se crean en blanco. Vista previa antes de
+  crear. Su tabla real (borrador 10) entra entera sin avisos.
+- Doble progresión con `recamaraMin` (sube solo si dejaste esas en recámara)
+  y el salto al disco disponible. Prehecho «De 3 a 5 con 2 en recámara ·
+  fuerza»; Bilbo pasa al grupo Hipertrofia (series de 15-30 cerca del fallo).
+- Prehechos míos: `perfil.prehechos`, «Guardar esta regla como prehecho mío»
+  en la ficha (grupo «Míos»), se quitan en Ajustes.
+- Redondeo: `perfil.redondeoKg` (Ajustes) y `ej.redondeoKg` (Ajustes finos);
+  `fijarRedondeo()` en calculos.js lo recibe desde `estado.emitir`.
+- Hoy: «¿Voy hoy?» dentro de la tarjeta Recuperación, una pregunta cada vez
+  con barra de progreso; últimos entrenamientos en breve (fecha y día) con
+  «Con detalle» recordado en localStorage.

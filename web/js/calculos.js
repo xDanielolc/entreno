@@ -126,17 +126,26 @@ export function sugerenciaSerie(datos, ejercicio, plan, { excluirSesion } = {}) 
 
   if (prog.tipo === 'carga') {
     const [, max] = prog.objetivoEsfuerzo || [];
-    if (!ultima) return { ...base, rango: prog.objetivoEsfuerzo, carga: referencia?.serie.carga ?? null };
+    if (!ultima) return { ...base, rango: prog.objetivoEsfuerzo, recamaraMin: prog.recamaraMin ?? null, carga: referencia?.serie.carga ?? null };
     const valorUltimo = sobre === 'carga' ? ultima.serie.carga : esfuerzoTotal(ultima.serie);
-    const sube = max != null && esfuerzoTotal(ultima.serie) >= max;
-    // En una máquina con sus pesos, subir es pasar al siguiente peso que hay.
+    // Sube al llegar al máximo del rango. Si la regla pide recámara (fuerza:
+    // «5 con 2 en recámara»), llegar al máximo apurando no cuenta.
+    const recamaraOk = prog.recamaraMin == null || ultima.serie.recamara == null || ultima.serie.recamara >= prog.recamaraMin;
+    const sube = max != null && esfuerzoTotal(ultima.serie) >= max && recamaraOk;
+    const faltaRecamara = max != null && esfuerzoTotal(ultima.serie) >= max && !recamaraOk;
+    // En una máquina con sus pesos, subir es pasar al siguiente peso que hay;
+    // si no, se suma el incremento y se deja en un peso que exista (disco).
     const siguiente = !sube ? valorUltimo
       : sobre === 'carga' && ejercicio.pesosMaquina?.length ? aPesoDisponible(ejercicio, valorUltimo ?? 0, { hacia: 'arriba' })
-        : redondear((valorUltimo ?? 0) + (prog.incremento || 0));
+        : sobre === 'carga' ? Math.max(aPesoDisponible(ejercicio, (valorUltimo ?? 0) + (prog.incremento || 0)),
+          aPesoDisponible(ejercicio, valorUltimo ?? 0, { hacia: 'arriba' }))
+          : redondear((valorUltimo ?? 0) + (prog.incremento || 0));
     return {
       ...base,
       rango: prog.objetivoEsfuerzo,
+      recamaraMin: prog.recamaraMin ?? null,
       sube,
+      faltaRecamara,
       carga: sobre === 'carga' ? siguiente : ultima.serie.carga,
       esfuerzoObjetivo: sobre === 'carga' ? (sube ? prog.objetivoEsfuerzo?.[0] : null) : siguiente,
     };
@@ -410,19 +419,36 @@ function sugerenciaPrograma(datos, ejercicio, plan, { excluirSesion } = {}) {
     carga: toca.series[0]?.carga ?? null, esfuerzoObjetivo: toca.series[0]?.reps ?? null };
 }
 
-// Redondea a medios discos: en el gimnasio no hay 25,6 kg.
-export function aPasoDeDisco(kg, paso = 2.5) {
+// A qué salto se redondean los pesos que propone la app: lo de Ajustes
+// (`perfil.redondeoKg`, 2,5 kg si no se toca: un disco de 1,25 por lado) o
+// lo del ejercicio (`ej.redondeoKg`: mancuernas de 2 en 2, por ejemplo).
+// El de Ajustes se fija aquí desde el estado para no pasar `datos` a todas
+// las cuentas.
+export const REDONDEO_POR_DEFECTO = 2.5;
+export const REDONDEOS = [0.5, 1, 1.25, 2, 2.5, 5];
+let redondeoGlobal = REDONDEO_POR_DEFECTO;
+export function fijarRedondeo(kg) { redondeoGlobal = kg > 0 ? kg : REDONDEO_POR_DEFECTO; }
+export function pasoDe(ejercicio) { return ejercicio?.redondeoKg > 0 ? ejercicio.redondeoKg : redondeoGlobal; }
+
+// Redondea al salto de disco: en el gimnasio no hay 25,6 kg.
+export function aPasoDeDisco(kg, paso = redondeoGlobal) {
   if (kg == null) return null;
   return redondear(Math.round(kg / paso) * paso, 2);
 }
 
 // Redondea a un peso que exista de verdad: si el ejercicio está atado a una
 // máquina con sus pesos, al más cercano de ellos (o al siguiente por arriba o
-// por abajo); si no, a medios discos.
+// por abajo); si no, al salto de disco del ejercicio o de Ajustes.
 export function aPesoDisponible(ejercicio, kg, { hacia = 'cerca' } = {}) {
   if (kg == null) return null;
   const pesos = ejercicio?.pesosMaquina?.length ? [...ejercicio.pesosMaquina].sort((a, b) => a - b) : null;
-  if (!pesos) return aPasoDeDisco(kg);
+  if (!pesos) {
+    const paso = pasoDe(ejercicio);
+    const cerca = aPasoDeDisco(kg, paso);
+    if (hacia === 'arriba' && cerca <= kg + 0.01) return redondear(cerca + paso, 2);
+    if (hacia === 'abajo' && cerca >= kg - 0.01) return redondear(Math.max(0, cerca - paso), 2);
+    return cerca;
+  }
   if (hacia === 'arriba') return pesos.find((p) => p > kg + 0.01) ?? pesos.at(-1);
   if (hacia === 'abajo') return [...pesos].reverse().find((p) => p < kg - 0.01) ?? pesos[0];
   return pesos.reduce((mejor, p) => (Math.abs(p - kg) < Math.abs(mejor - kg) ? p : mejor), pesos[0]);

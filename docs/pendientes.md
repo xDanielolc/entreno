@@ -84,6 +84,13 @@ y al final lo que es decoración o depende de terceros.
 - [x] Variantes en la lista general: fondos en paralelas con lastre y
       negativos, dominadas con lastre y negativas, flexiones con lastre,
       pájaro a una mano. Las variantes partidas conservan la foto del original.
+- [x] 0.46.0: «¿Voy hoy?» en la tarjeta de recuperación y de una pregunta en
+      una con barra; últimos entrenamientos en breve (con detalle a un toque);
+      Bilbo en hipertrofia; prehecho «De 3 a 5 con 2 en recámara» (doble
+      progresión de fuerza, `recamaraMin`); prehechos míos; redondeo de
+      pesos (Ajustes y por ejercicio); editor de rutinas con las series del
+      día en lista y «Añadir series» en un cartel; «Pegar una rutina escrita»
+      (texto o tabla, `rutina-texto.js`).
 - [x] 0.45.0: superseries en la rutina; consejos de la v044 programados
       (diagnóstico de bajadas y estancamientos, descansos cortos, técnicas
       de más, sin calentar, dolor, peso sin apuntar, llegar cansado, ciclo a

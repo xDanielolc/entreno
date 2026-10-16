@@ -441,8 +441,11 @@ export function vistaSesion(contenedor, { id }) {
     } else {
       const u = (s.ultima ?? s.referencia).serie;
       partes.push(`${s.ultima ? 'Última vez' : 'Última vez (en otra serie)'}: ${textoSerie(ej, u)}`);
-      if (s.modo === 'carga' && s.sube) partes.push(`hoy sube a ${formatearNumero(s.carga)} ${uCarga}`);
-      if (s.modo === 'carga' && !s.sube && s.rango) partes.push(`objetivo ${s.rango[1]} ${uEsf}: al llegar, sube el peso`);
+      if (s.modo === 'carga' && s.sube) partes.push(`hoy sube a ${formatearNumero(s.carga)} ${uCarga}`
+        + (s.rango ? ` × ${s.rango[0] === s.rango[1] ? s.rango[0] : `${s.rango[0]}-${s.rango[1]}`}` : ''));
+      if (s.modo === 'carga' && !s.sube && s.rango) partes.push(`objetivo ${s.rango[1]} ${uEsf}`
+        + (s.recamaraMin ? ` con ${s.recamaraMin} en recámara` : '') + ': al llegar, sube el peso'
+        + (s.faltaRecamara ? ' (la última vez llegaste, pero apurando)' : ''));
       if (s.modo === 'esfuerzo') partes.push(`hoy intenta ${formatearNumero(s.esfuerzoObjetivo)} ${uEsf}`);
     }
     if (!lineas.length) return h('p', { class: 'sugerencia' }, partes.join(' · '));

@@ -216,7 +216,6 @@ export function vistaInicio(contenedor) {
           avisoCuandoToca(d, rutina, dia),
           h('button', { class: 'boton grande', onclick: () => empezarConRutina(dia) }, toca.descansoHoy ? 'Empezar igualmente' : 'Empezar'),
           h('button', { class: 'boton secundario', onclick: elegirDia }, 'Otro día de la rutina'),
-          h('button', { class: 'boton secundario', onclick: () => voyHoy(d, dia) }, '¿Voy hoy? ¿Cansancio o pereza?'),
           // Las explicaciones, en un cartel aparte.
           h('button', { class: 'boton-mas-info', onclick: () => modal('Más info', h('div', { class: 'mas-info' },
             h('h3', {}, '¿Por qué esta y no otra?'),
@@ -248,9 +247,33 @@ export function vistaInicio(contenedor) {
 
     tarjetaSugerenciasAjuste(d),
     avisosDeHoy(d),
-    tarjetaRecuperacion(d, { compacta: true }),
+    tarjetaRecuperacion(d, { compacta: true,
+      extra: h('button', { class: 'boton secundario', onclick: () => voyHoy(d, dia) }, '¿Voy hoy? ¿Cansancio o pereza?') }),
 
-    recientes.length > 0 && h('section', {},
-      h('h2', {}, 'Últimos entrenamientos'),
-      recientes.map((s) => resumenSesion(d, s))));
+    recientes.length > 0 && seccionRecientes(d, recientes));
+}
+
+// Los últimos entrenamientos, en breve (fecha y día de la rutina) o con
+// detalle (los ejercicios), como se prefiera; se recuerda en este aparato.
+function seccionRecientes(d, recientes) {
+  const CLAVE = 'entreno-ultimos-detalle';
+  let detalle = false;
+  try { detalle = localStorage.getItem(CLAVE) === 'si'; } catch { /* sin almacenamiento */ }
+  const lista = h('div', { class: 'lista-recientes' });
+  const boton = h('button', { type: 'button', class: 'boton enlace boton-detalle' });
+  const pintar = () => {
+    lista.replaceChildren(...recientes.map((s) => resumenSesion(d, s, { breve: !detalle })));
+    boton.textContent = detalle ? 'En breve' : 'Con detalle';
+    boton.setAttribute('aria-pressed', String(detalle));
+  };
+  boton.onclick = () => {
+    detalle = !detalle;
+    try { localStorage.setItem(CLAVE, detalle ? 'si' : 'no'); } catch { /* sin almacenamiento */ }
+    pintar();
+  };
+  pintar();
+  return h('section', {},
+    h('div', { class: 'cabecera-seccion' }, h('h2', {}, 'Últimos entrenamientos'), boton),
+    lista,
+    h('a', { class: 'boton enlace', href: '#/historial' }, 'Ver todo el historial'));
 }

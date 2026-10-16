@@ -27,18 +27,21 @@ function pasaFiltro(d, s) {
   return true;
 }
 
-export function resumenSesion(datos, sesion) {
+// Una tarjeta por entrenamiento; toca y se abre. En breve: fecha, día de la
+// rutina y series; con detalle, también los ejercicios.
+export function resumenSesion(datos, sesion, { breve = false } = {}) {
   const rutina = datos.rutinas.find((r) => r.id === sesion.rutinaId);
   const dia = rutina?.dias.find((x) => x.id === sesion.diaRutinaId);
   const nombres = sesion.ejercicios
     .map((e) => datos.ejercicios.find((x) => x.id === e.ejercicioId)?.nombre ?? 'Ejercicio borrado');
   const series = sesion.ejercicios.reduce((n, e) => n + e.series.filter((s) => s.hecha).length, 0);
-  return h('a', { class: 'tarjeta fila-enlace', href: `#/sesion/${sesion.id}` },
+  const titulo = dia ? dia.nombre : (nombres.length ? `Sin rutina · ${nombres.length} ${nombres.length === 1 ? 'ejercicio' : 'ejercicios'}` : 'Sin ejercicios');
+  return h('a', { class: `tarjeta fila-enlace${breve ? ' breve' : ''}`, href: `#/sesion/${sesion.id}` },
     h('div', {},
       h('strong', {}, fechaLarga(sesion.fecha)),
       sesion.estado === 'en-curso' && h('span', { class: 'etiqueta' }, 'En curso'),
-      dia && h('div', {}, dia.nombre),
-      h('div', { class: 'suave' }, nombres.length ? nombres.join(', ') : 'Sin ejercicios')),
+      h('div', {}, titulo),
+      !breve && h('div', { class: 'suave' }, nombres.length ? nombres.join(', ') : 'Sin ejercicios')),
     h('span', { class: 'contador' }, `${series} ${series === 1 ? 'serie' : 'series'}`));
 }
 

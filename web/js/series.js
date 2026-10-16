@@ -47,23 +47,26 @@ export function planesDeItem(ejercicio, item) {
 }
 
 // Resumen corto de unas series: «Bilbo + 2 × 8-10 + 1 × 8-10 con drop set».
-export function textoPlan(plan) {
+// Con el ejercicio, los tiempos salen en minutos y segundos.
+export function textoPlan(plan, ej = null) {
   const prog = plan.progresion;
   if (plan.calentamiento || plan.tipo === 'calentamiento') return 'calentamiento';
   if (prog?.tipo === 'bilbo') return 'Bilbo';
   if (prog?.tipo === 'programa') return { '5x5': `${prog.series ?? 5} × 5`, '531': '5/3/1', hst: 'HST' }[prog.programa] ?? 'programa';
   if (prog?.tipo === 'maximo-trabajo') return 'máximo trabajo';
   const r = prog?.objetivoEsfuerzo ?? plan.objetivoEsfuerzo;
-  let t = r ? (r[0] === r[1] ? `${r[0]}` : `${r[0]}-${r[1]}`) : 'libre';
+  const v = (x) => (ej?.esfuerzo?.tipo === 'tiempo' ? (x < 60 ? `${x} s` : x % 60 ? `${Math.floor(x / 60)} min ${x % 60} s` : `${x / 60} min`) : String(x));
+  let t = r ? (r[0] === r[1] ? v(r[0]) : `${v(r[0])}-${v(r[1])}`) : 'libre';
+  if (prog?.recamaraMin != null && r) t += ` (${prog.recamaraMin} en recámara)`;
   if (plan.tecnicas?.includes('drop-set')) t += ' con drop set';
   else if (plan.tecnicas?.length) t += ` con ${plan.tecnicas.join(' y ')}`;
   return t;
 }
 
-export function resumenPlanes(planes) {
+export function resumenPlanes(planes, ej = null) {
   const grupos = [];
   for (const p of planes) {
-    const t = textoPlan(p);
+    const t = textoPlan(p, ej);
     if (grupos.at(-1)?.t === t) grupos.at(-1).n += 1;
     else grupos.push({ t, n: 1 });
   }

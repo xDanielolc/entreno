@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 14;
+export const VERSION_ACTUAL = 15;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -216,6 +216,8 @@ export function archivoNuevo({ nombre = '', correo = null } = {}) {
       recuperacion: { factores: {}, desde: {} },
       tutoriales: { nivel: null, vistos: {} },
       modoEntreno: 'ejercicio',
+      redondeoKg: 2.5,
+      prehechos: [],
     },
     sedes: [],
     ejercicios: [],
@@ -471,6 +473,14 @@ const MIGRACIONES = {
     datos.perfil.pesos ??= datos.perfil.pesoCorporalKg > 0 ? [{ fecha, kg: datos.perfil.pesoCorporalKg }] : [];
     for (const rutina of datos.rutinas) for (const dia of rutina.dias) for (const item of dia.ejercicios) item.superserie ??= false;
     datos.version = 14;
+    return datos;
+  },
+  // v14 → v15: a qué salto se redondean los pesos (`perfil.redondeoKg`, antes
+  // siempre 2,5) y los prehechos que guarda el usuario (`perfil.prehechos`).
+  14: (datos) => {
+    datos.perfil.redondeoKg ??= 2.5;
+    datos.perfil.prehechos ??= [];
+    datos.version = 15;
     return datos;
   },
 };
