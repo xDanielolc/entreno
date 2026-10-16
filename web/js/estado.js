@@ -113,6 +113,11 @@ export function guardarYa() {
   if (registro) local.guardarUsuario(registro).catch((e) => console.error('No se pudo guardar en el dispositivo', e));
 }
 
+// Si la app se va al fondo (otra app, pantalla apagada) justo después de un
+// cambio, se guarda al momento sin esperar a los 300 ms.
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') guardarYa(); });
+document.addEventListener('pagehide', guardarYa);
+
 function dispositivo() {
   const ua = navigator.userAgent;
   return /Android/i.test(ua) ? 'android' : /iPhone|iPad/i.test(ua) ? 'ios' : 'ordenador';
