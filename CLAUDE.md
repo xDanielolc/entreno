@@ -527,3 +527,15 @@ ficha del ejercicio ni al entrenar sin rutina (`planesDeItem`). «¿Voy hoy?»
 cuerpo bien»; sin pulso. Su árbol original v5 está en la carpeta «Test y
 árboles de decisión HTML», al lado del proyecto. `imagenDeEjercicio(ej)`
 usa `ej.fotoDe` en las variantes partidas.
+
+## Ronda 0.45.0 (16-10-2026): consejos, peso y superseries
+
+Esquema v14. Consejos de la lista v044 en recomendaciones.js
+(`progresoPorEjercicio` diagnostica por qué baja o se estanca; `descansos`
+usa `serie.hechaA`; `tecnicasDeMas`, `calentamiento`, `dolor` con la lista
+`DOLOR`, `pesoSinActualizar`, `llegasCansado`). Fuera los consejos 20 y 30
+(Dan). Récord al momento en el entreno (`avisarRecord` en sesion.js, a los
+2 s de escribir las repeticiones). Peso con fecha (`peso.js`, tarjeta en
+Cuerpo). Superserie: `item.superserie`; tras una serie del primero no hay
+descanso y se avisa del segundo. Las preguntas a Dan, siempre con la
+herramienta de test (AskUserQuestion), no en lista de texto.

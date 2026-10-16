@@ -1,8 +1,9 @@
 import { abrirFichaEnProgresion } from './ejercicios.js';
 import {
   aPesoDisponible, cargaCorporal, cargaDesdeLectura, esfuerzoTotal, formatearNumero,
-  redondear, rmDeReferencia, sugerenciaSerie, trabajoSerie, tramosPropuestos, usaTramos,
+  redondear, rmDeReferencia, seriesDeEjercicio, sugerenciaSerie, trabajoSerie, tramosPropuestos, usaTramos,
 } from '../calculos.js';
+import { rmDeSerie } from '../formula1rm.js';
 import { guiaTrasPrueba, pintarGuia, pista } from './tutorial.js';
 import { queEs } from './glosario.js';
 import { abrirCronometro, abrirIntervalos } from './intervalos.js';
@@ -697,6 +698,7 @@ export function vistaSesion(contenedor, { id }) {
                 if (antes == null && x.esfuerzo != null) descansoEntreSeries(ej);
               });
               recalcularAbajo(ej, i);
+              avisarRecord(ej, serie.id);
             } })),
 
       // «En recámara»: las repeticiones que podrías haber hecho y no hiciste.
@@ -930,7 +932,57 @@ export function vistaSesion(contenedor, { id }) {
     aviso(`Apuntado: ${formatearTiempo(segundos)}${texto ? ` (${texto})` : ''}.`);
   }
 
+  // Récord al momento, como en Hevy: dos segundos después de escribir las
+  // repeticiones, si esa serie supera tu mejor 1RM (o tus repeticiones con
+  // ese peso), sale el aviso. Una vez por serie y valor.
+  const esperaRecord = new Map();
+  const recordsAvisados = new Set();
+  function avisarRecord(ej, serieId) {
+    clearTimeout(esperaRecord.get(serieId));
+    esperaRecord.set(serieId, setTimeout(() => {
+      const datos = estado.datos();
+      const serie = datos.sesiones.find((s) => s.id === id)?.ejercicios.flatMap((e) => e.series).find((x) => x.id === serieId);
+      if (!serie?.hecha || serie.tramos?.length || serie.tipo === 'calentamiento' || !(serie.carga > 0)) return;
+      const otras = seriesDeEjercicio(datos, ej.id).filter((x) => x.serie.id !== serieId && !x.serie.tramos?.length);
+      if (!otras.length) return;
+      const rm = rmDeSerie(datos, ej, serie, esfuerzoTotal(serie));
+      const mejor = Math.max(0, ...otras.map((x) => rmDeSerie(datos, ej, x.serie, esfuerzoTotal(x.serie)) ?? 0));
+      const clave = `${serieId}:${serie.carga}:${serie.esfuerzo}`;
+      if (recordsAvisados.has(clave)) return;
+      if (rm && mejor && rm >= mejor + 0.5) {
+        recordsAvisados.add(clave);
+        aviso(`🏆 ¡Récord en ${ej.nombre}! 1RM estimado ${formatearNumero(redondear(rm, 1))} kg, `
+          + `${formatearNumero(redondear(rm - mejor, 1))} kg más que el anterior.`, { tipo: 'exito', ms: 6000 });
+        return;
+      }
+      const conEsePeso = otras.filter((x) => x.serie.carga === serie.carga).map((x) => esfuerzoTotal(x.serie) ?? 0);
+      if (conEsePeso.length && esfuerzoTotal(serie) > Math.max(...conEsePeso)) {
+        recordsAvisados.add(clave);
+        aviso(`🏆 ¡Récord de repeticiones con ${formatearNumero(serie.carga)} kg en ${ej.nombre}!`, { tipo: 'exito', ms: 6000 });
+      }
+    }, 2000));
+  }
+
+  // Superserie: el ejercicio marcado en la rutina se alterna con el
+  // siguiente, sin descanso entre los dos.
+  function itemDeRutina(ejId) {
+    return sesion.rutinaId
+      ? d.rutinas.find((r) => r.id === sesion.rutinaId)?.dias.find((x) => x.id === sesion.diaRutinaId)?.ejercicios.find((x) => x.ejercicioId === ejId)
+      : null;
+  }
+
   function descansoEntreSeries(ej) {
+    const i = sesion.ejercicios.findIndex((e) => e.ejercicioId === ej.id);
+    const siguiente = sesion.ejercicios[i + 1];
+    if (itemDeRutina(ej.id)?.superserie && siguiente) {
+      const otro = ejercicioDe(siguiente.ejercicioId);
+      aviso(`Superserie: ahora ${otro?.nombre ?? 'el siguiente'}, sin descanso.`,
+        { accion: posicion != null ? { texto: 'Ir', fn: () => irA(i + 1) } : null });
+      return;
+    }
+    const anterior = sesion.ejercicios[i - 1];
+    const vuelta = anterior && itemDeRutina(anterior.ejercicioId)?.superserie ? { texto: 'Volver', fn: () => irA(i - 1) } : null;
+    if (vuelta && posicion != null) aviso(`Descansa y vuelve a ${ejercicioDe(anterior.ejercicioId)?.nombre ?? 'la superserie'}.`, { accion: vuelta });
     if (['estiramiento', 'movilidad', 'yoga'].includes(tipoDeEjercicio(ej))) {
       const seg = d.perfil.descansoEstiramientos ?? DESCANSO_ESTIRAMIENTOS_POR_DEFECTO;
       if (seg) arrancarDescanso(seg, { texto: 'entre estiramientos' });
@@ -975,6 +1027,8 @@ export function vistaSesion(contenedor, { id }) {
 
   function marcarHecha(input, serie, ej) {
     serie.hecha = serie.tramos?.length ? serie.tramos.some((t) => t.esfuerzo != null) : serie.esfuerzo != null;
+    // La hora a la que la acabas: con ella se ve cuánto descansas entre series.
+    if (serie.hecha) serie.hechaA ??= new Date().toISOString(); else serie.hechaA = null;
     const caja = input.closest('.serie');
     caja?.classList.toggle('hecha', serie.hecha);
     if (serie.hecha && caja?.parentElement?.classList.contains('de-una-en-una')) {

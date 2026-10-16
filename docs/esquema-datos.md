@@ -532,3 +532,8 @@ la vez, a veces sin cobertura):
   `item.series = null` usa las del ejercicio (las que no son `soloRutina`), y
   «entrenar sin rutina» también. `ej.fotoDe`: nombre del ejercicio del que
   sale la foto (las variantes partidas de otro se llaman distinto).
+
+- **v14 (0.45.0).** `perfil.pesos` ([{ fecha, kg }], uno por día; el último
+  manda en `pesoCorporalKg`, ver `web/js/peso.js`). `serie.hechaA`: hora a
+  la que se acabó la serie (para los descansos). `item.superserie`: ese
+  ejercicio de la rutina se alterna con el siguiente sin descanso.

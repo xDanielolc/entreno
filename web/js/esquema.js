@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 13;
+export const VERSION_ACTUAL = 14;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -459,6 +459,18 @@ const MIGRACIONES = {
     // Y una variante partida de otro ejercicio guarda de quién es la foto.
     for (const ej of datos.ejercicios) ej.fotoDe ??= null;
     datos.version = 13;
+    return datos;
+  },
+  // v14: tu peso con fecha (`perfil.pesos`: [{ fecha, kg }]); el que ya
+  // tenías entra con la fecha de hoy. Las series guardan a qué hora las
+  // acabaste (`hechaA`) desde ahora, y un ejercicio de rutina puede ir en
+  // superserie con el siguiente (`item.superserie`).
+  13: (datos) => {
+    const hoy = new Date();
+    const fecha = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
+    datos.perfil.pesos ??= datos.perfil.pesoCorporalKg > 0 ? [{ fecha, kg: datos.perfil.pesoCorporalKg }] : [];
+    for (const rutina of datos.rutinas) for (const dia of rutina.dias) for (const item of dia.ejercicios) item.superserie ??= false;
+    datos.version = 14;
     return datos;
   },
 };

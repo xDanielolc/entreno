@@ -84,13 +84,11 @@ y al final lo que es decoración o depende de terceros.
 - [x] Variantes en la lista general: fondos en paralelas con lastre y
       negativos, dominadas con lastre y negativas, flexiones con lastre,
       pájaro a una mano. Las variantes partidas conservan la foto del original.
-- [ ] Superseries (dos ejercicios alternados): Dan no las usará, pero las
-      quiere como opción.
-- [ ] Programar los consejos aprobados en v044 (quitar c20 y c30; c16 solo
-      días de fuerza; récord en el ejercicio como Hevy; calentamiento en
-      Aprender; lista larga de palabras de dolor; comprobar las fuentes «por
-      comprobar»).
-- [ ] Registro del peso corporal (como en las apps de dieta, sin comidas).
+- [x] 0.45.0: superseries en la rutina; consejos de la v044 programados
+      (diagnóstico de bajadas y estancamientos, descansos cortos, técnicas
+      de más, sin calentar, dolor, peso sin apuntar, llegar cansado, ciclo a
+      punto de acabar, fuerza menos de 2 días); récord al momento en el
+      entreno; «Cómo calentar» en Aprender; registro del peso en Cuerpo.
 - [ ] Foto según el material elegido (barra / mancuernas / peso corporal):
       hace falta una imagen por variante; con Design.
 - [ ] Que el 1RM de las series de pocas repeticiones pese más que el de las

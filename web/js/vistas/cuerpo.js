@@ -9,7 +9,8 @@ import {
   FACTORES, claseDeRecuperacion, detalleDeRecuperacion, esAutomatico, factorAutomatico, factorPersonal, recuperacionPorMusculo,
   seriesEnDias, seriesSemanales, sugerenciasDeAjuste, textoDeRecuperacion, durezaSemanal,
 } from '../recuperacion.js';
-import { abrirAlLlegar, anadir, aviso, h, hoyISO, modal, plegable, selector } from '../ui.js';
+import { abrirAlLlegar, anadir, aviso, fechaCorta, h, hoyISO, leerNumero, modal, plegable, selector } from '../ui.js';
+import { apuntarPeso, quitarPeso } from '../peso.js';
 import { conGlosario } from './glosario.js';
 import { pista } from './tutorial.js';
 import { tarjetaEquilibrio } from './equilibrio.js';
@@ -164,7 +165,55 @@ export function vistaCuerpo(contenedor) {
     tarjetaMapa(d),
     tarjetaEquilibrio(d),
     tarjetaSeries(d),
+    tarjetaPeso(d),
     tarjetaAjustePersonal(d));
+}
+
+// Tu peso con fecha: apuntar, ver la tendencia y borrar un día mal puesto.
+function tarjetaPeso(d) {
+  const pesos = d.perfil.pesos ?? [];
+  const caja = h('input', { type: 'text', inputmode: 'decimal', class: 'numero-peso', placeholder: 'kg', 'aria-label': 'Tu peso hoy en kilos',
+    value: '' });
+  const apuntar = () => {
+    const kg = leerNumero(caja.value);
+    if (!(kg > 20 && kg < 400)) { aviso('Pon tu peso en kilos', { tipo: 'error' }); return; }
+    estado.cambiar((x) => { apuntarPeso(x, kg); });
+    aviso(`Apuntado: ${formatearNumero(kg)} kg hoy.`);
+  };
+  const ultimos = pesos.slice(-60);
+  let grafica = null;
+  const s = (tag, attrs = {}, ...hijos) => {
+    const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    for (const x of hijos.flat()) if (x) e.append(x);
+    return e;
+  };
+  if (ultimos.length >= 2) {
+    const ancho = 300, alto = 90, kgs = ultimos.map((p) => p.kg);
+    const min = Math.min(...kgs) - 0.5, max = Math.max(...kgs) + 0.5;
+    const t0 = new Date(ultimos[0].fecha), t1 = new Date(ultimos.at(-1).fecha);
+    const x = (f) => ((new Date(f) - t0) / Math.max(1, t1 - t0)) * (ancho - 20) + 10;
+    const y = (kg) => alto - 10 - ((kg - min) / (max - min)) * (alto - 20);
+    grafica = s('svg', { viewBox: `0 0 ${ancho} ${alto}`, class: 'grafica-peso', role: 'img',
+      'aria-label': `Tu peso: de ${formatearNumero(kgs[0])} a ${formatearNumero(kgs.at(-1))} kg` },
+    s('polyline', { points: ultimos.map((p) => `${x(p.fecha)},${y(p.kg)}`).join(' '), fill: 'none', stroke: 'currentColor', 'stroke-width': 2 }),
+    ultimos.map((p) => s('circle', { cx: x(p.fecha), cy: y(p.kg), r: 3, fill: 'currentColor' })));
+  }
+  const cambio = pesos.length >= 2 ? pesos.at(-1).kg - pesos.at(-2).kg : null;
+  return h('section', { class: 'tarjeta tarjeta-peso' },
+    h('h2', {}, 'Tu peso'),
+    pesos.length
+      ? h('p', { class: 'centrado' }, h('strong', {}, `${formatearNumero(pesos.at(-1).kg)} kg`),
+        ` el ${fechaCorta(pesos.at(-1).fecha)}`,
+        cambio != null && cambio !== 0 && h('span', { class: 'suave' }, ` (${cambio > 0 ? '+' : ''}${formatearNumero(Math.round(cambio * 10) / 10)} kg)`))
+      : h('p', { class: 'nota centrado' }, 'Apúntalo de vez en cuando: tus flexiones, dominadas y fondos se calculan con él.'),
+    h('div', { class: 'fila-peso' }, caja, h('button', { type: 'button', class: 'boton', onclick: apuntar }, 'Apuntar hoy')),
+    grafica,
+    pesos.length > 0 && plegable('peso-historial', 'Todas las veces', {}, h('table', { class: 'tabla-musculos' },
+      h('tbody', {}, [...pesos].reverse().map((p) => h('tr', {},
+        h('td', {}, fechaCorta(p.fecha)), h('td', {}, `${formatearNumero(p.kg)} kg`),
+        h('td', {}, h('button', { type: 'button', class: 'boton-icono', 'aria-label': `Borrar el peso del ${fechaCorta(p.fecha)}`,
+          onclick: () => estado.cambiar((x) => { quitarPeso(x, p.fecha); }) }, '✕'))))))));
 }
 
 function tarjetaMapa(d) {

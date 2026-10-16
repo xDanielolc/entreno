@@ -389,4 +389,34 @@ export const BIBLIOGRAFIA = [
       { texto: 'Stults-Kolehmainen et al. (2014), J Strength Cond Res: con mucho estrés, la fuerza tarda más en recuperarse (31 universitarios).', url: 'https://doi.org/10.1519/JSC.0000000000000335' },
     ],
   },
+  {
+    tema: 'Consejos de progreso (bajas, te estancas o subes)',
+    dice: 'Si tu 1RM baja dos sesiones, la app mira por qué puede ser: una pausa larga, muchas o pocas series, o que llegas cansado. '
+      + 'Si te estancas tres sesiones, mira la recámara, el volumen y si llevas seis semanas con lo mismo.',
+    matiz: 'Los umbrales (5 %, tres sesiones, seis semanas) son decisiones prácticas. Cambiar de ejercicio ayuda si es con cabeza; '
+      + 'cambiar al azar y a menudo puede frenar (Kassiano 2022). Tras parar unas semanas, la fuerza vuelve deprisa (Ogasawara 2013).',
+    fuentes: [
+      { texto: 'Ogasawara et al. (2013), Eur J Appl Physiol: con parones de 3 semanas se acaba igual que entrenando seguido; lo perdido se recupera rápido (14 hombres).', url: 'https://doi.org/10.1007/s00421-012-2511-9' },
+      { texto: 'Kassiano et al. (2022), J Strength Cond Res: revisión; variar ejercicios de forma sistemática ayuda, al azar y a menudo puede frenar.', url: 'https://doi.org/10.1519/JSC.0000000000004258' },
+      { texto: 'Bell et al. (2023), Sports Medicine Open: consenso de expertos sobre descargas.', url: 'https://doi.org/10.1186/s40798-023-00633-0' },
+    ],
+  },
+  {
+    tema: 'Descanso entre series',
+    dice: 'Si en los ejercicios pesados (8 repeticiones o menos) descansas poco más de un minuto, la app te sugiere 2 o 3 minutos.',
+    matiz: 'Los estudios son con gente entrenada y ejercicios básicos; en aislamiento, descansos más cortos pierden poco.',
+    fuentes: [
+      { texto: 'Schoenfeld et al. (2016), J Strength Cond Res: 3 minutos dieron más fuerza y algo más de músculo que 1 minuto.', url: 'https://doi.org/10.1519/JSC.0000000000001272' },
+      { texto: 'Grgic et al. (2017), Sports Medicine: revisión; para fuerza máxima, más de 2 minutos.', url: 'https://doi.org/10.1007/s40279-017-0788-x' },
+    ],
+  },
+  {
+    tema: 'Calentamiento y estiramientos antes',
+    dice: 'Unas series de aproximación en el primer ejercicio pesado. Estiramientos estáticos cortos o dinámicos.',
+    matiz: 'Los porcentajes de las series de aproximación son una pauta práctica, no salen de un estudio.',
+    fuentes: [
+      { texto: 'Fradkin et al. (2010), J Strength Cond Res: metaanálisis; el calentamiento mejora el rendimiento en el 79 % de las medidas.', url: 'https://doi.org/10.1519/JSC.0b013e3181c643a0' },
+      { texto: 'Behm et al. (2016), Appl Physiol Nutr Metab: estirar más de 60 s por músculo justo antes puede quitar algo de fuerza; menos, apenas.', url: 'https://doi.org/10.1139/apnm-2015-0235' },
+    ],
+  },
 ];

@@ -373,7 +373,8 @@ export function vistaFormularioRutina(contenedor, { id }) {
           : h('span', { class: 'miniatura sin-imagen', 'aria-hidden': 'true' }, nombre.slice(0, 2).toUpperCase()),
         h('span', { class: 'ej-rutina-texto' },
           h('strong', {}, nombre),
-          h('small', { class: 'suave' }, [resumen || 'Aún sin series', item.opcional && 'opcional', item.nota].filter(Boolean).join(' · '))),
+          h('small', { class: 'suave' }, [resumen || 'Aún sin series', item.opcional && 'opcional',
+            item.superserie && 'superserie con el siguiente', item.nota].filter(Boolean).join(' · '))),
         h('span', { class: 'ej-rutina-flecha', 'aria-hidden': 'true' }, abierto ? '▴' : '▾')),
       abierto && detalleEjercicio(dia, item, j, ej, clave));
   }
@@ -408,7 +409,11 @@ export function vistaFormularioRutina(contenedor, { id }) {
       item.modoCarga ?? '', (v) => { item.modoCarga = v || null; repintar(); }, { titulo: 'Pesos del drop set en esta rutina' })),
       h('div', { class: 'fila-marcas compacta' },
         h('button', { type: 'button', class: `boton-marca${item.opcional ? ' activo' : ''}`, 'aria-pressed': String(Boolean(item.opcional)),
-          onclick: () => { item.opcional = !item.opcional; repintar(); } }, 'Opcional')),
+          onclick: () => { item.opcional = !item.opcional; repintar(); } }, 'Opcional'),
+        j < dia.ejercicios.length - 1 && h('button', { type: 'button', class: `boton-marca${item.superserie ? ' activo' : ''}`,
+          'aria-pressed': String(Boolean(item.superserie)),
+          onclick: () => { item.superserie = !item.superserie; repintar(); } }, 'Superserie con el siguiente')),
+      item.superserie && h('small', { class: 'nota' }, 'Alternas una serie de cada uno sin descanso entre los dos; descansas después del segundo.'),
       campo('Nota para este día', h('input', { type: 'text', value: item.nota ?? '', placeholder: 'Agarre estrecho, pies en alto…',
         oninput: (e) => { item.nota = e.target.value || null; } })),
       orden,

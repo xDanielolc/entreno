@@ -14,6 +14,7 @@ import { recuperacionPorMusculo } from '../recuperacion.js';
 import { recomendacionesGenerales } from '../recomendaciones.js';
 import { renovarAlTocar } from '../sincronizacion.js';
 import { voyHoy } from './voy-hoy.js';
+import { apuntarPeso } from '../peso.js';
 
 // Lo que ya enseña el muñeco de Cuerpo (series por músculo) no se repite aquí.
 const YA_SE_VE = new Set(['volumen-bajo', 'volumen-bien']);
@@ -25,7 +26,7 @@ function avisosDeHoy(d) {
     return `${f.getFullYear()}-${1 + Math.round(((f - enero) / 86_400_000 - 3 + ((enero.getDay() + 6) % 7)) / 7)}`;
   })();
   return recomendacionesGenerales(d)
-    .filter((r) => r.nivel !== 'bien' && !YA_SE_VE.has(r.clave))
+    .filter((r) => (r.nivel !== 'bien' || r.clave === 'vas-bien') && !YA_SE_VE.has(r.clave))
     .map((r) => pista(`aviso-${r.clave}-${r.texto.split(/[:.]/)[0]}-${semana}`, r.texto,
       { siempre: true, icono: r.nivel === 'aviso' ? '⚠' : '→', clase: 'pista-aviso' }))
     .filter(Boolean)
@@ -193,7 +194,7 @@ export function vistaInicio(contenedor) {
             const kg = leerNumero(caja.value);
             if (!(kg > 0)) { aviso('Pon un número', { tipo: 'error' }); return; }
             cerrar();
-            estado.cambiar((x) => { x.perfil.pesoCorporalKg = kg; });
+            estado.cambiar((x) => { apuntarPeso(x, kg); });
           } }, 'Guardar')));
         setTimeout(() => caja.focus(), 50);
       } }, 'Poner mi peso')),

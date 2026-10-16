@@ -1482,3 +1482,10 @@ div.sugerencia > span { display: block; }
 .veredicto.ve { border-color: var(--mapa-verde, #23824a); }
 .veredicto.calienta { border-color: var(--mapa-ambar, #e8a317); }
 .veredicto.descansa { border-color: var(--mapa-rojo, #b3261e); }
+
+/* Tu peso (Cuerpo) */
+.tarjeta-peso { display: grid; gap: 10px; text-align: center; }
+.fila-peso { display: flex; gap: 8px; justify-content: center; align-items: center; }
+.fila-peso .numero-peso { width: 6em; text-align: center; min-height: 44px; font-size: 16px; }
+.grafica-peso { width: 100%; max-width: 360px; margin: 0 auto; color: var(--acento); }
+.tarjeta-peso table { margin: 0 auto; }

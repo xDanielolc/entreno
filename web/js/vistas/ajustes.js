@@ -1,3 +1,4 @@
+import { apuntarPeso } from '../peso.js';
 import { creditosCargados } from '../imagenes.js';
 import { formatearNumero } from '../calculos.js';
 import * as estado from '../estado.js';
@@ -62,9 +63,9 @@ export function vistaAjustes(contenedor) {
       h('label', { class: 'campo' },
         h('span', { class: 'etiqueta-campo' }, 'Peso corporal (kg)'),
         h('input', { type: 'text', inputmode: 'decimal', value: d.perfil.pesoCorporalKg ?? '',
-          oninput: (e) => estado.cambiar((x) => { x.perfil.pesoCorporalKg = leerNumero(e.target.value); }, { tecleo: true }) }),
+          onchange: (e) => estado.cambiar((x) => { apuntarPeso(x, leerNumero(e.target.value)); }) }),
         h('small', { class: 'nota' },
-          'Solo para calcular la carga en flexiones, dominadas y máquinas asistidas; esta app no va de controlar el peso.'))),
+          'Para calcular la carga en flexiones, dominadas y máquinas asistidas. Se apunta con la fecha de hoy; el historial, en Cuerpo.'))),
 
     apartado('Personalización',
       h('div', { class: 'campo' },

@@ -159,6 +159,17 @@ export function vistaAprender(contenedor) {
     comoDecideLaApp(),
     estirar(),
     comoSeEstimaTuRM(d),
+    apartado('Cómo calentar',
+      h('p', {}, 'Calentar mejora el rendimiento en casi todas las medidas (Fradkin 2010). No hace falta mucho:'),
+      h('ol', { class: 'nota' },
+        h('li', {}, '5 minutos de algo suave (bici, remo, andar rápido) para entrar en calor. Opcional si vas a calentar con el propio ejercicio.'),
+        h('li', {}, 'En el primer ejercicio pesado, 2 o 3 series de aproximación que suben de peso y bajan de repeticiones, '
+          + 'lejos del fallo: por ejemplo, 50 % de tu peso de trabajo × 8, 70 % × 4 y 85 % × 2.'),
+        h('li', {}, 'Descansa poco entre ellas (un minuto) y algo más antes de la primera serie de verdad.'),
+        h('li', {}, 'En los siguientes ejercicios del mismo músculo basta con una serie suave, o ninguna.'),
+        h('li', {}, 'Estiramientos estáticos largos (más de un minuto por músculo) justo antes pueden quitar algo de fuerza; '
+          + 'cortos o dinámicos, no (Behm 2016).')),
+      h('p', { class: 'nota' }, 'En la ficha del ejercicio, una serie puede ser «calentamiento»: sube de peso al principio y no cuenta para tu progreso.')),
     apartado('Cuánto cuenta un drop set',
       h('p', {}, 'Para saber cuánto has trabajado cada músculo, la app convierte los drop sets en series normales.'),
       h('ul', { class: 'nota' },
