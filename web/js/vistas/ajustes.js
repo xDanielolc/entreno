@@ -1,3 +1,4 @@
+import { icono } from '../iconos.js';
 import { apuntarPeso } from '../peso.js';
 import { creditosCargados } from '../imagenes.js';
 import { REDONDEO_POR_DEFECTO, formatearNumero } from '../calculos.js';
@@ -106,7 +107,7 @@ export function vistaAjustes(contenedor) {
     // Los intervalos que guardaste desde el cronómetro de HIIT: aquí se ven
     // todos y se quitan, además de desde el propio cartel.
     apartado('Intervalos (HIIT)',
-      h('p', { class: 'nota' }, 'Se usan desde el botón «🔁 Intervalos» de cualquier ejercicio que se mida en tiempo. Los tuyos se '
+      h('p', { class: 'nota' }, 'Se usan desde el botón «Intervalos» de cualquier ejercicio que se mida en tiempo. Los tuyos se '
         + 'guardan allí con «Guardar estos intervalos como míos».'),
       (d.perfil.hiitPropios ?? []).length
         ? h('ul', { class: 'lista-enlaces' }, d.perfil.hiitPropios.map((x) => h('li', { class: 'fila-ejercicio' },
@@ -121,14 +122,14 @@ export function vistaAjustes(contenedor) {
       numeroAjuste('Entre series (segundos)', d.perfil.descansoSegundos, (x, v) => { x.perfil.descansoSegundos = v; }),
       numeroAjuste('Entre estiramientos (segundos)', d.perfil.descansoEstiramientos ?? DESCANSO_ESTIRAMIENTOS_POR_DEFECTO,
         (x, v) => { x.perfil.descansoEstiramientos = v; }),
-      h('small', { class: 'nota' }, 'El cronómetro arranca solo al apuntar el peso y las repeticiones de una serie, y al apuntar la última bajada de un drop set. '
+      h('small', { class: 'nota' }, 'El cronómetro arranca solo al apuntar el peso y las repeticiones de una serie, y al apuntar la última bajada de una serie descendente. '
         + 'Ponlo a 0 para desactivarlo. Si lo saltas o le añades tiempo, la app te ofrece cambiarlo desde allí.'),
       h('div', { class: 'fila-marcas compacta' },
         h('button', { type: 'button', class: `boton-marca${d.perfil.avisarDescanso ? ' activo' : ''}`, 'aria-pressed': String(Boolean(d.perfil.avisarDescanso)),
           onclick: async () => {
             if (d.perfil.avisarDescanso) { estado.cambiar((x) => { x.perfil.avisarDescanso = false; }); return; }
             await activarNotificaciones();
-          } }, d.perfil.avisarDescanso ? '🔔 Avisando al acabar el descanso' : '🔔 Avisar con notificación y vibración al acabar')),
+          } }, d.perfil.avisarDescanso ? '¡Te aviso cuando acaben los descansos!' : 'Sin avisos al acabar el descanso: tocar para activarlos')),
       h('small', { class: 'nota' }, puedeNotificar()
         ? 'Con la app instalada: mientras dura el descanso, la notificación va diciendo cuánto queda; al acabar, suena y vibra aunque tengas la pantalla apagada.'
         : 'Este navegador no admite notificaciones; en el móvil, con la app instalada, sí.'),
@@ -166,12 +167,12 @@ export function vistaAjustes(contenedor) {
           h('button', { type: 'button', class: 'boton-icono papelera', 'aria-label': `Quitar ${m.nombre}`, onclick: async () => {
             if (!await confirmar(`¿Quitar el prehecho «${m.nombre}»? Las series que ya lo usan no cambian.`, { si: 'Quitar', peligro: true })) return;
             estado.cambiar((x) => { x.perfil.prehechos = x.perfil.prehechos.filter((y) => y.id !== m.id); });
-          } }, '🗑')))),
+          } }, icono('papelera'))))),
         h('small', { class: 'nota' }, 'Se guardan desde la ficha de un ejercicio, con «Guardar esta regla como prehecho mío».')),
       h('div', { class: 'campo' },
         h('span', { class: 'etiqueta-campo' }, 'Los «?» que explican las palabras'),
         opciones(MODOS_GLOSARIO, modoGlosario(d), (m) => estado.cambiar((x) => { x.perfil.glosario = m; }), { compacto: true }),
-        h('small', { class: 'nota' }, 'Salen detrás de palabras como 1RM, recámara o drop set. También se quitan desde el propio cartel.')),
+        h('small', { class: 'nota' }, 'Salen detrás de palabras como 1RM, recámara o serie descendente. También se quitan desde el propio cartel.')),
       h('label', { class: 'casilla' },
         h('input', { type: 'checkbox', checked: d.perfil.preguntarVista !== false,
           onchange: (e) => estado.cambiar((x) => { x.perfil.preguntarVista = e.target.checked; }) }),
@@ -180,20 +181,20 @@ export function vistaAjustes(contenedor) {
         h('input', { type: 'checkbox', checked: d.perfil.preguntarComoLlegas !== false,
           onchange: (e) => estado.cambiar((x) => { x.perfil.preguntarComoLlegas = e.target.checked; x.perfil.comoLlegasSaltos = 0; }) }),
         'Preguntar «¿cómo llegas hoy?» al empezar (tu sensación de cada músculo, para afinar la recuperación)'),
-      h('h3', {}, 'Drop sets'),
+      h('h3', {}, 'Series descendentes'),
       h('div', { class: 'fila-campos' },
         numeroAjuste('Bajadas', d.perfil.dropSet?.bajadas ?? 4, (x, v) => { x.perfil.dropSet = { ...x.perfil.dropSet, bajadas: v }; }),
         numeroAjuste('Kilos por bajada', d.perfil.dropSet?.salto ?? 10, (x, v) => { x.perfil.dropSet = { ...x.perfil.dropSet, salto: v }; }),
         numeroAjuste('Arranca al (% del 1RM)', d.perfil.dropSet?.inicioPorcentaje ?? 80, (x, v) => { x.perfil.dropSet = { ...x.perfil.dropSet, inicioPorcentaje: v }; })),
       h('div', { class: 'campo' },
-        h('span', { class: 'etiqueta-campo' }, 'Cuánto cuenta un drop set'),
+        h('span', { class: 'etiqueta-campo' }, 'Cuánto cuenta una serie descendente'),
         opciones(FORMAS_DROP_SET, d.perfil.cuentaDropSet ?? FORMA_DROP_SET_POR_DEFECTO, (m) => estado.cambiar((x) => { x.perfil.cuentaDropSet = m; }), { compacto: true }),
         h('small', { class: 'nota' }, FORMAS_DROP_SET[d.perfil.cuentaDropSet ?? FORMA_DROP_SET_POR_DEFECTO].descripcion)),
       h('div', { class: 'campo' },
-        h('span', { class: 'etiqueta-campo' }, 'Los pesos del drop set, por'),
+        h('span', { class: 'etiqueta-campo' }, 'Los pesos de la serie descendente, por'),
         opciones({ rm: { etiqueta: '% del 1RM' }, kg: { etiqueta: 'Kilos a mano' } }, d.perfil.dropSet?.modoCarga ?? 'rm',
           (m) => estado.cambiar((x) => { x.perfil.dropSet = { ...x.perfil.dropSet, modoCarga: m, autoRellenar: m === 'rm' }; }), { compacto: true }),
-        h('small', { class: 'nota' }, 'Por % del 1RM: haces la Bilbo con 60 kg × 20 y el drop set de debajo se rellena solo al porcentaje de arriba. '
+        h('small', { class: 'nota' }, 'Por % del 1RM: haces la Bilbo con 60 kg × 20 y la serie descendente de debajo se rellena solo al porcentaje de arriba. '
           + 'A mano: los kilos se quedan como los dejes. Cada ejercicio, cada rutina y cada serie del día pueden cambiarlo.')),
       h('h3', {}, 'Rest-pause y miorrepeticiones'),
       h('div', { class: 'fila-campos' },
@@ -313,7 +314,7 @@ function seccionSedes(d, apartado) {
             y.archivado = true;
             if (x.perfil.sedePorDefecto === y.id) x.perfil.sedePorDefecto = null;
           });
-        } }, '🗑'))),
+        } }, icono('papelera')))),
     h('button', { class: 'boton secundario', onclick: () => estado.cambiar((x) => {
       x.sedes.push(nuevaSede(sedes.length ? `Sitio ${sedes.length + 1}` : 'Mi gimnasio'));
     }) }, '+ Añadir sitio'));

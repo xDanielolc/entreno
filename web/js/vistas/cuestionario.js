@@ -11,7 +11,7 @@ export const PREGUNTAS = [
   { clave: 'experiencia', titulo: '¿Cuánto sabes de entrenar?', opciones: {
     novato: { etiqueta: 'Nada o casi nada', descripcion: 'Te lo explico todo, sin prisa.' },
     algo: { etiqueta: 'Lo básico', descripcion: 'Sé qué es una serie y una repetición; lo demás, según.' },
-    avanzado: { etiqueta: 'Bastante', descripcion: 'Conozco el 1RM, la recámara, los drop sets, las progresiones y los programas. Solo dime dónde está cada cosa.' },
+    avanzado: { etiqueta: 'Bastante', descripcion: 'Conozco el 1RM, la recámara, las series descendentes, las progresiones y los programas. Solo dime dónde está cada cosa.' },
   } },
   { clave: 'objetivo', titulo: '¿Qué buscas?', opciones: {
     musculo: { etiqueta: 'Ganar músculo', descripcion: 'Hipertrofia: series cerca del fallo, con el peso que sea, sin cansarte de más.' },

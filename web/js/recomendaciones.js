@@ -29,7 +29,7 @@ const DIA = 24;
 
 // Cuántas series pedirle a un músculo esta semana. Las de 10 a 20 salen de
 // estudios con series a 2-3 repeticiones del fallo; si tú las llevas al
-// fallo o con drop sets, con bastantes menos ya hay estímulo de sobra.
+// fallo o con series descendentes, con bastantes menos ya hay estímulo de sobra.
 function minimoDe(dureza, musculo) {
   const x = dureza[musculo];
   const duro = x && x.series > 0 && x.duras / x.series >= 0.5;
@@ -347,7 +347,7 @@ function tecnicasDeMas(datos, recientes) {
   if (entradas.length < 6) return [];
   const con = entradas.filter((e) => e.series.some((x) => x.hecha && x.tecnicas?.length)).length;
   if (con / entradas.length < 0.7) return [];
-  return [r('tecnicas', 'consejo', `Esta semana has usado drop sets u otras técnicas en ${Math.round((con / entradas.length) * 100)} % de los ejercicios. `
+  return [r('tecnicas', 'consejo', `Esta semana has usado series descendentes u otras técnicas en ${Math.round((con / entradas.length) * 100)} % de los ejercicios. `
     + 'Ahorran tiempo, pero no dan más músculo que las series normales: déjalas para 1 o 2 ejercicios por sesión.')];
 }
 

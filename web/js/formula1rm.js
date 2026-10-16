@@ -196,8 +196,8 @@ export const EXPLICACIONES_1RM = [
   { titulo: 'Qué pasa con pocos datos', texto: 'Empieza a ajustar desde la primera quincena, pero sin fiarse del todo: el factor final se '
     + 'queda a medio camino entre 1 (la fórmula del estudio) y el que dicen tus datos. Con 1 quincena aplica la mitad del ajuste, con 3 '
     + 'el 75 %, con 9 el 90 %. Así una semana rara no te descoloca los objetivos.' },
-  { titulo: 'Dentro de cada entrenamiento', texto: 'Tu 1RM de hoy sale de la primera serie (la Bilbo, normalmente). El drop set '
-    + 'de debajo no parte de ese 1RM tal cual: la app aprende de tus drop sets anteriores cuánto rindes tras la primera serie '
+  { titulo: 'Dentro de cada entrenamiento', texto: 'Tu 1RM de hoy sale de la primera serie (la Bilbo, normalmente). La serie descendente '
+    + 'de debajo no parte de ese 1RM tal cual: la app aprende de tus series descendentes anteriores cuánto rindes tras la primera serie '
     + '(por el cansancio) y lo corrige. Si la primera bajada sale muy lejos de lo esperado (menos del 75 % o más del 125 % de las '
     + 'repeticiones previstas), te avisa: puede ser la fórmula, el cansancio de la serie anterior o que no estés recuperado.' },
   { titulo: 'Qué significa el factor', texto: 'Por encima de 1: en ese ejercicio aguantas más repeticiones de las que predice el estudio '

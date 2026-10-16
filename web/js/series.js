@@ -1,6 +1,6 @@
 // Crea una serie a partir de su plantilla en el ejercicio, ya rellena con lo
 // que toca hoy: la carga del día del ciclo, el objetivo a superar y, en un
-// drop set, las bajadas propuestas.
+// serie descendente, las bajadas propuestas.
 
 import {
   aPesoDisponible, cargaCorporal, esfuerzoTotal, lecturaDesdeCarga, redondear, rmDeReferencia, saltoAjustado, sugerenciaSerie,
@@ -46,7 +46,7 @@ export function planesDeItem(ejercicio, item) {
   return (ejercicio.series || []).filter((p) => (item?.series ? item.series.includes(p.id) : !p.soloRutina));
 }
 
-// Resumen corto de unas series: «Bilbo + 2 × 8-10 + 1 × 8-10 con drop set».
+// Resumen corto de unas series: «Bilbo + 2 × 8-10 + 1 × 8-10 con serie descendente».
 // Con el ejercicio, los tiempos salen en minutos y segundos.
 export function textoPlan(plan, ej = null) {
   const prog = plan.progresion;
@@ -58,9 +58,24 @@ export function textoPlan(plan, ej = null) {
   const v = (x) => (ej?.esfuerzo?.tipo === 'tiempo' ? (x < 60 ? `${x} s` : x % 60 ? `${Math.floor(x / 60)} min ${x % 60} s` : `${x / 60} min`) : String(x));
   let t = r ? (r[0] === r[1] ? v(r[0]) : `${v(r[0])}-${v(r[1])}`) : 'libre';
   if (prog?.recamaraMin != null && r) t += ` (${prog.recamaraMin} en recámara)`;
-  if (plan.tecnicas?.includes('drop-set')) t += ' con drop set';
+  if (plan.tecnicas?.includes('drop-set')) t += ' con serie descendente';
   else if (plan.tecnicas?.length) t += ` con ${plan.tecnicas.join(' y ')}`;
   return t;
+}
+
+// Cómo lleva la app una serie, en pocas palabras.
+export function nombreRegla(plan) {
+  const p = plan.progresion ?? {};
+  if (plan.calentamiento || plan.tipo === 'calentamiento') return 'Calentamiento: no progresa';
+  if (p.tipo === 'bilbo') return 'Ciclo: el peso sube cada sesión';
+  if (p.tipo === 'programa') return 'Programa clásico';
+  if (p.tipo === 'maximo-trabajo') return 'Máximo trabajo';
+  if (p.tipo === 'esfuerzo') return 'Un poco más cada vez';
+  if (p.tipo === 'libre') return 'Solo apuntar: ves la vez anterior';
+  if (p.porRM) return p.porRM.fija === 'pct' ? `Peso según tu 1RM (${p.porRM.valor} %)` : 'Peso según tu 1RM';
+  const r = p.objetivoEsfuerzo;
+  if (r && r[0] === r[1]) return 'Sube el peso al completarlas';
+  return 'Doble progresión: al llegar arriba, sube el peso';
 }
 
 export function resumenPlanes(planes, ej = null) {
@@ -109,7 +124,7 @@ export function crearSerieDesdePlan(datos, ejercicio, plan, { excluirSesion } = 
     serie.carga = cargaCorporal(ejercicio, datos.perfil.pesoCorporalKg, serie.lastre) ?? carga;
   }
   if (usaTramos(plan.tecnicas)) {
-    // Un drop set suele arrancar a un porcentaje del 1RM (80 % por defecto).
+    // Una serie descendente suele arrancar a un porcentaje del 1RM (80 % por defecto).
     const inicio = plan.tramoInicio ?? datos.perfil.dropSet?.inicioPorcentaje ?? null;
     if (serie.carga == null && inicio) {
       const rm = rmDeReferencia(datos, ejercicio, { cicloN: serie.cicloN, excluirSesion });
@@ -167,7 +182,7 @@ export function entradaDeEjercicio(datos, ej, { excluirSesion } = {}) {
   return entrada;
 }
 
-// Cuánto se baja en cada tramo nuevo: en un drop set, los kilos fijados en el
+// Cuánto se baja en cada tramo nuevo: en una serie descendente, los kilos fijados en el
 // ejercicio o en Ajustes; en rest-pause y miorrepeticiones, nada.
 export function saltoDeTramo(datos, ejercicio, serie) {
   const config = tramosDe(serie.tecnicas);
@@ -178,9 +193,9 @@ export function saltoDeTramo(datos, ejercicio, serie) {
 
 // Cuánto rindes en la primera bajada respecto al 1RM que acabas de hacer en
 // la serie de arriba: no es lo mismo tu 1RM en la primera serie que tras
-// ella. Se aprende de tus drop sets anteriores de esta serie (el 1RM que
+// ella. Se aprende de tus series descendentes anteriores de esta serie (el 1RM que
 // «dice» su primera bajada, entre el de la serie de arriba) y se aplica con
-// prudencia: con un drop set, la mitad del ajuste; con tres, el 75 %.
+// prudencia: con una serie descendente, la mitad del ajuste; con tres, el 75 %.
 export function fatigaTrasSerie(datos, ejercicio, planId, { excluirSesion } = {}) {
   const ratios = [];
   const sesiones = datos.sesiones.filter((s) => !s.borrada && s.id !== excluirSesion)

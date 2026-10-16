@@ -17,7 +17,7 @@ export function selectorTecnicas(tecnicas, alCambiar) {
   }));
 }
 
-// La misma elección, plegada en un botón que dice las elegidas («Drop set ▾»)
+// La misma elección, plegada en un botón que dice las elegidas («Serie descendente ▾»)
 // y abre la lista: en el entreno no se ven todas a la vez.
 export function desplegableTecnicas(tecnicas, alCambiar) {
   const puestas = tecnicas || [];
@@ -35,7 +35,7 @@ export function desplegableTecnicas(tecnicas, alCambiar) {
   } }, `${textoTecnicas(puestas) || 'Elegir técnica'} ▾`);
 }
 
-// Texto corto para el historial: «Drop set + Unilateral».
+// Texto corto para el historial: «Serie descendente + Unilateral».
 export function textoTecnicas(tecnicas) {
   return (tecnicas || []).map((k) => TECNICAS[k]?.etiqueta ?? k).join(' + ');
 }

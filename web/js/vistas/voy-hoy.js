@@ -29,8 +29,8 @@ const PREGUNTAS = [
 ];
 
 const FUENTES = [
-  ['Preguntas mejor que pulsómetro', 'Cómo te sientes refleja la carga de entrenamiento mejor que medidas como el pulso (Saw et al. 2016, revisión '
-    + 'de 56 estudios). El pulso en reposo es poco fiable para ver si estás pasado de carga (Bosquet et al. 2008).'],
+  ['Por qué preguntas', 'Cómo te sientes refleja el cansancio del entrenamiento mejor que muchas mediciones (Saw et al. 2016, revisión '
+    + 'de 56 estudios).'],
   ['Sueño', 'Dormir 6 h o menos baja el rendimiento; en fuerza máxima, poco (alrededor de un 3 %); en series largas, bastante más '
     + '(Craven et al. 2022, metaanálisis de 77 estudios).'],
   ['Estrés', 'Con mucho estrés en la vida, la fuerza tarda más en recuperarse tras un entreno duro (Stults-Kolehmainen et al. 2014; '

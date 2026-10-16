@@ -4,7 +4,7 @@
 // Hay dos clases de descanso:
 //   · entre series: el de Ajustes (2 minutos por defecto);
 //   · dentro de una serie con tramos: el justo para cambiar el peso en un
-//     drop set o para recuperar el aliento en rest-pause;
+//     serie descendente o para recuperar el aliento en rest-pause;
 //   · en miorrepeticiones, en vez de reloj, una guía de respiración: un
 //     círculo que crece al coger aire y mengua al soltarlo (3 respiraciones
 //     de 4 + 4 segundos, por defecto).
@@ -93,13 +93,29 @@ export async function activarNotificaciones() {
   return true;
 }
 
+// Al entrenar, mientras no se haya contestado: «¿Te aviso cuando acabe cada
+// descanso?». Con la pantalla apagada, la app no puede vibrar sola: hace
+// falta el permiso de notificaciones.
+export function preguntaAvisos() {
+  const perfil = estado.datos()?.perfil;
+  if (!puedeNotificar() || perfil?.avisarDescanso !== undefined) return null;
+  if (Notification.permission === 'denied') return null;
+  const caja = h('div', { class: 'tarjeta pregunta-avisos' },
+    h('p', {}, h('strong', {}, '¿Te aviso cuando acabe cada descanso?'),
+      h('small', { class: 'bloque suave' }, 'Con una notificación que vibra, aunque tengas el móvil bloqueado. Mientras, te dice cuánto queda.')),
+    h('div', { class: 'fila-botones' },
+      h('button', { type: 'button', class: 'boton secundario', onclick: () => { estado.cambiar((x) => { x.perfil.avisarDescanso = false; }); caja.remove(); } }, 'Sin avisos, gracias'),
+      h('button', { type: 'button', class: 'boton', onclick: async () => { if (await activarNotificaciones()) caja.remove(); } }, '¡Avísame!')));
+  return caja;
+}
+
 async function notificar(titulo, cuerpo, { silencio = false, vibrar = null } = {}) {
   if (!notificacionesActivas()) return;
   try {
     const reg = await navigator.serviceWorker.ready;
     await reg.showNotification(titulo, {
       body: cuerpo, tag: 'descanso', renotify: !silencio, silent: silencio, icon: './iconos/icono-192.png', badge: './iconos/icono-192.png',
-      vibrate: vibrar ?? (silencio ? [] : [300, 100, 300, 100, 500]), data: { url: location.href },
+      vibrate: vibrar ?? (silencio ? [] : [700, 250, 700, 250, 1000, 250, 1000]), requireInteraction: !silencio, data: { url: location.href },
     });
   } catch { /* sin service worker (navegador de escritorio sin instalar): nada */ }
 }
@@ -168,7 +184,7 @@ function formatear(segundos) {
 // Un pitido corto, sin archivos de sonido, y una vibración si el móvil puede.
 function avisar() {
   try {
-    navigator.vibrate?.([200, 100, 200]);
+    navigator.vibrate?.([600, 200, 600, 200, 900]);
     const audio = new AudioContext();
     const osc = audio.createOscillator();
     const vol = audio.createGain();
@@ -239,10 +255,7 @@ export function barraDescanso() {
       h('span', { class: 'circulo-respira', 'aria-hidden': 'true' }),
       h('span', { class: 'texto-respira' })),
     h('button', { class: 'boton enlace descanso-alargar', onclick: alargar }, pasoAlargar() === 30 ? '+30 s' : '+1 min'),
-    h('button', { class: 'boton enlace', onclick: saltar }, 'Saltar'),
-    puedeNotificar() && Notification.permission !== 'denied' && !estado.datos()?.perfil?.avisarDescanso
-      && h('button', { class: 'boton enlace descanso-campana', 'aria-label': 'Avisarme con una notificación al acabar', title: 'Avisarme al acabar',
-        onclick: async (ev) => { if (await activarNotificaciones()) ev.target.remove(); } }, '🔔'));
+    h('button', { class: 'boton enlace', onclick: saltar }, 'Saltar'));
   cajas.add(caja);
   return caja;
 }

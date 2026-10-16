@@ -1473,13 +1473,13 @@ a.boton-privacidad { justify-content: flex-start; padding-left: 18px; }
 /* Móvil primero: ningún texto se sale de su botón; siempre centrado y, si
    no cabe, en dos líneas. */
 .boton, .boton-marca, .chip, .boton-filtros, .selector-abrir {
-  text-align: center; white-space: normal; overflow-wrap: break-word; hyphens: auto; min-width: 0; max-width: 100%;
+  text-align: center; white-space: normal; overflow-wrap: normal; hyphens: manual; min-width: 0; max-width: 100%;
 }
 .boton-marca { justify-content: center; }
 .fila-marcas > .boton-marca { flex: 1 1 auto; }
 
 /* Los tres modos del mapa caben en 375 px sin partir «Recuperación». */
-.modos-mapa .boton-marca { font-size: .8rem; padding: 6px 2px; overflow-wrap: normal; hyphens: auto; }
+.modos-mapa .boton-marca { font-size: .8rem; padding: 6px 2px; overflow-wrap: normal; hyphens: manual; }
 /* Equilibrio: grupos de botones separados y con su título. */
 .equilibrio .grupo-botones { margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--borde); }
 .equilibrio .grupo-botones > .etiqueta-grupo { display: block; text-align: center; font-size: .8rem; color: var(--texto-suave); margin-bottom: 4px; }
@@ -1602,25 +1602,25 @@ div.sugerencia > span { display: block; }
   position: fixed; inset: 0; z-index: 100;
   display: flex; align-items: center; justify-content: center;
   background: var(--fondo); color: var(--texto);
-  animation: presentacion-fuera .3s ease-in 2s forwards;
+  animation: presentacion-fuera .3s ease-in 2.45s forwards;
 }
 #presentacion .escena { position: relative; width: 240px; height: 120px; display: flex; align-items: center; justify-content: center; }
 #presentacion .caja {
   position: absolute; left: 50%; top: 50%; width: 64px; height: 64px; margin: -32px 0 0 -32px;
   border-radius: 18px; background: var(--acento); box-shadow: 0 10px 28px -8px color-mix(in srgb, var(--acento) 70%, transparent);
   transform: scale(0); opacity: 0;
-  animation: caja-cerrar .38s cubic-bezier(.2,.9,.3,1.3) 1s forwards;
+  animation: caja-cerrar .75s cubic-bezier(.25,.8,.3,1.15) 1s forwards;
 }
 #presentacion .pesa {
   position: absolute; left: 50%; top: 50%; width: 120px; height: 120px; margin: -60px 0 0 -60px;
   color: var(--acento); transform-origin: 50% 85%;
-  animation: pesa-saltar 1s cubic-bezier(.3,0,.4,1) forwards, pesa-encajar .4s cubic-bezier(.2,.9,.3,1.2) 1s forwards;
+  animation: pesa-saltar 1s cubic-bezier(.3,0,.4,1) forwards, pesa-encajar .75s cubic-bezier(.25,.8,.3,1.1) 1s forwards;
 }
 #presentacion .pesa svg { width: 100%; height: 100%; display: block; }
 #presentacion .nombre {
   position: absolute; left: 0; right: 0; top: 50%; margin-top: 44px; text-align: center; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em;
   opacity: 0; transform: translateY(8px);
-  animation: nombre-entrar .35s ease-out 1.45s forwards;
+  animation: nombre-entrar .35s ease-out 1.85s forwards;
 }
 /* Los saltos: avanza desde la izquierda con tres botes, aplastándose al
    caer y estirándose al subir, con un poco de inclinación hacia donde va. */
@@ -1640,18 +1640,24 @@ div.sugerencia > span { display: block; }
 /* Entra en la caja: se encoge al tamaño del icono y se vuelve blanca. */
 @keyframes pesa-encajar {
   0%   { transform: translate(0, 0) scale(1); color: var(--acento); }
-  60%  { transform: translate(0, -26px) scale(.38); color: var(--acento-texto); }
+  45%  { transform: translate(0, -6px) scale(.9); color: var(--acento); }
+  58%  { transform: translate(0, -26px) scale(.38); color: var(--acento-texto); }
   100% { transform: translate(0, -24px) scale(.42); color: var(--acento-texto); }
 }
+/* Al acabar, la pesa se sustituye por su tamaño real (sin escalar): así el
+   borde queda nítido, no borroso. */
+#presentacion .pesa.quieta { animation: none; transform: none; width: 50px; height: 50px; margin: -25px 0 0 -25px; color: var(--acento-texto); }
 @keyframes caja-cerrar {
-  0%   { transform: scale(1.6); opacity: 0; }
-  60%  { transform: scale(.94); opacity: 1; }
-  100% { transform: scale(1); opacity: 1; }
+  0%   { transform: translateY(-90px) scale(1.5); opacity: 0; }
+  35%  { transform: translateY(-50px) scale(1.35); opacity: .9; }
+  58%  { transform: translateY(4px) scale(1.04, .9); opacity: 1; }
+  72%  { transform: translateY(-3px) scale(.97, 1.04); }
+  100% { transform: none; opacity: 1; }
 }
 @keyframes nombre-entrar { to { opacity: 1; transform: none; } }
 @keyframes presentacion-fuera { to { opacity: 0; visibility: hidden; } }
 @media (prefers-reduced-motion: reduce) {
-  #presentacion { animation: presentacion-fuera .3s ease-in .6s forwards; }
+  #presentacion { animation: presentacion-fuera .3s ease-in .8s forwards; }
   #presentacion .pesa { animation: none; transform: translate(0, -24px) scale(.42); color: var(--acento-texto); }
   #presentacion .caja { animation: none; transform: none; opacity: 1; }
   #presentacion .nombre { animation: none; opacity: 1; transform: none; }
@@ -1668,3 +1674,76 @@ div.sugerencia > span { display: block; }
 /* La barra del descanso: el tiempo y los dos botones en una línea. */
 .descanso .boton.enlace { min-width: 0; margin: 0; flex: 0 0 auto; }
 .descanso .descanso-motivo { flex: 1 1 auto; }
+
+/* La serie de prueba del 1RM: un letrero claro en lugar del tipo de serie. */
+.insignia-prueba { display: inline-flex; align-items: center; min-height: 36px; padding: 4px 14px; border-radius: 999px;
+  background: var(--aviso-fondo); color: var(--aviso); border: 1.5px solid var(--aviso); font-weight: 800; letter-spacing: .03em;
+  text-transform: uppercase; font-size: .85rem; }
+
+/* Asistente de series: lo contestado en una línea; la pregunta abierta, debajo. */
+.asistente { display: grid; gap: 10px; }
+.respuesta { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 48px; padding: 8px 14px; font: inherit; text-align: left;
+  color: var(--texto); background: var(--superficie); border: 1px solid var(--borde); border-radius: 14px; cursor: pointer; }
+.respuesta-pregunta { color: var(--texto-suave); font-size: .85rem; min-width: 6.5em; }
+.respuesta strong { flex: 1; }
+.respuesta-cambiar { color: var(--texto-suave); font-size: .8rem; text-decoration: underline; }
+.pregunta-asistente { padding: 12px; border-radius: var(--radio); background: var(--superficie-2); display: grid; gap: 8px; }
+.titulo-pregunta { margin: 0; text-align: center; font-weight: 800; font-size: 1.05rem; }
+.opciones-asistente { display: grid; gap: 8px; }
+.opciones-asistente .boton-marca { width: 100%; }
+.opciones-asistente.compacta { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
+.opciones-asistente.compacta .boton-marca { text-align: center; }
+
+/* Ficha: cada serie en una línea; «Ajustar» abre el detalle. */
+.linea-plan { display: flex; align-items: center; gap: 8px; padding: 8px 6px 8px 12px; margin-bottom: 8px; border-radius: 14px;
+  background: var(--superficie-2); }
+.linea-plan-texto { flex: 1; min-width: 0; }
+.linea-plan .boton.secundario { min-height: 40px; padding: 6px 14px; }
+.plan-ajustando { display: grid; gap: 8px; margin-bottom: 12px; }
+/* Los tres botones de la ficha: siempre en tres columnas iguales. */
+.vistas-ficha { display: grid !important; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 6px; }
+.vistas-ficha .boton-marca { min-width: 0; text-align: center; padding: 6px 4px; font-weight: 600; }
+.vistas-ficha .boton-marca.activo { font-weight: 800; }
+
+/* Iconos de trazo (iconos.js) dentro de botones y textos: del tamaño del texto. */
+.boton-icono .icono, .aviso-cerrar .icono, .pista-cerrar .icono { display: inline-flex; }
+.boton-icono .icono svg, .aviso-cerrar .icono svg, .pista-cerrar .icono svg { width: 20px; height: 20px; }
+.boton .icono svg, .con-icono .icono svg { width: 18px; height: 18px; }
+.con-icono { display: inline-flex; align-items: center; gap: 6px; }
+.pista-icono .icono svg { width: 18px; height: 18px; }
+.boton-icono.papelera, .borrar-serie { color: var(--peligro); }
+.boton-cancelar-x { color: var(--peligro); border: 1.5px solid color-mix(in srgb, var(--peligro) 50%, transparent) !important; }
+
+/* Sin cortes con guion en ninguna parte (Dan): las palabras saltan enteras. */
+html, body, button, .boton, .boton-marca, .opcion, .chip, td, th { hyphens: manual !important; -webkit-hyphens: manual !important; }
+.modos-mapa .boton-marca { word-break: normal; overflow-wrap: normal; }
+.pregunta-avisos { border: 1.5px solid var(--acento); }
+.pregunta-avisos p { margin: 0 0 4px; text-align: center; }
+.pregunta-avisos .fila-botones { margin-top: 8px; }
+
+/* Criterio común (Dan): nada de triángulos de desplegable. Lo que se abre y
+   se cierra es un botoncito redondo, como los modos del mapa: se ve que se
+   toca, y abierto queda marcado. Los apartados grandes (Ajustes, Aprender)
+   llevan una flecha a la derecha. */
+details > summary { list-style: none; }
+details > summary::-webkit-details-marker { display: none; }
+details.explicacion, details.papelera, details.fuente, details.como-llegas, details.instalar-detalle { text-align: center; }
+details.explicacion > summary, .papelera > summary, .fuente > summary, .como-llegas > summary, .instalar details > summary,
+.desplegable-musculos > summary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; width: auto; max-width: 100%; min-height: 40px;
+  margin: 6px auto; padding: 6px 16px; border-radius: 999px; border: 1.5px solid var(--borde); background: var(--superficie);
+  color: var(--texto); font-weight: 600; font-size: .92rem; cursor: pointer; text-align: center;
+}
+details.explicacion > summary::after, .papelera > summary::after, .fuente > summary::after, .como-llegas > summary::after,
+.instalar details > summary::after, .desplegable-musculos > summary::after { content: '+'; font-weight: 800; color: var(--texto-suave); }
+details.explicacion[open] > summary, .papelera[open] > summary, .fuente[open] > summary, .como-llegas[open] > summary,
+.instalar details[open] > summary, .desplegable-musculos[open] > summary { border-color: var(--acento); background: var(--acento-suave); }
+details.explicacion[open] > summary::after, .papelera[open] > summary::after, .fuente[open] > summary::after, .como-llegas[open] > summary::after,
+.instalar details[open] > summary::after, .desplegable-musculos[open] > summary::after { content: '−'; }
+details[open] > :not(summary) { text-align: left; }
+details[open] > .fila-botones, details[open] > .boton, details[open] > .tabla-musculos, details[open] > table { text-align: center; }
+.apartado > summary { justify-content: space-between; }
+.apartado > summary::after { content: '›'; font-size: 1.4rem; color: var(--texto-suave); transition: transform .15s; }
+.apartado[open] > summary::after { transform: rotate(90deg); }
+details.bloque-ciclo.plegable > summary::after { content: '›'; margin-left: auto; font-size: 1.3rem; color: var(--texto-suave); transition: transform .15s; }
+details.bloque-ciclo.plegable[open] > summary::after { transform: rotate(90deg); }

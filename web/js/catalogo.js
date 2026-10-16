@@ -435,7 +435,7 @@ export function tipoDeEjercicio(ej) {
 }
 
 // Máquinas de placas y poleas: sus pesos van de placa en placa y la
-// secuencia de un drop set se puede dejar fija.
+// secuencia de una serie descendente se puede dejar fija.
 export function esMaquinaDePlacas(x) {
   return ['máquina', 'polea'].includes(x?.material);
 }

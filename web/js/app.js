@@ -63,8 +63,49 @@ document.querySelector('.marca-app')?.prepend(icono('marca'));
   if (presentacion) {
     const quitar = () => presentacion.remove();
     presentacion.addEventListener('click', quitar, { once: true });
-    setTimeout(quitar, 2000);
+    setTimeout(() => presentacion.querySelector('.pesa')?.classList.add('quieta'), 1780);
+    setTimeout(quitar, 2800);
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) sonidosPresentacion();
   }
+}
+
+// Los botes y el golpe de la caja, sintetizados (sin archivos). El navegador
+// solo deja sonar si ya has tocado la app alguna vez; si no, se queda mudo.
+function sonidosPresentacion() {
+  let audio;
+  try { audio = new AudioContext(); } catch { return; }
+  const bote = (t, tono) => {
+    const o = audio.createOscillator(); const v = audio.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(tono * 0.6, audio.currentTime + t);
+    o.frequency.exponentialRampToValueAtTime(tono, audio.currentTime + t + 0.06);
+    o.frequency.exponentialRampToValueAtTime(tono * 0.8, audio.currentTime + t + 0.16);
+    v.gain.setValueAtTime(0.0001, audio.currentTime + t);
+    v.gain.exponentialRampToValueAtTime(0.18, audio.currentTime + t + 0.015);
+    v.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + t + 0.18);
+    o.connect(v).connect(audio.destination); o.start(audio.currentTime + t); o.stop(audio.currentTime + t + 0.2);
+  };
+  const golpe = (t) => {
+    const o = audio.createOscillator(); const v = audio.createGain();
+    o.type = 'triangle';
+    o.frequency.setValueAtTime(150, audio.currentTime + t);
+    o.frequency.exponentialRampToValueAtTime(55, audio.currentTime + t + 0.18);
+    v.gain.setValueAtTime(0.0001, audio.currentTime + t);
+    v.gain.exponentialRampToValueAtTime(0.35, audio.currentTime + t + 0.01);
+    v.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + t + 0.25);
+    o.connect(v).connect(audio.destination); o.start(audio.currentTime + t); o.stop(audio.currentTime + t + 0.3);
+  };
+  const sonar = () => {
+    if (audio.state !== 'running') return;
+    // Al compás de la animación, que empezó al pintarse la página.
+    const ya = (document.querySelector('#presentacion .pesa')?.getAnimations?.()[0]?.currentTime ?? 0) / 1000;
+    const en = (t, fn, ...x) => { if (t - ya >= 0) fn(t - ya, ...x); };
+    en(0.28, bote, 520); en(0.6, bote, 600); en(0.88, bote, 680); en(1.44, golpe);
+    setTimeout(() => audio.close(), 2500);
+  };
+  if (audio.state === 'running') sonar();
+  else audio.resume().then(sonar).catch(() => {});
+  setTimeout(() => { if (audio.state !== 'running') audio.close().catch(() => {}); }, 400);
 }
 const principal = document.getElementById('vista');
 const navegacion = document.getElementById('navegacion');
@@ -134,7 +175,7 @@ function pintarBandaEntreno() {
   const enCurso = d?.sesiones?.find((s) => s.estado === 'en-curso' && !s.borrada && !s.tutorial);
   if (!enCurso || location.hash === `#/sesion/${enCurso.id}`) return;
   const banda = h('a', { class: 'banda-entreno', href: `#/sesion/${enCurso.id}` },
-    h('span', {}, '⏱ Entrenamiento en curso'),
+    h('span', { class: 'con-icono' }, icono('reloj'), 'Entrenamiento en curso'),
     h('strong', {}, 'Volver'));
   document.querySelector('.barra-superior').after(banda);
 }

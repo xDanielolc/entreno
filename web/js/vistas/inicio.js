@@ -28,14 +28,14 @@ function avisosDeHoy(d) {
   return recomendacionesGenerales(d)
     .filter((r) => (r.nivel !== 'bien' || r.clave === 'vas-bien') && !YA_SE_VE.has(r.clave))
     .map((r) => pista(`aviso-${r.clave}-${r.texto.split(/[:.]/)[0]}-${semana}`, r.texto,
-      { siempre: true, icono: r.nivel === 'aviso' ? '⚠' : '→', clase: 'pista-aviso' }))
+      { siempre: true, icono: r.nivel === 'aviso' ? 'aviso' : '→', clase: 'pista-aviso' }))
     .filter(Boolean)
     .slice(0, 2);
 }
 
 let preguntandoTutorial = false;
 import { masRecienteAntes, resumenSesion } from './historial.js';
-import { empezarDia, enPuntos, queToca, rutinasActivas } from './rutinas.js';
+import { avisoPlantillaNueva, empezarDia, enPuntos, queToca, rutinasActivas } from './rutinas.js';
 
 // ¿Toca de verdad entrenar hoy? Mira los músculos del día que toca y, si
 // alguno sigue tocado, dice cuándo estará listo. Y si llevas más días parado
@@ -212,6 +212,7 @@ export function vistaInicio(contenedor) {
           h('p', { class: 'suave' }, `${rutina.nombre} · ${toca.descansoHoy ? 'siguiente' : 'hoy toca'}`
             + (toca.motivo ? ` (${toca.motivo})` : '')),
           h('h2', {}, dia.nombre),
+          avisoPlantillaNueva(rutina),
           !dia.ejercicios.length && h('p', { class: 'suave' }, 'Este día no tiene ejercicios todavía'),
           avisoCuandoToca(d, rutina, dia),
           h('button', { class: 'boton grande', onclick: () => empezarConRutina(dia) }, toca.descansoHoy ? 'Empezar igualmente' : 'Empezar'),

@@ -19,7 +19,7 @@ import { aviso, h, modal } from '../ui.js';
 // Comparación de una serie con la anterior y con el ciclo anterior
 // ---------------------------------------------------------------------------
 
-// Lo que se compara: el 1RM estimado si hay carga, el trabajo en un drop set
+// Lo que se compara: el 1RM estimado si hay carga, el trabajo en una serie descendente
 // y lo que midas (tiempo, repeticiones) si no hay carga.
 function medida(datos, ej, serie) {
   if (ej.carga?.tipo === 'ninguna') {

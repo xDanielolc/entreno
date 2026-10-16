@@ -43,7 +43,7 @@ export function redondear(n, decimales = 2) {
 }
 
 // Trabajo de una serie: carga × esfuerzo, sumando los tramos si los tiene
-// (un drop set son varias bajadas, cada una con su peso y sus repeticiones).
+// (una serie descendente son varias bajadas, cada una con su peso y sus repeticiones).
 export function trabajoSerie(serie) {
   if (serie.tramos?.length) {
     return serie.tramos.reduce((t, x) => t + (x.carga ?? 0) * (x.esfuerzo ?? 0), 0) || null;
@@ -109,7 +109,7 @@ export function sugerenciaSerie(datos, ejercicio, plan, { excluirSesion } = {}) 
   const historial = seriesDeEjercicio(datos, ejercicio.id, { excluirSesion, planId: plan.id });
   const ultima = historial.at(-1) ?? null;
   // Si esta serie es nueva pero el ejercicio ya se ha hecho, se parte de la
-  // última carga conocida: así un drop set recién creado no sale vacío.
+  // última carga conocida: así una serie descendente recién creada no sale vacía.
   const referencia = ultima
     ?? seriesDeEjercicio(datos, ejercicio.id, { excluirSesion }).filter((x) => x.serie.carga != null).at(-1)
     ?? null;
@@ -122,6 +122,10 @@ export function sugerenciaSerie(datos, ejercicio, plan, { excluirSesion } = {}) 
 
   if (prog.tipo === 'maximo-trabajo') {
     return { ...base, ...maximoTrabajo(datos, ejercicio, { excluirSesion, tope: prog.topeEsfuerzo ?? 50 }) };
+  }
+
+  if (prog.tipo === 'carga' && prog.porRM && sobre === 'carga') {
+    return { ...base, ...sugerenciaPorRM(datos, ejercicio, plan, { excluirSesion, ultima }) };
   }
 
   if (prog.tipo === 'carga') {
@@ -189,6 +193,52 @@ export function sugerenciaSerie(datos, ejercicio, plan, { excluirSesion } = {}) 
   return { ...base, carga: ultima?.serie.carga ?? referencia?.serie.carga ?? null };
 }
 
+// El mejor 1RM de las últimas `semanas` semanas (sin bajadas); si no hay
+// series en ese plazo, el de siempre (o el puesto a mano).
+export function rmReciente(datos, ejercicio, semanas = 8, { excluirSesion } = {}) {
+  const desde = new Date(Date.now() - semanas * 7 * 86_400_000);
+  const corte = `${desde.getFullYear()}-${String(desde.getMonth() + 1).padStart(2, '0')}-${String(desde.getDate()).padStart(2, '0')}`;
+  let mejor = null;
+  for (const x of seriesDeEjercicio(datos, ejercicio.id, { excluirSesion })) {
+    if (x.sesion.fecha < corte || x.serie.tipo === 'calentamiento') continue;
+    const rm = rmSinTramos(datos, ejercicio, x.serie);
+    if (rm && (!mejor || rm > mejor.valor)) mejor = { valor: redondear(rm, 1), fecha: x.sesion.fecha };
+  }
+  if (mejor) return mejor;
+  const siempre = rmDeReferencia(datos, ejercicio, { excluirSesion });
+  return siempre ? { valor: siempre.valor, fecha: null, deSiempre: true } : null;
+}
+
+// El peso de una serie de doble progresión o «según tu 1RM» a partir de un
+// 1RM: el que da el máximo del rango (o las repeticiones fijadas) dejando la
+// recámara pedida, o el porcentaje fijado.
+export function pesoDePlan(datos, ejercicio, plan, rm) {
+  const prog = plan.progresion ?? {};
+  if (!(rm > 0)) return null;
+  if (prog.porRM?.fija === 'pct') return aPesoDisponible(ejercicio, (rm * prog.porRM.valor) / 100);
+  const reps = prog.porRM?.valor ?? prog.objetivoEsfuerzo?.[1];
+  if (!(reps > 0)) return null;
+  const recamara = prog.recamaraMin ?? ejercicio.recamaraPorDefecto ?? datos.perfil?.recamaraPorDefecto ?? 1;
+  const peso = pesoParaReps(modeloDe(datos, ejercicio), rm, reps, recamara);
+  return peso > 0 ? aPesoDisponible(ejercicio, peso) : null;
+}
+
+// «Peso según tu 1RM»: el peso sale de tu máximo reciente y el objetivo son
+// las repeticiones que superan el 1RM de la última vez con ese peso.
+function sugerenciaPorRM(datos, ejercicio, plan, { excluirSesion, ultima }) {
+  const prog = plan.progresion;
+  const rm = rmReciente(datos, ejercicio, prog.porRM.semanas ?? 8, { excluirSesion });
+  const comun = { porRM: true, rango: prog.objetivoEsfuerzo, recamaraMin: prog.recamaraMin ?? null };
+  if (!rm) return { ...comun, carga: null, sinRM: true };
+  const carga = pesoDePlan(datos, ejercicio, plan, rm.valor);
+  const recamara = prog.recamaraMin ?? ejercicio.recamaraPorDefecto ?? datos.perfil?.recamaraPorDefecto ?? 1;
+  const rmUltima = ultima ? rmSinTramos(datos, ejercicio, ultima.serie) : null;
+  const iguala = rmUltima && carga > 0 ? repsParaIgualar(modeloDe(datos, ejercicio), rmUltima, carga, recamara) : null;
+  const objetivoSuperar = iguala != null ? Math.min(40, Math.floor(Math.max(0, iguala)) + 1) : null;
+  return { ...comun, carga, rmUsado: rm.valor, rmFecha: rm.fecha, rmUltima, objetivoSuperar,
+    esfuerzoObjetivo: prog.porRM.fija === 'reps' ? prog.porRM.valor : null };
+}
+
 // La fase de repeticiones que toca en la sesión `dia` del ciclo. Cada fase
 // dura sus sesiones; al acabar la última se vuelve a la primera.
 export function faseDelDia(fases, dia) {
@@ -219,9 +269,9 @@ function objetivosExtra(gen, dia) {
 // usa el reinicio «al % del mejor 1RM de este ciclo».
 export const modeloDeEjercicio = (datos, ejercicio) => modeloDe(datos, ejercicio);
 
-// El 1RM de una serie, sin las de tramos (drop set, rest-pause…): su peso es
+// El 1RM de una serie, sin las de tramos (serie descendente, rest-pause…): su peso es
 // el del primer tramo y sus repeticiones, la suma de todos; el 1RM saldría
-// inflado y el siguiente drop set arrancaría cada vez más alto.
+// inflado y el siguiente serie descendente arrancaría cada vez más alto.
 function rmSinTramos(datos, ejercicio, serie) {
   return serie.tramos?.length ? null : rmDeSerie(datos, ejercicio, serie, esfuerzoTotal(serie));
 }
@@ -577,7 +627,7 @@ export function maximoTrabajo(datos, ejercicio, { excluirSesion, tope = 50 } = {
     trabajoEsperado: redondear(ajuste.trabajoEn(carga), 0), cima: aPasoDeDisco(cima), aviso };
 }
 
-// Pesos propuestos para las bajadas de un drop set, a partir de la carga de
+// Pesos propuestos para las bajadas de una serie descendente, a partir de la carga de
 // la serie y de la última vez que se hizo.
 // Valores por defecto de cada técnica con tramos, según Ajustes.
 export function tramosPorDefecto(perfil, tecnica) {

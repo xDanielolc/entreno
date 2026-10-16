@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 16;
+export const VERSION_ACTUAL = 17;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -74,7 +74,7 @@ export const TIPOS_SERIE = {
 //   campos  casillas propias de esa técnica (segundos, repeticiones lentas…)
 //   recamara  fija las repeticiones que dejas sin hacer (0 = hasta el fallo)
 export const TECNICAS = {
-  'drop-set':           { etiqueta: 'Drop set',           tramos: { nombre: 'Bajada', salto: 10 } },
+  'drop-set':           { etiqueta: 'Serie descendente',           tramos: { nombre: 'Bajada', salto: 10 } },
   'rest-pause':         { etiqueta: 'Rest-pause',         tramos: { nombre: 'Miniserie', salto: 0 }, recamara: 0 },
   'miorepeticiones':    { etiqueta: 'Miorrepeticiones',   tramos: { nombre: 'Miniserie', salto: 0 } },
   'isometrico-final':   { etiqueta: 'Isométrico final',   campos: [{ clave: 'segundos', etiqueta: 'Isométrico', unidad: 's' }] },
@@ -288,7 +288,7 @@ const MIGRACIONES = {
   },
 
   // v4: el fallo deja de ser técnica y pasa a la recámara; las bajadas de un
-  // drop set se guardan en kilos fijos (lo que se quita de la barra).
+  // serie descendente se guardan en kilos fijos (lo que se quita de la barra).
   3: (datos) => {
     const limpiar = (x) => {
       if (!x.tecnicas) return;
@@ -311,7 +311,7 @@ const MIGRACIONES = {
     return datos;
   },
 
-  // v5: ajustes generales del drop set (cuántas bajadas, cuántos kilos por
+  // v5: ajustes generales de la serie descendente (cuántas bajadas, cuántos kilos por
   // bajada y con qué porcentaje del 1RM se arranca).
   4: (datos) => {
     datos.perfil.dropSet ??= { bajadas: 4, salto: 10, inicioPorcentaje: 80 };
@@ -327,8 +327,8 @@ const MIGRACIONES = {
     return datos;
   },
 
-  // v7: descansos propios dentro de una serie (entre bajadas de un drop set,
-  // rest-pause y miorrepeticiones) y relleno automático del drop set con el
+  // v7: descansos propios dentro de una serie (entre bajadas de una serie descendente,
+  // rest-pause y miorrepeticiones) y relleno automático de la serie descendente con el
   // 1RM de la serie de arriba. Además se limpian los pesos «NaN» que dejaba
   // el botón «+ Bajada» de la versión anterior.
   6: (datos) => {
@@ -392,7 +392,7 @@ const MIGRACIONES = {
   },
 
   // v10: tutoriales (nivel y avisos ya vistos), modo de entreno preferido,
-  // drop set por kg o % en cuatro niveles (Ajustes, ejercicio, ejercicio de
+  // serie descendente por kg o % en cuatro niveles (Ajustes, ejercicio, ejercicio de
   // una rutina y serie del día), fracción del peso corporal por ejercicio
   // (flexiones ≈ 64 %) y lastre en las series de peso corporal.
   9: (datos) => {
@@ -493,6 +493,14 @@ const MIGRACIONES = {
       if (f < 1 && (ej.fraccionCorporal == null || ej.fraccionCorporal === 1)) ej.fraccionCorporal = f;
     }
     datos.version = 16;
+    return datos;
+  },
+  // v16 → v17: campos nuevos opcionales, sin nada que convertir:
+  // `progresion.porRM` ({ fija: 'reps' | 'pct', valor, semanas }: peso según
+  // tu 1RM reciente) y `rutina.versionPlantilla` (de qué versión de la
+  // prehecha salió).
+  16: (datos) => {
+    datos.version = 17;
     return datos;
   },
 };

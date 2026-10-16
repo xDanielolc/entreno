@@ -6,6 +6,7 @@
 // apague la pantalla. Pide mantener la pantalla encendida si el navegador
 // lo permite (Wake Lock).
 
+import { icono } from '../iconos.js';
 import * as estado from '../estado.js';
 import { h, modal } from '../ui.js';
 import { queEs } from './glosario.js';
@@ -80,7 +81,7 @@ export function abrirIntervalos({ alTerminar } = {}) {
           estado.cambiar((x) => { x.perfil.hiitPropios = (x.perfil.hiitPropios ?? []).filter((y) => y.nombre !== p.nombre); }, { tecleo: true });
           if (config.preset === k) config.preset = 'tabata';
           pintarConfig();
-        } }, '✕')))),
+        } }, icono('cerrar'))))),
       h('p', { class: 'nota' }, todos()[config.preset]?.descripcion ?? ''),
       h('div', { class: 'fila-campos' },
         campo('Trabajo (s)', 'trabajo'), campo('Descanso (s)', 'descanso'), campo('Rondas', 'rondas')),

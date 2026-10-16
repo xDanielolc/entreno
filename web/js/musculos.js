@@ -23,7 +23,7 @@ export const MUSCULOS = {
   antebrazoFlexor:   { nombre: 'Antebrazo interior (flexores)', corto: 'Antebrazo interior', grupo: 'tirón', tamano: 'pequeno', vistas: ['delante'], propia: true },
   antebrazoExtensor: { nombre: 'Antebrazo exterior (extensores)', corto: 'Antebrazo exterior', grupo: 'tirón', tamano: 'pequeno', vistas: ['detras'], propia: true },
   abdomen:         { nombre: 'Abdomen',          grupo: 'core',   tamano: 'medio',   vistas: ['delante'], propia: true },
-  oblicuos:        { nombre: 'Oblicuos',         grupo: 'core',   tamano: 'pequeno', vistas: ['delante'] },
+  oblicuos:        { nombre: 'Oblicuos',         grupo: 'core',   tamano: 'pequeno', vistas: ['delante'], propia: true },
   dorsal:          { nombre: 'Dorsal',           grupo: 'tirón',  tamano: 'grande',  vistas: ['detras'] },
   lumbar:          { nombre: 'Lumbares',         grupo: 'core',   tamano: 'medio',   vistas: ['detras'], propia: true },
   gluteo:          { nombre: 'Glúteo',           grupo: 'pierna', tamano: 'grande',  vistas: ['detras'] },

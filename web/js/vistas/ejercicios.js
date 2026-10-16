@@ -1,3 +1,4 @@
+import { icono } from '../iconos.js';
 import {
   REDONDEO_POR_DEFECTO, aPesoDisponible, cicloActual, formatearNumero, generarEscalera, lecturaDesdeCarga, pesosDeMaquina, registrosDelCiclo,
   modeloDeEjercicio, rmDeReferencia, seriesDelPrograma,
@@ -24,6 +25,9 @@ import { pista } from './tutorial.js';
 import { explicar } from './glosario.js';
 import { barraFiltros, cajaLista, ejercicioDesdeCatalogo, elegirEjercicio, filtrar, hayFiltro, ordenActual, pieCatalogo, tarjetaItem } from './selector-ejercicios.js';
 import { selectorTecnicas } from './tecnicas.js';
+import { abrirAsistenteSeries } from './configurar-series.js';
+import { crearPlanesRapidos } from '../rapidas.js';
+import { nombreRegla, resumenPlanes } from '../series.js';
 import { TECNICAS } from '../esquema.js';
 
 // Grupos habituales, para el desplegable de la ficha.
@@ -169,6 +173,9 @@ function ejercicioVacio() {
 }
 
 const VISTAS_FICHA = { progreso: 'Progreso', todo: 'Ficha completa', paso: 'Paso a paso' };
+// La foto de cada ejercicio al abrirlo y las series que se están ajustando a mano.
+const fotosFicha = new Map();
+const planesAjustando = new Set();
 const vistaFicha = new Map();    // id del ejercicio → vista elegida
 let musculosAbiertos = false;   // «Músculos» de la ficha abierto al repintar
 const pasoFicha = new Map();     // id del ejercicio → paso en el que ibas
@@ -195,6 +202,8 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
   // Se edita un borrador que se guarda solo a cada cambio, en cuanto tiene
   // nombre: salir de la pantalla no pierde nada.
   const retomado = !existente && !paraSesion && Boolean(borradorNuevo);
+  // Cómo estaba al entrar, para «Deshacer los cambios».
+  if (existente && !fotosFicha.has(existente.id)) fotosFicha.set(existente.id, structuredClone(existente));
   const borrador = existente ? structuredClone(existente) : paraSesion ? ejercicioVacio() : (borradorNuevo ??= ejercicioVacio());
   borrador.series ??= [];
   // Las series que solo usa alguna rutina se cambian desde la rutina: aquí
@@ -418,13 +427,18 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
       h('fieldset', {},
         h('legend', {}, '¿Cómo te lleva la app? ', ayuda('Cómo te lleva la app', [
           'Cada vez que entrenes, la app te dice el peso y el objetivo de cada serie según esta regla. Tú solo apuntas lo que haces.',
-          'Si el ejercicio lleva series distintas (una Bilbo y luego una con drop set, por ejemplo), añade otra serie con otra '
+          'Si el ejercicio lleva series distintas (una Bilbo y luego una con serie descendente, por ejemplo), añade otra serie con otra '
             + 'regla: cada una aparece al entrenar y sigue la suya.'])),
-        borrador.series.map((plan, i) => tarjetaPlan(plan, i)),
-        h('button', { type: 'button', class: 'boton secundario', onclick: () => {
-          borrador.series.push(serieNuevaPlantilla(borrador, { tipo: 'libre' }));
+        borrador.series.map((plan, i) => (planesAjustando.has(plan.id) ? h('div', { class: 'plan-ajustando' }, tarjetaPlan(plan, i),
+          h('button', { type: 'button', class: 'boton secundario', onclick: () => { planesAjustando.delete(plan.id); repintar(); } }, 'Hecho'))
+          : lineaPlan(plan, i))),
+        h('button', { type: 'button', class: 'boton', onclick: () => abrirAsistenteSeries({ ej: borrador, datos: d, contexto: 'ficha',
+          alAceptar: (f) => { borrador.series.push(...crearPlanesRapidos(d, borrador, f)); repintar(); persistir(); } }) }, '+ Añadir series'),
+        h('button', { type: 'button', class: 'boton enlace', onclick: () => {
+          const plan = serieNuevaPlantilla(borrador, { tipo: 'libre' });
+          borrador.series.push(plan); planesAjustando.add(plan.id);
           repintar();
-        } }, '+ Otra serie con otra regla')),
+        } }, 'Montar una serie a mano (avanzado)')),
 
       h('details', { class: 'tarjeta explicacion' },
         h('summary', {}, 'Ajustes finos'),
@@ -455,7 +469,7 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         ? 'Los cambios se guardan solos.'
         : 'En cuanto le pongas nombre, se guarda solo.'),
       h('div', { class: 'fila-botones' },
-        !existente && h('button', { type: 'button', class: 'boton secundario', onclick: descartar }, 'Descartar'),
+        h('button', { type: 'button', class: 'boton secundario', onclick: existente ? deshacerTodo : descartar }, existente ? 'Deshacer los cambios' : 'Descartar'),
         h('button', { class: 'boton', type: 'submit' }, 'Listo')),
 
       accionesEjercicio()];
@@ -502,7 +516,7 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
       ultimo && accionesEjercicio());
   }
 
-  // Máquina con sus pesos: la app solo propone pesos que existen (drop sets,
+  // Máquina con sus pesos: la app solo propone pesos que existen (series descendentes,
   // subidas de la doble progresión, ciclos). Se generan de golpe y se pueden
   // copiar de otro ejercicio de la misma máquina.
   function seccionPesosMaquina() {
@@ -521,7 +535,7 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
       pesos.length
         ? h('div', { class: 'tecnicas' }, pesos.map((p) => h('span', { class: 'chip' }, formatearNumero(p),
           h('button', { type: 'button', class: 'chip-quitar', 'aria-label': `Quitar ${p} kg`,
-            onclick: () => { borrador.pesosMaquina = pesos.filter((x) => x !== p); repintar(); } }, '✕'))))
+            onclick: () => { borrador.pesosMaquina = pesos.filter((x) => x !== p); repintar(); } }, icono('cerrar')))))
         : h('p', { class: 'nota' }, 'Sin pesos: la app redondeará a 2,5 kg. Mete los de la máquina para que solo te proponga pesos que existan.'),
       h('div', { class: 'fila-campos' },
         campo('Del primero', numeroInput(gen.desde, (v) => { gen.desde = v; }, { onchange: generar })),
@@ -544,7 +558,7 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
           aviso(`Pesos de ${elegido.nombre} copiados.`);
         }, { titulo: 'Copiar los pesos de otro ejercicio de la misma máquina', lista: true }),
       pesos.length > 0 && h('small', { class: 'nota' }, `${pesos.length} pesos, de ${formatearNumero(pesos[0])} a ${formatearNumero(pesos.at(-1))} kg. `
-        + 'Los drop sets, las subidas y los ciclos usarán solo estos.'));
+        + 'Las series descendentes, las subidas y los ciclos usarán solo estos.'));
   }
 
   // Agarre: en los ejercicios donde agarras (tirones, peso muerto, curls),
@@ -822,6 +836,19 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         }, nombreMusculo(m)))));
   }
 
+  // Cada serie en una línea: qué es y cómo la lleva la app. «Ajustar» abre
+  // todo el detalle (lo de antes) solo para esa serie.
+  function lineaPlan(plan, i) {
+    return h('div', { class: 'linea-plan' },
+      h('span', { class: 'linea-plan-texto' }, h('strong', {}, resumenPlanes([plan], borrador)), h('small', { class: 'bloque suave' }, nombreRegla(plan))),
+      h('button', { type: 'button', class: 'boton secundario', onclick: () => { planesAjustando.add(plan.id); repintar(); } }, 'Ajustar'),
+      borrador.series.length > 1 && h('button', { type: 'button', class: 'boton-icono', 'aria-label': `Quitar la serie ${i + 1}`, onclick: () => {
+        const [quitada] = borrador.series.splice(i, 1);
+        repintar(); persistir();
+        aviso(`Serie quitada: ${resumenPlanes([quitada], borrador)}.`, { accion: { texto: 'Deshacer', fn: () => { borrador.series.splice(i, 0, quitada); repintar(); persistir(); } } });
+      } }, icono('cerrar')));
+  }
+
   // Qué reglas puede llevar una serie según cómo se mide el ejercicio.
   // Qué hace la app con esta serie. Cuatro opciones y nada más: casi todo
   // es un ciclo (una escalera que sube y, cuando se acaba, vuelve a empezar
@@ -1032,7 +1059,7 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
             const [quitada] = borrador.series.splice(i, 1);
             repintar();
             aviso(`Serie ${i + 1} quitada.`, { accion: { texto: 'Deshacer', fn: () => { borrador.series.splice(i, 0, quitada); repintar(); } } });
-          } }, '🗑')),
+          } }, icono('papelera'))),
 
       opciones(REGLAS, regla, (r) => fijarRegla(plan, r), { compacto: true }),
       // Donde se presenta el ciclo, su «?»: qué es la sobrecarga progresiva.
@@ -1058,7 +1085,7 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
           'Guardar esta regla como prehecho mío')),
 
       // Cómo es la serie: las técnicas valen para cualquier regla, también
-      // dentro de un ciclo. Un drop set es una forma de hacer la serie, no
+      // dentro de un ciclo. Una serie descendente es una forma de hacer la serie, no
       // una progresión.
       regla !== 'libre' && !estira && tipoDeEjercicio(borrador) !== 'cardio'
       && bloque('¿Añadir técnica avanzada de intensidad?',
@@ -1435,7 +1462,7 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
               campo(`Fase ${k + 1}: repeticiones`, numeroInput(f.reps, (v) => { f.reps = v; toca(); })),
               campo('Durante (sesiones)', numeroInput(f.sesiones, (v) => { f.sesiones = Math.max(1, Math.round(v ?? 1)); toca(); })),
               gen.fases.length > 1 && h('button', { type: 'button', class: 'boton-icono', 'aria-label': `Quitar la fase ${k + 1}`,
-                onclick: () => { gen.fases.splice(k, 1); toca(); repintar(); } }, '✕'))),
+                onclick: () => { gen.fases.splice(k, 1); toca(); repintar(); } }, icono('cerrar')))),
             h('button', { type: 'button', class: 'boton enlace', onclick: () => {
               const ultima = gen.fases.at(-1);
               gen.fases.push({ reps: Math.max(1, (ultima?.reps ?? 10) - 2), sesiones: ultima?.sesiones ?? 6 });
@@ -1550,6 +1577,8 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
   }
 
   function guardar() {
+    if (existente) fotosFicha.delete(existente.id);
+    planesAjustando.clear();
     borrador.nombre = borrador.nombre.trim();
     if (!borrador.nombre) { aviso('Ponle un nombre al ejercicio', { tipo: 'error' }); return; }
     if (borrador.series.some((s) => s.progresion?.sinMejora)) {
@@ -1578,6 +1607,17 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
       return;
     }
     estado.emitir('datos');
+    location.hash = '#/ejercicios';
+  }
+
+  // Vuelve el ejercicio a como estaba al abrir la ficha.
+  async function deshacerTodo() {
+    if (!await confirmar('¿Deshacer todo lo que has cambiado en este ejercicio desde que lo abriste?', { si: 'Deshacer' })) return;
+    const foto = fotosFicha.get(existente.id);
+    if (foto) estado.cambiar((datos) => { const i = datos.ejercicios.findIndex((x) => x.id === foto.id); if (i >= 0) datos.ejercicios[i] = structuredClone(foto); });
+    fotosFicha.delete(existente.id);
+    planesAjustando.clear();
+    aviso('Ejercicio como estaba al abrirlo.');
     location.hash = '#/ejercicios';
   }
 

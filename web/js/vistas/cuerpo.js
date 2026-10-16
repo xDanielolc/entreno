@@ -1,6 +1,7 @@
 // Mapa de recuperación: qué músculos están listos y cuáles siguen tocados,
 // más el volumen de la semana con sus avisos.
 
+import { icono } from '../iconos.js';
 import { formatearNumero } from '../calculos.js';
 import * as estado from '../estado.js';
 import { cuentaParaFatiga } from '../catalogo.js';
@@ -69,7 +70,7 @@ export function tarjetaRecuperacion(datos, { compacta = false, extra = null } = 
       h('p', { class: 'nota' }, 'Con detalle, para quien quiera saberlo:'),
       h('ul', {},
         h('li', {}, 'Lo cerca del fallo que acabaste las series, que es lo que más pesa: con 3 o más en recámara, 24 h; '
-          + 'con 1 o 2, 36 h; al fallo, 48 h; al fallo con más de 15 repeticiones o con drop set, 60 h. '
+          + 'con 1 o 2, 36 h; al fallo, 48 h; al fallo con más de 15 repeticiones o con serie descendente, 60 h. '
           + 'Se hace la media de tus series con la más dura. Los estudios miden a las 24 y 48 h; las 36 y 60 h son estimaciones de la app.'),
         h('li', {}, 'El volumen, que pesa cada vez menos: una serie se queda en el 57 % de esas horas, '
           + 'dos en el 69 %, tres en el 78 %, cinco en el 89 %, ocho en el 96 % y a partir de ahí casi no cambia.'),
@@ -214,7 +215,7 @@ function tarjetaPeso(d) {
       h('tbody', {}, [...pesos].reverse().map((p) => h('tr', {},
         h('td', {}, fechaCorta(p.fecha)), h('td', {}, `${formatearNumero(p.kg)} kg`),
         h('td', {}, h('button', { type: 'button', class: 'boton-icono', 'aria-label': `Borrar el peso del ${fechaCorta(p.fecha)}`,
-          onclick: () => estado.cambiar((x) => { quitarPeso(x, p.fecha); }) }, '✕'))))))));
+          onclick: () => estado.cambiar((x) => { quitarPeso(x, p.fecha); }) }, icono('cerrar')))))))));
 }
 
 function tarjetaMapa(d) {
@@ -271,7 +272,7 @@ function tarjetaMapa(d) {
     modoMapa === 'recuperacion' && plegable('cuerpo-calculo', 'Cómo se calcula', {},
       h('ul', { class: 'nota' },
         h('li', {}, 'Justo al acabar, el músculo está al 0 % y sube hasta el 100 %.'),
-        h('li', {}, 'Lo que más pesa es lo cerca del fallo que acabaste: de 24 h (3 o más en recámara) a 60 h (al fallo con drop set o más de 15 repeticiones).'),
+        h('li', {}, 'Lo que más pesa es lo cerca del fallo que acabaste: de 24 h (3 o más en recámara) a 60 h (al fallo con serie descendente o más de 15 repeticiones).'),
         h('li', {}, 'Más series alargan algo el tiempo, cada vez menos.'),
         h('li', {}, 'Tu ritmo de recuperación (abajo) lo alarga o lo acorta.'),
         h('li', {}, 'Respaldo: Morán-Navarro 2017 y Pareja-Blanco 2019 y 2020 (miden a las 24 y 48 h; las 36 y 60 h son estimaciones de la app). La forma exacta de la curva es una aproximación de la app.'))));
@@ -325,7 +326,7 @@ function tarjetaSeries(d) {
         h('li', {}, 'Puedes poner el tuyo tocando el número.'),
         h('li', {}, 'Rojo: te falta mucho. Ámbar: te falta algo. Verde: en su sitio. Azul: te pasas. Morado: te pasas mucho.'),
         h('li', {}, `El máximo es ${SERIES_MAXIMAS} series, o el doble de tu objetivo. Si te pasas y el músculo no se ha recuperado, sale en morado.`),
-        h('li', {}, 'Un músculo secundario cuenta media serie. Un drop set, según lo que elijas en Ajustes.'),
+        h('li', {}, 'Un músculo secundario cuenta media serie. Una serie descendente, según lo que elijas en Ajustes.'),
         h('li', {}, 'Estiramientos, movilidad y yoga no cuentan.')),
       h('a', { class: 'boton enlace', href: '#/aprender', onclick: () => abrirAlLlegar('ap-de-donde-sale-cada-cosa', 'ap-series-por-musculo-y-semana') },
         'De dónde salen estos números')));

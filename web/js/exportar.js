@@ -30,7 +30,7 @@ const hora = (iso) => (iso ? new Date(iso).toLocaleTimeString('es-ES', { hour: '
 
 // Una fila por ejercicio y día, con cada serie en su columna, como en una
 // hoja de gimnasio: «60 kg × 12 + 1» (peso × repeticiones + recámara); un
-// drop set se escribe «60×8 → 50×6 → 40×5».
+// serie descendente se escribe «60×8 → 50×6 → 40×5».
 const coma = (n) => (n == null ? '' : String(Math.round(n * 100) / 100).replace('.', ','));
 
 function textoSerieCorto(ej, serie) {
@@ -49,7 +49,7 @@ export function csvEntrenamientos(datos) {
   const cabecera = ['Fecha', 'Rutina', 'Día', 'Sitio', 'Ejercicio'];
   for (let i = 1; i <= MAX; i++) cabecera.push(`Serie ${i}`);
   cabecera.push('Mejor 1RM del día', 'Comentarios de las series', 'Comentarios del entrenamiento');
-  const lineas = [['Cada serie: peso × repeticiones + las que te quedaban. Un drop set: 60×8 → 50×6.'], cabecera];
+  const lineas = [['Cada serie: peso × repeticiones + las que te quedaban. Una serie descendente: 60×8 → 50×6.'], cabecera];
   const sesiones = [...datos.sesiones].filter((s) => !s.borrada)
     .sort((a, b) => (a.fecha + (a.inicio || '')).localeCompare(b.fecha + (b.inicio || '')));
   for (const s of sesiones) {

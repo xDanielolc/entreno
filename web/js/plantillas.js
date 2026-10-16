@@ -39,6 +39,9 @@ const deTexto = (texto) => ({ texto, dias: analizarRutina(texto).dias.map((d) =>
 export const PLANTILLAS = [
   {
     id: 'fuerza-sin-maquinas',
+    // Sube este número cada vez que cambie la rutina: las rutinas hechas con
+    // una versión anterior ofrecen actualizarse.
+    version: 2,
     nombre: 'Fuerza sin máquinas: cuatro días',
     autor: 'Dan (su rutina de 10-2026)',
     resumen: 'Dos días de torso y dos de pierna, solo con barra, mancuernas y tu peso. Cada básico tiene un día pesado '
@@ -47,49 +50,53 @@ export const PLANTILLAS = [
       + 'pesadas y moderadas (Moesgaard 2022) y quedándose a 2 del fallo en lo pesado, que rinde igual y cansa menos (Pareja-Blanco '
       + '2017; Robinson 2024). La serie máxima de 1-2 repeticiones es la que mejor mide el 1RM (Mayhew 2008) y practicarlo también '
       + 'se entrena (Mattocks 2017). La serie Bilbo, ligera y rápida como primera serie, no perjudica el 1RM (González-Alcázar 2025). '
-      + 'Tríceps estirado (Maeo 2023), gemelo de pie (Kinoshita 2023) y un drop set al final para ahorrar tiempo (Sødal 2023). '
+      + 'Tríceps estirado (Maeo 2023), gemelo de pie (Kinoshita 2023) y una serie descendente al final para ahorrar tiempo (Sødal 2023). '
       + 'Las dominadas se aprenden con negativas y racimos de 1-2 con pausas (Cuevas-Aburto 2021 muestra que repartir las '
-      + 'repeticiones da el mismo rendimiento). El 4 × 4, las negativas, el curl nórdico y el 90 % de la serie máxima son decisiones '
-      + 'prácticas sin estudio propio.',
-    comoSeHace: 'Sigue los cuatro días en orden cuando estés recuperado, sin dejar pasar más de 3 o 4 días entre sesiones. Calienta '
-      + 'el primer básico con 2 o 3 series de aproximación. En la serie máxima pon un peso con el que hagas 1 o 2 dejándote 1 o 2 en '
-      + 'recámara: de ahí sale tu 1RM. En las series de 4, el peso sube solo cuando las sacas con 2 en recámara. Descansa 3 minutos '
-      + 'en lo pesado y 45-60 s entre las dominadas en racimo. El cardio del final es opcional. Sesiones de 60 a 70 minutos.',
+      + 'repeticiones da el mismo rendimiento). El curl femoral sentado hizo crecer más los isquios que el tumbado (Maeo 2021) y que '
+      + 'el nórdico (Maeo 2024): es la única máquina de la rutina. Calentar mejora el rendimiento sobre todo en lo pesado (Fradkin 2010; '
+      + 'Abad 2011). El 4 × 4, las negativas y el 90 % de la serie máxima son decisiones prácticas sin estudio propio.',
+    comoSeHace: 'Sigue los cuatro días en orden cuando estés recuperado, sin dejar pasar más de 3 o 4 días entre sesiones. '
+      + 'Calentamiento: los días de pierna, los 15 minutos de cardio suave del principio; los de torso, 5 minutos de bici o andar. '
+      + 'En el primer básico, series de aproximación: barra sola × 10, 50 % × 8, 70 % × 3 y 80 % × 1-2 (y 85 % × 1 si toca serie '
+      + 'máxima); en el segundo y el tercero, 60 % × 5 y 80 % × 2. La Bilbo no necesita calentamiento. En la serie máxima pon un peso '
+      + 'con el que hagas 1 o 2 dejándote 1 en recámara: de ahí sale tu 1RM. En las series de 4, el peso sube solo cuando las sacas '
+      + 'con 2 en recámara. Descansa 3 minutos en lo pesado y 45-60 s entre las dominadas en racimo. El curl femoral sentado, en su '
+      + 'ficha, «de un solo sitio»: cada máquina pesa distinto. Sesiones de 60 a 70 minutos.',
     ...deTexto(`Día 1: Torso, banca pesada
 Press de banca: máxima 1-2 + 4 × 4 con 2 en recámara (máxima a un 90 %; después 80-85 %, 3 min de descanso)
 Remo con barra: Bilbo + 2 × 8-10 con 2 en recámara
 Press militar: Bilbo + 2 × 8-10 con 2 en recámara
 Dominadas negativas: 3 × 3-5 (bajada de 3-5 s; sube con salto o desde un banco)
-Curl martillo: 2 × 8-12 con 1 en recámara, drop set en la última (alterno, con mancuernas)
-Extensión de tríceps sobre la cabeza: 2 × 8-12 con 1 en recámara, drop set en la última (con mancuerna)
+Curl martillo: 2 × 8-12 con 1 en recámara, serie descendente en la última (alterno, con mancuernas)
+Extensión de tríceps sobre la cabeza: 2 × 8-12 con 1 en recámara, serie descendente en la última (con mancuerna)
 Elevaciones laterales: 2 × 12-15 con 1 en recámara
 Pájaro a una mano: 2 × 12-15 con 1 en recámara (por brazo)
 
 Día 2: Pierna, sentadilla pesada
+Cardio: calentamiento 15 min (suave: bici, cinta o andar rápido, a un ritmo que te deje hablar)
 Sentadilla: máxima 1-2 + 4 × 4 con 2 en recámara (máxima a un 90 %; después 80-85 %)
 Gemelo de pie con barra: 3 × 10-15 (justo después de la sentadilla, con la barra en la espalda)
 Peso muerto rumano: 3 × 6-8 con 2 en recámara (desde arriba, rodillas algo flexionadas)
-Curl nórdico: 3 × 5-8 con 1 en recámara
+Curl femoral sentado: 3 × 8-12 con 1 en recámara (si no hay, tumbado o de pie en máquina, o en polea)
 Rueda abdominal: 2 × 8-12
-Cardio: 15 min (opcional) (suave: bici, cinta o andar rápido)
 
 Día 3: Torso, remo pesado
 Remo con barra: máxima 1-2 + 4 × 4-5 con 2 en recámara (máxima a un 90 %; después 80-85 %)
 Press militar: máxima 1-2 + 3 × 5-6 con 2 en recámara (máxima a un 90 %; después pesado)
 Press de banca: Bilbo + 2 × 6-8 con 2 en recámara
 Dominadas: 6 × 1-2 (en racimo: 45-60 s entre series; cuando salgan 3 seguidas, pasa a 5 × 3)
-Curl martillo: 2 × 8-12 con 1 en recámara, drop set en la última (alterno, con mancuernas)
+Curl martillo: 2 × 8-12 con 1 en recámara, serie descendente en la última (alterno, con mancuernas)
 Fondos de tríceps: 2 × 6-10 (en paralelas; si no salen 6, negativos 2 × 3-5; al pasar de 10, con lastre)
 Elevaciones laterales: 2 × 12-15 con 1 en recámara
 Pájaro a una mano: 2 × 12-15 con 1 en recámara (por brazo)
 
 Día 4: Pierna, peso muerto pesado
+Cardio: calentamiento 15 min (suave: bici, cinta o andar rápido, a un ritmo que te deje hablar)
 Peso muerto sumo: máxima 1-2 + 3 × 3-4 con 2 en recámara (máxima a un 90 %; después 80-85 %)
 Sentadilla: 3 × 6-8 con 2 en recámara (70-75 %)
 Gemelo de pie con barra: 3 × 10-15 (justo después de la sentadilla, con la barra en la espalda)
-Curl nórdico: 3 × 5-8 con 1 en recámara
-Elevación de piernas colgado: 2 × 8-12 (piernas estiradas)
-Cardio: 15 min (opcional) (suave: bici, cinta o andar rápido)`),
+Curl femoral sentado: 3 × 8-12 con 1 en recámara (si no hay, tumbado o de pie en máquina, o en polea)
+Elevación de piernas colgado: 2 × 8-12 (piernas estiradas)`),
   },
   {
     id: 'plpl-bilbo-heavy-duty',
@@ -99,7 +106,7 @@ Cardio: 15 min (opcional) (suave: bici, cinta o andar rápido)`),
     porQue: 'Junta dos ideas. El método Bilbo sube la carga un poco cada día dentro de un ciclo y te pide superar el 1RM del día '
       + 'anterior, con series largas (20-30 repeticiones) y rápidas. Un ensayo muestra que una serie así no perjudica el 1RM '
       + '(González-Alcázar 2025); que cargue menos las articulaciones es una opinión, sin estudio. '
-      + 'Detrás va una sola serie muy intensa al estilo Heavy Duty (drop set, isométrico final o excéntricas lentas), que da el '
+      + 'Detrás va una sola serie muy intensa al estilo Heavy Duty (serie descendente, isométrico final o excéntricas lentas), que da el '
       + 'estímulo de alta intensidad con poco volumen. Alternar empuje, pierna y tirón deja descansar cada grupo varios días. Filosofía: poco volumen, mucha intención. Cada serie tiene un porqué y un número que superar; no hay series de relleno. Si una sesión no mejora nada, es que faltó descanso, no series.',
     comoSeHace: 'Rota los cuatro días en orden, entrenando en días alternos o cuando el mapa de recuperación lo permita. En cada '
       + 'ejercicio haz primero la serie Bilbo con el peso del día del ciclo, y justo después la de intensidad. El cardio del final es '
@@ -249,7 +256,7 @@ Cardio: 15 min (opcional) (suave: bici, cinta o andar rápido)`),
     autor: 'Dan (versión anterior, noviembre de 2025)',
     resumen: 'Tres días: empuje, tirón y pierna. Cada ejercicio con una serie Bilbo y una de intensidad; unos 30-40 minutos por día.',
     porQue: 'La misma idea que la PLPL, en tres días en lugar de cuatro: la serie Bilbo (20-30 repeticiones sin llegar al fallo) '
-      + 'construye la base, y la serie Heavy Duty (6-12 repeticiones con rest-pause, drop set, isométrico o excéntricas) da el estímulo '
+      + 'construye la base, y la serie Heavy Duty (6-12 repeticiones con rest-pause, serie descendente, isométrico o excéntricas) da el estímulo '
       + 'intenso. En peso muerto, press, sentadilla, dominadas y fondos se para en el fallo técnico, antes de perder la postura; '
       + 'en máquinas se puede ir al fallo total. Filosofía: la misma que la de cuatro días, con una sesión menos por semana para quien tiene menos tiempo o se recupera más despacio. Cada ejercicio, una serie que construye y otra que exprime.',
     comoSeHace: 'Rota empuje, tirón y pierna. En cada ejercicio, primero la serie Bilbo y después la de intensidad. Subida explosiva '
@@ -552,6 +559,7 @@ export function anadirPlantilla(datos, plantilla) {
     const id = crearRutinaDesdeTexto(datos, analizarRutina(plantilla.texto), { nombre: plantilla.nombre });
     const rutina = datos.rutinas.find((r) => r.id === id);
     rutina.plantilla = plantilla.id;
+    rutina.versionPlantilla = plantilla.version ?? 1;
     rutina.descripcion = `${plantilla.porQue}\n\n${plantilla.comoSeHace}`;
     return id;
   }
@@ -577,4 +585,33 @@ export function anadirPlantilla(datos, plantilla) {
   };
   datos.rutinas.push(rutina);
   return rutina.id;
+}
+
+// ¿Hay una versión más nueva de la prehecha de la que salió esta rutina?
+export function plantillaNueva(rutina) {
+  const p = PLANTILLAS.find((x) => x.id === rutina?.plantilla);
+  return p?.texto && (rutina.versionPlantilla ?? 1) < (p.version ?? 1) ? p : null;
+}
+
+// Rehace los días de la rutina con la última versión de su prehecha. Los
+// entrenamientos hechos no se tocan; los ejercicios que ya tienes se usan
+// tal cual (con su historial) y las series «solo de esta rutina» que ya no
+// sirven se retiran (las que tienen historial se quedan, sin salir).
+export function actualizarDesdePlantilla(datos, rutinaId) {
+  const rutina = datos.rutinas.find((r) => r.id === rutinaId);
+  const plantilla = PLANTILLAS.find((x) => x.id === rutina?.plantilla);
+  if (!rutina || !plantilla?.texto) return false;
+  const conHistorial = new Set(datos.sesiones.flatMap((s) => s.ejercicios.flatMap((x) => x.series.map((y) => y.planId))));
+  for (const ej of datos.ejercicios) {
+    ej.series = (ej.series ?? []).filter((p) => p.soloRutina !== rutina.id || conHistorial.has(p.id));
+    for (const p of ej.series) if (p.soloRutina === rutina.id) p.soloRutina = 'retirada';
+  }
+  const idTemporal = crearRutinaDesdeTexto(datos, analizarRutina(plantilla.texto), { nombre: rutina.nombre });
+  const nueva = datos.rutinas.find((r) => r.id === idTemporal);
+  for (const ej of datos.ejercicios) for (const p of ej.series ?? []) if (p.soloRutina === idTemporal) p.soloRutina = rutina.id;
+  rutina.dias = nueva.dias;
+  rutina.descripcion = `${plantilla.porQue}\n\n${plantilla.comoSeHace}`;
+  rutina.versionPlantilla = plantilla.version ?? 1;
+  datos.rutinas = datos.rutinas.filter((r) => r.id !== idTemporal);
+  return true;
 }

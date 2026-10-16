@@ -11,7 +11,7 @@ Rutina: Fuerza sin máquinas
 Día 1: Torso, banca pesada
 Press de banca: máxima 1-2 + 4 × 4 fuerza
 Remo con barra: Bilbo + 2 × 8-10 con 2 en recámara
-Curl martillo con mancuernas: 2 × 8-12, drop set en la última
+Curl martillo con mancuernas: 2 × 8-12, descendente en la última
 Cardio suave: 15 min (opcional)
 ```
 
@@ -21,7 +21,7 @@ Cardio suave: 15 min (opcional)
 - Lo que va entre paréntesis es una nota del ejercicio para ese día («(en
   racimo: 45 s entre series)»), salvo «(opcional)» y «(superserie)».
 - Palabras que cambian la serie: **Bilbo**, **máxima** (1-2 pesadas, 1 en
-  recámara), **fuerza** (2 en recámara), **drop** (set en la última),
+  recámara), **fuerza** (2 en recámara), **descendente** (en la última; también vale «drop»), **ascendente**,
   **calentamiento**, **N en recámara**, **opcional**, **superserie**.
 
 ## Una tabla
@@ -50,6 +50,6 @@ cuadran solos («Fondos de tríceps (paralelas)» → «Fondos de tríceps»).
 
 «Escríbeme la rutina como tabla con columnas Sesión, Ejercicio, Series ×
 repeticiones, Tipo y Cómo. En Tipo usa solo: normales, serie máxima, Bilbo,
-drop set en la última, calentamiento. En Cómo pon las repeticiones en
+descendente en la última, calentamiento. En Cómo pon las repeticiones en
 recámara así: “2 en recámara”. Las series con «×» y los rangos con guion:
 “4 × 4”, “2 × 8-10”, “15 min”.»

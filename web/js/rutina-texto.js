@@ -5,7 +5,7 @@
 //   Día 1: Torso, banca pesada
 //   Press de banca: máxima 1-2 + 4 × 4 fuerza
 //   Remo con barra: Bilbo + 2 × 8-10
-//   Curl martillo: 2 × 8-12, drop set en la última
+//   Curl martillo: 2 × 8-12, serie descendente en la última
 //   Cardio suave: 15 min (opcional)
 //
 // o una tabla (como las que escriben las IA), con las columnas sesión,
@@ -15,7 +15,7 @@
 //   |          | Remo con barra | 1 × 20-30 + 2 × 8-10 | Bilbo + normales |
 //
 // Palabras que entiende en las series: Bilbo, máxima, fuerza (2 en
-// recámara), drop (set en la última), calentamiento, min / s (tiempo),
+// recámara), descendente o drop (en la última), ascendente, calentamiento, min / s (tiempo),
 // opcional y superserie.
 
 import { CATALOGO, normalizar } from './catalogo.js';
@@ -26,7 +26,7 @@ import { nuevoId } from './ui.js';
 export const EJEMPLO = `Día 1: Torso
 Press de banca: máxima 1-2 + 4 × 4 fuerza
 Remo con barra: Bilbo + 2 × 8-10
-Curl martillo con mancuernas: 2 × 8-12, drop set en la última
+Curl martillo con mancuernas: 2 × 8-12, serie descendente en la última
 Cardio suave: 15 min (opcional)
 
 Día 2: Pierna
@@ -58,7 +58,8 @@ function analizarPieza(texto, tipoTexto = '', comoTexto = '') {
   }
   if (/bilbo/.test(t)) forma.tipo = 'bilbo';
   else if (/maxim/.test(t)) { forma.tipo = 'maxima'; forma.de ??= 1; forma.a ??= 2; }
-  else if (/drop/.test(t)) forma.tipo = 'ultima-drop';
+  else if (/drop|descend/.test(t)) forma.tipo = 'ultima-drop';
+  else if (/ascend|piramid/.test(t)) forma.forma = 'ascendente';
   else if (/calent/.test(t)) forma.tipo = 'calentamiento';
   else if (/fuerza/.test(t)) forma.tipo = 'fuerza';
   // «2 en recámara» (o «2-3 en recámara»): el peso sube solo si te dejas esas.
@@ -84,10 +85,10 @@ function analizarSeries(seriesTexto, tipoTexto = '', comoTexto = '') {
     const como = comos.length === piezas.length ? comos[i] : comos.join(' ');
     const forma = analizarPieza(pieza, tipo, como);
     if (forma) formas.push(forma);
-    else if (formas.length && /drop|maxim|fuerza|recamara|calent/i.test(pieza)) {
-      // «2 × 8-12, drop set en la última»: la palabra va con la pieza anterior.
+    else if (formas.length && /drop|descend|maxim|fuerza|recamara|calent/i.test(pieza)) {
+      // «2 × 8-12, serie descendente en la última»: la palabra va con la pieza anterior.
       const ultima = formas.at(-1);
-      if (/drop/i.test(pieza)) ultima.tipo = 'ultima-drop';
+      if (/drop|descend/i.test(pieza)) ultima.tipo = 'ultima-drop';
       else if (/maxim/i.test(pieza)) ultima.tipo = 'maxima';
       else if (/fuerza|recamara/i.test(pieza)) ultima.tipo = 'fuerza';
       else if (/calent/i.test(pieza)) ultima.tipo = 'calentamiento';

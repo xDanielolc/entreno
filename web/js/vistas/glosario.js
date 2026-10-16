@@ -17,7 +17,7 @@ export const GLOSARIO = {
     + 'sentadilla, o empujar y volver en una flexión. «12 repeticiones» son doce veces seguidas.' },
   serie: { pregunta: '¿Qué es una serie?', termino: 'Serie', texto: 'Un grupo de repeticiones seguidas, sin soltar. «3 series de 10» son diez repeticiones, descanso, '
     + 'diez más, descanso y diez más.' },
-  'drop-set': { pregunta: '¿Qué es un drop set?', termino: 'Drop set', texto: 'Una serie en la que, al no poder más, bajas el peso y sigues sin descansar, varias veces. '
+  'drop-set': { pregunta: '¿Qué es una serie descendente?', termino: 'Serie descendente', texto: 'Una serie en la que, al no poder más, bajas el peso y sigues sin descansar, varias veces. '
     + 'Cada bajada se apunta aparte. Es una técnica de intensidad: exprime el músculo en poco tiempo.' },
   'rest-pause': { pregunta: '¿Qué es el rest-pause?', termino: 'Rest-pause', texto: 'Haces una serie, descansas solo 15-20 segundos y repites con el mismo peso, dos o tres '
     + 'veces. Cada miniserie se apunta aparte.' },
@@ -38,7 +38,7 @@ export const GLOSARIO = {
     + 'sesión (lo cerca del fallo), de cuántas series hiciste y de tu genética. La app lo estima y tú puedes ajustar tu ritmo.' },
   'peso-corporal': { pregunta: '¿Para qué pido tu peso?', termino: 'Peso corporal', texto: 'Tu peso se usa para calcular la carga de las flexiones, dominadas o fondos, y para '
     + 'las máquinas asistidas. No es para controlar el peso: esta app va de entrenar.' },
-  intensidad: { pregunta: '¿Qué es una serie de intensidad?', termino: 'Serie de intensidad', texto: 'Una serie dura con alguna técnica (drop set, rest-pause, isométrico…) que lleva '
+  intensidad: { pregunta: '¿Qué es una serie de intensidad?', termino: 'Serie de intensidad', texto: 'Una serie dura con alguna técnica (serie descendente, rest-pause, isométrico…) que lleva '
     + 'el músculo al límite. Con una o dos por ejercicio basta.' },
   descarga: { pregunta: '¿Qué es una semana de descarga?', termino: 'Semana de descarga', texto: 'Una semana más suave a propósito: menos peso o menos series (más o menos la mitad). '
     + 'Sirve para quitarte el cansancio acumulado y volver con fuerza. Conviene una cada seis u ocho semanas, o cuando notas que todo cuesta.' },
@@ -48,14 +48,14 @@ export const GLOSARIO = {
     termino: 'Trabajo',
     pregunta: '¿Qué es el trabajo?',
     texto: 'El peso por las repeticiones de una serie: 50 kg × 10 son 500 kg de trabajo. Sirve para comparar series en las que '
-      + 'has cambiado peso y repeticiones a la vez, y es la forma de tener récord en un drop set, donde el 1RM no vale.',
+      + 'has cambiado peso y repeticiones a la vez, y es la forma de tener récord en una serie descendente, donde el 1RM no vale.',
   },
 };
 
 // Palabras del glosario que pueden aparecer en cualquier texto de la app, y
 // su clave. Se usa para poner un «?» detrás de la primera vez que salen.
 const TERMINOS = [
-  ['1RM', 'rm'], ['recámara', 'recamara'], ['fallo', 'fallo'], ['repeticiones', 'repeticion'], ['drop set', 'drop-set'], ['rest-pause', 'rest-pause'],
+  ['1RM', 'rm'], ['recámara', 'recamara'], ['fallo', 'fallo'], ['repeticiones', 'repeticion'], ['serie descendente', 'drop-set'], ['rest-pause', 'rest-pause'],
   ['volumen', 'volumen'], ['trabajo', 'trabajo'], ['Bilbo', 'bilbo'], ['descarga', 'descarga'], ['doble progresión', 'doble-progresion'], ['HIIT', 'hiit'],
   ['sobrecarga progresiva', 'sobrecarga'], ['progresión de cargas', 'sobrecarga'],
 ];

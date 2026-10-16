@@ -42,14 +42,14 @@ function factorVolumen(series) {
 }
 
 // ¿Fue una serie dura? Lo es si la llevaste a una repetición del fallo o
-// menos, o si llevaba bajadas o miniseries (drop set, rest-pause): esas
+// menos, o si llevaba bajadas o miniseries (serie descendente, rest-pause): esas
 // terminan al fallo por definición.
 export function serieDura(serie) {
   if ((serie.tramos || []).filter((t) => t.esfuerzo != null).length > 1) return true;
   return serie.recamara != null && serie.recamara <= 1;
 }
 
-// Cuántas series vale un drop set (o un rest-pause) según sus tramos. Las
+// Cuántas series vale una serie descendente (o un rest-pause) según sus tramos. Las
 // dos formas encajan con los estudios pequeños que hay; por defecto va la
 // que clava el de Fink 2018 (1 serie + 3 bajadas = 3 series).
 export const FORMA_DROP_SET_POR_DEFECTO = 'x-1';

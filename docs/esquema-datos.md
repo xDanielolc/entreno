@@ -551,3 +551,10 @@ la vez, a veces sin cobertura):
   nórdico 0,65) deja de ser 1. `perfil.avisarDescanso`: notificación con
   vibración al acabar el descanso. `serie.rmUsado` también en series
   normales cuyo peso salió del 1RM de hoy (`deHoy: true`).
+
+- **v17 (0.49.0).** `progresion.porRM` en la doble progresión («carga»):
+  { fija: 'reps' | 'pct', valor, semanas }. El peso sale del mejor 1RM de
+  las últimas `semanas` (`rmReciente` en calculos.js) y el objetivo son las
+  repeticiones que superan el 1RM de la última vez. `rutina.versionPlantilla`:
+  versión de la prehecha de la que salió (si la prehecha tiene una mayor,
+  la app ofrece actualizarla sin tocar lo entrenado).

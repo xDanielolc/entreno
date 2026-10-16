@@ -1,3 +1,5 @@
+import { icono } from './iconos.js';
+
 // Utilidades para construir la interfaz sin librerías.
 
 // h('button', { class: 'boton', onclick: fn }, 'Texto') crea un elemento.
@@ -148,7 +150,7 @@ export function aviso(texto, { tipo = 'info', ms, accion } = {}) {
   caja.replaceChildren();
   anadir(caja, h('span', { class: 'aviso-texto-caja' }, texto),
     accion && h('button', { class: 'aviso-accion', onclick: () => { ocultar(); accion.fn(); } }, accion.texto),
-    h('button', { class: 'aviso-cerrar', 'aria-label': 'Cerrar aviso', onclick: ocultar }, '✕'));
+    h('button', { class: 'aviso-cerrar', 'aria-label': 'Cerrar aviso', onclick: ocultar }, icono('cerrar')));
   caja.className = `aviso aviso-${tipo} visible`;
   clearTimeout(temporizadorAviso);
   temporizadorAviso = setTimeout(ocultar, ms ?? (accion ? Math.min(40000, Math.max(14000, porLectura)) : Math.min(25000, porLectura)));
@@ -160,7 +162,7 @@ export function modal(titulo, contenido) {
   const caja = h('div', { class: 'modal', role: 'dialog', 'aria-modal': 'true', 'aria-label': titulo },
     h('div', { class: 'modal-cabecera' },
       h('h2', {}, titulo),
-      h('button', { class: 'boton-icono', 'aria-label': 'Cerrar', onclick: () => cerrar() }, '✕')),
+      h('button', { class: 'boton-icono', 'aria-label': 'Cerrar', onclick: () => cerrar() }, icono('cerrar'))),
     contenido);
   fondo.append(caja);
   document.body.append(fondo);

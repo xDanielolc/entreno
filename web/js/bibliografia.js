@@ -27,9 +27,9 @@ export const BIBLIOGRAFIA = [
     ],
   },
   {
-    tema: 'Drop sets',
+    tema: 'Series descendentes',
     dice: 'La app propone 4 bajadas quitando los mismos kilos cada vez, y te deja cambiarlo.',
-    matiz: 'Los drop sets dan la misma hipertrofia y fuerza que las series normales, en la mitad o un tercio de tiempo, con más '
+    matiz: 'Las series descendentes dan la misma hipertrofia y fuerza que las series normales, en la mitad o un tercio de tiempo, con más '
       + 'esfuerzo percibido y más lactato. Ningún estudio compara 3 bajadas contra 4 (los estudios usan 3 o 4): ese número es una '
       + 'decisión práctica, no una recomendación científica.',
     fuentes: [
@@ -57,17 +57,17 @@ export const BIBLIOGRAFIA = [
     ],
   },
   {
-    tema: 'Cómo cuenta un drop set',
-    dice: 'Por defecto, un drop set cuenta como todos sus tramos menos uno (uno de tres bajadas son tres series), como en Fink 2018. '
+    tema: 'Cómo cuenta una serie descendente',
+    dice: 'Por defecto, una serie descendente cuenta como todos sus tramos menos uno (uno de tres bajadas son tres series), como en Fink 2018. '
       + 'En Ajustes o en Aprender puedes cambiarlo a la forma de Ozaki 2018: una serie más media por bajada.',
-    matiz: 'Sale de los estudios que comparan drop sets con series normales. En Fink 2018 (16 personas), un drop set con tres bajadas '
+    matiz: 'Sale de los estudios que comparan series descendentes con series normales. En Fink 2018 (16 personas), una serie descendente con tres bajadas '
       + 'hizo crecer el tríceps un 10 % y tres series de 12, un 5 %, sin diferencia estadística con tan poca gente. En Ozaki 2018 '
       + '(9 personas), una serie al 80 % con bajadas hasta el 30 % del 1RM creció igual que tres series. Contar cada bajada como una '
       + 'serie entera inflaría el volumen. Son estudios pequeños: es una aproximación.',
     fuentes: [
-      { texto: 'Fink et al. (2018), J Sports Med Phys Fitness: un drop set frente a tres series normales (la forma que usa la app por defecto).', url: 'https://doi.org/10.23736/S0022-4707.17.06838-4' },
+      { texto: 'Fink et al. (2018), J Sports Med Phys Fitness: una serie descendente frente a tres series normales (la forma que usa la app por defecto).', url: 'https://doi.org/10.23736/S0022-4707.17.06838-4' },
       { texto: 'Ozaki et al. (2018), Journal of Sports Sciences: una serie pesada con bajadas hasta el 30 % del 1RM frente a tres series.', url: 'https://doi.org/10.1080/02640414.2017.1331042' },
-      { texto: 'Sødal et al. (2023), Sports Medicine Open: metaanálisis; drop sets y series normales dan una hipertrofia parecida, en menos tiempo.', url: 'https://doi.org/10.1186/s40798-023-00620-5' },
+      { texto: 'Sødal et al. (2023), Sports Medicine Open: metaanálisis; series descendentes y series normales dan una hipertrofia parecida, en menos tiempo.', url: 'https://doi.org/10.1186/s40798-023-00620-5' },
     ],
   },
   {
@@ -348,13 +348,13 @@ export const BIBLIOGRAFIA = [
   },
   {
     tema: 'Técnicas de intensidad',
-    dice: 'Rest-pause, miorrepeticiones, excéntricas lentas, isométrico final y drop sets, combinables.',
-    matiz: 'Rest-pause y drop sets dan lo mismo que las series normales (Enes 2021; Sødal 2023). Las excéntricas lentas no añaden '
+    dice: 'Rest-pause, miorrepeticiones, excéntricas lentas, isométrico final y series descendentes, combinables.',
+    matiz: 'Rest-pause y series descendentes dan lo mismo que las series normales (Enes 2021; Sødal 2023). Las excéntricas lentas no añaden '
       + 'crecimiento si la repetición pasa de unos 8-10 segundos (Schoenfeld 2015). Sobre las miorrepeticiones y el isométrico final '
       + 'no hay ensayos: son técnicas de entrenadores.',
     fuentes: [
-      { texto: 'Enes et al. (2021), Appl Physiol Nutr Metab: rest-pause y drop set frente a series tradicionales.', url: 'https://doi.org/10.1139/apnm-2021-0278' },
-      { texto: 'Sødal et al. (2023), Sports Medicine Open: metaanálisis de drop sets.', url: 'https://doi.org/10.1186/s40798-023-00620-5' },
+      { texto: 'Enes et al. (2021), Appl Physiol Nutr Metab: rest-pause y serie descendente frente a series tradicionales.', url: 'https://doi.org/10.1139/apnm-2021-0278' },
+      { texto: 'Sødal et al. (2023), Sports Medicine Open: metaanálisis de series descendentes.', url: 'https://doi.org/10.1186/s40798-023-00620-5' },
       { texto: 'Schoenfeld, Ogborn y Krieger (2015), Sports Medicine: duración de la repetición.', url: 'https://doi.org/10.1007/s40279-015-0304-0' },
     ],
   },

@@ -43,6 +43,13 @@ CAPAS = {
                     [(84, 147.5), (97, 147.5), (97, 160), (84, 160)],
                     [(84.5, 162), (97, 162), (97, 182), (92, 180.5), (87.5, 174), (85, 167)]],
     },
+    # Oblicuos (17-10-2026): propios y simétricos. El de wger tocaba los
+    # cuadros del abdomen en un lado y en el otro dejaba una línea; ahora los
+    # dos dejan la misma separación.
+    "oblicuos": {
+        "delante": [[(70, 114), (75, 111.5), (80, 112.5), (82, 116), (82, 130), (82, 145), (82.3, 158), (83, 166), (85, 172.5),
+                     (86.5, 177), (82, 176), (76, 170), (71, 162), (68, 152), (66.8, 140), (67.5, 126), (68.5, 118)]],
+    },
     # Pecho: por debajo de la clavícula, por el esternón, por la línea de
     # abajo del pectoral y, por fuera, hasta la línea que lo separa del
     # hombro, sin tocarlo.
@@ -107,7 +114,7 @@ CAPAS = {
 
 
 # Eje de simetría: el cuerpo de wger tiene el centro del tronco en x = 98,5.
-EJE = {("abdomen", "delante"): 98.5, ("pecho", "delante"): 98.5}
+EJE = {("abdomen", "delante"): 98.5, ("pecho", "delante"): 98.5, ("oblicuos", "delante"): 98.5}
 
 
 def reflejar(poligono, eje=ANCHO / 2):
