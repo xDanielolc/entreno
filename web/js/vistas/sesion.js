@@ -364,7 +364,7 @@ export function vistaSesion(contenedor, { id }) {
           + 'Al escribirlos arranca el descanso.'
         : ej.esfuerzo?.tipo === 'tiempo'
           ? 'Apunta la serie al acabarla: al escribir el tiempo arranca el descanso.'
-          : 'Apunta la serie al acabarla: al escribir las repeticiones arranca el descanso. '
+          : 'Apunta la serie al acabarla: con el peso y las repeticiones puestos arranca el descanso. '
             + 'Cada casilla lleva encima lo que va dentro (toca «?» para saber más).'),
 
       entrada.series.map((serie, j) => {
@@ -406,6 +406,9 @@ export function vistaSesion(contenedor, { id }) {
             h('button', { type: 'button', class: 'boton enlace', onclick: () => ponerRMaMano(ej, serie) }, 'Ya sé mi 1RM: lo meto a mano'));
         }
         if (!serie.hecha) return h('p', { class: 'sugerencia' }, 'Espera a la prueba de arriba: con ella se pone el peso de esta serie.');
+      } else if (serie.hecha && j === entrada.series.findIndex((x) => x.tipo !== 'calentamiento')) {
+        // La prueba ya hecha: lo que ha salido de ella.
+        return h('p', { class: 'sugerencia' }, `Prueba hecha: tu 1RM sale en ${formatearNumero(Math.round(rmHoy))} kg; las series de abajo ya llevan su peso.`);
       }
     }
     const uCarga = unidadCarga(ej);

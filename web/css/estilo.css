@@ -1665,3 +1665,6 @@ div.sugerencia > span { display: block; }
 .boton-paso-grande { flex: 0 0 60px; min-height: 60px; font-size: 1.6rem; padding: 0; }
 .terminar-entreno.secundario { margin-top: 20px; }
 .descanso-campana { width: auto; min-width: 44px; font-size: 1.1rem; }
+/* La barra del descanso: el tiempo y los dos botones en una línea. */
+.descanso .boton.enlace { min-width: 0; margin: 0; flex: 0 0 auto; }
+.descanso .descanso-motivo { flex: 1 1 auto; }

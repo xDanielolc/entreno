@@ -652,3 +652,9 @@ Esquema v16. Lo que vio Dan en el gimnasio y cómo quedó:
   de piernas» conserva su foto por alias. Fracciones del peso corporal:
   piernas 0,32 (Winter 2009), curl nórdico 0,65 (estimación);
   `FRACCION_CORPORAL_POR_NOMBRE` y migración v16 para los ya creados.
+- 0.48.1: la recámara de una serie nueva sale de la regla (`recamaraMin`, 2
+  en fuerza) antes que del ejercicio o de Ajustes; la barra del descanso
+  vuelve a caber en una línea (`.boton.enlace` tenía un `min-width` de 14em
+  que la rompía); tras la prueba, la serie dice el 1RM que ha salido. Las
+  gráficas siguen con su paleta propia (azul, naranja, verde, ámbar): datos,
+  no interfaz.
