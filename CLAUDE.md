@@ -658,3 +658,44 @@ Esquema v16. Lo que vio Dan en el gimnasio y cómo quedó:
   que la rompía); tras la prueba, la serie dice el 1RM que ha salido. Las
   gráficas siguen con su paleta propia (azul, naranja, verde, ámbar): datos,
   no interfaz.
+
+## Ronda 0.49.0 (17-10-2026): la programación, por fin sencilla
+
+Esquema v17. Dan: «la programación me da más problemas que el papel». Hecho:
+- **Asistente de series** (`vistas/configurar-series.js`, `abrirAsistenteSeries`):
+  una pregunta cada vez (qué serie es → qué mejoras → cómo te lleva la app →
+  rango o valor → recámara, cuántas, cómo son y dónde, ya contestadas). Lo
+  contestado queda en una línea con «Cambiar». Se usa en la rutina y en la
+  ficha («+ Añadir series»). Formas y planes en `rapidas.js`
+  (`crearPlanesRapidos`, `completarForma`, `textoForma`); los modos son
+  doble progresión, sube al completarlas (reps fijas), **peso según tu 1RM**
+  (`progresion.porRM`: fijas reps o %; el peso sale del mejor 1RM de 8
+  semanas, `rmReciente`, y el objetivo son las reps que superan el 1RM de la
+  última vez), un poco más cada vez, solo apuntar y los prehechos propios.
+  Series **ascendentes** (pirámide: reps del máximo al mínimo, peso sube).
+- Ficha: cada serie en una línea (`lineaPlan`, `nombreRegla` en series.js)
+  con «Ajustar» (abre el editor de siempre) y ✕ con «Deshacer». Los tres
+  botones de vista, en rejilla fija. «Deshacer los cambios» en ficha y rutina
+  (foto al entrar: `fotosFicha`, `fotoRutina`).
+- Rutina: quitar una serie del día ya no borra nada (queda en «Series de
+  este ejercicio que hoy no hace este día»).
+- Entreno: letrero «Prueba de 1RM» en la serie de prueba (`esPrueba`);
+  «espera a la prueba» aparece y desaparece con ella (`pruebasVistas`);
+  `pesoDePlan` (calculos.js) pone el peso de cualquier serie desde un 1RM.
+- Prehecha «Fuerza sin máquinas» versión 2 (curl femoral sentado, cardio de
+  calentamiento al empezar los días de pierna, pautas de calentamiento);
+  `plantillaNueva` / `actualizarDesdePlantilla` y el aviso «Actualizar mi
+  rutina» en Hoy y en el editor (no toca los entrenamientos).
+- «Drop set» pasa a **serie descendente** en todos los textos (la clave
+  interna sigue siendo 'drop-set').
+- Estética (`docs/guia-de-estilo.md`, nueva): iconos de trazo en toda la app
+  (papelera, bocadillo, ojo, reloj, cerrar, bombilla…); los desplegables son
+  botoncitos redondos con «+»/«−»; sin cortes con guion; avisos del descanso
+  con una pregunta clara al entrenar (`preguntaAvisos`) y sin campana;
+  vibración más larga; presentación con la caja más lenta, sonidos de rebote
+  sintetizados (solo suenan si el navegador lo deja) y la pesa nítida al
+  final (`.pesa.quieta`); oblicuos como capa propia simétrica; fuera el pulso
+  de las fuentes de «¿Voy hoy?».
+- GIF: las animaciones grises con músculos en rojo (peso muerto sumo,
+  prensa, tríceps sobre la cabeza) son de FitnessProgramer, subidas a wger
+  por terceros; sus condiciones prohíben copiarlas. No se añaden más.
