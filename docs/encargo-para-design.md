@@ -157,3 +157,19 @@ funciona y es legal, así que el dibujo propio es una mejora, no una urgencia.
   Everkinetic (CC-BY-SA, citadas en Aprender); las nuevas serían propias, así
   que hay que encargarlas, no copiarlas. Dos fotogramas por ejercicio permiten
   montar el gesto sin grabar vídeo ni usar material ajeno.
+
+---
+
+## Temas de dibujo (17-10-2026)
+
+Dan quiere dos temas de dibujos, además de los de color:
+
+- **Cartoon (por defecto):** los dibujos de línea simpáticos (como los de
+  Everkinetic que ya usa la app, animados en dos posturas) y un muñeco del
+  cuerpo en ese mismo estilo, con los músculos dibujados para colorearlos
+  según la recuperación.
+- **Anatómico:** la figura gris con los músculos en rojo (estilo de la guía
+  de Ángel7Real), tanto en los ejercicios como en el mapa del cuerpo.
+
+Los dos, con dibujos propios (sin copiar láminas con derechos) y las mismas
+posturas, para poder cambiar de tema sin perder nada.

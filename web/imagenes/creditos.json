@@ -117,9 +117,12 @@
    "animada": true
   },
   "Fondos de tríceps": {
-   "archivo": "imagenes/ejercicios/fondos-de-triceps.png",
-   "autor": "Franpol",
-   "nombreEnWger": "Fondos"
+   "archivo": "imagenes/ejercicios/anim/fondos-de-triceps.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/fondos-de-triceps.png",
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "tricep-dips"
   },
   "Fondos asistidos": {
    "archivo": "imagenes/ejercicios/fondos-asistidos.png",
@@ -146,9 +149,10 @@
   "Elevaciones laterales": {
    "archivo": "imagenes/ejercicios/anim/elevaciones-laterales.webp",
    "autor": "Everkinetic",
-   "nombreEnWger": "Lateral Raises",
    "estatica": "imagenes/ejercicios/elevaciones-laterales.png",
-   "animada": true
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "lateral-dumbbell-raises"
   },
   "Elevaciones laterales en polea": {
    "archivo": "imagenes/ejercicios/elevaciones-laterales-en-polea.jpg",
@@ -175,19 +179,28 @@
    "animada": true
   },
   "Extensión de tríceps en polea": {
-   "archivo": "imagenes/ejercicios/extension-de-triceps-en-polea.png",
-   "autor": "Franpol",
-   "nombreEnWger": "Extension de triceps polea"
+   "archivo": "imagenes/ejercicios/anim/extension-de-triceps-en-polea.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/extension-de-triceps-en-polea.png",
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "triceps-pushdown-with-cable"
   },
   "Extensión de tríceps sobre la cabeza": {
-   "archivo": "imagenes/ejercicios/extension-de-triceps-sobre-la-cabeza.webp",
-   "autor": "wger",
-   "nombreEnWger": "Extensión de tríceps sobre la cabeza (mancuerna)"
+   "archivo": "imagenes/ejercicios/anim/extension-de-triceps-sobre-la-cabeza.webp",
+   "autor": "Everkinetic",
+   "estatica": null,
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "standing-triceps-extension-2"
   },
   "Flexiones": {
-   "archivo": "imagenes/ejercicios/flexiones.png",
-   "autor": "Settebello",
-   "nombreEnWger": "Push-Up"
+   "archivo": "imagenes/ejercicios/anim/flexiones.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/flexiones.png",
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "push-ups"
   },
   "Flexiones en pica": {
    "archivo": "imagenes/ejercicios/flexiones-en-pica.png",
@@ -200,9 +213,12 @@
    "nombreEnWger": "Flexiones en pino"
   },
   "Dominadas": {
-   "archivo": "imagenes/ejercicios/dominadas.jpg",
-   "autor": "Imobard",
-   "nombreEnWger": "Dominadas"
+   "archivo": "imagenes/ejercicios/anim/dominadas.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/dominadas.jpg",
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "pull-ups"
   },
   "Dominadas supinas": {
    "archivo": "imagenes/ejercicios/dominadas-supinas.jpg",
@@ -220,9 +236,12 @@
    "nombreEnWger": "Jalón al pecho con agarre neutro"
   },
   "Jalón con agarre estrecho": {
-   "archivo": "imagenes/ejercicios/jalon-con-agarre-estrecho.png",
-   "autor": "Franpol",
-   "nombreEnWger": "Jalón al Pecho con Agarre Cerrado"
+   "archivo": "imagenes/ejercicios/anim/jalon-con-agarre-estrecho.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/jalon-con-agarre-estrecho.png",
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "v-bar-pull-down"
   },
   "Remo en T": {
    "archivo": "imagenes/ejercicios/anim/remo-en-t.webp",
@@ -254,9 +273,12 @@
    "nombreEnWger": "Dumbbell Bent Over Face Pull"
   },
   "Remo al mentón": {
-   "archivo": "imagenes/ejercicios/remo-al-menton.png",
-   "autor": "wger",
-   "nombreEnWger": "Remo al Menton"
+   "archivo": "imagenes/ejercicios/anim/remo-al-menton.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/remo-al-menton.png",
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "upright-barbell-rows"
   },
   "Encogimientos de trapecio": {
    "archivo": "imagenes/ejercicios/anim/encogimientos-de-trapecio.webp",
@@ -278,9 +300,12 @@
    "animada": true
   },
   "Curl inclinado": {
-   "archivo": "imagenes/ejercicios/curl-inclinado.png",
-   "autor": "wger",
-   "nombreEnWger": "Curl inclinado con mancuernas"
+   "archivo": "imagenes/ejercicios/anim/curl-inclinado.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/curl-inclinado.png",
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "alternating-incline-curl-with-dumbbell"
   },
   "Curl en polea": {
    "archivo": "imagenes/ejercicios/anim/curl-en-polea.webp",
@@ -320,20 +345,28 @@
    "nombreEnWger": "Sentadilla multipower"
   },
   "Prensa de piernas": {
-   "archivo": "imagenes/ejercicios/prensa-de-piernas.webp",
-   "autor": "wger",
-   "nombreEnWger": "Prensa de piernas"
+   "archivo": "imagenes/ejercicios/anim/prensa-de-piernas.webp",
+   "autor": "Everkinetic",
+   "estatica": null,
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "leg-press"
   },
   "Peso muerto": {
-   "archivo": "imagenes/ejercicios/peso-muerto-rumano.png",
-   "autor": "wger",
-   "nombreEnWger": "Peso muerto rumano con barra",
-   "aliasDe": "Peso muerto rumano"
+   "archivo": "imagenes/ejercicios/anim/peso-muerto.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/peso-muerto-rumano.png",
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "barbell-dead-lifts"
   },
   "Peso muerto sumo": {
-   "archivo": "imagenes/ejercicios/peso-muerto-sumo.webp",
-   "autor": "wger",
-   "nombreEnWger": "Peso muerto sumo"
+   "archivo": "imagenes/ejercicios/anim/peso-muerto-sumo.webp",
+   "autor": "Everkinetic",
+   "estatica": null,
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "barbell-dead-lifts"
   },
   "Peso muerto rumano": {
    "archivo": "imagenes/ejercicios/peso-muerto-rumano.png",
@@ -341,9 +374,12 @@
    "nombreEnWger": "Peso muerto rumano con barra"
   },
   "Zancadas": {
-   "archivo": "imagenes/ejercicios/zancadas.png",
-   "autor": "Franpol",
-   "nombreEnWger": "Zancadas con peso"
+   "archivo": "imagenes/ejercicios/anim/zancadas.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/zancadas.png",
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "dumbbell-lunges"
   },
   "Hip thrust": {
    "archivo": "imagenes/ejercicios/hip-thrust.webp",
@@ -356,9 +392,12 @@
    "nombreEnWger": "Puente de glúteos"
   },
   "Extensión de cuádriceps": {
-   "archivo": "imagenes/ejercicios/extension-de-cuadriceps.png",
-   "autor": "Franpol",
-   "nombreEnWger": "Leg Extension"
+   "archivo": "imagenes/ejercicios/anim/extension-de-cuadriceps.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/extension-de-cuadriceps.png",
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "leg-extensions"
   },
   "Curl femoral tumbado": {
    "archivo": "imagenes/ejercicios/curl-femoral-tumbado.png",
@@ -1785,9 +1824,12 @@
    "animada": true
   },
   "Peso muerto con mancuernas": {
-   "archivo": "imagenes/ejercicios/peso-muerto.jpeg",
-   "autor": "philip",
-   "nombreEnWger": "Peso Muerto Convencional"
+   "archivo": "imagenes/ejercicios/anim/peso-muerto-con-mancuernas.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/peso-muerto.jpeg",
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "dumbbell-dead-lifts"
   },
   "Sentadilla con salto": {
    "archivo": "imagenes/ejercicios/anim/sentadilla.webp",
@@ -1834,10 +1876,12 @@
    "aliasDe": "Fondos de tríceps"
   },
   "Fondos en paralelas negativos": {
-   "archivo": "imagenes/ejercicios/fondos-de-triceps.png",
-   "autor": "Franpol",
-   "nombreEnWger": "Fondos",
-   "aliasDe": "Fondos de tríceps"
+   "archivo": "imagenes/ejercicios/anim/fondos-en-paralelas-negativos.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/fondos-de-triceps.png",
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "tricep-dips"
   },
   "Dominadas con lastre": {
    "archivo": "imagenes/ejercicios/dominadas.jpg",
@@ -1846,10 +1890,12 @@
    "aliasDe": "Dominadas"
   },
   "Dominadas negativas": {
-   "archivo": "imagenes/ejercicios/dominadas.jpg",
-   "autor": "Imobard",
-   "nombreEnWger": "Dominadas",
-   "aliasDe": "Dominadas"
+   "archivo": "imagenes/ejercicios/anim/dominadas-negativas.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/dominadas.jpg",
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "pull-ups"
   },
   "Flexiones con lastre": {
    "archivo": "imagenes/ejercicios/flexiones.png",

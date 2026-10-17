@@ -1,3 +1,4 @@
+import { icono } from '../iconos.js';
 import * as drive from '../drive.js';
 import * as estado from '../estado.js';
 import { pedirToken } from '../google-auth.js';
@@ -57,7 +58,7 @@ export function vistaBienvenida(contenedor) {
 
   anadir(contenedor,
     h('section', { class: 'bienvenida' },
-      h('div', { class: 'logo', 'aria-hidden': 'true' }, '🏋️'),
+      h('div', { class: 'logo logo-app', 'aria-hidden': 'true' }, icono('marca')),
       h('h1', {}, 'App de entrenamiento'),
       h('p', { class: 'suave' },
         'Registra tus series, sigue tu progresión y lleva tus rutinas contigo, también sin cobertura.'),

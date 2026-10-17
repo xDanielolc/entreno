@@ -134,7 +134,8 @@ export function sugerenciaSerie(datos, ejercicio, plan, { excluirSesion } = {}) 
       // Sin historial de esta serie: si hay un 1RM (de otras series o puesto
       // a mano), el peso es el que da el máximo del rango con la recámara
       // pedida. Si no hay 1RM, la primera serie del día hace de prueba.
-      const conPeso = sobre === 'carga' && !['ninguna', 'altura'].includes(ejercicio.carga?.tipo);
+      // Con tu peso no hace falta prueba: el peso ya se sabe (el tuyo).
+      const conPeso = sobre === 'carga' && !['ninguna', 'altura', 'pesoCorporal'].includes(ejercicio.carga?.tipo);
       const rm = conPeso ? rmDeReferencia(datos, ejercicio, { excluirSesion }) : null;
       let carga = referencia?.serie.carga ?? null;
       let porFormula = false;
@@ -229,7 +230,7 @@ function sugerenciaPorRM(datos, ejercicio, plan, { excluirSesion, ultima }) {
   const prog = plan.progresion;
   const rm = rmReciente(datos, ejercicio, prog.porRM.semanas ?? 8, { excluirSesion });
   const comun = { porRM: true, rango: prog.objetivoEsfuerzo, recamaraMin: prog.recamaraMin ?? null };
-  if (!rm) return { ...comun, carga: null, sinRM: true };
+  if (!rm) return { ...comun, carga: null, sinRM: ejercicio.carga?.tipo !== 'pesoCorporal' };
   const carga = pesoDePlan(datos, ejercicio, plan, rm.valor);
   const recamara = prog.recamaraMin ?? ejercicio.recamaraPorDefecto ?? datos.perfil?.recamaraPorDefecto ?? 1;
   const rmUltima = ultima ? rmSinTramos(datos, ejercicio, ultima.serie) : null;

@@ -4,8 +4,8 @@ from pathlib import Path
 from PIL import Image, ImageDraw
 
 DESTINO = Path(__file__).resolve().parent.parent / "web" / "iconos"
-FONDO = (22, 24, 28)
-ACENTO = (111, 207, 151)
+FONDO = (14, 16, 20)
+ACENTO = (242, 243, 246)
 
 
 def dibujar(tamano, margen_seguro):
@@ -33,8 +33,8 @@ def main():
     dibujar(512, 0.2).save(DESTINO / "icono-maskable-512.png")   # Android recorta los bordes
     (DESTINO / "icono.svg").write_text(
         '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'
-        '<rect width="100" height="100" rx="22" fill="#16181c"/>'
-        '<g fill="#6fcf97"><rect x="14" y="47" width="72" height="6" rx="3"/>'
+        '<rect width="100" height="100" rx="22" fill="#0e1014"/>'
+        '<g fill="#f2f3f6"><rect x="14" y="47" width="72" height="6" rx="3"/>'
         '<rect x="22" y="30" width="10" height="40" rx="4"/><rect x="68" y="30" width="10" height="40" rx="4"/>'
         '<rect x="12" y="38" width="8" height="24" rx="3"/><rect x="80" y="38" width="8" height="24" rx="3"/></g></svg>',
         encoding="utf-8")

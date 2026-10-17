@@ -3,96 +3,116 @@
 // Lo que tiene una respuesta razonable (recámara, cuántas, cómo son, dónde)
 // viene ya contestado, para no hacer diez preguntas por ejercicio.
 //
-// Sirve en la rutina y en la ficha del ejercicio. Devuelve una «forma» (ver
-// rapidas.js) a `alAceptar`.
+// El árbol (Dan, 17-10-2026):
+//   ¿La app te lleva el progreso?
+//     · No, solo apuntar → qué serie es (de trabajo, calentamiento, máxima) y
+//       un objetivo orientativo. Al entrenar ves lo del último día.
+//     · Sí → qué mejoras (peso, repeticiones, tiempo, distancia) → cómo
+//       (doble progresión, sube al completarlas, según tu 1RM, por ciclos o
+//       un prehecho tuyo) → el rango → recámara, cuántas, cómo son (iguales,
+//       descendente, ascendentes, miorrepeticiones, rest-pause) y dónde.
+//
+// Sirve en la rutina, en la ficha del ejercicio y en el entreno. Devuelve una
+// «forma» (ver rapidas.js) a `alAceptar`.
 
 import { h, leerNumero, modal } from '../ui.js';
 import {
-  PORCENTAJES, RANGOS_MAXIMA, RANGOS_REPS, REPS_FIJAS, TIEMPOS, conPeso, conPesoYReps, mideTiempo, repsAscendentes, textoForma, textoTiempo,
+  CICLOS_ASISTENTE, PORCENTAJES, RANGOS_MAXIMA, RANGOS_REPS, REPS_FIJAS, TIEMPOS, conPeso, conPesoYReps, mideTiempo, repsAscendentes,
+  textoForma, textoTiempo,
 } from '../rapidas.js';
 
 const rangoTexto = (r, tiempo) => (r == null ? 'sin objetivo'
   : r[0] === r[1] ? (tiempo ? textoTiempo(r[0]) : String(r[0])) : tiempo ? `${textoTiempo(r[0])}-${textoTiempo(r[1])}` : `${r[0]}-${r[1]}`);
 const igual = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
-function preguntas(ej, datos, contexto) {
+function preguntas(ej, datos, contexto, conRutina) {
   const peso = conPeso(ej);
   const repsConPeso = conPesoYReps(ej);
   const tiempo = mideTiempo(ej);
   const mios = (datos.perfil?.prehechos ?? []).filter((m) => !(m.progresion?.sobre === 'carga' && !peso));
+  const si = (f) => f.progreso === 'si';
+  const conCargaModo = (f) => si(f) && ['doble', 'lineal', 'rm'].includes(f.modo);
   return [
-    { clave: 'tipo', titulo: '¿Qué serie es?', corto: 'Serie',
+    { clave: 'progreso', titulo: '¿La app te lleva el progreso?', corto: 'Progreso',
       opciones: () => [
-        ['trabajo', 'De trabajo', 'Las que cuentan: la app te lleva el progreso.'],
-        ['calentamiento', 'Calentamiento', 'De aproximación: no progresan ni cuentan para récords.'],
+        ['si', 'Sí, que me diga qué toca', 'Cada día te pone el peso y el objetivo para superarte.'],
+        ['no', 'No, solo apuntar', 'Ves lo que hiciste el último día e intentas superarlo a tu aire.'],
+      ] },
+    { clave: 'tipo', titulo: '¿Qué serie es?', corto: 'Serie', aplica: (f) => f.progreso === 'no',
+      opciones: () => [
+        ['trabajo', 'De trabajo', 'Cuenta para tu progreso y tu recuperación.'],
+        ['calentamiento', 'Calentamiento', 'De aproximación: no cuenta para récords ni recuperación.'],
         repsConPeso && ['maxima', 'Serie máxima', 'Una o dos pesadas: de aquí sale tu 1RM más fiable.'],
-        repsConPeso && ['bilbo', 'Bilbo', 'Una serie larga y rápida cuyo peso sube cada sesión.'],
       ].filter(Boolean) },
-    { clave: 'mejora', titulo: '¿Qué quieres ir mejorando?', corto: 'Mejoras', aplica: (f) => f.tipo === 'trabajo',
+    { clave: 'mejora', titulo: '¿Qué quieres ir mejorando?', corto: 'Mejoras', aplica: si,
       opciones: () => [
-        !tiempo && ['reps', 'Repeticiones', repsConPeso ? 'Con el mismo peso, más repeticiones. Lo más habitual.' : 'Más repeticiones cada vez.'],
-        repsConPeso && ['peso', 'Peso', 'Con las mismas repeticiones, más peso.'],
-        tiempo && ['tiempo', 'Tiempo', 'Aguantar más.'],
-        ej.esfuerzoExtra?.tipo === 'distancia' && ['distancia', 'Distancia', 'Llegar más lejos.'],
+        repsConPeso && ['peso', 'El peso', 'Con las mismas repeticiones, más kilos.'],
+        !tiempo && ['reps', 'Las repeticiones', repsConPeso ? 'Con el mismo peso, más repeticiones; luego sube el peso.' : 'Más repeticiones cada vez.'],
+        tiempo && ['tiempo', 'El tiempo', 'Aguantar más.'],
+        ej.esfuerzoExtra?.tipo === 'distancia' && ['distancia', 'La distancia', 'Llegar más lejos.'],
       ].filter(Boolean) },
-    { clave: 'modo', titulo: '¿Cómo te lleva la app?', corto: 'Cómo', aplica: (f) => f.tipo === 'trabajo',
+    { clave: 'modo', titulo: '¿Cómo te lleva la app?', corto: 'Cómo', aplica: si,
       opciones: (f) => [
-        f.mejora === 'reps' && repsConPeso && ['doble', 'Doble progresión', 'Mismo peso hasta llegar arriba del rango; entonces la app sube el peso. Lo recomendado.'],
-        f.mejora === 'peso' && ['lineal', 'Sube el peso al completarlas', 'Mismas repeticiones; cuando las sacas todas, la próxima vez más peso.'],
-        repsConPeso && ['rm', 'Peso según tu 1RM', 'La app pone el peso con tu máximo de las últimas 8 semanas y te dice cuántas hacer para superar la última vez.'],
-        (!repsConPeso || f.mejora === 'tiempo' || f.mejora === 'distancia') && ['mas', 'Un poco más cada vez', 'La app te pide algo más que la última vez.'],
-        ['libre', 'Solo apuntar', 'Sin reglas: ves lo de la vez anterior en gris e intentas superarlo.'],
+        f.mejora === 'peso' && ['lineal', 'Sube al completarlas', 'Repeticiones fijas. Cuando las sacas todas, la próxima vez +2,5 kg; si no, repites el peso.'],
+        f.mejora === 'reps' && repsConPeso && ['doble', 'Doble progresión', 'Mismo peso hasta llegar arriba del rango; entonces sube el peso y vuelves abajo.'],
+        repsConPeso && ['rm', 'Según tu fuerza (1RM)', 'El peso lo calcula la app con tu mejor 1RM de las últimas 8 semanas: si te haces más fuerte, sube solo. Te dice cuántas hacer para superar la última vez.'],
+        (!repsConPeso) && ['mas', 'Un poco más cada vez', 'Te pide algo más que la última vez.'],
+        ['ciclo', 'Por ciclos', 'Lo que mejoras sube cada sesión durante un ciclo; al acabar, vuelve a empezar más arriba. Bilbo, 5×5, 5/3/1…'],
         ...mios.map((m) => [`mio:${m.id}`, m.nombre, m.descripcion]),
       ].filter(Boolean) },
+    { clave: 'ciclo', titulo: '¿Qué ciclo?', corto: 'Ciclo', aplica: (f) => si(f) && f.modo === 'ciclo',
+      opciones: () => CICLOS_ASISTENTE.filter((c) => (c.conPeso ? repsConPeso : true) && (c.tiempo ? tiempo : true) && (c.sinPeso ? !peso : true))
+        .map((c) => [c.clave, c.etiqueta, c.explica]) },
     // El rango (o el valor fijo), según el modo.
     { clave: 'rango', titulo: '¿Entre cuántas repeticiones?', corto: 'Repeticiones',
-      aplica: (f) => (f.tipo === 'trabajo' && ['doble', 'libre', 'mas'].includes(f.modo) && !(f.modo === 'mas' && tiempo))
-        || f.tipo === 'calentamiento' || f.tipo === 'maxima',
-      titulo2: (f) => (f.tipo === 'maxima' ? '¿Cuántas en la serie máxima?' : f.tipo === 'calentamiento' ? '¿Cuántas repeticiones?'
-        : f.modo === 'libre' ? '¿Algún objetivo orientativo?' : tiempo ? '¿Cuánto tiempo?' : '¿Entre cuántas repeticiones?'),
-      chips: (f) => (f.tipo === 'maxima' ? RANGOS_MAXIMA
+      aplica: (f) => (f.progreso === 'no') || (si(f) && ['doble', 'mas'].includes(f.modo) && !(f.modo === 'mas' && tiempo)),
+      titulo2: (f) => (f.tipo === 'maxima' && f.progreso === 'no' ? '¿Cuántas en la serie máxima?' : f.tipo === 'calentamiento' ? '¿Cuántas repeticiones?'
+        : f.progreso === 'no' ? '¿Algún objetivo orientativo?' : tiempo ? '¿Cuánto tiempo?' : '¿Entre cuántas repeticiones?'),
+      chips: (f) => (f.tipo === 'maxima' && f.progreso === 'no' ? RANGOS_MAXIMA
         : tiempo ? TIEMPOS.map((s) => [s, s])
           : f.tipo === 'calentamiento' ? [[5, 5], [8, 8], [10, 10], [12, 12]]
-            : f.modo === 'libre' ? [null, ...RANGOS_REPS] : RANGOS_REPS),
-      libre: true, defecto: (f) => (f.tipo === 'maxima' ? [1, 2] : undefined) },
-    { clave: 'reps', titulo: '¿Cuántas repeticiones?', corto: 'Repeticiones', aplica: (f) => f.tipo === 'trabajo' && f.modo === 'lineal',
+            : f.progreso === 'no' ? [null, ...RANGOS_REPS] : [[1, 2], ...RANGOS_REPS]),
+      libre: true },
+    { clave: 'reps', titulo: '¿Cuántas repeticiones?', corto: 'Repeticiones', aplica: (f) => si(f) && f.modo === 'lineal',
       chips: () => REPS_FIJAS.map((r) => [r, r]) },
-    { clave: 'fija', titulo: '¿Qué fijas tú?', corto: 'Fijas', aplica: (f) => f.tipo === 'trabajo' && f.modo === 'rm',
+    { clave: 'fija', titulo: '¿Qué fijas tú?', corto: 'Fijas', aplica: (f) => si(f) && f.modo === 'rm',
       opciones: () => [['reps', 'Las repeticiones', 'La app busca el peso con el que harías esas repeticiones.'],
-        ['pct', 'El % del 1RM', 'La app pone ese porcentaje de tu máximo.']] },
-    { clave: 'valor', titulo: '¿Cuántas?', corto: (f) => (f.fija === 'pct' ? '% del 1RM' : 'Repeticiones'), aplica: (f) => f.tipo === 'trabajo' && f.modo === 'rm' && f.fija,
+        ['pct', 'El % del 1RM', 'La app pone ese porcentaje de tu máximo y te dice cuántas hacer.']] },
+    { clave: 'valor', titulo: '¿Cuántas?', corto: (f) => (f.fija === 'pct' ? '% del 1RM' : 'Repeticiones'), aplica: (f) => si(f) && f.modo === 'rm' && f.fija,
       titulo2: (f) => (f.fija === 'pct' ? '¿A qué porcentaje?' : '¿Cuántas repeticiones?'),
       chips: (f) => (f.fija === 'pct' ? PORCENTAJES.map((p) => [p, p]) : REPS_FIJAS.map((r) => [r, r])),
       textoChip: (f, c) => (f.fija === 'pct' ? `${c[0]} %` : String(c[0])) },
-    { clave: 'recamara', titulo: '¿Cuántas te dejas en recámara?', corto: 'Recámara', aplica: (f) => peso && f.tipo === 'trabajo'
-      && ['doble', 'lineal', 'rm'].includes(f.modo) && !tiempo,
+    { clave: 'recamara', titulo: '¿Cuántas te dejas en recámara?', corto: 'Recámara', aplica: (f) => peso && !tiempo && conCargaModo(f),
       opciones: () => [[0, 'Ninguna (al fallo)'], [1, '1'], [2, '2'], [3, '3']], compacta: true,
       defecto: (f) => ((f.rango?.[1] ?? f.reps ?? f.valor ?? 10) <= 6 || (f.fija === 'pct' && f.valor >= 80) ? 2 : 1) },
-    { clave: 'n', titulo: '¿Cuántas series?', corto: 'Series', aplica: (f) => f.tipo !== 'bilbo', contador: true,
-      defecto: (f) => (f.tipo === 'maxima' ? 1 : f.tipo === 'calentamiento' ? 2 : 3) },
-    { clave: 'forma', titulo: '¿Cómo son las series?', corto: 'Forma', aplica: (f) => repsConPeso && f.tipo === 'trabajo'
-      && ['doble', 'lineal', 'rm'].includes(f.modo),
+    { clave: 'n', titulo: '¿Cuántas series?', corto: 'Series', contador: true,
+      aplica: (f) => !(si(f) && f.modo === 'ciclo' && ['bilbo', '5x5', '531', 'hst'].includes(f.ciclo)),
+      defecto: (f) => (f.tipo === 'maxima' || (f.rango && f.rango[1] <= 2) ? 1 : f.tipo === 'calentamiento' ? 2 : 3) },
+    { clave: 'forma', titulo: '¿Cómo son las series?', corto: 'Forma', aplica: (f) => repsConPeso && f.tipo !== 'calentamiento'
+      && (conCargaModo(f) || (f.progreso === 'no' && f.tipo === 'trabajo')),
       opciones: (f) => [['normal', 'Todas iguales'],
         ['descendente', 'Descendente en la última', 'La última sigue bajando el peso sin descansar.'],
-        (f.n ?? 3) >= 2 && f.modo !== 'lineal' && (f.rango || f.modo === 'rm') && ['ascendente', 'Ascendentes', 'Cada serie con más peso y menos repeticiones (pirámide).']].filter(Boolean),
+        (f.n ?? 3) >= 2 && f.modo !== 'lineal' && (f.rango || f.modo === 'rm') && ['ascendente', 'Ascendentes', 'Cada serie con más peso y menos repeticiones (pirámide).'],
+        ['miorrepeticiones', 'Miorrepeticiones en la última', 'Al acabar, miniseries de pocas repeticiones con 3-5 respiraciones entre medias.'],
+        ['rest-pause', 'Rest-pause en la última', 'Al acabar, 15-20 s de pausa y unas pocas más, un par de veces.']].filter(Boolean),
       defecto: () => 'normal' },
-    { clave: 'donde', titulo: '¿Dónde valen?', corto: 'Dónde', aplica: () => contexto === 'rutina',
+    { clave: 'donde', titulo: '¿Dónde valen?', corto: 'Dónde', aplica: () => contexto === 'rutina' || (contexto === 'entreno' && conRutina),
       opciones: () => [['rutina', 'Solo en esta rutina', 'Al entrenar sin rutina este ejercicio usa las suyas.'],
-        ['ejercicio', 'También sin rutina', 'Pasan a ser las series del ejercicio.']], compacta: true },
+        ['ejercicio', contexto === 'entreno' ? 'Siempre en este ejercicio' : 'También sin rutina', 'Pasan a ser las series del ejercicio.']], compacta: true },
   ];
 }
 
-export function abrirAsistenteSeries({ ej, datos, contexto = 'rutina', donde = 'rutina', alAceptar }) {
+export function abrirAsistenteSeries({ ej, datos, contexto = 'rutina', donde = 'rutina', conRutina = false, alAceptar }) {
   const f = { donde };
-  const lista = preguntas(ej, datos, contexto);
+  const lista = preguntas(ej, datos, contexto, conRutina);
   let abierta = null;
   const zona = h('div', { class: 'asistente' });
   const cerrar = modal(`Añadir series: ${ej.nombre}`, zona);
   const tiempo = mideTiempo(ej);
 
   const aplica = (q) => !q.aplica || q.aplica(f);
-  // Lo que tiene una sola opción se contesta solo; lo que tiene defecto, también.
   function rellenar() {
+    if (f.progreso === 'si') f.tipo = 'trabajo';
     for (const q of lista) {
       if (!aplica(q)) continue;
       if (f[q.clave] !== undefined) continue;
@@ -102,12 +122,11 @@ export function abrirAsistenteSeries({ ej, datos, contexto = 'rutina', donde = '
       if (d !== undefined) f[q.clave] = d;
     }
   }
-  // Al cambiar una respuesta, las que dependen de ella vuelven a preguntarse
-  // (salvo cuántas y dónde, que valen para todo).
   function contestar(q, valor) {
     f[q.clave] = valor;
     const i = lista.indexOf(q);
     for (const otra of lista.slice(i + 1)) if (!['n', 'donde'].includes(otra.clave)) delete f[otra.clave];
+    if (q.clave === 'progreso') delete f.tipo;
     abierta = null;
     pintar();
   }
@@ -151,7 +170,6 @@ export function abrirAsistenteSeries({ ej, datos, contexto = 'rutina', donde = '
     return h('div', { class: 'pregunta-asistente' }, h('p', { class: 'titulo-pregunta' }, titulo), cuerpo);
   }
 
-  // «Otro»: dos casillas y un botón.
   function otroRango(q) {
     const de = h('input', { type: 'text', inputmode: 'numeric', class: 'numero-corto', 'aria-label': 'Desde', placeholder: 'de' });
     const a = h('input', { type: 'text', inputmode: 'numeric', class: 'numero-corto', 'aria-label': 'Hasta', placeholder: 'a' });
@@ -167,9 +185,6 @@ export function abrirAsistenteSeries({ ej, datos, contexto = 'rutina', donde = '
     rellenar();
     const toca = actual();
     const filas = [];
-    // Lo contestado antes de la pregunta abierta, en una línea; lo de después,
-    // oculto hasta llegar ahí (si se reabre una anterior, lo ya contestado de
-    // después sigue en su línea).
     const iToca = lista.findIndex((q) => q.clave === toca);
     for (const [k, q] of lista.entries()) {
       if (!aplica(q)) continue;
@@ -177,7 +192,8 @@ export function abrirAsistenteSeries({ ej, datos, contexto = 'rutina', donde = '
       if (f[q.clave] === undefined) continue;
       if (iToca >= 0 && k > iToca && abierta == null) continue;
       filas.push(h('button', { type: 'button', class: 'respuesta', onclick: () => { abierta = q.clave; pintar(); } },
-        h('span', { class: 'respuesta-pregunta' }, typeof q.corto === 'function' ? q.corto(f) : q.corto), h('strong', {}, valorTexto(q)), h('span', { class: 'respuesta-cambiar', 'aria-hidden': 'true' }, 'Cambiar')));
+        h('span', { class: 'respuesta-pregunta' }, typeof q.corto === 'function' ? q.corto(f) : q.corto), h('strong', {}, valorTexto(q)),
+        h('span', { class: 'respuesta-cambiar', 'aria-hidden': 'true' }, 'Cambiar')));
     }
     const listo = !toca;
     const forma = { ...f, n: f.n ?? 1, rango: f.rango ?? (f.reps ? [f.reps, f.reps] : f.rango) };
