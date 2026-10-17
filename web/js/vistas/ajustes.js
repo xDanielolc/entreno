@@ -301,7 +301,7 @@ function seccionSedes(d, apartado) {
     sedes.map((s) => h('div', { class: 'fila-sede' },
       h('input', { type: 'text', value: s.nombre, 'aria-label': 'Nombre del sitio',
         oninput: (e) => cambiarSede(s.id, (y) => { y.nombre = e.target.value; }, { tecleo: true }) }),
-      selector(Object.entries(TIPOS_SEDE).map(([k, v]) => [k, `${v.icono} ${v.etiqueta}`]), s.tipo,
+      selector(Object.entries(TIPOS_SEDE).map(([k, v]) => [k, v.etiqueta]), s.tipo,
         (v) => cambiarSede(s.id, (y) => { y.tipo = v; }), { titulo: 'Tipo de sitio', lista: true }),
       h('label', { class: 'casilla' },
         h('input', { type: 'radio', name: 'sede-defecto', checked: d.perfil.sedePorDefecto === s.id,

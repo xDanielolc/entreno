@@ -10,10 +10,10 @@
 import { nuevoId } from './ui.js';
 
 export const TIPOS_SEDE = {
-  gimnasio: { etiqueta: 'Gimnasio', icono: '🏋️' },
-  casa: { etiqueta: 'Casa', icono: '🏠' },
-  calle: { etiqueta: 'Calle o parque', icono: '🌳' },
-  otro: { etiqueta: 'Otro', icono: '📍' },
+  gimnasio: { etiqueta: 'Gimnasio' },
+  casa: { etiqueta: 'Casa' },
+  calle: { etiqueta: 'Calle o parque' },
+  otro: { etiqueta: 'Otro' },
 };
 
 export function sedesActivas(datos) {
@@ -22,7 +22,7 @@ export function sedesActivas(datos) {
 
 export function nombreSede(datos, id) {
   const s = (datos.sedes || []).find((x) => x.id === id);
-  return s ? `${TIPOS_SEDE[s.tipo]?.icono ?? '📍'} ${s.nombre}` : 'Sin indicar';
+  return s ? s.nombre : 'Sin indicar';
 }
 
 export function nuevaSede(nombre, tipo = 'gimnasio') {

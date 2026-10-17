@@ -40,7 +40,7 @@ const MODOS = {
     ['Delante, abajo', DELANTE.filter((m) => TREN_INFERIOR.includes(m))],
   ] },
 };
-const PERIODOS = { 7: 'Esta semana', 30: 'Este mes', propio: 'Otro…' };
+const PERIODOS = { 7: 'Esta semana', 30: 'Este mes', propio: 'Otro' };
 
 let modo = 'zonas';
 let dias = 7;
@@ -68,9 +68,9 @@ export function tarjetaEquilibrio(d) {
     caja.replaceChildren(
       h('h2', { class: 'centrado' }, 'Equilibrio'),
       h('p', { class: 'nota centrado' }, 'Qué entrenas más y qué tienes descompensado.'),
-      h('div', { class: 'grupo-botones' }, h('span', { class: 'etiqueta-grupo' }, 'Ver por'),
+      h('div', { class: 'grupo-botones' },
         filaBotones(Object.entries(MODOS).map(([k, x]) => [k, x.texto]), modo, (k) => { modo = k; pintar(); })),
-      h('div', { class: 'grupo-botones' }, h('span', { class: 'etiqueta-grupo' }, 'Periodo'),
+      h('div', { class: 'grupo-botones' },
         filaBotones(Object.entries(PERIODOS), periodo, (k) => {
           periodo = k;
           if (k !== 'propio') dias = Number(k);

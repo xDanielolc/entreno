@@ -1,5 +1,9 @@
 import { icono } from '../iconos.js';
 import { abrirFichaEnProgresion } from './ejercicios.js';
+import { seccionProgreso } from './graficas.js';
+import { abrirAsistenteSeries } from './configurar-series.js';
+import { crearPlanesRapidos } from '../rapidas.js';
+import { planesDeItem, seriesDesdePlan } from '../series.js';
 import {
   aPesoDisponible, cargaCorporal, cargaDesdeLectura, esfuerzoTotal, formatearNumero,
   pesoDePlan, redondear, rmDeReferencia, seriesDeEjercicio, sugerenciaSerie, trabajoSerie, tramosPropuestos, usaTramos,
@@ -58,6 +62,9 @@ const EXPLICA_TIPO = {
   libre: 'Cuenta como una serie normal, pero sin objetivo: apuntas lo que hagas.',
 };
 
+// Hacia dónde se deslizó la última tarjeta (para animar la siguiente).
+let direccionPendiente = null;
+
 export function vistaSesion(contenedor, { id }) {
   const d = estado.datos();
   const sesion = d.sesiones.find((s) => s.id === id);
@@ -91,6 +98,8 @@ export function vistaSesion(contenedor, { id }) {
   const eleccion = guiado.get(id) ?? null;
   const modo = eleccion?.modo ?? 'todo';
   const posicion = eleccion?.pos ?? null;     // null = ver el entrenamiento entero
+  let direccionDeslizar = direccionPendiente;
+  direccionPendiente = null;
   const algoHecho = sesion.ejercicios.some((e) => e.series.some((s) => s.hecha));
 
   // Modifica esta sesión. Se busca de nuevo dentro de cambiar() por si los
@@ -101,6 +110,8 @@ export function vistaSesion(contenedor, { id }) {
   }, opciones);
 
   const enCurso = sesion.estado === 'en-curso';
+  const movil = matchMedia('(max-width: 699px)').matches;
+  if (enCurso) contenedor.classList.add('con-barra-entreno');
   const visibles = posicion == null
     ? sesion.ejercicios.map((entrada, i) => [entrada, i])
     : sesion.ejercicios.slice(posicion, posicion + 1).map((entrada) => [entrada, posicion]);
@@ -132,25 +143,23 @@ export function vistaSesion(contenedor, { id }) {
     barraDescanso(),
     enCurso && !sesion.tutorial && preguntaAvisos(),
 
-    posicion != null && pasoEntreEjercicios(),
+    // Móvil, de uno en uno: puntitos (uno por ejercicio) y, la primera vez,
+    // la nota de que se desliza. En el ordenador, nada arriba.
+    enCurso && posicion != null && movil && puntosEjercicios(),
+    enCurso && posicion != null && movil && pista('deslizar-ejercicios', 'Desliza la tarjeta a izquierda o derecha para cambiar de ejercicio.'),
+    !enCurso && posicion != null && pasoEntreEjercicios(),
 
     visibles.map(([entrada, i]) => tarjetaEjercicio(entrada, i)),
 
-    // Abajo, el botón que de verdad toca: siguiente ejercicio (o terminar).
-    posicion != null && pasoEntreEjercicios({ grande: true }),
+    // En el ordenador, «+ Añadir ejercicio» va debajo del ejercicio; en el
+    // móvil está en la barra fija.
+    (!enCurso || !movil) && h('button', { class: 'boton secundario grande anadir-ejercicio', onclick: elegirEjercicio }, '+ Añadir ejercicio'),
 
-    h('button', { class: 'boton secundario grande', onclick: elegirEjercicio }, '+ Añadir ejercicio'),
-
-    // Comentarios del entrenamiento: tras el bocadillo (abiertos si ya hay).
+    // Comentarios del entrenamiento (desde «⋯»; abiertos si ya hay).
     notasSesion,
 
     enCurso
-      ? [h('button', { class: `boton grande terminar-entreno${posicion != null && posicion < sesion.ejercicios.length - 1 ? ' secundario' : ''}`, onclick: terminar }, 'Terminar entrenamiento'),
-        h('div', { class: 'fila-iconos-entreno' },
-          h('button', { type: 'button', class: 'boton-icono boton-bocadillo', 'aria-label': 'Comentarios del entrenamiento',
-            title: 'Comentarios del entrenamiento', onclick: () => { notasSesion.hidden = !notasSesion.hidden; if (!notasSesion.hidden) notasSesion.querySelector('textarea').focus(); } }, icono('bocadillo')),
-          h('button', { type: 'button', class: 'boton-icono boton-cancelar-x', 'aria-label': 'Cancelar entrenamiento',
-            title: 'Cancelar entrenamiento', onclick: cancelar }, icono('cerrar')))]
+      ? barraEntreno()
       : [h('p', { class: 'nota' }, 'Cada cambio se guarda al momento. Si te equivocas, toca «Deshacer» en el aviso que sale abajo.'),
         h('button', { class: 'boton grande', onclick: () => { editando.delete(id); dispatchEvent(new HashChangeEvent('hashchange')); } }, 'Hecho, dejar de editar')],
 
@@ -187,6 +196,81 @@ export function vistaSesion(contenedor, { id }) {
         h('small', { class: 'bloque suave' }, 'Con tu peso: una repetición más cada sesión hasta llegar a 20.')),
       h('button', { type: 'button', class: 'boton-marca', onclick: () => { cerrar(); cicloPendiente = { sesion: id, ej: ej.id, i, j }; abrirFichaEnProgresion(ej.id); } },
         h('strong', {}, 'Otro: montarlo en la ficha'), h('small', { class: 'bloque suave' }, 'Se abre el ejercicio para elegirlo paso a paso.'))));
+  }
+
+  // La barra fija de abajo. En el móvil: «+ Añadir ejercicio» y «⋯» a la
+  // misma altura, y «Terminar» a todo el ancho cuando toca (último ejercicio,
+  // todo hecho o viendo todos). En el ordenador: ‹, «Siguiente» y «⋯».
+  function barraEntreno() {
+    const n = sesion.ejercicios.length;
+    const ultimo = posicion == null || posicion >= n - 1;
+    const todoHecho = sesion.ejercicios.length > 0 && sesion.ejercicios.every((x) => x.series.every((s) => s.hecha));
+    const mas = h('button', { type: 'button', class: 'boton secundario barra-mas', 'aria-label': 'Más opciones', onclick: masOpciones }, '⋯');
+    const botonTerminar = h('button', { type: 'button', class: 'boton grande barra-terminar', onclick: terminar }, 'Terminar entrenamiento');
+    if (movil) {
+      return h('div', { class: 'barra-entreno' },
+        h('div', { class: 'barra-entreno-fila' },
+          h('button', { type: 'button', class: 'boton secundario barra-anadir', onclick: elegirEjercicio }, '+ Añadir ejercicio'), mas),
+        (ultimo || todoHecho) && botonTerminar);
+    }
+    if (posicion == null) {
+      return h('div', { class: 'barra-entreno' }, h('div', { class: 'barra-entreno-fila' }, botonTerminar, mas));
+    }
+    const nombreSiguiente = d.ejercicios.find((x) => x.id === sesion.ejercicios[posicion + 1]?.ejercicioId)?.nombre ?? '';
+    return h('div', { class: 'barra-entreno' },
+      h('div', { class: 'barra-entreno-fila' },
+        h('button', { type: 'button', class: 'boton secundario boton-paso-grande', 'aria-label': 'Ejercicio anterior', disabled: posicion === 0,
+          onclick: () => { irA(posicion - 1); window.scrollTo(0, 0); } }, '‹'),
+        ultimo ? botonTerminar
+          : h('button', { type: 'button', class: 'boton grande boton-siguiente', onclick: () => { irA(posicion + 1); window.scrollTo(0, 0); } },
+            h('span', {}, 'Siguiente ›'), h('small', {}, nombreSiguiente)),
+        mas));
+  }
+
+  // Los puntitos de arriba: uno por ejercicio; el de ahora, alargado. Se
+  // pueden tocar para saltar.
+  function puntosEjercicios() {
+    return h('div', { class: 'puntos-ejercicios', role: 'tablist', 'aria-label': 'Ejercicios' },
+      sesion.ejercicios.map((x, k) => h('button', { type: 'button', role: 'tab', 'aria-selected': String(k === posicion),
+        'aria-label': ejercicioDe(x.ejercicioId)?.nombre ?? `Ejercicio ${k + 1}`, class: `${k === posicion ? 'activo' : ''}${x.series.length && x.series.every((s) => s.hecha) ? ' hecho' : ''}`,
+        onclick: () => { irA(k); window.scrollTo(0, 0); } })));
+  }
+
+  // Deslizar la tarjeta del ejercicio: a la izquierda, el siguiente; a la
+  // derecha, el anterior. Solo si el gesto es claramente horizontal.
+  function deslizable(tarjeta) {
+    let x0 = null, y0 = null;
+    tarjeta.addEventListener('touchstart', (ev) => {
+      if (ev.target.closest('input, textarea, button.chip')) { x0 = null; return; }
+      x0 = ev.touches[0].clientX; y0 = ev.touches[0].clientY;
+    }, { passive: true });
+    tarjeta.addEventListener('touchend', (ev) => {
+      if (x0 == null) return;
+      const dx = ev.changedTouches[0].clientX - x0; const dy = ev.changedTouches[0].clientY - y0;
+      x0 = null;
+      if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+      const nueva = posicion + (dx < 0 ? 1 : -1);
+      if (nueva < 0 || nueva >= sesion.ejercicios.length) return;
+      direccionDeslizar = dx < 0 ? 'izquierda' : 'derecha';
+      irA(nueva); window.scrollTo(0, 0);
+    });
+    if (direccionDeslizar) { tarjeta.classList.add(`entra-${direccionDeslizar}`); direccionDeslizar = null; }
+    return tarjeta;
+  }
+
+  // «⋯»: lo que no se usa en cada serie.
+  function masOpciones() {
+    const opciones = [
+      posicion == null ? ['Ver de uno en uno', 'ojo', () => irA(0)] : ['Ver todos los ejercicios', 'ojo', () => irA(null)],
+      ['Cómo verlo', 'ajustes', () => elegirVista()],
+      ['Comentario del entrenamiento', 'bocadillo', () => { notasSesion.hidden = false; notasSesion.scrollIntoView({ block: 'center' }); notasSesion.querySelector('textarea').focus(); }],
+      movil ? null : ['+ Añadir ejercicio', null, () => elegirEjercicio()],
+      ['Terminar entrenamiento', 'reloj', () => terminar()],
+      ['Cancelar entrenamiento', 'cerrar', () => cancelar(), true],
+    ].filter(Boolean);
+    const cerrar = modal('Más opciones', h('div', { class: 'lista-selector lista-con-iconos' },
+      opciones.map(([texto, ic, fn, peligro]) => h('button', { type: 'button', class: `boton-marca${peligro ? ' peligro-texto' : ''}`,
+        onclick: () => { cerrar(); fn(); } }, ic && icono(ic), h('span', {}, texto)))));
   }
 
   function pasoEntreEjercicios({ grande = false } = {}) {
@@ -326,6 +410,7 @@ export function vistaSesion(contenedor, { id }) {
   }
 
   function irA(nueva) {
+    direccionPendiente = direccionDeslizar;
     const modoActual = guiado.get(id)?.modo ?? d.perfil.modoEntreno ?? 'ejercicio';
     if (nueva == null) guardarVista('todo', null);
     else guardarVista(modoActual === 'todo' ? 'ejercicio' : modoActual, Math.max(0, Math.min(nueva, sesion.ejercicios.length - 1)));
@@ -342,9 +427,14 @@ export function vistaSesion(contenedor, { id }) {
     const primeraSinHacer = entrada.series.findIndex((s) => !s.hecha);
     const oculta = (j) => modo === 'serie' && primeraSinHacer >= 0 && j > primeraSinHacer;
     const ocultas = entrada.series.filter((s, j) => oculta(j)).length;
-    return h('article', { class: `tarjeta ejercicio-sesion ${modo === 'serie' ? 'de-una-en-una' : ''}`, 'data-entrada': indice },
+    const foto = imagenDeEjercicio(ej);
+    const grande = posicion != null;
+    const tarjeta = h('article', { class: `tarjeta ejercicio-sesion ${modo === 'serie' ? 'de-una-en-una' : ''}${grande ? ' una' : ''}`, 'data-entrada': indice },
+      grande && foto && h('button', { type: 'button', class: 'foto-ejercicio', 'aria-label': `Cómo vas en ${ej.nombre}`, onclick: () => verProgreso(ej) },
+        h('img', { src: foto.archivo, alt: '' }), h('span', { class: 'foto-pista' }, 'Cómo vas ›')),
       h('div', { class: 'cabecera-tarjeta' },
-        imagenDeEjercicio(ej) && h('img', { class: 'miniatura', src: imagenDeEjercicio(ej).archivo, alt: '', loading: 'lazy' }),
+        !grande && foto && h('button', { type: 'button', class: 'miniatura-boton', 'aria-label': `Cómo vas en ${ej.nombre}`, onclick: () => verProgreso(ej) },
+          h('img', { class: 'miniatura', src: foto.archivo, alt: '', loading: 'lazy' })),
         h('h2', { class: 'crece' }, ej.nombre),
         h('button', { class: 'boton-icono', 'aria-label': `Quitar ${ej.nombre}`,
           onclick: () => quitarEjercicio(indice, ej) }, icono('cerrar'))),
@@ -376,7 +466,38 @@ export function vistaSesion(contenedor, { id }) {
       }),
       ocultas > 0 && h('p', { class: 'nota series-ocultas' }, `${ocultas} ${ocultas === 1 ? 'serie más' : 'series más'}: aparece al apuntar esta.`),
 
-      h('button', { class: 'boton secundario', onclick: () => anadirSerie(indice, ej, entrada) }, '+ Serie'));
+      h('div', { class: 'fila-botones fila-mas-series' },
+        h('button', { class: 'boton secundario', onclick: () => anadirSerie(indice, ej, entrada) }, '+ Serie'),
+        enCurso && h('button', { class: 'boton secundario', onclick: () => asistenteEnEntreno(indice, ej) }, '+ Series nuevas…')));
+    return grande && enCurso && movil ? deslizable(tarjeta) : tarjeta;
+  }
+
+  // Las estadísticas del ejercicio en un cartel, sin salir del entreno.
+  function verProgreso(ej) {
+    modal(ej.nombre, h('div', { class: 'progreso-en-cartel' },
+      seccionProgreso(d, ej) ?? h('p', { class: 'suave centrado' }, 'Aún no hay entrenamientos de este ejercicio con los que hacer gráficas.')));
+  }
+
+  // El asistente de series también al entrenar: crea las series en el
+  // ejercicio (o solo para esta rutina) y las pone ya en el entreno de hoy.
+  function asistenteEnEntreno(i, ej) {
+    abrirAsistenteSeries({ ej, datos: d, contexto: 'entreno', conRutina: Boolean(sesion.rutinaId), donde: sesion.rutinaId ? 'rutina' : 'ejercicio',
+      alAceptar: (f) => {
+        estado.cambiar((datos) => {
+          const propio = datos.ejercicios.find((x) => x.id === ej.id);
+          const planes = crearPlanesRapidos(datos, propio, f);
+          const soloRutina = f.donde === 'rutina' && sesion.rutinaId ? sesion.rutinaId : null;
+          for (const p of planes) { p.soloRutina = soloRutina; propio.series.push(p); }
+          if (soloRutina) {
+            const item = datos.rutinas.find((r) => r.id === sesion.rutinaId)?.dias.find((x) => x.id === sesion.diaRutinaId)
+              ?.ejercicios.find((x) => x.ejercicioId === ej.id);
+            if (item) item.series = [...planesDeItem(propio, item).map((p) => p.id).filter((pid) => !planes.some((q) => q.id === pid)), ...planes.map((p) => p.id)];
+          }
+          const s = datos.sesiones.find((x) => x.id === id);
+          for (const p of planes) s.ejercicios[i].series.push(...seriesDesdePlan(datos, propio, p, { excluirSesion: id }));
+        });
+        aviso('Series añadidas al ejercicio y al entreno de hoy.');
+      } });
   }
 
   // El mejor 1RM estimado del ciclo en curso, con sus porcentajes: sirve para

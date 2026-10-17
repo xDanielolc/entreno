@@ -19,6 +19,8 @@ import { pintarGuia } from './vistas/tutorial.js';
 import { vistaAprender } from './vistas/aprender.js';
 import { vistaPruebaColores } from './vistas/prueba-colores.js';
 import { vistaPruebaBotones } from './vistas/prueba-botones.js';
+import { vistaPruebaPresentacion } from './vistas/prueba-presentacion.js';
+import { vistaGuiaEstilo } from './vistas/guia-estilo.js';
 import { aplicarTema } from './vistas/cuestionario.js';
 
 // La última pantalla se recuerda: si el móvil cierra la app en mitad de un
@@ -47,6 +49,8 @@ const RUTAS = [
   { patron: /^#\/aprender$/, vista: vistaAprender, pestana: 'aprender' },
   { patron: /^#\/prueba-colores$/, vista: vistaPruebaColores, pestana: 'ajustes' },
   { patron: /^#\/prueba-botones$/, vista: vistaPruebaBotones, pestana: 'inicio' },
+  { patron: /^#\/prueba-presentacion$/, vista: vistaPruebaPresentacion, pestana: 'ajustes' },
+  { patron: /^#\/guia-estilo$/, vista: vistaGuiaEstilo, pestana: 'aprender' },
 ];
 
 const PESTANAS = [
@@ -65,8 +69,7 @@ document.querySelector('.marca-app')?.prepend(icono('marca'));
   if (presentacion) {
     const quitar = () => presentacion.remove();
     presentacion.addEventListener('click', quitar, { once: true });
-    setTimeout(() => presentacion.querySelector('.pesa')?.classList.add('quieta'), 1780);
-    setTimeout(quitar, 2800);
+    setTimeout(quitar, 2850);
     if (!matchMedia('(prefers-reduced-motion: reduce)').matches) sonidosPresentacion();
   }
 }
@@ -102,7 +105,7 @@ function sonidosPresentacion() {
     // Al compás de la animación, que empezó al pintarse la página.
     const ya = (document.querySelector('#presentacion .pesa')?.getAnimations?.()[0]?.currentTime ?? 0) / 1000;
     const en = (t, fn, ...x) => { if (t - ya >= 0) fn(t - ya, ...x); };
-    en(0.28, bote, 520); en(0.6, bote, 600); en(0.88, bote, 680); en(1.44, golpe);
+    en(0.28, bote, 520); en(0.6, bote, 600); en(0.88, bote, 680); en(1.33, golpe); en(1.82, golpe);
     setTimeout(() => audio.close(), 2500);
   };
   if (audio.state === 'running') sonar();
@@ -118,6 +121,7 @@ function renderizar() {
   const mismaRuta = renderizar.ultimaRuta === location.hash;
   renderizar.ultimaRuta = location.hash;
   principal.replaceChildren();
+  principal.className = 'contenido';
 
   if (!estado.usuario()) {
     navegacion.hidden = true;
@@ -284,7 +288,7 @@ async function guardarImagenesParaSinConexion() {
     const capas = Object.entries(MUSCULOS).flatMap(([clave, m]) => m.vistas.map((v) => archivoCapa(clave, v)));
     const cuerpo = ['imagenes/musculos/cuerpo-delante.svg', 'imagenes/musculos/cuerpo-detras.svg'];
     // El mismo nombre que CACHE_IMAGENES en sw.js: si no, el service worker lo borra.
-    const cache = await caches.open('entreno-imagenes-7');
+    const cache = await caches.open('entreno-imagenes-8');
     for (const ruta of [...cuerpo, ...capas, ...mios]) {
       if (!(await cache.match(ruta, { ignoreSearch: true }))) {
         const r = await fetch(ruta).catch(() => null);

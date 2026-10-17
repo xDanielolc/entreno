@@ -708,3 +708,48 @@ Esquema v17. Dan: «la programación me da más problemas que el papel». Hecho:
   guarda la estática en `estatica` y marca `animada`. El encargo de dibujos
   a Design pide el estilo de la guía de Ángel7Real (figura gris, músculo en
   rojo) con dibujos propios.
+
+## Ronda 0.50.0 (17-10-2026): entreno nuevo, asistente con su árbol y guía de estilo
+
+- **Asistente de series** con el árbol de Dan: primero «¿La app te lleva el
+  progreso?». No → qué serie es (trabajo, calentamiento, máxima) y objetivo
+  orientativo. Sí → qué mejoras (peso, repeticiones, tiempo, distancia) →
+  cómo (doble progresión, sube al completarlas, según tu 1RM, **por ciclos**
+  con los prehechos Bilbo, lineal, semanal, 5×5, 5/3/1, HST, más reps, más
+  tiempo o «a mi manera», o un prehecho tuyo) → rango → recámara, cuántas,
+  cómo son (iguales, descendente, ascendentes, **miorrepeticiones** o
+  **rest-pause** en la última) y dónde. `CICLOS_ASISTENTE` en rapidas.js.
+  También en el entreno: «+ Series nuevas…» junto a «+ Serie»
+  (`asistenteEnEntreno` en sesion.js; crea las series en el ejercicio o solo
+  para la rutina y las mete en el entreno de hoy).
+- **Pantalla de entreno** (lo eligió Dan con `#/prueba-botones`): en el móvil
+  se desliza la tarjeta para cambiar de ejercicio (`deslizable`), puntitos
+  arriba y una pista que se cierra; barra fija abajo con «+ Añadir
+  ejercicio» y «⋯» a la misma altura y «Terminar entrenamiento» a todo el
+  ancho cuando toca (último ejercicio, todo hecho o viendo todos). En el
+  ordenador, barra fija con ‹, «Siguiente › nombre» y «⋯». «⋯» abre «Más
+  opciones» (ver todos/uno a uno, cómo verlo, comentario, terminar,
+  cancelar), con iconos alineados. Foto grande del ejercicio arriba; al
+  tocarla se abren sus estadísticas en un cartel (`verProgreso`). Títulos de
+  los carteles, centrados. Sin prueba de 1RM en ejercicios con tu peso.
+- **Presentación**: la pesa entra ya a su tamaño (nítida) y la caja la
+  atrapa. Variantes «cae» (del cielo, se apoya en la esquina derecha «\»,
+  bote y cae a plano) y «derecha» (entra recta, choca y se asienta); se
+  eligen en `#/prueba-presentacion` (localStorage `entreno-presentacion`).
+  El sonido no suena: el navegador no deja sonar nada antes de tocar la app.
+  Iconos de la app (y el color del arranque del móvil) en tinta y blanco.
+- **Guía de estilo** v2 (`docs/guia-de-estilo.md`) con paleta nombrada en
+  claro y oscuro, tipos, espacios, radios, componentes, iconos, movimiento y
+  tono; y **guía viva** en `#/guia-estilo` (`vistas/guia-estilo.js`), que lee
+  los colores de las variables CSS.
+- Equilibrio sin «Ver por» ni «Periodo» y «Otro» sin puntos; sitios sin
+  emojis; logo de la bienvenida con el icono; oblicuos más separados.
+- **Animaciones**: `animar_imagenes.py` encaja las dos posturas por abajo
+  (`ancla`: lo que no se mueve) y recorta sobre blanco; `FORZADOS` toma de
+  Everkinetic dominadas, negativas (empiezan arriba, `invertir`), fondos,
+  prensa, peso muerto, tríceps sobre la cabeza, etc. Fuera las tres de
+  FitnessProgramer (borradas del repositorio). 78 animadas. Almacén de
+  imágenes `entreno-imagenes-8`.
+- Idea de Dan para Design: tema por defecto «Cartoon» (estos dibujos de
+  línea, también el muñeco del cuerpo con los músculos) y tema «Anatómico»
+  (lo de ahora con músculos en rojo).

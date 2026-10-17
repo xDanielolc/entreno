@@ -101,6 +101,21 @@ y al final lo que es decoración o depende de terceros.
 - [ ] Que el 1RM de las series de pocas repeticiones pese más que el de las
       de 20-30 (la calibración personal lo corrige en parte, no del todo).
 
+## 0d. Encargo «Diario y test» (17-10-2026)
+
+Viene de la investigación «Dormir menos sin perder descanso». Encargo
+completo en `docs/encargo-diario-y-test.md` (tres fases, estimación y
+fuentes). Hacer la fase A primero: permite empezar la línea base del plan.
+
+- [ ] Fase A: apartado «Diario» (peso reutilizando `peso.js`, sueño con
+      tiempo en cama, sueño real y eficiencia, sensación 1-5, alcohol,
+      pulso nocturno), resumen semanal con repeticiones de los básicos,
+      gráfica, esquema v18 con `diario[]` y `perfil.necesidadSuenoH`.
+- [ ] Fase B: PVT de 3 min, Karolinska, Epworth, línea base de 14 días,
+      semáforo dominical, enlace con «¿Voy hoy?», tema «Sueño y
+      rendimiento» en `bibliografia.js` (y corregir la cifra de Craven).
+- [ ] Fase C: prueba de la cama ampliada y plan de adelanto de fase.
+
 ## 1. La app funcionando en condiciones
 
 Es lo primero. Dan lo dijo así el 23-09-2026: *«Me rindo con el tutorial hasta
