@@ -1747,3 +1747,27 @@ details[open] > .fila-botones, details[open] > .boton, details[open] > .tabla-mu
 .apartado[open] > summary::after { transform: rotate(90deg); }
 details.bloque-ciclo.plegable > summary::after { content: '›'; margin-left: auto; font-size: 1.3rem; color: var(--texto-suave); transition: transform .15s; }
 details.bloque-ciclo.plegable[open] > summary::after { transform: rotate(90deg); }
+
+/* Página de prueba de los botones del entreno (#/prueba-botones). */
+.sim-opciones .boton-marca { flex: 1 1 45%; text-align: center; }
+.sim-pantalla { display: grid; gap: 10px; padding-bottom: 90px; }
+.sim-cabecera { display: flex; align-items: center; justify-content: space-between; min-height: 44px; }
+.sim-iconos { display: inline-flex; gap: 6px; }
+.sim-mas { font-size: 1.5rem; font-weight: 800; }
+.sim-tarjeta h2 { margin: 0 0 6px; }
+.sim-tarjeta > .boton { width: 100%; }
+.sim-anadir { width: 100%; border-style: dashed; }
+.sim-fila { margin-top: 4px; }
+.sim-barra-fija { position: fixed; left: 0; right: 0; bottom: calc(66px + env(safe-area-inset-bottom)); z-index: 9; display: flex; gap: 8px;
+  padding: 8px 12px; background: color-mix(in srgb, var(--fondo) 92%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--borde); max-width: 640px; margin: 0 auto; }
+.sim-barra-fija .boton.grande { flex: 1; margin: 0; min-height: 56px; flex-direction: column; gap: 0; line-height: 1.15; }
+.sim-barra-fija .boton-siguiente small, .sim-fila .boton-siguiente small { font-weight: 500; opacity: .8; font-size: .8rem; }
+.sim-barra-fija .boton-paso-grande { flex: 0 0 56px; min-height: 56px; }
+.sim-puntos { display: flex; justify-content: center; gap: 8px; }
+.sim-puntos span { width: 8px; height: 8px; border-radius: 50%; background: var(--borde); }
+.sim-puntos span.activo { background: var(--acento); width: 22px; border-radius: 4px; }
+.sim-carrusel { touch-action: pan-y; user-select: none; }
+.sim-fila-d { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.sim-fila-d .boton { flex: 1; }
+.sim-fila-d .boton-paso-grande { flex: 0 0 56px; }
