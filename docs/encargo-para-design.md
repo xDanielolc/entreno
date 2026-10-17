@@ -109,12 +109,24 @@ abajo la explicación de por qué pide lo que pide, por si quieres cambiarlo.
 > - Cuadrado, 700 × 700 píxeles como mínimo, PNG o WebP con fondo blanco (no
 >   transparente).
 >
-> Referencia de estilo: las ilustraciones de wger.de (licencia CC-BY-SA); las
-> nuevas deben parecerse en aire y en encuadre, **sin copiar ninguna**.
+> Referencia de estilo: las láminas de una guía de entrenamiento que uso
+> (figura anatómica de un hombre en gris claro con el músculo que trabaja en
+> rojo anaranjado, material en negro y gris, fondo blanco, vista de tres
+> cuartos). Es un estilo muy extendido en las apps de gimnasio. Quiero ese
+> aire, pero con dibujos **propios**: no se puede copiar ni calcar ninguna
+> lámina existente (las de esas webs tienen derechos). Todas iguales entre
+> sí: misma figura, misma luz, mismo grosor de línea, mismo rojo.
 >
 > Cada ejercicio, dos imágenes: **inicio** y **final** del movimiento, con la
 > misma cámara y la misma figura, para poder montarlas luego como una
-> animación de dos fotogramas.
+> animación de dos fotogramas. La app ya las monta así (WebP animado de
+> dos fotogramas, 0,9 s cada uno; ver `herramientas/animar_imagenes.py`).
+>
+> Empieza por los ejercicios de mi rutina (press de banca, remo con barra,
+> press militar, dominadas, curl martillo, extensión de tríceps sobre la
+> cabeza, elevaciones laterales, pájaro a una mano, sentadilla, gemelo de
+> pie con barra, peso muerto rumano y sumo, curl femoral sentado, rueda
+> abdominal, elevación de piernas colgado, fondos en paralelas).
 >
 > Te paso la lista de ejercicios que faltan, con los músculos principales y
 > secundarios de cada uno, y el material que usa.

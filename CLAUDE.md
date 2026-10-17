@@ -699,3 +699,12 @@ Esquema v17. Dan: «la programación me da más problemas que el papel». Hecho:
 - GIF: las animaciones grises con músculos en rojo (peso muerto sumo,
   prensa, tríceps sobre la cabeza) son de FitnessProgramer, subidas a wger
   por terceros; sus condiciones prohíben copiarlas. No se añaden más.
+- 0.49.1-0.49.2: página oculta `#/prueba-botones` (`vistas/prueba-botones.js`)
+  con cuatro formas de ordenar los botones de abajo del entreno, para que Dan
+  elija. Borrador de correo a FitnessProgramer pidiendo permiso (en Gmail de
+  Dan, lo envía él). Animaciones libres provisionales: `herramientas/
+  animar_imagenes.py` junta las dos posturas de Everkinetic y wger en un
+  WebP animado (`web/imagenes/ejercicios/anim/`, 62 ejercicios); creditos
+  guarda la estática en `estatica` y marca `animada`. El encargo de dibujos
+  a Design pide el estilo de la guía de Ángel7Real (figura gris, músculo en
+  rojo) con dibujos propios.
