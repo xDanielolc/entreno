@@ -94,6 +94,8 @@ export function crearPlanesRapidos(datos, ej, forma) {
       const plan = libre(de != null ? [de, a] : null);
       plan.tipo = 'calentamiento';
       plan.calentamiento = true;
+      // «al 50 %»: el peso sale de tu 1RM; 0 % es la barra sola.
+      if (f.pct != null && conPeso(ej)) plan.progresion.porRM = { fija: 'pct', valor: f.pct, semanas: 8 };
       return plan;
     });
   }
@@ -189,7 +191,7 @@ export function textoForma(forma, ej) {
   const rango = de == null ? '' : de === a ? v(de) : `${v(de)}-${v(a)}`;
   const n = f.n ?? 1;
   const ultima = { descendente: ', descendente en la última', miorrepeticiones: ', miorrepeticiones en la última', 'rest-pause': ', rest-pause en la última' }[f.forma] ?? '';
-  if (f.tipo === 'calentamiento') return `${n} × ${rango || '?'} de calentamiento`;
+  if (f.tipo === 'calentamiento') return `${n} × ${rango || '?'} de calentamiento${f.pct > 0 ? ` al ${f.pct} %` : f.pct === 0 ? ' con la barra' : ''}`;
   if (f.progreso === 'no') return `${f.tipo === 'maxima' ? 'serie máxima ' : `${n} × `}${rango || 'libre'}, solo apuntar${ultima}`;
   if (f.tipo === 'maxima') return `serie máxima ${rango || '1-2'}`;
   const recamara = f.recamara != null && conPeso(ej) ? ` con ${f.recamara} en recámara` : '';

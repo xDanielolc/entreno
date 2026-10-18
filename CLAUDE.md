@@ -753,3 +753,53 @@ Esquema v17. Dan: «la programación me da más problemas que el papel». Hecho:
 - Idea de Dan para Design: tema por defecto «Cartoon» (estos dibujos de
   línea, también el muñeco del cuerpo con los músculos) y tema «Anatómico»
   (lo de ahora con músculos en rojo).
+
+## Ronda 0.51.0 (19-10-2026): su primer entreno de verdad con la 0.50
+
+Esquema v18 (todo opcional). Lo que vio Dan en el gimnasio y cómo quedó:
+- **Un solo 1RM por ejercicio** (`rmDelEjercicio` en calculos.js): base =
+  mejor serie de 8 semanas (o de siempre, o el puesto a mano si nunca lo
+  has hecho); manda una serie de hoy si da más (o cualquiera de hoy si la
+  base era a mano, salvo que lo pongas a mano después: `rmManualEn`). Sale
+  en la cabecera de la tarjeta («Tu 1RM: 134 kg · sale de…» con «?»); el
+  % de cada serie usa el de las series de arriba (`antesDe`), así no cambia
+  al apuntar las de abajo. Fuera el «1RM X · primera vez» de cada fila.
+- No cuentan para el 1RM (`valeParaRM`): calentamientos, tramos y series
+  con más de 5 en recámara. La calibración personal ignora el entreno en
+  curso (si no, el 1RM de cada serie bailaba al teclear).
+- Pesos que pone la app (`serie.cargaAuto`): se ajustan solos si el 1RM de
+  hoy cambia (`reajustarDebajo`, al salir de una casilla y al pintar); los
+  que tocas tú (`cargaAMano`), no. Un ciclo sin montar se monta con el 1RM
+  de hoy (`crearSerieDesdePlan(..., { rmHoy })` → `prepararCiclo({ rm })`).
+  La prueba de 1RM solo sale si no hay ningún 1RM (ni de antes ni de hoy).
+- Textos: «Hoy: 82,5 kg × 4 dejando 2…» en vez de «Primera vez…»; en un
+  ciclo nuevo «↑ Objetivo: N reps (las que igualan tu 1RM de X kg)» y la
+  marca «✓ objetivo cumplido» (`objetivoDe: 'rm'`); «superado» solo con una
+  vez anterior. Calentamiento sin marca, sin recámara y sin comparación;
+  una serie pasada a calentamiento suelta su regla (`planIdAntes`). El tipo
+  de serie «Libre» se llama como su regla («Doble progresión», «Serie
+  máxima»…). Recámara: 0 al fallo, 1 casi, 2-3 cerca, 4+ lejos, y se
+  actualiza al escribir.
+- **Peso mínimo** (`pesoMinimoDe`): con barra, 20 kg (o `ej.pesoMinimo`, en
+  Ajustes finos); `materialDe` lo saca del catálogo si el ejercicio no lo
+  guarda. `aPesoDisponible` nunca propone menos.
+- **Modo «una serie»**: se ve una sola serie («Serie 2 de 4» y puntitos) y
+  se desliza de serie en serie y luego al siguiente ejercicio (`avanzar`,
+  `indiceSerie`, `sesion.vista.serie`). Fuera «aparece al apuntar esta».
+- Móvil: el entreno sin las pestañas de abajo (`body.entreno-a-pantalla`;
+  «⋯ → Ir a la app»); la flecha de volver arriba va encima de la barra
+  (`--alto-barra-entreno`, con ResizeObserver). Sin zoom en la página
+  (viewport); el mapa del cuerpo se abre grande al tocarlo.
+- Ejercicio sin series: nota clara, «+ Serie suelta» y «Programar series…»
+  (antes «+ Serie» y «+ Series nuevas…»). Casillas vacías con lo de la
+  última vez en gris.
+- «Cómo vas» enseña gráfica desde el primer día (1RM de cada serie).
+- Rutina prehecha «Fuerza sin máquinas» versión 3: los calentamientos van
+  como series (`calentamiento 1 × 8 al 50 %`, `con la barra` = 0 %; el
+  parser lee el %, `progresion.porRM` pct en el plan de calentamiento).
+  «Actualizar mi rutina» reutiliza las series iguales de antes
+  (`reutilizarPlanes`, por firma): no se pierde «la última vez» ni el ciclo.
+- Animaciones: el lienzo abarca las dos posturas (antes se salían y se
+  cortaban); sentadilla y peso muerto, solo la postura completa (en el
+  original de Everkinetic la otra viene cortada). Almacén de imágenes
+  `entreno-imagenes-9`.

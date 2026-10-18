@@ -147,7 +147,7 @@
    "animada": true
   },
   "Elevaciones laterales": {
-   "archivo": "imagenes/ejercicios/anim/elevaciones-laterales.webp",
+   "archivo": "imagenes/ejercicios/anim/elevaciones-laterales-ek.webp",
    "autor": "Everkinetic",
    "estatica": "imagenes/ejercicios/elevaciones-laterales.png",
    "animada": true,
@@ -320,12 +320,12 @@
    "nombreEnWger": "Curl De Muñeca Con Barra"
   },
   "Sentadilla": {
-   "archivo": "imagenes/ejercicios/anim/sentadilla-con-barra.webp",
+   "archivo": "imagenes/ejercicios/anim/sentadilla-ek.webp",
    "autor": "Everkinetic",
    "fuente": "everkinetic",
    "nombreEnFuente": "barbell-squat",
    "estatica": "imagenes/ejercicios/sentadilla-con-barra.png",
-   "animada": true
+   "animada": false
   },
   "Sentadilla frontal": {
    "archivo": "imagenes/ejercicios/anim/sentadilla-frontal.webp",
@@ -356,7 +356,7 @@
    "archivo": "imagenes/ejercicios/anim/peso-muerto.webp",
    "autor": "Everkinetic",
    "estatica": "imagenes/ejercicios/peso-muerto-rumano.png",
-   "animada": true,
+   "animada": false,
    "fuente": "everkinetic",
    "nombreEnFuente": "barbell-dead-lifts"
   },
@@ -364,7 +364,7 @@
    "archivo": "imagenes/ejercicios/anim/peso-muerto-sumo.webp",
    "autor": "Everkinetic",
    "estatica": null,
-   "animada": true,
+   "animada": false,
    "fuente": "everkinetic",
    "nombreEnFuente": "barbell-dead-lifts"
   },

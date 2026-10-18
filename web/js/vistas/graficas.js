@@ -8,7 +8,7 @@
 // (Dan prefirió quitar la etiqueta del final de cada línea).
 
 import {
-  esfuerzoTotal, formatearNumero, records, registrosDelCiclo, seriesDeEjercicio, trabajoSerie,
+  esfuerzoTotal, formatearNumero, records, registrosDelCiclo, seriesDeEjercicio, trabajoSerie, valeParaRM,
 } from '../calculos.js';
 import { rmDeSerie } from '../formula1rm.js';
 import { recomendacionesGenerales } from '../recomendaciones.js';
@@ -147,11 +147,22 @@ function tendencia(puntos) {
 function graficaHistorial(datos, ejercicio, paleta) {
   const porDia = new Map();
   for (const x of seriesDeEjercicio(datos, ejercicio.id)) {
-    if (x.serie.tramos?.length || x.serie.tipo === 'calentamiento') continue;
+    if (!valeParaRM(x.serie)) continue;
     const v = rmDeSerie(datos, ejercicio, x.serie, esfuerzoTotal(x.serie));
     if (v != null) porDia.set(x.sesion.fecha, Math.max(porDia.get(x.sesion.fecha) ?? 0, v));
   }
   const fechas = [...porDia.keys()].sort();
+  // El primer día ya hay gráfica: el 1RM que sale de cada serie de ese día.
+  if (fechas.length === 1) {
+    const puntos = seriesDeEjercicio(datos, ejercicio.id).filter((x) => valeParaRM(x.serie))
+      .map((x) => rmDeSerie(datos, ejercicio, x.serie, esfuerzoTotal(x.serie))).filter((v) => v != null)
+      .map((v, k) => ({ x: k + 1, y: Math.round(v * 10) / 10 }));
+    if (!puntos.length) return null;
+    return [
+      h('p', { class: 'tendencia' }, 'Tu primer día: el 1RM que sale de cada serie. Desde el segundo día verás cómo progresas.'),
+      graficaLineas({ titulo: 'Tu 1RM estimado en cada serie', unidad: 'kg', etiquetaX: 'Serie',
+        series: [{ nombre: '1RM de la serie', color: paleta[0], puntos }] })];
+  }
   if (fechas.length < 2) return null;
   const t0 = new Date(fechas[0]).getTime();
   const puntos = fechas.map((f, i) => ({ x: i + 1, y: Math.round(porDia.get(f) * 10) / 10, dias: (new Date(f).getTime() - t0) / 86_400_000 }));

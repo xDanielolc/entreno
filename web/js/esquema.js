@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 17;
+export const VERSION_ACTUAL = 18;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -88,8 +88,9 @@ export const TECNICAS = {
 // en recámara. Con 0 has llegado al fallo; con 1 o más lo has dejado antes.
 export function tipoDeFallo(recamara) {
   if (recamara == null) return null;
-  if (recamara <= 0) return 'Fallo absoluto';
+  if (recamara <= 0) return 'Al fallo';
   if (recamara <= 1) return 'Casi al fallo';
+  if (recamara <= 3) return 'Cerca del fallo';
   return 'Lejos del fallo';
 }
 
@@ -501,6 +502,15 @@ const MIGRACIONES = {
   // prehecha salió).
   16: (datos) => {
     datos.version = 17;
+    return datos;
+  },
+  // v17 → v18: campos nuevos opcionales, sin nada que convertir:
+  // `ejercicio.pesoMinimo` (la barra vacía), `ejercicio.rmManualEn`,
+  // `serie.cargaAuto` / `serie.cargaAMano`, `serie.objetivoDe`,
+  // `serie.rmObjetivo`, `serie.planIdAntes` / `serie.objetivoAntes`,
+  // `sesion.vista.serie` y `progresion.porRM` también en calentamientos.
+  17: (datos) => {
+    datos.version = 18;
     return datos;
   },
 };

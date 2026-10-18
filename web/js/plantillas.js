@@ -41,7 +41,7 @@ export const PLANTILLAS = [
     id: 'fuerza-sin-maquinas',
     // Sube este número cada vez que cambie la rutina: las rutinas hechas con
     // una versión anterior ofrecen actualizarse.
-    version: 2,
+    version: 3,
     nombre: 'Fuerza sin máquinas: cuatro días',
     autor: 'Dan (su rutina de 10-2026)',
     resumen: 'Dos días de torso y dos de pierna, solo con barra, mancuernas y tu peso. Cada básico tiene un día pesado '
@@ -57,13 +57,14 @@ export const PLANTILLAS = [
       + 'Abad 2011). El 4 × 4, las negativas y el 90 % de la serie máxima son decisiones prácticas sin estudio propio.',
     comoSeHace: 'Sigue los cuatro días en orden cuando estés recuperado, sin dejar pasar más de 3 o 4 días entre sesiones. '
       + 'Calentamiento: los días de pierna, los 15 minutos de cardio suave del principio; los de torso, 5 minutos de bici o andar. '
-      + 'En el primer básico, series de aproximación: barra sola × 10, 50 % × 8, 70 % × 3 y 80 % × 1-2 (y 85 % × 1 si toca serie '
-      + 'máxima); en el segundo y el tercero, 60 % × 5 y 80 % × 2. La Bilbo no necesita calentamiento. En la serie máxima pon un peso '
+      + 'Las series de aproximación ya vienen en cada básico, con su peso según tu 1RM: en el primero, barra sola × 10, 50 % × 8, '
+      + '70 % × 3 y 80 % × 1; en los pesados de después, 60 % × 5 y 80 % × 2; en los moderados, 50 % × 5 y 70 % × 3. '
+      + 'No cuentan para tu progreso ni para tu 1RM. La Bilbo no necesita calentamiento. En la serie máxima pon un peso '
       + 'con el que hagas 1 o 2 dejándote 1 en recámara: de ahí sale tu 1RM. En las series de 4, el peso sube solo cuando las sacas '
       + 'con 2 en recámara. Descansa 3 minutos en lo pesado y 45-60 s entre las dominadas en racimo. El curl femoral sentado, en su '
       + 'ficha, «de un solo sitio»: cada máquina pesa distinto. Sesiones de 60 a 70 minutos.',
     ...deTexto(`Día 1: Torso, banca pesada
-Press de banca: máxima 1-2 + 4 × 4 con 2 en recámara (máxima a un 90 %; después 80-85 %, 3 min de descanso)
+Press de banca: calentamiento 1 × 10 con la barra + calentamiento 1 × 8 al 50 % + calentamiento 1 × 3 al 70 % + calentamiento 1 × 1 al 80 % + máxima 1-2 + 4 × 4 con 2 en recámara (máxima a un 90 %; después 80-85 %, 3 min de descanso)
 Remo con barra: Bilbo + 2 × 8-10 con 2 en recámara
 Press militar: Bilbo + 2 × 8-10 con 2 en recámara
 Dominadas negativas: 3 × 3-5 (bajada de 3-5 s; sube con salto o desde un banco)
@@ -74,15 +75,15 @@ Pájaro a una mano: 2 × 12-15 con 1 en recámara (por brazo)
 
 Día 2: Pierna, sentadilla pesada
 Cardio: calentamiento 15 min (suave: bici, cinta o andar rápido, a un ritmo que te deje hablar)
-Sentadilla: máxima 1-2 + 4 × 4 con 2 en recámara (máxima a un 90 %; después 80-85 %)
+Sentadilla: calentamiento 1 × 10 con la barra + calentamiento 1 × 8 al 50 % + calentamiento 1 × 3 al 70 % + calentamiento 1 × 1 al 80 % + máxima 1-2 + 4 × 4 con 2 en recámara (máxima a un 90 %; después 80-85 %)
 Gemelo de pie con barra: 3 × 10-15 (justo después de la sentadilla, con la barra en la espalda)
-Peso muerto rumano: 3 × 6-8 con 2 en recámara (desde arriba, rodillas algo flexionadas)
+Peso muerto rumano: calentamiento 1 × 5 al 50 % + calentamiento 1 × 3 al 70 % + 3 × 6-8 con 2 en recámara (desde arriba, rodillas algo flexionadas)
 Curl femoral sentado: 3 × 8-12 con 1 en recámara (si no hay, tumbado o de pie en máquina, o en polea)
 Rueda abdominal: 2 × 8-12
 
 Día 3: Torso, remo pesado
-Remo con barra: máxima 1-2 + 4 × 4-5 con 2 en recámara (máxima a un 90 %; después 80-85 %)
-Press militar: máxima 1-2 + 3 × 5-6 con 2 en recámara (máxima a un 90 %; después pesado)
+Remo con barra: calentamiento 1 × 10 con la barra + calentamiento 1 × 8 al 50 % + calentamiento 1 × 3 al 70 % + calentamiento 1 × 1 al 80 % + máxima 1-2 + 4 × 4-5 con 2 en recámara (máxima a un 90 %; después 80-85 %)
+Press militar: calentamiento 1 × 5 al 60 % + calentamiento 1 × 2 al 80 % + máxima 1-2 + 3 × 5-6 con 2 en recámara (máxima a un 90 %; después pesado)
 Press de banca: Bilbo + 2 × 6-8 con 2 en recámara
 Dominadas: 6 × 1-2 (en racimo: 45-60 s entre series; cuando salgan 3 seguidas, pasa a 5 × 3)
 Curl martillo: 2 × 8-12 con 1 en recámara, serie descendente en la última (alterno, con mancuernas)
@@ -92,8 +93,8 @@ Pájaro a una mano: 2 × 12-15 con 1 en recámara (por brazo)
 
 Día 4: Pierna, peso muerto pesado
 Cardio: calentamiento 15 min (suave: bici, cinta o andar rápido, a un ritmo que te deje hablar)
-Peso muerto sumo: máxima 1-2 + 3 × 3-4 con 2 en recámara (máxima a un 90 %; después 80-85 %)
-Sentadilla: 3 × 6-8 con 2 en recámara (70-75 %)
+Peso muerto sumo: calentamiento 1 × 10 con la barra + calentamiento 1 × 8 al 50 % + calentamiento 1 × 3 al 70 % + calentamiento 1 × 1 al 80 % + máxima 1-2 + 3 × 3-4 con 2 en recámara (máxima a un 90 %; después 80-85 %)
+Sentadilla: calentamiento 1 × 5 al 50 % + calentamiento 1 × 3 al 70 % + 3 × 6-8 con 2 en recámara (70-75 %)
 Gemelo de pie con barra: 3 × 10-15 (justo después de la sentadilla, con la barra en la espalda)
 Curl femoral sentado: 3 × 8-12 con 1 en recámara (si no hay, tumbado o de pie en máquina, o en polea)
 Elevación de piernas colgado: 2 × 8-12 (piernas estiradas)`),
@@ -597,6 +598,34 @@ export function plantillaNueva(rutina) {
 // entrenamientos hechos no se tocan; los ejercicios que ya tienes se usan
 // tal cual (con su historial) y las series «solo de esta rutina» que ya no
 // sirven se retiran (las que tienen historial se quedan, sin salir).
+// Al actualizar una rutina, las series que no cambian siguen siendo las de
+// antes (con su «última vez» y su ciclo en curso): si una serie nueva es igual
+// que una vieja del mismo ejercicio (la suya o una retirada con historial),
+// se usa la vieja y la nueva sobra.
+const firmaPlan = (p) => JSON.stringify([p.tipo, Boolean(p.calentamiento), p.progresion?.tipo ?? null, p.progresion?.preset ?? null,
+  p.progresion?.objetivoEsfuerzo ?? p.objetivoEsfuerzo ?? null, p.progresion?.recamaraMin ?? null, p.progresion?.porRM ?? null,
+  [...(p.tecnicas ?? [])].sort()]);
+function reutilizarPlanes(datos, rutina) {
+  const usados = new Set();
+  for (const dia of rutina.dias) {
+    for (const item of dia.ejercicios) {
+      const ej = datos.ejercicios.find((e) => e.id === item.ejercicioId);
+      if (!ej || !Array.isArray(item.series)) continue;
+      item.series = item.series.map((pid) => {
+        const nuevo = ej.series.find((p) => p.id === pid);
+        if (!nuevo || nuevo.soloRutina !== rutina.id) return pid;
+        const viejo = ej.series.find((q) => q !== nuevo && !usados.has(q.id) && (q.soloRutina === 'retirada' || !q.soloRutina)
+          && firmaPlan(q) === firmaPlan(nuevo));
+        if (!viejo) return pid;
+        usados.add(viejo.id);
+        if (viejo.soloRutina === 'retirada') viejo.soloRutina = rutina.id;
+        ej.series = ej.series.filter((p) => p.id !== nuevo.id);
+        return viejo.id;
+      });
+    }
+  }
+}
+
 export function actualizarDesdePlantilla(datos, rutinaId) {
   const rutina = datos.rutinas.find((r) => r.id === rutinaId);
   const plantilla = PLANTILLAS.find((x) => x.id === rutina?.plantilla);
@@ -610,6 +639,7 @@ export function actualizarDesdePlantilla(datos, rutinaId) {
   const nueva = datos.rutinas.find((r) => r.id === idTemporal);
   for (const ej of datos.ejercicios) for (const p of ej.series ?? []) if (p.soloRutina === idTemporal) p.soloRutina = rutina.id;
   rutina.dias = nueva.dias;
+  reutilizarPlanes(datos, rutina);
   rutina.descripcion = `${plantilla.porQue}\n\n${plantilla.comoSeHace}`;
   rutina.versionPlantilla = plantilla.version ?? 1;
   datos.rutinas = datos.rutinas.filter((r) => r.id !== idTemporal);

@@ -42,7 +42,7 @@ function diferencia(ahora, antes) {
 }
 
 export function comparacionSerie(datos, ej, serie, { excluirSesion } = {}) {
-  if (!serie.hecha) return '';
+  if (!serie.hecha || serie.tipo === 'calentamiento') return '';
   const hoy = medida(datos, ej, serie);
   if (!hoy) return '';
   const historial = seriesDeEjercicio(datos, ej.id, { excluirSesion, planId: serie.planId || undefined })
@@ -60,7 +60,9 @@ export function comparacionSerie(datos, ej, serie, { excluirSesion } = {}) {
   if (mAnterior) partes.push(`${diferencia(hoy.valor, mAnterior.valor)} frente a la última vez`);
   const mCiclo = delCicloAnterior && medida(datos, ej, delCicloAnterior.serie);
   if (mCiclo) partes.push(`${diferencia(hoy.valor, mCiclo.valor)} frente al día ${serie.diaCiclo} del ciclo ${serie.cicloN - 1}`);
-  if (!mAnterior && !mCiclo) partes.push('primera vez: aún no hay con qué comparar');
+  // Sin nada con qué comparar no se dice nada: el 1RM del ejercicio ya sale
+  // arriba, en la cabecera (antes salía uno distinto en cada serie y liaba).
+  if (!mAnterior && !mCiclo) return '';
   return partes.join(' · ');
 }
 

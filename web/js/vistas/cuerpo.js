@@ -43,9 +43,7 @@ export function tarjetaRecuperacion(datos, { compacta = false, extra = null } = 
       h('span', { class: 'texto' }, `${media} % de media`),
       h('span', { class: 'carril' }, h('span', { class: 'relleno', style: `width: ${media}%` }))),
 
-    !compacta && h('div', { class: 'cuerpos' },
-      siluetaCuerpo({ vista: 'delante', estadoPorMusculo: estados }),
-      siluetaCuerpo({ vista: 'detras', estadoPorMusculo: estados })),
+    !compacta && cuerposAmpliables(estados, 'Recuperación'),
 
     sinMusculos.length > 0 && h('div', { class: 'aviso-texto' },
       h('p', {}, 'Un ejercicio solo sale en el mapa si tiene marcado su músculo principal (y, mejor, los secundarios). '
@@ -252,9 +250,7 @@ function tarjetaMapa(d) {
     h('div', { class: 'leyenda' }, LEYENDAS[modoMapa].map(([clase, texto]) => h('span', { class: 'leyenda-item' },
       h('span', { class: `leyenda-color ${clase}` }), texto)),
     modoMapa === 'menos' && h('span', { class: 'leyenda-item' }, 'Media de los dos últimos meses')),
-    h('div', { class: 'cuerpos' },
-      siluetaCuerpo({ vista: 'delante', estadoPorMusculo: estados }),
-      siluetaCuerpo({ vista: 'detras', estadoPorMusculo: estados })),
+    cuerposAmpliables(estados, 'Mapa del cuerpo'),
     // Debajo, lo mismo en una tabla corta en vez de una frase por músculo.
     modoMapa === 'recuperacion' && (tocados.length
       ? h('table', { class: 'tabla-musculos' },
@@ -375,4 +371,16 @@ export function listaRecomendaciones(lista) {
   return h('ul', { class: 'recomendaciones' }, lista.map((x) => h('li', { class: x.nivel },
     h('span', { class: 'icono-rec', 'aria-hidden': 'true' }, icono[x.nivel]),
     x.enlace ? h('a', { href: x.enlace }, conGlosario(x.texto)) : h('span', {}, conGlosario(x.texto)))));
+}
+
+// La página no se amplía con dos dedos (molesta al apuntar); el mapa sí: al
+// tocarlo se abre grande, de frente y de espaldas uno debajo del otro.
+function cuerposAmpliables(estados, titulo) {
+  return h('button', { type: 'button', class: 'cuerpos cuerpos-boton', 'aria-label': `${titulo}: ver en grande`,
+    onclick: () => modal(titulo, h('div', { class: 'cuerpos ampliado' },
+      siluetaCuerpo({ vista: 'delante', estadoPorMusculo: estados }),
+      siluetaCuerpo({ vista: 'detras', estadoPorMusculo: estados }))) },
+  siluetaCuerpo({ vista: 'delante', estadoPorMusculo: estados }),
+  siluetaCuerpo({ vista: 'detras', estadoPorMusculo: estados }),
+  h('span', { class: 'foto-pista' }, 'Ampliar'));
 }

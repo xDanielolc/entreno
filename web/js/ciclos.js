@@ -107,17 +107,20 @@ function conMargen(datos, ejercicio, prog, rm, valor) {
 // quieras empezar y del 1RM de ese momento (el que pusiste o el de la
 // prueba). Se llama al crear la serie del entrenamiento. Devuelve true si
 // ese día toca la prueba.
-export function prepararCiclo(datos, ejercicio, plan, { excluirSesion } = {}) {
+// `rm`: un 1RM que ya se sabe hoy (de otra serie de este entrenamiento). Con
+// él no hace falta prueba: el ciclo se monta ya.
+export function prepararCiclo(datos, ejercicio, plan, { excluirSesion, rm: rmDado = null } = {}) {
   const prog = plan.progresion;
   if (prog?.tipo === 'bilbo' && prog.sobre === 'esfuerzo') return prepararCicloDeEsfuerzo(datos, ejercicio, plan, { excluirSesion });
   if (prog?.tipo !== 'bilbo' || prog.sobre !== 'carga') return false;
-  if (esperaPrueba(datos, ejercicio, plan, { excluirSesion })) return true;
+  if (!rmDado && esperaPrueba(datos, ejercicio, plan, { excluirSesion })) return true;
   const ciclo = prog.ciclos?.find((c) => c.n === prog.cicloActual) ?? prog.ciclos?.at(-1);
   const primero = !ciclo || (prog.ciclos.length === 1 && !ciclo.inicio);
   if (!primero && !ciclo.pendientePrueba) return false;
   if (ciclo && ultimaSesionHecha(datos, ejercicio, plan, ciclo.n) > 0) return false;
-  const referencia = rmDeReferencia(datos, ejercicio, { excluirSesion });
-  const inicio = primero ? inicioDe(prog, Boolean(referencia)) : { modo: 'prueba', porcentaje: prog.reinicio?.porcentaje };
+  const referencia = rmDado ? { valor: rmDado } : rmDeReferencia(datos, ejercicio, { excluirSesion });
+  const pedido = primero ? inicioDe(prog, Boolean(referencia)) : { modo: 'prueba', porcentaje: prog.reinicio?.porcentaje };
+  const inicio = rmDado && pedido.modo === 'prueba' ? { modo: 'porcentaje', porcentaje: pedido.porcentaje } : pedido;
   const rm = inicio.modo === 'prueba'
     ? rmDePrueba(datos, ejercicio, plan, primero ? null : ciclo.inicio, { excluirSesion })
     : referencia?.valor;

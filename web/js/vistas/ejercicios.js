@@ -9,7 +9,7 @@ import {
   UNIDADES, unidadMedida,
   progresionPorDefecto, serieNuevaPlantilla, sobrePorDefecto, tramosDe,
 } from '../esquema.js';
-import { inicialDelPrograma, tramosPorDefecto } from '../calculos.js';
+import { BARRA_POR_DEFECTO, inicialDelPrograma, materialDe, tramosPorDefecto } from '../calculos.js';
 import { EXPLICACIONES_1RM, FORMULAS, calibrar, estimar1RM, modeloDe, pesoParaReps, textoCalibracion } from '../formula1rm.js';
 import { FRACCION_CORPORAL_POR_NOMBRE, PROGRAMAS, fraccionSinDato } from '../esquema.js';
 import { MODOS_INICIO, MODOS_REINICIO, PRESETS_CICLO, inicioDe, alargarCiclo, aplicarPreset, completarCiclo, describirCiclo, empezarCicloNuevo, escaleraDe } from '../ciclos.js';
@@ -459,6 +459,12 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
           numeroInput(borrador.redondeoKg, (v) => { borrador.redondeoKg = v > 0 ? v : null; }),
           h('small', { class: 'nota' }, `Vacío = lo de Ajustes (${formatearNumero(d.perfil.redondeoKg ?? REDONDEO_POR_DEFECTO)}). `
             + 'Mancuernas de 2 en 2, microdiscos de 0,25, máquinas de 5 en 5…')),
+        borrador.carga.tipo === 'peso' && !borrador.pesosMaquina?.length
+        && campo('Peso mínimo: la barra vacía (kg)',
+          numeroInput(borrador.pesoMinimo, (v) => { borrador.pesoMinimo = v != null && v >= 0 ? v : null; }),
+          h('small', { class: 'nota' }, materialDe(borrador) === 'barra'
+            ? `Vacío = ${BARRA_POR_DEFECTO} (barra olímpica). La app nunca propone menos. Barra de curl o de mujer: 10 o 15.`
+            : 'Vacío = sin mínimo. Si lo haces con barra, pon lo que pesa vacía.')),
         campo('Descanso entre series en este ejercicio (segundos)',
           numeroInput(borrador.descansoSegundos, (v) => { borrador.descansoSegundos = v ?? undefined; }),
           h('small', { class: 'nota' }, `Vacío = lo de Ajustes (${d.perfil.descansoSegundos ?? 'sin descanso'} s). Al saltar o alargar un descanso, la app te ofrece guardarlo aquí.`)),

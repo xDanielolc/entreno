@@ -56,10 +56,17 @@ def a_rgb(datos):
     return im.convert("RGB")
 
 
+def mascara(im, umbral=245):
+    """Lo que no es blanco (incluidas las líneas grises claras y el azul
+    claro de Everkinetic: con un umbral más bajo se quedaban fuera y se
+    cortaban)."""
+    return im.convert("L").point(lambda v: 255 if v < umbral else 0)
+
+
 def ancla(im):
     """Centro horizontal y borde de abajo de lo que hay en la franja baja del
     dibujo (pies, banco, suelo): lo que no se mueve entre las dos posturas."""
-    gris = im.convert("L").point(lambda v: 255 if v < 200 else 0)
+    gris = mascara(im, 200)
     caja = gris.getbbox()
     if not caja:
         return im.width / 2, im.height
@@ -70,37 +77,28 @@ def ancla(im):
 
 
 def animar(fotos, salida, duraciones=(900, 900)):
-    """Junta las posturas en un WebP animado sobre blanco, encajadas por abajo."""
+    """Junta las posturas en un WebP animado sobre blanco, encajadas por abajo.
+    Cada postura se coloca con su ancla en el mismo punto; el lienzo es el
+    cuadrado que abarca el dibujo de todas (así no se corta nada)."""
     ims = [a_rgb(f) for f in fotos]
     anclas = [ancla(i) for i in ims]
-    margen = 40
-    ancho = max(i.width for i in ims) + 2 * margen
-    alto = max(i.height for i in ims) + 2 * margen
-    ax, ay = ancho / 2, alto - margen
+    cajas = [mascara(i).getbbox() or (0, 0, i.width, i.height) for i in ims]
+    # Caja de lo dibujado, en coordenadas con el ancla en (0, 0).
+    x0 = min(c[0] - a[0] for c, a in zip(cajas, anclas))
+    y0 = min(c[1] - a[1] for c, a in zip(cajas, anclas))
+    x1 = max(c[2] - a[0] for c, a in zip(cajas, anclas))
+    y1 = max(c[3] - a[1] for c, a in zip(cajas, anclas))
+    margen = 24
+    lado = round(max(x1 - x0, y1 - y0) + 2 * margen)
+    cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
     marcos = []
-    for i, (cx, cy) in zip(ims, anclas):
-        lienzo = Image.new("RGB", (ancho, alto), "white")
-        lienzo.paste(i, (round(ax - cx), round(ay - cy)))
+    for im, (ax, ay) in zip(ims, anclas):
+        lienzo = Image.new("RGB", (lado, lado), "white")
+        lienzo.paste(im, (round(lado / 2 - cx - ax), round(lado / 2 - cy - ay)))
         marcos.append(lienzo)
-    # Se recorta todo a lo que ocupan las dos posturas juntas.
-    caja = None
-    for m in marcos:
-        b = m.convert("L").point(lambda v: 255 if v < 200 else 0).getbbox()
-        if b:
-            caja = b if not caja else (min(caja[0], b[0]), min(caja[1], b[1]), max(caja[2], b[2]), max(caja[3], b[3]))
-    if caja:
-        x0, y0, x1, y1 = caja
-        lado = max(x1 - x0, y1 - y0) + 30
-        cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
-        # Recorte sobre blanco (recortar fuera de la imagen deja negro).
-        nuevos = []
-        for m in marcos:
-            f = Image.new("RGB", (round(lado), round(lado)), "white")
-            f.paste(m, (round(lado / 2 - cx), round(lado / 2 - cy)))
-            nuevos.append(f)
-        marcos = nuevos
-    lado = 600
-    marcos = [m.resize((lado, lado), Image.LANCZOS) if m.width > lado else m for m in marcos]
+    tope = 600
+    if lado > tope:
+        marcos = [m.resize((tope, tope), Image.LANCZOS) for m in marcos]
     marcos[0].save(salida, "WEBP", save_all=True, append_images=marcos[1:], duration=list(duraciones), loop=0, quality=82, method=6)
 
 
@@ -113,8 +111,11 @@ FORZADOS = {
     "Fondos en paralelas negativos": ("tricep-dips", "invertir"),
     "Extensión de tríceps sobre la cabeza": "standing-triceps-extension-2",
     "Prensa de piernas": "leg-press",
-    "Peso muerto": "barbell-dead-lifts",
-    "Peso muerto sumo": "barbell-dead-lifts",
+    # En el original, una de las dos posturas viene cortada (las piernas en
+    # la sentadilla, los discos en el peso muerto): solo la postura completa.
+    "Sentadilla": ("barbell-squat", "solo-final"),
+    "Peso muerto": ("barbell-dead-lifts", "solo-final"),
+    "Peso muerto sumo": ("barbell-dead-lifts", "solo-final"),
     "Peso muerto con mancuernas": "dumbbell-dead-lifts",
     "Press militar": "barbell-shoulder-press",
     "Press de hombro con mancuernas": "dumbbell-shoulder-press",
@@ -144,19 +145,25 @@ def forzar(ejercicios, ek):
             continue
         base = re.sub(r"[^a-z0-9]+", "-", unicodedata.normalize("NFKD", nombre).encode("ascii", "ignore").decode().lower()).strip("-")
         salida = DESTINO / f"{base}.webp"
-        if invertir:
+        # Si el nombre ya lo usa otro ejercicio (una foto de wger), se aparta.
+        ocupado = any(c.get("archivo") == f"imagenes/ejercicios/anim/{salida.name}" for n, c in ejercicios.items() if n != nombre)
+        if ocupado:
+            salida = DESTINO / f"{base}-ek.webp"
+        if invertir == "solo-final":
+            animar(fotos[1:], salida, duraciones=(900,))
+        elif invertir:
             animar(list(reversed(fotos)), salida, duraciones=(1100, 700))
         else:
             animar(fotos, salida)
         c = ejercicios[nombre]
         # Las animadas de webs comerciales (WebP) no se guardan como estática.
         c["estatica"] = c.get("estatica") or (None if c["archivo"].endswith(".webp") else c["archivo"])
-        c.update({"archivo": f"imagenes/ejercicios/anim/{salida.name}", "animada": True, "autor": "Everkinetic",
+        c.update({"archivo": f"imagenes/ejercicios/anim/{salida.name}", "animada": invertir != "solo-final", "autor": "Everkinetic",
                   "fuente": "everkinetic", "nombreEnFuente": clave})
         c.pop("nombreEnWger", None)
         c.pop("aliasDe", None)
         hechos += 1
-        print(f"  forzada: {nombre} ← {clave}{' (al revés)' if invertir else ''}")
+        print(f"  forzada: {nombre} <- {clave}{' (al revés)' if invertir else ''}")
     return hechos
 
 

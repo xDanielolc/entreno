@@ -62,6 +62,12 @@ function analizarPieza(texto, tipoTexto = '', comoTexto = '') {
   else if (/ascend|piramid/.test(t)) forma.forma = 'ascendente';
   else if (/calent/.test(t)) forma.tipo = 'calentamiento';
   else if (/fuerza/.test(t)) forma.tipo = 'fuerza';
+  // Calentamiento al % del 1RM («1 × 8 al 50 %») o con la barra sola (0 %).
+  if (forma.tipo === 'calentamiento') {
+    const pct = t.match(/(\d+)\s*%/);
+    if (pct) forma.pct = Number(pct[1]);
+    else if (/barra/.test(t)) forma.pct = 0;
+  }
   // «2 en recámara» (o «2-3 en recámara»): el peso sube solo si te dejas esas.
   const recamara = conComo.match(/(\d)(?:\s*-\s*\d)?\s*en recamara/);
   if (recamara && forma.tipo !== 'maxima' && forma.tipo !== 'bilbo') forma.recamaraMin = Number(recamara[1]);

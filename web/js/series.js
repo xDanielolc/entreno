@@ -67,6 +67,7 @@ export function textoPlan(plan, ej = null) {
 export function nombreRegla(plan) {
   const p = plan.progresion ?? {};
   if (plan.calentamiento || plan.tipo === 'calentamiento') return 'Calentamiento: no progresa';
+  if (p.tipo === 'carga' && !p.porRM && (p.objetivoEsfuerzo ?? plan.objetivoEsfuerzo)?.[1] <= 2) return 'Serie máxima: mide tu 1RM';
   if (p.tipo === 'bilbo') return 'Ciclo: el peso sube cada sesión';
   if (p.tipo === 'programa') return 'Programa clásico';
   if (p.tipo === 'maximo-trabajo') return 'Máximo trabajo';
@@ -88,12 +89,13 @@ export function resumenPlanes(planes, ej = null) {
   return grupos.map(({ t, n }) => (/^\d/.test(t) ? `${n} × ${t}` : n > 1 ? `${n} × ${t}` : t)).join(' + ');
 }
 
-export function crearSerieDesdePlan(datos, ejercicio, plan, { excluirSesion } = {}) {
+export function crearSerieDesdePlan(datos, ejercicio, plan, { excluirSesion, rmHoy = null } = {}) {
   // Un ciclo sin montar (Bilbo puesto por defecto, por ejemplo) se monta en
-  // cuanto hay un 1RM del que partir. La primera vez no lo hay: haces lo que
-  // puedas y con eso queda montado para la siguiente.
-  prepararCiclo(datos, ejercicio, plan, { excluirSesion });
-  let s = sugerenciaSerie(datos, ejercicio, plan, { excluirSesion });
+  // cuanto hay un 1RM del que partir: el de tu historial, el que pusiste o
+  // el de una serie de hoy (`rmHoy`). Si no hay ninguno, haces lo que puedas
+  // y con eso queda montado para la siguiente.
+  prepararCiclo(datos, ejercicio, plan, { excluirSesion, rm: rmHoy });
+  let s = sugerenciaSerie(datos, ejercicio, plan, { excluirSesion, rmHoy });
   // Un ciclo terminado o agotado empieza el siguiente solo (si no es manual).
   if (renovarSiToca(datos, ejercicio, plan, s)) s = sugerenciaSerie(datos, ejercicio, plan, { excluirSesion });
   const carga = s.carga ?? null;
@@ -118,6 +120,17 @@ export function crearSerieDesdePlan(datos, ejercicio, plan, { excluirSesion } = 
     diaCiclo: s.dia ?? null,
     lastre: null,
   };
+  // Peso puesto por la app con tu 1RM: si hoy cambia el 1RM, se ajusta solo
+  // (mientras no lo toques tú).
+  if (carga != null && (s.porFormula || s.porRM || s.pct > 0)) {
+    serie.cargaAuto = true;
+    if (s.rmUsado) serie.rmUsado = { valor: s.rmUsado };
+  }
+  // Primera vez en un ciclo: el objetivo son las repeticiones que igualan tu 1RM.
+  if (s.modo === 'bilbo' && s.sinAnterior && serie.objetivo != null) {
+    serie.objetivoDe = 'rm';
+    serie.rmObjetivo = s.rmObjetivo ?? null;
+  }
   // Peso corporal: la carga sale de tu peso (y del lastre de la última vez).
   if (ejercicio.carga.tipo === 'pesoCorporal') {
     serie.lastre = s.ultima?.serie.lastre ?? 0;

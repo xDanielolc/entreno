@@ -2,6 +2,7 @@
 
 import { PROGRAMAS, TECNICAS, recamaraDe, tramosDe } from './esquema.js';
 import { modeloDe, pesoParaReps, repsParaIgualar, rmDeSerie } from './formula1rm.js';
+import { CATALOGO, normalizar } from './catalogo.js';
 
 // Las fórmulas del 1RM están en formula1rm.js (Marzagao con factor personal).
 
@@ -103,7 +104,7 @@ export function registrosDelCiclo(datos, ejercicio, plan, cicloN, { excluirSesio
 
 // Devuelve siempre un objeto con la misma forma, sea cual sea la progresión:
 //   modo, carga, esfuerzoObjetivo, objetivoSuperar, texto…
-export function sugerenciaSerie(datos, ejercicio, plan, { excluirSesion } = {}) {
+export function sugerenciaSerie(datos, ejercicio, plan, { excluirSesion, rmHoy = null } = {}) {
   const prog = plan.progresion || { tipo: 'libre' };
   const sobre = prog.sobre || (ejercicio.carga?.tipo === 'ninguna' ? 'esfuerzo' : 'carga');
   const historial = seriesDeEjercicio(datos, ejercicio.id, { excluirSesion, planId: plan.id });
@@ -116,7 +117,7 @@ export function sugerenciaSerie(datos, ejercicio, plan, { excluirSesion } = {}) 
   // «Primera vez» solo si el ejercicio no se ha hecho nunca, con ninguna serie.
   const base = { modo: prog.tipo, sobre, ultima, referencia, primeraVez: !ultima && !referencia };
 
-  if (prog.tipo === 'bilbo') return { ...base, ...sugerenciaBilbo(datos, ejercicio, plan, { excluirSesion, sobre }) };
+  if (prog.tipo === 'bilbo') return { ...base, ...sugerenciaBilbo(datos, ejercicio, plan, { excluirSesion, sobre, rmHoy }) };
 
   if (prog.tipo === 'programa') return { ...base, ...sugerenciaPrograma(datos, ejercicio, plan, { excluirSesion }) };
 
@@ -129,7 +130,7 @@ export function sugerenciaSerie(datos, ejercicio, plan, { excluirSesion } = {}) 
   }
 
   if (prog.tipo === 'carga') {
-    const [, max] = prog.objetivoEsfuerzo || [];
+    const [, max] = prog.objetivoEsfuerzo || plan.objetivoEsfuerzo || [];
     if (!ultima) {
       // Sin historial de esta serie: si hay un 1RM (de otras series o puesto
       // a mano), el peso es el que da el máximo del rango con la recámara
@@ -144,7 +145,7 @@ export function sugerenciaSerie(datos, ejercicio, plan, { excluirSesion } = {}) 
         const peso = pesoParaReps(modeloDe(datos, ejercicio), rm.valor, max, recamara);
         if (peso > 0) { carga = aPesoDisponible(ejercicio, peso); porFormula = true; }
       }
-      return { ...base, rango: prog.objetivoEsfuerzo, recamaraMin: prog.recamaraMin ?? null, carga, porFormula,
+      return { ...base, rango: prog.objetivoEsfuerzo ?? plan.objetivoEsfuerzo, recamaraMin: prog.recamaraMin ?? null, carga, porFormula,
         rmUsado: rm?.valor ?? null, sinRM: conPeso && !rm };
     }
     const valorUltimo = sobre === 'carga' ? ultima.serie.carga : esfuerzoTotal(ultima.serie);
@@ -191,7 +192,14 @@ export function sugerenciaSerie(datos, ejercicio, plan, { excluirSesion } = {}) 
     };
   }
 
-  return { ...base, carga: ultima?.serie.carga ?? referencia?.serie.carga ?? null };
+  // Calentamiento al % de tu 1RM («50 % × 8»); con 0 %, la barra sola.
+  if (prog.porRM?.fija === 'pct' && sobre === 'carga') {
+    const rm = rmReciente(datos, ejercicio, prog.porRM.semanas ?? 8, { excluirSesion });
+    const carga = prog.porRM.valor > 0 ? (rm ? aPesoDisponible(ejercicio, (rm.valor * prog.porRM.valor) / 100) : null)
+      : (pesoMinimoDe(ejercicio) || null);
+    return { ...base, carga, pct: prog.porRM.valor, rmUsado: rm?.valor ?? null, rango: plan.objetivoEsfuerzo };
+  }
+  return { ...base, carga: ultima?.serie.carga ?? referencia?.serie.carga ?? null, rango: plan.objetivoEsfuerzo ?? null };
 }
 
 // El mejor 1RM de las últimas `semanas` semanas (sin bajadas); si no hay
@@ -207,7 +215,35 @@ export function rmReciente(datos, ejercicio, semanas = 8, { excluirSesion } = {}
   }
   if (mejor) return mejor;
   const siempre = rmDeReferencia(datos, ejercicio, { excluirSesion });
-  return siempre ? { valor: siempre.valor, fecha: null, deSiempre: true } : null;
+  return siempre ? { valor: siempre.valor, fecha: null, deSiempre: true, manual: Boolean(siempre.manual) } : null;
+}
+
+// El 1RM con el que trabaja la app en un ejercicio: uno solo, el mismo en
+// toda la pantalla del entreno.
+//   · Base: el mejor de tus series de las últimas 8 semanas; si no hay, el
+//     de siempre; si nunca has hecho el ejercicio, el que pusiste a mano.
+//   · Hoy: si una serie de hoy da más, manda la de hoy. Si la base es la
+//     puesta a mano, manda cualquier serie de hoy (es un dato real, no una
+//     suposición).
+// `antesDe` ({ i, j }) mira solo las series de hoy anteriores a esa; así el
+// porcentaje de una serie ya hecha no cambia al apuntar las de debajo.
+export function rmDelEjercicio(datos, ejercicio, { sesion = null, antesDe = null } = {}) {
+  const base = rmReciente(datos, ejercicio, 8, { excluirSesion: sesion?.id });
+  let hoy = null;
+  (sesion?.ejercicios ?? []).forEach((entrada, i) => {
+    if (entrada.ejercicioId !== ejercicio.id) return;
+    entrada.series.forEach((s, j) => {
+      if (antesDe && (i > antesDe.i || (i === antesDe.i && j >= antesDe.j))) return;
+      if (!s.hecha) return;
+      const rm = rmSinTramos(datos, ejercicio, s);
+      if (rm && (!hoy || rm > hoy.valor)) hoy = { valor: redondear(rm, 1), serie: s };
+    });
+  });
+  // El puesto a mano después de esas series de hoy manda (lo acabas de decir tú).
+  const manualDespues = base?.manual && ejercicio.rmManualEn && hoy?.serie?.hechaA && ejercicio.rmManualEn > hoy.serie.hechaA;
+  if (hoy && !manualDespues && (!base || base.manual || hoy.valor > base.valor)) return { valor: hoy.valor, origen: 'hoy', serie: hoy.serie };
+  if (!base) return null;
+  return { valor: base.valor, origen: base.manual ? 'manual' : 'historial', fecha: base.fecha };
 }
 
 // El peso de una serie de doble progresión o «según tu 1RM» a partir de un
@@ -273,8 +309,15 @@ export const modeloDeEjercicio = (datos, ejercicio) => modeloDe(datos, ejercicio
 // El 1RM de una serie, sin las de tramos (serie descendente, rest-pause…): su peso es
 // el del primer tramo y sus repeticiones, la suma de todos; el 1RM saldría
 // inflado y el siguiente serie descendente arrancaría cada vez más alto.
+// Tampoco valen los calentamientos ni las series con más de 5 en recámara:
+// lejos del fallo, la recámara que uno cree dejar se equivoca mucho y el 1RM
+// sale torcido (Zourdos 2016; Halperin 2022).
+export const RECAMARA_MAX_PARA_1RM = 5;
+export function valeParaRM(serie) {
+  return Boolean(serie) && !serie.tramos?.length && serie.tipo !== 'calentamiento' && !(serie.recamara > RECAMARA_MAX_PARA_1RM);
+}
 function rmSinTramos(datos, ejercicio, serie) {
-  return serie.tramos?.length ? null : rmDeSerie(datos, ejercicio, serie, esfuerzoTotal(serie));
+  return valeParaRM(serie) ? rmDeSerie(datos, ejercicio, serie, esfuerzoTotal(serie)) : null;
 }
 
 export function mejorRMDelCiclo(datos, ejercicio, plan, cicloN) {
@@ -309,7 +352,7 @@ export function esperaPrueba(datos, ejercicio, plan, { excluirSesion } = {}) {
   return !rmDePrueba(datos, ejercicio, plan, primero ? null : ciclo.inicio, { excluirSesion });
 }
 
-function sugerenciaBilbo(datos, ejercicio, plan, { excluirSesion, sobre }) {
+function sugerenciaBilbo(datos, ejercicio, plan, { excluirSesion, sobre, rmHoy = null }) {
   const prog = plan.progresion;
   const ciclo = cicloActual(plan);
   if (esperaPrueba(datos, ejercicio, plan, { excluirSesion })) return { sinCiclo: true, prueba: true };
@@ -340,7 +383,7 @@ function sugerenciaBilbo(datos, ejercicio, plan, { excluirSesion, sobre }) {
   // Sin series de esta serie todavía: el 1RM del ejercicio (de otras series
   // o el que pusiste a mano).
   const rmAnterior = referencia ? rmDeSerie(datos, ejercicio, referencia, esfuerzoTotal(referencia))
-    : (rmDeReferencia(datos, ejercicio, { excluirSesion })?.valor ?? null);
+    : (rmHoy ?? rmDeReferencia(datos, ejercicio, { excluirSesion })?.valor ?? null);
   const recamara = recamaraDe(plan.tecnicas, ejercicio.recamaraPorDefecto ?? datos.perfil.recamaraPorDefecto ?? 1);
   const reps = rmAnterior && valor > 0 ? repsParaIgualar(modeloDe(datos, ejercicio), rmAnterior, valor, recamara) : null;
   // Repeticiones enteras y con tope: por encima de 40 el peso es demasiado bajo.
@@ -390,7 +433,8 @@ function sugerenciaBilbo(datos, ejercicio, plan, { excluirSesion, sobre }) {
     if (r) cicloPrevio = { cicloN: c.n, dia: r.dia, carga: r.serie.carga, esfuerzo: esfuerzoTotal(r.serie), mismoPeso: Math.abs((r.serie.carga ?? -1) - valor) < 0.01 };
     break;
   }
-  return { ...resultado, carga: valor, objetivoSuperar, objetivosExtra: objetivosExtra(gen, dia), fase,
+  return { ...resultado, carga: valor, objetivoSuperar, objetivosExtra: objetivosExtra(gen, dia), fase, rmObjetivo: rmAnterior,
+    sinAnterior: !referencia,
     pesoBajo: reps != null && reps > 40, cicloAgotado: agotado, cicloPrevio, refAnterior: referencia };
 }
 
@@ -494,6 +538,24 @@ export const REDONDEO_POR_DEFECTO = 2.5;
 export const REDONDEOS = [0.5, 1, 1.25, 2, 2.5, 5];
 let redondeoGlobal = REDONDEO_POR_DEFECTO;
 export function fijarRedondeo(kg) { redondeoGlobal = kg > 0 ? kg : REDONDEO_POR_DEFECTO; }
+
+// El peso más bajo que se puede poner en un ejercicio: con barra, la barra
+// vacía (20 kg por defecto; se cambia en la ficha, «Ajustes finos»).
+export const BARRA_POR_DEFECTO = 20;
+export function pesoMinimoDe(ejercicio) {
+  if (ejercicio?.pesoMinimo != null) return ejercicio.pesoMinimo;
+  return ejercicio?.carga?.tipo === 'peso' && !ejercicio.pesosMaquina?.length && materialDe(ejercicio) === 'barra' ? BARRA_POR_DEFECTO : 0;
+}
+
+// El material del ejercicio; si no lo tiene apuntado, el del catálogo con
+// el mismo nombre (los creados desde una rutina escrita no lo guardan).
+const materialPorNombre = new Map();
+export function materialDe(ejercicio) {
+  if (ejercicio?.material) return ejercicio.material;
+  const clave = normalizar(ejercicio?.nombre ?? '');
+  if (!materialPorNombre.has(clave)) materialPorNombre.set(clave, CATALOGO.find((c) => normalizar(c.nombre) === clave)?.material ?? null);
+  return materialPorNombre.get(clave);
+}
 export function pasoDe(ejercicio) { return ejercicio?.redondeoKg > 0 ? ejercicio.redondeoKg : redondeoGlobal; }
 
 // Redondea al salto de disco: en el gimnasio no hay 25,6 kg.
@@ -511,9 +573,11 @@ export function aPesoDisponible(ejercicio, kg, { hacia = 'cerca' } = {}) {
   if (!pesos) {
     const paso = pasoDe(ejercicio);
     const cerca = aPasoDeDisco(kg, paso);
-    if (hacia === 'arriba' && cerca <= kg + 0.01) return redondear(cerca + paso, 2);
-    if (hacia === 'abajo' && cerca >= kg - 0.01) return redondear(Math.max(0, cerca - paso), 2);
-    return cerca;
+    const minimo = pesoMinimoDe(ejercicio);
+    const conMinimo = (x) => (kg > 0 && minimo > 0 ? Math.max(minimo, x) : x);
+    if (hacia === 'arriba' && cerca <= kg + 0.01) return conMinimo(redondear(cerca + paso, 2));
+    if (hacia === 'abajo' && cerca >= kg - 0.01) return conMinimo(redondear(Math.max(0, cerca - paso), 2));
+    return conMinimo(cerca);
   }
   if (hacia === 'arriba') return pesos.find((p) => p > kg + 0.01) ?? pesos.at(-1);
   if (hacia === 'abajo') return [...pesos].reverse().find((p) => p < kg - 0.01) ?? pesos[0];
@@ -704,7 +768,7 @@ export function records(datos, ejercicioId) {
     if (trabajo != null && (!mejorTrabajo || trabajo > mejorTrabajo.valor)) {
       mejorTrabajo = { valor: trabajo, fecha: x.sesion.fecha, serie: x.serie };
     }
-    const rm = x.serie.tramos?.length ? null : rmDeSerie(datos, ejercicio, x.serie, esfuerzoTotal(x.serie));
+    const rm = rmSinTramos(datos, ejercicio, x.serie);
     if (rm != null && (!mejor1RM || rm > mejor1RM.valor)) {
       mejor1RM = { valor: redondear(rm, 1), fecha: x.sesion.fecha, serie: x.serie };
     }

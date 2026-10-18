@@ -97,7 +97,9 @@ const PRUDENCIA = 1;
 function seriesParaCalibrar(datos, ejercicio) {
   const salida = [];
   for (const sesion of datos.sesiones) {
-    if (sesion.borrada || !sesion.fecha) continue;
+    // El entrenamiento en curso no cuenta: si no, el 1RM de cada serie
+    // cambiaría mientras apuntas las de debajo.
+    if (sesion.borrada || !sesion.fecha || sesion.estado === 'en-curso') continue;
     for (const entrada of sesion.ejercicios) {
       if (entrada.ejercicioId !== ejercicio.id) continue;
       for (const s of entrada.series) {

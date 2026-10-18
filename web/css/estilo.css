@@ -1117,6 +1117,9 @@ legend .ayuda, summary .ayuda { margin-left: 6px; vertical-align: middle; }
   box-shadow: 0 3px 12px rgba(0,0,0,.2); cursor: pointer;
 }
 .volver-arriba[hidden] { display: none; }
+/* En el entreno, encima de la barra fija (su alto lo pone el JS). */
+body.hay-barra-entreno .volver-arriba { bottom: calc(66px + env(safe-area-inset-bottom, 0px) + var(--alto-barra-entreno, 80px) + 12px); }
+body.entreno-a-pantalla .volver-arriba { bottom: calc(var(--alto-barra-entreno, 80px) + 12px); }
 
 /* Selector sin desplegable: con muchas opciones, un botón que abre la lista. */
 .selector-abrir { width: 100%; justify-content: space-between; text-align: left; }
@@ -1804,6 +1807,22 @@ details.bloque-ciclo.plegable[open] > summary::after { transform: rotate(90deg);
 
 /* --- Entreno: barra fija, puntitos, foto y deslizar --------------------- */
 .contenido.con-barra-entreno { padding-bottom: calc(220px + env(safe-area-inset-bottom)); }
+/* Móvil: el entreno a pantalla completa, sin las pestañas de abajo. */
+body.entreno-a-pantalla #navegacion { display: none; }
+body.entreno-a-pantalla .barra-entreno { bottom: 0; padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
+body.entreno-a-pantalla .contenido.con-barra-entreno { padding-bottom: calc(var(--alto-barra-entreno, 80px) + 24px); }
+.contador-series { display: grid; justify-items: center; gap: 4px; margin: 2px 0 8px; font-size: .9rem; }
+.contador-series .puntos-ejercicios { margin: 0; }
+.linea-1rm { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 0 0 10px; color: var(--texto-suave); }
+.linea-1rm > span:first-child { flex: 1; min-width: 12em; }
+.linea-1rm strong { color: var(--texto); }
+.linea-1rm .boton.enlace { min-width: 0; margin: 0; }
+.sin-series { margin: 8px 0 0; }
+/* Sin zoom con dos dedos en la página; el mapa del cuerpo se amplía al tocarlo. */
+html { touch-action: pan-x pan-y; }
+.cuerpos-boton { position: relative; width: 100%; padding: 0; border: 0; background: none; cursor: zoom-in; font: inherit; color: inherit; }
+.cuerpos.ampliado { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.cuerpos.ampliado .cuerpo { max-width: none; width: 100%; }
 .barra-entreno { position: fixed; left: 0; right: 0; bottom: calc(66px + env(safe-area-inset-bottom)); z-index: 9;
   display: grid; gap: 8px; padding: 10px 12px; max-width: 640px; margin: 0 auto;
   background: color-mix(in srgb, var(--fondo) 92%, transparent); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);

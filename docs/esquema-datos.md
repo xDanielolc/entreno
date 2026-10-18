@@ -558,3 +558,16 @@ la vez, a veces sin cobertura):
   repeticiones que superan el 1RM de la última vez. `rutina.versionPlantilla`:
   versión de la prehecha de la que salió (si la prehecha tiene una mayor,
   la app ofrece actualizarla sin tocar lo entrenado).
+
+- **v18 (0.51.0).** Todo opcional. `ejercicio.pesoMinimo`: el peso más bajo
+  que propone la app (la barra vacía; sin él, 20 kg si el material es
+  «barra» y el peso es libre). `ejercicio.rmManualEn`: cuándo pusiste el 1RM
+  a mano (manda sobre las series de hoy hechas antes). En la serie:
+  `cargaAuto` (el peso lo puso la app con tu 1RM y se ajusta si el 1RM de hoy
+  cambia), `cargaAMano` (lo cambiaste tú: no se toca), `objetivoDe: 'rm'`
+  (primera vez en un ciclo: el objetivo iguala tu 1RM, no «la última vez»),
+  `rmObjetivo`, y `planIdAntes` / `objetivoAntes` (una serie pasada a
+  calentamiento deja su regla y la recupera si vuelve). `sesion.vista.serie`:
+  qué serie se ve en el modo «una serie». `progresion.porRM` con
+  `fija: 'pct'` también en planes de calentamiento («50 % × 8»; 0 % = la
+  barra sola).

@@ -22,6 +22,11 @@ fallo que hay que arreglar.
    Títulos, botones y tablas van centrados.
 5. **La app decide por ti.** Pesos, objetivos y avisos los pone la app; tú
    apuntas lo que haces.
+6. **Un número, una vez.** Cada dato sale en un solo sitio y con un solo
+   valor (el 1RM del ejercicio, en su cabecera); nada de repetirlo en cada
+   fila con cifras distintas.
+7. **Sin zoom.** La página no se amplía con dos dedos; lo que de verdad
+   necesita verse en grande (el mapa del cuerpo) se abre grande al tocarlo.
 
 ## 2. Color
 
@@ -129,7 +134,7 @@ Las casillas de texto, siempre a 16 px o más (si no, el móvil hace zoom).
 | Respuesta | fila con pregunta, valor y «Cambiar» | lo ya contestado en un asistente |
 | Hoja | cartel que sube desde abajo | elegir, confirmar, ver detalles |
 | Aviso | píldora de tinta abajo, con «Deshacer» | confirmar lo hecho |
-| Barra del entreno | fija abajo, translúcida | añadir ejercicio, «⋯», siguiente, terminar |
+| Barra del entreno | fija abajo, translúcida; en el móvil sustituye a las pestañas | añadir ejercicio, «⋯», siguiente, terminar |
 
 - Nunca un desplegable del sistema (`<select>`): botones marcados o una hoja.
 - Todo lo que se quita se puede recuperar («Deshacer» o «sin usar»), y las
