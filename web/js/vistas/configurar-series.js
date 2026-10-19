@@ -33,7 +33,7 @@ function preguntas(ej, datos, contexto, conRutina) {
   const si = (f) => f.progreso === 'si';
   const conCargaModo = (f) => si(f) && ['doble', 'lineal', 'rm'].includes(f.modo);
   return [
-    { clave: 'progreso', titulo: '¿La app te lleva el progreso?', corto: 'Progreso',
+    { clave: 'progreso', titulo: contexto === 'entreno' ? '¿Estas series nuevas llevan progresión?' : '¿La app te lleva el progreso?', corto: 'Progreso',
       opciones: () => [
         ['si', 'Sí, que me diga qué toca', 'Cada día te pone el peso y el objetivo para superarte.'],
         ['no', 'No, solo apuntar', 'Ves lo que hiciste el último día e intentas superarlo a tu aire.'],
@@ -107,7 +107,8 @@ export function abrirAsistenteSeries({ ej, datos, contexto = 'rutina', donde = '
   const lista = preguntas(ej, datos, contexto, conRutina);
   let abierta = null;
   const zona = h('div', { class: 'asistente' });
-  const cerrar = modal(`Añadir series: ${ej.nombre}`, zona);
+  const nota = contexto === 'entreno' && h('p', { class: 'nota centrado' }, 'Series nuevas para este ejercicio. Las que ya tienes siguen igual, con su progresión.');
+  const cerrar = modal(`${contexto === 'entreno' ? 'Programar series' : 'Añadir series'}: ${ej.nombre}`, nota ? h('div', {}, nota, zona) : zona);
   const tiempo = mideTiempo(ej);
 
   const aplica = (q) => !q.aplica || q.aplica(f);

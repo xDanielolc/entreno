@@ -102,68 +102,158 @@ def animar(fotos, salida, duraciones=(900, 900)):
     marcos[0].save(salida, "WEBP", save_all=True, append_images=marcos[1:], duration=list(duraciones), loop=0, quality=82, method=6)
 
 
+# Cada ejercicio con su dibujo de Everkinetic, elegido mirando las dos
+# posturas (revisión del 19-10-2026). Una lista: se prueba en orden hasta dar
+# con una que tenga las dos posturas. («invertir», empieza por la postura
+# final: las negativas empiezan arriba.) Si una postura viene cortada en el
+# original (el dibujo toca el borde), se queda solo la completa.
 FORZADOS = {
-    "Elevaciones laterales": "lateral-dumbbell-raises",
-    "Dominadas": "pull-ups",
-    "Dominadas negativas": ("pull-ups", "invertir"),
-    "Dominadas supinas": "chin-ups",
-    "Fondos de tríceps": "tricep-dips",
-    "Fondos en paralelas negativos": ("tricep-dips", "invertir"),
-    "Extensión de tríceps sobre la cabeza": "standing-triceps-extension-2",
-    "Prensa de piernas": "leg-press",
-    # En el original, una de las dos posturas viene cortada (las piernas en
-    # la sentadilla, los discos en el peso muerto): solo la postura completa.
-    "Sentadilla": ("barbell-squat", "solo-final"),
-    "Peso muerto": ("barbell-dead-lifts", "solo-final"),
-    "Peso muerto sumo": ("barbell-dead-lifts", "solo-final"),
-    "Peso muerto con mancuernas": "dumbbell-dead-lifts",
-    "Press militar": "barbell-shoulder-press",
-    "Press de hombro con mancuernas": "dumbbell-shoulder-press",
-    "Jalón al pecho": "wide-grip-lat-pull-down",
-    "Jalón con agarre estrecho": "v-bar-pull-down",
-    "Extensión de tríceps en polea": "triceps-pushdown-with-cable",
-    "Extensión de cuádriceps": "leg-extensions",
-    "Remo al mentón": "upright-barbell-rows",
-    "Flexiones": "push-ups",
-    "Zancadas": "dumbbell-lunges",
-    "Curl inclinado": "alternating-incline-curl-with-dumbbell",
+    "Abductores en máquina": ["thigh-abductor"],
+    "Aductores en máquina": ["thigh-adductor"],
+    "Aperturas con mancuernas": ["dumbbell-flys"],
+    "Buenos días": ["barbell-good-mornings"],
+    "Cruces en polea": ["cable-crossover"],
+    "Crunch abdominal": ["crunches"],
+    "Crunch en polea": ["seated-ab-crunch-with-cable"],
+    "Curl concentrado": ["concentration-curls-with-dumbbell"],
+    "Curl de bíceps con barra": ["biceps-curls-with-barbell", "ez-bar-curl-with-barbell"],
+    "Curl de bíceps con mancuernas": ["biceps-curl-with-dumbbell", "alternating-biceps-curl-with-dumbbell"],
+    "Curl de bíceps en máquina": ["biceps-curl-with-machine", "preacher-curl-with-machine"],
+    "Curl en polea": ["standing-biceps-curl-with-cable"],
+    "Curl femoral sentado": ["seated-leg-curl"],
+    "Curl femoral tumbado": ["lying-leg-curl-machine"],
+    "Curl inclinado": ["alternating-incline-curl-with-dumbbell"],
+    "Curl invertido": ["biceps-curl-reverse-with-dumbbells"],
+    "Curl martillo": ["biceps-hammer-curl-with-dumbbell", "alternating-hammer-curl-with-dumbbell"],
+    "Curl predicador": ["preacher-curl-with-barbell", "two-arm-preacher-curl-with-dumbbell"],
+    "Dominadas": ["pull-ups"],
+    "Dominadas asistidas": ["pull-ups"],
+    "Dominadas negativas": [("pull-ups", "invertir")],
+    "Dominadas supinas": ["chin-ups", "narrow-parallel-grip-chin-ups"],
+    "Elevación de gemelos": ["standing-calf-raise-with-dumbbell", "standing-calf-raises-using-machine"],
+    "Elevación de gemelos en multipower": ["standing-barbell-calf-raise", "smith-machine-reverse-calf-raises"],
+    "Elevación de gemelos en prensa": ["calves-press-on-leg-machine"],
+    "Elevación de gemelos sentado": ["seated-calf-raise-using-machine", "seated-calf-raise-with-barbell"],
+    "Elevación de gemelos tipo burro": ["donkey-calf-raises"],
+    "Elevaciones frontales": ["front-dumbbell-raise", "front-raises"],
+    "Elevaciones laterales": ["lateral-dumbbell-raises"],
+    "Encogimientos de trapecio": ["barbell-shrugs", "shoulder-shrugs"],
+    "Extensión de cuádriceps": ["leg-extensions"],
+    "Extensión de tríceps en máquina": ["triceps-extensions-using-machine"],
+    "Extensión de tríceps en polea": ["triceps-pushdown-with-cable"],
+    "Extensión de tríceps sobre la cabeza": ["standing-triceps-extension-2", "seated-two-arm-triceps-extension-with-dumbbell"],
+    "Flexiones": ["push-ups"],
+    "Flexiones diamante": ["close-triceps-pushup"],
+    "Fondos asistidos": ["chest-dips"],
+    "Fondos de tríceps": ["chest-dips", "tricep-dips-using-body-weight"],
+    "Fondos en banco": ["bench-dips"],
+    "Fondos en paralelas negativos": [("chest-dips", "invertir")],
+    "Hip thrust": ["bridging"],
+    "Hiperextensiones": ["hyperextensions"],
+    "Jalón al pecho": ["wide-grip-lat-pull-down", "underhand-pull-downs"],
+    "Jalón con agarre estrecho": ["v-bar-pull-down"],
+    "Patada de glúteo en polea": ["one-legged-cable-kickback"],
+    "Patada de tríceps": ["triceps-kickback-with-dumbbell"],
+    "Peso muerto": [("barbell-dead-lifts", "solo-final")],
+    "Peso muerto con mancuernas": ["dumbbell-dead-lifts"],
+    "Peso muerto rumano": [("romanian-dead-lift", "solo-final")],
+    "Peso muerto sumo": [("barbell-dead-lifts", "solo-final")],
+    "Plancha lateral": ["side-plank"],
+    "Prensa de piernas": ["leg-press"],
+    "Press cerrado": ["close-grip-barbell-bench-press"],
+    "Press de banca": ["bench-press"],
+    "Press de banca con mancuernas": ["bench-press-dumbbell"],
+    "Press de hombro con mancuernas": ["dumbbell-shoulder-press", "one-arm-dumbbell-shoulder-press", "arnold-press"],
+    "Press de pecho en máquina": ["machine-bench-press", "decline-chest-press"],
+    "Press declinado": ["decline-barbell-bench-press"],
+    "Press francés": ["lying-triceps-press-with-barbell"],
+    "Press inclinado": ["incline-bench-press"],
+    "Press inclinado con mancuernas": ["incline-dumbbell-press", "dumbbell-incline-bench-press"],
+    "Press militar": ["barbell-shoulder-press", "seated-military-press"],
+    "Pullover en polea": ["straight-arm-push-down"],
+    "Puente de glúteo": ["bridging"],
+    "Pájaros con mancuernas": ["bent-over-rear-deltoid-raise-with-head-on-bench", "lying-rear-lateral-raise"],
+    "Remo al mentón": ["upright-barbell-rows"],
+    "Remo con barra": ["bent-over-row-with-barbell", "reverse-grips-bent-over-barbell-rows", "rear-deltoid-row-barbell"],
+    "Remo con mancuerna": ["rear-deltoid-row-dumbbell"],
+    "Remo en T": ["t-bar-rows"],
+    "Remo en máquina": ["seated-cable-rows"],
+    "Remo en polea": ["seated-cable-rows"],
+    "Remo invertido": ["body-row"],
+    "Rueda abdominal": ["ab-rollout-on-knees-with-barbell"],
+    "Sentadilla": [("barbell-squat", "solo-final")],
+    "Sentadilla búlgara": ["one-leg-squat-with-barbell", "single-leg-squat-with-barbell"],
+    "Sentadilla en multipower": [("smith-machine-squats", "solo-final")],
+    "Sentadilla frontal": [("front-squat-with-barbell", "solo-final")],
+    "Sentadilla goblet": [("pile-squat-with-dumbbell", "solo-final")],
+    "Sentadilla hack": ["hack-squat-machine"],
+    "Sentadilla sissy": ["weighted-sissy-squat-with-weight-plate"],
+    "Subida al cajón": ["step-ups-with-dumbbells"],
+    "Superman": ["supermans"],
+    "Zancadas": [("dumbbell-lunges", "solo-inicio")],
+    "Zancadas hacia atrás": [("rear-lunges-with-dumbbell", "solo-inicio")],
 }
+
+
+def cortada(im):
+    """¿El dibujo llega al borde de la imagen? Entonces viene cortado."""
+    caja = mascara(im).getbbox()
+    if not caja:
+        return False
+    x0, y0, x1, y1 = caja
+    return x0 <= 2 or y0 <= 2 or x1 >= im.width - 2 or y1 >= im.height - 2
 
 
 def forzar(ejercicios, ek):
     hechos = 0
-    for nombre, cual in FORZADOS.items():
-        clave, invertir = (cual if isinstance(cual, tuple) else (cual, None))
-        if nombre not in ejercicios or clave not in ek:
-            print(f"  (sin {nombre} o sin {clave})")
+    for nombre, opciones in FORZADOS.items():
+        if nombre not in ejercicios:
+            print(f"  (sin {nombre} en los créditos)")
             continue
-        i = ek[clave]
-        try:
-            fotos = [bajar(EVERKINETIC_PNG.format(id=i, fase="relaxation")), bajar(EVERKINETIC_PNG.format(id=i, fase="tension"))]
-        except Exception:  # noqa: BLE001
-            print(f"  (sin las dos posturas: {clave})")
+        fotos = clave = invertir = None
+        for op in opciones:
+            k, inv = (op if isinstance(op, tuple) else (op, None))
+            if k not in ek:
+                continue
+            try:
+                fotos = [bajar(EVERKINETIC_PNG.format(id=ek[k], fase="relaxation")), bajar(EVERKINETIC_PNG.format(id=ek[k], fase="tension"))]
+                clave, invertir = k, inv
+                break
+            except Exception:  # noqa: BLE001
+                continue
+        if not fotos:
+            print(f"  (sin dibujo con dos posturas: {nombre})")
             continue
+        # «solo-final» / «solo-inicio»: la otra postura viene cortada en el
+        # original (las piernas o los discos fuera del dibujo).
+        if invertir in ("solo-final", "solo-inicio"):
+            sanas = fotos[1:] if invertir == "solo-final" else fotos[:1]
+            invertir = None
+        else:
+            ims = [a_rgb(f) for f in fotos]
+            sanas = [f for f, im in zip(fotos, ims) if not cortada(im)]
+        solo = len(sanas) == 1
         base = re.sub(r"[^a-z0-9]+", "-", unicodedata.normalize("NFKD", nombre).encode("ascii", "ignore").decode().lower()).strip("-")
         salida = DESTINO / f"{base}.webp"
         # Si el nombre ya lo usa otro ejercicio (una foto de wger), se aparta.
         ocupado = any(c.get("archivo") == f"imagenes/ejercicios/anim/{salida.name}" for n, c in ejercicios.items() if n != nombre)
         if ocupado:
             salida = DESTINO / f"{base}-ek.webp"
-        if invertir == "solo-final":
-            animar(fotos[1:], salida, duraciones=(900,))
+        if solo:
+            animar(sanas, salida, duraciones=(900,))
         elif invertir:
             animar(list(reversed(fotos)), salida, duraciones=(1100, 700))
         else:
             animar(fotos, salida)
         c = ejercicios[nombre]
-        # Las animadas de webs comerciales (WebP) no se guardan como estática.
-        c["estatica"] = c.get("estatica") or (None if c["archivo"].endswith(".webp") else c["archivo"])
-        c.update({"archivo": f"imagenes/ejercicios/anim/{salida.name}", "animada": invertir != "solo-final", "autor": "Everkinetic",
+        if c.get("fuente") != "propia":
+            c["estatica"] = c.get("estatica") or (None if c["archivo"].endswith(".webp") else c["archivo"])
+        c.update({"archivo": f"imagenes/ejercicios/anim/{salida.name}", "animada": not solo, "autor": "Everkinetic",
                   "fuente": "everkinetic", "nombreEnFuente": clave})
-        c.pop("nombreEnWger", None)
-        c.pop("aliasDe", None)
+        for k in ("nombreEnWger", "aliasDe"):
+            c.pop(k, None)
         hechos += 1
-        print(f"  forzada: {nombre} <- {clave}{' (al revés)' if invertir else ''}")
+        print(f"  {nombre} <- {clave}{' (solo la postura completa)' if solo else ''}{' (al revés)' if invertir else ''}")
     return hechos
 
 
@@ -233,6 +323,11 @@ def main():
         print(f"  animada: {', '.join(nombres)}")
 
     hechos += forzar(ejercicios, ek)
+    # Los alias (otro nombre del mismo ejercicio) enseñan lo mismo que su base.
+    for nombre, c in ejercicios.items():
+        base = ejercicios.get(c.get("aliasDe") or "")
+        if base and base.get("archivo") != c.get("archivo"):
+            c.update({k: base[k] for k in ("archivo", "autor", "fuente", "nombreEnFuente", "animada") if k in base})
     ruta.write_text(json.dumps(creditos, ensure_ascii=False, indent=1), encoding="utf-8")
     print(f"{hechos} animadas. Sin segunda postura ({len(sin)}): {', '.join(sin)}")
 

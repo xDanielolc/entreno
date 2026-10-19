@@ -114,7 +114,7 @@ async function notificar(titulo, cuerpo, { silencio = false, vibrar = null } = {
   try {
     const reg = await navigator.serviceWorker.ready;
     await reg.showNotification(titulo, {
-      body: cuerpo, tag: 'descanso', renotify: !silencio, silent: silencio, icon: './iconos/icono-192.png', badge: './iconos/icono-192.png',
+      body: cuerpo, tag: 'descanso', renotify: !silencio, silent: silencio, icon: './iconos/icono-v2-192.png', badge: './iconos/icono-v2-192.png',
       vibrate: vibrar ?? (silencio ? [] : [700, 250, 700, 250, 1000, 250, 1000]), requireInteraction: !silencio, data: { url: location.href },
     });
   } catch { /* sin service worker (navegador de escritorio sin instalar): nada */ }

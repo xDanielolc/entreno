@@ -65,44 +65,52 @@
  },
  "ejercicios": {
   "Press de banca": {
-   "archivo": "imagenes/ejercicios/anim/press-de-banca.webp",
+   "archivo": "imagenes/ejercicios/anim/press-de-banca-ek.webp",
    "autor": "Everkinetic",
-   "nombreEnWger": "Press de Banca",
    "estatica": "imagenes/ejercicios/press-de-banca.png",
-   "animada": true
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "bench-press"
   },
   "Press de banca con mancuernas": {
    "archivo": "imagenes/ejercicios/anim/press-de-banca-con-mancuernas.webp",
    "autor": "Everkinetic",
-   "nombreEnWger": "Press de banca con mancuernas",
    "estatica": "imagenes/ejercicios/press-de-banca-con-mancuernas.png",
-   "animada": true
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "bench-press-dumbbell"
   },
   "Press inclinado": {
    "archivo": "imagenes/ejercicios/anim/press-inclinado.webp",
    "autor": "Everkinetic",
-   "nombreEnWger": "Press inclinado con mancuernas",
    "estatica": "imagenes/ejercicios/press-inclinado.png",
-   "animada": true
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "incline-bench-press"
   },
   "Press inclinado con mancuernas": {
    "archivo": "imagenes/ejercicios/anim/press-inclinado-con-mancuernas.webp",
    "autor": "Everkinetic",
-   "nombreEnWger": "Press inclinado con mancuernas",
    "estatica": "imagenes/ejercicios/press-inclinado-con-mancuernas.png",
-   "animada": true
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "incline-dumbbell-press"
   },
   "Press declinado": {
    "archivo": "imagenes/ejercicios/anim/press-declinado.webp",
    "autor": "Everkinetic",
-   "nombreEnWger": "Press de Banca Declinado con Barra",
    "estatica": "imagenes/ejercicios/press-declinado.png",
-   "animada": true
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "decline-barbell-bench-press"
   },
   "Press de pecho en máquina": {
-   "archivo": "imagenes/ejercicios/press-de-pecho-en-maquina.webp",
-   "autor": "roneydya",
-   "nombreEnWger": "Press de Pecho en Máquina"
+   "archivo": "imagenes/ejercicios/anim/press-de-pecho-en-maquina.webp",
+   "autor": "Everkinetic",
+   "estatica": null,
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "machine-bench-press"
   },
   "Aperturas de pecho": {
    "archivo": "imagenes/ejercicios/aperturas-de-pecho.png",
@@ -111,10 +119,11 @@
   },
   "Aperturas con mancuernas": {
    "archivo": "imagenes/ejercicios/anim/aperturas-con-mancuernas.webp",
-   "autor": "cshep442",
-   "nombreEnWger": "Aperturas con Mancuernas",
+   "autor": "Everkinetic",
    "estatica": "imagenes/ejercicios/aperturas-con-mancuernas.png",
-   "animada": true
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "dumbbell-flys"
   },
   "Fondos de tríceps": {
    "archivo": "imagenes/ejercicios/anim/fondos-de-triceps.webp",
@@ -122,22 +131,31 @@
    "estatica": "imagenes/ejercicios/fondos-de-triceps.png",
    "animada": true,
    "fuente": "everkinetic",
-   "nombreEnFuente": "tricep-dips"
+   "nombreEnFuente": "chest-dips"
   },
   "Fondos asistidos": {
-   "archivo": "imagenes/ejercicios/fondos-asistidos.png",
-   "autor": "Franpol",
-   "nombreEnWger": "Fondos"
+   "archivo": "imagenes/ejercicios/anim/fondos-asistidos.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/fondos-asistidos.png",
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "chest-dips"
   },
   "Press militar": {
-   "archivo": "imagenes/ejercicios/press-militar.png",
-   "autor": "Franpol",
-   "nombreEnWger": "Press militar"
+   "archivo": "imagenes/ejercicios/anim/press-militar.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/press-militar.png",
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "seated-military-press"
   },
   "Press de hombro con mancuernas": {
-   "archivo": "imagenes/ejercicios/press-de-hombro-con-mancuernas.jpg",
-   "autor": "philip",
-   "nombreEnWger": "Press de hombro con mancuernas"
+   "archivo": "imagenes/ejercicios/anim/press-de-hombro-con-mancuernas.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/press-de-hombro-con-mancuernas.jpg",
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "one-arm-dumbbell-shoulder-press"
   },
   "Press de hombro en máquina": {
    "archivo": "imagenes/ejercicios/anim/press-de-hombro-en-maquina.webp",
@@ -160,23 +178,28 @@
    "nombreEnWger": "Elevaciones laterales en polea (a un brazo)"
   },
   "Elevaciones frontales": {
-   "archivo": "imagenes/ejercicios/elevaciones-frontales.png",
-   "autor": "philip",
-   "nombreEnWger": "Elevaciones frontales"
+   "archivo": "imagenes/ejercicios/anim/elevaciones-frontales.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/elevaciones-frontales.png",
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "front-dumbbell-raise"
   },
   "Press cerrado": {
    "archivo": "imagenes/ejercicios/anim/press-cerrado.webp",
    "autor": "Everkinetic",
-   "nombreEnWger": "Press de Banca con Agarre Cerrado",
    "estatica": "imagenes/ejercicios/press-cerrado.png",
-   "animada": true
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "close-grip-barbell-bench-press"
   },
   "Press francés": {
-   "archivo": "imagenes/ejercicios/anim/press-frances.webp",
+   "archivo": "imagenes/ejercicios/anim/press-frances-ek.webp",
    "autor": "Everkinetic",
-   "nombreEnWger": "Press Francés con Barra SZ",
    "estatica": "imagenes/ejercicios/press-frances.png",
-   "animada": true
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "lying-triceps-press-with-barbell"
   },
   "Extensión de tríceps en polea": {
    "archivo": "imagenes/ejercicios/anim/extension-de-triceps-en-polea.webp",
@@ -221,19 +244,28 @@
    "nombreEnFuente": "pull-ups"
   },
   "Dominadas supinas": {
-   "archivo": "imagenes/ejercicios/dominadas-supinas.jpg",
-   "autor": "Imobard",
-   "nombreEnWger": "Dominadas"
+   "archivo": "imagenes/ejercicios/anim/dominadas-supinas.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/dominadas-supinas.jpg",
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "narrow-parallel-grip-chin-ups"
   },
   "Dominadas asistidas": {
-   "archivo": "imagenes/ejercicios/dominadas-asistidas.jpg",
-   "autor": "Imobard",
-   "nombreEnWger": "Dominadas"
+   "archivo": "imagenes/ejercicios/anim/dominadas-asistidas.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/dominadas-asistidas.jpg",
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "pull-ups"
   },
   "Jalón al pecho": {
-   "archivo": "imagenes/ejercicios/jalon-al-pecho.png",
-   "autor": "Franpol",
-   "nombreEnWger": "Jalón al pecho con agarre neutro"
+   "archivo": "imagenes/ejercicios/anim/jalon-al-pecho.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/jalon-al-pecho.png",
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "underhand-pull-downs"
   },
   "Jalón con agarre estrecho": {
    "archivo": "imagenes/ejercicios/anim/jalon-con-agarre-estrecho.webp",
@@ -246,31 +278,39 @@
   "Remo en T": {
    "archivo": "imagenes/ejercicios/anim/remo-en-t.webp",
    "autor": "Everkinetic",
-   "nombreEnWger": "Remo en \"T\"",
    "estatica": "imagenes/ejercicios/remo-en-t.png",
-   "animada": true
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "t-bar-rows"
   },
   "Remo en polea": {
-   "archivo": "imagenes/ejercicios/anim/remo-en-polea.webp",
-   "autor": "technofer",
-   "nombreEnWger": "Remo unilateral en polea",
+   "archivo": "imagenes/ejercicios/anim/remo-en-polea-ek.webp",
+   "autor": "Everkinetic",
    "estatica": "imagenes/ejercicios/remo-en-polea.jpg",
-   "animada": true
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "seated-cable-rows"
   },
   "Remo en máquina": {
-   "archivo": "imagenes/ejercicios/remo-en-maquina.png",
-   "autor": "barry",
-   "nombreEnWger": "Remo sentado (máquina)"
+   "archivo": "imagenes/ejercicios/anim/remo-en-maquina.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/remo-en-maquina.png",
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "seated-cable-rows"
   },
   "Remo invertido": {
-   "archivo": "imagenes/ejercicios/remo-invertido.jpg",
-   "autor": "Gavru",
-   "nombreEnWger": "Remo invertido"
+   "archivo": "imagenes/ejercicios/anim/remo-invertido.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/remo-invertido.jpg",
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "body-row"
   },
   "Face pull": {
-   "archivo": "imagenes/ejercicios/face-pull.webp",
-   "autor": "AlucardEvil40",
-   "nombreEnWger": "Dumbbell Bent Over Face Pull"
+   "archivo": "imagenes/munecos/face-pull.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
   },
   "Remo al mentón": {
    "archivo": "imagenes/ejercicios/anim/remo-al-menton.webp",
@@ -281,23 +321,28 @@
    "nombreEnFuente": "upright-barbell-rows"
   },
   "Encogimientos de trapecio": {
-   "archivo": "imagenes/ejercicios/anim/encogimientos-de-trapecio.webp",
+   "archivo": "imagenes/ejercicios/anim/encogimientos-de-trapecio-ek.webp",
    "autor": "Everkinetic",
-   "nombreEnWger": "Encogimientos de hombros con mancuernas",
    "estatica": "imagenes/ejercicios/encogimientos-de-trapecio.png",
-   "animada": true
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "barbell-shrugs"
   },
   "Curl de bíceps con barra": {
-   "archivo": "imagenes/ejercicios/curl-de-biceps-con-barra.png",
-   "autor": "Franpol",
-   "nombreEnWger": "Curl de biceps con barra Z"
+   "archivo": "imagenes/ejercicios/anim/curl-de-biceps-con-barra.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/curl-de-biceps-con-barra.png",
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "biceps-curls-with-barbell"
   },
   "Curl martillo": {
    "archivo": "imagenes/ejercicios/anim/curl-martillo.webp",
    "autor": "Everkinetic",
-   "nombreEnWger": "Curl Martillo",
    "estatica": "imagenes/ejercicios/curl-martillo.png",
-   "animada": true
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "biceps-hammer-curl-with-dumbbell"
   },
   "Curl inclinado": {
    "archivo": "imagenes/ejercicios/anim/curl-inclinado.webp",
@@ -308,16 +353,17 @@
    "nombreEnFuente": "alternating-incline-curl-with-dumbbell"
   },
   "Curl en polea": {
-   "archivo": "imagenes/ejercicios/anim/curl-en-polea.webp",
+   "archivo": "imagenes/ejercicios/anim/curl-en-polea-ek.webp",
    "autor": "Everkinetic",
-   "nombreEnWger": "Curl de Bíceps en Polea",
    "estatica": "imagenes/ejercicios/curl-en-polea.png",
-   "animada": true
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "standing-biceps-curl-with-cable"
   },
   "Curl de muñeca": {
-   "archivo": "imagenes/ejercicios/curl-de-muneca.png",
-   "autor": "wger",
-   "nombreEnWger": "Curl De Muñeca Con Barra"
+   "archivo": "imagenes/munecos/curl-de-muneca.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
   },
   "Sentadilla": {
    "archivo": "imagenes/ejercicios/anim/sentadilla-ek.webp",
@@ -330,19 +376,26 @@
   "Sentadilla frontal": {
    "archivo": "imagenes/ejercicios/anim/sentadilla-frontal.webp",
    "autor": "Everkinetic",
-   "nombreEnWger": "Sentadilla Frontal",
    "estatica": "imagenes/ejercicios/sentadilla-frontal.png",
-   "animada": true
+   "animada": false,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "front-squat-with-barbell"
   },
   "Sentadilla búlgara": {
-   "archivo": "imagenes/ejercicios/sentadilla-bulgara.png",
-   "autor": "Franpol",
-   "nombreEnWger": "Sentadilla búlgara izquierda"
+   "archivo": "imagenes/ejercicios/anim/sentadilla-bulgara.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/sentadilla-bulgara.png",
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "one-leg-squat-with-barbell"
   },
   "Sentadilla en multipower": {
-   "archivo": "imagenes/ejercicios/sentadilla-en-multipower.jpg",
-   "autor": "wger",
-   "nombreEnWger": "Sentadilla multipower"
+   "archivo": "imagenes/ejercicios/anim/sentadilla-en-multipower.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/sentadilla-en-multipower.jpg",
+   "animada": false,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "smith-machine-squats"
   },
   "Prensa de piernas": {
    "archivo": "imagenes/ejercicios/anim/prensa-de-piernas.webp",
@@ -369,27 +422,36 @@
    "nombreEnFuente": "barbell-dead-lifts"
   },
   "Peso muerto rumano": {
-   "archivo": "imagenes/ejercicios/peso-muerto-rumano.png",
-   "autor": "wger",
-   "nombreEnWger": "Peso muerto rumano con barra"
+   "archivo": "imagenes/ejercicios/anim/peso-muerto-rumano.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/peso-muerto-rumano.png",
+   "animada": false,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "romanian-dead-lift"
   },
   "Zancadas": {
    "archivo": "imagenes/ejercicios/anim/zancadas.webp",
    "autor": "Everkinetic",
    "estatica": "imagenes/ejercicios/zancadas.png",
-   "animada": true,
+   "animada": false,
    "fuente": "everkinetic",
    "nombreEnFuente": "dumbbell-lunges"
   },
   "Hip thrust": {
-   "archivo": "imagenes/ejercicios/hip-thrust.webp",
-   "autor": "AlucardEvil40",
-   "nombreEnWger": "Dumbbell Hip Thrust"
+   "archivo": "imagenes/ejercicios/anim/hip-thrust.webp",
+   "autor": "Everkinetic",
+   "estatica": null,
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "bridging"
   },
   "Puente de glúteo": {
-   "archivo": "imagenes/ejercicios/puente-de-gluteo.png",
-   "autor": "wger",
-   "nombreEnWger": "Puente de glúteos"
+   "archivo": "imagenes/ejercicios/anim/puente-de-gluteo.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/puente-de-gluteo.png",
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "bridging"
   },
   "Extensión de cuádriceps": {
    "archivo": "imagenes/ejercicios/anim/extension-de-cuadriceps.webp",
@@ -400,28 +462,36 @@
    "nombreEnFuente": "leg-extensions"
   },
   "Curl femoral tumbado": {
-   "archivo": "imagenes/ejercicios/curl-femoral-tumbado.png",
-   "autor": "Franpol",
-   "nombreEnWger": "Curl femoral"
+   "archivo": "imagenes/ejercicios/anim/curl-femoral-tumbado.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/curl-femoral-tumbado.png",
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "lying-leg-curl-machine"
   },
   "Curl femoral sentado": {
    "archivo": "imagenes/ejercicios/anim/curl-femoral-sentado.webp",
    "autor": "Everkinetic",
-   "nombreEnWger": "Curl femoral sentado",
    "estatica": "imagenes/ejercicios/curl-femoral-sentado.png",
-   "animada": true
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "seated-leg-curl"
   },
   "Elevación de gemelos": {
-   "archivo": "imagenes/ejercicios/anim/elevacion-de-gemelos.webp",
-   "autor": "clafal",
-   "nombreEnWger": "Elevación de talón de pie",
+   "archivo": "imagenes/ejercicios/anim/elevacion-de-gemelos-ek.webp",
+   "autor": "Everkinetic",
    "estatica": "imagenes/ejercicios/elevacion-de-gemelos.jpeg",
-   "animada": true
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "standing-calf-raises-using-machine"
   },
   "Elevación de gemelos en prensa": {
-   "archivo": "imagenes/ejercicios/elevacion-de-gemelos-en-prensa.jpeg",
-   "autor": "wger",
-   "nombreEnWger": "Gemelos en prensa"
+   "archivo": "imagenes/ejercicios/anim/elevacion-de-gemelos-en-prensa.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/elevacion-de-gemelos-en-prensa.jpeg",
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "calves-press-on-leg-machine"
   },
   "Elevación de gemelos tipo burro": {
    "archivo": "imagenes/ejercicios/anim/elevacion-de-gemelos-tipo-burro.webp",
@@ -441,16 +511,20 @@
    "animada": true
   },
   "Elevación de gemelos sentado": {
-   "archivo": "imagenes/ejercicios/elevacion-de-gemelos-sentado.jpeg",
-   "autor": "AlucardEvil40",
-   "nombreEnWger": "Elevación de gemelos sentado con mancuerna"
+   "archivo": "imagenes/ejercicios/anim/elevacion-de-gemelos-sentado.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/elevacion-de-gemelos-sentado.jpeg",
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "seated-calf-raise-using-machine"
   },
   "Crunch abdominal": {
-   "archivo": "imagenes/ejercicios/anim/crunch-abdominal.webp",
-   "autor": "wger",
-   "nombreEnWger": "Abdominal",
+   "archivo": "imagenes/ejercicios/anim/crunch-abdominal-ek.webp",
+   "autor": "Everkinetic",
    "estatica": "imagenes/ejercicios/crunch-abdominal.png",
-   "animada": true
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "crunches"
   },
   "Plancha": {
    "archivo": "imagenes/ejercicios/anim/plancha.webp",
@@ -460,11 +534,9 @@
    "animada": true
   },
   "Press pallof": {
-   "archivo": "imagenes/ejercicios/anim/press-pallof.webp",
-   "autor": "wger",
-   "nombreEnWger": "Pallof Press",
-   "estatica": "imagenes/ejercicios/press-pallof.png",
-   "animada": true
+   "archivo": "imagenes/munecos/press-pallof.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
   },
   "Elevaciones de piernas": {
    "archivo": "imagenes/munecos/elevacion-de-piernas-colgado.svg",
@@ -478,7 +550,7 @@
    "nombreEnWger": "Elevaciones de Rodillas en Barra"
   },
   "Cruces en polea": {
-   "archivo": "imagenes/ejercicios/anim/cruces-en-polea.webp",
+   "archivo": "imagenes/ejercicios/anim/cruces-en-polea-ek.webp",
    "autor": "Everkinetic",
    "fuente": "everkinetic",
    "nombreEnFuente": "cable-crossover",
@@ -502,7 +574,7 @@
    "animada": true
   },
   "Patada de tríceps": {
-   "archivo": "imagenes/ejercicios/anim/patada-de-triceps.webp",
+   "archivo": "imagenes/ejercicios/anim/patada-de-triceps-ek.webp",
    "autor": "Everkinetic",
    "fuente": "everkinetic",
    "nombreEnFuente": "triceps-kickback-with-dumbbell",
@@ -526,7 +598,7 @@
    "animada": true
   },
   "Pullover en polea": {
-   "archivo": "imagenes/ejercicios/anim/pullover-en-polea.webp",
+   "archivo": "imagenes/ejercicios/anim/pullover-en-polea-ek.webp",
    "autor": "Everkinetic",
    "fuente": "everkinetic",
    "nombreEnFuente": "straight-arm-push-down",
@@ -542,7 +614,7 @@
    "animada": true
   },
   "Pájaros con mancuernas": {
-   "archivo": "imagenes/ejercicios/anim/pajaros-con-mancuernas.webp",
+   "archivo": "imagenes/ejercicios/anim/pajaros-con-mancuernas-ek.webp",
    "autor": "Everkinetic",
    "fuente": "everkinetic",
    "nombreEnFuente": "bent-over-rear-deltoid-raise-with-head-on-bench",
@@ -574,7 +646,7 @@
    "animada": true
   },
   "Curl predicador": {
-   "archivo": "imagenes/ejercicios/anim/curl-predicador.webp",
+   "archivo": "imagenes/ejercicios/anim/curl-predicador-ek.webp",
    "autor": "Everkinetic",
    "fuente": "everkinetic",
    "nombreEnFuente": "preacher-curl-with-barbell",
@@ -601,9 +673,9 @@
    "archivo": "imagenes/ejercicios/anim/sentadilla-goblet.webp",
    "autor": "Everkinetic",
    "fuente": "everkinetic",
-   "nombreEnFuente": "squats-using-dumbbells",
+   "nombreEnFuente": "pile-squat-with-dumbbell",
    "estatica": "imagenes/ejercicios/sentadilla-goblet.png",
-   "animada": true
+   "animada": false
   },
   "Sentadilla hack": {
    "archivo": "imagenes/ejercicios/anim/sentadilla-hack.webp",
@@ -635,7 +707,7 @@
    "fuente": "everkinetic",
    "nombreEnFuente": "rear-lunges-with-dumbbell",
    "estatica": "imagenes/ejercicios/zancadas-hacia-atras.png",
-   "animada": true
+   "animada": false
   },
   "Subida al cajón": {
    "archivo": "imagenes/ejercicios/anim/subida-al-cajon.webp",
@@ -686,7 +758,7 @@
    "animada": true
   },
   "Hiperextensiones": {
-   "archivo": "imagenes/ejercicios/anim/hiperextensiones.webp",
+   "archivo": "imagenes/ejercicios/anim/hiperextensiones-ek.webp",
    "autor": "Everkinetic",
    "fuente": "everkinetic",
    "nombreEnFuente": "hyperextensions",
@@ -771,9 +843,11 @@
    "fuente": "propia"
   },
   "Remo con barra": {
-   "archivo": "imagenes/munecos/remo-con-barra.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/anim/remo-con-barra.webp",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "animada": true,
+   "nombreEnFuente": "reverse-grips-bent-over-barbell-rows"
   },
   "Extensión de muñeca": {
    "archivo": "imagenes/munecos/extension-de-muneca.svg",
@@ -1376,9 +1450,11 @@
    "fuente": "propia"
   },
   "Rueda abdominal": {
-   "archivo": "imagenes/munecos/rueda-abdominal.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/anim/rueda-abdominal.webp",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "animada": true,
+   "nombreEnFuente": "ab-rollout-on-knees-with-barbell"
   },
   "Cardio": {
    "archivo": "imagenes/munecos/cardio.svg",
@@ -1521,10 +1597,11 @@
    "fuente": "propia"
   },
   "Curl de muñeca con barra": {
-   "archivo": "imagenes/ejercicios/curl-de-muneca.png",
-   "autor": "wger",
+   "archivo": "imagenes/munecos/curl-de-muneca.svg",
+   "autor": "dibujo propio de la app",
    "nombreEnWger": "Curl De Muñeca Con Barra",
-   "aliasDe": "Curl de muñeca"
+   "aliasDe": "Curl de muñeca",
+   "fuente": "propia"
   },
   "Sujeción de barra en rack": {
    "archivo": "imagenes/munecos/colgarse-de-la-barra.svg",
@@ -1533,27 +1610,35 @@
    "aliasDe": "Colgarse de la barra"
   },
   "Jalón con cuerda": {
-   "archivo": "imagenes/ejercicios/jalon-al-pecho.png",
-   "autor": "Franpol",
+   "archivo": "imagenes/ejercicios/anim/jalon-al-pecho.webp",
+   "autor": "Everkinetic",
    "nombreEnWger": "Jalón al pecho con agarre neutro",
-   "aliasDe": "Jalón al pecho"
+   "aliasDe": "Jalón al pecho",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "underhand-pull-downs",
+   "animada": true
   },
   "Curl bayesian en polea": {
-   "archivo": "imagenes/ejercicios/anim/curl-en-polea.webp",
+   "archivo": "imagenes/ejercicios/anim/curl-en-polea-ek.webp",
    "autor": "Everkinetic",
    "nombreEnWger": "Curl de Bíceps en Polea",
    "aliasDe": "Curl en polea",
    "estatica": "imagenes/ejercicios/curl-en-polea.png",
-   "animada": true
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "standing-biceps-curl-with-cable"
   },
   "Curl araña": {
-   "archivo": "imagenes/ejercicios/curl-inclinado.png",
-   "autor": "wger",
+   "archivo": "imagenes/ejercicios/anim/curl-inclinado.webp",
+   "autor": "Everkinetic",
    "nombreEnWger": "Curl inclinado con mancuernas",
-   "aliasDe": "Curl inclinado"
+   "aliasDe": "Curl inclinado",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "alternating-incline-curl-with-dumbbell",
+   "animada": true
   },
   "Curl predicador en polea": {
-   "archivo": "imagenes/ejercicios/anim/curl-predicador.webp",
+   "archivo": "imagenes/ejercicios/anim/curl-predicador-ek.webp",
    "autor": "Everkinetic",
    "fuente": "everkinetic",
    "nombreEnFuente": "preacher-curl-with-barbell",
@@ -1562,33 +1647,44 @@
    "animada": true
   },
   "Jalón supino": {
-   "archivo": "imagenes/ejercicios/jalon-al-pecho.png",
-   "autor": "Franpol",
+   "archivo": "imagenes/ejercicios/anim/jalon-al-pecho.webp",
+   "autor": "Everkinetic",
    "nombreEnWger": "Jalón al pecho con agarre neutro",
-   "aliasDe": "Jalón al pecho"
+   "aliasDe": "Jalón al pecho",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "underhand-pull-downs",
+   "animada": true
   },
   "JM press en multipower": {
-   "archivo": "imagenes/ejercicios/anim/press-frances.webp",
+   "archivo": "imagenes/ejercicios/anim/press-frances-ek.webp",
    "autor": "Everkinetic",
    "nombreEnWger": "Press Francés con Barra SZ",
    "aliasDe": "Press francés",
    "estatica": "imagenes/ejercicios/press-frances.png",
-   "animada": true
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "lying-triceps-press-with-barbell"
   },
   "Extensión de tríceps unilateral en polea": {
-   "archivo": "imagenes/ejercicios/extension-de-triceps-en-polea.png",
-   "autor": "Franpol",
+   "archivo": "imagenes/ejercicios/anim/extension-de-triceps-en-polea.webp",
+   "autor": "Everkinetic",
    "nombreEnWger": "Extension de triceps polea",
-   "aliasDe": "Extensión de tríceps en polea"
+   "aliasDe": "Extensión de tríceps en polea",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "triceps-pushdown-with-cable",
+   "animada": true
   },
   "Extensión de tríceps tipo katana": {
-   "archivo": "imagenes/ejercicios/extension-de-triceps-en-polea.png",
-   "autor": "Franpol",
+   "archivo": "imagenes/ejercicios/anim/extension-de-triceps-en-polea.webp",
+   "autor": "Everkinetic",
    "nombreEnWger": "Extension de triceps polea",
-   "aliasDe": "Extensión de tríceps en polea"
+   "aliasDe": "Extensión de tríceps en polea",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "triceps-pushdown-with-cable",
+   "animada": true
   },
   "Patada de tríceps en polea": {
-   "archivo": "imagenes/ejercicios/anim/patada-de-triceps.webp",
+   "archivo": "imagenes/ejercicios/anim/patada-de-triceps-ek.webp",
    "autor": "Everkinetic",
    "fuente": "everkinetic",
    "nombreEnFuente": "triceps-kickback-with-dumbbell",
@@ -1597,27 +1693,35 @@
    "animada": true
   },
   "Press de hombro en multipower": {
-   "archivo": "imagenes/ejercicios/press-militar.png",
-   "autor": "Franpol",
+   "archivo": "imagenes/ejercicios/anim/press-militar.webp",
+   "autor": "Everkinetic",
    "nombreEnWger": "Press militar",
-   "aliasDe": "Press militar"
+   "aliasDe": "Press militar",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "seated-military-press",
+   "animada": true
   },
   "Press tras nuca": {
-   "archivo": "imagenes/ejercicios/press-militar.png",
-   "autor": "Franpol",
+   "archivo": "imagenes/ejercicios/anim/press-militar.webp",
+   "autor": "Everkinetic",
    "nombreEnWger": "Press militar",
-   "aliasDe": "Press militar"
+   "aliasDe": "Press militar",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "seated-military-press",
+   "animada": true
   },
   "Elevaciones laterales en máquina": {
-   "archivo": "imagenes/ejercicios/anim/elevaciones-laterales.webp",
+   "archivo": "imagenes/ejercicios/anim/elevaciones-laterales-ek.webp",
    "autor": "Everkinetic",
    "nombreEnWger": "Lateral Raises",
    "aliasDe": "Elevaciones laterales",
    "estatica": "imagenes/ejercicios/elevaciones-laterales.png",
-   "animada": true
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "lateral-dumbbell-raises"
   },
   "Pájaros en polea": {
-   "archivo": "imagenes/ejercicios/anim/pajaros-con-mancuernas.webp",
+   "archivo": "imagenes/ejercicios/anim/pajaros-con-mancuernas-ek.webp",
    "autor": "Everkinetic",
    "fuente": "everkinetic",
    "nombreEnFuente": "bent-over-rear-deltoid-raise-with-head-on-bench",
@@ -1626,47 +1730,61 @@
    "animada": true
   },
   "Pull apart en polea": {
-   "archivo": "imagenes/ejercicios/face-pull.webp",
-   "autor": "AlucardEvil40",
+   "archivo": "imagenes/munecos/face-pull.svg",
+   "autor": "dibujo propio de la app",
    "nombreEnWger": "Dumbbell Bent Over Face Pull",
-   "aliasDe": "Face pull"
+   "aliasDe": "Face pull",
+   "fuente": "propia"
   },
   "Remo abierto en polea": {
-   "archivo": "imagenes/ejercicios/anim/remo-en-polea.webp",
-   "autor": "technofer",
+   "archivo": "imagenes/ejercicios/anim/remo-en-polea-ek.webp",
+   "autor": "Everkinetic",
    "nombreEnWger": "Remo unilateral en polea",
    "aliasDe": "Remo en polea",
    "estatica": "imagenes/ejercicios/remo-en-polea.jpg",
-   "animada": true
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "seated-cable-rows"
   },
   "Jalón unilateral en polea": {
-   "archivo": "imagenes/ejercicios/jalon-al-pecho.png",
-   "autor": "Franpol",
+   "archivo": "imagenes/ejercicios/anim/jalon-al-pecho.webp",
+   "autor": "Everkinetic",
    "nombreEnWger": "Jalón al pecho con agarre neutro",
-   "aliasDe": "Jalón al pecho"
+   "aliasDe": "Jalón al pecho",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "underhand-pull-downs",
+   "animada": true
   },
   "Jalón tras nuca": {
-   "archivo": "imagenes/ejercicios/jalon-al-pecho.png",
-   "autor": "Franpol",
+   "archivo": "imagenes/ejercicios/anim/jalon-al-pecho.webp",
+   "autor": "Everkinetic",
    "nombreEnWger": "Jalón al pecho con agarre neutro",
-   "aliasDe": "Jalón al pecho"
+   "aliasDe": "Jalón al pecho",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "underhand-pull-downs",
+   "animada": true
   },
   "Dominadas tras nuca": {
-   "archivo": "imagenes/ejercicios/dominadas.jpg",
-   "autor": "Imobard",
+   "archivo": "imagenes/ejercicios/anim/dominadas.webp",
+   "autor": "Everkinetic",
    "nombreEnWger": "Dominadas",
-   "aliasDe": "Dominadas"
+   "aliasDe": "Dominadas",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "pull-ups",
+   "animada": true
   },
   "Remo unilateral en polea": {
-   "archivo": "imagenes/ejercicios/anim/remo-en-polea.webp",
-   "autor": "technofer",
+   "archivo": "imagenes/ejercicios/anim/remo-en-polea-ek.webp",
+   "autor": "Everkinetic",
    "nombreEnWger": "Remo unilateral en polea",
    "aliasDe": "Remo en polea",
    "estatica": "imagenes/ejercicios/remo-en-polea.jpg",
-   "animada": true
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "seated-cable-rows"
   },
   "Pullover con mancuerna": {
-   "archivo": "imagenes/ejercicios/anim/pullover-en-polea.webp",
+   "archivo": "imagenes/ejercicios/anim/pullover-en-polea-ek.webp",
    "autor": "Everkinetic",
    "fuente": "everkinetic",
    "nombreEnFuente": "straight-arm-push-down",
@@ -1675,7 +1793,7 @@
    "animada": true
   },
   "Pullover en máquina": {
-   "archivo": "imagenes/ejercicios/anim/pullover-en-polea.webp",
+   "archivo": "imagenes/ejercicios/anim/pullover-en-polea-ek.webp",
    "autor": "Everkinetic",
    "fuente": "everkinetic",
    "nombreEnFuente": "straight-arm-push-down",
@@ -1684,23 +1802,27 @@
    "animada": true
   },
   "Encogimientos de trapecio con barra": {
-   "archivo": "imagenes/ejercicios/anim/encogimientos-de-trapecio.webp",
+   "archivo": "imagenes/ejercicios/anim/encogimientos-de-trapecio-ek.webp",
    "autor": "Everkinetic",
    "nombreEnWger": "Encogimientos de hombros con mancuernas",
    "aliasDe": "Encogimientos de trapecio",
    "estatica": "imagenes/ejercicios/encogimientos-de-trapecio.png",
-   "animada": true
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "barbell-shrugs"
   },
   "Press de banca en multipower": {
-   "archivo": "imagenes/ejercicios/anim/press-de-banca.webp",
+   "archivo": "imagenes/ejercicios/anim/press-de-banca-ek.webp",
    "autor": "Everkinetic",
    "nombreEnWger": "Press de Banca",
    "aliasDe": "Press de banca",
    "estatica": "imagenes/ejercicios/press-de-banca.png",
-   "animada": true
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "bench-press"
   },
   "Press unilateral en polea": {
-   "archivo": "imagenes/ejercicios/anim/cruces-en-polea.webp",
+   "archivo": "imagenes/ejercicios/anim/cruces-en-polea-ek.webp",
    "autor": "Everkinetic",
    "fuente": "everkinetic",
    "nombreEnFuente": "cable-crossover",
@@ -1709,7 +1831,7 @@
    "animada": true
   },
   "Cruces en polea baja": {
-   "archivo": "imagenes/ejercicios/anim/cruces-en-polea.webp",
+   "archivo": "imagenes/ejercicios/anim/cruces-en-polea-ek.webp",
    "autor": "Everkinetic",
    "fuente": "everkinetic",
    "nombreEnFuente": "cable-crossover",
@@ -1718,7 +1840,7 @@
    "animada": true
   },
   "Cruces en polea sentado": {
-   "archivo": "imagenes/ejercicios/anim/cruces-en-polea.webp",
+   "archivo": "imagenes/ejercicios/anim/cruces-en-polea-ek.webp",
    "autor": "Everkinetic",
    "fuente": "everkinetic",
    "nombreEnFuente": "cable-crossover",
@@ -1727,31 +1849,43 @@
    "animada": true
   },
   "Fondos de pecho": {
-   "archivo": "imagenes/ejercicios/fondos-de-triceps.png",
-   "autor": "Franpol",
+   "archivo": "imagenes/ejercicios/anim/fondos-de-triceps.webp",
+   "autor": "Everkinetic",
    "nombreEnWger": "Fondos",
-   "aliasDe": "Fondos de tríceps"
+   "aliasDe": "Fondos de tríceps",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "chest-dips",
+   "animada": true
   },
   "Peso muerto piernas rígidas": {
-   "archivo": "imagenes/ejercicios/peso-muerto-rumano.png",
-   "autor": "wger",
+   "archivo": "imagenes/ejercicios/anim/peso-muerto-rumano.webp",
+   "autor": "Everkinetic",
    "nombreEnWger": "Peso muerto rumano con barra",
-   "aliasDe": "Peso muerto rumano"
+   "aliasDe": "Peso muerto rumano",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "romanian-dead-lift",
+   "animada": false
   },
   "Curl femoral de pie": {
-   "archivo": "imagenes/ejercicios/curl-femoral-tumbado.png",
-   "autor": "Franpol",
+   "archivo": "imagenes/ejercicios/anim/curl-femoral-tumbado.webp",
+   "autor": "Everkinetic",
    "nombreEnWger": "Curl femoral",
-   "aliasDe": "Curl femoral tumbado"
+   "aliasDe": "Curl femoral tumbado",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "lying-leg-curl-machine",
+   "animada": true
   },
   "Hip thrust en máquina": {
-   "archivo": "imagenes/ejercicios/hip-thrust.webp",
-   "autor": "AlucardEvil40",
+   "archivo": "imagenes/ejercicios/anim/hip-thrust.webp",
+   "autor": "Everkinetic",
    "nombreEnWger": "Dumbbell Hip Thrust",
-   "aliasDe": "Hip thrust"
+   "aliasDe": "Hip thrust",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "bridging",
+   "animada": true
   },
   "Hiperextensiones inversas": {
-   "archivo": "imagenes/ejercicios/anim/hiperextensiones.webp",
+   "archivo": "imagenes/ejercicios/anim/hiperextensiones-ek.webp",
    "autor": "Everkinetic",
    "fuente": "everkinetic",
    "nombreEnFuente": "hyperextensions",
@@ -1760,26 +1894,33 @@
    "animada": true
   },
   "Pull through en polea": {
-   "archivo": "imagenes/ejercicios/peso-muerto-rumano.png",
-   "autor": "wger",
+   "archivo": "imagenes/ejercicios/anim/peso-muerto-rumano.webp",
+   "autor": "Everkinetic",
    "nombreEnWger": "Peso muerto rumano con barra",
-   "aliasDe": "Peso muerto rumano"
+   "aliasDe": "Peso muerto rumano",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "romanian-dead-lift",
+   "animada": false
   },
   "Crunch en suelo": {
-   "archivo": "imagenes/ejercicios/anim/crunch-abdominal.webp",
-   "autor": "wger",
+   "archivo": "imagenes/ejercicios/anim/crunch-abdominal-ek.webp",
+   "autor": "Everkinetic",
    "nombreEnWger": "Abdominal",
    "aliasDe": "Crunch abdominal",
    "estatica": "imagenes/ejercicios/crunch-abdominal.png",
-   "animada": true
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "crunches"
   },
   "Crunch lastrado": {
-   "archivo": "imagenes/ejercicios/anim/crunch-abdominal.webp",
-   "autor": "wger",
+   "archivo": "imagenes/ejercicios/anim/crunch-abdominal-ek.webp",
+   "autor": "Everkinetic",
    "nombreEnWger": "Abdominal",
    "aliasDe": "Crunch abdominal",
    "estatica": "imagenes/ejercicios/crunch-abdominal.png",
-   "animada": true
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "crunches"
   },
   "Plancha dinámica": {
    "archivo": "imagenes/ejercicios/anim/plancha.webp",
@@ -1810,18 +1951,20 @@
    "aliasDe": "Paseo del granjero"
   },
   "Escalador": {
-   "archivo": "imagenes/munecos/eliptica.svg",
+   "archivo": "imagenes/munecos/mountain-climbers.svg",
    "autor": "dibujo propio de la app",
    "fuente": "propia",
-   "aliasDe": "Elíptica"
+   "aliasDe": "Mountain climbers"
   },
   "Press convergente en máquina": {
-   "archivo": "imagenes/ejercicios/anim/press-de-banca.webp",
+   "archivo": "imagenes/ejercicios/anim/press-de-banca-ek.webp",
    "autor": "Everkinetic",
    "nombreEnWger": "Press de Banca",
    "aliasDe": "Press de banca",
    "estatica": "imagenes/ejercicios/press-de-banca.png",
-   "animada": true
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "bench-press"
   },
   "Peso muerto con mancuernas": {
    "archivo": "imagenes/ejercicios/anim/peso-muerto-con-mancuernas.webp",
@@ -1832,18 +1975,23 @@
    "nombreEnFuente": "dumbbell-dead-lifts"
   },
   "Sentadilla con salto": {
-   "archivo": "imagenes/ejercicios/anim/sentadilla.webp",
-   "autor": "philip",
+   "archivo": "imagenes/ejercicios/anim/sentadilla-ek.webp",
+   "autor": "Everkinetic",
    "nombreEnWger": "Sentadilla con disco",
    "aliasDe": "Sentadilla",
    "estatica": "imagenes/ejercicios/sentadilla.jpeg",
-   "animada": true
+   "animada": false,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "barbell-squat"
   },
   "Zancadas con salto": {
-   "archivo": "imagenes/ejercicios/zancadas.png",
-   "autor": "Franpol",
+   "archivo": "imagenes/ejercicios/anim/zancadas.webp",
+   "autor": "Everkinetic",
    "nombreEnWger": "Zancadas con peso",
-   "aliasDe": "Zancadas"
+   "aliasDe": "Zancadas",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "dumbbell-lunges",
+   "animada": false
   },
   "Salto vertical": {
    "archivo": "imagenes/munecos/saltos-al-cajon.svg",
@@ -1864,16 +2012,22 @@
    "aliasDe": "Saltos al cajón"
   },
   "Flexiones con palmada": {
-   "archivo": "imagenes/ejercicios/flexiones.png",
-   "autor": "Settebello",
+   "archivo": "imagenes/ejercicios/anim/flexiones.webp",
+   "autor": "Everkinetic",
    "nombreEnWger": "Push-Up",
-   "aliasDe": "Flexiones"
+   "aliasDe": "Flexiones",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "push-ups",
+   "animada": true
   },
   "Fondos en paralelas con lastre": {
-   "archivo": "imagenes/ejercicios/fondos-de-triceps.png",
-   "autor": "Franpol",
+   "archivo": "imagenes/ejercicios/anim/fondos-de-triceps.webp",
+   "autor": "Everkinetic",
    "nombreEnWger": "Fondos",
-   "aliasDe": "Fondos de tríceps"
+   "aliasDe": "Fondos de tríceps",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "chest-dips",
+   "animada": true
   },
   "Fondos en paralelas negativos": {
    "archivo": "imagenes/ejercicios/anim/fondos-en-paralelas-negativos.webp",
@@ -1881,13 +2035,16 @@
    "estatica": "imagenes/ejercicios/fondos-de-triceps.png",
    "animada": true,
    "fuente": "everkinetic",
-   "nombreEnFuente": "tricep-dips"
+   "nombreEnFuente": "chest-dips"
   },
   "Dominadas con lastre": {
-   "archivo": "imagenes/ejercicios/dominadas.jpg",
-   "autor": "Imobard",
+   "archivo": "imagenes/ejercicios/anim/dominadas.webp",
+   "autor": "Everkinetic",
    "nombreEnWger": "Dominadas",
-   "aliasDe": "Dominadas"
+   "aliasDe": "Dominadas",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "pull-ups",
+   "animada": true
   },
   "Dominadas negativas": {
    "archivo": "imagenes/ejercicios/anim/dominadas-negativas.webp",
@@ -1898,13 +2055,16 @@
    "nombreEnFuente": "pull-ups"
   },
   "Flexiones con lastre": {
-   "archivo": "imagenes/ejercicios/flexiones.png",
-   "autor": "Settebello",
+   "archivo": "imagenes/ejercicios/anim/flexiones.webp",
+   "autor": "Everkinetic",
    "nombreEnWger": "Push-Up",
-   "aliasDe": "Flexiones"
+   "aliasDe": "Flexiones",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "push-ups",
+   "animada": true
   },
   "Pájaro a una mano": {
-   "archivo": "imagenes/ejercicios/anim/pajaros-con-mancuernas.webp",
+   "archivo": "imagenes/ejercicios/anim/pajaros-con-mancuernas-ek.webp",
    "autor": "Everkinetic",
    "fuente": "everkinetic",
    "nombreEnFuente": "bent-over-rear-deltoid-raise-with-head-on-bench",
@@ -1913,12 +2073,14 @@
    "animada": true
   },
   "Gemelo de pie con barra": {
-   "archivo": "imagenes/ejercicios/anim/elevacion-de-gemelos.webp",
-   "autor": "clafal",
+   "archivo": "imagenes/ejercicios/anim/elevacion-de-gemelos-ek.webp",
+   "autor": "Everkinetic",
    "nombreEnWger": "Elevación de talón de pie",
    "aliasDe": "Elevación de gemelos",
    "estatica": "imagenes/ejercicios/elevacion-de-gemelos.jpeg",
-   "animada": true
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "standing-calf-raises-using-machine"
   },
   "Elevación de piernas colgado": {
    "archivo": "imagenes/munecos/elevacion-de-piernas-colgado.svg",
@@ -1936,6 +2098,81 @@
    "nombreEnWger": "Elevaciones de piernas tumbado",
    "estatica": "imagenes/ejercicios/elevaciones-de-piernas.png",
    "animada": true
+  },
+  "Cinta de correr": {
+   "archivo": "imagenes/munecos/cinta-de-correr.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Bicicleta estática": {
+   "archivo": "imagenes/munecos/bicicleta-estatica.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Spinning": {
+   "archivo": "imagenes/munecos/spinning.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Cinta de andar en cuesta": {
+   "archivo": "imagenes/munecos/cinta-de-andar-en-cuesta.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Escalera sin fin": {
+   "archivo": "imagenes/munecos/escalera-sin-fin.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Esquí de fondo (máquina)": {
+   "archivo": "imagenes/munecos/esqui-de-fondo-maquina.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Patinaje": {
+   "archivo": "imagenes/munecos/patinaje.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Baile": {
+   "archivo": "imagenes/munecos/baile.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Sprints": {
+   "archivo": "imagenes/munecos/sprints.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Trineo (empujar)": {
+   "archivo": "imagenes/munecos/trineo-empujar.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Battle ropes": {
+   "archivo": "imagenes/munecos/battle-ropes.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Air squat": {
+   "archivo": "imagenes/munecos/air-squat.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Mountain climbers": {
+   "archivo": "imagenes/munecos/mountain-climbers.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Kettlebell swing": {
+   "archivo": "imagenes/munecos/kettlebell-swing.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
+  },
+  "Lanzamiento de balón medicinal": {
+   "archivo": "imagenes/munecos/lanzamiento-de-balon-medicinal.svg",
+   "autor": "dibujo propio de la app",
+   "fuente": "propia"
   }
  }
 }

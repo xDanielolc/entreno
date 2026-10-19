@@ -824,3 +824,40 @@ la línea de la necesidad) y de pulso. Tema «Sueño y rendimiento» en la
 bibliografía. Pendiente: fase B (PVT de 3 min, Karolinska, Epworth, línea
 base, semáforo, enlace con «¿Voy hoy?») y fase C (cama ampliada, adelanto de
 fase), tras probar la A.
+
+## Ronda 0.53.0 (19-10-2026): presentación, calentamiento y dibujos
+
+- Presentación en `web/js/presentacion.js`: los sonidos salen de una tabla
+  por variante calculada de los fotogramas clave del CSS, se programan con el
+  reloj del audio desde lo que lleva la animación y descontando la latencia
+  del altavoz (`outputLatency` + `baseLatency`); lo que ya pasó no suena.
+  Se repite al volver a la app tras más de 20 min fuera (si el móvil la
+  guardaba en segundo plano, abrirla desde el icono no la arrancaba).
+- Iconos renombrados a `icono-v2-*.png`: con otra dirección, Chrome nota el
+  cambio y actualiza el icono instalado (puede tardar un día o dos; si no,
+  quitar y volver a instalar).
+- `planesDeItem` respeta el orden del día de la rutina (al actualizar a la
+  v3 los calentamientos quedaban al final). Los calentamientos previstos
+  (`calentamientoPrevisto`: tipo calentamiento con plan de calentamiento)
+  van en una franja de botones «50 kg × 8» encima de la primera serie de
+  trabajo; no cuentan en «Serie 2 de 5» ni en los puntitos. «Cambiar pesos»
+  los abre como series normales. `sesion.vista.serie` es ahora la posición
+  entre las series de trabajo (`trabajoDe`).
+- Pasar de serie ya no sube a la foto: se coloca en «Serie N de M».
+- «Programar series» sin puntos suspensivos; en el entreno el asistente
+  pregunta «¿Estas series nuevas llevan progresión?» y avisa de que las que
+  ya tienes siguen igual.
+- Dibujos: `animar_imagenes.py` tiene ahora una tabla (`FORZADOS`) con el
+  dibujo de Everkinetic elegido a mano para ~85 ejercicios (revisión hoja a
+  hoja), con «solo-final»/«solo-inicio» donde el original corta una postura
+  (sentadillas, zancadas, peso muerto). Fuera los de wger con aspecto de
+  webs comerciales (marcas de agua, músculos en rojo). Los alias copian la
+  imagen de su base. `dibujar_munecos.py`: SVG con dos posturas que se
+  alternan (SMIL, funciona en `<img>`), segunda postura para 40 muñecos con
+  movimiento (yoga y estiramientos se quedan quietos: se aguantan), y 18
+  muñecos nuevos (cardio sin imagen, face pull, curl de muñeca, press
+  pallof). Almacén de imágenes `entreno-imagenes-10`.
+- Pendiente de imágenes: abducción en polea (el dibujo es de la máquina),
+  aperturas de pecho, flexiones en pica/pino y elevaciones laterales en polea
+  siguen sin animar; el estilo único para todo (tema «Cartoon») sigue
+  encargado a Design.

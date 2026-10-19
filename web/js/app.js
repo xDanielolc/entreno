@@ -23,6 +23,7 @@ import { vistaPruebaBotones } from './vistas/prueba-botones.js';
 import { vistaPruebaPresentacion } from './vistas/prueba-presentacion.js';
 import { vistaGuiaEstilo } from './vistas/guia-estilo.js';
 import { aplicarTema } from './vistas/cuestionario.js';
+import { mostrarPresentacion, repetirAlVolver } from './presentacion.js';
 
 // La última pantalla se recuerda: si el móvil cierra la app en mitad de un
 // entrenamiento, al volver se abre donde estabas.
@@ -66,55 +67,9 @@ const PESTANAS = [
 ];
 
 document.querySelector('.marca-app')?.prepend(icono('marca'));
-// La presentación se quita sola al acabar (o antes, con un toque).
-{
-  const presentacion = document.getElementById('presentacion');
-  if (presentacion) {
-    const quitar = () => presentacion.remove();
-    presentacion.addEventListener('click', quitar, { once: true });
-    setTimeout(quitar, 2850);
-    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) sonidosPresentacion();
-  }
-}
-
-// Los botes y el golpe de la caja, sintetizados (sin archivos). El navegador
-// solo deja sonar si ya has tocado la app alguna vez; si no, se queda mudo.
-function sonidosPresentacion() {
-  let audio;
-  try { audio = new AudioContext(); } catch { return; }
-  const bote = (t, tono) => {
-    const o = audio.createOscillator(); const v = audio.createGain();
-    o.type = 'sine';
-    o.frequency.setValueAtTime(tono * 0.6, audio.currentTime + t);
-    o.frequency.exponentialRampToValueAtTime(tono, audio.currentTime + t + 0.06);
-    o.frequency.exponentialRampToValueAtTime(tono * 0.8, audio.currentTime + t + 0.16);
-    v.gain.setValueAtTime(0.0001, audio.currentTime + t);
-    v.gain.exponentialRampToValueAtTime(0.18, audio.currentTime + t + 0.015);
-    v.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + t + 0.18);
-    o.connect(v).connect(audio.destination); o.start(audio.currentTime + t); o.stop(audio.currentTime + t + 0.2);
-  };
-  const golpe = (t) => {
-    const o = audio.createOscillator(); const v = audio.createGain();
-    o.type = 'triangle';
-    o.frequency.setValueAtTime(150, audio.currentTime + t);
-    o.frequency.exponentialRampToValueAtTime(55, audio.currentTime + t + 0.18);
-    v.gain.setValueAtTime(0.0001, audio.currentTime + t);
-    v.gain.exponentialRampToValueAtTime(0.35, audio.currentTime + t + 0.01);
-    v.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + t + 0.25);
-    o.connect(v).connect(audio.destination); o.start(audio.currentTime + t); o.stop(audio.currentTime + t + 0.3);
-  };
-  const sonar = () => {
-    if (audio.state !== 'running') return;
-    // Al compás de la animación, que empezó al pintarse la página.
-    const ya = (document.querySelector('#presentacion .pesa')?.getAnimations?.()[0]?.currentTime ?? 0) / 1000;
-    const en = (t, fn, ...x) => { if (t - ya >= 0) fn(t - ya, ...x); };
-    en(0.28, bote, 520); en(0.6, bote, 600); en(0.88, bote, 680); en(1.33, golpe); en(1.82, golpe);
-    setTimeout(() => audio.close(), 2500);
-  };
-  if (audio.state === 'running') sonar();
-  else audio.resume().then(sonar).catch(() => {});
-  setTimeout(() => { if (audio.state !== 'running') audio.close().catch(() => {}); }, 400);
-}
+// La presentación: al arrancar y al volver tras un buen rato fuera.
+mostrarPresentacion();
+repetirAlVolver();
 const principal = document.getElementById('vista');
 const navegacion = document.getElementById('navegacion');
 const indicador = document.getElementById('estado-sincronizacion');
@@ -292,7 +247,7 @@ async function guardarImagenesParaSinConexion() {
     const capas = Object.entries(MUSCULOS).flatMap(([clave, m]) => m.vistas.map((v) => archivoCapa(clave, v)));
     const cuerpo = ['imagenes/musculos/cuerpo-delante.svg', 'imagenes/musculos/cuerpo-detras.svg'];
     // El mismo nombre que CACHE_IMAGENES en sw.js: si no, el service worker lo borra.
-    const cache = await caches.open('entreno-imagenes-9');
+    const cache = await caches.open('entreno-imagenes-10');
     for (const ruta of [...cuerpo, ...capas, ...mios]) {
       if (!(await cache.match(ruta, { ignoreSearch: true }))) {
         const r = await fetch(ruta).catch(() => null);

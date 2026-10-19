@@ -99,39 +99,45 @@ def dibujar_objeto(o, j):
     raise ValueError(tipo)
 
 
-def svg_de(p):
-    j = p["j"]
-    xs = [x for x, _ in j.values()]
-    ys = [y for _, y in j.values()]
-    # Los objetos también cuentan para el encuadre.
-    for o in p["objetos"]:
-        if o[0] == "linea":
-            xs += [o[1][0], o[2][0]]; ys += [o[1][1], o[2][1]]
-        elif o[0] == "caja":
-            xs += [o[1], o[1] + o[3]]; ys += [o[2], o[2] + o[4]]
-        elif o[0] == "cuerda":
-            xs.append(o[2][0]); ys.append(o[2][1])
-        elif o[0] == "rodillo":
-            xs += [o[1] - 5, o[1] + 5]; ys += [o[2] - 5, o[2] + 5]
-        elif o[0] == "corazon":
-            s = o[3] if len(o) > 3 else 1
-            xs += [o[1] - 11 * s, o[1] + 11 * s]; ys += [o[2] - 15 * s, o[2] + 5 * s]
+def encuadre(poses):
+    """Caja común a todas las posturas (para que no salte al cambiar)."""
+    xs, ys = [], []
+    for p in poses:
+        j = p["j"]
+        xs += [x for x, _ in j.values()]
+        ys += [y for _, y in j.values()]
+        # Los objetos también cuentan para el encuadre.
+        for o in p["objetos"]:
+            if o[0] == "linea":
+                xs += [o[1][0], o[2][0]]; ys += [o[1][1], o[2][1]]
+            elif o[0] == "caja":
+                xs += [o[1], o[1] + o[3]]; ys += [o[2], o[2] + o[4]]
+            elif o[0] == "cuerda":
+                xs.append(o[2][0]); ys.append(o[2][1])
+            elif o[0] == "rodillo":
+                xs += [o[1] - 5, o[1] + 5]; ys += [o[2] - 5, o[2] + 5]
+            elif o[0] == "corazon":
+                s = o[3] if len(o) > 3 else 1
+                xs += [o[1] - 11 * s, o[1] + 11 * s]; ys += [o[2] - 15 * s, o[2] + 5 * s]
+            elif o[0] in ("mancuerna", "disco"):
+                m = j[o[1]]
+                xs += [m[0] - 8, m[0] + 8]; ys += [m[1] - 8, m[1] + 8]
     suelo_y = max(ys) + 4
     minx, maxx = min(xs) - 10, max(xs) + 10
     miny, maxy = min(ys) - 10, suelo_y + 4
     lado = max(maxx - minx, maxy - miny)
     cx, cy = (minx + maxx) / 2, (miny + maxy) / 2
-    caja = f"{cx - lado / 2:.1f} {cy - lado / 2:.1f} {lado:.1f} {lado:.1f}"
+    return cx, cy, lado, suelo_y
+
+
+def figura(p):
+    j = p["j"]
 
     def seg(a, b, color, w):
         return (f'<line x1="{j[a][0]:.1f}" y1="{j[a][1]:.1f}" x2="{j[b][0]:.1f}" y2="{j[b][1]:.1f}" '
                 f'stroke="{color}" stroke-width="{w}" stroke-linecap="round"/>')
 
-    partes = []
-    if p["suelo"]:
-        partes.append(f'<line x1="{cx - lado / 2 + 4:.1f}" y1="{suelo_y:.1f}" x2="{cx + lado / 2 - 4:.1f}" y2="{suelo_y:.1f}" '
-                      f'stroke="{OBJETO}" stroke-width="1.5" opacity=".6"/>')
-    partes += [dibujar_objeto(o, j) for o in p["objetos"] if o[0] in ("caja", "linea", "rodillo", "arco")]
+    partes = [dibujar_objeto(o, j) for o in p["objetos"] if o[0] in ("caja", "linea", "rodillo", "arco")]
     for n, color in (("2", LEJOS),):
         partes += [seg("hombro", "codo" + n, color, 6), seg("codo" + n, "mano" + n, color, 5.5),
                    seg("cadera", "rodilla" + n, color, 7), seg("rodilla" + n, "tobillo" + n, color, 6),
@@ -144,8 +150,28 @@ def svg_de(p):
     # (brazos arriba) no la tapan.
     partes.append(f'<circle cx="{hx:.1f}" cy="{hy:.1f}" r="{CABEZA}" fill="{CERCA}" stroke="#fff" stroke-width="1.5"/>')
     partes += [dibujar_objeto(o, j) for o in p["objetos"] if o[0] not in ("caja", "linea", "rodillo", "arco")]
-    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{caja}">'
-            + "".join(partes) + "</svg>\n")
+    return "".join(partes)
+
+
+# Con dos posturas, el SVG las alterna (como los dibujos animados de
+# Everkinetic): una se ve y la otra no, cada 0,9 s. Funciona dentro de <img>.
+CAMBIO = "1.8s"
+
+
+def svg_de(*poses):
+    cx, cy, lado, suelo_y = encuadre(poses)
+    caja = f"{cx - lado / 2:.1f} {cy - lado / 2:.1f} {lado:.1f} {lado:.1f}"
+    suelo = (f'<line x1="{cx - lado / 2 + 4:.1f}" y1="{suelo_y:.1f}" x2="{cx + lado / 2 - 4:.1f}" y2="{suelo_y:.1f}" '
+             f'stroke="{OBJETO}" stroke-width="1.5" opacity=".6"/>') if poses[0]["suelo"] else ""
+    if len(poses) == 1:
+        return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{caja}">{suelo}{figura(poses[0])}</svg>\n'
+    grupos = []
+    for k, p in enumerate(poses):
+        valores = "visible;hidden" if k == 0 else "hidden;visible"
+        grupos.append(f'<g visibility="{"visible" if k == 0 else "hidden"}">'
+                      f'<animate attributeName="visibility" values="{valores}" dur="{CAMBIO}" calcMode="discrete" repeatCount="indefinite"/>'
+                      f'{figura(p)}</g>')
+    return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{caja}">{suelo}{"".join(grupos)}</svg>\n'
 
 
 # --- Posturas base ---------------------------------------------------------
@@ -163,6 +189,26 @@ def P(base=None, **k):
 
 MUNECOS = {
     # --- Fuerza y core que faltan ------------------------------------------
+    # --- Cardio y potencia sin imagen (19-10-2026) ---------------------------
+    "Cinta de correr": P(t=-80, a1=(60, -30), a2=(130, 60), l1=(30, 120, 0), l2=(125, 60, 20), objetos=[("caja", -34, 40, 74, 5), ("linea", (36, 40), (44, -24))]),
+    "Cinta de andar en cuesta": P(DE_PIE, t=-82, a1=(70, 100), a2=(115, 85), l1=(60, 105, -10), l2=(110, 85, -10), objetos=[("linea", (-34, 46), (40, 36)), ("linea", (40, 36), (46, -26))]),
+    "Bicicleta estática": P(t=-60, a1=(30, 50), a2=(35, 55), l1=(20, 100, 0), l2=(70, 110, 0), suelo=False, objetos=[("disco", "tobillo1", 1), ("linea", (-5, 3), (30, -18))]),
+    "Spinning": P(t=-35, a1=(25, 45), a2=(30, 50), l1=(20, 100, 0), l2=(70, 110, 0), suelo=False, objetos=[("disco", "tobillo1", 1), ("linea", (-5, 3), (30, -18))]),
+    "Escalera sin fin": P(DE_PIE, t=-85, a1=(60, 100), a2=(120, 80), l1=(20, 90, 0), l2=(110, 80, 0), objetos=[("caja", 4, 20, 20, 19), ("caja", 24, 8, 20, 31)]),
+    "Esquí de fondo (máquina)": P(DE_PIE, t=-75, a1=(-40, -70), a2=(110, 130), l1=(60, 100, 0), l2=(115, 80, 0)),
+    "Patinaje": P(t=-45, a1=(130, 160), a2=(60, 20), l1=(60, 120, 0), l2=(150, 160, 160)),
+    "Baile": P(DE_PIE, a1=(-130, -150), a2=(40, 100), l1=(70, 100, 0), l2=(105, 80, 0)),
+    "Sprints": P(t=-65, a1=(50, -40), a2=(140, 70), l1=(20, 110, 0), l2=(135, 50, 30)),
+    "Trineo (empujar)": P(t=-30, a1=(-5, -5), a2=(0, 0), l1=(70, 120, 0), l2=(140, 100, 0), objetos=[("caja", 34, 20, 26, 22)]),
+    "Battle ropes": P(t=-75, a1=(30, -10), a2=(35, -5), l1=(30, 110, 0), l2=(40, 115, 0), objetos=[("cuerda", "mano1", (70, 38))]),
+    "Air squat": P(t=-90, a1=(0, 0), a2=(5, 5), l1=(90, 90, 0)),
+    "Mountain climbers": P(t=-5, a1=(90, 90), a2=(92, 92), l1=(-130, 130, 90), l2=(175, 178, 90)),
+    "Kettlebell swing": P(t=-30, a1=(95, 95), a2=(98, 98), l1=(70, 100, 0), l2=(75, 98, 0), objetos=[("disco", "mano1", 5)]),
+    "Lanzamiento de balón medicinal": P(DE_PIE, t=-95, a1=(-110, -130), a2=(-105, -125), l1=(80, 95, 0), l2=(100, 85, 0), objetos=[("disco", "mano1", 7)]),
+    "Face pull": P(DE_PIE, a1=(-12, -8), a2=(-8, -4), l1=(85, 92, 0), l2=(98, 88, 0), objetos=[("cuerda", "mano1", (62, -40))]),
+    "Curl de muñeca": P(t=-65, a1=(65, 0), a2=(68, 2), l1=(0, 90, 0), l2=(4, 92, 0),
+                        objetos=[("caja", -14, 0, 34, 7), ("mancuerna", "mano1")]),
+    "Press pallof": P(DE_PIE, a1=(70, -70), a2=(74, -66), l1=(80, 95, 0), l2=(100, 85, 0), objetos=[("cuerda", "mano1", (-40, -22))]),
     "Press Arnold": P(DE_PIE, a1=(-70, -95), a2=(-75, -90), l1=(0, 90, 0), objetos=[("caja", -10, 2, 22, 8), ("mancuerna", "mano1"), ("mancuerna", "mano2")]),
     "Remo con barra": P(t=-25, a1=(110, 70), a2=(115, 75), l1=(100, 80, 0), objetos=[("disco", "mano1", 7)]),
     "Extensión de muñeca": P(DE_PIE, t=-80, l1=(0, 90, 0), a1=(60, 0), a2=(70, 10), objetos=[("caja", -10, 2, 20, 8), ("mancuerna", "mano1")]),
@@ -342,6 +388,63 @@ YOGA = {
 }
 
 
+# La otra postura de cada ejercicio con movimiento.
+SEGUNDA = {
+    "Cinta de correr": P(t=-80, a1=(130, 60), a2=(60, -30), l1=(125, 60, 20), l2=(30, 120, 0), objetos=[("caja", -34, 40, 74, 5), ("linea", (36, 40), (44, -24))]),
+    "Cinta de andar en cuesta": P(DE_PIE, t=-82, a1=(115, 85), a2=(70, 100), l1=(110, 85, -10), l2=(60, 105, -10), objetos=[("linea", (-34, 46), (40, 36)), ("linea", (40, 36), (46, -26))]),
+    "Bicicleta estática": P(t=-60, a1=(30, 50), a2=(35, 55), l1=(70, 110, 0), l2=(20, 100, 0), suelo=False, objetos=[("disco", "tobillo1", 1), ("linea", (-5, 3), (30, -18))]),
+    "Spinning": P(t=-35, a1=(25, 45), a2=(30, 50), l1=(70, 110, 0), l2=(20, 100, 0), suelo=False, objetos=[("disco", "tobillo1", 1), ("linea", (-5, 3), (30, -18))]),
+    "Escalera sin fin": P(DE_PIE, t=-85, a1=(120, 80), a2=(60, 100), l1=(110, 80, 0), l2=(20, 90, 0), objetos=[("caja", 4, 20, 20, 19), ("caja", 24, 8, 20, 31)]),
+    "Escaleras": P(DE_PIE, t=-85, a1=(120, 80), a2=(60, 100), l1=(110, 80, 0), l2=(20, 90, 0), objetos=[("caja", 4, 20, 20, 19), ("caja", 24, 8, 20, 31)]),
+    "Bicicleta": P(t=-45, a1=(35, 60), a2=(40, 65), l1=(70, 110, 0), l2=(20, 100, 0), suelo=False, objetos=[("disco", "tobillo1", 1), ("linea", (-5, 3), (30, -18))]),
+    "Esquí de fondo (máquina)": P(DE_PIE, t=-75, a1=(110, 130), a2=(-40, -70), l1=(115, 80, 0), l2=(60, 100, 0)),
+    "Patinaje": P(t=-45, a1=(60, 20), a2=(130, 160), l1=(150, 160, 160), l2=(60, 120, 0)),
+    "Baile": P(DE_PIE, a1=(40, 100), a2=(-130, -150), l1=(105, 80, 0), l2=(70, 100, 0)),
+    "Sprints": P(t=-65, a1=(140, 70), a2=(50, -40), l1=(135, 50, 30), l2=(20, 110, 0)),
+    "Trineo (empujar)": P(t=-30, a1=(-5, -5), a2=(0, 0), l1=(140, 100, 0), l2=(70, 120, 0), objetos=[("caja", 34, 20, 26, 22)]),
+    "Battle ropes": P(t=-75, a1=(60, 40), a2=(65, 45), l1=(30, 110, 0), l2=(40, 115, 0), objetos=[("cuerda", "mano1", (70, 38))]),
+    "Air squat": P(t=-60, a1=(0, 0), a2=(5, 5), l1=(5, 110, 0), l2=(10, 112, 0)),
+    "Mountain climbers": P(t=-5, a1=(90, 90), a2=(92, 92), l1=(175, 178, 90), l2=(-130, 130, 90)),
+    "Kettlebell swing": P(DE_PIE, a1=(0, 0), a2=(4, 4), objetos=[("disco", "mano1", 5)]),
+    "Lanzamiento de balón medicinal": P(DE_PIE, t=-80, a1=(-20, -20), a2=(-15, -15), l1=(70, 100, 0), l2=(110, 85, 0), objetos=[("disco", "mano1", 7)]),
+    "Face pull": P(DE_PIE, a1=(-35, 180), a2=(-30, 185), l1=(85, 92, 0), l2=(98, 88, 0), objetos=[("cuerda", "mano1", (62, -40))]),
+    "Curl de muñeca": P(t=-65, a1=(65, -25), a2=(68, -22), l1=(0, 90, 0), l2=(4, 92, 0),
+                        objetos=[("caja", -14, 0, 34, 7), ("mancuerna", "mano1")]),
+    "Press pallof": P(DE_PIE, a1=(0, 0), a2=(4, 4), l1=(80, 95, 0), l2=(100, 85, 0), objetos=[("cuerda", "mano1", (-40, -22))]),
+    "Press Arnold": P(DE_PIE, a1=(-92, -92), a2=(-88, -88), l1=(0, 90, 0), objetos=[("caja", -10, 2, 22, 8), ("mancuerna", "mano1"), ("mancuerna", "mano2")]),
+    "Extensión de muñeca": P(DE_PIE, t=-80, l1=(0, 90, 0), a1=(60, -25), a2=(70, -15), objetos=[("caja", -10, 2, 20, 8), ("mancuerna", "mano1")]),
+    "Paseo del granjero": P(DE_PIE, a1=(90, 90), l1=(110, 80, 0), l2=(70, 100, 0), objetos=[("mancuerna", "mano1"), ("mancuerna", "mano2")]),
+    "Sentadilla a una pierna": P(t=-88, a1=(15, 15), l1=(90, 90, 0), l2=(20, 60, -30)),
+    "Curl nórdico": P(t=-90, a1=(90, 90), l1=(90, 180, 90), l2=(92, 180, 90)),
+    "Elevación de piernas colgado": P(DE_PIE, a1=(-90, -90), a2=(-95, -92), l1=(88, 90, 0), l2=(92, 92, 0), suelo=False,
+                                      objetos=[("linea", (-14, -64), (14, -64))]),
+    "Elevación de rodillas colgado": P(DE_PIE, a1=(-90, -90), a2=(-95, -92), l1=(88, 90, 0), l2=(92, 92, 0), suelo=False,
+                                       objetos=[("linea", (-14, -64), (14, -64))]),
+    "Elevación de tibiales": P(DE_PIE, t=-95, l1=(100, 95, 0), objetos=[("linea", (-9, -45), (-9, 44))]),
+    "Bicho muerto": P(TUMBADO_ARRIBA, a1=(190, 180), a2=(-90, -90), l1=(-10, -5, -40), l2=(-90, 0, -60)),
+    "Pájaro-perro": P(CUADRUPEDIA, a2=(85, 90), l2=(85, 180, 180)),
+    "Leñador en polea": P(DE_PIE, t=-85, a1=(120, 120), a2=(125, 125), l1=(80, 95, 0), l2=(100, 88, 0), objetos=[("cuerda", "mano1", (-35, -70))]),
+    "Giros rusos": P(t=-115, a1=(-15, -25), l1=(-30, 25, 0), l2=(-25, 30, 0), objetos=[("disco", "mano1", 5)]),
+    "Comba": P(DE_PIE, a1=(100, 10), a2=(105, 15), l1=(88, 95, 25), objetos=[("comba",)]),
+    "Boxeo": P(DE_PIE, t=-85, a1=(70, -100), a2=(0, 0), l1=(75, 100, 0), l2=(110, 85, 0)),
+    "Carrera": P(t=-80, a1=(130, 60), a2=(60, -30), l1=(125, 60, 20), l2=(30, 120, 0)),
+    "Cardio": P(t=-80, a1=(130, 60), a2=(60, -30), l1=(125, 60, 20), l2=(30, 120, 0), objetos=[("corazon", 34, -34, 1.8)]),
+    "HIIT": P(t=-85, a1=(140, 60), a2=(-40, -70), l1=(120, 50, 20), l2=(40, 130, 0), suelo=False, objetos=[("corazon", 30, -40, 1.5)]),
+    "Tabata": P(t=-85, a1=(140, 60), a2=(-40, -70), l1=(120, 50, 20), l2=(40, 130, 0), suelo=False, objetos=[("corazon", 30, -40, 1.5)]),
+    "Burpees": P(DE_PIE, a1=(-100, -100), a2=(-95, -95)),
+    "Jumping jacks": P(DE_PIE, a1=(95, 90), a2=(100, 92), l1=(88, 90, 0), l2=(92, 90, 0), suelo=False),
+    "Rodillas al pecho": P(DE_PIE, t=-88, a1=(120, 60), a2=(60, 0), l1=(95, 95, 0), l2=(-10, 110, 0)),
+    "Elíptica": P(DE_PIE, t=-88, a1=(70, -60), a2=(40, -40), l1=(110, 80, 0), l2=(70, 100, 0)),
+    "Remo de cardio": P(t=-60, a1=(-5, -5), a2=(0, 0), l1=(-50, 60, -20), objetos=[("linea", (-15, 4), (45, 4))]),
+    "Natación": P(t=0, a1=(170, 175), a2=(0, 0), l1=(175, 170, 180), l2=(180, 185, 180), suelo=False),
+    "Caminar": P(DE_PIE, a1=(115, 85), a2=(70, 100), l1=(110, 85, 0), l2=(70, 100, 0)),
+    "Senderismo": P(DE_PIE, t=-80, a1=(115, 85), a2=(60, 90), l1=(110, 85, 0), l2=(70, 100, 0), objetos=[("linea", (30, -12), (38, 44))]),
+}
+
+# Dibujos propios que sustituyen a uno que había (no era del ejercicio o no era libre).
+SUSTITUIR = {"Face pull", "Curl de muñeca", "Press pallof"}
+
+
 def main():
     creditos_ruta = IMAGENES / "creditos.json"
     creditos = json.loads(creditos_ruta.read_text(encoding="utf-8"))
@@ -357,13 +460,14 @@ def main():
     nombres = re.findall(r"(?:ej|estiramiento|movilidad)\('([^']+)'", catalogo)
     nombres += [f"{e} ({s})" for e, s in re.findall(r"yoga\('([^']+)', '([^']+)'", catalogo)]
     for nombre in nombres:
-        if nombre in creditos["ejercicios"] and creditos["ejercicios"][nombre].get("fuente") != "propia":
+        if nombre in creditos["ejercicios"] and creditos["ejercicios"][nombre].get("fuente") != "propia" and nombre not in SUSTITUIR:
             continue
         if nombre not in todos:
             faltan.append(nombre)
             continue
         archivo = f"{normalizar(nombre)}.svg"
-        (DESTINO / archivo).write_text(svg_de(todos[nombre]), encoding="utf-8")
+        poses = [todos[nombre]] + ([SEGUNDA[nombre]] if nombre in SEGUNDA else [])
+        (DESTINO / archivo).write_text(svg_de(*poses), encoding="utf-8")
         creditos["ejercicios"][nombre] = {"archivo": f"imagenes/munecos/{archivo}", "autor": "dibujo propio de la app", "fuente": "propia"}
         hechos += 1
 

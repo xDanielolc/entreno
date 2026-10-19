@@ -62,6 +62,9 @@ const EXPLICA_TIPO = {
   libre: 'Cuenta como una serie normal, pero sin objetivo: apuntas lo que hagas.',
 };
 
+// Calentamientos abiertos para cambiar sus pesos («sesión:ejercicio»).
+const calentamientoAbierto = new Set();
+
 // Hacia dónde se deslizó la última tarjeta (para animar la siguiente).
 let direccionPendiente = null;
 
@@ -226,7 +229,7 @@ export function vistaSesion(contenedor, { id }) {
     }
     const nombreSiguiente = d.ejercicios.find((x) => x.id === sesion.ejercicios[posicion + 1]?.ejercicioId)?.nombre ?? '';
     const entradaActual = sesion.ejercicios[posicion];
-    const otraSerie = unaSerie && entradaActual && indiceSerie(entradaActual) < entradaActual.series.length - 1;
+    const otraSerie = unaSerie && entradaActual && indiceSerie(entradaActual) < trabajoDe(entradaActual).length - 1;
     return h('div', { class: 'barra-entreno' },
       h('div', { class: 'barra-entreno-fila' },
         h('button', { type: 'button', class: 'boton secundario boton-paso-grande', 'aria-label': 'Anterior',
@@ -275,12 +278,21 @@ export function vistaSesion(contenedor, { id }) {
     return pista;
   }
 
-  // La serie que se ve en el modo «serie»: la elegida o la primera sin hacer.
+  // Las series de trabajo de un ejercicio (sus índices): los calentamientos
+  // previstos van aparte, en una franja.
+  function trabajoDe(entrada) {
+    const ej = ejercicioDe(entrada?.ejercicioId);
+    return (entrada?.series ?? []).map((s, j) => j).filter((j) => !calentamientoPrevisto(ej, entrada.series[j]));
+  }
+
+  // La serie que se ve en el modo «serie» (su posición entre las de
+  // trabajo): la elegida o la primera sin hacer.
   function indiceSerie(entrada) {
-    const n = entrada?.series.length ?? 0;
+    const t = trabajoDe(entrada);
+    const n = t.length;
     if (!n) return 0;
     if (serieElegida != null) return Math.max(0, Math.min(n - 1, serieElegida === 'ultima' ? n - 1 : serieElegida));
-    const sinHacer = entrada.series.findIndex((s) => !s.hecha);
+    const sinHacer = t.findIndex((j) => !entrada.series[j].hecha);
     return sinHacer >= 0 ? sinHacer : n - 1;
   }
 
@@ -292,11 +304,12 @@ export function vistaSesion(contenedor, { id }) {
     if (unaSerie) {
       const entrada = sesion.ejercicios[posicion];
       const k = indiceSerie(entrada) + paso;
-      if (entrada && k >= 0 && k < entrada.series.length) {
+      if (entrada && k >= 0 && k < trabajoDe(entrada).length) {
         direccionPendiente = direccionDeslizar;
         guardarVista('serie', posicion, k);
         estado.emitir('vista');
-        window.scrollTo(0, 0);
+        // Sin volver a la foto: la serie nueva queda donde estaba la anterior.
+        setTimeout(() => document.querySelector('.contador-series')?.scrollIntoView({ block: 'start' }), 0);
         return;
       }
     }
@@ -508,8 +521,12 @@ export function vistaSesion(contenedor, { id }) {
   function tarjetaEjercicio(entrada, indice) {
     const ej = ejercicioDe(entrada.ejercicioId);
     if (!ej) return h('div', { class: 'tarjeta' }, 'Ejercicio borrado');
-    // Modo «serie»: solo se ve una serie; las demás, deslizando.
+    // Modo «serie»: solo se ve una serie de trabajo; las demás, deslizando.
+    // Los calentamientos previstos, en una franja encima de la primera.
+    const trabajo = trabajoDe(entrada);
+    const calentamientos = entrada.series.map((s, j) => [s, j]).filter(([s]) => calentamientoPrevisto(ej, s));
     const k = unaSerie ? indiceSerie(entrada) : null;
+    const visible = k == null ? null : trabajo[k];
     const vacia = entrada.series.length === 0;
     const foto = imagenDeEjercicio(ej);
     const grande = posicion != null;
@@ -543,25 +560,58 @@ export function vistaSesion(contenedor, { id }) {
           : 'Apunta la serie al acabarla: con el peso y las repeticiones puestos arranca el descanso. '
             + 'Cada casilla lleva encima lo que va dentro (toca «?» para saber más).'),
 
-      unaSerie && entrada.series.length > 1 && puntosSeries(entrada, k),
-      entrada.series.map((serie, j) => (k == null || j === k ? bloqueSerie(ej, entrada, indice, j, serie) : null)),
+      calentamientos.length > 0 && (k == null || k === 0) && franjaCalentamiento(ej, entrada, indice, calentamientos),
+      unaSerie && trabajo.length > 1 && puntosSeries(entrada, k, trabajo),
+      entrada.series.map((serie, j) => (calentamientoPrevisto(ej, serie) || (visible != null && j !== visible) ? null
+        : bloqueSerie(ej, entrada, indice, j, serie))),
 
       // Sin series: qué hacer, claro. Con series: una más igual o programar.
       vacia && h('p', { class: 'nota centrado sin-series' }, 'Este ejercicio no tiene series. Añade una suelta o prográmalas (con su progresión).'),
       h('div', { class: 'fila-botones fila-mas-series' },
         h('button', { class: 'boton secundario', onclick: () => anadirSerie(indice, ej, entrada) }, vacia ? '+ Serie suelta' : '+ Otra serie'),
-        enCurso && h('button', { class: `boton ${vacia ? '' : 'secundario'}`, onclick: () => asistenteEnEntreno(indice, ej) }, 'Programar series…')));
+        enCurso && h('button', { class: `boton ${vacia ? '' : 'secundario'}`, onclick: () => asistenteEnEntreno(indice, ej) }, 'Programar series')));
     if (enCurso) setTimeout(() => reajustarDebajo(ej, indice), 0);
     return grande && enCurso && movil ? deslizable(tarjeta) : tarjeta;
   }
 
-  // Modo «serie»: «Serie 2 de 4» y un puntito por serie (se pueden tocar).
-  function puntosSeries(entrada, k) {
+  // Modo «serie»: «Serie 2 de 4» y un puntito por serie de trabajo (se pueden tocar).
+  function puntosSeries(entrada, k, trabajo) {
     return h('div', { class: 'contador-series' },
-      h('span', { class: 'suave' }, `Serie ${k + 1} de ${entrada.series.length}`),
-      h('div', { class: 'puntos-ejercicios puntos-series' }, entrada.series.map((s, j) => h('button', { type: 'button',
-        'aria-label': `Serie ${j + 1}`, class: `${j === k ? 'activo' : ''}${s.hecha ? ' hecho' : ''}`,
-        onclick: () => { guardarVista('serie', posicion, j); estado.emitir('vista'); } }))));
+      h('span', { class: 'suave' }, `Serie ${k + 1} de ${trabajo.length}`),
+      h('div', { class: 'puntos-ejercicios puntos-series' }, trabajo.map((j, n) => h('button', { type: 'button',
+        'aria-label': `Serie ${n + 1}`, class: `${n === k ? 'activo' : ''}${entrada.series[j].hecha ? ' hecho' : ''}`,
+        onclick: () => { guardarVista('serie', posicion, n); estado.emitir('vista'); } }))));
+  }
+
+  // Los calentamientos previstos, en una franja: un botón por serie
+  // («50 kg × 8») que se toca al hacerla. «Cambiar pesos» los abre como
+  // series normales.
+  function franjaCalentamiento(ej, entrada, i, lista) {
+    const clave = `${id}:${i}`;
+    const abierto = calentamientoAbierto.has(clave);
+    const u = unidadCarga(ej);
+    return h('div', { class: 'franja-calentamiento' },
+      h('div', { class: 'titulo-con-ayuda' }, h('span', { class: 'etiqueta-campo' }, 'Calentamiento'),
+        ayuda('Calentamiento', 'Series de aproximación: suben poco a poco hasta cerca del peso de trabajo. Toca cada una al hacerla. '
+          + 'No cuentan para tu progreso, tu 1RM ni tu recuperación.')),
+      abierto ? lista.map(([s, j]) => bloqueSerie(ej, entrada, i, j, s))
+        : h('div', { class: 'chips-calentamiento' }, lista.map(([s, j]) => {
+          const reps = planDe(ej, s)?.objetivoEsfuerzo?.[1] ?? s.esfuerzo;
+          return h('button', { type: 'button', class: `chip-calentamiento${s.hecha ? ' hecho' : ''}`, 'aria-pressed': String(Boolean(s.hecha)),
+            onclick: () => cambiarSesion((x) => {
+              const y = x.ejercicios[i].series[j];
+              if (y.hecha) { y.hecha = false; y.esfuerzo = null; y.hechaA = null; return; }
+              y.esfuerzo ??= reps ?? null;
+              y.hecha = true;
+              y.hechaA = new Date().toISOString();
+            }) },
+          h('span', { class: 'chip-marca', 'aria-hidden': 'true' }, s.hecha ? '✓' : ''),
+          `${s.carga != null ? `${formatearNumero(s.carga)} ${u}` : 'Ligero'}${reps ? ` × ${reps}` : ''}`);
+        })),
+      h('button', { type: 'button', class: 'boton enlace', onclick: () => {
+        if (abierto) calentamientoAbierto.delete(clave); else calentamientoAbierto.add(clave);
+        estado.emitir('vista');
+      } }, abierto ? 'Listo' : 'Cambiar pesos'));
   }
 
   // Las estadísticas del ejercicio en un cartel, sin salir del entreno.
@@ -586,7 +636,7 @@ export function vistaSesion(contenedor, { id }) {
             if (item) item.series = [...planesDeItem(propio, item).map((p) => p.id).filter((pid) => !planes.some((q) => q.id === pid)), ...planes.map((p) => p.id)];
           }
           const s = datos.sesiones.find((x) => x.id === id);
-          const antes = s.ejercicios[i].series.length;
+          const antes = trabajoDe(s.ejercicios[i]).length;
           for (const p of planes) s.ejercicios[i].series.push(...seriesDesdePlan(datos, propio, p, { excluirSesion: id }));
           if (unaSerie) { guiado.set(id, { modo, pos: posicion, serie: antes }); s.vista = { modo, pos: posicion, serie: antes }; }
         });
@@ -1486,7 +1536,7 @@ export function vistaSesion(contenedor, { id }) {
   // hiciste la Bilbo, aparece la de intensidad con su técnica.
   function anadirSerie(i, ej, entrada) {
     cambiarSesion((s, datos) => {
-      if (unaSerie) { const nueva = s.ejercicios[i].series.length; guiado.set(id, { modo, pos: posicion, serie: nueva }); s.vista = { modo, pos: posicion, serie: nueva }; }
+      if (unaSerie) { const nueva = trabajoDe(s.ejercicios[i]).length; guiado.set(id, { modo, pos: posicion, serie: nueva }); s.vista = { modo, pos: posicion, serie: nueva }; }
       const puestas = new Set(s.ejercicios[i].series.map((x) => x.planId).filter(Boolean));
       const siguiente = (ej.series || []).find((plan) => !puestas.has(plan.id));
       if (siguiente) {
@@ -1621,6 +1671,11 @@ function horaEnFecha(iso, fecha, minutosMas = 0) {
   const [a, m, d] = fecha.split('-').map(Number);
   const nueva = new Date(a, m - 1, d, base.getHours(), base.getMinutes() + minutosMas);
   return nueva.toISOString();
+}
+
+// Un calentamiento que viene de la rutina (con su peso): va en la franja.
+function calentamientoPrevisto(ej, serie) {
+  return serie?.tipo === 'calentamiento' && Boolean(planDe(ej, serie)?.calentamiento);
 }
 
 function planDe(ej, serie) {

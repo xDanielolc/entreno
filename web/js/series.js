@@ -42,8 +42,11 @@ export function planPorDefecto(datos, ejercicio) {
 
 // Las series de un ejercicio que entran en un día de rutina. Sin elección
 // en la rutina, las del propio ejercicio (no las que solo usa alguna rutina).
+// En el orden del día de la rutina (los calentamientos, primero), no en el
+// de la ficha del ejercicio.
 export function planesDeItem(ejercicio, item) {
-  return (ejercicio.series || []).filter((p) => (item?.series ? item.series.includes(p.id) : !p.soloRutina));
+  if (item?.series) return item.series.map((pid) => (ejercicio.series || []).find((p) => p.id === pid)).filter(Boolean);
+  return (ejercicio.series || []).filter((p) => !p.soloRutina);
 }
 
 // Resumen corto de unas series: «Bilbo + 2 × 8-10 + 1 × 8-10 con serie descendente».

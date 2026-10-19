@@ -27,10 +27,10 @@ def dibujar(tamano, margen_seguro):
 
 def main():
     DESTINO.mkdir(parents=True, exist_ok=True)
-    dibujar(192, 0.08).save(DESTINO / "icono-192.png")
-    dibujar(512, 0.08).save(DESTINO / "icono-512.png")
-    dibujar(180, 0.08).save(DESTINO / "icono-180.png")
-    dibujar(512, 0.2).save(DESTINO / "icono-maskable-512.png")   # Android recorta los bordes
+    dibujar(192, 0.08).save(DESTINO / "icono-v2-192.png")
+    dibujar(512, 0.08).save(DESTINO / "icono-v2-512.png")
+    dibujar(180, 0.08).save(DESTINO / "icono-v2-180.png")
+    dibujar(512, 0.2).save(DESTINO / "icono-v2-maskable-512.png")   # Android recorta los bordes
     (DESTINO / "icono.svg").write_text(
         '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'
         '<rect width="100" height="100" rx="22" fill="#0e1014"/>'
