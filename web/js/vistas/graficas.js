@@ -122,7 +122,7 @@ function tablaDeDatos(series, unidad, etiquetaX) {
 const COLORES_CLARO = ['#2a78d6', '#eb6834', '#1baf7a', '#eda100'];
 const COLORES_OSCURO = ['#3987e5', '#d95926', '#199e70', '#c98500'];
 
-function colores() {
+export function colores() {
   const oscuro = document.documentElement.dataset.tema === 'oscuro'
     || (!document.documentElement.dataset.tema && matchMedia('(prefers-color-scheme: dark)').matches);
   return oscuro ? COLORES_OSCURO : COLORES_CLARO;

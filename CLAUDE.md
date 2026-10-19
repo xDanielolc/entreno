@@ -806,3 +806,21 @@ Esquema v18 (todo opcional). Lo que vio Dan en el gimnasio y cómo quedó:
 - 0.51.1: «Desliza para terminar» en el móvil (lo eligió Dan entre cuatro
   opciones): `deslizarParaTerminar()` en sesion.js; un toque solo da la
   pista, con el teclado Intro termina.
+
+## Ronda 0.52.0 (19-10-2026): Diario, fase A
+
+Encargo «Diario y test» (el original, con su plan, está en `datos-privados/`,
+fuera de Git: nada personal en el código). Esquema v19: `diario[]` (una
+entrada por día con `id` = `fecha` = el día en que te levantas; horas
+«HH:MM») y `perfil.necesidadSuenoH` (8,5). `fusion.js` funde `diario` como
+las demás colecciones. Pestaña nueva «Diario» (siete pestañas, más
+estrechas): peso (peso.js, el mismo de Cuerpo), sueño (luz, levantarse,
+latencia, despierto, remoloneo → en cama, sueño real y eficiencia, en
+`diario.js`), sensación 1-5 con «?» («es un dato, no un criterio»), alcohol,
+último café, pulso nocturno y siesta; tabla de 14 días (tocar uno lo edita);
+«Tu semana» frente a la anterior (medias, fin de semana frente a laborables,
+repeticiones de trabajo en los básicos y su cambio); gráficas de sueño (con
+la línea de la necesidad) y de pulso. Tema «Sueño y rendimiento» en la
+bibliografía. Pendiente: fase B (PVT de 3 min, Karolinska, Epworth, línea
+base, semáforo, enlace con «¿Voy hoy?») y fase C (cama ampliada, adelanto de
+fase), tras probar la A.

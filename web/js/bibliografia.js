@@ -419,4 +419,21 @@ export const BIBLIOGRAFIA = [
       { texto: 'Behm et al. (2016), Appl Physiol Nutr Metab: estirar más de 60 s por músculo justo antes puede quitar algo de fuerza; menos, apenas.', url: 'https://doi.org/10.1139/apnm-2015-0235' },
     ],
   },
+  {
+    tema: 'Sueño y rendimiento',
+    dice: 'El diario calcula el sueño real (tiempo en cama menos lo que tardas en dormirte, lo que estás despierto y lo que '
+      + 'remoloneas) y la eficiencia, y pone tu semana al lado de tus repeticiones en los básicos.',
+    matiz: 'La sensación de cansancio se acostumbra a dormir poco mientras el rendimiento sigue cayendo: por eso se apunta, pero no '
+      + 'decide sola. Dormir poco se nota antes en el volumen que aguantas que en el 1RM. Los relojes aciertan cuándo duermes y fallan '
+      + 'cuándo estás despierto, así que de ellos solo se apuntan horas y pulso.',
+    fuentes: [
+      { texto: 'Ohayon et al. (2004), Sleep: metaanálisis de parámetros del sueño a lo largo de la vida; eficiencia normal del 85 % o más.', url: 'https://pubmed.ncbi.nlm.nih.gov/15586779/' },
+      { texto: 'Van Dongen et al. (2003), Sleep: con 4-6 h durante dos semanas el rendimiento cae sin parar mientras la somnolencia sentida se estanca.', url: 'https://pubmed.ncbi.nlm.nih.gov/12683469/' },
+      { texto: 'Cook et al. (2012), Int J Sport Nutr Exerc Metab: tras dormir poco baja el volumen de las sesiones de fuerza.', url: 'https://pubmed.ncbi.nlm.nih.gov/22349085/' },
+      { texto: 'Knowles et al. (2022), Med Sci Sports Exerc: la restricción de sueño afecta antes a la resistencia muscular y la velocidad que a la fuerza máxima.', url: 'https://pubmed.ncbi.nlm.nih.gov/36136596/' },
+      { texto: 'Craven et al. (2022), Sports Medicine: metaanálisis de 69 publicaciones; dormir poco baja el rendimiento un 7,6 % de media, más por la tarde.', url: 'https://pubmed.ncbi.nlm.nih.gov/35708888/' },
+      { texto: 'Roenneberg et al. (2012), Curr Biol: dormir mucho más el fin de semana (jet lag social) indica deuda de sueño.', url: 'https://pubmed.ncbi.nlm.nih.gov/22578422/' },
+      { texto: 'Chinoy et al. (2021), Sleep: los relojes y pulseras detectan bien el sueño (sensibilidad ≥ 0,93) y mal la vigilia (0,18-0,54).', url: 'https://pubmed.ncbi.nlm.nih.gov/33378539/' },
+    ],
+  },
 ];

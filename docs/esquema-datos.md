@@ -571,3 +571,11 @@ la vez, a veces sin cobertura):
   qué serie se ve en el modo «una serie». `progresion.porRM` con
   `fija: 'pct'` también en planes de calentamiento («50 % × 8»; 0 % = la
   barra sola).
+
+- **v19 (0.52.0).** `diario[]`: una entrada por día, `{ id, fecha, luzApagada,
+  levantado, latenciaMin, despiertoMin, remoloneoMin, sensacion (1-5),
+  alcohol ('no' | 'poco' | 'mucho'), cafeinaHora, pulsoNocturno, siestaMin }`
+  (todo opcional salvo `id` y `fecha`, que son la fecha del día en que te
+  levantas). Las horas van como «HH:MM». El sueño real y la eficiencia se
+  calculan (`diario.js`), no se guardan. `perfil.necesidadSuenoH` (8,5 por
+  defecto). Los pesos siguen en `perfil.pesos`.

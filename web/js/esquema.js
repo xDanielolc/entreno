@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 18;
+export const VERSION_ACTUAL = 19;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -219,11 +219,13 @@ export function archivoNuevo({ nombre = '', correo = null } = {}) {
       modoEntreno: 'ejercicio',
       redondeoKg: 2.5,
       prehechos: [],
+      necesidadSuenoH: 8.5,
     },
     sedes: [],
     ejercicios: [],
     rutinas: [],
     sesiones: [],
+    diario: [],
   };
 }
 
@@ -511,6 +513,14 @@ const MIGRACIONES = {
   // `sesion.vista.serie` y `progresion.porRM` también en calentamientos.
   17: (datos) => {
     datos.version = 18;
+    return datos;
+  },
+  // v18 → v19: el diario (una entrada por día: sueño, sensación, alcohol,
+  // cafeína, pulso nocturno y siesta) y lo que necesitas dormir.
+  18: (datos) => {
+    datos.diario ??= [];
+    datos.perfil.necesidadSuenoH ??= 8.5;
+    datos.version = 19;
     return datos;
   },
 };

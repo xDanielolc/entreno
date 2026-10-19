@@ -1818,6 +1818,32 @@ body.entreno-a-pantalla .contenido.con-barra-entreno { padding-bottom: calc(var(
 .linea-1rm strong { color: var(--texto); }
 .linea-1rm .boton.enlace { min-width: 0; margin: 0; }
 .sin-series { margin: 8px 0 0; }
+/* Diario */
+.fila-campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 8px; }
+.fila-campos .campo { margin: 0; }
+.con-unidad { display: flex; align-items: center; gap: 6px; }
+.con-unidad input { flex: 1; min-width: 0; }
+.diario-dia h3 { margin: 14px 0 6px; font-size: 1rem; }
+.calculo-sueno { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 14px; margin: 10px 0; font-variant-numeric: tabular-nums; }
+.calculo-sueno .bien strong { color: var(--bien); }
+.calculo-sueno .aviso strong { color: var(--aviso); }
+.estrellas { display: flex; justify-content: center; gap: 6px; margin: 4px 0; }
+.estrella { width: 48px; height: 48px; padding: 0; border: 1px solid var(--borde); border-radius: 50%; background: var(--superficie-2);
+  color: var(--texto-suave); font-size: 1.4rem; cursor: pointer; }
+.estrella.activa { background: var(--acento-suave); color: var(--aviso); border-color: transparent; }
+.tabla-desliza { overflow-x: auto; }
+.tabla-diario { width: 100%; border-collapse: collapse; font-size: .9rem; text-align: center; font-variant-numeric: tabular-nums; }
+.tabla-diario th { font-weight: 600; color: var(--texto-suave); font-size: .8rem; padding: 4px; }
+.tabla-diario td { padding: 8px 4px; border-top: 1px solid var(--borde); }
+.tabla-diario tbody tr { cursor: pointer; }
+.tabla-diario tbody tr:nth-child(even) { background: var(--superficie-2); }
+.tabla-diario tr.elegida td { font-weight: 700; color: var(--texto); }
+.tabla-semana td:not(:first-child), .tabla-semana th { text-align: center; }
+.necesidad-sueno { max-width: 20em; margin: 16px auto 0; }
+/* Siete pestañas: un poco más estrechas. */
+.navegacion { grid-template-columns: repeat(7, 1fr); }
+.navegacion a { font-size: .66rem; }
+.navegacion .icono { width: 40px; }
 /* Sin zoom con dos dedos en la página; el mapa del cuerpo se amplía al tocarlo. */
 html { touch-action: pan-x pan-y; }
 .cuerpos-boton { position: relative; width: 100%; padding: 0; border: 0; background: none; cursor: zoom-in; font: inherit; color: inherit; }
