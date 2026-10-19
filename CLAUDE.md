@@ -803,3 +803,6 @@ Esquema v18 (todo opcional). Lo que vio Dan en el gimnasio y cómo quedó:
   cortaban); sentadilla y peso muerto, solo la postura completa (en el
   original de Everkinetic la otra viene cortada). Almacén de imágenes
   `entreno-imagenes-9`.
+- 0.51.1: «Desliza para terminar» en el móvil (lo eligió Dan entre cuatro
+  opciones): `deslizarParaTerminar()` en sesion.js; un toque solo da la
+  pista, con el teclado Intro termina.

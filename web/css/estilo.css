@@ -1832,6 +1832,14 @@ html { touch-action: pan-x pan-y; }
 .barra-anadir { flex: 1; }
 .barra-mas { flex: 0 0 56px; font-size: 1.4rem; font-weight: 800; padding: 0; }
 .barra-terminar { width: 100%; margin: 0; min-height: 54px; }
+/* «Desliza para terminar»: pista blanca (tinta) con la flecha que se arrastra. */
+.deslizar-terminar { position: relative; display: flex; align-items: center; justify-content: center; min-height: 56px; border-radius: 999px;
+  background: var(--acento); color: var(--acento-texto); font-weight: 700; touch-action: none; user-select: none; -webkit-user-select: none; cursor: grab; }
+.deslizar-terminar:focus-visible { outline: 3px solid var(--acento-suave); outline-offset: 2px; }
+.deslizar-texto { padding-left: 40px; transition: opacity .15s; }
+.deslizar-tirador { position: absolute; left: 4px; top: 4px; bottom: 4px; aspect-ratio: 1; display: grid; place-items: center; border-radius: 50%;
+  background: var(--acento-texto); color: var(--acento); font-size: 1.3rem; transition: transform .25s ease-out; }
+@media (prefers-reduced-motion: reduce) { .deslizar-tirador, .deslizar-texto { transition: none; } }
 .barra-entreno .boton-siguiente { flex: 1; flex-direction: column; gap: 0; line-height: 1.15; margin: 0; }
 .barra-entreno .boton-siguiente small { font-weight: 500; opacity: .8; font-size: .8rem; }
 .barra-entreno-fila .barra-terminar { flex: 1; width: auto; }

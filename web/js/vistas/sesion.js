@@ -219,7 +219,7 @@ export function vistaSesion(contenedor, { id }) {
       return h('div', { class: 'barra-entreno' },
         h('div', { class: 'barra-entreno-fila' },
           h('button', { type: 'button', class: 'boton secundario barra-anadir', onclick: elegirEjercicio }, '+ Añadir ejercicio'), mas),
-        (ultimo || todoHecho) && botonTerminar);
+        (ultimo || todoHecho) && deslizarParaTerminar());
     }
     if (posicion == null) {
       return h('div', { class: 'barra-entreno' }, h('div', { class: 'barra-entreno-fila' }, botonTerminar, mas));
@@ -236,6 +236,43 @@ export function vistaSesion(contenedor, { id }) {
           : h('button', { type: 'button', class: 'boton grande boton-siguiente', onclick: () => avanzar(1) },
             h('span', {}, otraSerie ? 'Siguiente serie ›' : 'Siguiente ›'), h('small', {}, otraSerie ? '' : nombreSiguiente)),
         mas));
+  }
+
+  // «Desliza para terminar» (lo eligió Dan): una barra que se arrastra hasta
+  // el final; así no se termina sin querer. Un toque solo da la pista; con
+  // el teclado, Intro termina.
+  function deslizarParaTerminar() {
+    const tirador = h('span', { class: 'deslizar-tirador', 'aria-hidden': 'true' }, '➜');
+    const texto = h('span', { class: 'deslizar-texto' }, 'Desliza para terminar');
+    const pista = h('div', { class: 'deslizar-terminar', role: 'button', tabindex: '0', 'aria-label': 'Terminar entrenamiento (desliza o pulsa Intro)',
+      onkeydown: (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); terminar(); } } }, texto, tirador);
+    let x0 = null;
+    let max = 0;
+    const mover = (dx) => {
+      const x = Math.max(0, Math.min(max, dx));
+      tirador.style.transform = `translateX(${x}px)`;
+      texto.style.opacity = String(1 - x / Math.max(1, max));
+      return x;
+    };
+    pista.addEventListener('pointerdown', (e) => {
+      x0 = e.clientX;
+      max = pista.clientWidth - tirador.offsetWidth - 8;
+      pista.setPointerCapture(e.pointerId);
+      tirador.style.transition = 'none';
+    });
+    pista.addEventListener('pointermove', (e) => { if (x0 != null) mover(e.clientX - x0); });
+    const soltar = (e) => {
+      if (x0 == null) return;
+      const x = mover(e.clientX - x0);
+      x0 = null;
+      tirador.style.transition = '';
+      if (x >= max * 0.85) { mover(max); terminar(); setTimeout(() => { if (pista.isConnected) mover(0); }, 400); return; }
+      mover(0);
+      if (x < 8) aviso('Desliza la flecha hasta el final para terminar.');
+    };
+    pista.addEventListener('pointerup', soltar);
+    pista.addEventListener('pointercancel', () => { x0 = null; tirador.style.transition = ''; mover(0); });
+    return pista;
   }
 
   // La serie que se ve en el modo «serie»: la elegida o la primera sin hacer.
