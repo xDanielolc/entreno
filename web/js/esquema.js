@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 19;
+export const VERSION_ACTUAL = 20;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -521,6 +521,14 @@ const MIGRACIONES = {
     datos.diario ??= [];
     datos.perfil.necesidadSuenoH ??= 8.5;
     datos.version = 19;
+    return datos;
+  },
+  // v19 → v20: todas las fórmulas del 1RM, a la que se ajusta a ti (lo pidió
+  // Dan: la genérica no la quiere nadie que tenga series). Campo nuevo
+  // opcional `ejercicio.pesoMinimoPct` (peso mínimo como % del 1RM).
+  19: (datos) => {
+    for (const ej of datos.ejercicios) ej.formula1RM = 'personal';
+    datos.version = 20;
     return datos;
   },
 };

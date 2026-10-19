@@ -129,7 +129,7 @@ export function prepararCiclo(datos, ejercicio, plan, { excluirSesion, rm: rmDad
     if (!ciclo && referencia) empezarCicloNuevo(datos, ejercicio, plan);
     return false;
   }
-  const inicial = aPesoDisponible(ejercicio, valor);
+  const inicial = aPesoDisponible(ejercicio, valor, { rm });
   if (!ciclo) {
     empezarCicloNuevo(datos, ejercicio, plan, { inicial });
   } else {

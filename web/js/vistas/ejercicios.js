@@ -13,7 +13,7 @@ import { BARRA_POR_DEFECTO, inicialDelPrograma, materialDe, tramosPorDefecto } f
 import { EXPLICACIONES_1RM, FORMULAS, calibrar, estimar1RM, modeloDe, pesoParaReps, textoCalibracion } from '../formula1rm.js';
 import { FRACCION_CORPORAL_POR_NOMBRE, PROGRAMAS, fraccionSinDato } from '../esquema.js';
 import { MODOS_INICIO, MODOS_REINICIO, PRESETS_CICLO, inicioDe, alargarCiclo, aplicarPreset, completarCiclo, describirCiclo, empezarCicloNuevo, escaleraDe } from '../ciclos.js';
-import { abrirAlLlegar, ayuda, hoyISO, confirmarEscribiendo, idApartado } from '../ui.js';
+import { abrirAlLlegar, ampliar, ayuda, hoyISO, confirmarEscribiendo, idApartado } from '../ui.js';
 import { CATALOGO, esMaquinaDePlacas, normalizar, tipoDeEjercicio } from '../catalogo.js';
 import { ORDEN_MUSCULOS, nombreMusculo } from '../musculos.js';
 import { entradaDeEjercicio, planesPorDefecto } from '../series.js';
@@ -275,8 +275,10 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
       } }, 'Empezar otro')),
     vivasDeRutinas > 0 && h('p', { class: 'nota centrado' },
       `Además tiene ${vivasDeRutinas === 1 ? 'una serie' : `${vivasDeRutinas} series`} «solo aquí» de alguna rutina: se cambian desde la rutina.`),
-    imagenFicha && h('figure', { class: 'imagen-ejercicio' },
-      h('img', { src: imagenFicha.archivo, alt: `Ilustración de ${existente.nombre}`, loading: 'lazy' })),
+    imagenFicha && h('button', { type: 'button', class: 'imagen-ejercicio imagen-ampliable', 'aria-label': `Ver en grande el dibujo de ${existente.nombre}`,
+      onclick: () => ampliar(existente.nombre, () => h('img', { class: 'imagen-grande', src: imagenFicha.archivo, alt: `Ilustración de ${existente.nombre}` })) },
+    h('img', { src: imagenFicha.archivo, alt: `Ilustración de ${existente.nombre}`, loading: 'lazy' })),
+    imagenFicha && pista('ampliar-dibujo', 'Toca el dibujo para verlo en grande.'),
     cabecera,
     zona);
 
@@ -453,18 +455,22 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         !['ninguna', 'altura'].includes(borrador.carga.tipo) && seccionFormula(),
         borrador.esfuerzo.tipo === 'repeticiones' && campo('Repeticiones en recámara por defecto en este ejercicio',
           numeroInput(borrador.recamaraPorDefecto, (v) => { borrador.recamaraPorDefecto = v; }),
-          h('small', { class: 'nota' }, `Vacío = lo de Ajustes (${d.perfil.recamaraPorDefecto ?? 1}).`)),
+          h('small', { class: 'nota' }, `Vacío = lo que pida cada serie: ${d.perfil.recamaraPorDefecto ?? 1} en hipertrofia y 2 en fuerza (series de 6 o menos).`)),
         !['ninguna', 'altura'].includes(borrador.carga.tipo) && !borrador.pesosMaquina?.length
         && campo('Los pesos que propone la app en este ejercicio van de (kg)',
           numeroInput(borrador.redondeoKg, (v) => { borrador.redondeoKg = v > 0 ? v : null; }),
           h('small', { class: 'nota' }, `Vacío = lo de Ajustes (${formatearNumero(d.perfil.redondeoKg ?? REDONDEO_POR_DEFECTO)}). `
             + 'Mancuernas de 2 en 2, microdiscos de 0,25, máquinas de 5 en 5…')),
         borrador.carga.tipo === 'peso' && !borrador.pesosMaquina?.length
-        && campo('Peso mínimo: la barra vacía (kg)',
+        && campo('Peso mínimo (kg): la barra vacía u otro',
           numeroInput(borrador.pesoMinimo, (v) => { borrador.pesoMinimo = v != null && v >= 0 ? v : null; }),
           h('small', { class: 'nota' }, materialDe(borrador) === 'barra'
             ? `Vacío = ${BARRA_POR_DEFECTO} (barra olímpica). La app nunca propone menos. Barra de curl o de mujer: 10 o 15.`
             : 'Vacío = sin mínimo. Si lo haces con barra, pon lo que pesa vacía.')),
+        borrador.carga.tipo === 'peso' && !borrador.pesosMaquina?.length
+        && campo('… o un % de tu 1RM',
+          numeroInput(borrador.pesoMinimoPct, (v) => { borrador.pesoMinimoPct = v > 0 && v < 100 ? v : null; }),
+          h('small', { class: 'nota' }, 'Vacío = sin %. Si pones los dos, manda el que sea más alto ese día.')),
         campo('Descanso entre series en este ejercicio (segundos)',
           numeroInput(borrador.descansoSegundos, (v) => { borrador.descansoSegundos = v ?? undefined; }),
           h('small', { class: 'nota' }, `Vacío = lo de Ajustes (${d.perfil.descansoSegundos ?? 'sin descanso'} s). Al saltar o alargar un descanso, la app te ofrece guardarlo aquí.`)),

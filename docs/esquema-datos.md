@@ -579,3 +579,7 @@ la vez, a veces sin cobertura):
   levantas). Las horas van como «HH:MM». El sueño real y la eficiencia se
   calculan (`diario.js`), no se guardan. `perfil.necesidadSuenoH` (8,5 por
   defecto). Los pesos siguen en `perfil.pesos`.
+
+- **v20 (0.54.0).** Todas las fórmulas del 1RM pasan a «se ajusta a ti»
+  (`formula1RM: 'personal'`). `ejercicio.pesoMinimoPct` (opcional): peso
+  mínimo como % del 1RM; con `pesoMinimo`, manda el más alto ese día.

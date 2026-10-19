@@ -63,11 +63,16 @@ export function reiniciarPistas() {
 // cada cosa» solo sale la de la recámara.
 // `siempre`: sale aunque hayas quitado el tutorial, hasta que la cierres
 // (para lo que conviene leer una vez sí o sí).
+// Las pistas de «dónde está cada cosa» (gestos y botones escondidos) salen
+// también en el nivel avanzado: es justo lo que ese nivel pide.
+const PISTAS_DE_USO = new Set(['sesion-datos', 'deslizar-ejercicios', 'deslizar-series', 'foto-estadisticas', 'ampliar-mapa',
+  'ampliar-dibujo', 'equilibrio']);
+
 export function pista(clave, texto, { siempre = false, icono: simbolo = 'bombilla', clase = '' } = {}) {
   const t = config();
   const nivel = t.nivel ?? 'basico';
   if (!siempre && nivel === 'ninguno') return null;
-  if (!siempre && nivel === 'avanzado' && clave !== 'sesion-datos') return null;
+  if (!siempre && nivel === 'avanzado' && !PISTAS_DE_USO.has(clave)) return null;
   if (t.vistos?.[clave]) return null;
   const caja = h('div', { class: `pista ${clase}`, role: 'note' },
     h('span', { class: 'pista-icono', 'aria-hidden': 'true' }, ['bombilla', 'aviso'].includes(simbolo) ? icono(simbolo) : simbolo),

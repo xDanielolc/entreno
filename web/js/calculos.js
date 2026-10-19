@@ -141,9 +141,9 @@ export function sugerenciaSerie(datos, ejercicio, plan, { excluirSesion, rmHoy =
       let carga = referencia?.serie.carga ?? null;
       let porFormula = false;
       if (rm && max > 0) {
-        const recamara = prog.recamaraMin ?? ejercicio.recamaraPorDefecto ?? datos.perfil?.recamaraPorDefecto ?? 1;
+        const recamara = recamaraPorDefectoDe(datos, ejercicio, plan);
         const peso = pesoParaReps(modeloDe(datos, ejercicio), rm.valor, max, recamara);
-        if (peso > 0) { carga = aPesoDisponible(ejercicio, peso); porFormula = true; }
+        if (peso > 0) { carga = aPesoDisponible(ejercicio, peso, { rm: rm.valor }); porFormula = true; }
       }
       return { ...base, rango: prog.objetivoEsfuerzo ?? plan.objetivoEsfuerzo, recamaraMin: prog.recamaraMin ?? null, carga, porFormula,
         rmUsado: rm?.valor ?? null, sinRM: conPeso && !rm };
@@ -252,12 +252,12 @@ export function rmDelEjercicio(datos, ejercicio, { sesion = null, antesDe = null
 export function pesoDePlan(datos, ejercicio, plan, rm) {
   const prog = plan.progresion ?? {};
   if (!(rm > 0)) return null;
-  if (prog.porRM?.fija === 'pct') return aPesoDisponible(ejercicio, (rm * prog.porRM.valor) / 100);
+  if (prog.porRM?.fija === 'pct') return aPesoDisponible(ejercicio, (rm * prog.porRM.valor) / 100, { rm });
   const reps = prog.porRM?.valor ?? prog.objetivoEsfuerzo?.[1];
   if (!(reps > 0)) return null;
-  const recamara = prog.recamaraMin ?? ejercicio.recamaraPorDefecto ?? datos.perfil?.recamaraPorDefecto ?? 1;
+  const recamara = recamaraPorDefectoDe(datos, ejercicio, plan);
   const peso = pesoParaReps(modeloDe(datos, ejercicio), rm, reps, recamara);
-  return peso > 0 ? aPesoDisponible(ejercicio, peso) : null;
+  return peso > 0 ? aPesoDisponible(ejercicio, peso, { rm }) : null;
 }
 
 // «Peso según tu 1RM»: el peso sale de tu máximo reciente y el objetivo son
@@ -268,7 +268,7 @@ function sugerenciaPorRM(datos, ejercicio, plan, { excluirSesion, ultima }) {
   const comun = { porRM: true, rango: prog.objetivoEsfuerzo, recamaraMin: prog.recamaraMin ?? null };
   if (!rm) return { ...comun, carga: null, sinRM: ejercicio.carga?.tipo !== 'pesoCorporal' };
   const carga = pesoDePlan(datos, ejercicio, plan, rm.valor);
-  const recamara = prog.recamaraMin ?? ejercicio.recamaraPorDefecto ?? datos.perfil?.recamaraPorDefecto ?? 1;
+  const recamara = recamaraPorDefectoDe(datos, ejercicio, plan);
   const rmUltima = ultima ? rmSinTramos(datos, ejercicio, ultima.serie) : null;
   const iguala = rmUltima && carga > 0 ? repsParaIgualar(modeloDe(datos, ejercicio), rmUltima, carga, recamara) : null;
   const objetivoSuperar = iguala != null ? Math.min(40, Math.floor(Math.max(0, iguala)) + 1) : null;
@@ -540,11 +540,27 @@ let redondeoGlobal = REDONDEO_POR_DEFECTO;
 export function fijarRedondeo(kg) { redondeoGlobal = kg > 0 ? kg : REDONDEO_POR_DEFECTO; }
 
 // El peso más bajo que se puede poner en un ejercicio: con barra, la barra
-// vacía (20 kg por defecto; se cambia en la ficha, «Ajustes finos»).
+// vacía (20 kg por defecto; se cambia en la ficha, «Ajustes finos»). Si
+// además pones un % de tu 1RM, manda lo que sea más alto ese día.
 export const BARRA_POR_DEFECTO = 20;
-export function pesoMinimoDe(ejercicio) {
-  if (ejercicio?.pesoMinimo != null) return ejercicio.pesoMinimo;
-  return ejercicio?.carga?.tipo === 'peso' && !ejercicio.pesosMaquina?.length && materialDe(ejercicio) === 'barra' ? BARRA_POR_DEFECTO : 0;
+export function pesoMinimoDe(ejercicio, rm = null) {
+  const fijo = ejercicio?.pesoMinimo != null ? ejercicio.pesoMinimo
+    : ejercicio?.carga?.tipo === 'peso' && !ejercicio.pesosMaquina?.length && materialDe(ejercicio) === 'barra' ? BARRA_POR_DEFECTO : 0;
+  const pct = ejercicio?.pesoMinimoPct > 0 && rm > 0 ? (rm * ejercicio.pesoMinimoPct) / 100 : 0;
+  return Math.max(fijo, pct);
+}
+
+// Las repeticiones en recámara que pide una serie si no lo dice su regla ni
+// el ejercicio: 2 en fuerza (series de 6 o menos, o programas de fuerza) y 1
+// en hipertrofia (o lo que pongas en Ajustes, si es más).
+export function recamaraPorDefectoDe(datos, ejercicio, plan) {
+  const prog = plan?.progresion ?? {};
+  if (prog.recamaraMin != null) return prog.recamaraMin;
+  if (ejercicio?.recamaraPorDefecto != null) return ejercicio.recamaraPorDefecto;
+  const general = datos?.perfil?.recamaraPorDefecto ?? 1;
+  const max = (prog.objetivoEsfuerzo ?? plan?.objetivoEsfuerzo)?.[1];
+  const fuerza = (max != null && max <= 6) || ['5x5', '531'].includes(prog.programa);
+  return fuerza ? Math.max(2, general) : general;
 }
 
 // El material del ejercicio; si no lo tiene apuntado, el del catálogo con
@@ -567,13 +583,13 @@ export function aPasoDeDisco(kg, paso = redondeoGlobal) {
 // Redondea a un peso que exista de verdad: si el ejercicio está atado a una
 // máquina con sus pesos, al más cercano de ellos (o al siguiente por arriba o
 // por abajo); si no, al salto de disco del ejercicio o de Ajustes.
-export function aPesoDisponible(ejercicio, kg, { hacia = 'cerca' } = {}) {
+export function aPesoDisponible(ejercicio, kg, { hacia = 'cerca', rm = null } = {}) {
   if (kg == null) return null;
   const pesos = ejercicio?.pesosMaquina?.length ? [...ejercicio.pesosMaquina].sort((a, b) => a - b) : null;
   if (!pesos) {
     const paso = pasoDe(ejercicio);
     const cerca = aPasoDeDisco(kg, paso);
-    const minimo = pesoMinimoDe(ejercicio);
+    const minimo = pesoMinimoDe(ejercicio, rm);
     const conMinimo = (x) => (kg > 0 && minimo > 0 ? Math.max(minimo, x) : x);
     if (hacia === 'arriba' && cerca <= kg + 0.01) return conMinimo(redondear(cerca + paso, 2));
     if (hacia === 'abajo' && cerca >= kg - 0.01) return conMinimo(redondear(Math.max(0, cerca - paso), 2));

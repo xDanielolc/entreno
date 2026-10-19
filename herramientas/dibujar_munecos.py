@@ -26,7 +26,8 @@ RAIZ = Path(__file__).resolve().parent.parent
 IMAGENES = RAIZ / "web" / "imagenes"
 DESTINO = IMAGENES / "munecos"
 
-CERCA, LEJOS, OBJETO = "#2f5d8c", "#9dbbdc", "#8a94a3"
+CERCA, LEJOS, OBJETO_GRIS = "#2f5d8c", "#9dbbdc", "#8a94a3"
+OBJETO = OBJETO_GRIS
 TORSO, CUELLO, CABEZA = 30, 5, 7
 BRAZO, ANTEBRAZO = 16, 15
 MUSLO, PIERNA, PIE = 20, 19, 6
@@ -63,7 +64,8 @@ def pose(t=-90, a1=(90, 90), a2=None, l1=(90, 90, 0), l2=None, cabeza=None, obje
 
 # --- Objetos ---------------------------------------------------------------
 
-def dibujar_objeto(o, j):
+def dibujar_objeto(o, j, color=None):
+    OBJETO = color or OBJETO_GRIS
     tipo = o[0]
     lin = lambda a, b, w=3: f'<line x1="{a[0]:.1f}" y1="{a[1]:.1f}" x2="{b[0]:.1f}" y2="{b[1]:.1f}" stroke="{OBJETO}" stroke-width="{w}" stroke-linecap="round"/>'
     if tipo == "mancuerna":
@@ -130,7 +132,34 @@ def encuadre(poses):
     return cx, cy, lado, suelo_y
 
 
+# Estilo de línea: cada segmento con contorno oscuro y relleno blanco, como
+# los dibujos de línea de Everkinetic. Primero todos los contornos y luego
+# todos los rellenos, para que las uniones no se vean cortadas.
+TINTA, TINTA_LEJOS = "#1d1f24", "#8b9099"
+
+
+def figura_linea(p):
+    j = p["j"]
+
+    def seg(a, b, color, w):
+        return (f'<line x1="{j[a][0]:.1f}" y1="{j[a][1]:.1f}" x2="{j[b][0]:.1f}" y2="{j[b][1]:.1f}" '
+                f'stroke="{color}" stroke-width="{w}" stroke-linecap="round"/>')
+
+    lejos = [("hombro", "codo2", 6), ("codo2", "mano2", 5.5), ("cadera", "rodilla2", 7.5), ("rodilla2", "tobillo2", 6.5), ("tobillo2", "pie2", 5)]
+    cerca = [("cadera", "hombro", 11), ("cadera", "rodilla1", 8), ("rodilla1", "tobillo1", 7), ("tobillo1", "pie1", 5.5),
+             ("hombro", "codo1", 7), ("codo1", "mano1", 6.5)]
+    partes = [dibujar_objeto(o, j, TINTA) for o in p["objetos"] if o[0] in ("caja", "linea", "rodillo", "arco")]
+    partes += [seg(a, b, TINTA_LEJOS, w + 3) for a, b, w in lejos] + [seg(a, b, "#fff", w) for a, b, w in lejos]
+    partes += [seg(a, b, TINTA, w + 3.4) for a, b, w in cerca] + [seg(a, b, "#fff", w) for a, b, w in cerca]
+    hx, hy = j["cabeza"]
+    partes.append(f'<circle cx="{hx:.1f}" cy="{hy:.1f}" r="{CABEZA}" fill="#fff" stroke="{TINTA}" stroke-width="1.8"/>')
+    partes += [dibujar_objeto(o, j, TINTA) for o in p["objetos"] if o[0] not in ("caja", "linea", "rodillo", "arco")]
+    return "".join(partes)
+
+
 def figura(p):
+    if p.get("linea"):
+        return figura_linea(p)
     j = p["j"]
 
     def seg(a, b, color, w):
@@ -185,6 +214,22 @@ TUMBADO_ABAJO = dict(t=180, a1=(180, 180), l1=(0, 0, 80))         # boca abajo, 
 
 def P(base=None, **k):
     return pose(**{**(base or {}), **k})
+
+
+def igualar(ref, p, junta):
+    """Mueve la postura `p` (solo el muñeco, no los objetos fijos) para que su
+    `junta` caiga donde la de `ref`: así los pies (o las manos en la barra)
+    no saltan entre una postura y otra."""
+    dx = ref["j"][junta][0] - p["j"][junta][0]
+    dy = ref["j"][junta][1] - p["j"][junta][1]
+    p["j"] = {k: (x + dx, y + dy) for k, (x, y) in p["j"].items()}
+    return p
+
+
+def L(p):
+    """Marca la postura para el estilo de línea."""
+    p["linea"] = True
+    return p
 
 
 MUNECOS = {
@@ -388,6 +433,64 @@ YOGA = {
 }
 
 
+
+# --- Estilo de línea, con dos posturas (20-10-2026) -------------------------
+# Para los ejercicios cuyo dibujo de Everkinetic viene cortado o no es del
+# ejercicio. La segunda postura se coloca con `igualar` sobre el apoyo.
+BARRA_ESPALDA = [("disco", "hombro", 8)]
+LINEA = {}
+
+
+def par(nombre, a, b, apoyo="tobillo1"):
+    a, b = L(a), L(b)
+    LINEA[nombre] = (a, igualar(a, b, apoyo) if apoyo else b)
+
+
+par("Sentadilla", P(DE_PIE, a1=(115, -55), a2=(118, -52), objetos=BARRA_ESPALDA),
+    P(t=-52, a1=(150, -10), a2=(153, -8), l1=(12, 112, 0), l2=(15, 114, 0), objetos=BARRA_ESPALDA))
+par("Sentadilla en multipower", P(DE_PIE, a1=(115, -55), a2=(118, -52), objetos=BARRA_ESPALDA + [("linea", (-22, -78), (-22, 44)), ("linea", (22, -78), (22, 44))]),
+    P(t=-58, a1=(150, -10), a2=(153, -8), l1=(10, 110, 0), l2=(13, 112, 0), objetos=BARRA_ESPALDA + [("linea", (-22, -78), (-22, 44)), ("linea", (22, -78), (22, 44))]))
+par("Sentadilla frontal", P(DE_PIE, a1=(20, 190), a2=(24, 192), objetos=[("disco", "mano1", 8)]),
+    P(t=-72, a1=(20, 190), a2=(24, 192), l1=(8, 108, 0), l2=(11, 110, 0), objetos=[("disco", "mano1", 8)]))
+par("Sentadilla goblet", P(DE_PIE, a1=(60, -110), a2=(64, -106), objetos=[("mancuerna", "mano1")]),
+    P(t=-68, a1=(60, -110), a2=(64, -106), l1=(8, 108, 0), l2=(11, 110, 0), objetos=[("mancuerna", "mano1")]))
+par("Peso muerto", P(DE_PIE, a1=(92, 90), a2=(95, 92), objetos=[("disco", "mano1", 10)]),
+    P(t=-22, a1=(90, 90), a2=(92, 92), l1=(55, 112, 0), l2=(58, 114, 0), objetos=[("disco", "mano1", 10)]))
+par("Peso muerto sumo", P(DE_PIE, a1=(92, 90), a2=(95, 92), l1=(80, 95, 0), l2=(100, 85, 0), objetos=[("disco", "mano1", 10)]),
+    P(t=-40, a1=(90, 90), a2=(92, 92), l1=(30, 105, 0), l2=(40, 100, 0), objetos=[("disco", "mano1", 10)]))
+par("Peso muerto rumano", P(DE_PIE, a1=(92, 90), a2=(95, 92), objetos=[("disco", "mano1", 7)]),
+    P(t=-12, a1=(90, 90), a2=(92, 92), l1=(80, 98, 0), l2=(82, 100, 0), objetos=[("disco", "mano1", 7)]))
+par("Zancadas", P(DE_PIE, a1=(92, 90), a2=(95, 92), objetos=[("mancuerna", "mano1")]),
+    P(t=-88, a1=(92, 90), a2=(95, 92), l1=(12, 92, 0), l2=(118, 168, 180), objetos=[("mancuerna", "mano1")]))
+par("Zancadas hacia atrás", P(DE_PIE, a1=(92, 90), a2=(95, 92), objetos=[("mancuerna", "mano1")]),
+    P(t=-88, a1=(92, 90), a2=(95, 92), l1=(12, 92, 0), l2=(118, 168, 180), objetos=[("mancuerna", "mano1")]))
+par("Rueda abdominal", P(t=-38, cabeza=-38, a1=(85, 85), a2=(87, 87), l1=(70, 180, 90), l2=(72, 182, 90), objetos=[("rueda", "mano1")]),
+    P(t=-6, cabeza=-6, a1=(4, 6), a2=(6, 8), l1=(150, 180, 90), l2=(152, 182, 90), objetos=[("rueda", "mano1")]), apoyo="rodilla1")
+par("Hip thrust", P(t=-151, a1=(29, 29), a2=(31, 31), l1=(-30, 69, 0), l2=(-27, 72, 0), objetos=[("disco", "cadera", 7), ("caja", -50, 4, 26, 18)]),
+    P(t=180, a1=(5, -5), a2=(7, -3), l1=(0, 90, 0), l2=(3, 92, 0), objetos=[("disco", "cadera", 7), ("caja", -50, 4, 26, 18)]))
+par("Dominadas con lastre", P(DE_PIE, a1=(-90, -90), a2=(-95, -92), l1=(95, 110, 30), l2=(98, 112, 30), suelo=False,
+                              objetos=[("linea", (-16, -64), (16, -64)), ("disco", "cadera", 6)]),
+    P(DE_PIE, a1=(110, -70), a2=(113, -67), l1=(95, 115, 30), l2=(98, 117, 30), suelo=False,
+      objetos=[("linea", (-16, -64), (16, -64)), ("disco", "cadera", 6)]), apoyo="mano1")
+par("Dominadas asistidas", P(DE_PIE, a1=(-90, -90), a2=(-95, -92), l1=(95, 150, 30), l2=(98, 152, 30), suelo=False,
+                             objetos=[("linea", (-16, -64), (16, -64)), ("cuerda", "rodilla1", (6, -64))]),
+    P(DE_PIE, a1=(110, -70), a2=(113, -67), l1=(95, 150, 30), l2=(98, 152, 30), suelo=False,
+      objetos=[("linea", (-16, -64), (16, -64)), ("cuerda", "rodilla1", (6, -64))]), apoyo="mano1")
+par("Flexiones con lastre", P(t=-25, a1=(90, 90), a2=(92, 92), l1=(155, 155, 90), l2=(157, 157, 90), objetos=[("disco", "hombro", 6)]),
+    P(t=-10, a1=(150, 55), a2=(152, 57), l1=(170, 170, 90), l2=(172, 172, 90), objetos=[("disco", "hombro", 6)]), apoyo="pie1")
+par("Máquina de glúteo", P(CUADRUPEDIA, l1=(90, 180, 180), l2=(80, 175, 180), objetos=[("caja", -8, 18, 40, 10)]),
+    P(CUADRUPEDIA, l1=(185, 180, 180), l2=(80, 175, 180), objetos=[("caja", -8, 18, 40, 10)]), apoyo="mano1")
+# Abducción en polea: vista de frente (las dos piernas, a un lado y a otro).
+par("Abducción en polea", P(DE_PIE, a1=(100, 95), a2=(80, 85), l1=(85, 90, 0), l2=(95, 90, 180), objetos=[("cuerda", "tobillo1", (-40, 40))]),
+    P(DE_PIE, a1=(100, 95), a2=(80, 85), l1=(55, 55, 0), l2=(95, 90, 180), objetos=[("cuerda", "tobillo1", (-40, 40))]), apoyo="tobillo2")
+# Los dos de prueba que pidió Dan, en el nuevo estilo.
+par("Elevación de piernas colgado", P(DE_PIE, a1=(-90, -90), a2=(-95, -92), l1=(88, 90, 0), l2=(92, 92, 0), suelo=False,
+                                      objetos=[("linea", (-16, -64), (16, -64))]),
+    P(DE_PIE, a1=(-90, -90), a2=(-95, -92), l1=(-5, -5, -60), l2=(-2, -2, -60), suelo=False,
+      objetos=[("linea", (-16, -64), (16, -64))]), apoyo="mano1")
+par("Curl nórdico", P(t=-90, a1=(90, 90), a2=(92, 92), l1=(90, 180, 90), l2=(92, 180, 90), objetos=[("caja", -46, 22, 50, 6)]),
+    P(t=-40, a1=(30, 40), a2=(33, 43), l1=(90, 180, 90), l2=(92, 180, 90), objetos=[("caja", -46, 22, 50, 6)]), apoyo="rodilla1")
+
 # La otra postura de cada ejercicio con movimiento.
 SEGUNDA = {
     "Cinta de correr": P(t=-80, a1=(130, 60), a2=(60, -30), l1=(125, 60, 20), l2=(30, 120, 0), objetos=[("caja", -34, 40, 74, 5), ("linea", (36, 40), (44, -24))]),
@@ -442,7 +545,7 @@ SEGUNDA = {
 }
 
 # Dibujos propios que sustituyen a uno que había (no era del ejercicio o no era libre).
-SUSTITUIR = {"Face pull", "Curl de muñeca", "Press pallof"}
+SUSTITUIR = {"Face pull", "Curl de muñeca", "Press pallof", *LINEA}
 
 
 def main():
@@ -452,6 +555,9 @@ def main():
     DESTINO.mkdir(parents=True, exist_ok=True)
 
     todos = dict(MUNECOS)
+    for nombre, (a, b) in LINEA.items():
+        todos[nombre] = a
+        SEGUNDA[nombre] = b
     for espanol, sanscrito in re.findall(r"yoga\('([^']+)', '([^']+)'", catalogo):
         if sanscrito in YOGA:
             todos[f"{espanol} ({sanscrito})"] = YOGA[sanscrito]

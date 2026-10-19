@@ -170,6 +170,38 @@ export function modal(titulo, contenido) {
   return cerrar;
 }
 
+// Ver algo en grande (el mapa del cuerpo, el equilibrio, el dibujo de un
+// ejercicio): ocupa toda la pantalla y, si tumbas el móvil, se tumba con él
+// (la app va siempre en vertical, así que se mira cómo está el móvil).
+export function ampliar(titulo, construir) {
+  const lienzo = h('div', { class: 'ampliado-lienzo' }, construir());
+  const cerrar = modal(titulo, lienzo);
+  const caja = lienzo.closest('.modal');
+  caja?.classList.add('modal-ampliado');
+  const girar = (e) => {
+    if (!lienzo.isConnected) { removeEventListener('deviceorientation', girar); return; }
+    if (e.gamma == null) return;
+    // De lado: inclinado más de 55° a un lado y no tumbado boca arriba.
+    const lado = Math.abs(e.gamma) > 55 && Math.abs(e.beta ?? 0) < 50 ? (e.gamma > 0 ? 'derecha' : 'izquierda') : null;
+    caja?.classList.toggle('tumbado', Boolean(lado));
+    caja?.classList.toggle('tumbado-izquierda', lado === 'izquierda');
+  };
+  addEventListener('deviceorientation', girar);
+  return cerrar;
+}
+
+// Un «?» pequeño en la esquina de abajo a la derecha de una tarjeta, para los
+// curiosos: abre la explicación en un cartel (`construir` devuelve lo que va
+// dentro). La tarjeta necesita la clase `con-ayuda-esquina`.
+export function ayudaEsquina(titulo, construir) {
+  return h('button', { type: 'button', class: 'que-es ayuda ayuda-esquina', 'aria-label': `Cómo funciona: ${titulo}`,
+    onclick: (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const cerrar = modal(titulo, h('div', { class: 'ayuda-texto' }, construir(), h('button', { class: 'boton', onclick: () => cerrar() }, 'Entendido')));
+    } }, '?');
+}
+
 // Elegir una opción sin desplegables: en el móvil, un <select> saca la barra
 // de «Anterior / Siguiente» y se entiende mal. Con pocas opciones salen
 // botones que se quedan marcados; con muchas, un botón con lo elegido que abre

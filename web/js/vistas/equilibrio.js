@@ -6,7 +6,8 @@
 import { formatearNumero } from '../calculos.js';
 import { MUSCULOS, TREN_INFERIOR, TREN_SUPERIOR } from '../musculos.js';
 import { durezaSemanal, seriesEnDias } from '../recuperacion.js';
-import { h } from '../ui.js';
+import { ampliar, h } from '../ui.js';
+import { pista } from './tutorial.js';
 import { objetivoSeries } from './cuerpo.js';
 
 // Zonas del cuerpo: los 20 músculos juntados en 12, como hace Lyfta.
@@ -62,12 +63,15 @@ export function tarjetaEquilibrio(d) {
     const total = valores.reduce((t, v) => t + v.hechas, 0);
     // Radio: en «Zonas», frente al objetivo (el anillo discontinuo es el 100 %);
     // en lo demás, frente al eje que más lleva.
+    // Con pocas sesiones, frente al objetivo todo quedaba en un puntito: el
+    // radio va con la raíz cuadrada (lo pequeño se ve más grande y el orden
+    // no cambia).
     const tope = porObjetivo ? 1.5 : Math.max(...valores.map((v) => v.hechas), 1);
-    const radio = (v) => Math.min(1, (porObjetivo ? v.pct : v.hechas) / tope);
+    const radio = (v) => Math.sqrt(Math.min(1, (porObjetivo ? v.pct : v.hechas) / tope));
 
     caja.replaceChildren(
       h('h2', { class: 'centrado' }, 'Equilibrio'),
-      h('p', { class: 'nota centrado' }, 'Qué entrenas más y qué tienes descompensado.'),
+      pista('equilibrio', 'Qué entrenas más y qué tienes descompensado. Toca las opciones para verlo de otra forma, y el gráfico para verlo en grande.'),
       h('div', { class: 'grupo-botones' },
         filaBotones(Object.entries(MODOS).map(([k, x]) => [k, x.texto]), modo, (k) => { modo = k; pintar(); })),
       h('div', { class: 'grupo-botones' },
@@ -81,7 +85,9 @@ export function tarjetaEquilibrio(d) {
             onchange: (e) => { const n = Math.round(Number(e.target.value)); dias = n >= 1 && n <= 365 ? n : dias; pintar(); } }),
           'días')),
       total
-        ? arana(valores.map((v) => ({ ...v, r: radio(v) })), porObjetivo ? 1 / 1.5 : null)
+        ? h('button', { type: 'button', class: 'arana-boton', 'aria-label': 'Ver el equilibrio en grande',
+          onclick: () => ampliar('Equilibrio', () => arana(valores.map((v) => ({ ...v, r: radio(v) })), porObjetivo ? Math.sqrt(1 / 1.5) : null)) },
+        arana(valores.map((v) => ({ ...v, r: radio(v) })), porObjetivo ? Math.sqrt(1 / 1.5) : null))
         : h('p', { class: 'suave centrado' }, `Sin series ${dias === 7 ? 'esta semana' : dias === 30 ? 'este mes' : `en los últimos ${dias} días`}.`),
       total > 0 && h('ul', { class: 'nota lista-equilibrio' }, conclusiones(valores, porObjetivo).map((t) => h('li', {}, t))));
   };
@@ -130,7 +136,7 @@ function arana(valores, anilloObjetivo) {
     for (const x of hijos.flat()) if (x != null && x !== false) e.append(x);
     return e;
   };
-  const T = 320; const C = T / 2; const R = 120;
+  const T = 320; const C = T / 2; const R = 132;
   const k = valores.length;
   const punto = (i, r) => {
     const a = -Math.PI / 2 + (2 * Math.PI * i) / k;
@@ -138,7 +144,7 @@ function arana(valores, anilloObjetivo) {
   };
   const poligono = (r) => valores.map((_, i) => punto(i, typeof r === 'function' ? r(i) : r).map((x) => x.toFixed(1)).join(',')).join(' ');
   // Márgenes anchos a los lados para que las etiquetas quepan en el móvil.
-  return nodo('svg', { viewBox: `-100 -30 ${T + 200} ${T + 60}`, class: 'arana', role: 'img',
+  return nodo('svg', { viewBox: `-78 -34 ${T + 156} ${T + 68}`, class: 'arana', role: 'img',
     'aria-label': valores.map((v) => `${v.nombre}: ${formatearNumero(Math.round(v.hechas * 10) / 10)} series`).join('. ') },
   [0.25, 0.5, 0.75, 1].map((r) => nodo('polygon', { points: poligono(r), class: 'arana-red' })),
   valores.map((_, i) => { const [x, y] = punto(i, 1); return nodo('line', { x1: C, y1: C, x2: x, y2: y, class: 'arana-red' }); }),

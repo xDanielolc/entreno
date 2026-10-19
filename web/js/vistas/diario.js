@@ -139,11 +139,11 @@ function resumen(d, hoy) {
   ];
   return h('section', { class: 'tarjeta' },
     h('div', { class: 'titulo-con-ayuda' }, h('h2', {}, 'Tu semana'),
-      ayuda('Tu semana', null, { lista: [
+      ayuda('Tu semana', [
         'Sueño real: tiempo en cama menos lo que tardas en dormirte, lo que estás despierto y lo que remoloneas. Eficiencia normal: 85 % o más (Ohayon 2004).',
         'Fin de semana frente a laborables: si duermes más de una hora de más el fin de semana, arrastras deuda de sueño (Roenneberg 2012).',
         'Repeticiones en básicos: las de tus series de trabajo de banca, sentadilla, peso muerto, remo y press militar, y en paréntesis el cambio frente a la semana anterior. Dormir poco se nota antes en el volumen que aguantas que en tu 1RM (Cook 2012; Knowles 2022).',
-      ] })),
+      ])),
     h('table', { class: 'tabla-musculos tabla-semana' },
       h('thead', {}, h('tr', {}, h('th', {}, ''), h('th', {}, 'Esta semana'), h('th', {}, 'La anterior'))),
       h('tbody', {}, filas.map(([t, x, y]) => h('tr', {}, h('td', {}, t), h('td', {}, x), h('td', {}, y))))));

@@ -5,6 +5,7 @@
 import {
   aPesoDisponible, cargaCorporal, esfuerzoTotal, lecturaDesdeCarga, redondear, rmDeReferencia, saltoAjustado, sugerenciaSerie,
   tramosPropuestos, usaTramos,
+  recamaraPorDefectoDe,
 } from './calculos.js';
 import { recamaraDe, tramosDe } from './esquema.js';
 import { modeloDe, repsParaIgualar, rmDeSerie } from './formula1rm.js';
@@ -109,7 +110,7 @@ export function crearSerieDesdePlan(datos, ejercicio, plan, { excluirSesion, rmH
     tecnicas: [...(plan.tecnicas || [])],
     detalle: {},
     // La recámara que pide la regla (fuerza: 2) manda sobre la del ejercicio y la de Ajustes.
-    recamara: recamaraDe(plan.tecnicas, plan.progresion?.recamaraMin ?? ejercicio.recamaraPorDefecto ?? datos.perfil.recamaraPorDefecto ?? 1),
+    recamara: recamaraDe(plan.tecnicas, recamaraPorDefectoDe(datos, ejercicio, plan)),
     carga,
     lectura: ejercicio.carga.tipo === 'asistida' ? lecturaDesdeCarga(carga, datos.perfil.pesoCorporalKg) : null,
     esfuerzo: null,

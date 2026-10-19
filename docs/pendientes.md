@@ -293,3 +293,20 @@ Pasado a `pendientes-design.md`. Se deja aquí lo que ya había, como historia.
 - ¿Hasta dónde llega la app web? Dan preguntó si esto podrá ser «una app
   genuina» algún día. Respuesta corta: sí, y sin rehacerla (ver la nota en
   CLAUDE.md). Queda anotado por si algún día quiere darle ese paso.
+
+## 0d. Ronda 0.54 (20-10-2026): lo que queda
+
+- [ ] **Comprobar la rutina «Fuerza sin máquinas» contra la que tiene Dan
+  estipulada**, día por día y serie por serie (él no ha podido; pidió dejarlo
+  como pendiente). Esperar también a la respuesta de la conversación de
+  investigación sobre el calentamiento (cuántas series de aproximación, a qué
+  % y con cuántas repeticiones; por qué máxima y luego bajar).
+- [ ] **App a la medida de cada uno** (idea de Dan, sin prisa): activar o
+  quitar apartados enteros (Diario, Cuerpo, Historial…) y, dentro de cada
+  uno, lo que se ve (por ejemplo, en Hoy el sueño sí y el peso no).
+- [ ] Dibujos: pasar el resto de muñecos al estilo de línea si a Dan le
+  gustan los de prueba (curl nórdico y elevación de piernas colgado); remo en
+  máquina (sale el de polea); flexiones en pica y en pino, aperturas de pecho
+  y elevaciones laterales en polea, sin animar.
+- [ ] Diario, fases B y C (ver CLAUDE.md, ronda 0.52.0).
+

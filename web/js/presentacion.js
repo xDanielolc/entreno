@@ -1,25 +1,26 @@
 // La presentación al abrir la app (la pesa que salta y la caja que la
-// atrapa) y sus sonidos. Sale al arrancar y también al volver a la app tras
-// un buen rato fuera: si el móvil la tenía guardada en segundo plano, abrirla
-// desde el icono no la arranca de nuevo y la presentación no salía.
+// atrapa) y sus sonidos. La animación espera quieta hasta que este código la
+// pone en marcha («en-marcha»), y en ese mismo momento se programan los
+// sonidos: así suenan cuando se ve el golpe. Sale al arrancar y también al
+// volver a la app tras un buen rato fuera (si el móvil la tenía guardada en
+// segundo plano, abrirla desde el icono no la arrancaba de nuevo).
 
 const CLAVE = 'entreno-presentacion';
-export const DURACION_MS = 2850;
+export const DURACION_MS = 4400;
 // Fuera más de esto, al volver se repite la presentación.
 const AUSENCIA_PARA_REPETIR_MS = 20 * 60 * 1000;
 
-// Cuándo suena cada cosa, en segundos desde que empieza la animación. Salen
-// de los fotogramas clave del CSS (estilo.css, «Presentación al abrir»):
-// la pesa toca el suelo en el 28, 60 y 88 % de su segundo de saltos; la caja
-// empieza a moverse a los 1,05 s.
+// Cuándo suena cada cosa, en segundos desde que arranca. Salen de los
+// fotogramas clave del CSS (estilo.css, «Presentación al abrir»): la pesa
+// toca el suelo en el 30, 60 y 84 % de su 1,8 s de saltos; la caja sale a
+// los 1,75 s.
+const BOTES = [['bote', 1.8 * 0.30, 480], ['bote', 1.8 * 0.60, 560], ['bote', 1.8 * 0.84, 640]];
 const SONIDOS = {
-  // Cae del cielo (0,95 s): la esquina toca el suelo al 30 %, el botecito
-  // vuelve a tocar al 58 % y queda plana al 78 %.
-  cae: [['bote', 0.28, 520], ['bote', 0.60, 600], ['bote', 0.88, 680],
-    ['golpe', 1.05 + 0.95 * 0.30, 1], ['golpe', 1.05 + 0.95 * 0.58, 0.45], ['golpe', 1.05 + 0.95 * 0.78, 0.8]],
-  // Entra por la derecha (0,9 s): choca al 32 % y se asienta al 66 %.
-  derecha: [['bote', 0.28, 520], ['bote', 0.60, 600], ['bote', 0.88, 680],
-    ['golpe', 1.05 + 0.9 * 0.32, 1], ['golpe', 1.05 + 0.9 * 0.66, 0.5]],
+  // Cae del cielo (1,3 s): la esquina choca al 30 % (golpe seco), bota al 58 %
+  // (golpecito) y cae a plano al 78 % (golpe sordo, más grave y más largo).
+  cae: [...BOTES, ['seco', 1.75 + 1.3 * 0.30, 1], ['seco', 1.75 + 1.3 * 0.58, 0.35], ['plano', 1.75 + 1.3 * 0.78, 1]],
+  // Entra por la derecha (1,2 s): choca al 32 % y se asienta al 66 %.
+  derecha: [...BOTES, ['seco', 1.75 + 1.2 * 0.32, 1], ['plano', 1.75 + 1.2 * 0.66, 0.8]],
 };
 
 export function variantePresentacion() {
@@ -41,8 +42,16 @@ export function mostrarPresentacion(variante = variantePresentacion(), { nueva =
   if (!p) return;
   const quitar = () => p.remove();
   p.addEventListener('click', quitar, { once: true });
-  setTimeout(quitar, DURACION_MS);
-  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) sonar(p, p.className || variante);
+  const quieto = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const arrancar = (sonidos) => {
+    p.classList.add('en-marcha');
+    sonidos?.();
+    setTimeout(quitar, quieto ? 1300 : DURACION_MS);
+  };
+  if (quieto) { arrancar(null); return; }
+  // Animación y sonido salen juntos: se espera (como mucho 0,2 s) a que el
+  // audio esté listo y en ese instante arrancan los dos.
+  preparar(p.className.trim() || variante).then(arrancar);
 }
 
 // Al volver a la app tras más de 20 minutos fuera, se repite.
@@ -56,48 +65,56 @@ export function repetirAlVolver() {
 }
 
 // Los sonidos, sintetizados (sin archivos). Se programan con el reloj del
-// audio, a partir de lo que lleva ya la animación, y descontando lo que
-// tarda el altavoz en sonar (en Android, a menudo 0,1 s o más): así cada
-// golpe suena cuando se ve. El navegador solo deja sonar si ya has tocado la
-// app alguna vez; si no, se queda mudo.
-function sonar(presentacion, variante) {
+// audio, descontando lo que tarda el altavoz en sonar (en Android, a menudo
+// 0,1 s o más). El navegador solo deja sonar si ya has tocado la app alguna
+// vez; si no, la animación sale igual, muda.
+function preparar(variante) {
   let audio;
-  try { audio = new AudioContext({ latencyHint: 'interactive' }); } catch { return; }
-  const bote = (t, tono) => {
-    const o = audio.createOscillator(); const v = audio.createGain();
-    o.type = 'sine';
-    o.frequency.setValueAtTime(tono * 0.6, t);
-    o.frequency.exponentialRampToValueAtTime(tono, t + 0.05);
-    o.frequency.exponentialRampToValueAtTime(tono * 0.8, t + 0.14);
-    v.gain.setValueAtTime(0.0001, t);
-    v.gain.exponentialRampToValueAtTime(0.18, t + 0.006);
-    v.gain.exponentialRampToValueAtTime(0.0001, t + 0.16);
-    o.connect(v).connect(audio.destination); o.start(t); o.stop(t + 0.18);
+  try { audio = new AudioContext({ latencyHint: 'interactive' }); } catch { return Promise.resolve(null); }
+  const salida = audio.destination;
+  // Ruido blanco corto: la parte «seca» de un golpe.
+  const ruido = (t, dur, filtroHz, fuerza) => {
+    const buffer = audio.createBuffer(1, Math.ceil(audio.sampleRate * dur), audio.sampleRate);
+    const datos = buffer.getChannelData(0);
+    for (let i = 0; i < datos.length; i++) datos[i] = (Math.random() * 2 - 1) * (1 - i / datos.length) ** 3;
+    const fuente = audio.createBufferSource(); fuente.buffer = buffer;
+    const filtro = audio.createBiquadFilter(); filtro.type = 'lowpass'; filtro.frequency.value = filtroHz;
+    const v = audio.createGain(); v.gain.value = fuerza;
+    fuente.connect(filtro).connect(v).connect(salida);
+    fuente.start(t);
   };
-  const golpe = (t, fuerza) => {
+  // Un tono que cae: el cuerpo grave del golpe o el «boing» del bote.
+  const tono = (t, desde, hasta, dur, fuerza, tipo = 'sine', ataque = 0.004) => {
     const o = audio.createOscillator(); const v = audio.createGain();
-    o.type = 'triangle';
-    o.frequency.setValueAtTime(150, t);
-    o.frequency.exponentialRampToValueAtTime(55, t + 0.18);
+    o.type = tipo;
+    o.frequency.setValueAtTime(desde, t);
+    o.frequency.exponentialRampToValueAtTime(hasta, t + dur);
     v.gain.setValueAtTime(0.0001, t);
-    v.gain.exponentialRampToValueAtTime(0.35 * fuerza, t + 0.004);
-    v.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
-    o.connect(v).connect(audio.destination); o.start(t); o.stop(t + 0.26);
+    v.gain.exponentialRampToValueAtTime(fuerza, t + ataque);
+    v.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(v).connect(salida); o.start(t); o.stop(t + dur + 0.02);
+  };
+  const sonidos = {
+    // La pesa rebotando: un «boing» corto y agudo.
+    bote: (t, f) => { tono(t, f * 0.6, f, 0.05, 0.16); tono(t + 0.05, f, f * 0.8, 0.1, 0.08); },
+    // La caja chocando: golpe seco, con chasquido y poco cuerpo.
+    seco: (t, x) => { ruido(t, 0.05, 2200, 0.55 * x); tono(t, 170, 70, 0.12, 0.35 * x, 'triangle', 0.002); },
+    // La caja cayendo a plano: golpe sordo, más grave, más largo y blando.
+    plano: (t, x) => { ruido(t, 0.16, 500, 0.35 * x); tono(t, 95, 42, 0.3, 0.32 * x, 'sine', 0.015); },
   };
   const programar = () => {
-    if (audio.state !== 'running') return;
-    const anim = presentacion.querySelector('.pesa')?.getAnimations?.()[0];
-    const lleva = (anim?.currentTime ?? 0) / 1000;
+    if (audio.state !== 'running') { audio.close().catch(() => {}); return; }
     const retraso = (audio.outputLatency || 0) + (audio.baseLatency || 0);
     const ahora = audio.currentTime;
     for (const [tipo, momento, x] of SONIDOS[variante] ?? SONIDOS.cae) {
-      const t = ahora + momento - lleva - retraso;
-      if (t < ahora) continue;   // ya pasó: mejor callado que a destiempo
-      (tipo === 'bote' ? bote : golpe)(t, x);
+      const t = ahora + momento - retraso;
+      if (t > ahora) sonidos[tipo](t, x);
     }
     setTimeout(() => audio.close().catch(() => {}), DURACION_MS);
   };
-  if (audio.state === 'running') programar();
-  else audio.resume().then(programar).catch(() => {});
-  setTimeout(() => { if (audio.state !== 'running') audio.close().catch(() => {}); }, 400);
+  if (audio.state === 'running') return Promise.resolve(programar);
+  return Promise.race([
+    audio.resume().then(() => programar).catch(() => programar),
+    new Promise((ok) => setTimeout(() => ok(programar), 200)),
+  ]);
 }

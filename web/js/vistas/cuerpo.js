@@ -10,7 +10,7 @@ import {
   FACTORES, claseDeRecuperacion, detalleDeRecuperacion, esAutomatico, factorAutomatico, factorPersonal, recuperacionPorMusculo,
   seriesEnDias, seriesSemanales, sugerenciasDeAjuste, textoDeRecuperacion, durezaSemanal,
 } from '../recuperacion.js';
-import { abrirAlLlegar, anadir, aviso, fechaCorta, h, hoyISO, leerNumero, modal, plegable, selector } from '../ui.js';
+import { abrirAlLlegar, ampliar, anadir, aviso, ayudaEsquina, fechaCorta, h, hoyISO, leerNumero, modal, plegable, selector } from '../ui.js';
 import { apuntarPeso, quitarPeso } from '../peso.js';
 import { conGlosario } from './glosario.js';
 import { pista } from './tutorial.js';
@@ -36,7 +36,7 @@ export function tarjetaRecuperacion(datos, { compacta = false, extra = null } = 
     .sort((a, b) => a.porcentaje - b.porcentaje);
   const media = Math.round(ORDEN_MUSCULOS.reduce((t, m) => t + rec[m].porcentaje, 0) / ORDEN_MUSCULOS.length);
 
-  return h('section', { class: 'tarjeta recuperacion' },
+  return h('section', { class: 'tarjeta recuperacion con-ayuda-esquina' },
     h('h2', {}, 'Recuperación'),
     // La media, en una barra bajo el título: se lee de un vistazo.
     h('div', { class: `barra-media ${claseDeRecuperacion(media)}`, role: 'img', 'aria-label': `Recuperación media: ${media} %` },
@@ -61,8 +61,7 @@ export function tarjetaRecuperacion(datos, { compacta = false, extra = null } = 
             !compacta && h('small', { class: 'suave bloque' }, detalleDeRecuperacion(x))))))
       : h('p', { class: 'suave' }, 'Todo recuperado: puedes entrenar lo que quieras.'),
 
-    !compacta && h('details', { class: 'explicacion' },
-      h('summary', {}, '¿Cómo se calculan estos porcentajes y horas?'),
+    ayudaEsquina('Cómo se calcula la recuperación', () => [
       h('p', {}, 'Tu recuperación depende de tres cosas: lo dura que fue la sesión (lo cerca del fallo que acabaste), cuántas series '
         + 'hiciste y tu genética (tu ajuste personal). Justo al acabar el músculo está al 0 % y va subiendo hasta el 100 %.'),
       h('p', { class: 'nota' }, 'Con detalle, para quien quiera saberlo:'),
@@ -75,7 +74,7 @@ export function tarjetaRecuperacion(datos, { compacta = false, extra = null } = 
         h('li', {}, 'Tu ajuste personal por músculo, si lo has puesto (abajo).')),
       h('p', { class: 'nota' }, 'Respaldo: las horas según la cercanía al fallo y que el volumen apenas influya salen de '
         + 'Morán-Navarro (2017) y Pareja-Blanco (2019 y 2020). La forma de la curva del volumen y la media con la serie más dura '
-        + 'son aproximaciones de la app. No hay estudios que den un tiempo fijo por músculo; por eso existe el ajuste personal.')),
+        + 'son aproximaciones de la app. No hay estudios que den un tiempo fijo por músculo; por eso existe el ajuste personal.')]),
 
     extra,
     compacta && h('a', { class: 'boton enlace', href: '#/cuerpo' }, 'Ver el mapa del cuerpo y el volumen'));
@@ -242,7 +241,7 @@ function tarjetaMapa(d) {
   const menos = ORDEN_MUSCULOS.map((m) => ({ m, media: dosMeses[m] / (60 / 7) }))
     .sort((a, b) => a.media - b.media).slice(0, 5);
 
-  return h('section', { class: 'tarjeta recuperacion' },
+  return h('section', { class: 'tarjeta recuperacion con-ayuda-esquina' },
     h('div', { class: 'fila-marcas compacta modos-mapa', role: 'group', 'aria-label': 'Qué enseña el mapa' },
       Object.entries(MODOS_MAPA).map(([clave, texto]) => h('button', { type: 'button',
         class: `boton-marca${clave === modoMapa ? ' activo' : ''}`, 'aria-pressed': String(clave === modoMapa),
@@ -251,6 +250,7 @@ function tarjetaMapa(d) {
       h('span', { class: `leyenda-color ${clase}` }), texto)),
     modoMapa === 'menos' && h('span', { class: 'leyenda-item' }, 'Media de los dos últimos meses')),
     cuerposAmpliables(estados, 'Mapa del cuerpo'),
+    pista('ampliar-mapa', 'Toca el muñeco para verlo en grande (y tumba el móvil si quieres verlo más ancho).'),
     // Debajo, lo mismo en una tabla corta en vez de una frase por músculo.
     modoMapa === 'recuperacion' && (tocados.length
       ? h('table', { class: 'tabla-musculos' },
@@ -265,13 +265,16 @@ function tarjetaMapa(d) {
       h('tbody', {}, menos.map((x) => h('tr', {},
         h('td', {}, h('span', { class: `punto ${estados[x.m].clase}` }), nombreMusculo(x.m, { corto: true })),
         h('td', { class: 'num' }, redondo(x.media)))))),
-    modoMapa === 'recuperacion' && plegable('cuerpo-calculo', 'Cómo se calcula', {},
-      h('ul', { class: 'nota' },
+    modoMapa === 'recuperacion' && ayudaEsquina('Cómo se calcula', () => h('ul', {},
         h('li', {}, 'Justo al acabar, el músculo está al 0 % y sube hasta el 100 %.'),
         h('li', {}, 'Lo que más pesa es lo cerca del fallo que acabaste: de 24 h (3 o más en recámara) a 60 h (al fallo con serie descendente o más de 15 repeticiones).'),
         h('li', {}, 'Más series alargan algo el tiempo, cada vez menos.'),
         h('li', {}, 'Tu ritmo de recuperación (abajo) lo alarga o lo acorta.'),
-        h('li', {}, 'Respaldo: Morán-Navarro 2017 y Pareja-Blanco 2019 y 2020 (miden a las 24 y 48 h; las 36 y 60 h son estimaciones de la app). La forma exacta de la curva es una aproximación de la app.'))));
+        h('li', {}, 'Respaldo: Morán-Navarro 2017 y Pareja-Blanco 2019 y 2020 (miden a las 24 y 48 h; las 36 y 60 h son estimaciones de la app). La forma exacta de la curva es una aproximación de la app.'))),
+    modoMapa === 'semana' && ayudaEsquina('Qué entrenar esta semana', () => h('p', {},
+      'Cada músculo, coloreado según las series que llevas esta semana frente a tu objetivo: rojo, te falta mucho; ámbar, algo; verde, en su sitio; azul, te pasas; morado, te pasas mucho.')),
+    modoMapa === 'menos' && ayudaEsquina('Lo que menos entrenas', () => h('p', {},
+      'La media de series por semana de los dos últimos meses frente a tu objetivo: lo que llevas tiempo dejando de lado.')));
 }
 
 // Series de la semana por músculo, de más a menos, como «8/10».
@@ -298,7 +301,7 @@ function tarjetaSeries(d) {
       }, { titulo: 'Objetivo', botones: true })));
   };
 
-  return h('section', { class: 'tarjeta' },
+  return h('section', { class: 'tarjeta con-ayuda-esquina' },
     h('h2', {}, 'Series por músculo en los últimos 7 días'),
     pasados.length > 0 && h('p', { class: 'aviso-texto' },
       `Te pasas en ${pasados.map((x) => nombreMusculo(x.m, { corto: true })).join(', ')}: vigila que se recuperen antes de volver a cargarlos.`),
@@ -316,16 +319,17 @@ function tarjetaSeries(d) {
       filas.length
         ? h('p', { class: 'nota' }, 'Toca el número para cambiar el objetivo. Solo salen los músculos que has entrenado en los dos últimos meses.')
         : h('p', { class: 'suave' }, 'Aún no hay series en los dos últimos meses.')),
-    plegable('cuerpo-como', 'Cómo funciona', { id: 'como-cuentan-las-series' },
-      h('ul', { class: 'nota' },
+    ayudaEsquina('Cómo funciona', () => [h('ul', {},
         h('li', {}, `Objetivo: ${SERIES_MINIMAS} series por semana, o 6 si la mitad o más van al fallo o con bajadas.`),
         h('li', {}, 'Puedes poner el tuyo tocando el número.'),
         h('li', {}, 'Rojo: te falta mucho. Ámbar: te falta algo. Verde: en su sitio. Azul: te pasas. Morado: te pasas mucho.'),
         h('li', {}, `El máximo es ${SERIES_MAXIMAS} series, o el doble de tu objetivo. Si te pasas y el músculo no se ha recuperado, sale en morado.`),
         h('li', {}, 'Un músculo secundario cuenta media serie. Una serie descendente, según lo que elijas en Ajustes.'),
         h('li', {}, 'Estiramientos, movilidad y yoga no cuentan.')),
-      h('a', { class: 'boton enlace', href: '#/aprender', onclick: () => abrirAlLlegar('ap-de-donde-sale-cada-cosa', 'ap-series-por-musculo-y-semana') },
-        'De dónde salen estos números')));
+      h('a', { class: 'boton secundario', href: '#/aprender', onclick: () => {
+        document.querySelectorAll('.modal-fondo').forEach((m) => m.remove());
+        abrirAlLlegar('ap-de-donde-sale-cada-cosa', 'ap-series-por-musculo-y-semana');
+      } }, 'De dónde salen estos números')]));
 }
 
 // ---------------------------------------------------------------------------
@@ -346,11 +350,10 @@ function tarjetaAjustePersonal(d) {
   });
   const coma = (n) => String(n).replace('.', ',');
 
-  return h('section', { class: 'tarjeta' },
+  return h('section', { class: 'tarjeta con-ayuda-esquina' },
     h('h2', {}, 'Ajustar ritmo de recuperación'),
     sugerencias.map((s) => tarjetaSugerencia(d, s)),
-    plegable('cuerpo-ritmo-que', 'Qué es', {},
-      h('ul', { class: 'nota' },
+    ayudaEsquina('Qué es el ritmo de recuperación', () => h('ul', {},
         h('li', {}, 'Cada persona se recupera a su ritmo. Este número multiplica las horas que calcula la app: ×1,2 son un 20 % más.'),
         h('li', {}, 'En automático, la app lo saca de lo que contestas en «¿Cómo llegas hoy?» al empezar a entrenar (hacen falta 3 respuestas).'),
         h('li', {}, 'También puedes fijarlo a mano.'))),
@@ -374,13 +377,12 @@ export function listaRecomendaciones(lista) {
 }
 
 // La página no se amplía con dos dedos (molesta al apuntar); el mapa sí: al
-// tocarlo se abre grande, de frente y de espaldas uno debajo del otro.
+// tocarlo se abre grande (y se tumba si tumbas el móvil).
 function cuerposAmpliables(estados, titulo) {
   return h('button', { type: 'button', class: 'cuerpos cuerpos-boton', 'aria-label': `${titulo}: ver en grande`,
-    onclick: () => modal(titulo, h('div', { class: 'cuerpos ampliado' },
+    onclick: () => ampliar(titulo, () => h('div', { class: 'cuerpos ampliado' },
       siluetaCuerpo({ vista: 'delante', estadoPorMusculo: estados }),
       siluetaCuerpo({ vista: 'detras', estadoPorMusculo: estados }))) },
   siluetaCuerpo({ vista: 'delante', estadoPorMusculo: estados }),
-  siluetaCuerpo({ vista: 'detras', estadoPorMusculo: estados }),
-  h('span', { class: 'foto-pista' }, 'Ampliar'));
+  siluetaCuerpo({ vista: 'detras', estadoPorMusculo: estados }));
 }

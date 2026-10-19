@@ -861,3 +861,41 @@ fase), tras probar la A.
   aperturas de pecho, flexiones en pica/pino y elevaciones laterales en polea
   siguen sin animar; el estilo único para todo (tema «Cartoon») sigue
   encargado a Design.
+
+## Ronda 0.54.0 (20-10-2026): sus notas de la 0.53
+
+- Entreno: la foto es el mismo `<img>` al cambiar de serie (`fotosVivas`), la
+  pantalla no se mueve y solo entra la serie (`serieEntra`); fuera el
+  letrero «Cómo vas» (pista `foto-estadisticas` una vez). «Desliza para
+  terminar» en el modo «una serie» solo en la última serie del último
+  ejercicio. Calentamientos en columna y con descanso (60 s entre ellos, el
+  normal tras el último). «?» en la esquina de la línea de qué toca
+  (`porQueHoy`): por qué hoy ese peso y ese objetivo, regla por regla.
+- Historial: «Mover a la papelera» y «Estadísticas y cambios» en el resumen
+  del día; mantener pulsado ya no saca el menú del navegador
+  (`contextmenu` en app.js).
+- Flecha de volver arriba: solo en Historial y la lista de Ejercicios, muy
+  abajo, en colores invertidos.
+- Cuerpo: los «Cómo funciona / Qué es / Cómo se calcula» pasan a un «?» en
+  la esquina (`ayudaEsquina` en ui.js); equilibrio sin la frase (pista), con
+  el radio en raíz cuadrada (con pocas series ya no es un puntito) y más
+  grande. `ampliar()` en ui.js: el mapa, el equilibrio y el dibujo de la
+  ficha a pantalla completa; se giran si tumbas el móvil (deviceorientation,
+  porque la app va en vertical). Pistas de uso también en el nivel avanzado
+  (`PISTAS_DE_USO` en tutorial.js).
+- Esquema v20: todas las fórmulas del 1RM a «se ajusta a ti»;
+  `ej.pesoMinimoPct` (con `pesoMinimo`, manda el más alto); recámara por
+  defecto según la serie (`recamaraPorDefectoDe`: 2 si son 6 o menos).
+- Presentación más larga (4,4 s): la pesa entra desde el borde; todo espera
+  a «en-marcha» y animación y sonido arrancan juntos (`preparar`); golpe seco
+  al caer la caja y sordo al quedar plana. Con «reducir movimiento» del
+  sistema (el Windows de Dan lo tiene) solo hay un fundido.
+- Instalar: el botón «Instalar» aparece aunque el aviso del navegador llegue
+  después de pintar la tarjeta.
+- Dibujos: `encajar()` en animar_imagenes.py coloca la segunda postura donde
+  más líneas coinciden (adiós al «teletransporte»). Estilo de línea en
+  `dibujar_munecos.py` (`figura_linea`, `par()`, `igualar()` sobre el pie, la
+  rodilla o la mano): sentadillas, peso muerto, zancadas, rueda, hip thrust,
+  dominadas con lastre y asistidas, flexiones con lastre, máquina de glúteo,
+  abducción y los dos de prueba. Almacén `entreno-imagenes-11`.
+

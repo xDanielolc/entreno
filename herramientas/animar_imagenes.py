@@ -22,7 +22,7 @@ import ssl
 import urllib.request
 from pathlib import Path
 
-from PIL import Image
+from PIL import Image, ImageChops
 
 RAIZ = Path(__file__).resolve().parent.parent
 IMAGENES = RAIZ / "web" / "imagenes"
@@ -76,12 +76,41 @@ def ancla(im):
     return x0 + (fb[0] + fb[2]) / 2, y1
 
 
+def encajar(base, otra):
+    """Dónde poner `otra` para que coincida lo más posible con `base` (lo que
+    no se mueve: banco, máquina, piernas…). Se parte de encajarlas por abajo y
+    se prueba a moverla hasta que solapan más líneas. Devuelve su ancla."""
+    ax, ay = ancla(base)
+    bx, by = ancla(otra)
+    escala = 160 / max(base.width, base.height, otra.width, otra.height)
+    pequeña = lambda im: mascara(im, 200).resize((max(1, round(im.width * escala)), max(1, round(im.height * escala))))
+    a, b = pequeña(base), pequeña(otra)
+    lado = 400
+    lienzo_a = Image.new("L", (lado, lado), 0)
+    lienzo_a.paste(a, (100, 100))
+    # Desplazamiento de partida (encajadas por abajo), en la escala pequeña.
+    x0 = round(100 + (ax - bx) * escala)
+    y0 = round(100 + (ay - by) * escala)
+    mejor, mejor_xy = -1, (x0, y0)
+    for dy in range(-24, 25, 2):
+        for dx in range(-24, 25, 2):
+            lienzo_b = Image.new("L", (lado, lado), 0)
+            lienzo_b.paste(b, (x0 + dx, y0 + dy))
+            n = ImageChops.multiply(lienzo_a, lienzo_b).histogram()[255]
+            if n > mejor:
+                mejor, mejor_xy = n, (x0 + dx, y0 + dy)
+    # La otra va desplazada respecto a la base; su ancla es la de la base menos ese desplazamiento.
+    despl_x = (mejor_xy[0] - 100) / escala
+    despl_y = (mejor_xy[1] - 100) / escala
+    return ax - despl_x, ay - despl_y
+
+
 def animar(fotos, salida, duraciones=(900, 900)):
     """Junta las posturas en un WebP animado sobre blanco, encajadas por abajo.
     Cada postura se coloca con su ancla en el mismo punto; el lienzo es el
     cuadrado que abarca el dibujo de todas (así no se corta nada)."""
     ims = [a_rgb(f) for f in fotos]
-    anclas = [ancla(i) for i in ims]
+    anclas = [ancla(ims[0])] + [encajar(ims[0], im) for im in ims[1:]]
     cajas = [mascara(i).getbbox() or (0, 0, i.width, i.height) for i in ims]
     # Caja de lo dibujado, en coordenadas con el ancla en (0, 0).
     x0 = min(c[0] - a[0] for c, a in zip(cajas, anclas))
@@ -127,7 +156,6 @@ FORZADOS = {
     "Curl martillo": ["biceps-hammer-curl-with-dumbbell", "alternating-hammer-curl-with-dumbbell"],
     "Curl predicador": ["preacher-curl-with-barbell", "two-arm-preacher-curl-with-dumbbell"],
     "Dominadas": ["pull-ups"],
-    "Dominadas asistidas": ["pull-ups"],
     "Dominadas negativas": [("pull-ups", "invertir")],
     "Dominadas supinas": ["chin-ups", "narrow-parallel-grip-chin-ups"],
     "Elevación de gemelos": ["standing-calf-raise-with-dumbbell", "standing-calf-raises-using-machine"],
@@ -135,6 +163,7 @@ FORZADOS = {
     "Elevación de gemelos en prensa": ["calves-press-on-leg-machine"],
     "Elevación de gemelos sentado": ["seated-calf-raise-using-machine", "seated-calf-raise-with-barbell"],
     "Elevación de gemelos tipo burro": ["donkey-calf-raises"],
+    "Gemelo de pie con barra": ["standing-barbell-calf-raise"],
     "Elevaciones frontales": ["front-dumbbell-raise", "front-raises"],
     "Elevaciones laterales": ["lateral-dumbbell-raises"],
     "Encogimientos de trapecio": ["barbell-shrugs", "shoulder-shrugs"],
@@ -148,16 +177,12 @@ FORZADOS = {
     "Fondos de tríceps": ["chest-dips", "tricep-dips-using-body-weight"],
     "Fondos en banco": ["bench-dips"],
     "Fondos en paralelas negativos": [("chest-dips", "invertir")],
-    "Hip thrust": ["bridging"],
     "Hiperextensiones": ["hyperextensions"],
     "Jalón al pecho": ["wide-grip-lat-pull-down", "underhand-pull-downs"],
     "Jalón con agarre estrecho": ["v-bar-pull-down"],
     "Patada de glúteo en polea": ["one-legged-cable-kickback"],
     "Patada de tríceps": ["triceps-kickback-with-dumbbell"],
-    "Peso muerto": [("barbell-dead-lifts", "solo-final")],
     "Peso muerto con mancuernas": ["dumbbell-dead-lifts"],
-    "Peso muerto rumano": [("romanian-dead-lift", "solo-final")],
-    "Peso muerto sumo": [("barbell-dead-lifts", "solo-final")],
     "Plancha lateral": ["side-plank"],
     "Prensa de piernas": ["leg-press"],
     "Press cerrado": ["close-grip-barbell-bench-press"],
@@ -180,18 +205,11 @@ FORZADOS = {
     "Remo en máquina": ["seated-cable-rows"],
     "Remo en polea": ["seated-cable-rows"],
     "Remo invertido": ["body-row"],
-    "Rueda abdominal": ["ab-rollout-on-knees-with-barbell"],
-    "Sentadilla": [("barbell-squat", "solo-final")],
     "Sentadilla búlgara": ["one-leg-squat-with-barbell", "single-leg-squat-with-barbell"],
-    "Sentadilla en multipower": [("smith-machine-squats", "solo-final")],
-    "Sentadilla frontal": [("front-squat-with-barbell", "solo-final")],
-    "Sentadilla goblet": [("pile-squat-with-dumbbell", "solo-final")],
     "Sentadilla hack": ["hack-squat-machine"],
     "Sentadilla sissy": ["weighted-sissy-squat-with-weight-plate"],
     "Subida al cajón": ["step-ups-with-dumbbells"],
     "Superman": ["supermans"],
-    "Zancadas": [("dumbbell-lunges", "solo-inicio")],
-    "Zancadas hacia atrás": [("rear-lunges-with-dumbbell", "solo-inicio")],
 }
 
 

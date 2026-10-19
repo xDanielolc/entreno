@@ -11,9 +11,19 @@ import { h } from '../ui.js';
 const CLAVE = 'entreno-instalar-oculto-hasta';
 let promptDiferido = null;
 
+// El navegador avisa de que se puede instalar (a veces después de pintar la
+// tarjeta): entonces la tarjeta cambia a un solo botón «Instalar», que abre
+// la instalación del propio navegador. Sin ese aviso (Safari, Firefox,
+// algunos navegadores de Android), quedan las instrucciones.
+const tarjetasVivas = new Set();
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   promptDiferido = e;
+  for (const pintar of tarjetasVivas) pintar();
+});
+window.addEventListener('appinstalled', () => {
+  promptDiferido = null;
+  document.querySelectorAll('.tarjeta.instalar').forEach((t) => t.remove());
 });
 
 function instalada() {
@@ -32,9 +42,15 @@ export function tarjetaInstalar() {
   if (instalada() || oculta()) return null;
   const esSamsung = /SamsungBrowser/i.test(navigator.userAgent);
   const esIos = /iPhone|iPad/i.test(navigator.userAgent);
-  const tarjeta = h('section', { class: 'tarjeta instalar' },
+  const tarjeta = h('section', { class: 'tarjeta instalar' });
+  const pintar = () => {
+    if (!tarjeta.isConnected && tarjeta.childElementCount) { tarjetasVivas.delete(pintar); return; }
+    tarjeta.replaceChildren(...contenido());
+  };
+  tarjetasVivas.add(pintar);
+  const contenido = () => [
     h('p', {}, h('strong', {}, 'Instala la app en la pantalla de inicio'), ': sin barra del navegador y sin cobertura.'),
-    h('details', {},
+    !promptDiferido && h('details', {},
       h('summary', {}, 'Cómo se instala'),
       esIos
         ? h('p', { class: 'nota' }, 'En Safari, toca el botón de compartir (el cuadrado con la flecha) y luego «Añadir a pantalla de inicio».')
@@ -44,12 +60,14 @@ export function tarjetaInstalar() {
         + 'de Samsung Internet (fabrica el paquete con una versión de Android antigua): puedes instalar igual, o abrir esta '
         + 'dirección en Chrome, donde no sale.')),
     h('div', { class: 'fila-botones' },
-      h('button', { class: 'boton enlace', onclick: () => { ocultar(30); tarjeta.remove(); } }, 'Ahora no'),
+      h('button', { class: 'boton secundario', onclick: () => { ocultar(30); tarjeta.remove(); } }, 'Ahora no'),
       promptDiferido && h('button', { class: 'boton', onclick: async () => {
         promptDiferido.prompt();
         const { outcome } = await promptDiferido.userChoice;
         promptDiferido = null;
-        if (outcome === 'accepted') tarjeta.remove();
-      } }, 'Instalar')));
+        if (outcome === 'accepted') tarjeta.remove(); else pintar();
+      } }, 'Instalar')),
+  ].filter(Boolean);
+  pintar();
   return tarjeta;
 }

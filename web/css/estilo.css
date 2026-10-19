@@ -1112,8 +1112,8 @@ legend .ayuda, summary .ayuda { margin-left: 6px; vertical-align: middle; }
 /* Volver arriba: abajo a la derecha, encima de las pestañas. */
 .volver-arriba {
   position: fixed; right: 14px; bottom: calc(76px + env(safe-area-inset-bottom, 0px)); z-index: 25;
-  width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--borde);
-  background: var(--superficie); color: var(--acento); font-size: 1.3rem; font-weight: 700;
+  width: 48px; height: 48px; border-radius: 50%; border: 0;
+  background: var(--texto); color: var(--fondo); font-size: 1.4rem; font-weight: 800;
   box-shadow: 0 3px 12px rgba(0,0,0,.2); cursor: pointer;
 }
 .volver-arriba[hidden] { display: none; }
@@ -1489,11 +1489,16 @@ a.boton-privacidad { justify-content: flex-start; padding-left: 18px; }
 .equilibrio .periodo-propio { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 6px; }
 .equilibrio .periodo-propio input { width: 5em; text-align: center; }
 .arana-etiqueta { font-size: 21px; font-weight: 600; }
-.arana { max-width: 420px; }
+.arana { max-width: 100%; }
 
 /* Serie de ciclo: «para superar la última vez» y «ciclo anterior», cada una en su línea. */
 div.sugerencia > span { display: block; }
 .sugerencia .comparativas { margin-top: 6px; display: grid; gap: 2px; font-size: .9rem; }
+/* El «?» de «por qué hoy esto», en la esquina de la línea de qué toca. */
+.sugerencia.con-porque { position: relative; padding-right: 40px; }
+.sugerencia .porque { position: absolute; top: 6px; right: 6px; }
+.serie.entra-izquierda { animation: entra-izquierda .22s ease-out; }
+.serie.entra-derecha { animation: entra-derecha .22s ease-out; }
 .sugerencia .compara { display: block; }
 
 /* Entreno: fecha, lugar y el ojo de la vista en una fila; abajo, bocadillo y ✕ roja. */
@@ -1598,22 +1603,25 @@ div.sugerencia > span { display: block; }
 .aviso-color { color: var(--aviso); }
 
 /* --------------------------------------------------------------------------
-   Presentación al abrir (17-10-2026). La pesa entra a saltos, ya a su tamaño
-   final (así se ve nítida), y la caja del logo la atrapa. Dos variantes, que
-   se eligen en #/prueba-presentacion:
+   Presentación al abrir (20-10-2026). La pesa entra a saltos desde el borde
+   de la pantalla y la caja del logo la atrapa. Todo espera a que el código
+   ponga «en-marcha» (presentacion.js): así la animación y los sonidos salen
+   a la vez. Dos variantes, que se eligen en #/prueba-presentacion:
      · «cae»: la caja cae del cielo, aterriza sobre su esquina derecha
        inclinada (\), da un botecito y cae hacia la izquierda hasta quedar
-       plana (–) con la pesa dentro;
+       plana con la pesa dentro;
      · «derecha»: la caja entra recta por la derecha, choca con la pesa, se
        inclina por el golpe y se asienta.
+   Tiempos (los usa presentacion.js para los sonidos): la pesa toca el suelo
+   a los 0,54, 1,08 y 1,51 s; la caja sale a los 1,75 s. Total, 4,4 s.
    Un toque la quita; con «reducir movimiento», solo un fundido.
    -------------------------------------------------------------------------- */
 #presentacion {
   position: fixed; inset: 0; z-index: 100; overflow: hidden;
   display: flex; align-items: center; justify-content: center;
   background: var(--fondo); color: var(--texto);
-  animation: presentacion-fuera .3s ease-in 2.5s forwards;
 }
+#presentacion.en-marcha { animation: presentacion-fuera .4s ease-in 3.95s forwards; }
 #presentacion .escena { position: relative; width: 240px; height: 140px; }
 #presentacion .caja {
   position: absolute; left: 50%; top: 50%; width: 64px; height: 64px; margin: -32px 0 0 -32px;
@@ -1622,33 +1630,36 @@ div.sugerencia > span { display: block; }
 }
 #presentacion .pesa {
   position: absolute; left: 50%; top: 50%; width: 46px; height: 46px; margin: -23px 0 0 -23px; z-index: 1;
-  color: var(--acento); transform-origin: 50% 90%;
-  animation: pesa-saltar 1s cubic-bezier(.3,0,.4,1) forwards, pesa-dentro .15s linear 1.32s forwards;
+  color: var(--acento); transform-origin: 50% 90%; opacity: 0;
+  animation: pesa-saltar 1.8s linear both, pesa-dentro .15s linear 2.14s forwards;
 }
 #presentacion .pesa svg { width: 100%; height: 100%; display: block; }
 #presentacion .nombre {
   position: absolute; left: 0; right: 0; top: 50%; margin-top: 46px; text-align: center; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em;
   opacity: 0; transform: translateY(8px);
-  animation: nombre-entrar .35s ease-out 1.95s forwards;
+  animation: nombre-entrar .45s ease-out 3s both;
 }
-/* Los saltos: tres botes desde la izquierda, aplastándose al caer. */
+/* Hasta que el código no la pone en marcha, todo quieto (y la pesa, fuera). */
+#presentacion:not(.en-marcha) .pesa, #presentacion:not(.en-marcha) .caja, #presentacion:not(.en-marcha) .nombre { animation-play-state: paused; }
+
+/* Los saltos: desde fuera de la pantalla, tres botes, aplastándose al caer.
+   Cada tramo lleva su propia curva: sube frenando y baja acelerando. */
 @keyframes pesa-saltar {
-  0%   { transform: translate(-170px, 6px) rotate(-12deg) scale(1, 1); opacity: 0; }
-  6%   { opacity: 1; }
-  14%  { transform: translate(-130px, -60px) rotate(-6deg) scale(.92, 1.1); }
-  28%  { transform: translate(-90px, 0) rotate(0deg) scale(1.22, .78); }
-  33%  { transform: translate(-80px, -5px) rotate(2deg) scale(1, 1.02); }
-  46%  { transform: translate(-45px, -42px) rotate(5deg) scale(.94, 1.08); }
-  60%  { transform: translate(-8px, 0) rotate(0deg) scale(1.2, .8); }
-  65%  { transform: translate(-4px, -3px) rotate(-1deg) scale(1, 1); }
-  76%  { transform: translate(0, -20px) rotate(0deg) scale(.96, 1.05); }
-  88%  { transform: translate(0, 0) scale(1.14, .86); }
-  100% { transform: translate(0, 0) scale(1, 1); }
+  0%   { transform: translate(-58vw, -60px) rotate(-14deg) scale(1, 1); opacity: 1; animation-timing-function: cubic-bezier(.5,0,1,.6); }
+  30%  { transform: translate(-26vw, 0) rotate(0deg) scale(1.22, .78); animation-timing-function: ease-out; }
+  34%  { transform: translate(-23vw, -6px) rotate(2deg) scale(.95, 1.06); animation-timing-function: cubic-bezier(.2,.6,.4,1); }
+  46%  { transform: translate(-13vw, -64px) rotate(6deg) scale(.95, 1.06); animation-timing-function: cubic-bezier(.5,0,1,.6); }
+  60%  { transform: translate(-4vw, 0) rotate(0deg) scale(1.2, .8); animation-timing-function: ease-out; }
+  64%  { transform: translate(-3vw, -4px) rotate(-1deg) scale(.97, 1.04); animation-timing-function: cubic-bezier(.2,.6,.4,1); }
+  73%  { transform: translate(0, -28px) rotate(0deg) scale(.97, 1.04); animation-timing-function: cubic-bezier(.5,0,1,.6); }
+  84%  { transform: translate(0, 0) scale(1.14, .86); animation-timing-function: ease-out; }
+  92%  { transform: translate(0, -3px) scale(.98, 1.02); }
+  100% { transform: translate(0, 0) scale(1, 1); opacity: 1; }
 }
 @keyframes pesa-dentro { to { color: var(--acento-texto); } }
 
-/* Variante «cae»: del cielo, esquina derecha, botecito y a plano. */
-#presentacion.cae .caja { animation: caja-cae .95s linear 1.05s forwards; }
+/* Variante «cae»: del cielo, esquina derecha (2,14 s), botecito (2,50 s) y a plano (2,76 s). */
+#presentacion.cae .caja { animation: caja-cae 1.3s linear 1.75s both; }
 @keyframes caja-cae {
   0%   { transform: translateY(-70vh) rotate(-4deg); opacity: 1; animation-timing-function: cubic-bezier(.5,0,1,.6); }
   30%  { transform: translateY(0) rotate(14deg); animation-timing-function: cubic-bezier(.2,.7,.4,1); }
@@ -1659,7 +1670,7 @@ div.sugerencia > span { display: block; }
   100% { transform: none; opacity: 1; }
 }
 /* Mientras está inclinada sobre la esquina, la pesa se mueve con ella. */
-#presentacion.cae .pesa { animation: pesa-saltar 1s cubic-bezier(.3,0,.4,1) forwards, pesa-dentro .15s linear 1.32s forwards, pesa-con-caja .65s linear 1.34s; }
+#presentacion.cae .pesa { animation: pesa-saltar 1.8s linear both, pesa-dentro .15s linear 2.14s forwards, pesa-con-caja .91s linear 2.14s; }
 @keyframes pesa-con-caja {
   0%   { transform: translate(5px, -3px) rotate(14deg); }
   20%  { transform: translate(6px, -12px) rotate(17deg); }
@@ -1669,8 +1680,8 @@ div.sugerencia > span { display: block; }
   100% { transform: none; }
 }
 
-/* Variante «derecha»: entra recta, choca y se asienta. */
-#presentacion.derecha .caja { transform-origin: 0% 100%; animation: caja-derecha .9s linear 1.05s forwards; }
+/* Variante «derecha»: entra recta, choca (2,13 s) y se asienta (2,54 s). */
+#presentacion.derecha .caja { transform-origin: 0% 100%; animation: caja-derecha 1.2s linear 1.75s both; }
 @keyframes caja-derecha {
   0%   { transform: translateX(70vw); opacity: 1; animation-timing-function: cubic-bezier(.4,0,1,.6); }
   32%  { transform: translateX(0) scale(.9, 1.06); animation-timing-function: ease-out; }
@@ -1679,7 +1690,7 @@ div.sugerencia > span { display: block; }
   82%  { transform: rotate(-1.5deg); }
   100% { transform: none; opacity: 1; }
 }
-#presentacion.derecha .pesa { animation: pesa-saltar 1s cubic-bezier(.3,0,.4,1) forwards, pesa-dentro .15s linear 1.32s forwards, pesa-empujon .6s ease-out 1.34s; }
+#presentacion.derecha .pesa { animation: pesa-saltar 1.8s linear both, pesa-dentro .15s linear 2.13s forwards, pesa-empujon .8s ease-out 2.13s; }
 @keyframes pesa-empujon {
   0%   { transform: translateX(-6px); }
   30%  { transform: translate(-10px, -2px) rotate(-12deg); }
@@ -1689,8 +1700,8 @@ div.sugerencia > span { display: block; }
 @keyframes nombre-entrar { to { opacity: 1; transform: none; } }
 @keyframes presentacion-fuera { to { opacity: 0; visibility: hidden; } }
 @media (prefers-reduced-motion: reduce) {
-  #presentacion { animation: presentacion-fuera .3s ease-in .8s forwards; }
-  #presentacion .pesa, #presentacion.cae .pesa, #presentacion.derecha .pesa { animation: none; color: var(--acento-texto); }
+  #presentacion.en-marcha { animation: presentacion-fuera .3s ease-in .9s forwards; }
+  #presentacion .pesa, #presentacion.cae .pesa, #presentacion.derecha .pesa { animation: none; opacity: 1; color: var(--acento-texto); }
   #presentacion .caja, #presentacion.cae .caja, #presentacion.derecha .caja { animation: none; transform: none; opacity: 1; }
   #presentacion .nombre { animation: none; opacity: 1; transform: none; }
 }
@@ -1818,13 +1829,28 @@ body.entreno-a-pantalla .contenido.con-barra-entreno { padding-bottom: calc(var(
 .linea-1rm strong { color: var(--texto); }
 .linea-1rm .boton.enlace { min-width: 0; margin: 0; }
 .sin-series { margin: 8px 0 0; }
+/* El «?» de la esquina de abajo a la derecha de una tarjeta. */
+.con-ayuda-esquina { position: relative; padding-bottom: 46px; }
+.ayuda-esquina { position: absolute; right: 12px; bottom: 12px; }
+/* Ver en grande: a toda la pantalla y, con el móvil de lado, girado. */
+.modal.modal-ampliado { width: 100vw; max-width: 100vw; height: 100dvh; max-height: 100dvh; border-radius: 0; display: grid; grid-template-rows: auto 1fr; }
+.ampliado-lienzo { display: grid; place-items: center; overflow: hidden; min-height: 0; }
+.ampliado-lienzo > * { max-width: 100%; max-height: 100%; }
+.imagen-grande { width: 100%; height: auto; max-height: 80dvh; object-fit: contain; background: #fff; border-radius: var(--radio-pequeno); }
+.modal-ampliado .arana { max-width: none; width: 100%; }
+.modal-ampliado.tumbado .ampliado-lienzo > * { transform: rotate(90deg); width: 80dvh; max-width: 80dvh; max-height: 92vw; }
+.modal-ampliado.tumbado-izquierda .ampliado-lienzo > * { transform: rotate(-90deg); }
+.modal-ampliado.tumbado .cuerpos.ampliado { grid-template-columns: 1fr 1fr; }
+.arana-boton, .imagen-ampliable { display: block; width: 100%; padding: 0; border: 0; background: none; cursor: zoom-in; font: inherit; color: inherit; }
+.modos-mapa .boton-marca { display: flex; align-items: center; justify-content: center; }
+a, button { -webkit-touch-callout: none; }
 .contador-series { scroll-margin-top: 72px; }
 /* Calentamiento: una franja con un botón por serie de aproximación. */
 .franja-calentamiento { display: grid; gap: 6px; margin: 0 0 12px; padding: 10px 12px; border-radius: var(--radio-pequeno); background: var(--superficie-2); }
 .franja-calentamiento .titulo-con-ayuda { margin: 0; }
 .franja-calentamiento .boton.enlace { justify-self: center; margin: 0; min-height: 36px; }
-.chips-calentamiento { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
-.chip-calentamiento { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 4px 12px 4px 6px; border-radius: 999px;
+.chips-calentamiento { display: grid; gap: 6px; }
+.chip-calentamiento { display: flex; width: 100%; align-items: center; gap: 10px; min-height: 44px; padding: 4px 14px 4px 8px; border-radius: 999px;
   border: 1px solid var(--borde); background: var(--superficie); color: var(--texto); font: inherit; font-weight: 600;
   font-variant-numeric: tabular-nums; cursor: pointer; }
 .chip-marca { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--borde); font-size: .85rem; }

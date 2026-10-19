@@ -62,6 +62,12 @@ const EXPLICA_TIPO = {
   libre: 'Cuenta como una serie normal, pero sin objetivo: apuntas lo que hagas.',
 };
 
+// Las fotos del entreno, una por ejercicio: al cambiar de serie se reutiliza
+// la misma imagen, así el dibujo no parpadea ni vuelve a empezar.
+const fotosVivas = new Map();
+// Hacia dónde entra la serie nueva (modo «serie»): solo se anima la serie.
+let serieEntra = null;
+
 // Calentamientos abiertos para cambiar sus pesos («sesión:ejercicio»).
 const calentamientoAbierto = new Set();
 
@@ -222,7 +228,8 @@ export function vistaSesion(contenedor, { id }) {
       return h('div', { class: 'barra-entreno' },
         h('div', { class: 'barra-entreno-fila' },
           h('button', { type: 'button', class: 'boton secundario barra-anadir', onclick: elegirEjercicio }, '+ Añadir ejercicio'), mas),
-        (ultimo || todoHecho) && deslizarParaTerminar());
+        ((ultimo && (!unaSerie || !sesion.ejercicios[posicion] || indiceSerie(sesion.ejercicios[posicion]) >= trabajoDe(sesion.ejercicios[posicion]).length - 1))
+          || todoHecho) && deslizarParaTerminar());
     }
     if (posicion == null) {
       return h('div', { class: 'barra-entreno' }, h('div', { class: 'barra-entreno-fila' }, botonTerminar, mas));
@@ -305,11 +312,13 @@ export function vistaSesion(contenedor, { id }) {
       const entrada = sesion.ejercicios[posicion];
       const k = indiceSerie(entrada) + paso;
       if (entrada && k >= 0 && k < trabajoDe(entrada).length) {
-        direccionPendiente = direccionDeslizar;
+        // La pantalla no se mueve y la foto se queda: solo entra la serie nueva.
+        serieEntra = paso > 0 ? 'izquierda' : 'derecha';
+        direccionDeslizar = null;
+        const y = window.scrollY;
         guardarVista('serie', posicion, k);
         estado.emitir('vista');
-        // Sin volver a la foto: la serie nueva queda donde estaba la anterior.
-        setTimeout(() => document.querySelector('.contador-series')?.scrollIntoView({ block: 'start' }), 0);
+        requestAnimationFrame(() => window.scrollTo(0, y));
         return;
       }
     }
@@ -532,7 +541,8 @@ export function vistaSesion(contenedor, { id }) {
     const grande = posicion != null;
     const tarjeta = h('article', { class: `tarjeta ejercicio-sesion ${modo === 'serie' ? 'de-una-en-una' : ''}${grande ? ' una' : ''}`, 'data-entrada': indice },
       grande && foto && h('button', { type: 'button', class: 'foto-ejercicio', 'aria-label': `Cómo vas en ${ej.nombre}`, onclick: () => verProgreso(ej) },
-        h('img', { src: foto.archivo, alt: '' }), h('span', { class: 'foto-pista' }, 'Cómo vas ›')),
+        fotoViva(foto.archivo)),
+      grande && foto && enCurso && pista('foto-estadisticas', 'Toca el dibujo del ejercicio para ver cómo vas: tus récords y la gráfica.'),
       h('div', { class: 'cabecera-tarjeta' },
         !grande && foto && h('button', { type: 'button', class: 'miniatura-boton', 'aria-label': `Cómo vas en ${ej.nombre}`, onclick: () => verProgreso(ej) },
           h('img', { class: 'miniatura', src: foto.archivo, alt: '', loading: 'lazy' })),
@@ -562,8 +572,12 @@ export function vistaSesion(contenedor, { id }) {
 
       calentamientos.length > 0 && (k == null || k === 0) && franjaCalentamiento(ej, entrada, indice, calentamientos),
       unaSerie && trabajo.length > 1 && puntosSeries(entrada, k, trabajo),
-      entrada.series.map((serie, j) => (calentamientoPrevisto(ej, serie) || (visible != null && j !== visible) ? null
-        : bloqueSerie(ej, entrada, indice, j, serie))),
+      entrada.series.map((serie, j) => {
+        if (calentamientoPrevisto(ej, serie) || (visible != null && j !== visible)) return null;
+        const bloque = bloqueSerie(ej, entrada, indice, j, serie);
+        if (visible != null && serieEntra) { bloque.classList.add(`entra-${serieEntra}`); serieEntra = null; }
+        return bloque;
+      }),
 
       // Sin series: qué hacer, claro. Con series: una más igual o programar.
       vacia && h('p', { class: 'nota centrado sin-series' }, 'Este ejercicio no tiene series. Añade una suelta o prográmalas (con su progresión).'),
@@ -572,6 +586,12 @@ export function vistaSesion(contenedor, { id }) {
         enCurso && h('button', { class: `boton ${vacia ? '' : 'secundario'}`, onclick: () => asistenteEnEntreno(indice, ej) }, 'Programar series')));
     if (enCurso) setTimeout(() => reajustarDebajo(ej, indice), 0);
     return grande && enCurso && movil ? deslizable(tarjeta) : tarjeta;
+  }
+
+  function fotoViva(archivo) {
+    let img = fotosVivas.get(archivo);
+    if (!img) { img = h('img', { src: archivo, alt: '' }); fotosVivas.set(archivo, img); }
+    return img;
   }
 
   // Modo «serie»: «Serie 2 de 4» y un puntito por serie de trabajo (se pueden tocar).
@@ -597,14 +617,23 @@ export function vistaSesion(contenedor, { id }) {
       abierto ? lista.map(([s, j]) => bloqueSerie(ej, entrada, i, j, s))
         : h('div', { class: 'chips-calentamiento' }, lista.map(([s, j]) => {
           const reps = planDe(ej, s)?.objetivoEsfuerzo?.[1] ?? s.esfuerzo;
+          const ultimoCal = j === lista.at(-1)[1];
           return h('button', { type: 'button', class: `chip-calentamiento${s.hecha ? ' hecho' : ''}`, 'aria-pressed': String(Boolean(s.hecha)),
-            onclick: () => cambiarSesion((x) => {
-              const y = x.ejercicios[i].series[j];
-              if (y.hecha) { y.hecha = false; y.esfuerzo = null; y.hechaA = null; return; }
-              y.esfuerzo ??= reps ?? null;
-              y.hecha = true;
-              y.hechaA = new Date().toISOString();
-            }) },
+            onclick: () => {
+              const ahora = !s.hecha;
+              cambiarSesion((x) => {
+                const y = x.ejercicios[i].series[j];
+                if (y.hecha) { y.hecha = false; y.esfuerzo = null; y.hechaA = null; return; }
+                y.esfuerzo ??= reps ?? null;
+                y.hecha = true;
+                y.hechaA = new Date().toISOString();
+              });
+              // Descanso corto entre calentamientos; tras el último, el de siempre.
+              if (ahora) {
+                if (ultimoCal) descansoEntreSeries(ej);
+                else arrancarDescanso(DESCANSO_CALENTAMIENTO, { texto: 'entre calentamientos' });
+              }
+            } },
           h('span', { class: 'chip-marca', 'aria-hidden': 'true' }, s.hecha ? '✓' : ''),
           `${s.carga != null ? `${formatearNumero(s.carga)} ${u}` : 'Ligero'}${reps ? ` × ${reps}` : ''}`);
         })),
@@ -664,9 +693,82 @@ export function vistaSesion(contenedor, { id }) {
         && h('button', { type: 'button', class: 'boton enlace', onclick: () => ponerRMaMano(ej, null) }, rm ? 'Cambiar' : 'Lo sé'));
   }
 
+  // La línea de qué toca, con un «?» en la esquina que cuenta por qué.
+  function lineaSugerencia(ej, serie, entrada = null, j = 0, i = null) {
+    const linea = lineaSugerenciaBase(ej, serie, entrada, j, i);
+    if (!linea || !linea.classList?.contains('sugerencia')) return linea;
+    const razones = porQueHoy(ej, serie, entrada, j, i);
+    if (razones.length) {
+      linea.classList.add('con-porque');
+      linea.append(h('span', { class: 'porque' }, ayuda('Por qué hoy esto', razones)));
+    }
+    return linea;
+  }
+
+  // Por qué toca hoy lo que toca, en llano, según la regla de la serie.
+  function porQueHoy(ej, serie, entrada, j, i) {
+    const plan = planDe(ej, serie);
+    if (!plan) return [];
+    const s = sugerenciaSerie(d, ej, plan, { excluirSesion: id });
+    const prog = plan.progresion ?? {};
+    const uC = unidadCarga(ej);
+    const uE = unidadEsfuerzo(ej);
+    const n = (x) => formatearNumero(x);
+    const rango = s.rango ?? prog.objetivoEsfuerzo ?? plan.objetivoEsfuerzo;
+    const tr = rango ? (rango[0] === rango[1] ? `${rango[0]}` : `${rango[0]} a ${rango[1]}`) : null;
+    const idx = i ?? sesion.ejercicios.indexOf(entrada);
+    const rm = entrada ? rmDelEjercicio(d, ej, { sesion, antesDe: { i: idx, j } }) : null;
+    const deDonde = !rm ? '' : rm.origen === 'hoy' ? ' (sale de una serie de hoy)' : rm.origen === 'manual' ? ' (el que pusiste a mano)' : ' (tu mejor serie de las últimas 8 semanas)';
+    const rec = prog.recamaraMin;
+    const lista = [];
+    if (serie.tipo === 'calentamiento') {
+      lista.push(s.pct > 0 && rm ? `Calentamiento al ${s.pct} % de tu 1RM de ${n(Math.round(rm.valor))} kg${deDonde}.`
+        : s.pct === 0 ? 'Calentamiento con la barra sola.' : 'Calentamiento: un peso ligero.');
+      lista.push('Las series de aproximación suben poco a poco hasta cerca del peso de trabajo, muy lejos del fallo: preparan sin cansar. No cuentan para tu progreso ni para tu 1RM.');
+      return lista;
+    }
+    if (prog.tipo === 'bilbo') {
+      lista.push('Esta serie va en un ciclo (Bilbo): cada sesión el peso sube un poco y haces todas las que puedas.');
+      if (s.ultimaDelCiclo || s.refAnterior) lista.push('El objetivo son las repeticiones que, con el peso de hoy, igualan el 1RM que sacaste la última vez: si las haces, eres más fuerte.');
+      else if (serie.objetivo != null) lista.push(`Es la primera sesión del ciclo: el objetivo son las repeticiones que igualan tu 1RM${rm ? ` de ${n(Math.round(rm.valor))} kg` : ''} con este peso.`);
+      lista.push('Cuando el objetivo baja de 15 repeticiones, el ciclo se acaba y empieza otro más ligero, partiendo de lo mejor que hiciste.');
+      return lista;
+    }
+    if (prog.tipo === 'programa') {
+      lista.push(`Programa ${PROGRAMAS[prog.programa]?.etiqueta ?? ''}: el peso y las repeticiones de hoy los marca el programa según la sesión en la que vas.`);
+      return lista;
+    }
+    if (prog.tipo === 'carga' && prog.porRM) {
+      lista.push(`El peso sale de tu mejor 1RM de las últimas ${prog.porRM.semanas ?? 8} semanas${rm ? ` (${n(Math.round(rm.valor))} kg)` : ''}: ${prog.porRM.fija === 'pct' ? `el ${prog.porRM.valor} % de él` : `el que te deja hacer ${prog.porRM.valor}${rec ? ` dejando ${rec} en recámara` : ''}`}.`);
+      lista.push('Si te haces más fuerte, el 1RM sube y el peso sube solo.');
+      return lista;
+    }
+    if (prog.tipo === 'carga') {
+      const fija = rango && rango[0] === rango[1];
+      lista.push(fija
+        ? `Repeticiones fijas (${tr}). Si haces todas${rec ? ` dejando ${rec} en recámara` : ''}, la próxima vez sube el peso; si no, repites el mismo. Eso es «sube el peso al completarlas».`
+        : `Doble progresión: con el mismo peso vas sumando repeticiones dentro del rango (${tr}). Al llegar arriba${rec ? ` dejando ${rec} en recámara` : ''}, sube el peso y vuelves a empezar por abajo.`);
+      if (!s.ultima) {
+        lista.push(serie.carga != null && rm
+          ? `Es la primera vez con esta serie: el peso es el que te deja hacer ${rango?.[1] ?? '?'}${rec ? ` dejando ${rec} en recámara` : ''} con tu 1RM de ${n(Math.round(rm.valor))} kg${deDonde}, según la fórmula del 1RM.`
+          : 'Es la primera vez con esta serie y la app aún no sabe tu 1RM: por eso pide una prueba.');
+      } else if (s.sube) {
+        lista.push(`La última vez hiciste ${textoSerie(ej, s.ultima.serie)}: llegaste arriba del rango, así que hoy sube a ${n(s.carga)} ${uC}.`);
+      } else {
+        lista.push(`La última vez hiciste ${textoSerie(ej, s.ultima.serie)}. Hasta llegar a ${rango?.[1] ?? '?'} ${uE}${rec ? ` con ${rec} en recámara` : ''}, el peso se queda igual.`
+          + (s.faltaRecamara ? ' Llegaste, pero apurando más de la cuenta: por eso no sube todavía.' : ''));
+      }
+      if (s.ultima) lista.push('En gris, dentro de las casillas vacías, ves lo que hiciste la última vez en esta serie.');
+      return lista;
+    }
+    if (prog.tipo === 'esfuerzo') lista.push('Un poco más cada vez: hoy, algo más que la última vez.');
+    else lista.push('Solo apuntar: la app no te pone objetivo. Ves lo de la última vez (en gris) e intentas superarlo a tu aire.');
+    return lista;
+  }
+
   // Cabecera de cada serie: qué toca hoy y cómo fue la última vez. Nunca
   // «primera vez» en cada serie: si el ejercicio es nuevo, dice qué toca hoy.
-  function lineaSugerencia(ej, serie, entrada = null, j = 0, i = null) {
+  function lineaSugerenciaBase(ej, serie, entrada = null, j = 0, i = null) {
     const plan = (ej.series || []).find((p) => p.id === serie.planId);
     const uCarga = unidadCarga(ej);
     const uEsf = unidadEsfuerzo(ej);
@@ -1673,6 +1775,9 @@ function horaEnFecha(iso, fecha, minutosMas = 0) {
   return nueva.toISOString();
 }
 
+// Entre series de aproximación basta con lo justo para cambiar los discos.
+const DESCANSO_CALENTAMIENTO = 60;
+
 // Un calentamiento que viene de la rutina (con su peso): va en la franja.
 function calentamientoPrevisto(ej, serie) {
   return serie?.tipo === 'calentamiento' && Boolean(planDe(ej, serie)?.calentamiento);
@@ -1708,8 +1813,21 @@ function resumenDelDia(contenedor, d, sesion) {
     sesion.notas && h('p', { class: 'tarjeta nota' }, sesion.notas),
     h('div', { class: 'acciones-hoy' },
       h('button', { class: 'boton', onclick: () => { editando.add(sesion.id); dispatchEvent(new HashChangeEvent('hashchange')); } }, 'Editar'),
-      h('button', { class: 'boton secundario', onclick: () => mostrarResumen(estado.datos(), sesion.id) }, 'Estadísticas'),
-      h('a', { class: 'boton secundario', href: '#/historial' }, 'Volver al historial')));
+      // Las estadísticas también son donde se hacen permanentes los cambios de ese día.
+      h('button', { class: 'boton secundario', onclick: () => mostrarResumen(estado.datos(), sesion.id) }, 'Estadísticas y cambios'),
+      h('a', { class: 'boton secundario', href: '#/historial' }, 'Volver al historial'),
+      sesion.borrada
+        ? h('button', { class: 'boton secundario', onclick: () => estado.cambiar((x) => {
+          const s = x.sesiones.find((y) => y.id === sesion.id); if (s) s.borrada = null;
+        }) }, 'Recuperar entrenamiento')
+        : h('button', { class: 'boton peligro', onclick: async () => {
+          if (!await confirmar('¿Mover este entrenamiento a la papelera? Dejará de contar para tu progresión; se recupera desde el historial.', { si: 'Mover a la papelera', peligro: true })) return;
+          estado.cambiar((x) => { const s = x.sesiones.find((y) => y.id === sesion.id); if (s) s.borrada = new Date().toISOString(); });
+          location.hash = '#/historial';
+          aviso('Entrenamiento en la papelera', { accion: { texto: 'Deshacer', fn: () => estado.cambiar((x) => {
+            const s = x.sesiones.find((y) => y.id === sesion.id); if (s) s.borrada = null;
+          }) } });
+        } }, 'Mover a la papelera')));
 }
 
 function nombreDelDia(datos, sesion) {

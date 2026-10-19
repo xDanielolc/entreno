@@ -67,6 +67,10 @@ const PESTANAS = [
 ];
 
 document.querySelector('.marca-app')?.prepend(icono('marca'));
+// Mantener pulsado un botón o un enlace no saca el menú del navegador (abrir
+// en otra pestaña, copiar enlace…): en una app no pinta nada.
+document.addEventListener('contextmenu', (e) => { if (e.target.closest?.('a, button, .tarjeta')) e.preventDefault(); });
+
 // La presentación: al arrancar y al volver tras un buen rato fuera.
 mostrarPresentacion();
 repetirAlVolver();
@@ -112,24 +116,17 @@ function renderizar() {
 }
 
 // Flecha para volver arriba: abajo a la derecha, a mano del pulgar y por
-// encima de las pestañas. Solo sale al deslizar hacia arriba, cuando ya has
-// bajado bastante, y se va a los dos segundos: así no tapa botones mientras
-// apuntas.
+// encima de las pestañas. Solo en las listas largas (historial y lista de
+// ejercicios) y cuando estás muy abajo; en colores invertidos para que se vea.
 const flechaArriba = h('button', { type: 'button', class: 'volver-arriba', hidden: true, 'aria-label': 'Volver arriba',
   onclick: () => { window.scrollTo({ top: 0, behavior: 'smooth' }); flechaArriba.hidden = true; } }, '↑');
 document.body.append(flechaArriba);
-let ultimoScroll = 0;
-let temporizadorFlecha = null;
+const CON_FLECHA = /^#\/(historial|ejercicios)$/;
 window.addEventListener('scroll', () => {
-  const y = window.scrollY;
-  const subiendo = y < ultimoScroll - 4;
-  ultimoScroll = y;
-  if (y < 600) { flechaArriba.hidden = true; return; }
-  if (!subiendo) return;
-  flechaArriba.hidden = false;
-  clearTimeout(temporizadorFlecha);
-  temporizadorFlecha = setTimeout(() => { flechaArriba.hidden = true; }, 2000);
+  const larga = document.documentElement.scrollHeight > window.innerHeight * 3;
+  flechaArriba.hidden = !(CON_FLECHA.test(location.hash) && larga && window.scrollY > window.innerHeight * 1.5);
 }, { passive: true });
+window.addEventListener('hashchange', () => { flechaArriba.hidden = true; });
 
 // Si hay un entrenamiento a medias y estás en otra pantalla, una banda fija
 // arriba te lleva de vuelta: el entrenamiento no se pierde por cambiar de
@@ -247,7 +244,7 @@ async function guardarImagenesParaSinConexion() {
     const capas = Object.entries(MUSCULOS).flatMap(([clave, m]) => m.vistas.map((v) => archivoCapa(clave, v)));
     const cuerpo = ['imagenes/musculos/cuerpo-delante.svg', 'imagenes/musculos/cuerpo-detras.svg'];
     // El mismo nombre que CACHE_IMAGENES en sw.js: si no, el service worker lo borra.
-    const cache = await caches.open('entreno-imagenes-10');
+    const cache = await caches.open('entreno-imagenes-11');
     for (const ruta of [...cuerpo, ...capas, ...mios]) {
       if (!(await cache.match(ruta, { ignoreSearch: true }))) {
         const r = await fetch(ruta).catch(() => null);
