@@ -160,14 +160,17 @@ export function vistaAprender(contenedor) {
     estirar(),
     comoSeEstimaTuRM(d),
     apartado('Cómo calentar',
-      h('p', {}, 'En este orden: calentamiento general, movilidad dinámica y, justo antes de cada básico, sus series de aproximación.'),
+      h('p', {}, 'En este orden: cardio o bici suave, movilidad de pie y, justo antes de cada básico, sus aproximaciones. Después, las series de trabajo.'),
       h('ul', { class: 'nota' },
-        h('li', {}, 'General, solo al empezar: unos minutos de algo suave (bici o andar rápido). Los días de pierna de la rutina de fuerza son 15 min de cardio, que hacen de calentamiento y de cardio de la semana.'),
-        h('li', {}, 'Movilidad dinámica, 3 min y de pie: círculos de brazos, palo por encima de la cabeza y giros de tronco; o balanceos de pierna, sentadilla profunda sin peso y bisagra de cadera.'),
-        h('li', {}, 'Aproximaciones: el primer básico con serie máxima, barra × 10 (si quieres), 50 % × 5, 70 % × 3 y 85 % × 1; el segundo con máxima, 60 % × 3 y 80 % × 1; un básico moderado, 50 % × 5; rumano y curl femoral, una serie suave. La Bilbo y los accesorios, ninguna: sus primeras repeticiones ya lo son.'),
-        h('li', {}, 'Van muy lejos del fallo (las de 5 al 50 % las harías 20 o 30 veces) y no cuentan como volumen ni para tu 1RM.'),
+        h('li', {}, 'General, solo al empezar: los días de pierna, 10 min de cardio suave (son los dos ratos de cardio de la semana); los de torso, 5 min de bici o andar rápido.'),
+        h('li', {}, 'Movilidad, 3 min, todo de pie y sin pausas. Torso: círculos de brazos, 10 en cada sentido; palo, barra vacía o toalla por encima de la cabeza, 10; giros de tronco con el palo en los hombros, 10 por lado. '
+          + 'Pierna: balanceos adelante y atrás y laterales, 10 por pierna; sentadilla profunda sin peso con 2 s abajo, 8; bisagra de cadera sin peso, 8; el día del sumo, también sentadilla sumo sin peso, 8.'),
+        h('li', {}, 'Aproximaciones: como mucho 3 por ejercicio, contando la barra sola. El primer básico del día con serie máxima: barra × 5, 60 % × 3 y 80 % × 1 '
+          + '(en el sumo se tira desde el suelo, así que la primera va con los discos grandes más ligeros del gimnasio). El segundo con máxima (el militar del día 3): 60 % × 3 y 80 % × 1. '
+          + 'Una sola, a un 50 % × 5: la sentadilla del día 4 y el rumano del día 2. Ninguna: la Bilbo (sus primeras repeticiones ya lo son), el rumano del día 4 (llegas caliente del sumo) y los accesorios.'),
+        h('li', {}, 'Van muy lejos del fallo y no cuentan como volumen ni para tu 1RM.'),
         h('li', {}, 'Sus pesos se redondean de 10 en 10 kg (55 → 50, 77,5 → 80) para calentar rápido y sin cuentas. Es una decisión práctica: '
-          + 'si prefieres los porcentajes exactos de los estudios, desmarca el botón de aquí debajo (también está en Ajustes → Entrenamiento y series). '
+          + 'si prefieres los porcentajes exactos, desmarca el botón de aquí debajo (también está en Ajustes → Entrenamiento y series). '
           + 'Las series de trabajo sí van con el % exacto de tu 1RM (al disco más cercano); si prefieres pesos más redondos para ir más rápido, '
           + 'sube «Los pesos que propone la app van de» en esos Ajustes (5, por ejemplo).',
           (() => {
@@ -179,25 +182,40 @@ export function vistaAprender(contenedor) {
                   aviso(redondo ? 'Calentamientos con el % exacto.' : 'Calentamientos de 10 en 10 kg.');
                 } }, redondo ? 'Calentamientos de 10 en 10 kg' : 'Calentamientos con el % exacto: tocar para redondear'));
           })()),
-        h('li', {}, 'Descansos: las ligeras, seguidas (solo cambiar discos); 2-3 min antes de la de 85 % y antes de la máxima; 3-5 min después de la máxima; 3 min entre las de bajada.'),
+        h('li', {}, 'Descansos: las aproximaciones, seguidas, solo lo que tardes en cambiar discos; 2-3 min entre la última y la serie máxima; 3-5 min tras la máxima.'),
         h('li', {}, 'Nunca estires un músculo 60 s o más seguidos antes de un básico pesado: si lo pide, menos de 60 s y después las aproximaciones. Los estiramientos largos, al terminar.')),
-      h('p', { class: 'nota' }, 'Respaldo: calentar mejoró el rendimiento en el 79 % de lo medido (Fradkin 2010); cardio más aproximaciones subieron el 1RM un 8,4 % frente a solo aproximaciones (Abad 2011); el estiramiento estático de 60 s o más quita fuerza y el de menos de 60 s casi nada (Behm 2016; Warneke y Lohmann 2024). '
-        + 'Decisión práctica, sin estudio que la fije: los porcentajes exactos, cuántas aproximaciones, hacer las ligeras seguidas y la lista de movimientos.')),
+      h('p', { class: 'nota' }, 'Lo que dice la evidencia: calentar mejoró el rendimiento en el 79 % de lo medido y casi nunca lo empeoró (Fradkin 2010); '
+        + 'añadir 20 min de bici suave a dos aproximaciones subió el 1RM un 8,4 % (Abad 2011), y tres aproximaciones como máximo encajan con lo que usan los estudios; '
+        + 'una aproximación más solo afinó un poco la estimación del 1RM (Perez 2021); en series al fallo, ningún calentamiento cambió las repeticiones '
+        + '(Ribeiro 2014; Souza 2024), por eso la Bilbo y los accesorios no llevan aproximación; el estiramiento estático de 60 s o más quita fuerza y el de menos de 60 s casi nada (Behm 2016; Warneke y Lohmann 2024).'),
+      h('p', { class: 'nota' }, 'Decisión práctica, sin estudio: el 60 % y el 80 % de las aproximaciones, el máximo de 3, redondear de 10 en 10 kg, hacerlas seguidas, '
+        + 'los 10 min de cardio y la lista de movimientos. Las guías de test de 1RM usan un esquema parecido (unas repeticiones ligeras y luego 3-5 más pesadas).')),
     apartado('Por qué la serie máxima va primero',
       h('ul', { class: 'nota' },
-        h('li', {}, 'Se hace lo más pesado sin cansancio: el músculo y el sistema nervioso están frescos.'),
-        h('li', {}, 'Mide: una serie de 1-2 con 1-2 en recámara da el 1RM estimado más fiable, porque las fórmulas aciertan más con pocas repeticiones (Mayhew 2008), y practicar el 1RM también entrena (Mattocks 2017). De ahí salen los kilos de todo lo demás.'),
-        h('li', {}, 'Las series de bajada ponen el volumen: añadir 2-3 series de bajada a una serie muy pesada pudo dar más fuerza que la serie pesada sola (Androulakis-Korakakis 2021), y cuanto más se baja, más volumen sale (Helms 2018).'),
-        h('li', {}, 'La bajada de esta rutina es pequeña (máxima al ~90 % y bajada al 80-85 % del 1RM): más exigente que en los estudios. Es una decisión práctica por priorizar la fuerza.'),
+        h('li', {}, 'Se hace lo más pesado sin cansancio: el músculo y el sistema nervioso están frescos. Es mecánica: no hay un ensayo que lo compare con hacerla al final.'),
+        h('li', {}, 'Mide: una serie de 1-2 con 1-2 en recámara da el 1RM estimado más fiable, porque las fórmulas aciertan más con pocas repeticiones (Mayhew 2008), y practicar el 1RM también se entrena: es una habilidad (Mattocks 2017). De esa medida salen los kilos de todo lo demás.'),
+        h('li', {}, 'Las series de bajada ponen el volumen: en powerlifters, una serie muy pesada sola tenía menos probabilidades de dar mejoras claras, y añadirle 2-3 series de bajada pudo dar más fuerza en 6 semanas (Androulakis-Korakakis 2021). Cuanto más se baja respecto a la máxima, más volumen sale (Helms 2018).'),
+        h('li', {}, 'La bajada de esta rutina: máxima a un 90 % y series de bajada al 80 % del 1RM, es decir, al ~89 % del peso de la máxima, más exigente que el ~80 % de Androulakis-Korakakis. No hay estudio que diga cuál es mejor; se mantiene porque la prioridad es la fuerza y se trabaja con 2 en recámara.'),
+        h('li', {}, 'Cuántas series de bajada: el estudio usó 2-3. La sentadilla, el remo y el sumo llevan 3 (con 4, el primer día de sentadilla acabaste sin fuerzas a mitad); la banca se queda en 4 × 4 mientras no dé problemas. Es una decisión práctica.'),
         h('li', {}, 'La «potenciación» (que la serie pesada haga rendir más a las siguientes) no es la razón: en saltos no añadió nada a un buen calentamiento (Rappelt 2024).'))),
-    apartado('Cómo progresan los básicos',
+    apartado('Cómo progresa esta rutina',
+      h('p', {}, 'Básicos (banca, remo, militar, sentadilla y peso muerto): porcentaje del 1RM estimado, corregido por la recámara.'),
       h('ul', { class: 'nota' },
-        h('li', {}, 'Cada serie pesada da un 1RM estimado con el peso, las repeticiones y la recámara. La app usa el de tus series de las últimas dos semanas, que suele salir de la serie máxima.'),
-        h('li', {}, 'Los kilos salen de ese 1RM: la máxima, para 1-2 con 1 en recámara (~90 %); las de bajada, para 4 con 2 en recámara (80-85 %). Si tu 1RM sube, todos los pesos suben solos.'),
-        h('li', {}, 'La recámara corrige: si te sobran (3 o más en recámara, o una repetición más), ese dato sube tu 1RM y la próxima vez el peso sube; si vas justo, el 1RM no sube y el peso se repite; si dos sesiones seguidas va peor, el 1RM de esas dos semanas baja y el peso también.'),
-        h('li', {}, 'El día moderado (Bilbo y normales) y los accesorios van en doble progresión: al llegar arriba del rango en todas las series, más peso y vuelta abajo.'),
-        h('li', {}, 'Para saber si progresas, mira la gráfica del 1RM estimado de cada básico (toca su dibujo en el entreno).')),
+        h('li', {}, 'Cada serie pesada da un 1RM estimado con el peso, las repeticiones y la recámara (repeticiones más recámara: las que harías al fallo). El de la serie máxima de la semana es el más fiable y es el que manda.'),
+        h('li', {}, 'Las series largas no fijan tu 1RM de referencia: la recámara se calcula peor por encima de 12 repeticiones (Halperin 2022). La Bilbo y las series de más de 12 se apuntan, pero no lo cambian. '
+          + 'Eso explica un salto grande el primer día con serie máxima (la sentadilla pasó de 109,6 a 130,7 kg): no es fuerza ganada en una sesión, es que el 1RM viejo salía de series largas y se quedaba corto.'),
+        h('li', {}, 'Los kilos salen de ese 1RM: series de bajada al 80 %, día moderado al 70-75 %, aproximaciones al 60-80 %. Si tu 1RM sube, todos los pesos suben solos.'),
+        h('li', {}, 'Si la serie anterior da otro 1RM a mitad del ejercicio, la app te propone el peso que saldría para las siguientes y tú decides.'),
+        h('li', {}, 'La recámara corrige: si te sobran (3 o más en recámara, o una repetición más con las mismas 2), ese dato sube tu 1RM y la próxima vez el peso sube; '
+          + 'así se puede llegar al 85 %. Si vas justo, el 1RM no sube y el peso se repite; si dos sesiones seguidas va peor, el 1RM de esas dos semanas baja y el peso también.'),
+        h('li', {}, 'Para saber si progresas, mira la gráfica del 1RM estimado de cada básico (toca su dibujo en el entreno): sale de las series de 12 o menos.')),
+      h('p', {}, 'Día moderado (Bilbo y normales; sentadilla al 70-75 %), rumano y accesorios: doble progresión.'),
+      h('ul', { class: 'nota' },
+        h('li', {}, 'Series normales y rumano: cuando todas llegan arriba del rango con la recámara pedida, más peso y vuelta al mínimo del rango. Accesorios, igual, con 1 en recámara.'),
+        h('li', {}, 'Bilbo: su propio ciclo; cuando pasa de 30 repeticiones, sube el peso.'),
+        h('li', {}, 'Con tu peso: dominadas en racimo de 6 × 1-2 a 5 × 3 y luego series normales; negativas, primero bajada más lenta (3 → 5 s) y luego más repeticiones; fondos, de 6 a 10 y luego con lastre.')),
       h('p', { class: 'nota' }, 'Respaldo: elegir la carga por esfuerzo rindió igual o algo mejor que solo por porcentaje (Helms 2018) y los métodos que se autorregulan superaron al porcentaje fijo en fuerza (Huang 2025). Aquí se combinan: porcentaje para poner el peso y recámara para corregirlo. '
+        + 'Decisión práctica: la doble progresión (no hay un ensayo que la compare con otros métodos) y los 2,5 kg. '
         + 'Diferencia con el papel: la rutina dice «+2,5 kg» o «−2,5 kg»; la app no suma ni resta saltos fijos, recalcula el peso con tu 1RM, que hace lo mismo de forma continua.')),
     apartado('Cuánto cuenta una serie descendente',
       h('p', {}, 'Para saber cuánto has trabajado cada músculo, la app convierte las series descendentes en series normales.'),

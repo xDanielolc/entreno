@@ -8,7 +8,7 @@
 // (Dan prefirió quitar la etiqueta del final de cada línea).
 
 import {
-  esfuerzoTotal, formatearNumero, records, registrosDelCiclo, seriesDeEjercicio, trabajoSerie, valeParaRM,
+  esfuerzoTotal, formatearNumero, records, registrosDelCiclo, seriesDeEjercicio, trabajoSerie, valeParaRM, valeParaReferencia,
 } from '../calculos.js';
 import { rmDeSerie } from '../formula1rm.js';
 import { recomendacionesGenerales } from '../recomendaciones.js';
@@ -146,15 +146,19 @@ function tendencia(puntos) {
 
 function graficaHistorial(datos, ejercicio, paleta) {
   const porDia = new Map();
+  // El 1RM de cada día, de las series de 12 o menos sin Bilbo (Halperin 2022);
+  // si el ejercicio no tiene ninguna, de las que haya.
+  const hayCortas = seriesDeEjercicio(datos, ejercicio.id).some((x) => valeParaReferencia(ejercicio, x.serie));
+  const vale = (serie) => (hayCortas ? valeParaReferencia(ejercicio, serie) : valeParaRM(serie));
   for (const x of seriesDeEjercicio(datos, ejercicio.id)) {
-    if (!valeParaRM(x.serie)) continue;
+    if (!vale(x.serie)) continue;
     const v = rmDeSerie(datos, ejercicio, x.serie, esfuerzoTotal(x.serie));
     if (v != null) porDia.set(x.sesion.fecha, Math.max(porDia.get(x.sesion.fecha) ?? 0, v));
   }
   const fechas = [...porDia.keys()].sort();
   // El primer día ya hay gráfica: el 1RM que sale de cada serie de ese día.
   if (fechas.length === 1) {
-    const puntos = seriesDeEjercicio(datos, ejercicio.id).filter((x) => valeParaRM(x.serie))
+    const puntos = seriesDeEjercicio(datos, ejercicio.id).filter((x) => vale(x.serie))
       .map((x) => rmDeSerie(datos, ejercicio, x.serie, esfuerzoTotal(x.serie))).filter((v) => v != null)
       .map((v, k) => ({ x: k + 1, y: Math.round(v * 10) / 10 }));
     if (!puntos.length) return null;

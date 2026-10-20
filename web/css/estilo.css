@@ -1926,6 +1926,9 @@ html { touch-action: pan-x pan-y; }
 .aviso-serie p { margin: 0 0 10px; }
 .aviso-serie .chips, .aviso-serie .fila-botones { justify-content: center; }
 .aviso-saltos { padding-right: 44px; }
+/* El aviso de la rutina para un ejercicio («si la espalda baja va cargada…»). */
+.aviso-rutina { margin: 4px 0 10px; padding: 10px 12px; border-radius: var(--radio-pequeno); background: var(--aviso-fondo); color: var(--aviso);
+  font-weight: 600; text-align: center; }
 .aviso-saltos .cerrar-aviso { position: absolute; top: 6px; right: 6px; }
 .deslizar-terminar.peligro .deslizar-tirador { background: #fff; color: var(--mal); }
 /* La página no se mueve de lado aunque algo se pase de ancho. */

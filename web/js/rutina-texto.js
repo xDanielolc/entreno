@@ -75,6 +75,11 @@ function analizarPieza(texto, tipoTexto = '', comoTexto = '') {
   if (/segun (tu|el) 1rm/.test(t) && forma.tipo !== 'calentamiento') {
     forma.modo = 'rm'; forma.fija = 'reps'; forma.valor = forma.a; forma.semanas = 2;
   }
+  // «3 × 4 al 80 %»: el peso es ese % de tu 1RM y las repeticiones, las pedidas.
+  const alPct = t.match(/\bal (\d+) ?%/);
+  if (alPct && forma.tipo !== 'calentamiento' && forma.tipo !== 'bilbo' && !/del trabajo|de trabajo/.test(t)) {
+    forma.modo = 'rm'; forma.fija = 'pct'; forma.valor = Number(alPct[1]); forma.semanas = 2; forma.conReps = true;
+  }
   // «2 en recámara» (o «2-3 en recámara»): el peso sube solo si te dejas esas.
   const recamara = conComo.match(/(\d)(?:\s*-\s*\d)?\s*en recamara/);
   if (recamara && forma.tipo !== 'maxima' && forma.tipo !== 'bilbo') forma.recamaraMin = Number(recamara[1]);
@@ -155,15 +160,19 @@ export function analizarRutina(texto) {
     const [, nombreEj, conParentesis] = partes;
     // Lo que va entre paréntesis es una nota («en racimo: 45 s entre series»),
     // salvo «opcional» y «superserie», que son marcas.
+    // Si empieza por «!», es un aviso que se ve siempre en el entreno.
     const notas = [];
+    const avisos2 = [];
     const resto = conParentesis.replace(/\(([^)]*)\)/g, (_, dentro) => {
       if (/^\s*(opcional|superserie)\s*$/i.test(dentro)) return ` ${dentro} `;
-      notas.push(dentro.trim());
+      if (/^\s*!/.test(dentro)) avisos2.push(dentro.replace(/^\s*!\s*/, '').trim());
+      else notas.push(dentro.trim());
       return ' ';
     });
     const { formas, opcional, superserie } = analizarSeries(resto);
     if (!formas.length) avisos.push(`«${nombreEj}»: no entiendo las series «${resto}»; entra sin series.`);
-    diaActual().ejercicios.push({ nombre: nombreEj.replace(/^[-•*]\s*/, ''), formas, opcional, superserie, linea, nota: notas.join('; ') || null });
+    diaActual().ejercicios.push({ nombre: nombreEj.replace(/^[-•*]\s*/, ''), formas, opcional, superserie, linea, nota: notas.join('; ') || null,
+      aviso: avisos2.join(' ') || null });
   }
   return { nombre, dias: dias.filter((x) => x.ejercicios.length), avisos };
 }
@@ -247,7 +256,7 @@ export function crearRutinaDesdeTexto(datos, analisis, { nombre, activa = true, 
       const propias = !(ej.series || []).some((p) => !p.soloRutina);
       for (const p of planes) { p.soloRutina = propias ? null : rutina.id; ej.series.push(p); }
       nuevoDia.ejercicios.push({ ejercicioId: ej.id, opcional: Boolean(item.opcional), superserie: Boolean(item.superserie),
-        series: propias ? null : planes.map((p) => p.id), nota: item.nota ?? null });
+        series: propias ? null : planes.map((p) => p.id), nota: item.nota ?? null, ...(item.aviso ? { aviso: item.aviso } : {}) });
     }
     rutina.dias.push(nuevoDia);
   }

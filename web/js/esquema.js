@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 20;
+export const VERSION_ACTUAL = 21;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -529,6 +529,12 @@ const MIGRACIONES = {
   19: (datos) => {
     for (const ej of datos.ejercicios) ej.formula1RM = 'personal';
     datos.version = 20;
+    return datos;
+  },
+  // v20 → v21: campo nuevo opcional en los ejercicios de un día de rutina,
+  // `aviso` (una nota que se ve siempre en el entreno). No hay que tocar nada.
+  20: (datos) => {
+    datos.version = 21;
     return datos;
   },
 };

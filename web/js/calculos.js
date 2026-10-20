@@ -208,13 +208,18 @@ export function rmReciente(datos, ejercicio, semanas = 8, { excluirSesion } = {}
   const desde = new Date(Date.now() - semanas * 7 * 86_400_000);
   const corte = `${desde.getFullYear()}-${String(desde.getMonth() + 1).padStart(2, '0')}-${String(desde.getDate()).padStart(2, '0')}`;
   let mejor = null;
+  let mejorLarga = null;
   for (const x of seriesDeEjercicio(datos, ejercicio.id, { excluirSesion })) {
     if (x.sesion.fecha < corte || x.serie.tipo === 'calentamiento') continue;
     const rm = rmSinTramos(datos, ejercicio, x.serie);
-    if (rm && (!mejor || rm > mejor.valor)) mejor = { valor: redondear(rm, 1), fecha: x.sesion.fecha };
+    if (!rm) continue;
+    const punto = { valor: redondear(rm, 1), fecha: x.sesion.fecha };
+    if (valeParaReferencia(ejercicio, x.serie)) { if (!mejor || rm > mejor.valor) mejor = punto; }
+    else if (!mejorLarga || rm > mejorLarga.valor) mejorLarga = punto;
   }
   if (mejor) return mejor;
-  const siempre = rmDeReferencia(datos, ejercicio, { excluirSesion });
+  const siempre = rmDeReferencia(datos, ejercicio, { excluirSesion, referencia: true });
+  if (mejorLarga && !siempre?.deReferencia) return mejorLarga;
   return siempre ? { valor: siempre.valor, fecha: null, deSiempre: true, manual: Boolean(siempre.manual) } : null;
 }
 
@@ -230,15 +235,21 @@ export function rmReciente(datos, ejercicio, semanas = 8, { excluirSesion } = {}
 export function rmDelEjercicio(datos, ejercicio, { sesion = null, antesDe = null } = {}) {
   const base = rmReciente(datos, ejercicio, 8, { excluirSesion: sesion?.id });
   let hoy = null;
+  let hoyLarga = null;
   (sesion?.ejercicios ?? []).forEach((entrada, i) => {
     if (entrada.ejercicioId !== ejercicio.id) return;
     entrada.series.forEach((s, j) => {
       if (antesDe && (i > antesDe.i || (i === antesDe.i && j >= antesDe.j))) return;
       if (!s.hecha) return;
       const rm = rmSinTramos(datos, ejercicio, s);
-      if (rm && (!hoy || rm > hoy.valor)) hoy = { valor: redondear(rm, 1), serie: s };
+      if (!rm) return;
+      if (valeParaReferencia(ejercicio, s)) { if (!hoy || rm > hoy.valor) hoy = { valor: redondear(rm, 1), serie: s }; }
+      else if (!hoyLarga || rm > hoyLarga.valor) hoyLarga = { valor: redondear(rm, 1), serie: s };
     });
   });
+  // Una Bilbo o una serie de más de 12 de hoy solo cuenta si no hay nada mejor
+  // (ni de antes ni de hoy): si no, no mueve la referencia.
+  if (!hoy && !base && hoyLarga) hoy = hoyLarga;
   // El puesto a mano después de esas series de hoy manda (lo acabas de decir tú).
   const manualDespues = base?.manual && ejercicio.rmManualEn && hoy?.serie?.hechaA && ejercicio.rmManualEn > hoy.serie.hechaA;
   if (hoy && !manualDespues && (!base || base.manual || hoy.valor > base.valor)) return { valor: hoy.valor, origen: 'hoy', serie: hoy.serie };
@@ -273,7 +284,8 @@ function sugerenciaPorRM(datos, ejercicio, plan, { excluirSesion, ultima }) {
   const iguala = rmUltima && carga > 0 ? repsParaIgualar(modeloDe(datos, ejercicio), rmUltima, carga, recamara) : null;
   const objetivoSuperar = iguala != null ? Math.min(40, Math.floor(Math.max(0, iguala)) + 1) : null;
   return { ...comun, carga, rmUsado: rm.valor, rmFecha: rm.fecha, rmUltima, objetivoSuperar,
-    esfuerzoObjetivo: prog.porRM.fija === 'reps' ? prog.porRM.valor : null };
+    // Con % fijo y repeticiones pedidas («3 × 4 al 80 %»), el objetivo es el mínimo del rango.
+    esfuerzoObjetivo: prog.porRM.fija === 'reps' ? prog.porRM.valor : (prog.objetivoEsfuerzo?.[0] ?? null) };
 }
 
 // La fase de repeticiones que toca en la sesión `dia` del ciclo. Cada fase
@@ -315,6 +327,18 @@ export const modeloDeEjercicio = (datos, ejercicio) => modeloDe(datos, ejercicio
 export const RECAMARA_MAX_PARA_1RM = 5;
 export function valeParaRM(serie) {
   return Boolean(serie) && !serie.tramos?.length && serie.tipo !== 'calentamiento' && !(serie.recamara > RECAMARA_MAX_PARA_1RM);
+}
+// El 1RM de referencia (el que pone los pesos) solo sale de series de 12
+// repeticiones o menos y nunca de una Bilbo: por encima de 12 la recámara se
+// calcula peor (Halperin 2022). Esas series se apuntan y siguen valiendo para
+// su ciclo, pero no mueven la referencia. Si un ejercicio solo tiene series
+// largas (unas laterales de 12-15), se usan esas: es lo único que hay.
+export const REPS_MAX_REFERENCIA = 12;
+export function esSerieBilbo(ejercicio, serie) {
+  return serie?.tipo === 'bilbo' || (ejercicio?.series ?? []).find((p) => p.id === serie?.planId)?.progresion?.tipo === 'bilbo';
+}
+export function valeParaReferencia(ejercicio, serie) {
+  return valeParaRM(serie) && !esSerieBilbo(ejercicio, serie) && (esfuerzoTotal(serie) ?? 0) <= REPS_MAX_REFERENCIA;
 }
 function rmSinTramos(datos, ejercicio, serie) {
   return valeParaRM(serie) ? rmDeSerie(datos, ejercicio, serie, esfuerzoTotal(serie)) : null;
@@ -616,15 +640,18 @@ export function pesosDeMaquina(desde, hasta, paso) {
 
 // 1RM de referencia para los porcentajes: el mejor del ciclo en curso y, si
 // no hay, el mejor de todo el historial del ejercicio.
-export function rmDeReferencia(datos, ejercicio, { cicloN, excluirSesion } = {}) {
+export function rmDeReferencia(datos, ejercicio, { cicloN, excluirSesion, referencia = false } = {}) {
   const series = seriesDeEjercicio(datos, ejercicio.id, { excluirSesion });
   const delCiclo = cicloN != null ? series.filter((x) => x.entrada.cicloN === cicloN) : [];
-  const candidatas = delCiclo.length ? delCiclo : series;
+  let candidatas = delCiclo.length ? delCiclo : series;
+  // Para la referencia, mejor las de 12 o menos (sin Bilbo) si las hay.
+  const cortas = referencia ? candidatas.filter((x) => valeParaReferencia(ejercicio, x.serie)) : [];
+  if (cortas.length) candidatas = cortas;
   const rms = candidatas.map((x) => rmSinTramos(datos, ejercicio, x.serie)).filter(Boolean);
   // Sin series todavía, vale el 1RM que hayas puesto tú en la ficha. En
   // cuanto hay una serie apuntada, manda lo que sale de tus series.
   if (!rms.length) return ejercicio.rmManual > 0 ? { valor: ejercicio.rmManual, delCiclo: false, manual: true } : null;
-  return { valor: redondear(Math.max(...rms), 1), delCiclo: Boolean(delCiclo.length) };
+  return { valor: redondear(Math.max(...rms), 1), delCiclo: Boolean(delCiclo.length), deReferencia: cortas.length > 0 };
 }
 
 // ---------------------------------------------------------------------------

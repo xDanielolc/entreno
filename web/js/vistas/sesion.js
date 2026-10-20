@@ -6,7 +6,7 @@ import { crearPlanesRapidos } from '../rapidas.js';
 import { nombreRegla, planesDeItem, seriesDesdePlan } from '../series.js';
 import {
   aPesoDisponible, cargaCorporal, cargaDesdeLectura, esfuerzoTotal, formatearNumero,
-  pasoDe, pesoDePlan, recamaraPorDefectoDe, redondear, rmDelEjercicio, rmDeReferencia, seriesDeEjercicio, sugerenciaSerie, trabajoSerie, tramosPropuestos, usaTramos,
+  pasoDe, pesoDePlan, recamaraPorDefectoDe, redondear, rmDelEjercicio, valeParaReferencia, rmDeReferencia, seriesDeEjercicio, sugerenciaSerie, trabajoSerie, tramosPropuestos, usaTramos,
 } from '../calculos.js';
 import { modeloDe, pesoParaReps, rmDeSerie } from '../formula1rm.js';
 import { guiaTrasPrueba, marcarVista, pintarGuia, pista } from './tutorial.js';
@@ -529,6 +529,8 @@ export function vistaSesion(contenedor, { id }) {
           onclick: () => quitarEjercicio(indice, ej) }, icono('cerrar'))),
 
       ej.notas && h('p', { class: 'nota' }, ej.notas),
+      // El aviso de la rutina para este ejercicio se ve siempre.
+      itemDeRutina(ej.id)?.aviso && h('p', { class: 'aviso-rutina' }, itemDeRutina(ej.id).aviso),
 
       referencia1RM(ej),
 
@@ -1009,7 +1011,7 @@ export function vistaSesion(contenedor, { id }) {
     const prog = plan?.progresion;
     if (prog?.tipo !== 'carga') return null;
     const previa = entrada.series.slice(0, j).reverse().find((x) => x.hecha && x.tipo !== 'calentamiento' && !x.tramos?.length && x.carga > 0 && x.esfuerzo > 0);
-    if (!previa || previa.recamara == null) return null;
+    if (!previa || previa.recamara == null || !valeParaReferencia(ej, previa)) return null;
     const rm = rmDeSerie(d, ej, previa, esfuerzoTotal(previa));
     if (!(rm > 0)) return null;
     let propuesto = null;
@@ -1670,16 +1672,14 @@ export function vistaSesion(contenedor, { id }) {
 
   function descansoEntreSeries(ej, serie = null) {
     const i = sesion.ejercicios.findIndex((e) => e.ejercicioId === ej.id);
-    // Calentamientos: las aproximaciones ligeras van seguidas (solo cambiar
-    // discos); antes de una pesada (80 % o más) y antes de la primera serie de
-    // trabajo, 2-3 min. Si era lo último del ejercicio (el cardio o la
-    // movilidad del principio), sin descanso: al siguiente.
+    // Calentamientos: las aproximaciones van seguidas (solo cambiar discos) y
+    // hay 2-3 min antes de la primera serie de trabajo. Si era lo último del
+    // ejercicio (el cardio o la movilidad del principio), sin descanso.
     if (serie?.tipo === 'calentamiento') {
       const lista = estado.datos().sesiones.find((s) => s.id === id)?.ejercicios[i]?.series ?? [];
       const siguiente = lista[lista.findIndex((x) => x.id === serie.id) + 1];
-      if (!siguiente) return;
-      const pesada = siguiente.tipo !== 'calentamiento' || (planDe(ej, siguiente)?.progresion?.porRM?.valor ?? 0) >= 80;
-      if (pesada && ej.carga?.tipo !== 'ninguna') arrancarDescanso(DESCANSO_ANTES_DE_PESADA, { texto: siguiente.tipo !== 'calentamiento' ? 'antes de la primera serie' : 'antes de la pesada' });
+      if (!siguiente || siguiente.tipo === 'calentamiento' || ej.carga?.tipo === 'ninguna') return;
+      arrancarDescanso(DESCANSO_ANTES_DE_PESADA, { texto: 'antes de la primera serie' });
       return;
     }
     const siguiente = sesion.ejercicios[i + 1];
@@ -1923,8 +1923,8 @@ function horaEnFecha(iso, fecha, minutosMas = 0) {
   return nueva.toISOString();
 }
 
-// Entre aproximaciones ligeras, solo lo que se tarda en cambiar discos (sin
-// temporizador); antes de una pesada o de la primera de trabajo, 2-3 min.
+// Entre aproximaciones, solo lo que se tarda en cambiar discos (sin
+// temporizador); antes de la primera serie de trabajo, 2-3 min.
 const DESCANSO_ANTES_DE_PESADA = 150;
 
 function planDe(ej, serie) {

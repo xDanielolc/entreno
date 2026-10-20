@@ -151,7 +151,8 @@ export function crearPlanesRapidos(datos, ej, forma) {
     if (f.modo === 'rm') {
       const porReps = asc || f.fija !== 'pct';
       plan.progresion.porRM = { fija: porReps ? 'reps' : 'pct', valor: porReps ? repsDe(i)[0] : f.valor, semanas: f.semanas ?? 8 };
-      if (!porReps) { plan.progresion.objetivoEsfuerzo = null; plan.objetivoEsfuerzo = null; }
+      // Con % fijo y sin repeticiones pedidas, sin objetivo; «3 × 4 al 80 %» lo conserva.
+      if (!porReps && !f.conReps) { plan.progresion.objetivoEsfuerzo = null; plan.objetivoEsfuerzo = null; }
     }
     return plan;
   });

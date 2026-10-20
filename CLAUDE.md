@@ -902,7 +902,7 @@ fase), tras probar la A.
 
 ## Ronda 0.55 (20-10-2026): su rutina del borrador 11
 
-- `datos-privados/rutina-dan-borrador-11.md` (fuera de Git) manda. La
+- `datos-privados/rutina-dan-borrador-11.md` mandaba (ya sustituido por el 12, ver ronda 0.58). La
   prehecha «Fuerza sin máquinas» va por la versión 4: calentamiento general
   (cardio 15 min los días de pierna, 5 min los de torso), «Movilidad
   dinámica de torso/pierna» (3 min, ejercicios nuevos del catálogo) y
@@ -993,3 +993,27 @@ fase), tras probar la A.
 - 0.57.2: el botón de los calentamientos redondos también dentro de Aprender
   → «Cómo calentar», justo donde se explica. Regla de Dan: una opción va
   donde se nombra (puede estar además en Ajustes), sin mandar a otro sitio.
+
+## Ronda 0.58.0 (21-10-2026): su rutina del borrador 12
+
+- `datos-privados/rutina-dan-borrador-12.md` sustituye al 11. Prehecha
+  «Fuerza sin máquinas» versión 5: aproximaciones como mucho 3 (barra × 5,
+  60 % × 3, 80 % × 1; militar 60/80; una a 50 % en sentadilla d4 y rumano
+  d2; sumo con «los discos grandes más ligeros», sin peso calculado),
+  bajadas «al 80 %» (el parser de rutina-texto convierte «N × R al P %» en
+  `porRM` pct con `conReps`, que conserva el objetivo de repeticiones),
+  sentadilla d2 3 × 4, rumano 2 × 6-8 y curl femoral 2 × 8-12 los dos días
+  de pierna, cardio 10 min, duraciones nuevas.
+- Esquema v21: `item.aviso` en los ejercicios de un día de rutina (paréntesis
+  que empieza por «!» en el texto), visible siempre en el entreno
+  (`.aviso-rutina`).
+- 1RM de referencia (`rmReciente`, `rmDelEjercicio`, gráfica del historial):
+  solo series de 12 o menos y sin Bilbo (`valeParaReferencia`, Halperin
+  2022); si el ejercicio no tiene ninguna, las que haya. `valeParaRM` NO
+  cambia: el ciclo Bilbo sigue usando sus series para reiniciar.
+- Calentamientos: todas las aproximaciones seguidas; 2:30 solo antes de la
+  primera serie de trabajo.
+- Aprender: «Cómo calentar», «Por qué la serie máxima va primero» y «Cómo
+  progresa esta rutina» con los apartados 3-5 del borrador 12; Halperin en
+  la bibliografía de la serie máxima (Schoenfeld 2019 ya estaba en
+  Frecuencia).

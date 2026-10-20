@@ -583,3 +583,4 @@ la vez, a veces sin cobertura):
 - **v20 (0.54.0).** Todas las fórmulas del 1RM pasan a «se ajusta a ti»
   (`formula1RM: 'personal'`). `ejercicio.pesoMinimoPct` (opcional): peso
   mínimo como % del 1RM; con `pesoMinimo`, manda el más alto ese día.
+- **v21 (0.58.0).** Campo opcional `aviso` en cada ejercicio de un día de rutina: una nota que se ve siempre en el entreno (en el texto de una rutina, un paréntesis que empieza por «!»).
