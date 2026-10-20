@@ -932,3 +932,25 @@ fase), tras probar la A.
   en html y body (la lista de Ejercicios bailaba de lado); sonidos de la caja
   «pim» al caer y «paf» al quedar plana; la línea del peso en Cuerpo lleva
   su explicación.
+
+## Ronda 0.56.0 (20-10-2026): calentamientos como series y reloj dentro
+
+- 0.55.3: la 0.55.2 borró sin querer `trabajoDe` (al sustituir un bloque
+  entre dos comentarios) y rompía la pantalla de entreno. Al recortar por
+  índices, mirar qué funciones caen dentro.
+- Los calentamientos son series como las demás, en su orden (fuera la franja
+  de botones): en el modo «serie» cada uno es su página («Calentamiento 2 de
+  4», puntitos más pequeños) y se marcan con «✓ Hecho: 55 kg × 5»
+  (`hechoDeUnToque`), que pasa solo a la siguiente (`pasarTrasHecha`).
+  Descansos de calentamiento en `descansoEntreSeries`: seguidas las ligeras,
+  2:30 antes de una de 80 % o más y antes de la primera de trabajo, ninguno si
+  era lo último del ejercicio. Un ejercicio solo de calentamiento (cardio,
+  movilidad) enseña su serie directamente.
+- Reloj dentro de la serie (`vistas/reloj-serie.js`, `relojSerie`): cuenta
+  atrás con lo programado, cronómetro o intervalos (chips con los de siempre,
+  los tuyos y «A mi manera», que abre la configuración de intervalos.js con
+  `alElegir`), anillo SVG que se llena, pitidos y apunte automático por id de
+  serie. El estado vive en el módulo: repintar no lo para. Fuera los botones
+  «Cronómetro / Intervalos (HIIT)» de arriba y `apuntarTiempo`.
+- Tarjeta «Desliza la tarjeta a los lados…» con `siempre: true` (sale con
+  cualquier nivel de pistas) y se quita sola al deslizar la primera vez.

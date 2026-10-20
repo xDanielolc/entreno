@@ -9,9 +9,10 @@ import {
   pesoDePlan, redondear, rmDelEjercicio, rmDeReferencia, seriesDeEjercicio, sugerenciaSerie, trabajoSerie, tramosPropuestos, usaTramos,
 } from '../calculos.js';
 import { modeloDe, pesoParaReps, rmDeSerie } from '../formula1rm.js';
-import { guiaTrasPrueba, pintarGuia, pista } from './tutorial.js';
+import { guiaTrasPrueba, marcarVista, pintarGuia, pista } from './tutorial.js';
 import { queEs } from './glosario.js';
-import { abrirCronometro, abrirIntervalos } from './intervalos.js';
+import { relojEnMarcha, relojSerie } from './reloj-serie.js';
+import { duracionTexto } from './intervalos.js';
 import { ayuda, modal, selector } from '../ui.js';
 import { aplicarPreset } from '../ciclos.js';
 import { renovarAlTocar } from '../sincronizacion.js';
@@ -69,7 +70,6 @@ const fotosVivas = new Map();
 let serieEntra = null;
 
 // Calentamientos abiertos para cambiar sus pesos («sesión:ejercicio»).
-const calentamientoAbierto = new Set();
 
 // Hacia dónde se deslizó la última tarjeta (para animar la siguiente).
 let direccionPendiente = null;
@@ -162,8 +162,9 @@ export function vistaSesion(contenedor, { id }) {
     // la nota de que se desliza. En el ordenador, nada arriba.
     enCurso && posicion != null && movil && puntosEjercicios(),
     enCurso && posicion != null && movil && (unaSerie
-      ? pista('deslizar-series', 'Desliza la tarjeta a izquierda o derecha para pasar de serie; al acabar las de un ejercicio, pasas al siguiente.')
-      : pista('deslizar-ejercicios', 'Desliza la tarjeta a izquierda o derecha para cambiar de ejercicio.')),
+      ? pista('deslizar-series', 'Desliza la tarjeta a los lados para pasar de serie. Después de la última serie, pasas al siguiente ejercicio.',
+        { siempre: true, icono: '⇆', clase: 'pista-deslizar' })
+      : pista('deslizar-ejercicios', 'Desliza la tarjeta a los lados para cambiar de ejercicio.', { siempre: true, icono: '⇆', clase: 'pista-deslizar' })),
     !enCurso && posicion != null && pasoEntreEjercicios(),
 
     visibles.map(([entrada, i]) => tarjetaEjercicio(entrada, i)),
@@ -253,11 +254,10 @@ export function vistaSesion(contenedor, { id }) {
     return deslizarParaConfirmar('Desliza para terminar', terminar);
   }
 
-  // Las series de trabajo de un ejercicio (sus índices): los calentamientos
-  // previstos van aparte, en una franja.
+  // Las series que se pasan de una en una (sus índices): todas, también los
+  // calentamientos (Dan: «el calentamiento se ve como una serie»).
   function trabajoDe(entrada) {
-    const ej = ejercicioDe(entrada?.ejercicioId);
-    return (entrada?.series ?? []).map((s, j) => j).filter((j) => !calentamientoPrevisto(ej, entrada.series[j]));
+    return (entrada?.series ?? []).map((s, j) => j);
   }
 
   // La serie que se ve en el modo «serie» (su posición entre las de
@@ -327,6 +327,9 @@ export function vistaSesion(contenedor, { id }) {
       x0 = null;
       if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
       direccionDeslizar = dx < 0 ? 'izquierda' : 'derecha';
+      // Ya sabe deslizar: fuera la tarjeta que lo explica.
+      const clave = unaSerie ? 'deslizar-series' : 'deslizar-ejercicios';
+      if (!d.perfil.tutoriales?.vistos?.[clave]) marcarVista(clave);
       avanzar(dx < 0 ? 1 : -1);
     });
     if (direccionDeslizar) { tarjeta.classList.add(`entra-${direccionDeslizar}`); direccionDeslizar = null; }
@@ -498,10 +501,9 @@ export function vistaSesion(contenedor, { id }) {
   function tarjetaEjercicio(entrada, indice) {
     const ej = ejercicioDe(entrada.ejercicioId);
     if (!ej) return h('div', { class: 'tarjeta' }, 'Ejercicio borrado');
-    // Modo «serie»: solo se ve una serie de trabajo; las demás, deslizando.
-    // Los calentamientos previstos, en una franja encima de la primera.
+    // Modo «serie»: solo se ve una serie; las demás, deslizando. Los
+    // calentamientos van en su orden, como una serie más.
     const trabajo = trabajoDe(entrada);
-    const calentamientos = entrada.series.map((s, j) => [s, j]).filter(([s]) => calentamientoPrevisto(ej, s));
     const k = unaSerie ? indiceSerie(entrada) : null;
     const visible = k == null ? null : trabajo[k];
     const vacia = entrada.series.length === 0;
@@ -524,26 +526,17 @@ export function vistaSesion(contenedor, { id }) {
 
       referencia1RM(ej),
 
-      // Cualquier ejercicio que se mida en tiempo puede usar el cronómetro y
-      // los intervalos: el tiempo se apunta solo en la primera serie vacía.
-      enCurso && mideTiempo(ej) && h('div', { class: 'fila-botones' },
-        h('button', { class: 'boton secundario', onclick: () => abrirCronometro({
-          alTerminar: (segundos) => apuntarTiempo(indice, segundos, null) }) }, icono('reloj'), 'Cronómetro'),
-        h('button', { class: 'boton secundario', onclick: () => abrirIntervalos({
-          alTerminar: (segundos, texto) => apuntarTiempo(indice, segundos, texto) }) }, icono('repetir'), 'Intervalos (HIIT)')),
-
       indice === 0 && enCurso && !sesion.tutorial && pista('sesion-datos', ['estiramiento', 'movilidad', 'yoga'].includes(tipoDeEjercicio(ej))
         ? 'Apunta cada estiramiento al acabarlo: los segundos que has aguantado y, si te apoyas con la mano, hasta dónde llegas. '
           + 'Al escribirlos arranca el descanso.'
         : ej.esfuerzo?.tipo === 'tiempo'
-          ? 'Apunta la serie al acabarla: al escribir el tiempo arranca el descanso.'
+          ? 'Toca «Empezar» en el reloj: al acabar, el tiempo se apunta solo. También puedes escribirlo en las casillas.'
           : 'Apunta la serie al acabarla: con el peso y las repeticiones puestos arranca el descanso. '
             + 'Cada casilla lleva encima lo que va dentro (toca «?» para saber más).'),
 
-      calentamientos.length > 0 && (k == null || k === 0) && franjaCalentamiento(ej, entrada, indice, calentamientos),
       unaSerie && trabajo.length > 1 && puntosSeries(entrada, k, trabajo),
       entrada.series.map((serie, j) => {
-        if (calentamientoPrevisto(ej, serie) || (visible != null && j !== visible)) return null;
+        if (visible != null && j !== visible) return null;
         const bloque = bloqueSerie(ej, entrada, indice, j, serie);
         if (visible != null && serieEntra) { bloque.classList.add(`entra-${serieEntra}`); serieEntra = null; }
         return bloque;
@@ -564,59 +557,17 @@ export function vistaSesion(contenedor, { id }) {
     return img;
   }
 
-  // Modo «serie»: «Serie 2 de 4» y un puntito por serie de trabajo (se pueden tocar).
+  // Modo «serie»: «Calentamiento 2 de 4» o «Serie 1 de 5», y un puntito por
+  // serie (los de calentar, más pequeños; se pueden tocar).
   function puntosSeries(entrada, k, trabajo) {
+    const esCal = (j) => entrada.series[j].tipo === 'calentamiento';
+    const grupo = trabajo.filter((j) => esCal(j) === esCal(trabajo[k]));
+    const n = grupo.indexOf(trabajo[k]) + 1;
     return h('div', { class: 'contador-series' },
-      h('span', { class: 'suave' }, `Serie ${k + 1} de ${trabajo.length}`),
+      h('span', { class: 'suave' }, `${esCal(trabajo[k]) ? 'Calentamiento' : 'Serie'} ${n} de ${grupo.length}`),
       h('div', { class: 'puntos-ejercicios puntos-series' }, trabajo.map((j, n) => h('button', { type: 'button',
-        'aria-label': `Serie ${n + 1}`, class: `${n === k ? 'activo' : ''}${entrada.series[j].hecha ? ' hecho' : ''}`,
+        'aria-label': `${esCal(j) ? 'Calentamiento' : 'Serie'} ${n + 1}`, class: `${n === k ? 'activo' : ''}${entrada.series[j].hecha ? ' hecho' : ''}${esCal(j) ? ' cal' : ''}`,
         onclick: () => { guardarVista('serie', posicion, n); estado.emitir('vista'); } }))));
-  }
-
-  // Los calentamientos previstos, en una franja: un botón por serie
-  // («50 kg × 8») que se toca al hacerla. «Cambiar pesos» los abre como
-  // series normales.
-  function franjaCalentamiento(ej, entrada, i, lista) {
-    const clave = `${id}:${i}`;
-    const abierto = calentamientoAbierto.has(clave);
-    const u = unidadCarga(ej);
-    return h('div', { class: 'franja-calentamiento' },
-      h('div', { class: 'titulo-con-ayuda' }, h('span', { class: 'etiqueta-campo' }, 'Calentamiento'),
-        ayuda('Calentamiento', 'Series de aproximación: suben poco a poco hasta cerca del peso de trabajo. Toca cada una al hacerla. '
-          + 'No cuentan para tu progreso, tu 1RM ni tu recuperación.')),
-      abierto ? lista.map(([s, j]) => bloqueSerie(ej, entrada, i, j, s))
-        : h('div', { class: 'chips-calentamiento' }, lista.map(([s, j]) => {
-          const reps = planDe(ej, s)?.objetivoEsfuerzo?.[1] ?? s.esfuerzo;
-          const enTiempo = ej.esfuerzo?.tipo === 'tiempo';
-          const ultimoCal = j === lista.at(-1)[1];
-          return h('button', { type: 'button', class: `chip-calentamiento${s.hecha ? ' hecho' : ''}`, 'aria-pressed': String(Boolean(s.hecha)),
-            onclick: () => {
-              const ahora = !s.hecha;
-              cambiarSesion((x) => {
-                const y = x.ejercicios[i].series[j];
-                if (y.hecha) { y.hecha = false; y.esfuerzo = null; y.hechaA = null; return; }
-                y.esfuerzo ??= reps ?? null;
-                y.hecha = true;
-                y.hechaA = new Date().toISOString();
-              });
-              // Las aproximaciones ligeras van seguidas (solo cambiar discos); antes
-              // de una pesada (80 % o más) y antes de la primera serie de trabajo,
-              // 2-3 min.
-              if (ahora) {
-                const pos = lista.findIndex(([, jj]) => jj === j);
-                const siguiente = lista[pos + 1]?.[0];
-                const pctSiguiente = siguiente ? planDe(ej, siguiente)?.progresion?.porRM?.valor ?? 0 : null;
-                if (ultimoCal || pctSiguiente >= 80) arrancarDescanso(DESCANSO_ANTES_DE_PESADA, { texto: ultimoCal ? 'antes de la primera serie' : 'antes de la pesada' });
-              }
-            } },
-          h('span', { class: 'chip-marca', 'aria-hidden': 'true' }, s.hecha ? '✓' : ''),
-          enTiempo ? textoEsfuerzo(ej, reps)
-            : `${s.carga != null ? `${formatearNumero(s.carga)} ${u}` : ej.carga?.tipo === 'ninguna' ? '' : 'Ligero'}${reps ? `${s.carga != null || ej.carga?.tipo !== 'ninguna' ? ' × ' : ''}${reps}` : ''}`);
-        })),
-      ej.carga?.tipo !== 'ninguna' && h('button', { type: 'button', class: 'boton enlace', onclick: () => {
-        if (abierto) calentamientoAbierto.delete(clave); else calentamientoAbierto.add(clave);
-        estado.emitir('vista');
-      } }, abierto ? 'Listo' : 'Cambiar pesos'));
   }
 
   // Las estadísticas del ejercicio en un cartel, sin salir del entreno.
@@ -754,6 +705,11 @@ export function vistaSesion(contenedor, { id }) {
     if (serie.tipo === 'calentamiento') {
       if (!plan?.calentamiento) return h('p', { class: 'sugerencia' }, 'Calentamiento: no cuenta para tu progreso ni para tu 1RM.');
       const s = sugerenciaSerie(d, ej, plan, { excluirSesion: id });
+      // Medido en tiempo (el cardio o la movilidad del principio): «15 min».
+      if (esTiempo(ej)) {
+        const seg = plan.objetivoEsfuerzo?.[1];
+        return h('p', { class: 'sugerencia' }, `Calentamiento${seg ? `: ${duracionTexto(seg)}` : ''}. Toca «Empezar» y se apunta solo al acabar.`);
+      }
       const reps = textoRango(plan.objetivoEsfuerzo);
       const peso = serie.carga != null ? `${formatearNumero(serie.carga)} ${uCarga}` : s.pct === 0 ? 'la barra sola' : 'un peso ligero';
       const pctTrabajo = plan.progresion?.porRM?.fija === 'pctTrabajo' ? plan.progresion.porRM.valor : null;
@@ -999,11 +955,70 @@ export function vistaSesion(contenedor, { id }) {
     return h('div', { class: `serie ${serie.hecha ? 'hecha' : ''}`, 'data-serie': j },
       lineaSugerencia(ej, serie, entrada, j, i),
       cabeceraSerie(ej, i, j, serie, entrada),
+      relojDeSerie(ej, entrada, i, j, serie),
       tramos ? tramosSerie(ej, i, j, serie, tramos) : valoresSerie(ej, i, j, serie),
+      hechoDeUnToque(ej, entrada, i, j, serie),
       camposTecnicas(ej, i, j, serie),
       camposEstiramiento(ej, i, j, serie),
       h('p', { class: 'comparacion' }, comparacionSerie(d, ej, serie, { excluirSesion: id })),
       comentarioSerie(ej, i, j, serie));
+  }
+
+  // El reloj de una serie medida en tiempo, dentro de ella: cuenta atrás con
+  // lo programado, cronómetro o intervalos. Sale en la serie que toca (la
+  // primera sin hacer, o la que se ve en el modo «serie»).
+  function relojDeSerie(ej, entrada, i, j, serie) {
+    if (!enCurso || !entrada || serie.hecha || !mideTiempo(ej) || serie.tramos?.length) return null;
+    const principal = esTiempo(ej);
+    const sinTiempo = (x) => !x.hecha && (principal ? x.esfuerzo == null : extraDeSerie(x, 'tiempo') == null);
+    const laQueToca = unaSerie || entrada.series.findIndex(sinTiempo) === j || relojEnMarcha(serie.id);
+    if (!laQueToca || !sinTiempo(serie)) return null;
+    const plan = planDe(ej, serie);
+    const ultima = ultimaDe(ej, serie);
+    const objetivo = principal
+      ? serie.objetivo ?? plan?.objetivoEsfuerzo?.[1] ?? plan?.progresion?.objetivoEsfuerzo?.[1] ?? ultima?.esfuerzo ?? null
+      : serie.objetivosExtra?.tiempo ?? (ultima ? extraDeSerie(ultima, 'tiempo') : null);
+    return relojSerie({ sesionId: id, serieId: serie.id, objetivo: objetivo > 0 ? objetivo : null,
+      despues: () => {
+        const x = estado.datos().sesiones.find((s) => s.id === id)?.ejercicios[i]?.series.find((y) => y.id === serie.id);
+        if (x) descansoEntreSeries(ej, x);
+        pasarTrasHecha(i, j);
+      } });
+  }
+
+  // En el modo «serie», al acabar una de un toque (reloj o «Hecho») se pasa
+  // a la siguiente; tras la última, al siguiente ejercicio.
+  function pasarTrasHecha(i, j) {
+    if (!unaSerie || posicion !== i) return;
+    const t = trabajoDe(sesion.ejercicios[i]);
+    const k = t.indexOf(j) + 1;
+    setTimeout(() => {
+      if (k > 0 && k < t.length) { serieEntra = 'izquierda'; guardarVista('serie', posicion, k); estado.emitir('vista'); }
+      else if (posicion + 1 < sesion.ejercicios.length) { irA(posicion + 1); window.scrollTo(0, 0); }
+    }, 350);
+  }
+
+  // Un calentamiento se marca de un toque con lo previsto («✓ Hecho: 55 kg × 5»);
+  // se puede cambiar antes en las casillas. En el modo «serie», pasa al siguiente.
+  function hechoDeUnToque(ej, entrada, i, j, serie) {
+    if (!enCurso || serie.hecha || serie.tipo !== 'calentamiento' || esTiempo(ej)) return null;
+    const plan = planDe(ej, serie);
+    const reps = serie.esfuerzo ?? plan?.objetivoEsfuerzo?.[1] ?? serie.objetivo ?? ultimaDe(ej, serie)?.esfuerzo ?? null;
+    const u = unidadCarga(ej);
+    const peso = serie.carga != null && !['ninguna', 'pesoCorporal'].includes(ej.carga?.tipo) ? `${formatearNumero(serie.carga)} ${u}` : '';
+    const texto = [peso, reps != null ? `${formatearNumero(reps)}${peso ? '' : ' repeticiones'}` : ''].filter(Boolean).join(' × ');
+    return h('button', { type: 'button', class: 'boton grande hecho-rapido', onclick: () => {
+      let hecha = null;
+      cambiarSesion((s) => {
+        const x = s.ejercicios[i].series[j];
+        x.esfuerzo ??= reps;
+        x.hecha = true;
+        x.hechaA = new Date().toISOString();
+        hecha = x;
+      });
+      if (hecha) descansoEntreSeries(ej, hecha);
+      pasarTrasHecha(i, j);
+    } }, texto ? `✓ Hecho: ${texto}` : '✓ Hecho');
   }
 
   // Un comentario por serie («agarre cerrado», «me molestó el hombro»…), y el
@@ -1074,7 +1089,8 @@ export function vistaSesion(contenedor, { id }) {
   // Estiramientos, movilidad y yoga: con qué técnica, con qué ayuda y, si
   // te apoyas con la mano, en qué punto de la escala (del puño a sin mano).
   function camposEstiramiento(ej, i, j, serie) {
-    if (!['estiramiento', 'movilidad', 'yoga'].includes(tipoDeEjercicio(ej))) return null;
+    // Un calentamiento (la movilidad dinámica del principio) no lleva ayudas ni escala.
+    if (!['estiramiento', 'movilidad', 'yoga'].includes(tipoDeEjercicio(ej)) || serie.tipo === 'calentamiento') return null;
     const actual = { ...ej.estiramiento, ...serie.estiramiento };
     const guardar = (clave, valor) => cambiarSesion((s) => {
       const x = s.ejercicios[i].series[j];
@@ -1484,23 +1500,6 @@ export function vistaSesion(contenedor, { id }) {
     } } });
   }
 
-  // Lo que devuelven el cronómetro y los intervalos: va a la primera serie
-  // sin hacer de ese ejercicio, y si no queda ninguna se crea una.
-  function apuntarTiempo(indice, segundos, texto) {
-    cambiarSesion((s) => {
-      const e = s.ejercicios[indice];
-      const ej = d.ejercicios.find((x) => x.id === e.ejercicioId);
-      const principal = ej?.esfuerzo?.tipo === 'tiempo';
-      let serie = e.series.find((x) => !x.hecha && (principal ? x.esfuerzo == null : extraDeSerie(x, 'tiempo') == null));
-      if (!serie) { serie = serieSuelta({ tipo: 'libre' }); e.series.push(serie); }
-      if (principal) serie.esfuerzo = segundos;
-      else { serie.extras ??= {}; serie.extras.tiempo = segundos; }
-      serie.hecha = true;
-      if (texto) e.notas = [e.notas, texto].filter(Boolean).join(' · ');
-    });
-    aviso(`Apuntado: ${formatearTiempo(segundos)}${texto ? ` (${texto})` : ''}.`);
-  }
-
   // Récord al momento, como en Hevy: dos segundos después de escribir las
   // repeticiones, si esa serie supera tu mejor 1RM (o tus repeticiones con
   // ese peso), sale el aviso. Una vez por serie y valor.
@@ -1542,6 +1541,18 @@ export function vistaSesion(contenedor, { id }) {
 
   function descansoEntreSeries(ej, serie = null) {
     const i = sesion.ejercicios.findIndex((e) => e.ejercicioId === ej.id);
+    // Calentamientos: las aproximaciones ligeras van seguidas (solo cambiar
+    // discos); antes de una pesada (80 % o más) y antes de la primera serie de
+    // trabajo, 2-3 min. Si era lo último del ejercicio (el cardio o la
+    // movilidad del principio), sin descanso: al siguiente.
+    if (serie?.tipo === 'calentamiento') {
+      const lista = estado.datos().sesiones.find((s) => s.id === id)?.ejercicios[i]?.series ?? [];
+      const siguiente = lista[lista.findIndex((x) => x.id === serie.id) + 1];
+      if (!siguiente) return;
+      const pesada = siguiente.tipo !== 'calentamiento' || (planDe(ej, siguiente)?.progresion?.porRM?.valor ?? 0) >= 80;
+      if (pesada && ej.carga?.tipo !== 'ninguna') arrancarDescanso(DESCANSO_ANTES_DE_PESADA, { texto: siguiente.tipo !== 'calentamiento' ? 'antes de la primera serie' : 'antes de la pesada' });
+      return;
+    }
     const siguiente = sesion.ejercicios[i + 1];
     if (itemDeRutina(ej.id)?.superserie && siguiente) {
       const otro = ejercicioDe(siguiente.ejercicioId);
@@ -1779,11 +1790,6 @@ function horaEnFecha(iso, fecha, minutosMas = 0) {
 // Entre aproximaciones ligeras, solo lo que se tarda en cambiar discos (sin
 // temporizador); antes de una pesada o de la primera de trabajo, 2-3 min.
 const DESCANSO_ANTES_DE_PESADA = 150;
-
-// Un calentamiento que viene de la rutina (con su peso): va en la franja.
-function calentamientoPrevisto(ej, serie) {
-  return serie?.tipo === 'calentamiento' && Boolean(planDe(ej, serie)?.calentamiento);
-}
 
 function planDe(ej, serie) {
   return (ej.series || []).find((p) => p.id === serie.planId) ?? null;

@@ -23,14 +23,14 @@ export const PRESETS_HIIT = {
 let audio = null;
 
 // «4 min», «6 s» o «2 min 30 s».
-function duracionTexto(seg) {
+export function duracionTexto(seg) {
   if (seg < 60) return `${seg} s`;
   const m = Math.floor(seg / 60), s = seg % 60;
   return s ? `${m} min ${s} s` : `${m} min`;
 }
 
 // Pitido: corto y agudo para avisar, largo y grave al cambiar de fase.
-function pitar(frecuencia = 880, duracion = 0.15, volumen = 0.25) {
+export function pitar(frecuencia = 880, duracion = 0.15, volumen = 0.25) {
   try {
     audio ??= new AudioContext();
     if (audio.state === 'suspended') audio.resume();
@@ -49,7 +49,7 @@ function pitar(frecuencia = 880, duracion = 0.15, volumen = 0.25) {
 
 // Abre el cronómetro. alTerminar(segundosTotales, descripcion) se llama al
 // acabar todas las rondas o al parar con algo hecho.
-export function abrirIntervalos({ alTerminar } = {}) {
+export function abrirIntervalos({ alTerminar, alElegir } = {}) {
   const perfil = estado.datos()?.perfil ?? {};
   const guardado = perfil.hiit ?? { preset: 'tabata' };
   // Los tuyos, guardados desde aquí, salen junto a los de siempre.
@@ -100,7 +100,9 @@ export function abrirIntervalos({ alTerminar } = {}) {
         estado.cambiar((x) => { x.perfil.hiit = { preset: config.preset, trabajo: config.trabajo, descanso: config.descanso, rondas: config.rondas }; }, { tecleo: true });
         cerrar();
         pitar(660, 0.1);
-        correr(config, alTerminar);
+        // Desde la serie, el reloj corre allí mismo (alElegir); si no, en un cartel.
+        if (alElegir) alElegir({ ...config, nombre: todos()[config.preset]?.etiqueta });
+        else correr(config, alTerminar);
       } }, 'Empezar')));
   };
   pintarConfig();
