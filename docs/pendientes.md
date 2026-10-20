@@ -310,3 +310,11 @@ Pasado a `pendientes-design.md`. Se deja aquí lo que ya había, como historia.
   y elevaciones laterales en polea, sin animar.
 - [ ] Diario, fases B y C (ver CLAUDE.md, ronda 0.52.0).
 
+- [ ] **Programar a mano sigue sin ser intuitivo** (Dan, 21-10-2026: «es en
+      mi opinión el apartado más flojo de la app»). Pendiente que él meta una
+      rutina a mano entera para ver dónde se atasca y rehacerlo con eso.
+- [ ] Sonidos de la caja de la presentación con su grabación de Freesound
+      («box impact.wav», en la carpeta del proyecto): primer golpe al caer,
+      segundo «paf». Falta saber su licencia antes de subirla al repositorio.
+- [ ] Empezar por el día de la rutina que uno quiera: ya existe «Otro día de
+      la rutina» en Hoy; comprobar que Dan lo encuentra.

@@ -58,13 +58,13 @@ export function vistaDiario(contenedor) {
 
   anadir(contenedor,
     h('h1', {}, 'Diario'),
-    h('section', { class: 'tarjeta diario-dia' },
+    h('section', { class: 'tarjeta diario-peso' },
       h('div', { class: 'cabecera-tarjeta' },
         h('h2', { class: 'crece' }, fecha === hoy ? 'Hoy' : fechaCorta(fecha)),
         fecha !== hoy && h('button', { type: 'button', class: 'boton secundario', onclick: () => { diaElegido = null; estado.emitir('vista'); } }, 'Volver a hoy')),
-      h('label', { class: 'campo' }, h('span', { class: 'etiqueta-campo' }, 'Peso'), h('span', { class: 'con-unidad' }, pesoCaja, h('small', { class: 'suave' }, 'kg'))),
-
-      h('h3', {}, 'Esta noche'),
+      h('label', { class: 'campo' }, h('span', { class: 'etiqueta-campo' }, 'Peso'), h('span', { class: 'con-unidad' }, pesoCaja, h('small', { class: 'suave' }, 'kg')))),
+    h('section', { class: 'tarjeta diario-dia' },
+      h('h2', {}, 'Esta noche'),
       h('p', { class: 'nota' }, 'Apúntalo cada mañana, al levantarte. Se guarda solo según escribes.'),
       fila(hora('luzApagada', 'Apagaste la luz'), hora('levantado', 'Te levantaste')),
       fila(numero('latenciaMin', 'Hasta dormirte', 'min'), numero('despiertoMin', 'Despierto de noche', 'min'), numero('remoloneoMin', 'Remoloneando', 'min')),
@@ -101,7 +101,8 @@ export function vistaDiario(contenedor) {
           const v = leerNumero(ev.target.value);
           if (v >= 4 && v <= 12) estado.cambiar((x) => { x.perfil.necesidadSuenoH = v; });
         } }),
-      h('small', { class: 'nota' }, 'Por defecto 8,5. Es la línea discontinua de la gráfica.')));
+      h('small', { class: 'nota' }, (d.diario ?? []).filter((x) => calcularSueno(x)).length >= 2
+        ? 'Por defecto 8,5. Es la línea discontinua de la gráfica del sueño.' : 'Por defecto 8,5.')));
 }
 
 // Los últimos 14 días con algo apuntado; tocar uno lo abre arriba.

@@ -14,6 +14,7 @@ import { recuperacionPorMusculo } from '../recuperacion.js';
 import { recomendacionesGenerales } from '../recomendaciones.js';
 import { renovarAlTocar } from '../sincronizacion.js';
 import { voyHoy } from './voy-hoy.js';
+import { preguntaAvisos } from './descanso.js';
 import { apuntarPeso } from '../peso.js';
 
 // Lo que ya enseña el muñeco de Cuerpo (series por músculo) no se repite aquí.
@@ -180,6 +181,7 @@ export function vistaInicio(contenedor) {
     estado.esSinCuenta() && barraModoPrueba(),
     h('h1', {}, saludo(d.perfil.nombre)),
     tarjetaInstalar(),
+    preguntaAvisos(),
     pista('hoy', 'Qué toca hoy y cómo va tu recuperación. Si quieres más ayuda, en la pestaña «Aprender» están el tutorial y el glosario.'),
 
     // Tu peso, aquí mismo: sin mandarte a Ajustes.

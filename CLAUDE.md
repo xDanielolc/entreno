@@ -1017,3 +1017,29 @@ fase), tras probar la A.
   progresa esta rutina» con los apartados 3-5 del borrador 12; Halperin en
   la bibliografía de la serie máxima (Schoenfeld 2019 ya estaba en
   Frecuencia).
+
+## Ronda 0.59.0 (21-10-2026): sus respuestas de la página de pruebas v057
+
+- 1RM de referencia: vuelve el máximo de todas las series (Dan: «si una
+  larga da más, que cuente»); `valeParaReferencia` queda sin uso salvo en
+  `rmDeReferencia({ referencia })`. El «?» del 1RM dice de qué serie sale
+  (resaltado, `.subrayado`); fuera la línea pequeña de debajo. Las líneas
+  «Hoy …» ya no repiten % ni 1RM. El tipo de serie dice «Programación: …».
+- Modo «serie»: `indiceSerie` fija la serie que ves (`serieElegida` ahora es
+  `let`): al apuntarla ya no salta sola a la siguiente.
+- `deslizable`: vale empezar encima de una casilla; por encima de
+  `.contador-series` cambia de ejercicio y por debajo, de serie.
+- `avisoRecuperacion(ej)`: músculos principales por debajo del 90 % al
+  empezar (sin contar el entreno en curso) y, solo entonces, el `item.aviso`
+  de la rutina. Se quita en Ajustes (`avisosEntreno.recuperacion`).
+- Rutina versión 6: primera aproximación al 30 % (el peso mínimo, la barra,
+  manda si es más) y el aviso del rumano en los dos días de pierna.
+  `actualizarDesdePlantilla` conserva el id de cada día por orden (antes te
+  devolvía al día 1).
+- «¿Cómo llegas?» se borra al cancelar el entreno y, al quitar un
+  ejercicio, lo de sus músculos. Prueba de 1RM: «quitar una serie» con 2 o
+  más sin hacer y también tras la prueba. El tiempo a mano, plegado bajo
+  «Escribir el tiempo a mano» mientras haya reloj. Diario: peso y sueño en
+  tarjetas aparte, estrellas en tinta. Gráfica del peso con kilos y fechas.
+  Permiso de avisos también en Hoy. Más aire en los botones de Ajustes y
+  Aprender.

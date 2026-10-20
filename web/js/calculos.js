@@ -207,19 +207,16 @@ export function sugerenciaSerie(datos, ejercicio, plan, { excluirSesion, rmHoy =
 export function rmReciente(datos, ejercicio, semanas = 8, { excluirSesion } = {}) {
   const desde = new Date(Date.now() - semanas * 7 * 86_400_000);
   const corte = `${desde.getFullYear()}-${String(desde.getMonth() + 1).padStart(2, '0')}-${String(desde.getDate()).padStart(2, '0')}`;
+  // El máximo de todas tus series del plazo: las largas (Bilbo, más de 12)
+  // suelen dar un 1RM más bajo, así que solo mandan si dan más (lo decidió Dan).
   let mejor = null;
-  let mejorLarga = null;
   for (const x of seriesDeEjercicio(datos, ejercicio.id, { excluirSesion })) {
     if (x.sesion.fecha < corte || x.serie.tipo === 'calentamiento') continue;
     const rm = rmSinTramos(datos, ejercicio, x.serie);
-    if (!rm) continue;
-    const punto = { valor: redondear(rm, 1), fecha: x.sesion.fecha };
-    if (valeParaReferencia(ejercicio, x.serie)) { if (!mejor || rm > mejor.valor) mejor = punto; }
-    else if (!mejorLarga || rm > mejorLarga.valor) mejorLarga = punto;
+    if (rm && (!mejor || rm > mejor.valor)) mejor = { valor: redondear(rm, 1), fecha: x.sesion.fecha, serie: x.serie };
   }
   if (mejor) return mejor;
-  const siempre = rmDeReferencia(datos, ejercicio, { excluirSesion, referencia: true });
-  if (mejorLarga && !siempre?.deReferencia) return mejorLarga;
+  const siempre = rmDeReferencia(datos, ejercicio, { excluirSesion });
   return siempre ? { valor: siempre.valor, fecha: null, deSiempre: true, manual: Boolean(siempre.manual) } : null;
 }
 
@@ -235,26 +232,20 @@ export function rmReciente(datos, ejercicio, semanas = 8, { excluirSesion } = {}
 export function rmDelEjercicio(datos, ejercicio, { sesion = null, antesDe = null } = {}) {
   const base = rmReciente(datos, ejercicio, 8, { excluirSesion: sesion?.id });
   let hoy = null;
-  let hoyLarga = null;
   (sesion?.ejercicios ?? []).forEach((entrada, i) => {
     if (entrada.ejercicioId !== ejercicio.id) return;
     entrada.series.forEach((s, j) => {
       if (antesDe && (i > antesDe.i || (i === antesDe.i && j >= antesDe.j))) return;
       if (!s.hecha) return;
       const rm = rmSinTramos(datos, ejercicio, s);
-      if (!rm) return;
-      if (valeParaReferencia(ejercicio, s)) { if (!hoy || rm > hoy.valor) hoy = { valor: redondear(rm, 1), serie: s }; }
-      else if (!hoyLarga || rm > hoyLarga.valor) hoyLarga = { valor: redondear(rm, 1), serie: s };
+      if (rm && (!hoy || rm > hoy.valor)) hoy = { valor: redondear(rm, 1), serie: s };
     });
   });
-  // Una Bilbo o una serie de más de 12 de hoy solo cuenta si no hay nada mejor
-  // (ni de antes ni de hoy): si no, no mueve la referencia.
-  if (!hoy && !base && hoyLarga) hoy = hoyLarga;
   // El puesto a mano después de esas series de hoy manda (lo acabas de decir tú).
   const manualDespues = base?.manual && ejercicio.rmManualEn && hoy?.serie?.hechaA && ejercicio.rmManualEn > hoy.serie.hechaA;
   if (hoy && !manualDespues && (!base || base.manual || hoy.valor > base.valor)) return { valor: hoy.valor, origen: 'hoy', serie: hoy.serie };
   if (!base) return null;
-  return { valor: base.valor, origen: base.manual ? 'manual' : 'historial', fecha: base.fecha };
+  return { valor: base.valor, origen: base.manual ? 'manual' : 'historial', fecha: base.fecha, serie: base.serie ?? null };
 }
 
 // El peso de una serie de doble progresión o «según tu 1RM» a partir de un

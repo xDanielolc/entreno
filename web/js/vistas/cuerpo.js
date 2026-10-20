@@ -188,15 +188,20 @@ function tarjetaPeso(d) {
     return e;
   };
   if (ultimos.length >= 2) {
-    const ancho = 300, alto = 90, kgs = ultimos.map((p) => p.kg);
+    const ancho = 300, alto = 120, kgs = ultimos.map((p) => p.kg);
     const min = Math.min(...kgs) - 0.5, max = Math.max(...kgs) + 0.5;
     const t0 = new Date(ultimos[0].fecha), t1 = new Date(ultimos.at(-1).fecha);
-    const x = (f) => ((new Date(f) - t0) / Math.max(1, t1 - t0)) * (ancho - 20) + 10;
-    const y = (kg) => alto - 10 - ((kg - min) / (max - min)) * (alto - 20);
+    const x = (f) => ((new Date(f) - t0) / Math.max(1, t1 - t0)) * (ancho - 60) + 30;
+    const y = (kg) => alto - 28 - ((kg - min) / (max - min)) * (alto - 56);
+    // Kilos encima y fecha debajo del primer punto y del último: así se lee como una gráfica.
+    const rotulo = (p, ancla) => [
+      s('text', { x: x(p.fecha), y: y(p.kg) - 10, 'text-anchor': ancla, 'font-size': 12, fill: 'currentColor' }, document.createTextNode(`${formatearNumero(p.kg)} kg`)),
+      s('text', { x: x(p.fecha), y: alto - 6, 'text-anchor': ancla, 'font-size': 11, fill: 'currentColor', opacity: 0.7 }, document.createTextNode(fechaCorta(p.fecha).slice(0, 5)))];
     grafica = s('svg', { viewBox: `0 0 ${ancho} ${alto}`, class: 'grafica-peso', role: 'img',
       'aria-label': `Tu peso: de ${formatearNumero(kgs[0])} a ${formatearNumero(kgs.at(-1))} kg` },
     s('polyline', { points: ultimos.map((p) => `${x(p.fecha)},${y(p.kg)}`).join(' '), fill: 'none', stroke: 'currentColor', 'stroke-width': 2 }),
-    ultimos.map((p) => s('circle', { cx: x(p.fecha), cy: y(p.kg), r: 3, fill: 'currentColor' })));
+    ultimos.map((p) => s('circle', { cx: x(p.fecha), cy: y(p.kg), r: 3, fill: 'currentColor' })),
+    rotulo(ultimos[0], 'start'), rotulo(ultimos.at(-1), 'end'));
   }
   const cambio = pesos.length >= 2 ? pesos.at(-1).kg - pesos.at(-2).kg : null;
   return h('section', { class: 'tarjeta tarjeta-peso' },
@@ -208,8 +213,7 @@ function tarjetaPeso(d) {
       : h('p', { class: 'nota centrado' }, 'Apúntalo de vez en cuando: tus flexiones, dominadas y fondos se calculan con él.'),
     h('div', { class: 'fila-peso' }, caja, h('button', { type: 'button', class: 'boton', onclick: apuntar }, 'Apuntar hoy')),
     // La línea es tu peso a lo largo del tiempo: se dice, que si no no se entiende.
-    grafica && h('p', { class: 'nota centrado' }, `Tu peso en el tiempo: del ${fechaCorta(ultimos[0].fecha)} (${formatearNumero(ultimos[0].kg)} kg) `
-      + `al ${fechaCorta(ultimos.at(-1).fecha)} (${formatearNumero(ultimos.at(-1).kg)} kg).`),
+    grafica && h('p', { class: 'nota centrado' }, 'Gráfica de tu peso: cada punto es un día que lo apuntaste. Si no cambia, la línea sale plana.'),
     grafica,
     pesos.length > 0 && plegable('peso-historial', 'Todas las veces', {}, h('table', { class: 'tabla-musculos' },
       h('tbody', {}, [...pesos].reverse().map((p) => h('tr', {},

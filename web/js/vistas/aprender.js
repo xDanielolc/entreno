@@ -165,8 +165,8 @@ export function vistaAprender(contenedor) {
         h('li', {}, 'General, solo al empezar: los días de pierna, 10 min de cardio suave (son los dos ratos de cardio de la semana); los de torso, 5 min de bici o andar rápido.'),
         h('li', {}, 'Movilidad, 3 min, todo de pie y sin pausas. Torso: círculos de brazos, 10 en cada sentido; palo, barra vacía o toalla por encima de la cabeza, 10; giros de tronco con el palo en los hombros, 10 por lado. '
           + 'Pierna: balanceos adelante y atrás y laterales, 10 por pierna; sentadilla profunda sin peso con 2 s abajo, 8; bisagra de cadera sin peso, 8; el día del sumo, también sentadilla sumo sin peso, 8.'),
-        h('li', {}, 'Aproximaciones: como mucho 3 por ejercicio, contando la barra sola. El primer básico del día con serie máxima: barra × 5, 60 % × 3 y 80 % × 1 '
-          + '(en el sumo se tira desde el suelo, así que la primera va con los discos grandes más ligeros del gimnasio). El segundo con máxima (el militar del día 3): 60 % × 3 y 80 % × 1. '
+        h('li', {}, 'Aproximaciones: como mucho 3 por ejercicio, contando la barra sola. El primer básico del día con serie máxima: 30 % × 5 (nunca menos que la barra), 60 % × 3 y 80 % × 1 '
+          + '(en el sumo se tira desde el suelo: si el 30 % se queda corto, la primera va con los discos grandes más ligeros del gimnasio). El segundo con máxima (el militar del día 3): 60 % × 3 y 80 % × 1. '
           + 'Una sola, a un 50 % × 5: la sentadilla del día 4 y el rumano del día 2. Ninguna: la Bilbo (sus primeras repeticiones ya lo son), el rumano del día 4 (llegas caliente del sumo) y los accesorios.'),
         h('li', {}, 'Van muy lejos del fallo y no cuentan como volumen ni para tu 1RM.'),
         h('li', {}, 'Sus pesos se redondean de 10 en 10 kg (55 → 50, 77,5 → 80) para calentar rápido y sin cuentas. Es una decisión práctica: '
@@ -202,13 +202,13 @@ export function vistaAprender(contenedor) {
       h('p', {}, 'Básicos (banca, remo, militar, sentadilla y peso muerto): porcentaje del 1RM estimado, corregido por la recámara.'),
       h('ul', { class: 'nota' },
         h('li', {}, 'Cada serie pesada da un 1RM estimado con el peso, las repeticiones y la recámara (repeticiones más recámara: las que harías al fallo). El de la serie máxima de la semana es el más fiable y es el que manda.'),
-        h('li', {}, 'Las series largas no fijan tu 1RM de referencia: la recámara se calcula peor por encima de 12 repeticiones (Halperin 2022). La Bilbo y las series de más de 12 se apuntan, pero no lo cambian. '
-          + 'Eso explica un salto grande el primer día con serie máxima (la sentadilla pasó de 109,6 a 130,7 kg): no es fuerza ganada en una sesión, es que el 1RM viejo salía de series largas y se quedaba corto.'),
+        h('li', {}, 'La app usa el máximo de tus series de las últimas semanas. Las series largas (la Bilbo, más de 12) suelen dar un 1RM más bajo, porque la recámara se calcula peor por encima de 12 repeticiones (Halperin 2022): '
+          + 'casi nunca mandan, pero si una da más, cuenta. Eso explica un salto grande el primer día con serie máxima (la sentadilla pasó de 109,6 a 130,7 kg): no es fuerza ganada en una sesión, es que el 1RM viejo salía de series largas y se quedaba corto.'),
         h('li', {}, 'Los kilos salen de ese 1RM: series de bajada al 80 %, día moderado al 70-75 %, aproximaciones al 60-80 %. Si tu 1RM sube, todos los pesos suben solos.'),
         h('li', {}, 'Si la serie anterior da otro 1RM a mitad del ejercicio, la app te propone el peso que saldría para las siguientes y tú decides.'),
         h('li', {}, 'La recámara corrige: si te sobran (3 o más en recámara, o una repetición más con las mismas 2), ese dato sube tu 1RM y la próxima vez el peso sube; '
           + 'así se puede llegar al 85 %. Si vas justo, el 1RM no sube y el peso se repite; si dos sesiones seguidas va peor, el 1RM de esas dos semanas baja y el peso también.'),
-        h('li', {}, 'Para saber si progresas, mira la gráfica del 1RM estimado de cada básico (toca su dibujo en el entreno): sale de las series de 12 o menos.')),
+        h('li', {}, 'Para saber si progresas, mira la gráfica del 1RM estimado de cada básico (toca su dibujo en el entreno).')),
       h('p', {}, 'Día moderado (Bilbo y normales; sentadilla al 70-75 %), rumano y accesorios: doble progresión.'),
       h('ul', { class: 'nota' },
         h('li', {}, 'Series normales y rumano: cuando todas llegan arriba del rango con la recámara pedida, más peso y vuelta al mínimo del rango. Accesorios, igual, con 1 en recámara.'),

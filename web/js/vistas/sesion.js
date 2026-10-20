@@ -6,7 +6,7 @@ import { crearPlanesRapidos } from '../rapidas.js';
 import { nombreRegla, planesDeItem, seriesDesdePlan } from '../series.js';
 import {
   aPesoDisponible, cargaCorporal, cargaDesdeLectura, esfuerzoTotal, formatearNumero,
-  pasoDe, pesoDePlan, recamaraPorDefectoDe, redondear, rmDelEjercicio, valeParaReferencia, rmDeReferencia, seriesDeEjercicio, sugerenciaSerie, trabajoSerie, tramosPropuestos, usaTramos,
+  pasoDe, pesoDePlan, recamaraPorDefectoDe, redondear, rmDelEjercicio, rmDeReferencia, seriesDeEjercicio, sugerenciaSerie, trabajoSerie, tramosPropuestos, usaTramos,
 } from '../calculos.js';
 import { modeloDe, pesoParaReps, rmDeSerie } from '../formula1rm.js';
 import { guiaTrasPrueba, marcarVista, pintarGuia, pista } from './tutorial.js';
@@ -31,6 +31,7 @@ import { cuentaParaFatiga, tipoDeEjercicio } from '../catalogo.js';
 import { ASISTENCIAS, ESCALA_MANO, PROGRAMAS, TECNICAS_ESTIRAMIENTO, extraDeSerie, medidasDe, unidadMedida } from '../esquema.js';
 import { ORDEN_MUSCULOS, nombreMusculo } from '../musculos.js';
 import { ESCALA_RECUPERACION, factorPersonal, puntuacionSentida, recuperacionPorMusculo } from '../recuperacion.js';
+import { fechaCorta } from '../ui.js';
 import { comparacionSerie, mostrarResumen } from './resumen-sesion.js';
 import { ejercicioEnSede, nombreSede, sedesActivas } from '../sedes.js';
 import { hoyISO } from '../ui.js';
@@ -70,6 +71,8 @@ const fotosVivas = new Map();
 let serieEntra = null;
 // Avisos de ejercicios saltados cerrados con ✕ (solo hasta que se cierra la app).
 const saltosCerrados = new Set();
+// Series medidas en tiempo con las casillas abiertas («Escribir el tiempo a mano»).
+const tiempoAbierto = new Set();
 // Cómo se hace la serie de prueba del 1RM: cerca del fallo, pero sin llegar.
 const PARA_EN_PRUEBA = 'para cuando te quede 1 en recámara (una más y fallarías); apunta las que hagas y esa recámara';
 
@@ -111,7 +114,7 @@ export function vistaSesion(contenedor, { id }) {
   const eleccion = guiado.get(id) ?? null;
   const modo = eleccion?.modo ?? 'todo';
   const posicion = eleccion?.pos ?? null;     // null = ver el entrenamiento entero
-  const serieElegida = eleccion?.serie ?? null;   // modo «serie»: cuál se ve (null = la primera sin hacer)
+  let serieElegida = eleccion?.serie ?? null;   // modo «serie»: cuál se ve (null = la primera sin hacer)
   let direccionDeslizar = direccionPendiente;
   direccionPendiente = null;
   const algoHecho = sesion.ejercicios.some((e) => e.series.some((s) => s.hecha));
@@ -166,7 +169,7 @@ export function vistaSesion(contenedor, { id }) {
     // la nota de que se desliza. En el ordenador, nada arriba.
     enCurso && posicion != null && movil && puntosEjercicios(),
     enCurso && posicion != null && movil && (unaSerie
-      ? pista('deslizar-series', 'Desliza la tarjeta a los lados para pasar de serie. Después de la última serie, pasas al siguiente ejercicio.',
+      ? pista('deslizar-series', 'Desliza a los lados: por la parte de abajo (la serie) pasas de serie; por la de arriba (el dibujo y el nombre), de ejercicio.',
         { siempre: true, icono: '⇆', clase: 'pista-deslizar' })
       : pista('deslizar-ejercicios', 'Desliza la tarjeta a los lados para cambiar de ejercicio.', { siempre: true, icono: '⇆', clase: 'pista-deslizar' })),
     !enCurso && posicion != null && pasoEntreEjercicios(),
@@ -274,7 +277,15 @@ export function vistaSesion(contenedor, { id }) {
     if (!n) return 0;
     if (serieElegida != null) return Math.max(0, Math.min(n - 1, serieElegida === 'ultima' ? n - 1 : serieElegida));
     const sinHacer = t.findIndex((j) => !entrada.series[j].hecha);
-    return sinHacer >= 0 ? sinHacer : n - 1;
+    const k = sinHacer >= 0 ? sinHacer : n - 1;
+    // Se fija la que ves: al apuntarla no salta a la siguiente (Dan no podía
+    // poner la recámara). Se pasa deslizando o con «Hecho».
+    if (unaSerie && posicion != null && sesion.ejercicios[posicion] === entrada) {
+      serieElegida = k;
+      guiado.set(id, { modo, pos: posicion, serie: k });
+      setTimeout(() => cambiarSesion((s) => { s.vista = { modo, pos: posicion, serie: k }; }, { tecleo: true }), 0);
+    }
+    return k;
   }
 
   // Pasar a lo siguiente (+1) o a lo anterior (-1): en el modo «serie», de
@@ -322,20 +333,30 @@ export function vistaSesion(contenedor, { id }) {
   // Deslizar la tarjeta del ejercicio: a la izquierda, el siguiente; a la
   // derecha, el anterior. Solo si el gesto es claramente horizontal.
   function deslizable(tarjeta) {
-    let x0 = null, y0 = null;
+    let x0 = null, y0 = null, arriba = false;
     tarjeta.addEventListener('touchstart', (ev) => {
-      if (ev.target.closest('input, textarea, button.chip')) { x0 = null; return; }
+      // Vale empezar encima de una casilla; no en los comentarios, el reloj ni las barras de deslizar.
+      if (ev.target.closest('textarea, .deslizar-terminar, .reloj-serie, .escala-0-10')) { x0 = null; return; }
       x0 = ev.touches[0].clientX; y0 = ev.touches[0].clientY;
+      // Arriba (dibujo, nombre, 1RM y puntitos de series) se cambia de ejercicio; abajo, de serie.
+      const series = tarjeta.querySelector('.contador-series');
+      arriba = Boolean(series) && y0 < series.getBoundingClientRect().top;
     }, { passive: true });
     tarjeta.addEventListener('touchend', (ev) => {
       if (x0 == null) return;
       const dx = ev.changedTouches[0].clientX - x0; const dy = ev.changedTouches[0].clientY - y0;
       x0 = null;
       if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+      document.activeElement?.blur?.();
       direccionDeslizar = dx < 0 ? 'izquierda' : 'derecha';
       // Ya sabe deslizar: fuera la tarjeta que lo explica.
       const clave = unaSerie ? 'deslizar-series' : 'deslizar-ejercicios';
       if (!d.perfil.tutoriales?.vistos?.[clave]) marcarVista(clave);
+      if (unaSerie && arriba) {
+        const nueva = posicion + (dx < 0 ? 1 : -1);
+        if (nueva >= 0 && nueva < sesion.ejercicios.length) { irA(nueva); window.scrollTo(0, 0); }
+        return;
+      }
       avanzar(dx < 0 ? 1 : -1);
     });
     if (direccionDeslizar) { tarjeta.classList.add(`entra-${direccionDeslizar}`); direccionDeslizar = null; }
@@ -529,8 +550,7 @@ export function vistaSesion(contenedor, { id }) {
           onclick: () => quitarEjercicio(indice, ej) }, icono('cerrar'))),
 
       ej.notas && h('p', { class: 'nota' }, ej.notas),
-      // El aviso de la rutina para este ejercicio se ve siempre.
-      itemDeRutina(ej.id)?.aviso && h('p', { class: 'aviso-rutina' }, itemDeRutina(ej.id).aviso),
+      enCurso && avisoRecuperacion(ej),
 
       referencia1RM(ej),
 
@@ -614,14 +634,17 @@ export function vistaSesion(contenedor, { id }) {
     if (['ninguna', 'altura'].includes(ej.carga?.tipo) || ej.esfuerzo?.tipo !== 'repeticiones') return null;
     const rm = rmDelEjercicio(d, ej, { sesion });
     if (!rm && ej.carga?.tipo === 'pesoCorporal') return null;
-    const origen = !rm ? '' : rm.origen === 'hoy' ? `sale de tu serie de hoy: ${textoSerie(ej, rm.serie)}`
-      : rm.origen === 'manual' ? 'el que pusiste a mano' : 'tu mejor serie de las últimas semanas';
+    const resaltado = (texto) => h('strong', { class: 'subrayado' }, texto);
+    const origen = !rm ? 'Aún no hay ninguna serie de la que sacarlo.'
+      : rm.origen === 'hoy' ? ['Ahora sale de ', resaltado(`tu serie de hoy: ${textoSerie(ej, rm.serie)}`), '.']
+        : rm.origen === 'manual' ? ['Ahora es ', resaltado('el que pusiste a mano'), '.']
+          : ['Ahora sale de ', resaltado(rm.serie ? `tu entrenamiento del ${fechaCorta(rm.fecha)}: ${textoSerie(ej, rm.serie)}` : 'tu mejor serie de siempre'), '.'];
     return h('div', { class: 'linea-1rm' },
-      h('span', {}, 'Tu 1RM: ', h('strong', {}, rm ? `${formatearNumero(Math.round(rm.valor))} kg` : 'aún no lo sabe la app'),
-        rm ? h('small', { class: 'suave bloque' }, origen) : null),
+      h('span', {}, 'Tu 1RM: ', h('strong', {}, rm ? `${formatearNumero(Math.round(rm.valor))} kg` : 'aún no lo sabe la app')),
       ayuda('Tu 1RM en este ejercicio', [
+        origen,
         'El 1RM es el peso con el que harías una sola repetición. La app usa uno solo por ejercicio para calcular los pesos y los porcentajes.',
-        'Sale de tu mejor serie de las últimas 8 semanas. Si nunca has hecho el ejercicio, vale el que pongas a mano; si tampoco hay, la primera serie hace de prueba.',
+        'Sale de tu mejor serie de las últimas 8 semanas (las series largas suelen dar menos, así que casi nunca mandan). Si nunca has hecho el ejercicio, vale el que pongas a mano; si tampoco hay, la primera serie hace de prueba.',
         'Si hoy haces una serie que da más, manda la de hoy, y las series de debajo cuyo peso puso la app se ajustan solas (las que hayas cambiado tú, no).',
         'No cuentan los calentamientos ni las series con más de 5 en recámara: lejos del fallo, la estimación se equivoca mucho.']),
       (!rm || rm.origen === 'manual') && ej.carga?.tipo !== 'pesoCorporal'
@@ -722,7 +745,7 @@ export function vistaSesion(contenedor, { id }) {
       const peso = serie.carga != null ? `${formatearNumero(serie.carga)} ${uCarga}` : s.pct === 0 ? 'la barra sola' : 'un peso ligero';
       const pctTrabajo = plan.progresion?.porRM?.fija === 'pctTrabajo' ? plan.progresion.porRM.valor : null;
       return h('p', { class: 'sugerencia' }, `Calentamiento: ${peso}${reps ? ` × ${reps}` : ''}`
-        + (s.pct > 0 ? ` (${s.pct} % de tu 1RM)` : pctTrabajo ? ` (${pctTrabajo} % del peso de trabajo)` : ''));
+        + (pctTrabajo ? ` (${pctTrabajo} % del peso de trabajo)` : ''));
     }
     if (!plan) return null;
     const s = sugerenciaSerie(d, ej, plan, { excluirSesion: id });
@@ -747,7 +770,11 @@ export function vistaSesion(contenedor, { id }) {
       }
       if (serie.hecha && j === primeraDeTrabajo && !rmAntes) {
         const rm = rmDelEjercicio(d, ej, { sesion, antesDe: { i: idx, j: j + 1 } });
-        if (rm) return h('p', { class: 'sugerencia' }, `Prueba hecha: tu 1RM sale en ${formatearNumero(Math.round(rm.valor))} kg; las series de debajo ya llevan su peso.`);
+        if (rm) {
+          return h('div', { class: 'tarjeta-prueba' },
+            h('p', {}, `Prueba hecha: tu 1RM sale en ${formatearNumero(Math.round(rm.valor))} kg; las series de debajo ya llevan su peso.`),
+            quitarPorPrueba(ej, entrada, idx));
+        }
       }
     }
 
@@ -805,9 +832,7 @@ export function vistaSesion(contenedor, { id }) {
       }
     } else if (s.porRM && serie.carga != null) {
       const base = serie.rmUsado?.valor ?? s.rmUsado;
-      partes.push(`Hoy ${formatearNumero(serie.carga)} ${uCarga}`
-        + (s.esfuerzoObjetivo ? ` × ${s.esfuerzoObjetivo}` : '')
-        + (base ? ` (${Math.round((serie.carga / base) * 100)} % de tu 1RM de ${formatearNumero(Math.round(base))} kg)` : ''));
+      partes.push(`Hoy ${formatearNumero(serie.carga)} ${uCarga}` + (s.esfuerzoObjetivo ? ` × ${s.esfuerzoObjetivo}` : ''));
       if (s.objetivoSuperar) lineas.push(h('span', { class: 'compara' }, '↑ Para superar la última vez: ', h('strong', {}, `${s.objetivoSuperar} ${uEsf}`)));
     } else if (s.modo === 'carga' && !s.ultima) {
       // Serie nueva: el peso sale de tu 1RM (el de la cabecera).
@@ -815,8 +840,7 @@ export function vistaSesion(contenedor, { id }) {
       const rec = s.recamaraMin ? ` dejando ${s.recamaraMin} en recámara` : '';
       if (serie.carga != null && ej.carga?.tipo !== 'pesoCorporal') {
         const base = serie.rmUsado?.valor ?? s.rmUsado;
-        partes.push(`Hoy: ${formatearNumero(serie.carga)} ${uCarga}${rango ? ` × ${rango}` : ''}${rec}`
-          + (base && !serie.hecha && !serie.cargaAMano ? ` (con tu 1RM de ${formatearNumero(Math.round(base))} kg)` : ''));
+        partes.push(`Hoy: ${formatearNumero(serie.carga)} ${uCarga}${rango ? ` × ${rango}` : ''}${rec}`);
       } else partes.push(`Hoy: ${rango ? `${rango} ${uEsf}` : 'apunta lo que hagas'}${rec}`);
     } else if (!s.ultima && !s.referencia) {
       // Solo apuntar, sin nada de antes: el rango y, si hay 1RM, un peso orientativo.
@@ -976,6 +1000,30 @@ export function vistaSesion(contenedor, { id }) {
       comentarioSerie(ej, i, j, serie));
   }
 
+  // Si algún músculo principal del ejercicio aún no está recuperado (ámbar o
+  // rojo en el mapa, menos del 90 %) al empezar el entreno, se avisa; y solo
+  // entonces sale el aviso de la rutina («si la espalda baja va cargada…»).
+  function avisoRecuperacion(ej) {
+    // La movilidad, los estiramientos y el cardio del principio no cansan: sin aviso.
+    if (d.perfil.avisosEntreno?.recuperacion === false || !cuentaParaFatiga(ej)) return null;
+    // Sin contar lo de este mismo entreno: es cómo llegabas al empezar.
+    const previsto = recuperacionPorMusculo({ ...d, sesiones: d.sesiones.filter((x) => x.id !== id) }, sesion.inicio ? new Date(sesion.inicio) : new Date());
+    const tocados = (ej.musculos?.principales ?? []).map((m) => [m, previsto[m]]).filter(([, x]) => x && x.porcentaje < 90);
+    if (!tocados.length) return null;
+    const texto = tocados.map(([m, x]) => `${nombreMusculo(m, { corto: true })} al ${Math.round(x.porcentaje)} %`).join(', ');
+    const deRutina = itemDeRutina(ej.id)?.aviso;
+    return h('p', { class: 'aviso-rutina' }, `Aún sin recuperar del todo: ${texto}.`, deRutina ? ` ${deRutina}` : '');
+  }
+
+  // Con el reloj en la serie, las casillas del tiempo quedan plegadas bajo
+  // «Escribir el tiempo a mano» (Dan las veía apiñadas); sin reloj, a la vista.
+  function tiempoAMano(ej, serie, casillas) {
+    const conReloj = enCurso && !serie.hecha && serie.esfuerzo == null;
+    if (!conReloj || tiempoAbierto.has(serie.id)) return casillas();
+    return h('button', { type: 'button', class: 'boton secundario tiempo-a-mano', onclick: () => { tiempoAbierto.add(serie.id); estado.emitir('vista'); } },
+      'Escribir el tiempo a mano');
+  }
+
   // Se te olvidó la recámara de la serie anterior: se pone aquí de un toque.
   // Se quita para siempre deslizando dentro de la tarjeta.
   function olvidoRecamara(ej, entrada, i, j) {
@@ -1011,7 +1059,7 @@ export function vistaSesion(contenedor, { id }) {
     const prog = plan?.progresion;
     if (prog?.tipo !== 'carga') return null;
     const previa = entrada.series.slice(0, j).reverse().find((x) => x.hecha && x.tipo !== 'calentamiento' && !x.tramos?.length && x.carga > 0 && x.esfuerzo > 0);
-    if (!previa || previa.recamara == null || !valeParaReferencia(ej, previa)) return null;
+    if (!previa || previa.recamara == null) return null;
     const rm = rmDeSerie(d, ej, previa, esfuerzoTotal(previa));
     if (!(rm > 0)) return null;
     let propuesto = null;
@@ -1063,7 +1111,7 @@ export function vistaSesion(contenedor, { id }) {
   // de las series de hoy (la última sin hacer). Solo hoy; la rutina no cambia.
   function quitarPorPrueba(ej, entrada, i) {
     const sinHacer = entrada.series.map((x, k) => [x, k]).filter(([x]) => !x.hecha && x.tipo !== 'calentamiento');
-    if (entrada.quitadaPorPrueba || sinHacer.length < 3) return null;
+    if (entrada.quitadaPorPrueba || sinHacer.length < 2) return null;
     return h('button', { type: 'button', class: 'boton secundario', onclick: () => {
       const [quitada, k] = sinHacer.at(-1);
       cambiarSesion((s) => { s.ejercicios[i].series.splice(k, 1); s.ejercicios[i].quitadaPorPrueba = true; });
@@ -1273,7 +1321,7 @@ export function vistaSesion(contenedor, { id }) {
         marcaObjetivo(serie));
     }
     const plan = planDe(ej, serie);
-    const nombreLibre = plan && !plan.calentamiento ? nombreRegla(plan).split(':')[0] : 'Sin objetivo';
+    const nombreLibre = plan && !plan.calentamiento ? `Programación: ${nombreRegla(plan).split(':')[0]}` : 'Sin objetivo';
     return h('div', { class: 'serie-cabecera' },
       selector(Object.entries(TIPOS_SERIE).map(([k, t]) => [k, k === 'libre' ? nombreLibre : t,
         k === 'libre' && plan && !plan.calentamiento ? nombreRegla(plan) : EXPLICA_TIPO[k]]), serie.tipo, (v) => {
@@ -1369,7 +1417,7 @@ export function vistaSesion(contenedor, { id }) {
         : campoCargaConPorcentaje(ej, i, j, serie)),
 
       esTiempo(ej)
-        ? campoTiempo('Tiempo', serie.esfuerzo, (segundos, caja) => {
+        ? tiempoAMano(ej, serie, () => campoTiempo('Tiempo', serie.esfuerzo, (segundos, caja) => {
           actualizar((x) => {
             const antes = serieCompleta(ej, x);
             x.esfuerzo = segundos;
@@ -1377,7 +1425,7 @@ export function vistaSesion(contenedor, { id }) {
             if (!antes && serieCompleta(ej, x)) descansoEntreSeries(ej, x);
           });
           recalcularAbajo(ej, i);
-        })
+        }))
         : h('label', { class: 'valor' },
           h('span', { class: 'et' }, unidadEsfuerzo(ej)),
           h('input', { type: 'text', inputmode: 'decimal', 'aria-label': TIPOS_ESFUERZO[ej.esfuerzo.tipo].etiqueta,
@@ -1817,7 +1865,14 @@ export function vistaSesion(contenedor, { id }) {
 
   function quitarEjercicio(i, ej) {
     let quitada;
-    cambiarSesion((s) => { [quitada] = s.ejercicios.splice(i, 1); });
+    cambiarSesion((s, datos) => {
+      [quitada] = s.ejercicios.splice(i, 1);
+      // «¿Cómo llegas?» de los músculos que ya no entrenas hoy, fuera.
+      if (s.sensaciones) {
+        const quedan = new Set(s.ejercicios.flatMap((x) => datos.ejercicios.find((e) => e.id === x.ejercicioId)?.musculos?.principales ?? []));
+        for (const m of Object.keys(s.sensaciones)) if (!quedan.has(m)) delete s.sensaciones[m];
+      }
+    });
     if (posicion != null && posicion >= sesion.ejercicios.length) irA(sesion.ejercicios.length - 1);
     aviso(`${ej.nombre} quitado`, { accion: { texto: 'Deshacer',
       fn: () => cambiarSesion((s) => { s.ejercicios.splice(i, 0, quitada); }) } });
@@ -1861,7 +1916,8 @@ export function vistaSesion(contenedor, { id }) {
     estado.cambiar((datos) => {
       if (algo) {
         const s = datos.sesiones.find((x) => x.id === id);
-        if (s) { s.estado = 'terminada'; s.fin = new Date().toISOString(); s.borrada = new Date().toISOString(); }
+        // Lo de «¿Cómo llegas?» no se guarda en un entreno cancelado.
+        if (s) { s.estado = 'terminada'; s.fin = new Date().toISOString(); s.borrada = new Date().toISOString(); delete s.sensaciones; delete s.sensacionesListas; }
       } else {
         datos.sesiones = datos.sesiones.filter((x) => x.id !== id);
       }

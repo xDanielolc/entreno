@@ -421,7 +421,7 @@ export const BIBLIOGRAFIA = [
   },
   {
     tema: 'Calentamiento y aproximaciones',
-    dice: 'Calentamiento general, movilidad de pie y como mucho 3 aproximaciones muy lejos del fallo justo antes de cada básico (barra × 5, 60 % × 3, 80 % × 1 en el primero), seguidas, que no cuentan como volumen.',
+    dice: 'Calentamiento general, movilidad de pie y como mucho 3 aproximaciones muy lejos del fallo justo antes de cada básico (30 % × 5, 60 % × 3, 80 % × 1 en el primero), seguidas, que no cuentan como volumen.',
     matiz: 'Los porcentajes, el máximo de 3, redondear de 10 en 10 kg y hacerlas seguidas son decisión práctica (parecida a las guías de test de 1RM), no un estudio. En series al fallo, un calentamiento más largo no dio más repeticiones: por eso la Bilbo y los accesorios no llevan aproximación propia.',
     fuentes: [
       { texto: 'Fradkin et al. (2010), J Strength Cond Res: calentar mejoró el rendimiento en el 79 % de los criterios medidos.', url: 'https://doi.org/10.1519/JSC.0b013e3181c643a0' },
@@ -435,11 +435,11 @@ export const BIBLIOGRAFIA = [
   },
   {
     tema: 'Serie máxima y series de bajada',
-    dice: 'Primero una serie máxima de 1-2 con 1-2 en recámara (mide el 1RM) y después 2-3 series de bajada al 80 % con 2 en recámara (ponen el volumen). Los kilos salen del 1RM estimado, que solo sale de series de 12 o menos, y la recámara lo corrige.',
+    dice: 'Primero una serie máxima de 1-2 con 1-2 en recámara (mide el 1RM) y después 2-3 series de bajada al 80 % con 2 en recámara (ponen el volumen). Los kilos salen del 1RM estimado (el máximo de tus series recientes) y la recámara lo corrige.',
     matiz: 'Que la serie máxima vaya primero es mecánica (se hace sin cansancio), no un ensayo que lo compare. La bajada de esta rutina (al ~89 % del peso de la máxima) es más exigente que la de los estudios, y el 80 % y el 4 × 4 de banca son decisiones prácticas.',
     fuentes: [
       { texto: 'Mayhew et al. (2008), J Strength Cond Res: las ecuaciones del 1RM aciertan más con menos de 10 repeticiones.', url: 'https://doi.org/10.1519/JSC.0b013e31817b02ad' },
-      { texto: 'Halperin et al. (2022), Sports Med: metaanálisis de 12 estudios; las repeticiones que faltan hasta el fallo se calculan peor por encima de 12. Por eso las series largas no fijan el 1RM de referencia.', url: 'https://doi.org/10.1007/s40279-021-01559-x' },
+      { texto: 'Halperin et al. (2022), Sports Med: metaanálisis de 12 estudios; las repeticiones que faltan hasta el fallo se calculan peor por encima de 12. Por eso las series largas suelen dar un 1RM más bajo y casi nunca mandan.', url: 'https://doi.org/10.1007/s40279-021-01559-x' },
       { texto: 'Mattocks et al. (2017), Med Sci Sports Exerc: practicar el 1RM aumenta la fuerza como entrenar con más volumen; es una habilidad.', url: 'https://pubmed.ncbi.nlm.nih.gov/?term=Mattocks+2017+practicing+the+test+strength' },
       { texto: 'Androulakis-Korakakis et al. (2021), Front Sports Act Living: añadir 2-3 series de bajada a una serie muy pesada pudo dar más fuerza.', url: 'https://doi.org/10.3389/fspor.2021.713655' },
       { texto: 'Helms et al. (2018), J Strength Cond Res: cuanto más se baja respecto a la serie máxima, más volumen semanal.', url: 'https://doi.org/10.1519/JSC.0000000000002032' },

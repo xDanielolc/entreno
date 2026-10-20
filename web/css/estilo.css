@@ -1878,7 +1878,7 @@ a, button { -webkit-touch-callout: none; }
 .estrellas { display: flex; justify-content: center; gap: 6px; margin: 4px 0; }
 .estrella { width: 48px; height: 48px; padding: 0; border: 1px solid var(--borde); border-radius: 50%; background: var(--superficie-2);
   color: var(--texto-suave); font-size: 1.4rem; cursor: pointer; }
-.estrella.activa { background: var(--acento-suave); color: var(--aviso); border-color: transparent; }
+.estrella.activa { background: var(--superficie-2); color: var(--texto); border-color: var(--texto-suave); }
 .tabla-desliza { overflow-x: auto; }
 .tabla-diario { width: 100%; border-collapse: collapse; font-size: .9rem; text-align: center; font-variant-numeric: tabular-nums; }
 .tabla-diario th { font-weight: 600; color: var(--texto-suave); font-size: .8rem; padding: 4px; }
@@ -2013,5 +2013,14 @@ html, body { overflow-x: clip; }
 .pista-deslizar .pista-icono { font-size: 1.3rem; animation: deslizar-pista 1.6s ease-in-out infinite; }
 @keyframes deslizar-pista { 0%, 100% { transform: translateX(-4px); } 50% { transform: translateX(4px); } }
 @media (prefers-reduced-motion: reduce) { .pista-deslizar .pista-icono { animation: none; } }
-.aviso-serie .chip.seleccionable { min-width: 46px; min-height: 44px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--texto-suave);
+.aviso-serie .chip.seleccionable { display: inline-grid; place-items: center; text-align: center; min-width: 46px; min-height: 44px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--texto-suave);
   background: var(--superficie); color: var(--texto); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* Más aire alrededor de los botones de Ajustes y Aprender (Dan: «muy apretado»). */
+.apartado .fila-marcas, .apartado .casilla, .apartado > .boton, .apartado li .fila-marcas { margin-top: 14px; margin-bottom: 14px; }
+.apartado .boton-marca { margin: 4px; }
+/* El origen del 1RM, resaltado dentro de su «?». */
+.subrayado { text-decoration: underline; text-underline-offset: 3px; }
+/* «Escribir el tiempo a mano», debajo del reloj. */
+.tiempo-a-mano { display: block; margin: 8px auto 4px; }
+.grafica-peso text { font-family: var(--fuente-numeros); }
