@@ -253,6 +253,13 @@ export function vistaSesion(contenedor, { id }) {
     return deslizarParaConfirmar('Desliza para terminar', terminar);
   }
 
+  // Las series de trabajo de un ejercicio (sus índices): los calentamientos
+  // previstos van aparte, en una franja.
+  function trabajoDe(entrada) {
+    const ej = ejercicioDe(entrada?.ejercicioId);
+    return (entrada?.series ?? []).map((s, j) => j).filter((j) => !calentamientoPrevisto(ej, entrada.series[j]));
+  }
+
   // La serie que se ve en el modo «serie» (su posición entre las de
   // trabajo): la elegida o la primera sin hacer.
   function indiceSerie(entrada) {
