@@ -304,6 +304,8 @@ export const CATALOGO = [
 
   // --- Movilidad ----------------------------------------------------------
   movilidad('CARs de hombro', ['hombro'], ['hombroPosterior']),
+  movilidad('Movilidad dinámica de torso', ['hombro'], ['pecho', 'dorsal']),
+  movilidad('Movilidad dinámica de pierna', ['cuadriceps'], ['gluteo', 'isquios', 'aductores']),
   movilidad('CARs de cadera', ['gluteo'], ['aductores', 'abductores']),
   movilidad('Dislocaciones con pica', ['hombro'], ['pecho', 'hombroPosterior'], 'pica o goma'),
   movilidad('Tobillo con rodilla a la pared', ['gemelo'], ['tibial'], 'pared', { carga: 'altura', esfuerzo: 'repeticiones' }),

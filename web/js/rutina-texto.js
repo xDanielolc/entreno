@@ -62,11 +62,18 @@ function analizarPieza(texto, tipoTexto = '', comoTexto = '') {
   else if (/ascend|piramid/.test(t)) forma.forma = 'ascendente';
   else if (/calent/.test(t)) forma.tipo = 'calentamiento';
   else if (/fuerza/.test(t)) forma.tipo = 'fuerza';
-  // Calentamiento al % del 1RM («1 × 8 al 50 %») o con la barra sola (0 %).
+  // Calentamiento al % del 1RM («1 × 8 al 50 %»), al % del peso de trabajo
+  // («al 50 % del trabajo») o con la barra sola (0 %).
   if (forma.tipo === 'calentamiento') {
     const pct = t.match(/(\d+)\s*%/);
-    if (pct) forma.pct = Number(pct[1]);
+    if (pct && /del trabajo|de trabajo/.test(t)) forma.pctTrabajo = Number(pct[1]);
+    else if (pct) forma.pct = Number(pct[1]);
     else if (/barra/.test(t)) forma.pct = 0;
+  }
+  // «según tu 1RM»: el peso sale de tu 1RM estimado de las últimas semanas
+  // (el de la serie máxima de la semana, si la hay) para hacer esas repeticiones.
+  if (/segun (tu|el) 1rm/.test(t) && forma.tipo !== 'calentamiento') {
+    forma.modo = 'rm'; forma.fija = 'reps'; forma.valor = forma.a; forma.semanas = 2;
   }
   // «2 en recámara» (o «2-3 en recámara»): el peso sube solo si te dejas esas.
   const recamara = conComo.match(/(\d)(?:\s*-\s*\d)?\s*en recamara/);

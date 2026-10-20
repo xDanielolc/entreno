@@ -547,6 +547,8 @@ export function vistaSesion(contenedor, { id }) {
         !grande && foto && h('button', { type: 'button', class: 'miniatura-boton', 'aria-label': `Cómo vas en ${ej.nombre}`, onclick: () => verProgreso(ej) },
           h('img', { class: 'miniatura', src: foto.archivo, alt: '', loading: 'lazy' })),
         h('h2', { class: 'crece' }, ej.nombre),
+        // Las notas de la rutina para este ejercicio (cómo se hace, descansos), en un «?».
+        itemDeRutina(ej.id)?.nota && ayuda(`${ej.nombre}: cómo se hace hoy`, itemDeRutina(ej.id).nota.split(/;\s*/).map((x) => x.charAt(0).toUpperCase() + x.slice(1) + (/[.!?]$/.test(x) ? '' : '.'))),
         h('button', { class: 'boton-icono', 'aria-label': `Quitar ${ej.nombre}`,
           onclick: () => quitarEjercicio(indice, ej) }, icono('cerrar'))),
 
@@ -617,6 +619,7 @@ export function vistaSesion(contenedor, { id }) {
       abierto ? lista.map(([s, j]) => bloqueSerie(ej, entrada, i, j, s))
         : h('div', { class: 'chips-calentamiento' }, lista.map(([s, j]) => {
           const reps = planDe(ej, s)?.objetivoEsfuerzo?.[1] ?? s.esfuerzo;
+          const enTiempo = ej.esfuerzo?.tipo === 'tiempo';
           const ultimoCal = j === lista.at(-1)[1];
           return h('button', { type: 'button', class: `chip-calentamiento${s.hecha ? ' hecho' : ''}`, 'aria-pressed': String(Boolean(s.hecha)),
             onclick: () => {
@@ -628,16 +631,21 @@ export function vistaSesion(contenedor, { id }) {
                 y.hecha = true;
                 y.hechaA = new Date().toISOString();
               });
-              // Descanso corto entre calentamientos; tras el último, el de siempre.
+              // Las aproximaciones ligeras van seguidas (solo cambiar discos); antes
+              // de una pesada (80 % o más) y antes de la primera serie de trabajo,
+              // 2-3 min.
               if (ahora) {
-                if (ultimoCal) descansoEntreSeries(ej);
-                else arrancarDescanso(DESCANSO_CALENTAMIENTO, { texto: 'entre calentamientos' });
+                const pos = lista.findIndex(([, jj]) => jj === j);
+                const siguiente = lista[pos + 1]?.[0];
+                const pctSiguiente = siguiente ? planDe(ej, siguiente)?.progresion?.porRM?.valor ?? 0 : null;
+                if (ultimoCal || pctSiguiente >= 80) arrancarDescanso(DESCANSO_ANTES_DE_PESADA, { texto: ultimoCal ? 'antes de la primera serie' : 'antes de la pesada' });
               }
             } },
           h('span', { class: 'chip-marca', 'aria-hidden': 'true' }, s.hecha ? '✓' : ''),
-          `${s.carga != null ? `${formatearNumero(s.carga)} ${u}` : 'Ligero'}${reps ? ` × ${reps}` : ''}`);
+          enTiempo ? textoEsfuerzo(ej, reps)
+            : `${s.carga != null ? `${formatearNumero(s.carga)} ${u}` : ej.carga?.tipo === 'ninguna' ? '' : 'Ligero'}${reps ? `${s.carga != null || ej.carga?.tipo !== 'ninguna' ? ' × ' : ''}${reps}` : ''}`);
         })),
-      h('button', { type: 'button', class: 'boton enlace', onclick: () => {
+      ej.carga?.tipo !== 'ninguna' && h('button', { type: 'button', class: 'boton enlace', onclick: () => {
         if (abierto) calentamientoAbierto.delete(clave); else calentamientoAbierto.add(clave);
         estado.emitir('vista');
       } }, abierto ? 'Listo' : 'Cambiar pesos'));
@@ -780,7 +788,9 @@ export function vistaSesion(contenedor, { id }) {
       const s = sugerenciaSerie(d, ej, plan, { excluirSesion: id });
       const reps = textoRango(plan.objetivoEsfuerzo);
       const peso = serie.carga != null ? `${formatearNumero(serie.carga)} ${uCarga}` : s.pct === 0 ? 'la barra sola' : 'un peso ligero';
-      return h('p', { class: 'sugerencia' }, `Calentamiento: ${peso}${reps ? ` × ${reps}` : ''}${s.pct > 0 ? ` (${s.pct} % de tu 1RM)` : ''}`);
+      const pctTrabajo = plan.progresion?.porRM?.fija === 'pctTrabajo' ? plan.progresion.porRM.valor : null;
+      return h('p', { class: 'sugerencia' }, `Calentamiento: ${peso}${reps ? ` × ${reps}` : ''}`
+        + (s.pct > 0 ? ` (${s.pct} % de tu 1RM)` : pctTrabajo ? ` (${pctTrabajo} % del peso de trabajo)` : ''));
     }
     if (!plan) return null;
     const s = sugerenciaSerie(d, ej, plan, { excluirSesion: id });
@@ -909,6 +919,17 @@ export function vistaSesion(contenedor, { id }) {
     if (!entrada) return false;
     let cambio = false;
     entrada.series.forEach((serie, j) => {
+      if (serie.tipo === 'calentamiento' && !serie.hecha && !serie.cargaAMano) {
+        const porRM = (e.series || []).find((pp) => pp.id === serie.planId)?.progresion?.porRM;
+        if (porRM?.fija !== 'pctTrabajo') return;
+        const trabajo = entrada.series.find((x) => x.tipo !== 'calentamiento' && x.carga > 0);
+        if (!trabajo) return;
+        const peso = aPesoDisponible(e, (trabajo.carga * porRM.valor) / 100);
+        if (peso === serie.carga) return;
+        cambio = true;
+        if (aplicar) { serie.carga = peso; serie.cargaAuto = true; }
+        return;
+      }
       if (serie.hecha || serie.tramos?.length || serie.cargaAMano || serie.tipo === 'calentamiento') return;
       const plan = (e.series || []).find((p) => p.id === serie.planId);
       if (!plan) return;
@@ -1239,7 +1260,7 @@ export function vistaSesion(contenedor, { id }) {
             const antes = serieCompleta(ej, x);
             x.esfuerzo = segundos;
             marcarHecha(caja, x, ej);
-            if (!antes && serieCompleta(ej, x)) descansoEntreSeries(ej);
+            if (!antes && serieCompleta(ej, x)) descansoEntreSeries(ej, x);
           });
           recalcularAbajo(ej, i);
         })
@@ -1253,7 +1274,7 @@ export function vistaSesion(contenedor, { id }) {
                 const antes = serieCompleta(ej, x);
                 x.esfuerzo = leerNumero(e.target.value);
                 marcarHecha(e.target, x, ej);
-                if (!antes && serieCompleta(ej, x)) descansoEntreSeries(ej);
+                if (!antes && serieCompleta(ej, x)) descansoEntreSeries(ej, x);
               });
               recalcularAbajo(ej, i);
               avisarRecord(ej, serie.id);
@@ -1326,7 +1347,7 @@ export function vistaSesion(contenedor, { id }) {
       if (tramo == null) {
         recalcularAbajo(ej, i);
         // El descanso arranca cuando están el peso y las repeticiones, en el orden que sea.
-        if (!antes && serieCompleta(ej, serie)) descansoEntreSeries(ej);
+        if (!antes && serieCompleta(ej, serie)) descansoEntreSeries(ej, serie);
       }
     });
     kilos.addEventListener('change', () => { if (tramo == null) reajustarDebajo(ej, i); });
@@ -1431,7 +1452,7 @@ export function vistaSesion(contenedor, { id }) {
                     arrancarDescanso(descansoDeTramo(d.perfil, tramos.tecnica), {
                       texto: tramos.tecnica === 'drop-set' ? 'para cambiar el peso' : 'para recuperar el aliento' });
                   }
-                } else descansoEntreSeries(ej);
+                } else descansoEntreSeries(ej, x);
               }
             }) })),
         serie.tramos.length > 1 ? h('button', { class: 'boton-icono', 'aria-label': `Quitar ${tramos.nombre.toLowerCase()} ${k + 1}`,
@@ -1551,7 +1572,7 @@ export function vistaSesion(contenedor, { id }) {
       : null;
   }
 
-  function descansoEntreSeries(ej) {
+  function descansoEntreSeries(ej, serie = null) {
     const i = sesion.ejercicios.findIndex((e) => e.ejercicioId === ej.id);
     const siguiente = sesion.ejercicios[i + 1];
     if (itemDeRutina(ej.id)?.superserie && siguiente) {
@@ -1568,9 +1589,21 @@ export function vistaSesion(contenedor, { id }) {
       if (seg) arrancarDescanso(seg, { texto: 'entre estiramientos' });
       return;
     }
-    // Cada ejercicio puede tener su descanso (ficha, Ajustes finos).
-    const seg = ej.descansoSegundos ?? d.perfil.descansoSegundos;
+    // Cada ejercicio puede tener su descanso (ficha, Ajustes finos). Si no,
+    // lo pide la serie: tras una serie máxima, 4 min (3-5); entre series de
+    // fuerza (6 o menos con 2 en recámara), 3 min; si no, el de Ajustes.
+    const seg = ej.descansoSegundos ?? descansoDeSerie(ej, serie) ?? d.perfil.descansoSegundos;
     if (seg) arrancarDescanso(seg, { ejercicio: { id: ej.id, nombre: ej.nombre } });
+  }
+
+  function descansoDeSerie(ej, serie) {
+    const plan = serie ? planDe(ej, serie) : null;
+    const prog = plan?.progresion ?? {};
+    const max = (prog.objetivoEsfuerzo ?? plan?.objetivoEsfuerzo)?.[1] ?? prog.porRM?.valor;
+    if (!plan || prog.tipo !== 'carga' || max == null) return null;
+    if (max <= 2) return 240;
+    if (max <= 6 && (prog.recamaraMin ?? 0) >= 2) return 180;
+    return null;
   }
 
   // Tras tocar una serie normal (peso, porcentaje, repeticiones o recámara),
@@ -1775,8 +1808,9 @@ function horaEnFecha(iso, fecha, minutosMas = 0) {
   return nueva.toISOString();
 }
 
-// Entre series de aproximación basta con lo justo para cambiar los discos.
-const DESCANSO_CALENTAMIENTO = 60;
+// Entre aproximaciones ligeras, solo lo que se tarda en cambiar discos (sin
+// temporizador); antes de una pesada o de la primera de trabajo, 2-3 min.
+const DESCANSO_ANTES_DE_PESADA = 150;
 
 // Un calentamiento que viene de la rutina (con su peso): va en la franja.
 function calentamientoPrevisto(ej, serie) {

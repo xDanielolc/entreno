@@ -95,7 +95,9 @@ export function crearPlanesRapidos(datos, ej, forma) {
       plan.tipo = 'calentamiento';
       plan.calentamiento = true;
       // «al 50 %»: el peso sale de tu 1RM; 0 % es la barra sola.
-      if (f.pct != null && conPeso(ej)) plan.progresion.porRM = { fija: 'pct', valor: f.pct, semanas: 8 };
+      if (f.pct != null && conPeso(ej)) plan.progresion.porRM = { fija: 'pct', valor: f.pct, semanas: f.semanas ?? 2 };
+      // Al % del peso de la primera serie de trabajo de ese día (rumano, curl femoral).
+      if (f.pctTrabajo != null && conPeso(ej)) plan.progresion.porRM = { fija: 'pctTrabajo', valor: f.pctTrabajo };
       return plan;
     });
   }
@@ -105,7 +107,12 @@ export function crearPlanesRapidos(datos, ej, forma) {
     return planes;
   }
   if (f.tipo === 'maxima') {
-    return Array.from({ length: n }, () => { const p = conCarga([de ?? 1, a ?? 2]); p.progresion.recamaraMin = f.recamara ?? 1; return p; });
+    return Array.from({ length: n }, () => {
+      const p = conCarga([de ?? 1, a ?? 2]);
+      p.progresion.recamaraMin = f.recamara ?? 1;
+      if (f.modo === 'rm') p.progresion.porRM = { fija: 'reps', valor: a ?? 2, semanas: f.semanas ?? 8 };
+      return p;
+    });
   }
   if (f.modo?.startsWith('mio:')) {
     const mio = (datos.perfil?.prehechos ?? []).find((m) => `mio:${m.id}` === f.modo);
@@ -143,7 +150,7 @@ export function crearPlanesRapidos(datos, ej, forma) {
     const plan = conCarga(repsDe(i));
     if (f.modo === 'rm') {
       const porReps = asc || f.fija !== 'pct';
-      plan.progresion.porRM = { fija: porReps ? 'reps' : 'pct', valor: porReps ? repsDe(i)[0] : f.valor, semanas: 8 };
+      plan.progresion.porRM = { fija: porReps ? 'reps' : 'pct', valor: porReps ? repsDe(i)[0] : f.valor, semanas: f.semanas ?? 8 };
       if (!porReps) { plan.progresion.objetivoEsfuerzo = null; plan.objetivoEsfuerzo = null; }
     }
     return plan;
