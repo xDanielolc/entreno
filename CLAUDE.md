@@ -1054,3 +1054,6 @@ fase), tras probar la A.
   4 dibujos de prueba (https://claude.ai/artifact/LKwqWx7KXyqbN3qv31mKLy).
   Design dibuja con código: pictogramas, no ilustraciones. Pendiente: lienzo
   con todas las pantallas para el repaso del proyecto.
+- 0.59.2: la caja ya no bota («la caja es dura»): toca con una esquina
+  (2,14 s, golpe) y cae a plano sobre la otra (2,43 s, «paf»); solo esos dos
+  sonidos, de 0,15 s cada uno.

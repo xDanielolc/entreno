@@ -1661,25 +1661,21 @@ div.sugerencia > span { display: block; }
 }
 @keyframes pesa-dentro { to { color: var(--acento-texto); } }
 
-/* Variante «cae»: del cielo, esquina derecha (2,14 s), botecito (2,50 s) y a plano (2,76 s). */
+/* Variante «cae»: del cielo, toca con la esquina derecha (2,14 s) y cae a
+   plano sobre la otra esquina (2,43 s). La caja es dura: no bota (Dan: «un
+   golpe seco, la pesa rebota, la caja es dura»). */
 #presentacion.cae .caja { animation: caja-cae 1.3s linear 1.75s both; }
 @keyframes caja-cae {
   0%   { transform: translateY(-70vh) rotate(-4deg); opacity: 1; animation-timing-function: cubic-bezier(.5,0,1,.6); }
-  30%  { transform: translateY(0) rotate(14deg); animation-timing-function: cubic-bezier(.2,.7,.4,1); }
-  44%  { transform: translateY(-9px) rotate(17deg); animation-timing-function: cubic-bezier(.6,0,1,.7); }
-  58%  { transform: translateY(0) rotate(15deg); animation-timing-function: cubic-bezier(.5,0,.9,.7); }
-  78%  { transform: translateY(0) rotate(-3deg); animation-timing-function: ease-out; }
-  89%  { transform: translateY(0) rotate(1.5deg); }
+  30%  { transform: translateY(0) rotate(14deg); animation-timing-function: cubic-bezier(.55,0,1,.45); }
+  52%  { transform: translateY(0) rotate(0deg); }
   100% { transform: none; opacity: 1; }
 }
 /* Mientras está inclinada sobre la esquina, la pesa se mueve con ella. */
 #presentacion.cae .pesa { animation: pesa-saltar 1.8s linear both, pesa-dentro .15s linear 2.14s forwards, pesa-con-caja .91s linear 2.14s; }
 @keyframes pesa-con-caja {
-  0%   { transform: translate(5px, -3px) rotate(14deg); }
-  20%  { transform: translate(6px, -12px) rotate(17deg); }
-  40%  { transform: translate(5px, -3px) rotate(15deg); }
-  70%  { transform: translate(-1px, 0) rotate(-3deg); }
-  85%  { transform: rotate(1.5deg); }
+  0%   { transform: translate(5px, -3px) rotate(14deg); animation-timing-function: cubic-bezier(.55,0,1,.45); }
+  31%  { transform: none; }
   100% { transform: none; }
 }
 

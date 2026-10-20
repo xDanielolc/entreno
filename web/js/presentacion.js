@@ -16,9 +16,9 @@ const AUSENCIA_PARA_REPETIR_MS = 20 * 60 * 1000;
 // los 1,75 s.
 const BOTES = [['bote', 1.8 * 0.30, 480], ['bote', 1.8 * 0.60, 560], ['bote', 1.8 * 0.84, 640]];
 const SONIDOS = {
-  // Cae del cielo (1,3 s): la esquina choca al 30 % (golpe seco), bota al 58 %
-  // (golpecito) y cae a plano al 78 % (golpe sordo, más grave y más largo).
-  cae: [...BOTES, ['seco', 1.75 + 1.3 * 0.30, 1], ['seco', 1.75 + 1.3 * 0.58, 0.35], ['plano', 1.75 + 1.3 * 0.78, 1]],
+  // Cae del cielo (1,3 s): la primera esquina toca al 30 % (golpe) y la
+  // segunda al 52 % («paf», al quedar plana). Sin bote: la caja es dura.
+  cae: [...BOTES, ['seco', 1.75 + 1.3 * 0.30, 1], ['plano', 1.75 + 1.3 * 0.52, 1]],
   // Entra por la derecha (1,2 s): choca al 32 % y se asienta al 66 %.
   derecha: [...BOTES, ['seco', 1.75 + 1.2 * 0.32, 1], ['plano', 1.75 + 1.2 * 0.66, 0.8]],
 };
