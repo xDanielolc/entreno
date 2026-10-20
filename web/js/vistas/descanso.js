@@ -181,10 +181,17 @@ function formatear(segundos) {
   return `${Math.floor(segundos / 60)}:${String(segundos % 60).padStart(2, '0')}`;
 }
 
+// Para comprobar que el móvil vibra: ahora mismo y, si hay avisos, con una
+// notificación a los 10 s (da tiempo a bloquear la pantalla).
+export function probarAviso() {
+  avisar();
+  if (notificacionesActivas()) setTimeout(() => notificar('Prueba del aviso', 'Así te avisa la app cuando acaba un descanso.'), 10_000);
+}
+
 // Un pitido corto, sin archivos de sonido, y una vibración si el móvil puede.
 function avisar() {
   try {
-    navigator.vibrate?.([600, 200, 600, 200, 900]);
+    navigator.vibrate?.([800, 200, 800, 200, 1200]);
     const audio = new AudioContext();
     const osc = audio.createOscillator();
     const vol = audio.createGain();

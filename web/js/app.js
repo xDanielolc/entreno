@@ -69,7 +69,10 @@ const PESTANAS = [
 document.querySelector('.marca-app')?.prepend(icono('marca'));
 // Mantener pulsado un botón o un enlace no saca el menú del navegador (abrir
 // en otra pestaña, copiar enlace…): en una app no pinta nada.
-document.addEventListener('contextmenu', (e) => { if (e.target.closest?.('a, button, .tarjeta')) e.preventDefault(); });
+document.addEventListener('contextmenu', (e) => {
+  if (e.target.closest?.('input, textarea, [contenteditable]')) return;   // copiar, cortar y pegar
+  if (e.target.closest?.('a, button, .tarjeta')) e.preventDefault();
+});
 
 // La presentación: al arrancar y al volver tras un buen rato fuera.
 mostrarPresentacion();

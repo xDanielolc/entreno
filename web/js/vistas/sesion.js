@@ -6,7 +6,7 @@ import { crearPlanesRapidos } from '../rapidas.js';
 import { nombreRegla, planesDeItem, seriesDesdePlan } from '../series.js';
 import {
   aPesoDisponible, cargaCorporal, cargaDesdeLectura, esfuerzoTotal, formatearNumero,
-  pesoDePlan, redondear, rmDelEjercicio, rmDeReferencia, seriesDeEjercicio, sugerenciaSerie, trabajoSerie, tramosPropuestos, usaTramos,
+  pasoDe, pesoDePlan, recamaraPorDefectoDe, redondear, rmDelEjercicio, rmDeReferencia, seriesDeEjercicio, sugerenciaSerie, trabajoSerie, tramosPropuestos, usaTramos,
 } from '../calculos.js';
 import { modeloDe, pesoParaReps, rmDeSerie } from '../formula1rm.js';
 import { guiaTrasPrueba, marcarVista, pintarGuia, pista } from './tutorial.js';
@@ -25,7 +25,7 @@ import {
   avisoPrimeraBajada, crearSerieDesdePlan, entradaDeEjercicio, modoCargaDe, origenModoCarga, recalcularTramos, saltoDeTramo,
   serieSuelta,
 } from '../series.js';
-import { anadir, aviso, confirmar, deslizarParaConfirmar, fechaLarga, h, formatearTiempo, leerNumero, leerTiempo } from '../ui.js';
+import { anadir, aviso, confirmar, deslizarParaConfirmar, fechaLarga, h, formatearTiempo, horario, leerNumero, leerTiempo } from '../ui.js';
 import { DESCANSO_ESTIRAMIENTOS_POR_DEFECTO, arrancarDescanso, arrancarRespiracion, barraDescanso, descansoDeTramo, preguntaAvisos } from './descanso.js';
 import { cuentaParaFatiga, tipoDeEjercicio } from '../catalogo.js';
 import { ASISTENCIAS, ESCALA_MANO, PROGRAMAS, TECNICAS_ESTIRAMIENTO, extraDeSerie, medidasDe, unidadMedida } from '../esquema.js';
@@ -68,6 +68,10 @@ const EXPLICA_TIPO = {
 const fotosVivas = new Map();
 // Hacia dónde entra la serie nueva (modo «serie»): solo se anima la serie.
 let serieEntra = null;
+// Avisos de ejercicios saltados cerrados con ✕ (solo hasta que se cierra la app).
+const saltosCerrados = new Set();
+// Cómo se hace la serie de prueba del 1RM: cerca del fallo, pero sin llegar.
+const PARA_EN_PRUEBA = 'para cuando te quede 1 en recámara (una más y fallarías); apunta las que hagas y esa recámara';
 
 // Calentamientos abiertos para cambiar sus pesos («sesión:ejercicio»).
 
@@ -166,6 +170,7 @@ export function vistaSesion(contenedor, { id }) {
         { siempre: true, icono: '⇆', clase: 'pista-deslizar' })
       : pista('deslizar-ejercicios', 'Desliza la tarjeta a los lados para cambiar de ejercicio.', { siempre: true, icono: '⇆', clase: 'pista-deslizar' })),
     !enCurso && posicion != null && pasoEntreEjercicios(),
+    avisoSaltos(),
 
     visibles.map(([entrada, i]) => tarjetaEjercicio(entrada, i)),
 
@@ -250,8 +255,9 @@ export function vistaSesion(contenedor, { id }) {
   }
 
   // «Desliza para terminar» (lo eligió Dan).
+  // En gris hasta que esté hecha la última serie del último ejercicio (o todo).
   function deslizarParaTerminar() {
-    return deslizarParaConfirmar('Desliza para terminar', terminar);
+    return deslizarParaConfirmar('Desliza para terminar', terminar, { apagado: !listoParaTerminar() });
   }
 
   // Las series que se pasan de una en una (sus índices): todas, también los
@@ -722,7 +728,8 @@ export function vistaSesion(contenedor, { id }) {
     const rmAntes = entrada ? rmDelEjercicio(d, ej, { sesion, antesDe: { i: idx, j } }) : null;
     const primeraDeTrabajo = entrada ? entrada.series.findIndex((x) => x.tipo !== 'calentamiento') : -1;
     const tarjetaPrueba = (texto) => h('div', { class: 'tarjeta-prueba' }, h('p', {}, texto),
-      h('button', { type: 'button', class: 'boton enlace', onclick: () => ponerRMaMano(ej, serie) }, 'Ya sé mi 1RM: lo meto a mano'));
+      h('button', { type: 'button', class: 'boton enlace', onclick: () => ponerRMaMano(ej, serie) }, 'Ya sé mi 1RM: lo meto a mano'),
+      entrada && quitarPorPrueba(ej, entrada, idx));
 
     // Sin ningún 1RM (ni de antes ni de hoy): la primera serie de trabajo es
     // la prueba y las demás esperan a ella.
@@ -732,7 +739,7 @@ export function vistaSesion(contenedor, { id }) {
           const [, max] = plan.progresion?.objetivoEsfuerzo ?? plan.objetivoEsfuerzo ?? [];
           return tarjetaPrueba((max ?? 10) <= 3
             ? `Pon un peso con el que hagas ${max} dejando ${plan.progresion?.recamaraMin ?? 1} en recámara. De aquí sale tu 1RM y el peso de las demás series.`
-            : 'Pon un peso con el que hagas de 3 a 10 y haz todas las que puedas. De aquí sale tu 1RM y el peso de las demás series.');
+            : `Pon un peso con el que hagas de 3 a 10 y ${PARA_EN_PRUEBA}. De aquí sale tu 1RM y el peso de las demás series.`);
         }
         return h('p', { class: 'sugerencia' }, 'Espera a la prueba de arriba: con ella se pone el peso de esta serie.');
       }
@@ -745,14 +752,14 @@ export function vistaSesion(contenedor, { id }) {
     const partes = [];
     const lineas = [];
     if (s.prueba && !serie.hecha && !rmAntes) {
-      return tarjetaPrueba('Aún no tienes 1RM en este ejercicio. Esta serie es la prueba: pon un peso con el que hagas de 3 a 10 y haz todas las que puedas. Con ella la app calcula tu 1RM y monta el ciclo.');
+      return tarjetaPrueba(`Aún no tienes 1RM en este ejercicio. Esta serie es la prueba: pon un peso con el que hagas de 3 a 10 y ${PARA_EN_PRUEBA}. Con ella la app calcula tu 1RM y monta el ciclo.`);
     }
 
     if (s.modo === 'bilbo') {
       if (s.sinCiclo) {
         if (plan.progresion?.sobre === 'esfuerzo') partes.push('Hoy: haz todas las que puedas; desde ahí el ciclo irá subiendo');
         else if (!serie.hecha && !rmAntes) {
-          return tarjetaPrueba('Sin 1RM todavía: pon un peso con el que hagas de 3 a 10 y haz todas las que puedas. De aquí sale tu 1RM y el ciclo.');
+          return tarjetaPrueba(`Sin 1RM todavía: pon un peso con el que hagas de 3 a 10 y ${PARA_EN_PRUEBA}. De aquí sale tu 1RM y el ciclo.`);
         } else partes.push(serie.hecha ? 'Hecha: con ella se monta el ciclo' : 'Montando el ciclo con tu 1RM de hoy…');
       } else if (s.cicloTerminado) partes.push(`Ciclo ${s.cicloN} terminado: prepara el siguiente en la ficha (o pon el reinicio en automático)`);
       else {
@@ -848,7 +855,7 @@ export function vistaSesion(contenedor, { id }) {
         if (porRM?.fija !== 'pctTrabajo') return;
         const trabajo = entrada.series.find((x) => x.tipo !== 'calentamiento' && x.carga > 0);
         if (!trabajo) return;
-        const peso = aPesoDisponible(e, (trabajo.carga * porRM.valor) / 100);
+        const peso = aPesoDisponible(e, (trabajo.carga * porRM.valor) / 100, { calentamiento: true });
         if (peso === serie.carga) return;
         cambio = true;
         if (aplicar) { serie.carga = peso; serie.cargaAuto = true; }
@@ -952,7 +959,10 @@ export function vistaSesion(contenedor, { id }) {
     serie.tecnicas ??= [];
     serie.detalle ??= {};
     const tramos = tramosDe(serie.tecnicas);
+    const toca = enCurso && entrada && !serie.hecha && (unaSerie || entrada.series.findIndex((x) => !x.hecha) === j);
     return h('div', { class: `serie ${serie.hecha ? 'hecha' : ''}`, 'data-serie': j },
+      toca && olvidoRecamara(ej, entrada, i, j),
+      toca && propuestaPorRMDeHoy(ej, entrada, i, j, serie),
       lineaSugerencia(ej, serie, entrada, j, i),
       cabeceraSerie(ej, i, j, serie, entrada),
       relojDeSerie(ej, entrada, i, j, serie),
@@ -962,6 +972,124 @@ export function vistaSesion(contenedor, { id }) {
       camposEstiramiento(ej, i, j, serie),
       h('p', { class: 'comparacion' }, comparacionSerie(d, ej, serie, { excluirSesion: id })),
       comentarioSerie(ej, i, j, serie));
+  }
+
+  // Se te olvidó la recámara de la serie anterior: se pone aquí de un toque.
+  // Se quita para siempre deslizando dentro de la tarjeta.
+  function olvidoRecamara(ej, entrada, i, j) {
+    if (d.perfil.avisosEntreno?.recamara === false) return null;
+    let ii = i; let jj = -1; let ejPrevio = ej;
+    for (let k = j - 1; k >= 0; k--) if (entrada.series[k].hecha && entrada.series[k].tipo !== 'calentamiento') { jj = k; break; }
+    // La primera serie de un ejercicio mira la última del anterior.
+    if (jj < 0 && i > 0) {
+      const anterior = sesion.ejercicios[i - 1];
+      ii = i - 1; ejPrevio = ejercicioDe(anterior.ejercicioId);
+      jj = anterior.series.findLastIndex((x) => x.hecha && x.tipo !== 'calentamiento');
+    }
+    const previa = jj >= 0 ? sesion.ejercicios[ii].series[jj] : null;
+    if (!previa || !ejPrevio || previa.recamara != null || previa.tramos?.length || !(previa.esfuerzo > 0)
+      || ejPrevio.esfuerzo?.tipo !== 'repeticiones') return null;
+    return h('div', { class: 'aviso-serie' },
+      h('p', {}, `Se te olvidó la recámara de ${ii !== i ? `${ejPrevio.nombre}, ` : ''}la serie anterior (${textoSerie(ejPrevio, previa)}). ¿Cuántas te quedaban?`),
+      h('div', { class: 'chips' }, [0, 1, 2, 3, 4, 5].map((v) => h('button', { type: 'button', class: 'chip seleccionable',
+        onclick: () => cambiarSesion((s) => { s.ejercicios[ii].series[jj].recamara = v; }) }, v === 5 ? '5+' : String(v)))),
+      deslizarParaConfirmar('Desliza para no avisarme más', () => {
+        estado.cambiar((x) => { x.perfil.avisosEntreno = { ...x.perfil.avisosEntreno, recamara: false }; });
+        aviso('Sin avisos de la recámara. Se vuelven a poner en Ajustes → Entrenamiento y series.');
+      }, { clase: 'pequeno' }));
+  }
+
+  // Si la serie anterior da otro 1RM hoy, la app propone el peso que saldría
+  // con él (a la baja, o al alza en doble progresión si llegaste arriba del
+  // rango); tú decides. Las series que siguen tu 1RM ya suben solas.
+  function propuestaPorRMDeHoy(ej, entrada, i, j, serie) {
+    if (d.perfil.avisosEntreno?.rmHoy === false || serie.propuestaVista || serie.tipo === 'calentamiento' || serie.tramos?.length
+      || serie.cargaAMano || !(serie.carga > 0) || ej.esfuerzo?.tipo !== 'repeticiones' || ej.carga?.tipo !== 'peso') return null;
+    const plan = planDe(ej, serie);
+    const prog = plan?.progresion;
+    if (prog?.tipo !== 'carga') return null;
+    const previa = entrada.series.slice(0, j).reverse().find((x) => x.hecha && x.tipo !== 'calentamiento' && !x.tramos?.length && x.carga > 0 && x.esfuerzo > 0);
+    if (!previa || previa.recamara == null) return null;
+    const rm = rmDeSerie(d, ej, previa, esfuerzoTotal(previa));
+    if (!(rm > 0)) return null;
+    let propuesto = null;
+    if (prog.porRM) propuesto = pesoDePlan(d, ej, plan, rm);
+    else {
+      // Doble progresión: si la anterior llegó arriba del rango con su recámara,
+      // más peso y vuelta al mínimo; si no llegó al mínimo, menos.
+      const [min, max] = prog.objetivoEsfuerzo ?? plan.objetivoEsfuerzo ?? [];
+      if (min == null || max == null || !mismaRegla(ej, previa, serie)) return null;
+      const hizo = esfuerzoTotal(previa);
+      const arriba = hizo >= max && previa.recamara >= (prog.recamaraMin ?? 0);
+      if (!arriba && hizo >= min) return null;
+      propuesto = aPesoDisponible(ej, pesoParaReps(modeloDe(d, ej), rm, min, recamaraPorDefectoDe(d, ej, plan)), { rm });
+      if (arriba ? propuesto <= serie.carga : propuesto >= serie.carga) return null;
+    }
+    if (!(propuesto > 0) || Math.abs(propuesto - serie.carga) < pasoDe(ej) - 0.01) return null;
+    const n = formatearNumero;
+    const usar = () => cambiarSesion((s) => {
+      const lista = s.ejercicios[i].series;
+      for (let k = j; k < lista.length; k++) {
+        const x = lista[k];
+        if (x.hecha || x.cargaAMano || !mismaRegla(ej, x, serie)) continue;
+        x.carga = propuesto; x.cargaAMano = true; delete x.cargaAuto;
+      }
+      lista[j].propuestaVista = true;
+    });
+    return h('div', { class: 'aviso-serie' },
+      h('p', {}, `Con la serie anterior, ${textoSerie(ej, previa)}, tu 1RM de hoy sale en ${n(Math.round(rm))} kg. `
+        + `Para esta saldrían ${n(propuesto)} kg en vez de ${n(serie.carga)}.`),
+      h('div', { class: 'fila-botones' },
+        h('button', { type: 'button', class: 'boton', onclick: usar }, `Usar ${n(propuesto)} kg`),
+        h('button', { type: 'button', class: 'boton secundario', onclick: () => cambiarSesion((s) => { s.ejercicios[i].series[j].propuestaVista = true; }) },
+          `Seguir con ${n(serie.carga)}`)),
+      deslizarParaConfirmar('Desliza para no proponérmelo más', () => {
+        estado.cambiar((x) => { x.perfil.avisosEntreno = { ...x.perfil.avisosEntreno, rmHoy: false }; });
+        aviso('Ya no te lo propongo. Se vuelve a poner en Ajustes → Entrenamiento y series.');
+      }, { clase: 'pequeno' }));
+  }
+
+  // Dos series con la misma regla (las de «3 × 6-8» llevan un plan cada una).
+  function mismaRegla(ej, a, b) {
+    if (a.planId === b.planId) return true;
+    const pa = planDe(ej, a); const pb = planDe(ej, b);
+    const firma = (p) => p && JSON.stringify([p.tipo, p.progresion?.tipo, p.progresion?.objetivoEsfuerzo ?? p.objetivoEsfuerzo, p.progresion?.porRM ?? null, p.tecnicas ?? []]);
+    return Boolean(pa && pb) && firma(pa) === firma(pb);
+  }
+
+  // El día de la prueba de 1RM: la prueba cansa, así que se puede quitar una
+  // de las series de hoy (la última sin hacer). Solo hoy; la rutina no cambia.
+  function quitarPorPrueba(ej, entrada, i) {
+    const sinHacer = entrada.series.map((x, k) => [x, k]).filter(([x]) => !x.hecha && x.tipo !== 'calentamiento');
+    if (entrada.quitadaPorPrueba || sinHacer.length < 3) return null;
+    return h('button', { type: 'button', class: 'boton secundario', onclick: () => {
+      const [quitada, k] = sinHacer.at(-1);
+      cambiarSesion((s) => { s.ejercicios[i].series.splice(k, 1); s.ejercicios[i].quitadaPorPrueba = true; });
+      aviso('Quitada una serie de hoy.', { accion: { texto: 'Deshacer', fn: () => cambiarSesion((s) => {
+        s.ejercicios[i].series.splice(k, 0, quitada); s.ejercicios[i].quitadaPorPrueba = false;
+      }) } });
+    } }, 'La prueba cansa: quitar una serie de hoy');
+  }
+
+  // Ejercicios que te has saltado (sin ninguna serie hecha y ya vas por
+  // otro): un aviso arriba. ✕ lo cierra hoy; deslizando, para siempre.
+  function avisoSaltos() {
+    if (!enCurso || d.perfil.avisosEntreno?.saltos === false) return null;
+    const hasta = posicion ?? sesion.ejercicios.findLastIndex((e) => e.series.some((x) => x.hecha));
+    const saltados = sesion.ejercicios.slice(0, Math.max(0, hasta))
+      .filter((e) => e.series.length && !e.series.some((x) => x.hecha) && !saltosCerrados.has(`${id}:${e.ejercicioId}`));
+    if (!saltados.length) return null;
+    const nombres = saltados.map((e) => ejercicioDe(e.ejercicioId)?.nombre ?? 'un ejercicio');
+    const caja = h('div', { class: 'aviso-serie aviso-saltos' },
+      h('button', { type: 'button', class: 'boton-icono cerrar-aviso', 'aria-label': 'Cerrar este aviso', onclick: () => {
+        saltados.forEach((e) => saltosCerrados.add(`${id}:${e.ejercicioId}`)); caja.remove();
+      } }, icono('cerrar')),
+      h('p', {}, `Te has saltado ${nombres.length > 1 ? `${nombres.slice(0, -1).join(', ')} y ${nombres.at(-1)}` : nombres[0]}.`),
+      deslizarParaConfirmar('Desliza para no avisarme más', () => {
+        estado.cambiar((x) => { x.perfil.avisosEntreno = { ...x.perfil.avisosEntreno, saltos: false }; });
+        aviso('Sin avisos de ejercicios saltados. Se vuelven a poner en Ajustes → Entrenamiento y series.');
+      }, { clase: 'pequeno' }));
+    return caja;
   }
 
   // El reloj de una serie medida en tiempo, dentro de ella: cuenta atrás con
@@ -1166,7 +1294,7 @@ export function vistaSesion(contenedor, { id }) {
       serie.tipo === 'intensidad' && desplegableTecnicas(serie.tecnicas, (nuevas) => cambiarSesion((s) => {
         const x = s.ejercicios[i].series[j];
         x.tecnicas = nuevas;
-        x.recamara = recamaraDe(nuevas, ej.recamaraPorDefecto ?? d.perfil.recamaraPorDefecto ?? 1);
+        x.recamara = recamaraDe(nuevas, x.recamara ?? null);
         x.tramos = tramosDe(nuevas) ? (x.tramos ?? tramosPropuestos(x, planDe(ej, x), null, d.perfil)) : null;
       })),
 
@@ -1272,6 +1400,7 @@ export function vistaSesion(contenedor, { id }) {
         return h('label', { class: 'valor recamara' },
           h('span', { class: 'et' }, 'Recámara', queEs('recamara', '?')),
           h('input', { type: 'text', inputmode: 'decimal', value: serie.recamara ?? '', 'aria-label': 'Repeticiones en recámara',
+            placeholder: serie.recamara == null ? String(ultimaDe(ej, serie)?.recamara ?? recamaraPorDefectoDe(d, ej, planDe(ej, serie))) : '',
             oninput: (e) => {
               const v = leerNumero(e.target.value);
               cercania.textContent = v != null ? (tipoDeFallo(v) || '') : '';
@@ -1625,7 +1754,14 @@ export function vistaSesion(contenedor, { id }) {
     return x.carga != null;
   }
 
+  function listoParaTerminar() {
+    const s = estado.datos().sesiones.find((x) => x.id === id);
+    const ejercicios = s?.ejercicios ?? [];
+    return ejercicios.length > 0 && (ejercicios.at(-1).series.at(-1)?.hecha || ejercicios.every((e) => e.series.every((x) => x.hecha)));
+  }
+
   function marcarHecha(input, serie, ej) {
+    setTimeout(() => document.querySelector('.barra-entreno .deslizar-terminar')?.classList.toggle('apagado', !listoParaTerminar()), 0);
     serie.hecha = serie.tramos?.length ? serie.tramos.some((t) => t.esfuerzo != null) : serie.esfuerzo != null;
     // La hora a la que la acabas: con ella se ve cuánto descansas entre series.
     if (serie.hecha) serie.hechaA ??= new Date().toISOString(); else serie.hechaA = null;
@@ -1662,7 +1798,7 @@ export function vistaSesion(contenedor, { id }) {
       // no contar dos veces en el ciclo.
       const esBilbo = anterior?.tipo === 'bilbo' || planDe(ej, anterior ?? {})?.progresion?.tipo === 'bilbo';
       const copia = serieSuelta({ tipo: esBilbo ? 'libre' : anterior?.tipo ?? 'libre', tecnicas: anterior?.tecnicas ?? [],
-        carga: anterior?.carga ?? null, recamara: anterior?.recamara ?? null });
+        carga: anterior?.carga ?? null, recamara: null });
       copia.planId = esBilbo ? null : anterior?.planId ?? null;
       copia.lectura = anterior?.lectura ?? null;
       if (usaTramos(copia.tecnicas)) copia.tramos = tramosPropuestos(copia, planDe(ej, copia), anterior, datos.perfil);
@@ -1805,7 +1941,7 @@ function resumenDelDia(contenedor, d, sesion) {
     sesion.borrada && h('p', { class: 'tarjeta aviso-tarjeta' }, 'Este entrenamiento está en la papelera: no cuenta para tu progresión.'),
     h('h1', {}, fechaLarga(sesion.fecha)),
     h('p', { class: 'suave' }, [nombreDelDia(d, sesion), sesion.sedeId && nombreSede(d, sesion.sedeId),
-      `${series} ${series === 1 ? 'serie' : 'series'}`, duracion && `${duracion} min`].filter(Boolean).join(' · ')),
+      `${series} ${series === 1 ? 'serie' : 'series'}`, horario(sesion) ?? (duracion && `${duracion} min`)].filter(Boolean).join(' · ')),
     sesion.ejercicios.map((entrada) => {
       const ej = d.ejercicios.find((e) => e.id === entrada.ejercicioId);
       const hechas = entrada.series.filter((s) => s.hecha);

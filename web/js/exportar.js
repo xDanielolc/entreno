@@ -46,7 +46,8 @@ function textoSerieCorto(ej, serie) {
 
 export function csvEntrenamientos(datos) {
   const MAX = 8;
-  const cabecera = ['Fecha', 'Rutina', 'Día', 'Sitio', 'Ejercicio'];
+  const cabecera = ['Fecha', 'Empieza', 'Acaba', 'Minutos', 'Rutina', 'Día', 'Sitio', 'Ejercicio'];
+  const hora = (iso) => (iso ? new Date(iso).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : '');
   for (let i = 1; i <= MAX; i++) cabecera.push(`Serie ${i}`);
   cabecera.push('Mejor 1RM del día', 'Comentarios de las series', 'Comentarios del entrenamiento');
   const lineas = [['Cada serie: peso × repeticiones + las que te quedaban. Una serie descendente: 60×8 → 50×6.'], cabecera];
@@ -65,7 +66,7 @@ export function csvEntrenamientos(datos) {
       while (celdas.length < MAX) celdas.push('');
       const rms = ej.carga?.tipo !== 'ninguna'
         ? hechas.filter((x) => !x.tramos?.length).map((x) => rmDeSerie(datos, ej, x, esfuerzoTotal(x))).filter(Boolean) : [];
-      lineas.push([s.fecha, rutina?.nombre ?? '', dia?.nombre ?? '', s.sedeId ? nombreSede(datos, s.sedeId) : '', ej.nombre,
+      lineas.push([s.fecha, hora(s.inicio), hora(s.fin), s.inicio && s.fin ? Math.round((new Date(s.fin) - new Date(s.inicio)) / 60_000) : '', rutina?.nombre ?? '', dia?.nombre ?? '', s.sedeId ? nombreSede(datos, s.sedeId) : '', ej.nombre,
         ...celdas, rms.length ? Math.round(Math.max(...rms) * 10) / 10 : '',
         // «Serie 2: me costó» por cada serie comentada, y lo del ejercicio.
         [...hechas.map((x, k) => x.nota && `Serie ${k + 1}: ${x.nota}`), entrada.nota].filter(Boolean).join(' · '),

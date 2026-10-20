@@ -1,6 +1,6 @@
 import * as estado from '../estado.js';
 import { sedeInicial } from '../sedes.js';
-import { anadir, fechaLarga, h, hoyISO, modal, nuevoId, selector } from '../ui.js';
+import { anadir, fechaLarga, h, hoyISO, modal, nuevoId, selector, horario } from '../ui.js';
 import { TIPOS_EJERCICIO, normalizar, tipoDeEjercicio } from '../catalogo.js';
 import { MUSCULOS, ORDEN_MUSCULOS } from '../musculos.js';
 
@@ -41,6 +41,7 @@ export function resumenSesion(datos, sesion, { breve = false } = {}) {
       h('strong', {}, fechaLarga(sesion.fecha)),
       sesion.estado === 'en-curso' && h('span', { class: 'etiqueta' }, 'En curso'),
       h('div', {}, titulo),
+      horario(sesion) && h('div', { class: 'suave' }, horario(sesion)),
       !breve && h('div', { class: 'suave' }, nombres.length ? nombres.join(', ') : 'Sin ejercicios')),
     h('span', { class: 'contador' }, `${series} ${series === 1 ? 'serie' : 'series'}`));
 }

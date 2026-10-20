@@ -193,10 +193,10 @@ export function ampliar(titulo, construir) {
 // Una barra que se arrastra hasta el final para confirmar algo importante
 // (terminar el entreno, mover a la papelera): así no se hace sin querer. Un
 // toque solo da la pista; con el teclado, Intro.
-export function deslizarParaConfirmar(texto, alConfirmar, { peligro = false } = {}) {
+export function deslizarParaConfirmar(texto, alConfirmar, { peligro = false, apagado = false, clase = '' } = {}) {
   const tirador = h('span', { class: 'deslizar-tirador', 'aria-hidden': 'true' }, '➜');
   const rotulo = h('span', { class: 'deslizar-texto' }, texto);
-  const pista = h('div', { class: `deslizar-terminar${peligro ? ' peligro' : ''}`, role: 'button', tabindex: '0', 'aria-label': `${texto} (desliza o pulsa Intro)`,
+  const pista = h('div', { class: `deslizar-terminar${peligro ? ' peligro' : ''}${apagado ? ' apagado' : ''}${clase ? ` ${clase}` : ''}`, role: 'button', tabindex: '0', 'aria-label': `${texto} (desliza o pulsa Intro)`,
     onkeydown: (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); alConfirmar(); } } }, rotulo, tirador);
   let x0 = null;
   let max = 0;
@@ -224,6 +224,15 @@ export function deslizarParaConfirmar(texto, alConfirmar, { peligro = false } = 
   });
   pista.addEventListener('pointercancel', () => { x0 = null; tirador.style.transition = ''; mover(0); });
   return pista;
+}
+
+// «18:20 a 19:41 · 81 min»: de qué hora a qué hora fue un entrenamiento.
+export function horario(sesion) {
+  if (!sesion?.inicio) return null;
+  const hora = (iso) => new Date(iso).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  if (!sesion.fin) return `desde las ${hora(sesion.inicio)}`;
+  const min = Math.round((new Date(sesion.fin) - new Date(sesion.inicio)) / 60_000);
+  return `${hora(sesion.inicio)} a ${hora(sesion.fin)} · ${min} min`;
 }
 
 // Un «?» pequeño en la esquina de abajo a la derecha de una tarjeta, para los

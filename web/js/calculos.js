@@ -195,7 +195,7 @@ export function sugerenciaSerie(datos, ejercicio, plan, { excluirSesion, rmHoy =
   // Calentamiento al % de tu 1RM («50 % × 8»); con 0 %, la barra sola.
   if (prog.porRM?.fija === 'pct' && sobre === 'carga') {
     const rm = rmReciente(datos, ejercicio, prog.porRM.semanas ?? 8, { excluirSesion });
-    const carga = prog.porRM.valor > 0 ? (rm ? aPesoDisponible(ejercicio, (rm.valor * prog.porRM.valor) / 100) : null)
+    const carga = prog.porRM.valor > 0 ? (rm ? aPesoDisponible(ejercicio, (rm.valor * prog.porRM.valor) / 100, { rm: rm.valor, calentamiento: Boolean(plan.calentamiento) }) : null)
       : (pesoMinimoDe(ejercicio) || null);
     return { ...base, carga, pct: prog.porRM.valor, rmUsado: rm?.valor ?? null, rango: plan.objetivoEsfuerzo };
   }
@@ -252,7 +252,7 @@ export function rmDelEjercicio(datos, ejercicio, { sesion = null, antesDe = null
 export function pesoDePlan(datos, ejercicio, plan, rm) {
   const prog = plan.progresion ?? {};
   if (!(rm > 0)) return null;
-  if (prog.porRM?.fija === 'pct') return aPesoDisponible(ejercicio, (rm * prog.porRM.valor) / 100, { rm });
+  if (prog.porRM?.fija === 'pct') return aPesoDisponible(ejercicio, (rm * prog.porRM.valor) / 100, { rm, calentamiento: Boolean(plan.calentamiento) });
   const reps = prog.porRM?.valor ?? prog.objetivoEsfuerzo?.[1];
   if (!(reps > 0)) return null;
   const recamara = recamaraPorDefectoDe(datos, ejercicio, plan);
@@ -538,6 +538,10 @@ export const REDONDEO_POR_DEFECTO = 2.5;
 export const REDONDEOS = [0.5, 1, 1.25, 2, 2.5, 5];
 let redondeoGlobal = REDONDEO_POR_DEFECTO;
 export function fijarRedondeo(kg) { redondeoGlobal = kg > 0 ? kg : REDONDEO_POR_DEFECTO; }
+// Calentamientos de 10 en 10 kg (decisión práctica de Dan: sin cuentas al
+// calentar). Se quita en Ajustes y entonces van con el % exacto.
+let calentamientoRedondo = true;
+export function fijarCalentamientoRedondo(valor) { calentamientoRedondo = valor !== false; }
 
 // El peso más bajo que se puede poner en un ejercicio: con barra, la barra
 // vacía (20 kg por defecto; se cambia en la ficha, «Ajustes finos»). Si
@@ -583,7 +587,7 @@ export function aPasoDeDisco(kg, paso = redondeoGlobal) {
 // Redondea a un peso que exista de verdad: si el ejercicio está atado a una
 // máquina con sus pesos, al más cercano de ellos (o al siguiente por arriba o
 // por abajo); si no, al salto de disco del ejercicio o de Ajustes.
-export function aPesoDisponible(ejercicio, kg, { hacia = 'cerca', rm = null } = {}) {
+export function aPesoDisponible(ejercicio, kg, { hacia = 'cerca', rm = null, calentamiento = false } = {}) {
   if (kg == null) return null;
   const pesos = ejercicio?.pesosMaquina?.length ? [...ejercicio.pesosMaquina].sort((a, b) => a - b) : null;
   if (!pesos) {
@@ -591,6 +595,8 @@ export function aPesoDisponible(ejercicio, kg, { hacia = 'cerca', rm = null } = 
     const cerca = aPasoDeDisco(kg, paso);
     const minimo = pesoMinimoDe(ejercicio, rm);
     const conMinimo = (x) => (kg > 0 && minimo > 0 ? Math.max(minimo, x) : x);
+    // Calentamiento: a la decena más cercana (55 → 50, 77,5 → 80); con poco peso, el paso de siempre.
+    if (calentamiento && calentamientoRedondo && kg >= 15) return conMinimo(Math.max(10, Math.round((kg - 0.01) / 10) * 10));
     if (hacia === 'arriba' && cerca <= kg + 0.01) return conMinimo(redondear(cerca + paso, 2));
     if (hacia === 'abajo' && cerca >= kg - 0.01) return conMinimo(redondear(Math.max(0, cerca - paso), 2));
     return conMinimo(cerca);

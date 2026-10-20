@@ -954,3 +954,32 @@ fase), tras probar la A.
   «Cronómetro / Intervalos (HIIT)» de arriba y `apuntarTiempo`.
 - Tarjeta «Desliza la tarjeta a los lados…» con `siempre: true` (sale con
   cualquier nivel de pistas) y se quita sola al deslizar la primera vez.
+
+## Ronda 0.57.0 (20-10-2026): notas de su segundo día en el gimnasio
+
+- Recámara: ya no se rellena sola (`crearSerieDesdePlan` la deja en null salvo
+  que una técnica la fije); en gris sale la de la última vez o la de la
+  regla. Si una serie hecha se queda sin recámara, la siguiente enseña
+  `olvidoRecamara` (chips 0-5+, también para la última serie del ejercicio
+  anterior).
+- `propuestaPorRMDeHoy`: si la serie anterior da otro 1RM, propone el peso que
+  saldría (series «según tu 1RM» a la baja; doble progresión al alza si
+  llegó arriba del rango con su recámara, o a la baja si no llegó al mínimo,
+  vuelta al mínimo del rango). «Usar» lo pone a mano en las que quedan con
+  la misma regla (`mismaRegla`: cada serie de «3 × 6-8» tiene su plan).
+- `avisoSaltos`: ejercicios sin ninguna serie hecha antes del actual; ✕ lo
+  cierra hasta cerrar la app. Los tres avisos se quitan para siempre
+  deslizando dentro de la tarjeta (`deslizarParaConfirmar(..., { clase:
+  'pequeno' })`) y vuelven en Ajustes (`perfil.avisosEntreno` recamara /
+  saltos / rmHoy).
+- Calentamientos de 10 en 10 kg (`aPesoDisponible(..., { calentamiento })`,
+  `perfil.calentamientoRedondo`, desactivable; explicado en Aprender). El
+  trabajo sigue con el % exacto.
+- Prueba de 1RM: «para cuando te quede 1 en recámara» y botón «La prueba
+  cansa: quitar una serie de hoy» (`quitarPorPrueba`, con Deshacer).
+- «Desliza para terminar» en gris (`apagado`) hasta que la última serie del
+  último ejercicio esté hecha (`listoParaTerminar`).
+- Horario «18:20 a 19:41 · 81 min» (`horario()` en ui.js) en el historial y
+  en el resumen del día; columnas Empieza, Acaba y Minutos en la hoja CSV.
+- Copiar y pegar en comentarios: el `contextmenu` de app.js ya no se bloquea
+  en casillas de texto. «Probar la vibración» en Ajustes → Descansos.

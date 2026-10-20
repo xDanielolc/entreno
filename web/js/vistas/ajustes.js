@@ -7,7 +7,7 @@ import { apartarCopia, copiasAparte, desconectar, eliminarCuenta, juntarCopia, r
 import { apartadoPlegable, modal, selector } from '../ui.js';
 import { VERSION_APP } from '../version.js';
 import { anadir, aviso, confirmar, h, hoyISO, leerNumero } from '../ui.js';
-import { DESCANSO_ESTIRAMIENTOS_POR_DEFECTO, DESCANSO_TRAMOS_POR_DEFECTO, RESPIRACION_POR_DEFECTO, activarNotificaciones, puedeNotificar } from './descanso.js';
+import { DESCANSO_ESTIRAMIENTOS_POR_DEFECTO, DESCANSO_TRAMOS_POR_DEFECTO, RESPIRACION_POR_DEFECTO, activarNotificaciones, probarAviso, puedeNotificar } from './descanso.js';
 import { TIPOS_SEDE, nuevaSede, sedesActivas } from '../sedes.js';
 import { calibrar, textoCalibracion } from '../formula1rm.js';
 import { TEXTO_AVISO, guardarPruebaEnCuenta } from '../modo-prueba.js';
@@ -133,6 +133,10 @@ export function vistaAjustes(contenedor) {
       h('small', { class: 'nota' }, puedeNotificar()
         ? 'Con la app instalada: mientras dura el descanso, la notificación va diciendo cuánto queda; al acabar, suena y vibra aunque tengas la pantalla apagada.'
         : 'Este navegador no admite notificaciones; en el móvil, con la app instalada, sí.'),
+      h('button', { type: 'button', class: 'boton secundario', onclick: probarAviso }, 'Probar la vibración'),
+      h('small', { class: 'nota' }, 'Vibra al tocar y, con los avisos puestos, otra vez a los 10 s (bloquea el móvil para ver la notificación). '
+        + 'Si no vibra, es cosa del móvil: en sus Ajustes → Notificaciones → la app (o Chrome), que las notificaciones vibren; '
+        + 'y en Sonido y vibración, que la vibración de notificaciones y de toques no esté a cero.'),
       h('div', { class: 'fila-campos' },
         [['drop-set', 'Entre bajadas (s)'], ['rest-pause', 'Rest-pause (s)']]
           .map(([clave, texto]) => numeroAjuste(texto, d.perfil.descansoTramos?.[clave] ?? DESCANSO_TRAMOS_POR_DEFECTO[clave],
@@ -181,6 +185,15 @@ export function vistaAjustes(contenedor) {
         h('input', { type: 'checkbox', checked: d.perfil.preguntarComoLlegas !== false,
           onchange: (e) => estado.cambiar((x) => { x.perfil.preguntarComoLlegas = e.target.checked; x.perfil.comoLlegasSaltos = 0; }) }),
         'Preguntar «¿cómo llegas hoy?» al empezar (tu sensación de cada músculo, para afinar la recuperación)'),
+      h('label', { class: 'casilla' },
+        h('input', { type: 'checkbox', checked: d.perfil.calentamientoRedondo !== false,
+          onchange: (e) => estado.cambiar((x) => { x.perfil.calentamientoRedondo = e.target.checked; }) }),
+        'Calentamientos con pesos redondos, de 10 en 10 kg (sin cuentas; si lo quitas, van con el % exacto)'),
+      [['recamara', 'Avisarme si se me olvida apuntar la recámara'], ['saltos', 'Avisarme si me salto un ejercicio'],
+        ['rmHoy', 'Proponerme otro peso si mi 1RM de hoy cambia a mitad del ejercicio']].map(([clave, texto]) => h('label', { class: 'casilla' },
+        h('input', { type: 'checkbox', checked: d.perfil.avisosEntreno?.[clave] !== false,
+          onchange: (e) => estado.cambiar((x) => { x.perfil.avisosEntreno = { ...x.perfil.avisosEntreno, [clave]: e.target.checked }; }) }),
+        texto)),
       h('h3', {}, 'Series descendentes'),
       h('div', { class: 'fila-campos' },
         numeroAjuste('Bajadas', d.perfil.dropSet?.bajadas ?? 4, (x, v) => { x.perfil.dropSet = { ...x.perfil.dropSet, bajadas: v }; }),

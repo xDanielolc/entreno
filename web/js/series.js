@@ -109,8 +109,9 @@ export function crearSerieDesdePlan(datos, ejercicio, plan, { excluirSesion, rmH
     tipo: plan.tipo,
     tecnicas: [...(plan.tecnicas || [])],
     detalle: {},
-    // La recámara que pide la regla (fuerza: 2) manda sobre la del ejercicio y la de Ajustes.
-    recamara: recamaraDe(plan.tecnicas, recamaraPorDefectoDe(datos, ejercicio, plan)),
+    // La recámara se apunta a mano (Dan: que no se rellene sola); solo la fija
+    // una técnica que la impone (al fallo = 0). La sugerida sale en gris.
+    recamara: recamaraDe(plan.tecnicas, null),
     carga,
     lectura: ejercicio.carga.tipo === 'asistida' ? lecturaDesdeCarga(carga, datos.perfil.pesoCorporalKg) : null,
     esfuerzo: null,

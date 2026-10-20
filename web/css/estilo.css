@@ -206,7 +206,7 @@ a { color: var(--acento); text-decoration-thickness: 1.5px; text-underline-offse
   font-size: 0.8rem;
   padding: 6px 12px;
   border-radius: 999px;
-  border: 1px solid var(--borde);
+  border: 1px solid var(--texto-suave);
   background: var(--superficie);
   color: var(--texto-suave);
   cursor: pointer;
@@ -471,7 +471,7 @@ legend { font-weight: 700; margin-bottom: 8px; padding: 0; }
   font: inherit;
   color: inherit;
   background: var(--superficie);
-  border: 1px solid var(--borde);
+  border: 1px solid var(--texto-suave);
   border-radius: var(--radio-pequeno);
   padding: 10px 14px;
   min-height: var(--alto-toque);
@@ -1038,7 +1038,7 @@ body:has(.modal-fondo) .guia { display: none; }
   line-height: 1;
   min-width: 56px;
   min-height: 48px;
-  border: 1px solid var(--borde);
+  border: 1px solid var(--texto-suave);
   border-radius: var(--radio-pequeno);
   background: var(--superficie);
   color: var(--acento);
@@ -1439,7 +1439,7 @@ a.boton-privacidad { justify-content: flex-start; padding-left: 18px; }
 .boton.enlace {
   background: var(--superficie);
   color: var(--texto);
-  border: 1px solid var(--borde);
+  border: 1px solid var(--texto-suave);
   width: fit-content;
   max-width: 100%;
   min-width: min(100%, 14em);
@@ -1915,6 +1915,18 @@ html { touch-action: pan-x pan-y; }
   background: var(--acento-texto); color: var(--acento); font-size: 1.3rem; transition: transform .25s ease-out; }
 @media (prefers-reduced-motion: reduce) { .deslizar-tirador, .deslizar-texto { transition: none; } }
 .deslizar-terminar.peligro { background: var(--mal); color: #fff; margin-top: 16px; }
+/* En gris hasta que toca terminar (la última serie hecha). */
+.deslizar-terminar.apagado { background: var(--superficie-2); color: var(--texto-suave); }
+.deslizar-terminar.apagado .deslizar-tirador { background: var(--borde); color: var(--texto-suave); }
+/* Dentro de un aviso: más baja y discreta. */
+.deslizar-terminar.pequeno { min-height: 44px; margin-top: 10px; font-size: 0.9rem; font-weight: 600; background: var(--superficie); color: var(--texto-suave); }
+.deslizar-terminar.pequeno .deslizar-tirador { background: var(--texto-suave); color: var(--superficie); font-size: 1rem; }
+/* Avisos dentro de la serie o arriba del entreno (recámara olvidada, otro 1RM hoy, ejercicio saltado). */
+.aviso-serie { position: relative; background: var(--superficie-2); border-radius: var(--radio-pequeno); padding: 12px 14px; margin: 8px 0 12px; text-align: center; }
+.aviso-serie p { margin: 0 0 10px; }
+.aviso-serie .chips, .aviso-serie .fila-botones { justify-content: center; }
+.aviso-saltos { padding-right: 44px; }
+.aviso-saltos .cerrar-aviso { position: absolute; top: 6px; right: 6px; }
 .deslizar-terminar.peligro .deslizar-tirador { background: #fff; color: var(--mal); }
 /* La página no se mueve de lado aunque algo se pase de ancho. */
 html, body { overflow-x: clip; }
@@ -1998,3 +2010,5 @@ html, body { overflow-x: clip; }
 .pista-deslizar .pista-icono { font-size: 1.3rem; animation: deslizar-pista 1.6s ease-in-out infinite; }
 @keyframes deslizar-pista { 0%, 100% { transform: translateX(-4px); } 50% { transform: translateX(4px); } }
 @media (prefers-reduced-motion: reduce) { .pista-deslizar .pista-icono { animation: none; } }
+.aviso-serie .chip.seleccionable { min-width: 46px; min-height: 44px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--texto-suave);
+  background: var(--superficie); color: var(--texto); font-weight: 700; font-variant-numeric: tabular-nums; }
