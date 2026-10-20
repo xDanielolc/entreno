@@ -96,13 +96,14 @@ export async function activarNotificaciones() {
 // Al entrenar, mientras no se haya contestado: «¿Te aviso cuando acabe cada
 // descanso?». Con la pantalla apagada, la app no puede vibrar sola: hace
 // falta el permiso de notificaciones.
+// El permiso es de cada móvil, pero el ajuste viaja con tu cuenta: si en este
+// móvil falta el permiso, se vuelve a preguntar aquí aunque el ajuste diga «sí».
 export function preguntaAvisos() {
   const perfil = estado.datos()?.perfil;
-  if (!puedeNotificar() || perfil?.avisarDescanso !== undefined) return null;
-  if (Notification.permission === 'denied') return null;
+  if (!puedeNotificar() || perfil?.avisarDescanso === false || Notification.permission !== 'default') return null;
   const caja = h('div', { class: 'tarjeta pregunta-avisos' },
     h('p', {}, h('strong', {}, '¿Te aviso cuando acabe cada descanso?'),
-      h('small', { class: 'bloque suave' }, 'Con una notificación que vibra, aunque tengas el móvil bloqueado. Mientras, te dice cuánto queda.')),
+      h('small', { class: 'bloque suave' }, 'Con una notificación que vibra, aunque tengas el móvil bloqueado. Al tocar «¡Avísame!», el móvil te pide permiso: acéptalo.')),
     h('div', { class: 'fila-botones' },
       h('button', { type: 'button', class: 'boton secundario', onclick: () => { estado.cambiar((x) => { x.perfil.avisarDescanso = false; }); caja.remove(); } }, 'Sin avisos, gracias'),
       h('button', { type: 'button', class: 'boton', onclick: async () => { if (await activarNotificaciones()) caja.remove(); } }, '¡Avísame!')));
@@ -137,8 +138,10 @@ function pintar() {
   if (finMs && segundos === 0) {
     clearInterval(intervalo);
     intervalo = null;
-    avisar();
-    if (entreSeries()) notificar('¡Descanso terminado!', 'A por la siguiente serie.');
+    // Con la app delante, su propio sonido y la vibración; la notificación
+    // (con el sonido del móvil) solo si no se ve la app o no ha podido vibrar.
+    const vibro = avisar();
+    if (entreSeries() && (document.visibilityState !== 'visible' || !vibro)) notificar('¡Descanso terminado!', 'A por la siguiente serie.');
   } else if (finMs && entreSeries() && segundos % 15 === 0) {
     // Cada 15 s se actualiza la misma notificación con lo que queda.
     notificar(`Descanso: ${formatear(segundos)}`, 'Te aviso cuando acabe.', { silencio: true });
@@ -188,22 +191,31 @@ export function probarAviso() {
   if (notificacionesActivas()) setTimeout(() => notificar('Prueba del aviso', 'Así te avisa la app cuando acaba un descanso.'), 10_000);
 }
 
-// Un pitido corto, sin archivos de sonido, y una vibración si el móvil puede.
+// El sonido propio del fin del descanso (tres notas que suben, como un
+// «¡vamos!»), sin archivos de sonido, y una vibración si el móvil puede.
+// Devuelve si el móvil aceptó vibrar.
 function avisar() {
+  let vibro = false;
+  try { vibro = Boolean(navigator.vibrate?.([800, 200, 800, 200, 1200])); } catch { /* nada */ }
   try {
-    navigator.vibrate?.([800, 200, 800, 200, 1200]);
     const audio = new AudioContext();
-    const osc = audio.createOscillator();
-    const vol = audio.createGain();
-    osc.frequency.value = 880;
-    vol.gain.setValueAtTime(0.0001, audio.currentTime);
-    vol.gain.exponentialRampToValueAtTime(0.2, audio.currentTime + 0.02);
-    vol.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + 0.5);
-    osc.connect(vol).connect(audio.destination);
-    osc.start();
-    osc.stop(audio.currentTime + 0.5);
-    setTimeout(() => audio.close(), 800);
+    [[660, 0], [880, 0.16], [1320, 0.32]].forEach(([frecuencia, desde], k) => {
+      const osc = audio.createOscillator();
+      const vol = audio.createGain();
+      const t = audio.currentTime + desde;
+      const dura = k === 2 ? 0.55 : 0.14;
+      osc.type = 'triangle';
+      osc.frequency.value = frecuencia;
+      vol.gain.setValueAtTime(0.0001, t);
+      vol.gain.exponentialRampToValueAtTime(0.3, t + 0.015);
+      vol.gain.exponentialRampToValueAtTime(0.0001, t + dura);
+      osc.connect(vol).connect(audio.destination);
+      osc.start(t);
+      osc.stop(t + dura + 0.02);
+    });
+    setTimeout(() => audio.close(), 1500);
   } catch { /* si el navegador no deja sonar, no pasa nada */ }
+  return vibro;
 }
 
 // Saltar o alargar el descanso entre series ofrece cambiar el ajuste desde

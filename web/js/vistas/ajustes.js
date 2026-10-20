@@ -124,17 +124,28 @@ export function vistaAjustes(contenedor) {
         (x, v) => { x.perfil.descansoEstiramientos = v; }),
       h('small', { class: 'nota' }, 'El cronómetro arranca solo al apuntar el peso y las repeticiones de una serie, y al apuntar la última bajada de una serie descendente. '
         + 'Ponlo a 0 para desactivarlo. Si lo saltas o le añades tiempo, la app te ofrece cambiarlo desde allí.'),
-      h('div', { class: 'fila-marcas compacta' },
-        h('button', { type: 'button', class: `boton-marca${d.perfil.avisarDescanso ? ' activo' : ''}`, 'aria-pressed': String(Boolean(d.perfil.avisarDescanso)),
-          onclick: async () => {
-            if (d.perfil.avisarDescanso) { estado.cambiar((x) => { x.perfil.avisarDescanso = false; }); return; }
-            await activarNotificaciones();
-          } }, d.perfil.avisarDescanso ? '¡Te aviso cuando acaben los descansos!' : 'Sin avisos al acabar el descanso: tocar para activarlos')),
+      // El permiso es de cada móvil: «activado» solo si además este móvil lo ha dado.
+      (() => {
+        const permiso = puedeNotificar() ? Notification.permission : 'no';
+        const activo = Boolean(d.perfil.avisarDescanso) && permiso === 'granted';
+        const texto = activo ? '¡Te aviso cuando acaben los descansos!'
+          : d.perfil.avisarDescanso && permiso === 'denied' ? 'Este móvil tiene bloqueados los avisos de la app'
+            : d.perfil.avisarDescanso ? 'Falta el permiso en este móvil: tocar para darlo'
+              : 'Sin avisos al acabar el descanso: tocar para activarlos';
+        return [h('div', { class: 'fila-marcas compacta' },
+          h('button', { type: 'button', class: `boton-marca${activo ? ' activo' : ''}`, 'aria-pressed': String(activo),
+            onclick: async () => {
+              if (activo) { estado.cambiar((x) => { x.perfil.avisarDescanso = false; }); return; }
+              await activarNotificaciones();
+            } }, texto)),
+        permiso === 'denied' && h('small', { class: 'nota' }, 'Para desbloquearlos: en los ajustes del móvil → Aplicaciones → la app (o Chrome) → Notificaciones → permitir.')];
+      })(),
       h('small', { class: 'nota' }, puedeNotificar()
         ? 'Con la app instalada: mientras dura el descanso, la notificación va diciendo cuánto queda; al acabar, suena y vibra aunque tengas la pantalla apagada.'
         : 'Este navegador no admite notificaciones; en el móvil, con la app instalada, sí.'),
       h('button', { type: 'button', class: 'boton secundario', onclick: probarAviso }, 'Probar la vibración'),
-      h('small', { class: 'nota' }, 'Vibra al tocar y, con los avisos puestos, otra vez a los 10 s (bloquea el móvil para ver la notificación). '
+      h('small', { class: 'nota' }, 'Suena y vibra al tocar y, con los avisos puestos, otra vez a los 10 s (bloquea el móvil para ver la notificación). '
+        + 'Con la app delante suena el sonido propio de la app; con el móvil bloqueado, el de las notificaciones, que se cambia en los ajustes del móvil (Notificaciones → la app → sonido). '
         + 'Si no vibra, es cosa del móvil: en sus Ajustes → Notificaciones → la app (o Chrome), que las notificaciones vibren; '
         + 'y en Sonido y vibración, que la vibración de notificaciones y de toques no esté a cero.'),
       h('div', { class: 'fila-campos' },

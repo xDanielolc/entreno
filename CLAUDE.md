@@ -983,3 +983,10 @@ fase), tras probar la A.
   en el resumen del día; columnas Empieza, Acaba y Minutos en la hoja CSV.
 - Copiar y pegar en comentarios: el `contextmenu` de app.js ya no se bloquea
   en casillas de texto. «Probar la vibración» en Ajustes → Descansos.
+- 0.57.1: el permiso de avisos es de cada móvil y `perfil.avisarDescanso` viaja
+  con la cuenta (a Dan le salía «activado» sin permiso en ese móvil): la
+  tarjeta `preguntaAvisos` sale mientras el permiso esté sin dar en ese móvil y
+  Ajustes dice «Falta el permiso en este móvil». Fin del descanso: con la app
+  delante, sonido propio (tres notas que suben) y vibración; la notificación,
+  cuyo sonido no se puede cambiar desde la web, solo si la app no se ve o el
+  móvil no aceptó vibrar.
