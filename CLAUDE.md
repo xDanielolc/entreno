@@ -899,3 +899,28 @@ fase), tras probar la A.
   dominadas con lastre y asistidas, flexiones con lastre, máquina de glúteo,
   abducción y los dos de prueba. Almacén `entreno-imagenes-11`.
 
+
+## Ronda 0.55 (20-10-2026): su rutina del borrador 11
+
+- `datos-privados/rutina-dan-borrador-11.md` (fuera de Git) manda. La
+  prehecha «Fuerza sin máquinas» va por la versión 4: calentamiento general
+  (cardio 15 min los días de pierna, 5 min los de torso), «Movilidad
+  dinámica de torso/pierna» (3 min, ejercicios nuevos del catálogo) y
+  aproximaciones por básico; básicos pesados con «según tu 1RM» (el parser
+  lo convierte en `progresion.porRM` con `semanas: 2`: máxima para 2 con 1 en
+  recámara, bajadas para 4-6 con 2), remo pesado 3 × 4-5. Calentamiento «al
+  50 % del trabajo» (`porRM.fija: 'pctTrabajo'`): sale del peso de la
+  primera serie de trabajo de ese día (en `ajustes()` de sesion.js). Duración
+  en el nombre del día.
+- Descansos: aproximaciones ligeras seguidas; 2,5 min antes de una de 80 % o
+  más y antes de la primera de trabajo; `descansoDeSerie`: 4 min tras una
+  máxima, 3 min entre series de fuerza (6 o menos con 2 en recámara).
+- Las notas de la rutina de cada ejercicio, en un «?» junto a su nombre.
+- Aprender: «Cómo calentar», «Por qué la serie máxima va primero» y «Cómo
+  progresan los básicos»; bibliografía «Calentamiento y aproximaciones» y
+  «Serie máxima y series de bajada». Diferencia con el papel: la rutina dice
+  ±2,5 kg; la app recalcula el peso con el 1RM de las dos últimas semanas.
+- 0.55.1: presentación que arranca con la pesa grande en el centro (donde la
+  deja la pantalla de arranque de Android) y salta hacia atrás haciéndose
+  pequeña; Diario con «Guardar el día», aviso de apuntarlo cada mañana y
+  casillas de hora más anchas.

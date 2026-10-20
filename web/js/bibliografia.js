@@ -420,6 +420,34 @@ export const BIBLIOGRAFIA = [
     ],
   },
   {
+    tema: 'Calentamiento y aproximaciones',
+    dice: 'Calentamiento general, movilidad dinámica de pie y series de aproximación muy lejos del fallo justo antes de cada básico (50 % × 5, 70 % × 3, 85 % × 1 en el primero), que no cuentan como volumen.',
+    matiz: 'Los porcentajes, el número de aproximaciones, hacer las ligeras seguidas y descansar 2-3 min antes de las pesadas son costumbre (como las guías de test de 1RM), no un estudio. En series al fallo, un calentamiento más largo no dio más repeticiones: por eso la Bilbo y los accesorios no llevan aproximación propia.',
+    fuentes: [
+      { texto: 'Fradkin et al. (2010), J Strength Cond Res: calentar mejoró el rendimiento en el 79 % de los criterios medidos.', url: 'https://doi.org/10.1519/JSC.0b013e3181c643a0' },
+      { texto: 'Abad et al. (2011), J Strength Cond Res: 20 min de bici más aproximaciones dieron un 8,4 % más de 1RM que solo las aproximaciones.', url: 'https://doi.org/10.1519/JSC.0b013e3181e8611b' },
+      { texto: 'Perez et al. (2021), Int J Exerc Sci: aproximaciones de 50 % × 5, 70 % × 3 y 90 % en banca; una más solo afinó la estimación del 1RM.', url: 'https://doi.org/10.70252/WMNC1089' },
+      { texto: 'Ribeiro et al. (2014), Percept Mot Skills: en 4 series al fallo al 80 %, ningún calentamiento cambió las repeticiones.', url: 'https://doi.org/10.2466/25.29.PMS.119c17z7' },
+      { texto: 'Souza et al. (2024), PeerJ: en sentadilla al fallo, una aproximación pesada no dio más repeticiones que la habitual de 8 al 45 %.', url: 'https://doi.org/10.7717/peerj.17347' },
+      { texto: 'Behm et al. (2016), Appl Physiol Nutr Metab: estiramiento estático, −1,1 % con menos de 60 s y −4,6 % con 60 s o más; el dinámico, +1,3 %.', url: 'https://doi.org/10.1139/apnm-2015-0235' },
+      { texto: 'Warneke y Lohmann (2024), J Sport Health Sci: en fuerza máxima, efecto pequeño del estiramiento estático y grande con 60 s o más.', url: 'https://doi.org/10.1016/j.jshs.2024.05.002' },
+    ],
+  },
+  {
+    tema: 'Serie máxima y series de bajada',
+    dice: 'Primero una serie máxima de 1-2 con 1-2 en recámara (mide el 1RM) y después series de bajada al 80-85 % con 2 en recámara (ponen el volumen). Los kilos salen del 1RM estimado y la recámara lo corrige.',
+    matiz: 'Que la serie máxima vaya primero es mecánica (se hace sin cansancio), no un ensayo que lo compare. La bajada de esta rutina (al 89-94 % del peso de la máxima) es más exigente que la de los estudios; es una decisión práctica.',
+    fuentes: [
+      { texto: 'Mayhew et al. (2008), J Strength Cond Res: las ecuaciones del 1RM aciertan más con menos de 10 repeticiones.', url: 'https://doi.org/10.1519/JSC.0b013e31817b02ad' },
+      { texto: 'Mattocks et al. (2017), Med Sci Sports Exerc: practicar el 1RM aumenta la fuerza como entrenar con más volumen; es una habilidad.', url: 'https://pubmed.ncbi.nlm.nih.gov/?term=Mattocks+2017+practicing+the+test+strength' },
+      { texto: 'Androulakis-Korakakis et al. (2021), Front Sports Act Living: añadir 2-3 series de bajada a una serie muy pesada pudo dar más fuerza.', url: 'https://doi.org/10.3389/fspor.2021.713655' },
+      { texto: 'Helms et al. (2018), J Strength Cond Res: cuanto más se baja respecto a la serie máxima, más volumen semanal.', url: 'https://doi.org/10.1519/JSC.0000000000002032' },
+      { texto: 'Helms et al. (2018), Front Physiol: elegir la carga por esfuerzo (RPE) rindió igual o algo mejor que solo por porcentaje.', url: 'https://doi.org/10.3389/fphys.2018.00247' },
+      { texto: 'Huang et al. (2025), J Exerc Sci Fit: metaanálisis en red; los métodos autorregulados superaron al porcentaje fijo en fuerza máxima.', url: 'https://doi.org/10.1016/j.jesf.2025.07.006' },
+      { texto: 'Rappelt et al. (2024), Front Physiol: un protocolo de potenciación no añadió nada a un buen calentamiento.', url: 'https://doi.org/10.3389/fphys.2024.1447421' },
+    ],
+  },
+  {
     tema: 'Sueño y rendimiento',
     dice: 'El diario calcula el sueño real (tiempo en cama menos lo que tardas en dormirte, lo que estás despierto y lo que '
       + 'remoloneas) y la eficiencia, y pone tu semana al lado de tus repeticiones en los básicos.',

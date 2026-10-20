@@ -9,7 +9,7 @@ import {
   semanaAnterior, textoHoras,
 } from '../diario.js';
 import { colores, graficaLineas } from './graficas.js';
-import { anadir, ayuda, fechaCorta, h, hoyISO, leerNumero } from '../ui.js';
+import { anadir, aviso, ayuda, fechaCorta, h, hoyISO, leerNumero } from '../ui.js';
 
 // El día que se edita arriba (por defecto, hoy). Se elige tocando una fila.
 let diaElegido = null;
@@ -65,6 +65,7 @@ export function vistaDiario(contenedor) {
       h('label', { class: 'campo' }, h('span', { class: 'etiqueta-campo' }, 'Peso'), h('span', { class: 'con-unidad' }, pesoCaja, h('small', { class: 'suave' }, 'kg'))),
 
       h('h3', {}, 'Esta noche'),
+      h('p', { class: 'nota' }, 'Apúntalo cada mañana, al levantarte. Se guarda solo según escribes.'),
       fila(hora('luzApagada', 'Apagaste la luz'), hora('levantado', 'Te levantaste')),
       fila(numero('latenciaMin', 'Hasta dormirte', 'min'), numero('despiertoMin', 'Despierto de noche', 'min'), numero('remoloneoMin', 'Remoloneando', 'min')),
       calculo,
@@ -82,7 +83,13 @@ export function vistaDiario(contenedor) {
         class: `boton-marca${e.alcohol === k ? ' activo' : ''}`, 'aria-pressed': String(e.alcohol === k),
         onclick: () => guardar('alcohol', e.alcohol === k ? null : k, { repintar: true }) }, t))),
       fila(hora('cafeinaHora', 'Último café o té'), numero('pulsoNocturno', 'Pulso nocturno', 'lpm'), numero('siestaMin', 'Siesta', 'min')),
-      h('p', { class: 'nota' }, 'Lo del reloj, a mano y solo esto: horas, pulso medio de la noche. Sus fases y puntuaciones no son fiables.')),
+      h('p', { class: 'nota' }, 'Lo del reloj, a mano y solo esto: horas, pulso medio de la noche. Sus fases y puntuaciones no son fiables.'),
+      // Se guarda solo, pero un botón da tranquilidad: confirma y lleva a la tabla.
+      h('button', { type: 'button', class: 'boton grande', onclick: () => {
+        document.activeElement?.blur?.();
+        aviso(entradaDe(estado.datos(), fecha) ? `Guardado: ${fecha === hoy ? 'hoy' : fechaCorta(fecha)}.` : 'No hay nada que guardar todavía.');
+        document.querySelector('.tabla-diario')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } }, 'Guardar el día')),
 
     tablaDias(d, fecha),
     resumen(d, hoy),

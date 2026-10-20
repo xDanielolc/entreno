@@ -1603,7 +1603,7 @@ div.sugerencia > span { display: block; }
 .aviso-color { color: var(--aviso); }
 
 /* --------------------------------------------------------------------------
-   Presentación al abrir (20-10-2026). La pesa entra a saltos desde el borde
+   Presentación al abrir (20-10-2026). La pesa sale grande del centro y salta hacia atrás
    de la pantalla y la caja del logo la atrapa. Todo espera a que el código
    ponga «en-marcha» (presentacion.js): así la animación y los sonidos salen
    a la vez. Dos variantes, que se eligen en #/prueba-presentacion:
@@ -1642,19 +1642,22 @@ div.sugerencia > span { display: block; }
 /* Hasta que el código no la pone en marcha, todo quieto (y la pesa, fuera). */
 #presentacion:not(.en-marcha) .pesa, #presentacion:not(.en-marcha) .caja, #presentacion:not(.en-marcha) .nombre { animation-play-state: paused; }
 
-/* Los saltos: desde fuera de la pantalla, tres botes, aplastándose al caer.
-   Cada tramo lleva su propia curva: sube frenando y baja acelerando. */
+/* Los saltos: la pesa empieza grande en el centro (donde la deja la pantalla
+   de arranque del móvil) y salta hacia atrás, cada vez más pequeña, con tres
+   botes; se aplasta al caer. Cada tramo lleva su curva: sube frenando y baja
+   acelerando. Los botes tocan el suelo al 30, 60 y 84 % (presentacion.js). */
 @keyframes pesa-saltar {
-  0%   { transform: translate(-58vw, -60px) rotate(-14deg) scale(1, 1); opacity: 1; animation-timing-function: cubic-bezier(.5,0,1,.6); }
-  30%  { transform: translate(-26vw, 0) rotate(0deg) scale(1.22, .78); animation-timing-function: ease-out; }
-  34%  { transform: translate(-23vw, -6px) rotate(2deg) scale(.95, 1.06); animation-timing-function: cubic-bezier(.2,.6,.4,1); }
-  46%  { transform: translate(-13vw, -64px) rotate(6deg) scale(.95, 1.06); animation-timing-function: cubic-bezier(.5,0,1,.6); }
-  60%  { transform: translate(-4vw, 0) rotate(0deg) scale(1.2, .8); animation-timing-function: ease-out; }
-  64%  { transform: translate(-3vw, -4px) rotate(-1deg) scale(.97, 1.04); animation-timing-function: cubic-bezier(.2,.6,.4,1); }
-  73%  { transform: translate(0, -28px) rotate(0deg) scale(.97, 1.04); animation-timing-function: cubic-bezier(.5,0,1,.6); }
-  84%  { transform: translate(0, 0) scale(1.14, .86); animation-timing-function: ease-out; }
-  92%  { transform: translate(0, -3px) scale(.98, 1.02); }
-  100% { transform: translate(0, 0) scale(1, 1); opacity: 1; }
+  0%   { transform: translateY(0) scale(2.6); opacity: 1; animation-timing-function: cubic-bezier(.2,.6,.4,1); }
+  14%  { transform: translateY(-70px) scale(2.15); animation-timing-function: cubic-bezier(.5,0,1,.6); }
+  30%  { transform: translateY(0) scale(2.05, 1.5); animation-timing-function: ease-out; }
+  34%  { transform: translateY(-4px) scale(1.7); animation-timing-function: cubic-bezier(.2,.6,.4,1); }
+  46%  { transform: translateY(-46px) scale(1.42); animation-timing-function: cubic-bezier(.5,0,1,.6); }
+  60%  { transform: translateY(0) scale(1.5, 1.1); animation-timing-function: ease-out; }
+  64%  { transform: translateY(-3px) scale(1.22); animation-timing-function: cubic-bezier(.2,.6,.4,1); }
+  73%  { transform: translateY(-22px) scale(1.1); animation-timing-function: cubic-bezier(.5,0,1,.6); }
+  84%  { transform: translateY(0) scale(1.14, .86); animation-timing-function: ease-out; }
+  92%  { transform: translateY(-2px) scale(.98, 1.02); }
+  100% { transform: translateY(0) scale(1, 1); opacity: 1; }
 }
 @keyframes pesa-dentro { to { color: var(--acento-texto); } }
 
@@ -1857,8 +1860,11 @@ a, button { -webkit-touch-callout: none; }
 .chip-calentamiento.hecho { background: var(--acento-suave); border-color: transparent; }
 .chip-calentamiento.hecho .chip-marca { background: var(--bien); border-color: var(--bien); color: var(--superficie); }
 /* Diario */
-.fila-campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 8px; }
-.fila-campos .campo { margin: 0; }
+.fila-campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 8px; align-items: end; }
+.fila-campos .campo { margin: 0; min-width: 0; }
+/* Las casillas de hora necesitan más sitio (el reloj del móvil se comía los minutos). */
+.fila-campos:has(input[type="time"]) { grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); }
+.fila-campos input[type="time"] { width: 100%; min-width: 0; font-variant-numeric: tabular-nums; padding-inline: 10px 6px; }
 .con-unidad { display: flex; align-items: center; gap: 6px; }
 .con-unidad input { flex: 1; min-width: 0; }
 .diario-dia h3 { margin: 14px 0 6px; font-size: 1rem; }
