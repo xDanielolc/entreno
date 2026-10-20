@@ -68,10 +68,27 @@ export function repetirAlVolver() {
 // audio, descontando lo que tarda el altavoz en sonar (en Android, a menudo
 // 0,1 s o más). El navegador solo deja sonar si ya has tocado la app alguna
 // vez; si no, la animación sale igual, muda.
+// Los golpes de la caja son una grabación de Freesound en dominio público
+// (CC0, «box impact»), cortada en dos: el golpe al caer y el «paf» al quedar
+// plana. Si no llegan a tiempo, suenan los sintetizados de siempre.
+const MUESTRAS = { seco: './sonidos/caja-golpe.wav', plano: './sonidos/caja-paf.wav' };
+const bytesMuestras = Object.fromEntries(Object.entries(MUESTRAS).map(([k, url]) => [k,
+  fetch(url).then((r) => (r.ok ? r.arrayBuffer() : null)).catch(() => null)]));
+
 function preparar(variante) {
   let audio;
   try { audio = new AudioContext({ latencyHint: 'interactive' }); } catch { return Promise.resolve(null); }
   const salida = audio.destination;
+  const grabadas = {};
+  for (const [k, prometido] of Object.entries(bytesMuestras)) {
+    prometido.then((bytes) => (bytes ? audio.decodeAudioData(bytes.slice(0)) : null)).then((b) => { if (b) grabadas[k] = b; }).catch(() => {});
+  }
+  const muestra = (t, buffer, fuerza) => {
+    const fuente = audio.createBufferSource(); fuente.buffer = buffer;
+    const v = audio.createGain(); v.gain.value = fuerza;
+    fuente.connect(v).connect(salida);
+    fuente.start(t);
+  };
   // Ruido blanco corto: la parte «seca» de un golpe.
   const ruido = (t, dur, filtroHz, fuerza) => {
     const buffer = audio.createBuffer(1, Math.ceil(audio.sampleRate * dur), audio.sampleRate);
@@ -98,17 +115,23 @@ function preparar(variante) {
     // La pesa rebotando: un «boing» corto y agudo.
     bote: (t, f) => { tono(t, f * 0.6, f, 0.05, 0.16); tono(t + 0.05, f, f * 0.8, 0.1, 0.08); },
     // La caja tocando el suelo con la esquina: «pim», un toque agudo y limpio.
-    seco: (t, x) => { tono(t, 1320, 1180, 0.18, 0.22 * x, 'sine', 0.002); tono(t, 2640, 2400, 0.08, 0.06 * x, 'sine', 0.002); },
+    seco: (t, x) => { if (grabadas.seco) { muestra(t, grabadas.seco, 0.9 * x); return; }
+      tono(t, 1320, 1180, 0.18, 0.22 * x, 'sine', 0.002); tono(t, 2640, 2400, 0.08, 0.06 * x, 'sine', 0.002); },
     // La caja cayendo a plano: «paf», un golpe de aire, sordo y corto.
-    plano: (t, x) => { ruido(t, 0.12, 900, 0.7 * x); tono(t, 120, 60, 0.12, 0.25 * x, 'sine', 0.004); },
+    plano: (t, x) => { if (grabadas.plano) { muestra(t, grabadas.plano, 0.9 * x); return; }
+      ruido(t, 0.12, 900, 0.7 * x); tono(t, 120, 60, 0.12, 0.25 * x, 'sine', 0.004); },
   };
   const programar = () => {
     if (audio.state !== 'running') { audio.close().catch(() => {}); return; }
     const retraso = (audio.outputLatency || 0) + (audio.baseLatency || 0);
     const ahora = audio.currentTime;
+    // Cada golpe se programa medio segundo antes de sonar: así, si la grabación
+    // ya está lista, suena ella (los golpes de la caja llegan pasados 2 s).
     for (const [tipo, momento, x] of SONIDOS[variante] ?? SONIDOS.cae) {
       const t = ahora + momento - retraso;
-      if (t > ahora) sonidos[tipo](t, x);
+      if (t <= ahora) continue;
+      const espera = Math.max(0, (t - audio.currentTime - 0.5) * 1000);
+      setTimeout(() => { if (audio.state === 'running' && t > audio.currentTime) sonidos[tipo](t, x); }, espera);
     }
     setTimeout(() => audio.close().catch(() => {}), DURACION_MS);
   };

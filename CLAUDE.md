@@ -1043,3 +1043,14 @@ fase), tras probar la A.
   tarjetas aparte, estrellas en tinta. Gráfica del peso con kilos y fechas.
   Permiso de avisos también en Hoy. Más aire en los botones de Ajustes y
   Aprender.
+- 0.59.1: los golpes de la caja de la presentación son ahora la grabación
+  que eligió Dan (Freesound, CC0, «box impact»), cortada en
+  `web/sonidos/caja-golpe.wav` (al caer) y `caja-paf.wav` (al quedar plana),
+  a 24 kHz mono; `presentacion.js` los descarga al cargar y programa cada
+  golpe medio segundo antes (si no han llegado, suenan los sintetizados).
+  El .wav original queda fuera de Git, en la carpeta del proyecto.
+- Design: sistema de diseño «Entreno» (https://claude.ai/artifact/WqVmYfoN7ZvuFDJX6v1jfj,
+  sacado de estilo.css, Manrope, iconos.js y la guía de estilo) y lienzo de
+  4 dibujos de prueba (https://claude.ai/artifact/LKwqWx7KXyqbN3qv31mKLy).
+  Design dibuja con código: pictogramas, no ilustraciones. Pendiente: lienzo
+  con todas las pantallas para el repaso del proyecto.
