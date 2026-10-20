@@ -190,6 +190,42 @@ export function ampliar(titulo, construir) {
   return cerrar;
 }
 
+// Una barra que se arrastra hasta el final para confirmar algo importante
+// (terminar el entreno, mover a la papelera): así no se hace sin querer. Un
+// toque solo da la pista; con el teclado, Intro.
+export function deslizarParaConfirmar(texto, alConfirmar, { peligro = false } = {}) {
+  const tirador = h('span', { class: 'deslizar-tirador', 'aria-hidden': 'true' }, '➜');
+  const rotulo = h('span', { class: 'deslizar-texto' }, texto);
+  const pista = h('div', { class: `deslizar-terminar${peligro ? ' peligro' : ''}`, role: 'button', tabindex: '0', 'aria-label': `${texto} (desliza o pulsa Intro)`,
+    onkeydown: (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); alConfirmar(); } } }, rotulo, tirador);
+  let x0 = null;
+  let max = 0;
+  const mover = (dx) => {
+    const x = Math.max(0, Math.min(max, dx));
+    tirador.style.transform = `translateX(${x}px)`;
+    rotulo.style.opacity = String(1 - x / Math.max(1, max));
+    return x;
+  };
+  pista.addEventListener('pointerdown', (e) => {
+    x0 = e.clientX;
+    max = pista.clientWidth - tirador.offsetWidth - 8;
+    pista.setPointerCapture(e.pointerId);
+    tirador.style.transition = 'none';
+  });
+  pista.addEventListener('pointermove', (e) => { if (x0 != null) mover(e.clientX - x0); });
+  pista.addEventListener('pointerup', (e) => {
+    if (x0 == null) return;
+    const x = mover(e.clientX - x0);
+    x0 = null;
+    tirador.style.transition = '';
+    if (x >= max * 0.85) { mover(max); alConfirmar(); setTimeout(() => { if (pista.isConnected) mover(0); }, 400); return; }
+    mover(0);
+    if (x < 8) aviso('Desliza la flecha hasta el final.');
+  });
+  pista.addEventListener('pointercancel', () => { x0 = null; tirador.style.transition = ''; mover(0); });
+  return pista;
+}
+
 // Un «?» pequeño en la esquina de abajo a la derecha de una tarjeta, para los
 // curiosos: abre la explicación en un cartel (`construir` devuelve lo que va
 // dentro). La tarjeta necesita la clase `con-ayuda-esquina`.

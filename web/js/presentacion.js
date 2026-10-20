@@ -97,10 +97,10 @@ function preparar(variante) {
   const sonidos = {
     // La pesa rebotando: un «boing» corto y agudo.
     bote: (t, f) => { tono(t, f * 0.6, f, 0.05, 0.16); tono(t + 0.05, f, f * 0.8, 0.1, 0.08); },
-    // La caja chocando: golpe seco, con chasquido y poco cuerpo.
-    seco: (t, x) => { ruido(t, 0.05, 2200, 0.55 * x); tono(t, 170, 70, 0.12, 0.35 * x, 'triangle', 0.002); },
-    // La caja cayendo a plano: golpe sordo, más grave, más largo y blando.
-    plano: (t, x) => { ruido(t, 0.16, 500, 0.35 * x); tono(t, 95, 42, 0.3, 0.32 * x, 'sine', 0.015); },
+    // La caja tocando el suelo con la esquina: «pim», un toque agudo y limpio.
+    seco: (t, x) => { tono(t, 1320, 1180, 0.18, 0.22 * x, 'sine', 0.002); tono(t, 2640, 2400, 0.08, 0.06 * x, 'sine', 0.002); },
+    // La caja cayendo a plano: «paf», un golpe de aire, sordo y corto.
+    plano: (t, x) => { ruido(t, 0.12, 900, 0.7 * x); tono(t, 120, 60, 0.12, 0.25 * x, 'sine', 0.004); },
   };
   const programar = () => {
     if (audio.state !== 'running') { audio.close().catch(() => {}); return; }

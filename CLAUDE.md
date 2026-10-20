@@ -924,3 +924,11 @@ fase), tras probar la A.
   deja la pantalla de arranque de Android) y salta hacia atrás haciéndose
   pequeña; Diario con «Guardar el día», aviso de apuntarlo cada mañana y
   casillas de hora más anchas.
+- 0.55.2 (sus respuestas de la v054): fuera la flecha de volver arriba;
+  `deslizarParaConfirmar` en ui.js (terminar el entreno y, en rojo y a todo
+  el ancho, mover un día a la papelera); sin «Volver al historial» (la app
+  no lleva botones de volver); Equilibrio sin el «null» (replaceChildren con
+  hijos nulos); ver en grande tumbado gira toda la zona; `overflow-x: clip`
+  en html y body (la lista de Ejercicios bailaba de lado); sonidos de la caja
+  «pim» al caer y «paf» al quedar plana; la línea del peso en Cuerpo lleva
+  su explicación.

@@ -207,6 +207,9 @@ function tarjetaPeso(d) {
         cambio != null && cambio !== 0 && h('span', { class: 'suave' }, ` (${cambio > 0 ? '+' : ''}${formatearNumero(Math.round(cambio * 10) / 10)} kg)`))
       : h('p', { class: 'nota centrado' }, 'Apúntalo de vez en cuando: tus flexiones, dominadas y fondos se calculan con él.'),
     h('div', { class: 'fila-peso' }, caja, h('button', { type: 'button', class: 'boton', onclick: apuntar }, 'Apuntar hoy')),
+    // La línea es tu peso a lo largo del tiempo: se dice, que si no no se entiende.
+    grafica && h('p', { class: 'nota centrado' }, `Tu peso en el tiempo: del ${fechaCorta(ultimos[0].fecha)} (${formatearNumero(ultimos[0].kg)} kg) `
+      + `al ${fechaCorta(ultimos.at(-1).fecha)} (${formatearNumero(ultimos.at(-1).kg)} kg).`),
     grafica,
     pesos.length > 0 && plegable('peso-historial', 'Todas las veces', {}, h('table', { class: 'tabla-musculos' },
       h('tbody', {}, [...pesos].reverse().map((p) => h('tr', {},

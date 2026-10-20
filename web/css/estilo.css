@@ -1841,9 +1841,13 @@ body.entreno-a-pantalla .contenido.con-barra-entreno { padding-bottom: calc(var(
 .ampliado-lienzo > * { max-width: 100%; max-height: 100%; }
 .imagen-grande { width: 100%; height: auto; max-height: 80dvh; object-fit: contain; background: #fff; border-radius: var(--radio-pequeno); }
 .modal-ampliado .arana { max-width: none; width: 100%; }
-.modal-ampliado.tumbado .ampliado-lienzo > * { transform: rotate(90deg); width: 80dvh; max-width: 80dvh; max-height: 92vw; }
-.modal-ampliado.tumbado-izquierda .ampliado-lienzo > * { transform: rotate(-90deg); }
-.modal-ampliado.tumbado .cuerpos.ampliado { grid-template-columns: 1fr 1fr; }
+.modal-ampliado.tumbado .ampliado-lienzo { position: fixed; left: 50%; top: 50%; width: 100dvh; height: 100vw; padding: 12px;
+  transform: translate(-50%, -50%) rotate(90deg); }
+.modal-ampliado.tumbado-izquierda .ampliado-lienzo { transform: translate(-50%, -50%) rotate(-90deg); }
+.modal-ampliado.tumbado .ampliado-lienzo > * { width: auto; height: 100%; max-height: 100%; max-width: 100%; }
+.modal-ampliado.tumbado .cuerpos.ampliado { grid-template-columns: 1fr 1fr; height: 100%; }
+.modal-ampliado.tumbado .cuerpos.ampliado .cuerpo { height: 100%; width: auto; }
+.modal-ampliado.tumbado .modal-cabecera { position: relative; z-index: 1; }
 .arana-boton, .imagen-ampliable { display: block; width: 100%; padding: 0; border: 0; background: none; cursor: zoom-in; font: inherit; color: inherit; }
 .modos-mapa .boton-marca { display: flex; align-items: center; justify-content: center; }
 a, button { -webkit-touch-callout: none; }
@@ -1910,6 +1914,10 @@ html { touch-action: pan-x pan-y; }
 .deslizar-tirador { position: absolute; left: 4px; top: 4px; bottom: 4px; aspect-ratio: 1; display: grid; place-items: center; border-radius: 50%;
   background: var(--acento-texto); color: var(--acento); font-size: 1.3rem; transition: transform .25s ease-out; }
 @media (prefers-reduced-motion: reduce) { .deslizar-tirador, .deslizar-texto { transition: none; } }
+.deslizar-terminar.peligro { background: var(--mal); color: #fff; margin-top: 16px; }
+.deslizar-terminar.peligro .deslizar-tirador { background: #fff; color: var(--mal); }
+/* La página no se mueve de lado aunque algo se pase de ancho. */
+html, body { overflow-x: clip; }
 .barra-entreno .boton-siguiente { flex: 1; flex-direction: column; gap: 0; line-height: 1.15; margin: 0; }
 .barra-entreno .boton-siguiente small { font-weight: 500; opacity: .8; font-size: .8rem; }
 .barra-entreno-fila .barra-terminar { flex: 1; width: auto; }

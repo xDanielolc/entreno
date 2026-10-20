@@ -69,7 +69,7 @@ export function tarjetaEquilibrio(d) {
     const tope = porObjetivo ? 1.5 : Math.max(...valores.map((v) => v.hechas), 1);
     const radio = (v) => Math.sqrt(Math.min(1, (porObjetivo ? v.pct : v.hechas) / tope));
 
-    caja.replaceChildren(
+    caja.replaceChildren(...[
       h('h2', { class: 'centrado' }, 'Equilibrio'),
       pista('equilibrio', 'Qué entrenas más y qué tienes descompensado. Toca las opciones para verlo de otra forma, y el gráfico para verlo en grande.'),
       h('div', { class: 'grupo-botones' },
@@ -89,7 +89,8 @@ export function tarjetaEquilibrio(d) {
           onclick: () => ampliar('Equilibrio', () => arana(valores.map((v) => ({ ...v, r: radio(v) })), porObjetivo ? Math.sqrt(1 / 1.5) : null)) },
         arana(valores.map((v) => ({ ...v, r: radio(v) })), porObjetivo ? Math.sqrt(1 / 1.5) : null))
         : h('p', { class: 'suave centrado' }, `Sin series ${dias === 7 ? 'esta semana' : dias === 30 ? 'este mes' : `en los últimos ${dias} días`}.`),
-      total > 0 && h('ul', { class: 'nota lista-equilibrio' }, conclusiones(valores, porObjetivo).map((t) => h('li', {}, t))));
+      total > 0 && h('ul', { class: 'nota lista-equilibrio' }, conclusiones(valores, porObjetivo).map((t) => h('li', {}, t))),
+    ].filter(Boolean));
   };
   pintar();
   return caja;

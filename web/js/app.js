@@ -115,18 +115,7 @@ function renderizar() {
   window.scrollTo(0, mismaRuta ? scroll : 0);
 }
 
-// Flecha para volver arriba: abajo a la derecha, a mano del pulgar y por
-// encima de las pestañas. Solo en las listas largas (historial y lista de
-// ejercicios) y cuando estás muy abajo; en colores invertidos para que se vea.
-const flechaArriba = h('button', { type: 'button', class: 'volver-arriba', hidden: true, 'aria-label': 'Volver arriba',
-  onclick: () => { window.scrollTo({ top: 0, behavior: 'smooth' }); flechaArriba.hidden = true; } }, '↑');
-document.body.append(flechaArriba);
-const CON_FLECHA = /^#\/(historial|ejercicios)$/;
-window.addEventListener('scroll', () => {
-  const larga = document.documentElement.scrollHeight > window.innerHeight * 3;
-  flechaArriba.hidden = !(CON_FLECHA.test(location.hash) && larga && window.scrollY > window.innerHeight * 1.5);
-}, { passive: true });
-window.addEventListener('hashchange', () => { flechaArriba.hidden = true; });
+// Sin flecha de volver arriba: Dan la vio innecesaria (20-10-2026).
 
 // Si hay un entrenamiento a medias y estás en otra pantalla, una banda fija
 // arriba te lleva de vuelta: el entrenamiento no se pierde por cambiar de

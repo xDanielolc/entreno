@@ -24,7 +24,7 @@ import {
   avisoPrimeraBajada, crearSerieDesdePlan, entradaDeEjercicio, modoCargaDe, origenModoCarga, recalcularTramos, saltoDeTramo,
   serieSuelta,
 } from '../series.js';
-import { anadir, aviso, confirmar, fechaLarga, h, formatearTiempo, leerNumero, leerTiempo } from '../ui.js';
+import { anadir, aviso, confirmar, deslizarParaConfirmar, fechaLarga, h, formatearTiempo, leerNumero, leerTiempo } from '../ui.js';
 import { DESCANSO_ESTIRAMIENTOS_POR_DEFECTO, arrancarDescanso, arrancarRespiracion, barraDescanso, descansoDeTramo, preguntaAvisos } from './descanso.js';
 import { cuentaParaFatiga, tipoDeEjercicio } from '../catalogo.js';
 import { ASISTENCIAS, ESCALA_MANO, PROGRAMAS, TECNICAS_ESTIRAMIENTO, extraDeSerie, medidasDe, unidadMedida } from '../esquema.js';
@@ -248,48 +248,9 @@ export function vistaSesion(contenedor, { id }) {
         mas));
   }
 
-  // «Desliza para terminar» (lo eligió Dan): una barra que se arrastra hasta
-  // el final; así no se termina sin querer. Un toque solo da la pista; con
-  // el teclado, Intro termina.
+  // «Desliza para terminar» (lo eligió Dan).
   function deslizarParaTerminar() {
-    const tirador = h('span', { class: 'deslizar-tirador', 'aria-hidden': 'true' }, '➜');
-    const texto = h('span', { class: 'deslizar-texto' }, 'Desliza para terminar');
-    const pista = h('div', { class: 'deslizar-terminar', role: 'button', tabindex: '0', 'aria-label': 'Terminar entrenamiento (desliza o pulsa Intro)',
-      onkeydown: (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); terminar(); } } }, texto, tirador);
-    let x0 = null;
-    let max = 0;
-    const mover = (dx) => {
-      const x = Math.max(0, Math.min(max, dx));
-      tirador.style.transform = `translateX(${x}px)`;
-      texto.style.opacity = String(1 - x / Math.max(1, max));
-      return x;
-    };
-    pista.addEventListener('pointerdown', (e) => {
-      x0 = e.clientX;
-      max = pista.clientWidth - tirador.offsetWidth - 8;
-      pista.setPointerCapture(e.pointerId);
-      tirador.style.transition = 'none';
-    });
-    pista.addEventListener('pointermove', (e) => { if (x0 != null) mover(e.clientX - x0); });
-    const soltar = (e) => {
-      if (x0 == null) return;
-      const x = mover(e.clientX - x0);
-      x0 = null;
-      tirador.style.transition = '';
-      if (x >= max * 0.85) { mover(max); terminar(); setTimeout(() => { if (pista.isConnected) mover(0); }, 400); return; }
-      mover(0);
-      if (x < 8) aviso('Desliza la flecha hasta el final para terminar.');
-    };
-    pista.addEventListener('pointerup', soltar);
-    pista.addEventListener('pointercancel', () => { x0 = null; tirador.style.transition = ''; mover(0); });
-    return pista;
-  }
-
-  // Las series de trabajo de un ejercicio (sus índices): los calentamientos
-  // previstos van aparte, en una franja.
-  function trabajoDe(entrada) {
-    const ej = ejercicioDe(entrada?.ejercicioId);
-    return (entrada?.series ?? []).map((s, j) => j).filter((j) => !calentamientoPrevisto(ej, entrada.series[j]));
+    return deslizarParaConfirmar('Desliza para terminar', terminar);
   }
 
   // La serie que se ve en el modo «serie» (su posición entre las de
@@ -1849,19 +1810,18 @@ function resumenDelDia(contenedor, d, sesion) {
       h('button', { class: 'boton', onclick: () => { editando.add(sesion.id); dispatchEvent(new HashChangeEvent('hashchange')); } }, 'Editar'),
       // Las estadísticas también son donde se hacen permanentes los cambios de ese día.
       h('button', { class: 'boton secundario', onclick: () => mostrarResumen(estado.datos(), sesion.id) }, 'Estadísticas y cambios'),
-      h('a', { class: 'boton secundario', href: '#/historial' }, 'Volver al historial'),
       sesion.borrada
         ? h('button', { class: 'boton secundario', onclick: () => estado.cambiar((x) => {
           const s = x.sesiones.find((y) => y.id === sesion.id); if (s) s.borrada = null;
         }) }, 'Recuperar entrenamiento')
-        : h('button', { class: 'boton peligro', onclick: async () => {
-          if (!await confirmar('¿Mover este entrenamiento a la papelera? Dejará de contar para tu progresión; se recupera desde el historial.', { si: 'Mover a la papelera', peligro: true })) return;
-          estado.cambiar((x) => { const s = x.sesiones.find((y) => y.id === sesion.id); if (s) s.borrada = new Date().toISOString(); });
-          location.hash = '#/historial';
-          aviso('Entrenamiento en la papelera', { accion: { texto: 'Deshacer', fn: () => estado.cambiar((x) => {
-            const s = x.sesiones.find((y) => y.id === sesion.id); if (s) s.borrada = null;
-          }) } });
-        } }, 'Mover a la papelera')));
+        : null),
+    !sesion.borrada && deslizarParaConfirmar('Desliza para mover a la papelera', () => {
+      estado.cambiar((x) => { const s = x.sesiones.find((y) => y.id === sesion.id); if (s) s.borrada = new Date().toISOString(); });
+      location.hash = '#/historial';
+      aviso('Entrenamiento en la papelera', { accion: { texto: 'Deshacer', fn: () => estado.cambiar((x) => {
+        const s = x.sesiones.find((y) => y.id === sesion.id); if (s) s.borrada = null;
+      }) } });
+    }, { peligro: true }));
 }
 
 function nombreDelDia(datos, sesion) {
