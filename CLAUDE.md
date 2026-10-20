@@ -990,3 +990,6 @@ fase), tras probar la A.
   delante, sonido propio (tres notas que suben) y vibración; la notificación,
   cuyo sonido no se puede cambiar desde la web, solo si la app no se ve o el
   móvil no aceptó vibrar.
+- 0.57.2: el botón de los calentamientos redondos también dentro de Aprender
+  → «Cómo calentar», justo donde se explica. Regla de Dan: una opción va
+  donde se nombra (puede estar además en Ajustes), sin mandar a otro sitio.

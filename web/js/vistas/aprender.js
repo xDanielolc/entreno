@@ -167,9 +167,18 @@ export function vistaAprender(contenedor) {
         h('li', {}, 'Aproximaciones: el primer básico con serie máxima, barra × 10 (si quieres), 50 % × 5, 70 % × 3 y 85 % × 1; el segundo con máxima, 60 % × 3 y 80 % × 1; un básico moderado, 50 % × 5; rumano y curl femoral, una serie suave. La Bilbo y los accesorios, ninguna: sus primeras repeticiones ya lo son.'),
         h('li', {}, 'Van muy lejos del fallo (las de 5 al 50 % las harías 20 o 30 veces) y no cuentan como volumen ni para tu 1RM.'),
         h('li', {}, 'Sus pesos se redondean de 10 en 10 kg (55 → 50, 77,5 → 80) para calentar rápido y sin cuentas. Es una decisión práctica: '
-          + 'para ir con los porcentajes exactos de los estudios, quita «Calentamientos con pesos redondos» en Ajustes → Entrenamiento y series. '
+          + 'si prefieres los porcentajes exactos de los estudios, desmarca el botón de aquí debajo (también está en Ajustes → Entrenamiento y series). '
           + 'Las series de trabajo sí van con el % exacto de tu 1RM (al disco más cercano); si prefieres pesos más redondos para ir más rápido, '
-          + 'sube «Los pesos que propone la app van de» en esos mismos Ajustes (5, por ejemplo).'),
+          + 'sube «Los pesos que propone la app van de» en esos Ajustes (5, por ejemplo).',
+          (() => {
+            const redondo = d.perfil.calentamientoRedondo !== false;
+            return h('div', { class: 'fila-marcas compacta' },
+              h('button', { type: 'button', class: `boton-marca${redondo ? ' activo' : ''}`, 'aria-pressed': String(redondo),
+                onclick: () => {
+                  estado.cambiar((x) => { x.perfil.calentamientoRedondo = !redondo; });
+                  aviso(redondo ? 'Calentamientos con el % exacto.' : 'Calentamientos de 10 en 10 kg.');
+                } }, redondo ? 'Calentamientos de 10 en 10 kg' : 'Calentamientos con el % exacto: tocar para redondear'));
+          })()),
         h('li', {}, 'Descansos: las ligeras, seguidas (solo cambiar discos); 2-3 min antes de la de 85 % y antes de la máxima; 3-5 min después de la máxima; 3 min entre las de bajada.'),
         h('li', {}, 'Nunca estires un músculo 60 s o más seguidos antes de un básico pesado: si lo pide, menos de 60 s y después las aproximaciones. Los estiramientos largos, al terminar.')),
       h('p', { class: 'nota' }, 'Respaldo: calentar mejoró el rendimiento en el 79 % de lo medido (Fradkin 2010); cardio más aproximaciones subieron el 1RM un 8,4 % frente a solo aproximaciones (Abad 2011); el estiramiento estático de 60 s o más quita fuerza y el de menos de 60 s casi nada (Behm 2016; Warneke y Lohmann 2024). '
