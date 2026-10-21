@@ -1082,6 +1082,11 @@ fase), tras probar la A.
   ChatGPT unas 10 al día. Gemini: conversación nueva por dibujo (si no,
   edita el anterior); descargar recargando la página y con hover antes
   del clic, si no a veces no descarga.
+- 0.60.3 (de madrugada): 90 dibujos propios (127 ejercicios con alias). Anclas
+  nuevas en imagenes_ia.py: `delante` (borde derecho y suelo). Lo que Gemini
+  no supo dibujar está en `imagenes-ia/pendientes.md` (no se usa; queda el
+  dibujo de antes). La cola completa la saca un bucle sobre peticiones.json
+  saltando lo que ya tiene original en gemini/ o chatgpt/.
 - Estilo: «Volver» de la banda verde como píldora, títulos de tarjeta
   centrados en toda la app, chips centrados, el cuestionario de bienvenida
   no vuelve a salir si lo cierras (localStorage `entreno-cuestionario-cerrado`).
