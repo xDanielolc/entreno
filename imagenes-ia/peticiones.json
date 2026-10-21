@@ -901,5 +901,950 @@
   "vista": "de pie, visto de lado, con un balón medicinal",
   "inicio": "balón sujeto con las dos manos por encima de la cabeza, cuerpo estirado",
   "final": "lanzando el balón contra el suelo, tronco doblado hacia delante y brazos abajo"
+ },
+ {
+  "slug": "burpees",
+  "ejercicio": "Burpees",
+  "vista": "visto de lado",
+  "inicio": "en cuclillas con las manos en el suelo",
+  "final": "saltando hacia arriba con los brazos estirados por encima de la cabeza"
+ },
+ {
+  "slug": "jumping-jacks",
+  "ejercicio": "Jumping jacks",
+  "vista": "visto de frente",
+  "inicio": "de pie con las piernas juntas y los brazos pegados al cuerpo",
+  "final": "en el aire con las piernas abiertas y los brazos arriba por encima de la cabeza"
+ },
+ {
+  "slug": "rodillas-al-pecho",
+  "ejercicio": "Rodillas al pecho",
+  "vista": "corriendo en el sitio, visto de lado",
+  "inicio": "la rodilla derecha subida hasta la altura de la cadera, brazos como al correr",
+  "final": "la rodilla izquierda subida hasta la altura de la cadera, brazos al revés"
+ },
+ {
+  "slug": "comba",
+  "ejercicio": "Comba",
+  "vista": "saltando a la comba, visto de lado",
+  "inicio": "de puntillas con la cuerda pasando por encima de la cabeza",
+  "final": "en el aire con la cuerda pasando bajo los pies"
+ },
+ {
+  "slug": "boxeo",
+  "ejercicio": "Boxeo",
+  "vista": "en guardia, visto de lado",
+  "inicio": "en guardia con los puños delante de la cara",
+  "final": "lanzando un directo con el brazo de delante estirado"
+ },
+ {
+  "slug": "escaleras",
+  "ejercicio": "Escaleras",
+  "vista": "subiendo unas escaleras, visto de lado",
+  "inicio": "un pie en el escalón de arriba, a punto de subir",
+  "final": "de pie en el escalón de arriba, el otro pie subiendo"
+ },
+ {
+  "slug": "carrera",
+  "ejercicio": "Carrera",
+  "vista": "corriendo, visto de lado",
+  "inicio": "zancada con la pierna derecha adelantada y el brazo izquierdo delante",
+  "final": "zancada con la pierna izquierda adelantada y el brazo derecho delante"
+ },
+ {
+  "slug": "bicicleta",
+  "ejercicio": "Bicicleta",
+  "vista": "montando en una bicicleta de carretera, sin casco, visto de lado",
+  "inicio": "pedaleando con el pedal más cercano arriba",
+  "final": "pedaleando con el pedal más cercano abajo"
+ },
+ {
+  "slug": "eliptica",
+  "ejercicio": "Elíptica",
+  "vista": "en una máquina elíptica, visto de lado",
+  "inicio": "pierna derecha adelantada y brazo izquierdo empujando el asa",
+  "final": "pierna izquierda adelantada y brazo derecho empujando el asa",
+  "ancla": "encajar"
+ },
+ {
+  "slug": "remo-de-cardio",
+  "ejercicio": "Remo de cardio",
+  "vista": "sentado en una máquina de remo de cardio, visto de lado",
+  "inicio": "rodillas dobladas cerca del pecho, brazos estirados hacia delante agarrando el asa",
+  "final": "piernas estiradas, tronco algo inclinado hacia atrás y el asa junto al abdomen",
+  "ancla": "encajar"
+ },
+ {
+  "slug": "natacion",
+  "ejercicio": "Natación",
+  "vista": "nadando a crol, visto de lado, con una línea de agua",
+  "inicio": "un brazo estirado hacia delante y el otro atrás",
+  "final": "los brazos al revés"
+ },
+ {
+  "slug": "caminar",
+  "ejercicio": "Caminar",
+  "vista": "caminando, visto de lado",
+  "inicio": "paso con la pierna derecha adelantada",
+  "final": "paso con la pierna izquierda adelantada"
+ },
+ {
+  "slug": "senderismo",
+  "ejercicio": "Senderismo",
+  "vista": "caminando por el monte con una mochila y bastones, visto de lado",
+  "inicio": "paso con la pierna derecha adelantada",
+  "final": "paso con la pierna izquierda adelantada"
+ },
+ {
+  "slug": "cinta-de-correr",
+  "ejercicio": "Cinta de correr",
+  "vista": "corriendo en una cinta, visto de lado",
+  "inicio": "zancada con la pierna derecha adelantada",
+  "final": "zancada con la pierna izquierda adelantada",
+  "ancla": "encajar"
+ },
+ {
+  "slug": "bicicleta-estatica",
+  "ejercicio": "Bicicleta estática",
+  "vista": "en una bicicleta estática vertical, visto de lado",
+  "inicio": "pedaleando con el pedal más cercano arriba",
+  "final": "pedaleando con el pedal más cercano abajo",
+  "ancla": "encajar"
+ },
+ {
+  "slug": "spinning",
+  "ejercicio": "Spinning",
+  "vista": "en una bicicleta de spinning de pie sobre los pedales, visto de lado",
+  "inicio": "de pie sobre los pedales, el más cercano arriba",
+  "final": "de pie sobre los pedales, el más cercano abajo",
+  "ancla": "encajar"
+ },
+ {
+  "slug": "cinta-de-andar-en-cuesta",
+  "ejercicio": "Cinta de andar en cuesta",
+  "vista": "caminando en una cinta inclinada, visto de lado",
+  "inicio": "paso con la pierna derecha adelantada",
+  "final": "paso con la pierna izquierda adelantada",
+  "ancla": "encajar"
+ },
+ {
+  "slug": "escalera-sin-fin",
+  "ejercicio": "Escalera sin fin",
+  "vista": "en una máquina de escaleras, visto de lado",
+  "inicio": "un pie arriba en el escalón y el otro abajo",
+  "final": "los pies al revés",
+  "ancla": "encajar"
+ },
+ {
+  "slug": "esqui-de-fondo-maquina",
+  "ejercicio": "Esquí de fondo (máquina)",
+  "vista": "de pie frente a una máquina de esquí con dos asas que cuelgan, visto de lado",
+  "inicio": "brazos estirados arriba agarrando las asas",
+  "final": "tronco doblado y brazos tirados hacia abajo hasta los muslos",
+  "ancla": "encajar"
+ },
+ {
+  "slug": "patinaje",
+  "ejercicio": "Patinaje",
+  "vista": "patinando en línea, visto de frente",
+  "inicio": "empujando con la pierna derecha hacia el lado",
+  "final": "empujando con la pierna izquierda hacia el lado"
+ },
+ {
+  "slug": "baile",
+  "ejercicio": "Baile",
+  "vista": "bailando, visto de frente",
+  "inicio": "un brazo arriba y la cadera hacia un lado",
+  "final": "el otro brazo arriba y la cadera hacia el otro lado"
+ },
+ {
+  "slug": "sprints",
+  "ejercicio": "Sprints",
+  "vista": "esprintando, visto de lado",
+  "inicio": "zancada larga con la pierna derecha muy adelantada, tronco inclinado",
+  "final": "zancada larga con la pierna izquierda muy adelantada"
+ },
+ {
+  "slug": "trineo-empujar",
+  "ejercicio": "Trineo (empujar)",
+  "vista": "empujando un trineo con discos, visto de lado",
+  "inicio": "inclinado con los brazos estirados en los postes, pierna derecha adelantada",
+  "final": "pierna izquierda adelantada, el trineo un poco más lejos"
+ },
+ {
+  "slug": "battle-ropes",
+  "ejercicio": "Battle ropes",
+  "vista": "con dos cuerdas gruesas ancladas, semiagachado, visto de lado",
+  "inicio": "los dos brazos arriba con las cuerdas",
+  "final": "los dos brazos abajo haciendo una onda en las cuerdas"
+ },
+ {
+  "slug": "air-squat",
+  "ejercicio": "Air squat",
+  "vista": "sin peso, brazos estirados al frente, visto de lado",
+  "inicio": "de pie con las piernas estiradas",
+  "final": "abajo con los muslos paralelos al suelo"
+ },
+ {
+  "slug": "mountain-climbers",
+  "ejercicio": "Mountain climbers",
+  "vista": "en posición de flexión, visto de lado, cabeza a la derecha",
+  "inicio": "la rodilla derecha llevada hacia el pecho",
+  "final": "la rodilla izquierda llevada hacia el pecho",
+  "ancla": "atras"
+ },
+ {
+  "slug": "kettlebell-swing",
+  "ejercicio": "Kettlebell swing",
+  "vista": "con una kettlebell agarrada con las dos manos, visto de lado",
+  "inicio": "cadera atrás, la kettlebell entre las piernas",
+  "final": "de pie y erguido con los brazos estirados y la kettlebell a la altura del pecho"
+ },
+ {
+  "slug": "saltos-al-cajon",
+  "ejercicio": "Saltos al cajón",
+  "vista": "delante de un cajón alto, visto de lado",
+  "inicio": "agachado con los brazos atrás, a punto de saltar",
+  "final": "de pie encima del cajón con las rodillas un poco dobladas"
+ },
+ {
+  "slug": "estiramiento",
+  "ejercicio": "Estiramiento",
+  "vista": "de pie, visto de frente",
+  "postura": "estirándose hacia arriba con los brazos por encima de la cabeza y las manos entrelazadas"
+ },
+ {
+  "slug": "estiramiento-de-isquios",
+  "ejercicio": "Estiramiento de isquios",
+  "vista": "sentado en el suelo, visto de lado",
+  "postura": "una pierna estirada delante y la otra doblada con la planta en el muslo, tronco inclinado hacia la pierna estirada y manos hacia el pie"
+ },
+ {
+  "slug": "estiramiento-de-cuadriceps",
+  "ejercicio": "Estiramiento de cuádriceps",
+  "vista": "de pie, visto de lado",
+  "postura": "sobre una pierna, agarrando el otro pie por detrás con la mano y llevando el talón al glúteo, rodillas juntas"
+ },
+ {
+  "slug": "estiramiento-de-psoas-en-zancada",
+  "ejercicio": "Estiramiento de psoas en zancada",
+  "vista": "visto de lado",
+  "postura": "en zancada con la rodilla de atrás apoyada en el suelo, cadera empujada hacia delante, tronco erguido, manos en la cintura"
+ },
+ {
+  "slug": "estiramiento-de-gemelo-en-pared",
+  "ejercicio": "Estiramiento de gemelo en pared",
+  "vista": "frente a una pared, visto de lado",
+  "postura": "manos en la pared, una pierna atrás estirada con el talón en el suelo y la otra delante doblada"
+ },
+ {
+  "slug": "estiramiento-de-gluteo-en-figura-de-4",
+  "ejercicio": "Estiramiento de glúteo en figura de 4",
+  "vista": "tumbado boca arriba, visto de lado",
+  "postura": "un tobillo cruzado encima de la otra rodilla, tirando con las manos del muslo de la pierna de abajo hacia el pecho"
+ },
+ {
+  "slug": "estiramiento-de-aductores-en-mariposa",
+  "ejercicio": "Estiramiento de aductores en mariposa",
+  "vista": "sentado en el suelo, visto de frente",
+  "postura": "plantas de los pies juntas, rodillas abiertas hacia los lados, manos en los pies y codos empujando las rodillas"
+ },
+ {
+  "slug": "estiramiento-de-pectoral-en-el-marco-de-la-puerta",
+  "ejercicio": "Estiramiento de pectoral en el marco de la puerta",
+  "vista": "de pie en el marco de una puerta, visto de lado",
+  "postura": "antebrazo apoyado en el marco con el codo a la altura del hombro, el cuerpo girado y adelantado"
+ },
+ {
+  "slug": "estiramiento-de-dorsal",
+  "ejercicio": "Estiramiento de dorsal",
+  "vista": "de rodillas en el suelo, visto de lado",
+  "postura": "sentado sobre los talones con los brazos estirados por delante en el suelo, la frente cerca del suelo"
+ },
+ {
+  "slug": "estiramiento-de-triceps",
+  "ejercicio": "Estiramiento de tríceps",
+  "vista": "de pie, visto de lado",
+  "postura": "un brazo doblado detrás de la cabeza con la mano en la espalda y la otra mano empujando ese codo"
+ },
+ {
+  "slug": "estiramiento-de-hombro-cruzado",
+  "ejercicio": "Estiramiento de hombro cruzado",
+  "vista": "de pie, visto de frente",
+  "postura": "un brazo estirado cruzado por delante del pecho y el otro brazo sujetándolo por el codo"
+ },
+ {
+  "slug": "estiramiento-lateral-de-cuello",
+  "ejercicio": "Estiramiento lateral de cuello",
+  "vista": "sentado, visto de frente",
+  "postura": "la cabeza inclinada hacia un hombro con la mano de ese lado encima de la cabeza, el otro brazo relajado abajo"
+ },
+ {
+  "slug": "estiramiento-de-antebrazo",
+  "ejercicio": "Estiramiento de antebrazo",
+  "vista": "de pie, visto de lado",
+  "postura": "un brazo estirado por delante con la palma hacia fuera y los dedos hacia abajo, la otra mano tirando de los dedos hacia el cuerpo"
+ },
+ {
+  "slug": "estiramiento-de-lumbares-con-rodillas-al-pecho",
+  "ejercicio": "Estiramiento de lumbares con rodillas al pecho",
+  "vista": "tumbado boca arriba, visto de lado",
+  "postura": "las dos rodillas abrazadas contra el pecho"
+ },
+ {
+  "slug": "estiramiento-de-soleo-en-pared",
+  "ejercicio": "Estiramiento de sóleo en pared",
+  "vista": "frente a una pared, visto de lado",
+  "postura": "manos en la pared, un pie atrás con el talón en el suelo y esa rodilla doblada"
+ },
+ {
+  "slug": "estiramiento-de-trapecio-superior",
+  "ejercicio": "Estiramiento de trapecio superior",
+  "vista": "sentado, visto de frente",
+  "postura": "la cabeza inclinada a un lado y un poco hacia delante, la mano de ese lado tirando suave de la cabeza, el otro hombro bajado"
+ },
+ {
+  "slug": "estiramiento-del-elevador-de-la-escapula",
+  "ejercicio": "Estiramiento del elevador de la escápula",
+  "vista": "sentado, visto de frente",
+  "postura": "la cabeza girada y bajada hacia la axila, la mano de ese lado en la nuca tirando suave hacia abajo"
+ },
+ {
+  "slug": "postura-del-sastre-apertura-lateral",
+  "ejercicio": "Postura del sastre (apertura lateral)",
+  "vista": "sentado en el suelo, visto de frente",
+  "postura": "piernas muy abiertas hacia los lados y estiradas, tronco erguido, manos en el suelo delante"
+ },
+ {
+  "slug": "zancada-hacia-el-split-frontal",
+  "ejercicio": "Zancada hacia el split frontal",
+  "vista": "visto de lado",
+  "postura": "una pierna estirada delante con el talón en el suelo y la otra estirada detrás con la rodilla en el suelo, manos en el suelo a los lados"
+ },
+ {
+  "slug": "estiramiento-del-sofa-couch-stretch",
+  "ejercicio": "Estiramiento del sofá (couch stretch)",
+  "vista": "visto de lado, junto a un sofá",
+  "postura": "rodilla de atrás en el suelo junto al sofá con el empeine apoyado en el respaldo, la otra pierna delante doblada, tronco erguido"
+ },
+ {
+  "slug": "estiramiento-de-gluteo-en-paloma",
+  "ejercicio": "Estiramiento de glúteo en paloma",
+  "vista": "en el suelo, visto de lado",
+  "postura": "una pierna doblada delante con la espinilla cruzada y la otra estirada atrás, tronco inclinado sobre la pierna de delante"
+ },
+ {
+  "slug": "estiramiento-del-empeine",
+  "ejercicio": "Estiramiento del empeine",
+  "vista": "de rodillas en el suelo, visto de lado",
+  "postura": "sentado sobre los talones con los empeines apoyados en el suelo y las manos detrás, tronco algo inclinado hacia atrás"
+ },
+ {
+  "slug": "estiramiento-de-los-dedos-del-pie",
+  "ejercicio": "Estiramiento de los dedos del pie",
+  "vista": "de rodillas en el suelo, visto de lado",
+  "postura": "sentado sobre los talones con los dedos de los pies doblados hacia arriba apoyados en el suelo"
+ },
+ {
+  "slug": "cars-de-hombro",
+  "ejercicio": "CARs de hombro",
+  "vista": "de pie, visto de lado",
+  "inicio": "un brazo estirado delante a la altura del hombro",
+  "final": "ese brazo estirado arriba y atrás, dibujando el círculo más grande posible"
+ },
+ {
+  "slug": "movilidad-dinamica-de-torso",
+  "ejercicio": "Movilidad dinámica de torso",
+  "vista": "de pie, visto de frente",
+  "inicio": "brazos abiertos en cruz, tronco girado hacia un lado",
+  "final": "brazos abiertos en cruz, tronco girado hacia el otro lado"
+ },
+ {
+  "slug": "movilidad-dinamica-de-pierna",
+  "ejercicio": "Movilidad dinámica de pierna",
+  "vista": "de pie, visto de lado, apoyado con una mano en la pared",
+  "inicio": "una pierna balanceada hacia delante y arriba",
+  "final": "esa pierna balanceada hacia atrás"
+ },
+ {
+  "slug": "cars-de-cadera",
+  "ejercicio": "CARs de cadera",
+  "vista": "a cuatro patas, visto de lado",
+  "inicio": "una rodilla levantada hacia el lado",
+  "final": "esa rodilla llevada hacia atrás, dibujando un círculo con la cadera"
+ },
+ {
+  "slug": "dislocaciones-con-pica",
+  "ejercicio": "Dislocaciones con pica",
+  "vista": "de pie con un palo largo agarrado con las manos muy separadas, visto de lado",
+  "inicio": "brazos estirados con el palo delante de los muslos",
+  "final": "brazos estirados con el palo detrás, a la altura de los glúteos, pasando por encima de la cabeza"
+ },
+ {
+  "slug": "tobillo-con-rodilla-a-la-pared",
+  "ejercicio": "Tobillo con rodilla a la pared",
+  "vista": "frente a una pared, en zancada, visto de lado",
+  "inicio": "el pie de delante a un palmo de la pared, la rodilla recta",
+  "final": "la rodilla de delante tocando la pared sin levantar el talón"
+ },
+ {
+  "slug": "rotacion-toracica-en-libro-abierto",
+  "ejercicio": "Rotación torácica en libro abierto",
+  "vista": "tumbado de lado en el suelo con las rodillas dobladas, visto desde arriba",
+  "inicio": "los dos brazos estirados juntos delante del pecho",
+  "final": "el brazo de arriba abierto hacia el otro lado, el pecho mirando al techo"
+ },
+ {
+  "slug": "sentadilla-profunda-mantenida",
+  "ejercicio": "Sentadilla profunda mantenida",
+  "vista": "visto de frente",
+  "postura": "en cuclillas lo más abajo posible, talones en el suelo, codos empujando las rodillas por dentro, manos juntas"
+ },
+ {
+  "slug": "sentadilla-cosaca",
+  "ejercicio": "Sentadilla cosaca",
+  "vista": "con las piernas muy abiertas, visto de frente",
+  "inicio": "agachado sobre la pierna derecha con la izquierda estirada",
+  "final": "agachado sobre la pierna izquierda con la derecha estirada"
+ },
+ {
+  "slug": "movilidad-de-muneca",
+  "ejercicio": "Movilidad de muñeca",
+  "vista": "a cuatro patas, visto de lado",
+  "inicio": "manos en el suelo con los dedos hacia delante, hombros por detrás de las manos",
+  "final": "hombros llevados por delante de las manos, muñecas dobladas"
+ },
+ {
+  "slug": "rotacion-90-90",
+  "ejercicio": "Rotación 90/90",
+  "vista": "sentado en el suelo con las dos rodillas dobladas a 90 grados, visto de frente",
+  "inicio": "las dos rodillas caídas hacia la izquierda",
+  "final": "las dos rodillas caídas hacia la derecha"
+ },
+ {
+  "slug": "gato-camello",
+  "ejercicio": "Gato-camello",
+  "vista": "a cuatro patas, visto de lado",
+  "inicio": "espalda arqueada hacia arriba como un gato, cabeza abajo",
+  "final": "espalda hundida hacia abajo, pecho y cabeza arriba"
+ },
+ {
+  "slug": "deslizamiento-neural-nerve-floss",
+  "ejercicio": "Deslizamiento neural (nerve floss)",
+  "vista": "sentado en una silla, visto de lado",
+  "inicio": "la pierna estirada delante con la punta del pie hacia arriba y la cabeza hacia atrás",
+  "final": "la rodilla doblada, el pie hacia abajo y la barbilla hacia el pecho"
+ },
+ {
+  "slug": "deslizamiento-neural-ciatico",
+  "ejercicio": "Deslizamiento neural ciático",
+  "vista": "tumbado boca arriba sujetando un muslo con las manos, visto de lado",
+  "inicio": "la rodilla doblada a 90 grados",
+  "final": "la pierna estirada hacia el techo con el pie flexionado"
+ },
+ {
+  "slug": "deslizamiento-neural-cervical",
+  "ejercicio": "Deslizamiento neural cervical",
+  "vista": "de pie, visto de frente",
+  "inicio": "un brazo abierto al lado con la palma arriba y la cabeza inclinada hacia ese brazo",
+  "final": "la muñeca doblada hacia abajo y la cabeza inclinada hacia el otro lado"
+ },
+ {
+  "slug": "rotacion-tibial-con-rodilla-flexionada",
+  "ejercicio": "Rotación tibial con rodilla flexionada",
+  "vista": "sentado en una silla, visto de frente",
+  "inicio": "el pie girado hacia dentro con la rodilla quieta",
+  "final": "el pie girado hacia fuera con la rodilla quieta"
+ },
+ {
+  "slug": "rotacion-toracica-en-cuadrupedia",
+  "ejercicio": "Rotación torácica en cuadrupedia",
+  "vista": "a cuatro patas con una mano en la nuca, visto de lado",
+  "inicio": "el codo bajado hacia la otra mano",
+  "final": "el codo levantado hacia el techo, el pecho girado"
+ },
+ {
+  "slug": "puente-por-fases",
+  "ejercicio": "Puente por fases",
+  "vista": "tumbado boca arriba con las rodillas dobladas, visto de lado",
+  "inicio": "cadera en el suelo",
+  "final": "cadera arriba, despegando la espalda vértebra a vértebra"
+ },
+ {
+  "slug": "rotacion-externa-de-hombro-con-banda",
+  "ejercicio": "Rotación externa de hombro con banda",
+  "vista": "de pie con una banda elástica entre las manos, codos pegados al cuerpo y doblados a 90 grados, visto de frente",
+  "inicio": "antebrazos hacia delante, manos juntas",
+  "final": "antebrazos abiertos hacia fuera estirando la banda"
+ },
+ {
+  "slug": "rotacion-interna-de-hombro-con-toalla",
+  "ejercicio": "Rotación interna de hombro con toalla",
+  "vista": "de pie con una toalla detrás de la espalda, visto de lado",
+  "inicio": "una mano arriba detrás de la cabeza y otra abajo detrás de la espalda agarrando la toalla",
+  "final": "la mano de arriba tirando de la toalla hacia arriba"
+ },
+ {
+  "slug": "retraccion-cervical-chin-tuck",
+  "ejercicio": "Retracción cervical (chin tuck)",
+  "vista": "sentado, visto de lado",
+  "inicio": "la cabeza adelantada",
+  "final": "la barbilla metida hacia atrás, la cabeza alineada con los hombros"
+ },
+ {
+  "slug": "flexion-lateral-de-cuello-activa",
+  "ejercicio": "Flexión lateral de cuello activa",
+  "vista": "sentado, visto de frente",
+  "inicio": "la cabeza inclinada hacia el hombro derecho",
+  "final": "la cabeza inclinada hacia el hombro izquierdo"
+ },
+ {
+  "slug": "extension-toracica-sobre-rodillo",
+  "ejercicio": "Extensión torácica sobre rodillo",
+  "vista": "tumbado boca arriba con un rodillo de espuma bajo la parte alta de la espalda, manos en la nuca, visto de lado",
+  "inicio": "tronco doblado hacia delante, codos juntos",
+  "final": "tronco extendido hacia atrás sobre el rodillo"
+ },
+ {
+  "slug": "elevaciones-y-t-w",
+  "ejercicio": "Elevaciones Y-T-W",
+  "vista": "tumbado boca abajo en un banco inclinado, visto de frente desde arriba",
+  "inicio": "brazos levantados en forma de Y",
+  "final": "brazos abiertos en forma de T"
+ },
+ {
+  "slug": "cobra-en-el-suelo",
+  "ejercicio": "Cobra en el suelo",
+  "vista": "tumbado boca abajo, visto de lado",
+  "inicio": "manos junto al pecho, todo el cuerpo en el suelo",
+  "final": "brazos estirados, pecho levantado, cadera en el suelo"
+ },
+ {
+  "slug": "flexion-y-extension-de-dedos-del-pie",
+  "ejercicio": "Flexión y extensión de dedos del pie",
+  "vista": "sentado, visto de lado, se ve el pie",
+  "inicio": "dedos del pie doblados hacia abajo",
+  "final": "dedos del pie levantados hacia arriba"
+ },
+ {
+  "slug": "isometrico-de-flexion-plantar",
+  "ejercicio": "Isométrico de flexión plantar",
+  "vista": "de pie junto a una pared, visto de lado",
+  "postura": "de puntillas sobre una pierna, aguantando, con una mano en la pared"
+ },
+ {
+  "slug": "liberacion-con-rodillo",
+  "ejercicio": "Liberación con rodillo",
+  "vista": "tumbado de lado con un rodillo de espuma bajo el muslo, apoyado en el antebrazo, visto de lado",
+  "inicio": "el rodillo cerca de la cadera",
+  "final": "el rodillo cerca de la rodilla"
+ },
+ {
+  "slug": "yoga-guerrero-i",
+  "ejercicio": "Guerrero I (Virabhadrasana I)",
+  "vista": "postura de yoga sobre una esterilla, visto de lado",
+  "postura": "zancada larga con la rodilla de delante doblada a 90 grados y la pierna de atrás estirada con el pie girado, cadera mirando al frente, brazos estirados arriba con las palmas juntas"
+ },
+ {
+  "slug": "yoga-guerrero-ii",
+  "ejercicio": "Guerrero II (Virabhadrasana II)",
+  "vista": "postura de yoga sobre una esterilla, visto de frente",
+  "postura": "piernas muy abiertas, rodilla de delante doblada a 90 grados, brazos estirados en cruz paralelos al suelo, mirada sobre la mano de delante"
+ },
+ {
+  "slug": "yoga-guerrero-iii",
+  "ejercicio": "Guerrero III (Virabhadrasana III)",
+  "vista": "postura de yoga, visto de lado",
+  "postura": "de pie sobre una pierna, tronco y la otra pierna en línea horizontal paralela al suelo, brazos estirados hacia delante"
+ },
+ {
+  "slug": "yoga-flexion-de-tronco-de-pie",
+  "ejercicio": "Flexión de tronco de pie (Uttanasana)",
+  "vista": "postura de yoga, visto de lado",
+  "postura": "de pie con las piernas estiradas, tronco doblado hacia delante con la cabeza hacia las rodillas y las manos en el suelo junto a los pies"
+ },
+ {
+  "slug": "yoga-flexion-amplia",
+  "ejercicio": "Flexión de tronco en postura amplia (Prasarita Padottanasana)",
+  "vista": "postura de yoga, visto de frente",
+  "postura": "piernas muy abiertas y estiradas, tronco doblado hacia delante con la coronilla hacia el suelo y las manos en el suelo entre los pies"
+ },
+ {
+  "slug": "yoga-estiramiento-lateral-intenso",
+  "ejercicio": "Estiramiento lateral intenso (Parsvottanasana)",
+  "vista": "postura de yoga, visto de lado",
+  "postura": "un pie delante y otro detrás con las piernas estiradas, tronco doblado sobre la pierna de delante, manos juntas en la espalda"
+ },
+ {
+  "slug": "yoga-montana",
+  "ejercicio": "Montaña (Tadasana)",
+  "vista": "postura de yoga, visto de frente",
+  "postura": "de pie, pies juntos, piernas estiradas, brazos relajados a los lados, cuerpo erguido"
+ },
+ {
+  "slug": "yoga-silla",
+  "ejercicio": "Silla (Utkatasana)",
+  "vista": "postura de yoga, visto de lado",
+  "postura": "rodillas dobladas como sentado en una silla invisible, pies juntos, brazos estirados arriba"
+ },
+ {
+  "slug": "yoga-aguila",
+  "ejercicio": "Águila (Garudasana)",
+  "vista": "postura de yoga, visto de frente",
+  "postura": "de pie sobre una pierna algo doblada, la otra pierna enroscada alrededor, brazos cruzados y entrelazados delante de la cara"
+ },
+ {
+  "slug": "yoga-arbol",
+  "ejercicio": "Árbol (Vrksasana)",
+  "vista": "postura de yoga, visto de frente",
+  "postura": "de pie sobre una pierna, la planta del otro pie apoyada en la cara interna del muslo, manos juntas delante del pecho"
+ },
+ {
+  "slug": "yoga-rey-de-los-bailarines",
+  "ejercicio": "Rey de los bailarines (Natarajasana)",
+  "vista": "postura de yoga, visto de lado",
+  "postura": "de pie sobre una pierna, la otra pierna doblada hacia atrás y arriba agarrada por el pie con la mano, el otro brazo estirado hacia delante, tronco inclinado"
+ },
+ {
+  "slug": "yoga-triangulo",
+  "ejercicio": "Triángulo (Trikonasana)",
+  "vista": "postura de yoga, visto de frente",
+  "postura": "piernas muy abiertas y estiradas, tronco inclinado de lado sobre la pierna de delante, una mano en la espinilla y el otro brazo estirado hacia el techo"
+ },
+ {
+  "slug": "yoga-mano-al-dedo-gordo",
+  "ejercicio": "Mano al dedo gordo del pie (Utthita Hasta Padangusthasana)",
+  "vista": "postura de yoga, visto de lado",
+  "postura": "de pie sobre una pierna, la otra pierna estirada hacia delante a la altura de la cadera, agarrando el dedo gordo con la mano"
+ },
+ {
+  "slug": "yoga-angulo-lateral-extendido",
+  "ejercicio": "Ángulo lateral extendido (Utthita Parsvakonasana)",
+  "vista": "postura de yoga, visto de frente",
+  "postura": "zancada lateral con la rodilla de delante doblada, el antebrazo apoyado en el muslo y el otro brazo estirado en diagonal por encima de la cabeza"
+ },
+ {
+  "slug": "yoga-angulo-lateral-girado",
+  "ejercicio": "Ángulo lateral girado (Parivritta Baddha Parsvakonasana)",
+  "vista": "postura de yoga, visto de frente",
+  "postura": "zancada con la rodilla de delante doblada, tronco girado hacia esa pierna con el codo contrario por fuera de la rodilla y las manos juntas delante del pecho"
+ },
+ {
+  "slug": "yoga-triangulo-girado",
+  "ejercicio": "Triángulo girado (Parivritta Trikonasana)",
+  "vista": "postura de yoga, visto de frente",
+  "postura": "piernas abiertas y estiradas, tronco girado e inclinado hacia la pierna de delante, la mano contraria en el suelo junto al pie y el otro brazo hacia el techo"
+ },
+ {
+  "slug": "yoga-sentada-en-cuclillas",
+  "ejercicio": "Sentada en cuclillas (Upavesasana)",
+  "vista": "postura de yoga, visto de frente",
+  "postura": "en cuclillas profundas con los pies algo abiertos, talones en el suelo, codos por dentro de las rodillas y manos juntas delante del pecho"
+ },
+ {
+  "slug": "yoga-medio-senor-de-los-peces",
+  "ejercicio": "Medio señor de los peces (Ardha Matsyendrasana)",
+  "vista": "postura de yoga sentado en el suelo, visto de frente",
+  "postura": "una pierna doblada en el suelo, la otra cruzada por encima con el pie junto a la rodilla, tronco girado con el codo contrario por fuera de la rodilla"
+ },
+ {
+  "slug": "yoga-angulo-ligado",
+  "ejercicio": "Ángulo ligado (Baddha Konasana)",
+  "vista": "postura de yoga sentado en el suelo, visto de frente",
+  "postura": "plantas de los pies juntas, rodillas abiertas hacia los lados casi en el suelo, manos agarrando los pies, espalda recta"
+ },
+ {
+  "slug": "yoga-angulo-ligado-tumbado",
+  "ejercicio": "Ángulo ligado tumbado (Supta Baddha Konasana)",
+  "vista": "postura de yoga tumbado boca arriba, visto de lado",
+  "postura": "plantas de los pies juntas y rodillas abiertas hacia los lados, brazos relajados a los lados"
+ },
+ {
+  "slug": "yoga-baston",
+  "ejercicio": "Bastón (Dandasana)",
+  "vista": "postura de yoga sentado en el suelo, visto de lado",
+  "postura": "piernas juntas estiradas delante, espalda recta, manos en el suelo junto a la cadera"
+ },
+ {
+  "slug": "yoga-cara-de-vaca",
+  "ejercicio": "Cara de vaca (Gomukhasana)",
+  "vista": "postura de yoga sentado en el suelo, visto de frente",
+  "postura": "rodillas una encima de la otra, un brazo por encima del hombro y el otro por detrás de la espalda con las manos agarradas"
+ },
+ {
+  "slug": "yoga-mono",
+  "ejercicio": "Mono (Hanumanasana)",
+  "vista": "postura de yoga, visto de lado",
+  "postura": "espagat frontal: una pierna estirada delante y la otra estirada detrás en el suelo, tronco erguido, brazos arriba"
+ },
+ {
+  "slug": "yoga-cabeza-a-la-rodilla",
+  "ejercicio": "Cabeza a la rodilla (Janu Sirsasana)",
+  "vista": "postura de yoga sentado en el suelo, visto de lado",
+  "postura": "una pierna estirada delante y la otra doblada con la planta en el muslo, tronco doblado sobre la pierna estirada agarrando el pie"
+ },
+ {
+  "slug": "yoga-cabeza-a-la-rodilla-girada",
+  "ejercicio": "Cabeza a la rodilla girada (Parivritta Janu Sirsasana)",
+  "vista": "postura de yoga sentado en el suelo, visto de frente",
+  "postura": "una pierna estirada al lado y la otra doblada, tronco inclinado de lado sobre la pierna estirada, el brazo de arriba por encima de la cabeza hacia el pie"
+ },
+ {
+  "slug": "yoga-tortuga",
+  "ejercicio": "Tortuga (Kurmasana)",
+  "vista": "postura de yoga sentado en el suelo, visto de frente",
+  "postura": "piernas abiertas y estiradas, tronco doblado hacia delante pegado al suelo, los brazos estirados por debajo de las rodillas hacia los lados"
+ },
+ {
+  "slug": "yoga-tortuga-tumbada",
+  "ejercicio": "Tortuga tumbada (Supta Kurmasana)",
+  "vista": "postura de yoga en el suelo, visto de lado",
+  "postura": "tronco doblado hacia delante en el suelo con las piernas cruzadas por detrás de la cabeza y las manos juntas a la espalda"
+ },
+ {
+  "slug": "yoga-gran-sello",
+  "ejercicio": "Gran sello (Mahamudra)",
+  "vista": "postura de yoga sentado en el suelo, visto de lado",
+  "postura": "una pierna estirada delante y la otra doblada, espalda recta, agarrando el pie de la pierna estirada con las dos manos, barbilla hacia el pecho"
+ },
+ {
+  "slug": "yoga-barca",
+  "ejercicio": "Barca (Navasana)",
+  "vista": "postura de yoga sentado en el suelo, visto de lado",
+  "postura": "equilibrado sobre los glúteos, piernas estiradas levantadas y tronco inclinado hacia atrás formando una V, brazos estirados hacia delante"
+ },
+ {
+  "slug": "yoga-estiramiento-del-oeste",
+  "ejercicio": "Estiramiento del oeste (Paschimottanasana)",
+  "vista": "postura de yoga sentado en el suelo, visto de lado",
+  "postura": "piernas juntas estiradas delante, tronco doblado sobre las piernas, manos agarrando los pies"
+ },
+ {
+  "slug": "yoga-sentada-en-angulo-amplio",
+  "ejercicio": "Sentada en ángulo amplio (Upavistha Konasana)",
+  "vista": "postura de yoga sentado en el suelo, visto de frente",
+  "postura": "piernas muy abiertas y estiradas, tronco inclinado hacia delante hacia el suelo, manos hacia delante"
+ },
+ {
+  "slug": "yoga-paloma-real",
+  "ejercicio": "Paloma real con una pierna (Eka Pada Rajakapotasana)",
+  "vista": "postura de yoga en el suelo, visto de lado",
+  "postura": "una pierna doblada delante y la otra estirada atrás, la de atrás doblada con el pie hacia la cabeza agarrado por las manos por encima, pecho abierto"
+ },
+ {
+  "slug": "yoga-camello",
+  "ejercicio": "Camello (Ustrasana)",
+  "vista": "postura de yoga de rodillas, visto de lado",
+  "postura": "de rodillas con el tronco arqueado hacia atrás, las manos agarrando los talones, cadera adelantada"
+ },
+ {
+  "slug": "yoga-nino",
+  "ejercicio": "Niño o embrión (Balasana)",
+  "vista": "postura de yoga en el suelo, visto de lado",
+  "postura": "sentado sobre los talones con el tronco doblado hacia delante, la frente en el suelo y los brazos estirados hacia delante"
+ },
+ {
+  "slug": "yoga-leon",
+  "ejercicio": "León (Simhasana)",
+  "vista": "postura de yoga de rodillas, visto de frente",
+  "postura": "sentado sobre los talones, manos en las rodillas con los dedos abiertos, tronco un poco adelantado, cabeza hacia arriba"
+ },
+ {
+  "slug": "yoga-pasador-de-puerta",
+  "ejercicio": "Pasador de puerta (Parighasana)",
+  "vista": "postura de yoga, visto de frente",
+  "postura": "de rodillas sobre una pierna, la otra estirada hacia el lado, tronco inclinado hacia la pierna estirada, el brazo de arriba por encima de la cabeza"
+ },
+ {
+  "slug": "yoga-heroe-tendido",
+  "ejercicio": "Héroe tendido (Supta Virasana)",
+  "vista": "postura de yoga, visto de lado",
+  "postura": "sentado entre los talones con las rodillas dobladas, la espalda tumbada hacia atrás en el suelo, brazos por encima de la cabeza"
+ },
+ {
+  "slug": "yoga-banco-sobre-dos-apoyos",
+  "ejercicio": "Banco sobre dos apoyos (Dwi Pada Pitham)",
+  "vista": "postura de yoga tumbado boca arriba, visto de lado",
+  "postura": "rodillas dobladas, pies en el suelo, cadera levantada y brazos estirados por detrás de la cabeza en el suelo"
+ },
+ {
+  "slug": "yoga-oreja-a-la-rodilla",
+  "ejercicio": "Oreja a la rodilla (Karnapidasana)",
+  "vista": "postura de yoga, visto de lado",
+  "postura": "tumbado sobre los hombros con las piernas pasadas por encima de la cabeza y las rodillas dobladas junto a las orejas"
+ },
+ {
+  "slug": "yoga-vishnu-en-el-divan",
+  "ejercicio": "Vishnu en el diván (Anantasana)",
+  "vista": "postura de yoga tumbado de lado, visto de frente",
+  "postura": "apoyado en un codo con la cabeza en la mano, la pierna de arriba estirada hacia el techo agarrada por el dedo gordo"
+ },
+ {
+  "slug": "yoga-apana",
+  "ejercicio": "Apana (Apanasana)",
+  "vista": "postura de yoga tumbado boca arriba, visto de lado",
+  "postura": "rodillas abrazadas contra el pecho con las dos manos"
+ },
+ {
+  "slug": "yoga-arado",
+  "ejercicio": "Arado (Halasana)",
+  "vista": "postura de yoga, visto de lado",
+  "postura": "tumbado sobre los hombros con las piernas estiradas pasadas por encima de la cabeza y los pies en el suelo detrás, brazos estirados en el suelo"
+ },
+ {
+  "slug": "yoga-cadaver",
+  "ejercicio": "Cadáver (Savasana)",
+  "vista": "postura de yoga tumbado boca arriba, visto de lado",
+  "postura": "tumbado relajado con las piernas estiradas algo separadas y los brazos a los lados con las palmas hacia arriba"
+ },
+ {
+  "slug": "yoga-pez",
+  "ejercicio": "Pez (Matsyasana)",
+  "vista": "postura de yoga tumbado boca arriba, visto de lado",
+  "postura": "piernas estiradas, pecho arqueado hacia arriba apoyado en los antebrazos, la coronilla tocando el suelo"
+ },
+ {
+  "slug": "yoga-puente",
+  "ejercicio": "Puente (Setu Bandhasana)",
+  "vista": "postura de yoga tumbado boca arriba, visto de lado",
+  "postura": "rodillas dobladas, pies en el suelo, cadera levantada y manos entrelazadas bajo la espalda"
+ },
+ {
+  "slug": "yoga-piernas-en-la-pared",
+  "ejercicio": "Piernas en la pared (Viparita Karani)",
+  "vista": "postura de yoga tumbado boca arriba junto a una pared, visto de lado",
+  "postura": "las piernas estiradas apoyadas en vertical contra la pared, brazos a los lados"
+ },
+ {
+  "slug": "yoga-sobre-los-hombros",
+  "ejercicio": "Sobre los hombros con apoyo (Salamba Sarvangasana)",
+  "vista": "postura de yoga, visto de lado",
+  "postura": "vertical sobre los hombros con las piernas estiradas hacia el techo y las manos sujetando la espalda"
+ },
+ {
+  "slug": "yoga-sobre-los-hombros-sin-brazos",
+  "ejercicio": "Sobre los hombros sin apoyo de brazos (Niralamba Sarvangasana)",
+  "vista": "postura de yoga, visto de lado",
+  "postura": "vertical sobre los hombros con las piernas estiradas hacia el techo y los brazos estirados junto a las piernas, sin apoyar"
+ },
+ {
+  "slug": "yoga-torsion-abdominal",
+  "ejercicio": "Torsión abdominal (Jathara Parivritti)",
+  "vista": "postura de yoga tumbado boca arriba, visto desde arriba",
+  "postura": "brazos en cruz en el suelo, las dos rodillas dobladas caídas hacia un lado, cabeza girada al otro"
+ },
+ {
+  "slug": "yoga-langosta-completa",
+  "ejercicio": "Langosta completa (Viparita Salabhasana)",
+  "vista": "postura de yoga tumbado boca abajo, visto de lado",
+  "postura": "apoyado en el pecho y la barbilla, piernas levantadas muy arriba casi en vertical, brazos estirados bajo el cuerpo"
+ },
+ {
+  "slug": "yoga-cobra",
+  "ejercicio": "Cobra (Bhujangasana)",
+  "vista": "postura de yoga tumbado boca abajo, visto de lado",
+  "postura": "piernas estiradas en el suelo, pecho levantado con los brazos algo doblados y las manos junto al pecho, mirada al frente"
+ },
+ {
+  "slug": "yoga-langosta",
+  "ejercicio": "Langosta (Salabhasana)",
+  "vista": "postura de yoga tumbado boca abajo, visto de lado",
+  "postura": "pecho, brazos estirados hacia atrás y piernas levantados del suelo a la vez"
+ },
+ {
+  "slug": "yoga-arco",
+  "ejercicio": "Arco (Dhanurasana)",
+  "vista": "postura de yoga tumbado boca abajo, visto de lado",
+  "postura": "rodillas dobladas y los tobillos agarrados con las manos, pecho y muslos levantados del suelo formando un arco"
+ },
+ {
+  "slug": "yoga-banco-sobre-cuatro-apoyos",
+  "ejercicio": "Banco sobre cuatro apoyos (Catush Pada Pitham)",
+  "vista": "postura de yoga, visto de lado",
+  "postura": "sentado con las manos en el suelo detrás y los pies delante, cadera levantada con el tronco horizontal como una mesa"
+ },
+ {
+  "slug": "yoga-grulla",
+  "ejercicio": "Grulla (Bakasana)",
+  "vista": "postura de yoga, visto de lado",
+  "postura": "en equilibrio sobre las manos en el suelo con los brazos doblados, rodillas apoyadas en la parte de atrás de los brazos y los pies levantados"
+ },
+ {
+  "slug": "yoga-grulla-lateral",
+  "ejercicio": "Grulla lateral (Parsva Bakasana)",
+  "vista": "postura de yoga, visto de frente",
+  "postura": "en equilibrio sobre las manos, las piernas juntas dobladas y giradas hacia un lado apoyadas en un brazo, pies levantados"
+ },
+ {
+  "slug": "yoga-plancha-hacia-arriba",
+  "ejercicio": "Plancha hacia arriba (Purvottanasana)",
+  "vista": "postura de yoga, visto de lado",
+  "postura": "boca arriba, cuerpo recto levantado apoyado en las manos detrás y los talones, cabeza hacia atrás"
+ },
+ {
+  "slug": "yoga-plancha-lateral-del-sabio",
+  "ejercicio": "Plancha lateral del sabio (Vasisthasana)",
+  "vista": "postura de yoga, visto de frente",
+  "postura": "de lado apoyado en una mano y el borde de un pie, cuerpo recto, el otro brazo estirado hacia el techo"
+ },
+ {
+  "slug": "yoga-angulo-en-ocho",
+  "ejercicio": "Ángulo en ocho (Astavakrasana)",
+  "vista": "postura de yoga, visto de frente",
+  "postura": "en equilibrio sobre las manos con los brazos doblados, piernas estiradas y cruzadas hacia un lado apoyadas sobre un brazo"
+ },
+ {
+  "slug": "yoga-arbol-boca-abajo",
+  "ejercicio": "Árbol boca abajo (Adho Mukha Vrksasana)",
+  "vista": "postura de yoga, visto de lado",
+  "postura": "haciendo el pino con los brazos estirados y el cuerpo recto en vertical"
+ },
+ {
+  "slug": "yoga-rueda",
+  "ejercicio": "Rueda o arco hacia arriba (Urdhva Dhanurasana)",
+  "vista": "postura de yoga, visto de lado",
+  "postura": "boca arriba con el cuerpo arqueado, apoyado en manos y pies, brazos y piernas estirados, cadera muy arriba"
+ },
+ {
+  "slug": "yoga-chaturanga",
+  "ejercicio": "Báculo sobre cuatro miembros (Chaturanga Dandasana)",
+  "vista": "postura de yoga, visto de lado",
+  "postura": "cuerpo recto y bajo, paralelo al suelo, apoyado en las manos con los codos doblados pegados al cuerpo y en las puntas de los pies"
+ },
+ {
+  "slug": "yoga-escorpion",
+  "ejercicio": "Escorpión (Vrschikasana)",
+  "vista": "postura de yoga, visto de lado",
+  "postura": "en equilibrio sobre los antebrazos, la espalda arqueada y las rodillas dobladas con los pies hacia la cabeza"
+ },
+ {
+  "slug": "yoga-pavo-real-cola",
+  "ejercicio": "Pavo real con la cola desplegada (Pincha Mayurasana)",
+  "vista": "postura de yoga, visto de lado",
+  "postura": "en equilibrio sobre los antebrazos con el cuerpo recto en vertical y las piernas estiradas hacia arriba"
+ },
+ {
+  "slug": "yoga-pavo-real",
+  "ejercicio": "Pavo real (Mayurasana)",
+  "vista": "postura de yoga, visto de lado",
+  "postura": "en equilibrio sobre las manos con los codos clavados en el abdomen, el cuerpo recto horizontal y las piernas estiradas hacia atrás"
+ },
+ {
+  "slug": "yoga-perro-boca-abajo",
+  "ejercicio": "Perro boca abajo (Adho Mukha Svanasana)",
+  "vista": "postura de yoga, visto de lado",
+  "postura": "manos y pies en el suelo, cadera muy alta formando una V invertida, brazos y piernas estirados, talones hacia el suelo"
+ },
+ {
+  "slug": "yoga-perro-boca-arriba",
+  "ejercicio": "Perro boca arriba (Urdhva Mukha Svanasana)",
+  "vista": "postura de yoga, visto de lado",
+  "postura": "brazos estirados con las manos en el suelo, pecho arqueado hacia arriba, piernas estiradas con los muslos levantados del suelo y los empeines apoyados"
+ },
+ {
+  "slug": "yoga-sobre-la-cabeza",
+  "ejercicio": "Sobre la cabeza con apoyo (Salamba Sirsasana)",
+  "vista": "postura de yoga, visto de lado",
+  "postura": "vertical sobre la cabeza con los antebrazos en el suelo y las manos entrelazadas alrededor de la cabeza, piernas estiradas hacia el techo"
  }
 ]

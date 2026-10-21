@@ -533,7 +533,7 @@ input.fecha { width: auto; }
 .valor { display: flex; flex-direction: column; align-items: stretch; gap: 2px; min-width: 0; }
 .valor input { font-family: var(--fuente-numeros); font-size: 1.25rem; font-weight: 700; text-align: center; max-width: none; width: 100%; padding-left: 4px; padding-right: 4px; }
 .valor > .et { font-size: 0.78rem; line-height: 1.15; color: var(--texto-suave); display: flex; align-items: flex-end; justify-content: center; gap: 3px; min-height: 2.3em; text-align: center; }
-.valor > .et .que-es { flex: 0 0 auto; }
+.valor > .et .que-es { flex: 0 0 auto; margin-left: 0; padding: 0 5px; } /* «Recámara ?» cabe en su columna */
 .valor span { color: var(--texto-suave); }
 .valor small { color: var(--texto-suave); font-size: 0.75rem; text-align: center; min-height: 1.1em; }
 
@@ -874,6 +874,8 @@ input, select, textarea { max-width: 100%; box-sizing: border-box; }
   border-radius: var(--radio-pequeno);
   background: #fff;
   flex: 0 0 auto;
+  /* Un filo fino: en el tema claro el dibujo (fondo blanco) se perdía en la tarjeta blanca. */
+  outline: 1px solid var(--borde); outline-offset: -1px;
 }
 
 .crece { flex: 1; min-width: 0; }
