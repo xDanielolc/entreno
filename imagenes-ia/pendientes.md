@@ -1,3 +1,13 @@
 # Dibujos que no salieron bien (repetir)
 - press-declinado: Gemini dibuja el banco plano aunque se le pida declinado (2 intentos).
 - dominadas-supinas: salen piernas sueltas junto a cada figura (borrador guardado como borrador-dominadas-supinas.jpg).
+- curl-de-muneca: Gemini dibuja un curl de bíceps en la postura final y no lo corrige; se queda el muñeco de antes.
+- subida-al-cajon: Gemini dibuja las dos fases iguales (un pie en el cajón) y no lo corrige.
+- curl-nordico: la postura final sale a cuatro patas (cadera doblada), no con el cuerpo recto; no se usa.
+- elevacion-de-tibiales: dibuja la postura final de puntillas (al revés); no se usa.
+- plancha-copenhague: las dos figuras no son la plancha Copenhague (una de lado y otra boca abajo); no se usa.
+- hiperextensiones: las dos posturas mal (los pies se sueltan y no baja el tronco); no se usa.
+- press-arnold: la figura de inicio sale más pequeña que la final; no se usa.
+- giros-rusos: sale con texto (INICIO/FINAL) y la figura reflejada; no se usa.
+- posicion-hueca: sale una V (como la barca), no la posición hueca; no se usa.
+- sentadilla-a-una-pierna: el pie de apoyo cambia de sitio entre las dos fases y no se puede encajar (borrador guardado).

@@ -348,7 +348,8 @@
   "ejercicio": "Encogimientos de trapecio",
   "vista": "de pie, visto de frente, con una mancuerna en cada mano",
   "inicio": "brazos colgando, hombros relajados",
-  "final": "hombros subidos hacia las orejas, brazos estirados"
+  "final": "hombros subidos hacia las orejas, brazos estirados",
+  "ancla": "cabeza"
  },
  {
   "slug": "curl-de-biceps-con-barra",
@@ -362,14 +363,16 @@
   "ejercicio": "Curl inclinado",
   "vista": "sentado en un banco inclinado unos 45 grados, visto de lado, con mancuernas",
   "inicio": "brazos colgando estirados hacia el suelo",
-  "final": "mancuernas subidas hasta los hombros"
+  "final": "mancuernas subidas hasta los hombros",
+  "ancla": "encajar"
  },
  {
   "slug": "curl-en-polea",
   "ejercicio": "Curl en polea",
   "vista": "de pie frente a una polea baja con una barra corta, visto de lado",
   "inicio": "brazos estirados",
-  "final": "barra subida hasta el pecho, codos pegados"
+  "final": "barra subida hasta el pecho, codos pegados",
+  "ancla": "encajar"
  },
  {
   "slug": "curl-de-muneca",
@@ -390,21 +393,24 @@
   "ejercicio": "Sentadilla búlgara",
   "vista": "visto de lado, el pie de atrás apoyado en un banco, una mancuerna en cada mano",
   "inicio": "de pie con la pierna delantera casi estirada",
-  "final": "rodilla de atrás casi tocando el suelo, muslo delantero paralelo al suelo"
+  "final": "rodilla de atrás casi tocando el suelo, muslo delantero paralelo al suelo",
+  "ancla": "encajar"
  },
  {
   "slug": "sentadilla-en-multipower",
   "ejercicio": "Sentadilla en multipower",
   "vista": "en una máquina multipower, visto de lado",
   "inicio": "de pie con la barra guiada en la espalda",
-  "final": "abajo con los muslos paralelos al suelo"
+  "final": "abajo con los muslos paralelos al suelo",
+  "ancla": "encajar"
  },
  {
   "slug": "prensa-de-piernas",
   "ejercicio": "Prensa de piernas",
   "vista": "sentado en una prensa de piernas inclinada, visto de lado",
   "inicio": "piernas estiradas empujando la plataforma",
-  "final": "rodillas dobladas cerca del pecho"
+  "final": "rodillas dobladas cerca del pecho",
+  "ancla": "encajar"
  },
  {
   "slug": "peso-muerto",
@@ -418,21 +424,24 @@
   "ejercicio": "Zancadas",
   "vista": "con mancuernas, visto de lado",
   "inicio": "de pie con las piernas juntas",
-  "final": "un paso largo adelante con las dos rodillas a 90 grados, la de atrás casi tocando el suelo"
+  "final": "un paso largo adelante con las dos rodillas a 90 grados, la de atrás casi tocando el suelo",
+  "ancla": "pies"
  },
  {
   "slug": "hip-thrust",
   "ejercicio": "Hip thrust",
   "vista": "con la espalda alta apoyada en un banco y una barra sobre la cadera, visto de lado",
   "inicio": "cadera abajo casi tocando el suelo",
-  "final": "cadera arriba, cuerpo recto de los hombros a las rodillas"
+  "final": "cadera arriba, cuerpo recto de los hombros a las rodillas",
+  "ancla": "encajar"
  },
  {
   "slug": "puente-de-gluteo",
   "ejercicio": "Puente de glúteo",
   "vista": "tumbado boca arriba en el suelo con las rodillas dobladas, visto de lado",
   "inicio": "cadera apoyada en el suelo",
-  "final": "cadera subida, cuerpo recto de los hombros a las rodillas"
+  "final": "cadera subida, cuerpo recto de los hombros a las rodillas",
+  "ancla": "atras"
  },
  {
   "slug": "sentadilla-goblet",
@@ -446,7 +455,8 @@
   "ejercicio": "Sentadilla hack",
   "vista": "en una máquina de sentadilla hack con la espalda apoyada en el respaldo inclinado y los hombros bajo las almohadillas, visto de lado",
   "inicio": "piernas casi estiradas",
-  "final": "rodillas dobladas a 90 grados, muslos paralelos a la plataforma"
+  "final": "rodillas dobladas a 90 grados, muslos paralelos a la plataforma",
+  "ancla": "encajar"
  },
  {
   "slug": "sentadilla-a-una-pierna",
@@ -460,7 +470,8 @@
   "ejercicio": "Sentadilla sissy",
   "vista": "sin peso, visto de lado, agarrado con una mano a un poste",
   "inicio": "de pie, de puntillas, cuerpo recto",
-  "final": "rodillas muy adelantadas y dobladas, cuerpo recto de las rodillas a la cabeza e inclinado hacia atrás"
+  "final": "rodillas muy adelantadas y dobladas, cuerpo recto de las rodillas a la cabeza e inclinado hacia atrás",
+  "ancla": "encajar"
  },
  {
   "slug": "peso-muerto-con-mancuernas",
@@ -481,7 +492,8 @@
   "ejercicio": "Zancadas hacia atrás",
   "vista": "con una mancuerna en cada mano, visto de lado",
   "inicio": "de pie con las piernas juntas",
-  "final": "un paso largo hacia atrás, las dos rodillas a 90 grados, la de atrás casi tocando el suelo"
+  "final": "un paso largo hacia atrás, las dos rodillas a 90 grados, la de atrás casi tocando el suelo",
+  "ancla": "delante"
  },
  {
   "slug": "subida-al-cajon",
@@ -495,28 +507,32 @@
   "ejercicio": "Patada de glúteo en polea",
   "vista": "de pie frente a una polea baja con la tobillera en un pie, agarrado a la máquina, visto de lado",
   "inicio": "las dos piernas juntas",
-  "final": "la pierna de la tobillera estirada hacia atrás y arriba"
+  "final": "la pierna de la tobillera estirada hacia atrás y arriba",
+  "ancla": "encajar"
  },
  {
   "slug": "maquina-de-gluteo",
   "ejercicio": "Máquina de glúteo",
   "vista": "en una máquina de patada de glúteo, con los antebrazos y una rodilla apoyados, visto de lado",
   "inicio": "la pierna libre doblada debajo del cuerpo",
-  "final": "la pierna libre empujando la plataforma hacia atrás y arriba, casi estirada"
+  "final": "la pierna libre empujando la plataforma hacia atrás y arriba, casi estirada",
+  "ancla": "encajar"
  },
  {
   "slug": "extension-de-cuadriceps",
   "ejercicio": "Extensión de cuádriceps",
   "vista": "sentado en una máquina de extensión de piernas con el rodillo delante de los tobillos, visto de lado",
   "inicio": "rodillas dobladas a 90 grados",
-  "final": "piernas estiradas hacia delante"
+  "final": "piernas estiradas hacia delante",
+  "ancla": "encajar"
  },
  {
   "slug": "curl-femoral-tumbado",
   "ejercicio": "Curl femoral tumbado",
   "vista": "tumbado boca abajo en una máquina de curl femoral con el rodillo detrás de los tobillos, visto de lado",
   "inicio": "piernas estiradas",
-  "final": "rodillas dobladas, talones hacia el glúteo"
+  "final": "rodillas dobladas, talones hacia el glúteo",
+  "ancla": "encajar"
  },
  {
   "slug": "curl-nordico",
@@ -537,7 +553,8 @@
   "ejercicio": "Elevación de gemelos sentado",
   "vista": "sentado en una máquina de gemelos con la almohadilla encima de las rodillas y la punta de los pies en un escalón, visto de lado",
   "inicio": "talones bajados",
-  "final": "talones subidos, de puntillas"
+  "final": "talones subidos, de puntillas",
+  "ancla": "encajar"
  },
  {
   "slug": "elevacion-de-tibiales",
@@ -558,21 +575,24 @@
   "ejercicio": "Abductores en máquina",
   "vista": "sentado en una máquina de abductores con las almohadillas por fuera de las rodillas, visto de frente",
   "inicio": "rodillas juntas",
-  "final": "rodillas abiertas hacia fuera"
+  "final": "rodillas abiertas hacia fuera",
+  "ancla": "cabeza"
  },
  {
   "slug": "abduccion-en-polea",
   "ejercicio": "Abducción en polea",
   "vista": "de pie de lado a una polea baja con la tobillera en el pie más lejano, agarrado a la máquina, visto de frente",
   "inicio": "las dos piernas juntas, el cable cruzando por delante",
-  "final": "la pierna de la tobillera levantada hacia el lado"
+  "final": "la pierna de la tobillera levantada hacia el lado",
+  "ancla": "encajar"
  },
  {
   "slug": "aductores-en-maquina",
   "ejercicio": "Aductores en máquina",
   "vista": "sentado en una máquina de aductores con las almohadillas por dentro de las rodillas, visto de frente",
   "inicio": "piernas abiertas",
-  "final": "rodillas juntas"
+  "final": "rodillas juntas",
+  "ancla": "cabeza"
  },
  {
   "slug": "plancha-copenhague",
@@ -629,7 +649,8 @@
   "ejercicio": "Remo con mancuerna",
   "vista": "con una rodilla y una mano apoyadas en un banco plano, visto de lado",
   "inicio": "el brazo libre estirado hacia el suelo con la mancuerna",
-  "final": "la mancuerna subida hasta la cadera, codo hacia atrás"
+  "final": "la mancuerna subida hasta la cadera, codo hacia atrás",
+  "ancla": "encajar"
  },
  {
   "slug": "pajaros-en-maquina",
@@ -643,21 +664,24 @@
   "ejercicio": "Curl de bíceps con mancuernas",
   "vista": "de pie, visto de frente",
   "inicio": "brazos estirados a los lados con una mancuerna en cada mano, palmas hacia delante",
-  "final": "las dos mancuernas subidas hasta los hombros, codos pegados"
+  "final": "las dos mancuernas subidas hasta los hombros, codos pegados",
+  "ancla": "cabeza"
  },
  {
   "slug": "curl-concentrado",
   "ejercicio": "Curl concentrado",
   "vista": "sentado en un banco con el codo apoyado en la cara interna del muslo, visto de frente",
   "inicio": "brazo estirado hacia el suelo con una mancuerna",
-  "final": "mancuerna subida hasta el hombro"
+  "final": "mancuerna subida hasta el hombro",
+  "ancla": "encajar"
  },
  {
   "slug": "curl-predicador",
   "ejercicio": "Curl predicador",
   "vista": "sentado en un banco Scott con los brazos apoyados en el atril inclinado, con una barra Z, visto de lado",
   "inicio": "brazos casi estirados",
-  "final": "barra subida hasta los hombros"
+  "final": "barra subida hasta los hombros",
+  "ancla": "encajar"
  },
  {
   "slug": "curl-de-biceps-en-maquina",
@@ -698,14 +722,16 @@
   "ejercicio": "Cruces en polea",
   "vista": "de pie entre dos poleas altas, un pie adelantado, visto de frente",
   "inicio": "brazos abiertos en cruz agarrando las asas, un poco por encima de los hombros",
-  "final": "manos juntas por delante de la cadera, brazos casi estirados"
+  "final": "manos juntas por delante de la cadera, brazos casi estirados",
+  "ancla": "cabeza"
  },
  {
   "slug": "fondos-en-banco",
   "ejercicio": "Fondos en banco",
   "vista": "con las manos apoyadas detrás en el borde de un banco y los talones en el suelo, piernas estiradas, visto de lado",
   "inicio": "brazos estirados",
-  "final": "codos doblados a 90 grados, cadera bajada"
+  "final": "codos doblados a 90 grados, cadera bajada",
+  "ancla": "delante"
  },
  {
   "slug": "fondos-en-paralelas-negativos",
@@ -733,7 +759,8 @@
   "ejercicio": "Patada de tríceps",
   "vista": "con una mancuerna, rodilla y mano libre apoyadas en un banco, visto de lado",
   "inicio": "brazo pegado al cuerpo, codo doblado a 90 grados",
-  "final": "brazo estirado hacia atrás"
+  "final": "brazo estirado hacia atrás",
+  "ancla": "encajar"
  },
  {
   "slug": "flexiones-con-lastre",
@@ -763,7 +790,8 @@
   "ejercicio": "Crunch abdominal",
   "vista": "tumbado boca arriba en el suelo con las rodillas dobladas y las manos junto a las sienes, visto de lado",
   "inicio": "espalda apoyada en el suelo",
-  "final": "hombros y parte alta de la espalda levantados, mirando a las rodillas"
+  "final": "hombros y parte alta de la espalda levantados, mirando a las rodillas",
+  "ancla": "delante"
  },
  {
   "slug": "crunch-en-polea",
@@ -777,7 +805,8 @@
   "ejercicio": "Crunch inverso",
   "vista": "tumbado boca arriba en el suelo con las manos a los lados, visto de lado",
   "inicio": "rodillas dobladas a 90 grados encima de la cadera",
-  "final": "cadera levantada del suelo, rodillas hacia el pecho"
+  "final": "cadera levantada del suelo, rodillas hacia el pecho",
+  "ancla": "atras"
  },
  {
   "slug": "plancha",
@@ -802,21 +831,24 @@
   "ejercicio": "Bicho muerto",
   "vista": "tumbado boca arriba en el suelo, visto de lado",
   "inicio": "brazos estirados hacia el techo y rodillas dobladas a 90 grados encima de la cadera",
-  "final": "un brazo estirado hacia atrás por encima de la cabeza y la pierna contraria estirada cerca del suelo"
+  "final": "un brazo estirado hacia atrás por encima de la cabeza y la pierna contraria estirada cerca del suelo",
+  "ancla": "encajar"
  },
  {
   "slug": "pajaro-perro",
   "ejercicio": "Pájaro-perro",
   "vista": "a cuatro patas en el suelo, visto de lado",
   "inicio": "manos bajo los hombros y rodillas bajo la cadera, espalda recta",
-  "final": "un brazo estirado hacia delante y la pierna contraria estirada hacia atrás, en línea con la espalda"
+  "final": "un brazo estirado hacia delante y la pierna contraria estirada hacia atrás, en línea con la espalda",
+  "ancla": "encajar"
  },
  {
   "slug": "superman",
   "ejercicio": "Superman",
   "vista": "tumbado boca abajo en el suelo, visto de lado",
   "inicio": "brazos estirados por delante, todo el cuerpo apoyado",
-  "final": "brazos, pecho y piernas levantados del suelo a la vez"
+  "final": "brazos, pecho y piernas levantados del suelo a la vez",
+  "ancla": "encajar"
  },
  {
   "slug": "lenador-en-polea",

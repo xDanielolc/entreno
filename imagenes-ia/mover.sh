@@ -20,3 +20,5 @@ if [ -z "$f" ]; then echo "NO HAY DESCARGA"; exit 1; fi
 sleep 1
 ext="${f##*.}"
 mv "$f" "$origen/$1.$ext" && echo "guardada $origen/$1.$ext"
+# Si se pulsó dos veces, la otra copia sobra.
+[ "$origen" = "gemini" ] && rm -f /c/Users/megad/Downloads/Gemini_Generated_Image_*

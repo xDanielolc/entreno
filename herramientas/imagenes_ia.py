@@ -80,6 +80,9 @@ def ancla(im, modo):
         # De frente y con los pies en el suelo: la cabeza marca el centro y los pies, el suelo.
         franja = tinta.crop((x0, y0, x1, y0 + max(8, (y1 - y0) // 16))).getbbox()
         return x0 + ((franja[0] + franja[2]) / 2 if franja else (x1 - x0) / 2), y1
+    if modo == "delante":
+        # Lo de delante (los pies o la mano, a la derecha) se queda quieto.
+        return x1, y1
     if modo == "atras":
         # Lo de atrás (los pies o las rodillas, a la izquierda) se queda quieto: el borde izquierdo y el de abajo.
         return x0, y1
