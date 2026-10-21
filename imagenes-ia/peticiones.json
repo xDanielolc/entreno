@@ -642,7 +642,8 @@
   "ejercicio": "Pullover en polea",
   "vista": "de pie frente a una polea alta con una barra recta, tronco algo inclinado, visto de lado",
   "inicio": "brazos estirados arriba por delante, a la altura de la cabeza",
-  "final": "brazos estirados bajados hasta los muslos"
+  "final": "brazos estirados bajados hasta los muslos",
+  "ancla": "encajar"
  },
  {
   "slug": "remo-con-mancuerna",
@@ -657,7 +658,8 @@
   "ejercicio": "Pájaros en máquina",
   "vista": "sentado de cara al respaldo en una máquina contractora, visto de frente desde detrás",
   "inicio": "brazos estirados por delante agarrando las asas",
-  "final": "brazos abiertos hacia atrás en cruz"
+  "final": "brazos abiertos hacia atrás en cruz",
+  "ancla": "encajar"
  },
  {
   "slug": "curl-de-biceps-con-mancuernas",
@@ -688,7 +690,9 @@
   "ejercicio": "Curl de bíceps en máquina",
   "vista": "sentado en una máquina de curl con los brazos en el apoyo, visto de lado",
   "inicio": "brazos estirados agarrando las asas",
-  "final": "codos doblados, asas subidas hasta los hombros"
+  "final": "codos doblados, asas subidas hasta los hombros",
+  "espejo": true,
+  "ancla": "encajar"
  },
  {
   "slug": "curl-invertido",
@@ -752,7 +756,8 @@
   "ejercicio": "Extensión de tríceps en máquina",
   "vista": "sentado en una máquina de tríceps con los codos en el apoyo, visto de lado",
   "inicio": "codos doblados, manos junto a los hombros",
-  "final": "brazos estirados empujando las asas hacia abajo"
+  "final": "brazos estirados empujando las asas hacia abajo",
+  "ancla": "encajar"
  },
  {
   "slug": "patada-de-triceps",
@@ -798,7 +803,8 @@
   "ejercicio": "Crunch en polea",
   "vista": "de rodillas frente a una polea alta con una cuerda junto a la cabeza, visto de lado",
   "inicio": "tronco erguido",
-  "final": "tronco enroscado hacia abajo, codos hacia los muslos"
+  "final": "tronco enroscado hacia abajo, codos hacia los muslos",
+  "ancla": "atras"
  },
  {
   "slug": "crunch-inverso",
@@ -884,7 +890,8 @@
   "ejercicio": "Elevación de piernas en el suelo",
   "vista": "tumbado boca arriba en el suelo con las manos a los lados, visto de lado",
   "inicio": "piernas estiradas casi tocando el suelo",
-  "final": "piernas estiradas subidas en vertical"
+  "final": "piernas estiradas subidas en vertical",
+  "ancla": "atras"
  },
  {
   "slug": "elevaciones-de-rodillas-en-paralelas",
@@ -981,7 +988,8 @@
   "ejercicio": "Carrera",
   "vista": "corriendo, visto de lado",
   "inicio": "zancada con la pierna derecha adelantada y el brazo izquierdo delante",
-  "final": "zancada con la pierna izquierda adelantada y el brazo derecho delante"
+  "final": "zancada con la pierna izquierda adelantada y el brazo derecho delante",
+  "solo": true
  },
  {
   "slug": "bicicleta",
@@ -1041,7 +1049,8 @@
   "vista": "en una bicicleta estática vertical, visto de lado",
   "inicio": "pedaleando con el pedal más cercano arriba",
   "final": "pedaleando con el pedal más cercano abajo",
-  "ancla": "encajar"
+  "ancla": "encajar",
+  "solo": true
  },
  {
   "slug": "spinning",
@@ -1087,7 +1096,8 @@
   "ejercicio": "Baile",
   "vista": "bailando, visto de frente",
   "inicio": "un brazo arriba y la cadera hacia un lado",
-  "final": "el otro brazo arriba y la cadera hacia el otro lado"
+  "final": "el otro brazo arriba y la cadera hacia el otro lado",
+  "ancla": "pies-sin-suelo"
  },
  {
   "slug": "sprints",
@@ -1108,7 +1118,8 @@
   "ejercicio": "Battle ropes",
   "vista": "con dos cuerdas gruesas ancladas, semiagachado, visto de lado",
   "inicio": "los dos brazos arriba con las cuerdas",
-  "final": "los dos brazos abajo haciendo una onda en las cuerdas"
+  "final": "los dos brazos abajo haciendo una onda en las cuerdas",
+  "ancla": "atras"
  },
  {
   "slug": "air-squat",
@@ -1123,21 +1134,23 @@
   "vista": "en posición de flexión, visto de lado, cabeza a la derecha",
   "inicio": "la rodilla derecha llevada hacia el pecho",
   "final": "la rodilla izquierda llevada hacia el pecho",
-  "ancla": "atras"
+  "ancla": "delante"
  },
  {
   "slug": "kettlebell-swing",
   "ejercicio": "Kettlebell swing",
   "vista": "con una kettlebell agarrada con las dos manos, visto de lado",
   "inicio": "cadera atrás, la kettlebell entre las piernas",
-  "final": "de pie y erguido con los brazos estirados y la kettlebell a la altura del pecho"
+  "final": "de pie y erguido con los brazos estirados y la kettlebell a la altura del pecho",
+  "ancla": "pies-sin-suelo"
  },
  {
   "slug": "saltos-al-cajon",
   "ejercicio": "Saltos al cajón",
   "vista": "delante de un cajón alto, visto de lado",
   "inicio": "agachado con los brazos atrás, a punto de saltar",
-  "final": "de pie encima del cajón con las rodillas un poco dobladas"
+  "final": "de pie encima del cajón con las rodillas un poco dobladas",
+  "ancla": "encajar"
  },
  {
   "slug": "estiramiento",

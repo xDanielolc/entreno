@@ -1090,3 +1090,11 @@ fase), tras probar la A.
 - Estilo: «Volver» de la banda verde como píldora, títulos de tarjeta
   centrados en toda la app, chips centrados, el cuestionario de bienvenida
   no vuelve a salir si lo cierras (localStorage `entreno-cuestionario-cerrado`).
+- 0.60.4 (21-10-2026, mañana): +45 dibujos (cardio, gimnasio y estiramientos):
+  186 ejercicios con dibujo propio. Gemini no sabe alternar piernas (correr,
+  andar, pedalear: saca dos figuras iguales), así que esos van con una sola
+  figura quieta (`quieto-`) o con `"solo": true` en peticiones.json (usa solo
+  la primera figura). `"espejo"` solo si la IA dibujó la segunda mirando al
+  otro lado (comprobarlo en el original, no en la captura). Ancla nueva
+  `pies-sin-suelo` (los pies sin la línea del suelo, que la IA dibuja de
+  distinto largo). Almacén `entreno-imagenes-14`.

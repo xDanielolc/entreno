@@ -87,6 +87,14 @@ def ancla(im, modo):
         # Lo de atrás (los pies o las rodillas, a la izquierda) se queda quieto: el borde izquierdo y el de abajo.
         return x0, y1
     alto = max(8, (y1 - y0) // 16)
+    if modo == "pies-sin-suelo":
+        # Como «pies», pero saltando la línea del suelo (la IA la dibuja de distinto largo en cada figura).
+        y = y1
+        while y > y0 and sum(1 for v in tinta.crop((x0, y - 1, x1, y)).get_flattened_data() if v) > (x1 - x0) // 3:
+            y -= 1
+        y -= 3
+        franja = tinta.crop((x0, y - alto, x1, y)).getbbox() or (0, 0, x1 - x0, 1)
+        return x0 + (franja[0] + franja[2]) / 2, y1
     franja = tinta.crop((x0, y1 - alto, x1, y1) if modo == "pies" else (x0, y0, x1, y0 + alto))
     fb = franja.getbbox() or (0, 0, x1 - x0, 1)
     return x0 + (fb[0] + fb[2]) / 2, (y1 if modo == "pies" else y0)
@@ -144,7 +152,7 @@ def quieta(im, salida, tope=600):
     lienzo.save(salida, "WEBP", quality=82, method=6)
 
 
-def procesar(origen, modo="pies"):
+def procesar(origen, modo="pies", espejo=False, solo=False):
     nombre = origen.stem.split("-", 1)[1]
     # ChatGPT deja el fondo gris muy claro: lo casi blanco pasa a blanco puro.
     im = Image.open(origen).convert("RGB").point(lambda v: 255 if v > 232 else v)
@@ -152,6 +160,13 @@ def procesar(origen, modo="pies"):
     fija = SALIDA / f"{nombre}-quieta.webp"
     if origen.stem.startswith("fases-"):
         inicio, final = (recortar(x, 0) for x in partir(im))
+        if solo:
+            # Las dos figuras salieron casi iguales (pasa al alternar piernas): basta la primera, quieta.
+            quieta(inicio, fija)
+            return nombre, False
+        if espejo:
+            # La IA dibujó la segunda figura mirando al otro lado: se le da la vuelta.
+            final = final.transpose(Image.FLIP_LEFT_RIGHT)
         animar([inicio, final], SALIDA / f"{nombre}.webp", modo)
         quieta(inicio, fija)
         return nombre, True
@@ -163,7 +178,7 @@ def leer_tabla():
     """De peticiones.json: nombre del dibujo → {"ejercicios": [...], "ancla": ...}."""
     if not PETICIONES.exists():
         return {}
-    return {p["slug"]: {"ejercicios": [p["ejercicio"], *p.get("tambien", [])], "ancla": p.get("ancla", "pies")}
+    return {p["slug"]: {"ejercicios": [p["ejercicio"], *p.get("tambien", [])], "ancla": p.get("ancla", "pies"), "espejo": p.get("espejo", False), "solo": p.get("solo", False)}
             for p in json.loads(PETICIONES.read_text(encoding="utf8"))}
 
 
@@ -209,7 +224,8 @@ def main():
                 continue
             entrada = tabla.get(nombre)
             modo = entrada.get("ancla", "pies") if isinstance(entrada, dict) else "pies"
-            _, animada = procesar(origen, modo)
+            opciones = entrada if isinstance(entrada, dict) else {}
+            _, animada = procesar(origen, modo, bool(opciones.get("espejo")), bool(opciones.get("solo")))
             hechos.append((nombre, animada, carpeta.name))
             print(("animada " if animada else "quieta  ") + nombre)
     apuntar(hechos)

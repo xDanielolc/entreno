@@ -11,3 +11,8 @@
 - giros-rusos: sale con texto (INICIO/FINAL) y la figura reflejada; no se usa.
 - posicion-hueca: sale una V (como la barca), no la posición hueca; no se usa.
 - sentadilla-a-una-pierna: el pie de apoyo cambia de sitio entre las dos fases y no se puede encajar (borrador guardado).
+- press-pallof: estira los brazos hacia el lado y no hacia delante; no se usa.
+- rodillas-al-pecho: Gemini sube la misma pierna en las dos figuras (no se ve la alternancia).
+- escaleras: Gemini lo dibujó con camiseta y zapatillas.
+- estiramiento-de-lumbares-con-rodillas-al-pecho: una pierna estirada y la otra doblada de forma imposible.
+- curl-invertido: se usa, pero Gemini pintó el pantalón relleno de negro; repetir cuando haya cupo.
