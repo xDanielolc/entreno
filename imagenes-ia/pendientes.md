@@ -42,5 +42,9 @@ Pendiente de la revisión:
 - Dominadas negativas: usar la dominada buena con la animación invertida.
 - Zancadas hacia atrás: puede usar la animación de las zancadas.
 - Extensión de tríceps sobre la cabeza: con los dos brazos y de frente.
-- yoga-angulo-ligado-tumbado: sale en relajación (piernas estiradas), no con las plantas juntas.
-- yoga-medio-senor-de-los-peces: se perdió la descarga; repetir.
+- yoga-chaturanga: sale en plancha alta con los brazos estirados, no con los codos a 90 grados. Segundo intento (codos a 90 grados en mayúsculas): sigue casi estirado.
+- yoga-rueda: sale boca abajo con la espalda arqueada, no boca arriba.
+- yoga-oreja-a-la-rodilla: sale un puente, no las piernas por encima de la cabeza.
+- yoga-sobre-los-hombros-sin-brazos: sale con las manos en la espalda (igual que la vela normal).
+- yoga-grulla-lateral: sale de pie, sin la postura.
+- yoga-tortuga-tumbada: sale sentado y encogido abrazando las rodillas, sin las piernas detrás de la nuca.

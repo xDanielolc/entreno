@@ -243,7 +243,8 @@ def main():
     filtro = sys.argv[1] if len(sys.argv) > 1 else None
     tabla = leer_tabla()
     hechos = []
-    for carpeta in sorted(p for p in ORIGENES.iterdir() if p.is_dir()):
+    # «descartes» guarda los que salieron mal: no se usan.
+    for carpeta in sorted(p for p in ORIGENES.iterdir() if p.is_dir() and p.name != "descartes"):
         for origen in sorted(carpeta.glob("*.jpg")) + sorted(carpeta.glob("*.png")):
             if not origen.stem.startswith(("fases-", "quieto-")):
                 continue

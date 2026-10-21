@@ -1259,9 +1259,11 @@
    "autor": "Gemini"
   },
   "Medio señor de los peces (Ardha Matsyendrasana)": {
-   "archivo": "imagenes/munecos/medio-senor-de-los-peces-ardha-matsyendrasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-medio-senor-de-los-peces-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-medio-senor-de-los-peces-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Ángulo ligado (Baddha Konasana)": {
    "archivo": "imagenes/ejercicios/ia/yoga-angulo-ligado-quieta.webp",
@@ -1271,39 +1273,53 @@
    "autor": "Gemini"
   },
   "Ángulo ligado tumbado (Supta Baddha Konasana)": {
-   "archivo": "imagenes/munecos/angulo-ligado-tumbado-supta-baddha-konasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-angulo-ligado-tumbado-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-angulo-ligado-tumbado-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Bastón (Dandasana)": {
-   "archivo": "imagenes/munecos/baston-dandasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-baston-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-baston-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Cara de vaca (Gomukhasana)": {
-   "archivo": "imagenes/munecos/cara-de-vaca-gomukhasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-cara-de-vaca-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-cara-de-vaca-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Mono (Hanumanasana)": {
-   "archivo": "imagenes/munecos/mono-hanumanasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-mono-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-mono-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Cabeza a la rodilla (Janu Sirsasana)": {
-   "archivo": "imagenes/munecos/cabeza-a-la-rodilla-janu-sirsasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-cabeza-a-la-rodilla-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-cabeza-a-la-rodilla-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Cabeza a la rodilla girada (Parivritta Janu Sirsasana)": {
-   "archivo": "imagenes/munecos/cabeza-a-la-rodilla-girada-parivritta-janu-sirsasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-cabeza-a-la-rodilla-girada-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-cabeza-a-la-rodilla-girada-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Tortuga (Kurmasana)": {
-   "archivo": "imagenes/munecos/tortuga-kurmasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-tortuga-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-tortuga-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Tortuga tumbada (Supta Kurmasana)": {
    "archivo": "imagenes/munecos/tortuga-tumbada-supta-kurmasana.svg",
@@ -1311,59 +1327,81 @@
    "fuente": "propia"
   },
   "Gran sello (Mahamudra)": {
-   "archivo": "imagenes/munecos/gran-sello-mahamudra.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-gran-sello-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-gran-sello-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Barca (Navasana)": {
-   "archivo": "imagenes/munecos/barca-navasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-barca-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-barca-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Estiramiento del oeste (Paschimottanasana)": {
-   "archivo": "imagenes/munecos/estiramiento-del-oeste-paschimottanasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-estiramiento-del-oeste-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-estiramiento-del-oeste-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Sentada en ángulo amplio (Upavistha Konasana)": {
-   "archivo": "imagenes/munecos/sentada-en-angulo-amplio-upavistha-konasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-sentada-en-angulo-amplio-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-sentada-en-angulo-amplio-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Paloma real con una pierna (Eka Pada Rajakapotasana)": {
-   "archivo": "imagenes/munecos/paloma-real-con-una-pierna-eka-pada-rajakapotasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-paloma-real-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-paloma-real-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Camello (Ustrasana)": {
-   "archivo": "imagenes/munecos/camello-ustrasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-camello-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-camello-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Niño o embrión (Balasana)": {
-   "archivo": "imagenes/munecos/nino-o-embrion-balasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-nino-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-nino-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "León (Simhasana)": {
-   "archivo": "imagenes/munecos/leon-simhasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-leon-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-leon-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Pasador de puerta (Parighasana)": {
-   "archivo": "imagenes/munecos/pasador-de-puerta-parighasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-pasador-de-puerta-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-pasador-de-puerta-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Héroe tendido (Supta Virasana)": {
-   "archivo": "imagenes/munecos/heroe-tendido-supta-virasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-heroe-tendido-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-heroe-tendido-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Banco sobre dos apoyos (Dwi Pada Pitham)": {
-   "archivo": "imagenes/munecos/banco-sobre-dos-apoyos-dwi-pada-pitham.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-banco-sobre-dos-apoyos-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-banco-sobre-dos-apoyos-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Oreja a la rodilla (Karnapidasana)": {
    "archivo": "imagenes/munecos/oreja-a-la-rodilla-karnapidasana.svg",
@@ -1371,44 +1409,60 @@
    "fuente": "propia"
   },
   "Vishnu en el diván (Anantasana)": {
-   "archivo": "imagenes/munecos/vishnu-en-el-divan-anantasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-vishnu-en-el-divan-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-vishnu-en-el-divan-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Apana (Apanasana)": {
-   "archivo": "imagenes/munecos/apana-apanasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-apana-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-apana-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Arado (Halasana)": {
-   "archivo": "imagenes/munecos/arado-halasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-arado-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-arado-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Cadáver (Savasana)": {
-   "archivo": "imagenes/munecos/cadaver-savasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-cadaver-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-cadaver-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Pez (Matsyasana)": {
-   "archivo": "imagenes/munecos/pez-matsyasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-pez-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-pez-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Puente (Setu Bandhasana)": {
-   "archivo": "imagenes/munecos/puente-setu-bandhasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-puente-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-puente-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Piernas en la pared (Viparita Karani)": {
-   "archivo": "imagenes/munecos/piernas-en-la-pared-viparita-karani.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-piernas-en-la-pared-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-piernas-en-la-pared-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Sobre los hombros con apoyo (Salamba Sarvangasana)": {
-   "archivo": "imagenes/munecos/sobre-los-hombros-con-apoyo-salamba-sarvangasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-sobre-los-hombros-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-sobre-los-hombros-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Sobre los hombros sin apoyo de brazos (Niralamba Sarvangasana)": {
    "archivo": "imagenes/munecos/sobre-los-hombros-sin-apoyo-de-brazos-niralamba-sarvangasana.svg",
@@ -1416,39 +1470,53 @@
    "fuente": "propia"
   },
   "Torsión abdominal (Jathara Parivritti)": {
-   "archivo": "imagenes/munecos/torsion-abdominal-jathara-parivritti.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-torsion-abdominal-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-torsion-abdominal-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Langosta completa (Viparita Salabhasana)": {
-   "archivo": "imagenes/munecos/langosta-completa-viparita-salabhasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-langosta-completa-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-langosta-completa-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Cobra (Bhujangasana)": {
-   "archivo": "imagenes/munecos/cobra-bhujangasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-cobra-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-cobra-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Langosta (Salabhasana)": {
-   "archivo": "imagenes/munecos/langosta-salabhasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-langosta-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-langosta-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Arco (Dhanurasana)": {
-   "archivo": "imagenes/munecos/arco-dhanurasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-arco-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-arco-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Banco sobre cuatro apoyos (Catush Pada Pitham)": {
-   "archivo": "imagenes/munecos/banco-sobre-cuatro-apoyos-catush-pada-pitham.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-banco-sobre-cuatro-apoyos-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-banco-sobre-cuatro-apoyos-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Grulla (Bakasana)": {
-   "archivo": "imagenes/munecos/grulla-bakasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-grulla-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-grulla-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Grulla lateral (Parsva Bakasana)": {
    "archivo": "imagenes/munecos/grulla-lateral-parsva-bakasana.svg",
@@ -1456,24 +1524,32 @@
    "fuente": "propia"
   },
   "Plancha hacia arriba (Purvottanasana)": {
-   "archivo": "imagenes/munecos/plancha-hacia-arriba-purvottanasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-plancha-hacia-arriba-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-plancha-hacia-arriba-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Plancha lateral del sabio (Vasisthasana)": {
-   "archivo": "imagenes/munecos/plancha-lateral-del-sabio-vasisthasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-plancha-lateral-del-sabio-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-plancha-lateral-del-sabio-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Ángulo en ocho (Astavakrasana)": {
-   "archivo": "imagenes/munecos/angulo-en-ocho-astavakrasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-angulo-en-ocho-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-angulo-en-ocho-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Árbol boca abajo (Adho Mukha Vrksasana)": {
-   "archivo": "imagenes/munecos/arbol-boca-abajo-adho-mukha-vrksasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-arbol-boca-abajo-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-arbol-boca-abajo-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Rueda o arco hacia arriba (Urdhva Dhanurasana)": {
    "archivo": "imagenes/munecos/rueda-o-arco-hacia-arriba-urdhva-dhanurasana.svg",
@@ -1486,34 +1562,46 @@
    "fuente": "propia"
   },
   "Escorpión (Vrschikasana)": {
-   "archivo": "imagenes/munecos/escorpion-vrschikasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-escorpion-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-escorpion-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Pavo real con la cola desplegada (Pincha Mayurasana)": {
-   "archivo": "imagenes/munecos/pavo-real-con-la-cola-desplegada-pincha-mayurasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-pavo-real-cola-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-pavo-real-cola-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Pavo real (Mayurasana)": {
-   "archivo": "imagenes/munecos/pavo-real-mayurasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-pavo-real-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-pavo-real-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Perro boca abajo (Adho Mukha Svanasana)": {
-   "archivo": "imagenes/munecos/perro-boca-abajo-adho-mukha-svanasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-perro-boca-abajo-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-perro-boca-abajo-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Perro boca arriba (Urdhva Mukha Svanasana)": {
-   "archivo": "imagenes/munecos/perro-boca-arriba-urdhva-mukha-svanasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-perro-boca-arriba-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-perro-boca-arriba-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Sobre la cabeza con apoyo (Salamba Sirsasana)": {
-   "archivo": "imagenes/munecos/sobre-la-cabeza-con-apoyo-salamba-sirsasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-sobre-la-cabeza-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-sobre-la-cabeza-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Rueda abdominal": {
    "archivo": "imagenes/ejercicios/ia/rueda-abdominal.webp",

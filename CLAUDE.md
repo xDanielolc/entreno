@@ -1108,3 +1108,9 @@ fase), tras probar la A.
   portapapeles (Dan no copia nada mientras) y la descarga con un `<a download>` sobre el blob de la
   imagen de la respuesta (`model-response img`), al momento. Almacén `entreno-imagenes-16` (0.60.6: más yoga).
 
+- 0.60.7 (21-10-2026, noche): últimas posturas de yoga (escorpión, pavo real con la cola,
+  paloma real…). La descarga de Gemini dejó de funcionar: ahora se pulsa «Copiar imagen» y se
+  guarda el portapapeles (scratchpad `copiada.sh`), restaurando la referencia antes de cada
+  petición y comprobando que el adjunto está antes de escribir. Los dibujos malos van a
+  `imagenes-ia/descartes/` (fuera de Git) y se anotan en `imagenes-ia/pendientes.md`.
+  Almacén `entreno-imagenes-17`.
