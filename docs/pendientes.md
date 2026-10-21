@@ -318,3 +318,11 @@ Pasado a `pendientes-design.md`. Se deja aquí lo que ya había, como historia.
       segundo «paf». Falta saber su licencia antes de subirla al repositorio.
 - [ ] Empezar por el día de la rutina que uno quiera: ya existe «Otro día de
       la rutina» en Hoy; comprobar que Dan lo encuentra.
+
+## Del repaso de dibujos (21-10-2026)
+
+- Nombres de ejercicio con el material: «Elevaciones laterales con mancuernas», «Elevaciones
+  frontales con mancuerna»… Dan lo pidió para todos («lo tendrás que comprobar con todo»). Cambiar
+  el nombre necesita migración (los entrenamientos guardan el ejercicio) y alias en creditos.json.
+- Plancha: la estática debe decir que es estática; la dinámica y la de arrastre de kettlebell,
+  con su propia animación.

@@ -31,6 +31,7 @@ RAIZ = pathlib.Path(__file__).resolve().parent.parent
 ORIGENES = RAIZ / "imagenes-ia"
 SALIDA = RAIZ / "web" / "imagenes" / "ejercicios" / "ia"
 CREDITOS = RAIZ / "web" / "imagenes" / "creditos.json"
+ANTES = ORIGENES / "creditos-antes.json"   # creditos.json de antes de los dibujos con IA (la 0.59)
 PETICIONES = ORIGENES / "peticiones.json"   # cada dibujo: su ejercicio, cómo se pidió y su ancla
 
 
@@ -47,6 +48,14 @@ def partir(im):
                 mejor, mejor_tramo = x - inicio, (inicio, x)
         else:
             inicio = None
+    if not mejor_tramo:
+        # A veces la IA pone una figura encima de la otra: entonces se corta por la fila en blanco.
+        filas = [sum(1 for x in range(0, ancho, 2) if tinta.getpixel((x, y))) for y in range(alto)]
+        tramo = max(((y0, y1) for y0 in range(int(alto * 0.25), int(alto * 0.75)) if filas[y0] == 0
+                     for y1 in [next((y for y in range(y0, alto) if filas[y]), alto)]), key=lambda t: t[1] - t[0], default=None)
+        if tramo:
+            corte = (tramo[0] + tramo[1]) // 2
+            return im.crop((0, 0, ancho, corte)), im.crop((0, corte, ancho, alto))
     corte = (mejor_tramo[0] + mejor_tramo[1]) // 2 if mejor_tramo else ancho // 2
     return im.crop((0, 0, corte, alto)), im.crop((corte, 0, ancho, alto))
 
@@ -178,7 +187,7 @@ def leer_tabla():
     """De peticiones.json: nombre del dibujo → {"ejercicios": [...], "ancla": ...}."""
     if not PETICIONES.exists():
         return {}
-    return {p["slug"]: {"ejercicios": [p["ejercicio"], *p.get("tambien", [])], "ancla": p.get("ancla", "pies"), "espejo": p.get("espejo", False), "solo": p.get("solo", False)}
+    return {p["slug"]: {"ejercicios": [p["ejercicio"], *p.get("tambien", [])], "ancla": p.get("ancla", "pies"), "espejo": p.get("espejo", False), "solo": p.get("solo", False), "usar": p.get("usar")}
             for p in json.loads(PETICIONES.read_text(encoding="utf8"))}
 
 
@@ -189,13 +198,32 @@ def ejercicios_de(entrada):
     return entrada if isinstance(entrada, list) else entrada.get("ejercicios", [])
 
 
+def hecho_por_persona(datos):
+    """Dibujos de Everkinetic o wger (no los muñecos generados por código)."""
+    return bool(datos) and "munecos/" not in datos.get("archivo", "") and datos.get("fuente") != "ia"
+
+
 def apuntar(hechos):
     """Pone la imagen nueva en los ejercicios que la usan (y en sus alias)."""
     tabla = leer_tabla()
     creditos = json.loads(CREDITOS.read_text(encoding="utf8"))
     ejercicios = creditos["ejercicios"]
+    antes = json.loads(ANTES.read_text(encoding="utf8"))["ejercicios"] if ANTES.exists() else {}
     for nombre, animada, origen in hechos:
-        for ej in ejercicios_de(tabla.get(nombre)):
+        entrada = tabla.get(nombre) or {}
+        for ej in ejercicios_de(entrada):
+            previo = antes.get(ej)
+            # Regla de Dan (21-10-2026): si ya había un dibujo hecho por una persona (Everkinetic, wger),
+            # se queda ese salvo que en la comparativa elija el de la IA ("usar": "ia"). "usar": "antes"
+            # fuerza el de antes también cuando era un muñeco.
+            usar = entrada.get("usar") if isinstance(entrada, dict) else None
+            if usar is None:
+                usar = "antes" if hecho_por_persona(previo) else "ia"
+            if usar == "antes" and previo:
+                for clave in [ej] + [k for k, o in ejercicios.items() if o.get("aliasDe") == ej]:
+                    if clave in antes:
+                        ejercicios[clave] = antes[clave]
+                continue
             datos = {
                 "archivo": f"imagenes/ejercicios/ia/{nombre}.webp" if animada else f"imagenes/ejercicios/ia/{nombre}-quieta.webp",
                 "estatica": f"imagenes/ejercicios/ia/{nombre}-quieta.webp",

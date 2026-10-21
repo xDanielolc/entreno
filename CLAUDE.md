@@ -1098,3 +1098,13 @@ fase), tras probar la A.
   otro lado (comprobarlo en el original, no en la captura). Ancla nueva
   `pies-sin-suelo` (los pies sin la línea del suelo, que la IA dibuja de
   distinto largo). Almacén `entreno-imagenes-14`.
+- 0.60.5 (21-10-2026, tarde, tras su revisión): **manda el dibujo hecho por una persona**.
+  Si el ejercicio tenía dibujo de Everkinetic o wger, la app lo usa (`hecho_por_persona` y
+  `imagenes-ia/creditos-antes.json`, el creditos de la 0.59); el de IA solo donde había muñeco y le
+  valía, o con `"usar": "ia"` en peticiones.json tras la comparativa
+  (https://claude.ai/artifact/KjxMo32vHkVN25pGW69Vdi). Revisión de la primera tanda:
+  https://claude.ai/artifact/7vCe7PkKhYgXQEWjZeRkgf. Errores típicos de la IA en `peticion_ia.py`
+  y en `imagenes-ia/pendientes.md`. Gemini se maneja sin ver la pantalla: la referencia por el
+  portapapeles (Dan no copia nada mientras) y la descarga con un `<a download>` sobre el blob de la
+  imagen de la respuesta (`model-response img`), al momento. Almacén `entreno-imagenes-15`.
+
