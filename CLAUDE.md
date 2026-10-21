@@ -1057,3 +1057,31 @@ fase), tras probar la A.
 - 0.59.2: la caja ya no bota («la caja es dura»): toca con una esquina
   (2,14 s, golpe) y cae a plano sobre la otra (2,43 s, «paf»); solo esos dos
   sonidos, de 0,15 s cada uno.
+
+## Ronda 0.60 (21-10-2026, de noche, sin Dan): dibujos hechos con IA
+
+- Los pictogramas de Design no le valieron («un mierdón»). Los dibujos los
+  hacen Gemini y ChatGPT con sus cuentas abiertas en su Chrome: estilo de
+  línea tipo Everkinetic, el mismo hombre calvo con cara de maniquí, pantalón
+  corto y descalzo, y el inicio y el final del movimiento en UNA imagen
+  apaisada. Referencia de estilo: `imagenes-ia/gemini/prueba1-elevaciones-laterales.jpg`.
+- Peticiones en `imagenes-ia/peticiones.json` (`herramientas/peticion_ia.py
+  <slug>` da el texto; `anadir_peticiones.py` junta listas como
+  `nuevas-a.json`, `nuevas-b.json`). Originales en `imagenes-ia/gemini/` y
+  `imagenes-ia/chatgpt/` (fuera de Git, pesan mucho): `fases-<slug>` o
+  `quieto-<slug>`. `imagenes-ia/mover.sh <nombre> [chatgpt]` mueve la última
+  descarga. Lo que salió mal, en `imagenes-ia/pendientes.md`.
+- `herramientas/imagenes_ia.py`: parte por el hueco blanco, blanquea el gris
+  del fondo de ChatGPT, encaja las dos posturas por su `ancla` (pies, barra,
+  atras = borde izquierdo y suelo, cabeza = centro de la cabeza, encajar =
+  máquina por correlación) y guarda `web/imagenes/ejercicios/ia/<slug>.webp`
+  (animada) y `-quieta.webp`; en creditos.json `fuente: 'ia'` y `autor`
+  (los alias copian la imagen). `textoCredito` lo dice. Almacén de imágenes
+  `entreno-imagenes-12`.
+- Límites gratuitos: Gemini unas 35-40 imágenes y se reabre en ~1,5 h;
+  ChatGPT unas 10 al día. Gemini: conversación nueva por dibujo (si no,
+  edita el anterior); descargar recargando la página y con hover antes
+  del clic, si no a veces no descarga.
+- Estilo: «Volver» de la banda verde como píldora, títulos de tarjeta
+  centrados en toda la app, chips centrados, el cuestionario de bienvenida
+  no vuelve a salir si lo cierras (localStorage `entreno-cuestionario-cerrado`).

@@ -370,6 +370,8 @@ a { color: var(--acento); text-decoration-thickness: 1.5px; text-underline-offse
 a.tarjeta.fila-enlace:active, button.tarjeta.fila-enlace:active { background: var(--superficie-2); }
 
 .tarjeta > :first-child { margin-top: 0; }
+/* Los títulos de las tarjetas, centrados en toda la app (regla de Dan: todo centrado). */
+.tarjeta > h2:first-child, .tarjeta > h3:first-child, .diario-peso .cabecera-tarjeta h2 { text-align: center; }
 .tarjeta .boton + .boton { margin-top: 8px; }
 .tarjeta > .boton { width: 100%; margin-top: 8px; }
 
@@ -1005,13 +1007,14 @@ body:has(.modal-fondo) .guia { display: none; }
   margin: 0 0 8px; padding: 10px 16px;
   background: var(--acento); color: var(--acento-texto); text-decoration: none; font-weight: 600;
 }
-.banda-entreno strong { text-decoration: underline; }
+/* «Volver» como botón (píldora), no como enlace subrayado: toda la banda se toca. */
+.banda-entreno strong { border: 1.5px solid currentColor; border-radius: 999px; padding: 3px 14px; font-size: .9em; }
 
 .reglas dt { font-weight: 700; margin-top: 10px; }
 .reglas dd { margin: 2px 0 0; }
 
 .buscador { width: 100%; box-sizing: border-box; font: inherit; padding: 10px 12px; border: 1px solid var(--borde); border-radius: var(--radio-pequeno); background: var(--superficie); color: var(--texto); margin: 8px 0; }
-.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-bottom: 8px; }
 
 /* El ciclo, en tres bloques: qué mejora, cuándo se acaba y por dónde sigue. */
 .bloque-ciclo { border: 1px solid var(--borde); border-radius: var(--radio-pequeno); padding: 10px 12px 14px; margin: 14px 0; }

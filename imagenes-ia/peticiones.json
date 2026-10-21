@@ -433,5 +433,473 @@
   "vista": "tumbado boca arriba en el suelo con las rodillas dobladas, visto de lado",
   "inicio": "cadera apoyada en el suelo",
   "final": "cadera subida, cuerpo recto de los hombros a las rodillas"
+ },
+ {
+  "slug": "sentadilla-goblet",
+  "ejercicio": "Sentadilla goblet",
+  "vista": "visto de lado, una mancuerna sujeta en vertical con las dos manos delante del pecho",
+  "inicio": "de pie con las piernas estiradas",
+  "final": "abajo, muslos paralelos al suelo, tronco erguido, codos entre las rodillas"
+ },
+ {
+  "slug": "sentadilla-hack",
+  "ejercicio": "Sentadilla hack",
+  "vista": "en una máquina de sentadilla hack con la espalda apoyada en el respaldo inclinado y los hombros bajo las almohadillas, visto de lado",
+  "inicio": "piernas casi estiradas",
+  "final": "rodillas dobladas a 90 grados, muslos paralelos a la plataforma"
+ },
+ {
+  "slug": "sentadilla-a-una-pierna",
+  "ejercicio": "Sentadilla a una pierna",
+  "vista": "sin peso, visto de lado",
+  "inicio": "de pie sobre una pierna, la otra estirada un poco hacia delante, brazos al frente",
+  "final": "abajo del todo sobre una pierna, la otra pierna estirada hacia delante sin tocar el suelo, brazos al frente"
+ },
+ {
+  "slug": "sentadilla-sissy",
+  "ejercicio": "Sentadilla sissy",
+  "vista": "sin peso, visto de lado, agarrado con una mano a un poste",
+  "inicio": "de pie, de puntillas, cuerpo recto",
+  "final": "rodillas muy adelantadas y dobladas, cuerpo recto de las rodillas a la cabeza e inclinado hacia atrás"
+ },
+ {
+  "slug": "peso-muerto-con-mancuernas",
+  "ejercicio": "Peso muerto con mancuernas",
+  "vista": "visto de lado, una mancuerna en cada mano",
+  "inicio": "agachado con la espalda recta y las mancuernas en el suelo junto a los pies",
+  "final": "de pie y erguido con las mancuernas a los lados de los muslos"
+ },
+ {
+  "slug": "buenos-dias",
+  "ejercicio": "Buenos días",
+  "vista": "con una barra con discos en la parte alta de la espalda, visto de lado",
+  "inicio": "de pie y erguido, rodillas un poco flexionadas",
+  "final": "tronco inclinado hacia delante casi horizontal con la cadera atrás y la espalda recta"
+ },
+ {
+  "slug": "zancadas-hacia-atras",
+  "ejercicio": "Zancadas hacia atrás",
+  "vista": "con una mancuerna en cada mano, visto de lado",
+  "inicio": "de pie con las piernas juntas",
+  "final": "un paso largo hacia atrás, las dos rodillas a 90 grados, la de atrás casi tocando el suelo"
+ },
+ {
+  "slug": "subida-al-cajon",
+  "ejercicio": "Subida al cajón",
+  "vista": "con una mancuerna en cada mano, delante de un cajón alto, visto de lado",
+  "inicio": "de pie en el suelo con un pie encima del cajón",
+  "final": "de pie encima del cajón con la pierna de apoyo estirada"
+ },
+ {
+  "slug": "patada-de-gluteo-en-polea",
+  "ejercicio": "Patada de glúteo en polea",
+  "vista": "de pie frente a una polea baja con la tobillera en un pie, agarrado a la máquina, visto de lado",
+  "inicio": "las dos piernas juntas",
+  "final": "la pierna de la tobillera estirada hacia atrás y arriba"
+ },
+ {
+  "slug": "maquina-de-gluteo",
+  "ejercicio": "Máquina de glúteo",
+  "vista": "en una máquina de patada de glúteo, con los antebrazos y una rodilla apoyados, visto de lado",
+  "inicio": "la pierna libre doblada debajo del cuerpo",
+  "final": "la pierna libre empujando la plataforma hacia atrás y arriba, casi estirada"
+ },
+ {
+  "slug": "extension-de-cuadriceps",
+  "ejercicio": "Extensión de cuádriceps",
+  "vista": "sentado en una máquina de extensión de piernas con el rodillo delante de los tobillos, visto de lado",
+  "inicio": "rodillas dobladas a 90 grados",
+  "final": "piernas estiradas hacia delante"
+ },
+ {
+  "slug": "curl-femoral-tumbado",
+  "ejercicio": "Curl femoral tumbado",
+  "vista": "tumbado boca abajo en una máquina de curl femoral con el rodillo detrás de los tobillos, visto de lado",
+  "inicio": "piernas estiradas",
+  "final": "rodillas dobladas, talones hacia el glúteo"
+ },
+ {
+  "slug": "curl-nordico",
+  "ejercicio": "Curl nórdico",
+  "vista": "de rodillas en una colchoneta con los tobillos sujetos por detrás, visto de lado",
+  "inicio": "cuerpo recto y vertical de las rodillas a la cabeza",
+  "final": "cuerpo recto inclinado hacia delante casi hasta el suelo, manos preparadas para frenar"
+ },
+ {
+  "slug": "elevacion-de-gemelos",
+  "ejercicio": "Elevación de gemelos",
+  "vista": "de pie en una máquina de gemelos con las almohadillas sobre los hombros y la punta de los pies en un escalón, visto de lado",
+  "inicio": "talones bajados por debajo del escalón",
+  "final": "de puntillas, talones lo más arriba posible"
+ },
+ {
+  "slug": "elevacion-de-gemelos-sentado",
+  "ejercicio": "Elevación de gemelos sentado",
+  "vista": "sentado en una máquina de gemelos con la almohadilla encima de las rodillas y la punta de los pies en un escalón, visto de lado",
+  "inicio": "talones bajados",
+  "final": "talones subidos, de puntillas"
+ },
+ {
+  "slug": "elevacion-de-tibiales",
+  "ejercicio": "Elevación de tibiales",
+  "vista": "de pie con la espalda apoyada en una pared y los talones un paso por delante, visto de lado",
+  "inicio": "las plantas de los pies apoyadas en el suelo",
+  "final": "las puntas de los pies levantadas hacia las espinillas, apoyado en los talones"
+ },
+ {
+  "slug": "tibial-con-disco",
+  "ejercicio": "Tibial con disco",
+  "vista": "sentado en el borde de un banco alto con un disco colgado de una correa sobre el empeine, visto de lado",
+  "inicio": "la punta del pie bajada",
+  "final": "la punta del pie levantada hacia la espinilla"
+ },
+ {
+  "slug": "abductores-en-maquina",
+  "ejercicio": "Abductores en máquina",
+  "vista": "sentado en una máquina de abductores con las almohadillas por fuera de las rodillas, visto de frente",
+  "inicio": "rodillas juntas",
+  "final": "rodillas abiertas hacia fuera"
+ },
+ {
+  "slug": "abduccion-en-polea",
+  "ejercicio": "Abducción en polea",
+  "vista": "de pie de lado a una polea baja con la tobillera en el pie más lejano, agarrado a la máquina, visto de frente",
+  "inicio": "las dos piernas juntas, el cable cruzando por delante",
+  "final": "la pierna de la tobillera levantada hacia el lado"
+ },
+ {
+  "slug": "aductores-en-maquina",
+  "ejercicio": "Aductores en máquina",
+  "vista": "sentado en una máquina de aductores con las almohadillas por dentro de las rodillas, visto de frente",
+  "inicio": "piernas abiertas",
+  "final": "rodillas juntas"
+ },
+ {
+  "slug": "plancha-copenhague",
+  "ejercicio": "Plancha Copenhague",
+  "vista": "de lado en el suelo con el antebrazo apoyado y el pie de arriba sobre un banco, visto de frente",
+  "inicio": "cadera apoyada en el suelo",
+  "final": "cuerpo recto y elevado, sujetado por el antebrazo y la pierna de arriba sobre el banco"
+ },
+ {
+  "slug": "hiperextensiones",
+  "ejercicio": "Hiperextensiones",
+  "vista": "en un banco de hiperextensiones a 45 grados con los tobillos sujetos, brazos cruzados en el pecho, visto de lado",
+  "inicio": "tronco bajado hacia el suelo, cadera doblada",
+  "final": "cuerpo en línea recta de los talones a la cabeza"
+ },
+ {
+  "slug": "elevacion-de-gemelos-en-multipower",
+  "ejercicio": "Elevación de gemelos en multipower",
+  "vista": "de pie en una máquina multipower con la barra en la espalda y la punta de los pies en un escalón, visto de lado",
+  "inicio": "talones bajados",
+  "final": "de puntillas, talones lo más arriba posible"
+ },
+ {
+  "slug": "elevacion-de-gemelos-en-prensa",
+  "ejercicio": "Elevación de gemelos en prensa",
+  "vista": "sentado en una prensa de piernas inclinada con solo la punta de los pies en el borde de la plataforma y las piernas estiradas, visto de lado",
+  "inicio": "tobillos doblados hacia el cuerpo",
+  "final": "tobillos estirados empujando la plataforma con las puntas"
+ },
+ {
+  "slug": "elevacion-de-gemelos-tipo-burro",
+  "ejercicio": "Elevación de gemelos tipo burro",
+  "vista": "en una máquina de gemelos tipo burro, inclinado hacia delante con la cadera bajo la almohadilla y la punta de los pies en un escalón, visto de lado",
+  "inicio": "talones bajados",
+  "final": "de puntillas, talones arriba"
+ },
+ {
+  "slug": "dominadas-con-lastre",
+  "ejercicio": "Dominadas con lastre",
+  "vista": "en barra fija con un cinturón de lastre y un disco colgando entre las piernas, visto de tres cuartos por detrás",
+  "inicio": "colgado con los brazos estirados",
+  "final": "barbilla por encima de la barra",
+  "ancla": "barra"
+ },
+ {
+  "slug": "pullover-en-polea",
+  "ejercicio": "Pullover en polea",
+  "vista": "de pie frente a una polea alta con una barra recta, tronco algo inclinado, visto de lado",
+  "inicio": "brazos estirados arriba por delante, a la altura de la cabeza",
+  "final": "brazos estirados bajados hasta los muslos"
+ },
+ {
+  "slug": "remo-con-mancuerna",
+  "ejercicio": "Remo con mancuerna",
+  "vista": "con una rodilla y una mano apoyadas en un banco plano, visto de lado",
+  "inicio": "el brazo libre estirado hacia el suelo con la mancuerna",
+  "final": "la mancuerna subida hasta la cadera, codo hacia atrás"
+ },
+ {
+  "slug": "pajaros-en-maquina",
+  "ejercicio": "Pájaros en máquina",
+  "vista": "sentado de cara al respaldo en una máquina contractora, visto de frente desde detrás",
+  "inicio": "brazos estirados por delante agarrando las asas",
+  "final": "brazos abiertos hacia atrás en cruz"
+ },
+ {
+  "slug": "curl-de-biceps-con-mancuernas",
+  "ejercicio": "Curl de bíceps con mancuernas",
+  "vista": "de pie, visto de frente",
+  "inicio": "brazos estirados a los lados con una mancuerna en cada mano, palmas hacia delante",
+  "final": "las dos mancuernas subidas hasta los hombros, codos pegados"
+ },
+ {
+  "slug": "curl-concentrado",
+  "ejercicio": "Curl concentrado",
+  "vista": "sentado en un banco con el codo apoyado en la cara interna del muslo, visto de frente",
+  "inicio": "brazo estirado hacia el suelo con una mancuerna",
+  "final": "mancuerna subida hasta el hombro"
+ },
+ {
+  "slug": "curl-predicador",
+  "ejercicio": "Curl predicador",
+  "vista": "sentado en un banco Scott con los brazos apoyados en el atril inclinado, con una barra Z, visto de lado",
+  "inicio": "brazos casi estirados",
+  "final": "barra subida hasta los hombros"
+ },
+ {
+  "slug": "curl-de-biceps-en-maquina",
+  "ejercicio": "Curl de bíceps en máquina",
+  "vista": "sentado en una máquina de curl con los brazos en el apoyo, visto de lado",
+  "inicio": "brazos estirados agarrando las asas",
+  "final": "codos doblados, asas subidas hasta los hombros"
+ },
+ {
+  "slug": "curl-invertido",
+  "ejercicio": "Curl invertido",
+  "vista": "de pie con una barra agarrada con las palmas hacia abajo, visto de lado",
+  "inicio": "brazos estirados con la barra delante de los muslos",
+  "final": "barra subida hasta los hombros, palmas hacia abajo"
+ },
+ {
+  "slug": "extension-de-muneca",
+  "ejercicio": "Extensión de muñeca",
+  "vista": "sentado con los antebrazos apoyados en los muslos y una barra en las manos, palmas hacia abajo, visto de lado",
+  "inicio": "muñecas dobladas hacia abajo",
+  "final": "muñecas dobladas hacia arriba"
+ },
+ {
+  "slug": "colgarse-de-la-barra",
+  "ejercicio": "Colgarse de la barra",
+  "vista": "visto de frente",
+  "postura": "colgado de una barra fija con los brazos estirados, agarre a la anchura de los hombros, cuerpo relajado"
+ },
+ {
+  "slug": "paseo-del-granjero",
+  "ejercicio": "Paseo del granjero",
+  "vista": "con una mancuerna pesada en cada mano, visto de lado",
+  "inicio": "de pie y erguido, a punto de dar un paso",
+  "final": "caminando, un paso largo hacia delante, erguido"
+ },
+ {
+  "slug": "cruces-en-polea",
+  "ejercicio": "Cruces en polea",
+  "vista": "de pie entre dos poleas altas, un pie adelantado, visto de frente",
+  "inicio": "brazos abiertos en cruz agarrando las asas, un poco por encima de los hombros",
+  "final": "manos juntas por delante de la cadera, brazos casi estirados"
+ },
+ {
+  "slug": "fondos-en-banco",
+  "ejercicio": "Fondos en banco",
+  "vista": "con las manos apoyadas detrás en el borde de un banco y los talones en el suelo, piernas estiradas, visto de lado",
+  "inicio": "brazos estirados",
+  "final": "codos doblados a 90 grados, cadera bajada"
+ },
+ {
+  "slug": "fondos-en-paralelas-negativos",
+  "ejercicio": "Fondos en paralelas negativos",
+  "vista": "en unas paralelas, visto de lado",
+  "inicio": "arriba con los brazos estirados",
+  "final": "bajando despacio, codos doblados a 90 grados"
+ },
+ {
+  "slug": "press-arnold",
+  "ejercicio": "Press Arnold",
+  "vista": "sentado en un banco con respaldo vertical, visto de frente",
+  "inicio": "mancuernas delante de la cara con las palmas mirando hacia ti, codos abajo",
+  "final": "brazos estirados con las mancuernas por encima de la cabeza, palmas hacia delante"
+ },
+ {
+  "slug": "extension-de-triceps-en-maquina",
+  "ejercicio": "Extensión de tríceps en máquina",
+  "vista": "sentado en una máquina de tríceps con los codos en el apoyo, visto de lado",
+  "inicio": "codos doblados, manos junto a los hombros",
+  "final": "brazos estirados empujando las asas hacia abajo"
+ },
+ {
+  "slug": "patada-de-triceps",
+  "ejercicio": "Patada de tríceps",
+  "vista": "con una mancuerna, rodilla y mano libre apoyadas en un banco, visto de lado",
+  "inicio": "brazo pegado al cuerpo, codo doblado a 90 grados",
+  "final": "brazo estirado hacia atrás"
+ },
+ {
+  "slug": "flexiones-con-lastre",
+  "ejercicio": "Flexiones con lastre",
+  "vista": "en el suelo con un disco sobre la espalda, visto de lado, cabeza a la derecha",
+  "inicio": "brazos estirados, cuerpo recto",
+  "final": "pecho casi tocando el suelo, codos doblados",
+  "ancla": "atras"
+ },
+ {
+  "slug": "flexiones-diamante",
+  "ejercicio": "Flexiones diamante",
+  "vista": "en el suelo con las manos juntas formando un rombo bajo el pecho, visto de lado, cabeza a la derecha",
+  "inicio": "brazos estirados, cuerpo recto",
+  "final": "pecho casi tocando las manos, codos pegados al cuerpo",
+  "ancla": "atras"
+ },
+ {
+  "slug": "flexiones-a-una-mano",
+  "ejercicio": "Flexiones a una mano",
+  "vista": "en el suelo con una mano apoyada y la otra a la espalda, piernas abiertas, visto de frente en diagonal",
+  "inicio": "brazo estirado, cuerpo recto",
+  "final": "codo doblado con el pecho cerca del suelo"
+ },
+ {
+  "slug": "crunch-abdominal",
+  "ejercicio": "Crunch abdominal",
+  "vista": "tumbado boca arriba en el suelo con las rodillas dobladas y las manos junto a las sienes, visto de lado",
+  "inicio": "espalda apoyada en el suelo",
+  "final": "hombros y parte alta de la espalda levantados, mirando a las rodillas"
+ },
+ {
+  "slug": "crunch-en-polea",
+  "ejercicio": "Crunch en polea",
+  "vista": "de rodillas frente a una polea alta con una cuerda junto a la cabeza, visto de lado",
+  "inicio": "tronco erguido",
+  "final": "tronco enroscado hacia abajo, codos hacia los muslos"
+ },
+ {
+  "slug": "crunch-inverso",
+  "ejercicio": "Crunch inverso",
+  "vista": "tumbado boca arriba en el suelo con las manos a los lados, visto de lado",
+  "inicio": "rodillas dobladas a 90 grados encima de la cadera",
+  "final": "cadera levantada del suelo, rodillas hacia el pecho"
+ },
+ {
+  "slug": "plancha",
+  "ejercicio": "Plancha",
+  "vista": "en el suelo, visto de lado",
+  "postura": "apoyado en los antebrazos y las puntas de los pies, cuerpo recto de la cabeza a los talones"
+ },
+ {
+  "slug": "plancha-lateral",
+  "ejercicio": "Plancha lateral",
+  "vista": "en el suelo de lado, visto de frente",
+  "postura": "apoyado en un antebrazo y el borde de un pie, cuerpo recto y cadera levantada, la otra mano en la cintura"
+ },
+ {
+  "slug": "posicion-hueca",
+  "ejercicio": "Posición hueca",
+  "vista": "tumbado boca arriba en el suelo, visto de lado",
+  "postura": "zona lumbar pegada al suelo, hombros y piernas estiradas levantados del suelo, brazos estirados por encima de la cabeza, el cuerpo como un plátano"
+ },
+ {
+  "slug": "bicho-muerto",
+  "ejercicio": "Bicho muerto",
+  "vista": "tumbado boca arriba en el suelo, visto de lado",
+  "inicio": "brazos estirados hacia el techo y rodillas dobladas a 90 grados encima de la cadera",
+  "final": "un brazo estirado hacia atrás por encima de la cabeza y la pierna contraria estirada cerca del suelo"
+ },
+ {
+  "slug": "pajaro-perro",
+  "ejercicio": "Pájaro-perro",
+  "vista": "a cuatro patas en el suelo, visto de lado",
+  "inicio": "manos bajo los hombros y rodillas bajo la cadera, espalda recta",
+  "final": "un brazo estirado hacia delante y la pierna contraria estirada hacia atrás, en línea con la espalda"
+ },
+ {
+  "slug": "superman",
+  "ejercicio": "Superman",
+  "vista": "tumbado boca abajo en el suelo, visto de lado",
+  "inicio": "brazos estirados por delante, todo el cuerpo apoyado",
+  "final": "brazos, pecho y piernas levantados del suelo a la vez"
+ },
+ {
+  "slug": "lenador-en-polea",
+  "ejercicio": "Leñador en polea",
+  "vista": "de pie de lado a una polea alta, agarrando el asa con las dos manos, visto de frente",
+  "inicio": "brazos estirados arriba hacia la polea, tronco girado hacia ella",
+  "final": "brazos estirados bajados en diagonal hasta la cadera contraria, tronco girado"
+ },
+ {
+  "slug": "giros-rusos",
+  "ejercicio": "Giros rusos",
+  "vista": "sentado en el suelo con las rodillas dobladas y los pies levantados, tronco inclinado hacia atrás, con un disco en las manos, visto de frente",
+  "inicio": "tronco girado a un lado, el disco junto a la cadera",
+  "final": "tronco girado al otro lado, el disco junto a la otra cadera"
+ },
+ {
+  "slug": "press-pallof",
+  "ejercicio": "Press pallof",
+  "vista": "de pie de lado a una polea a la altura del pecho, agarrando el asa con las dos manos, visto de frente",
+  "inicio": "manos junto al pecho",
+  "final": "brazos estirados hacia delante sin girar el tronco"
+ },
+ {
+  "slug": "elevacion-de-rodillas-colgado",
+  "ejercicio": "Elevación de rodillas colgado",
+  "vista": "colgado de una barra fija, visto de lado",
+  "inicio": "colgado con brazos y piernas estirados",
+  "final": "rodillas dobladas subidas hasta el pecho",
+  "ancla": "barra"
+ },
+ {
+  "slug": "elevacion-de-piernas-en-el-suelo",
+  "ejercicio": "Elevación de piernas en el suelo",
+  "vista": "tumbado boca arriba en el suelo con las manos a los lados, visto de lado",
+  "inicio": "piernas estiradas casi tocando el suelo",
+  "final": "piernas estiradas subidas en vertical"
+ },
+ {
+  "slug": "elevaciones-de-rodillas-en-paralelas",
+  "ejercicio": "Elevaciones de rodillas en paralelas",
+  "vista": "sujeto en una silla romana de paralelas con los antebrazos apoyados y la espalda en el respaldo, visto de lado",
+  "inicio": "piernas colgando estiradas",
+  "final": "rodillas dobladas subidas hasta el pecho"
+ },
+ {
+  "slug": "bandera-del-dragon",
+  "ejercicio": "Bandera del dragón",
+  "vista": "tumbado boca arriba en un banco plano agarrado al banco por detrás de la cabeza, visto de lado",
+  "inicio": "cuerpo recto y levantado en vertical apoyado solo en los hombros",
+  "final": "cuerpo recto bajado casi horizontal por encima del banco"
+ },
+ {
+  "slug": "flexion-de-cuello-con-disco",
+  "ejercicio": "Flexión de cuello con disco",
+  "vista": "tumbado boca arriba en un banco con la cabeza fuera del borde y un disco sujeto sobre la frente, visto de lado",
+  "inicio": "cabeza bajada hacia atrás",
+  "final": "barbilla subida hacia el pecho"
+ },
+ {
+  "slug": "extension-de-cuello-con-arnes",
+  "ejercicio": "Extensión de cuello con arnés",
+  "vista": "sentado en un banco con un arnés en la cabeza del que cuelga un disco, tronco inclinado, visto de lado",
+  "inicio": "barbilla hacia el pecho",
+  "final": "cabeza levantada mirando al frente"
+ },
+ {
+  "slug": "flexion-lateral-de-cuello",
+  "ejercicio": "Flexión lateral de cuello",
+  "vista": "tumbado de lado en un banco con la cabeza fuera del borde y una mano sobre la sien, visto de frente",
+  "inicio": "cabeza caída hacia el suelo",
+  "final": "cabeza levantada hacia el hombro de arriba"
+ },
+ {
+  "slug": "isometricos-de-cuello",
+  "ejercicio": "Isométricos de cuello",
+  "vista": "de pie, visto de lado",
+  "postura": "una mano en la frente empujando hacia atrás mientras la cabeza empuja hacia delante, sin moverse"
+ },
+ {
+  "slug": "lanzamiento-de-balon-medicinal",
+  "ejercicio": "Lanzamiento de balón medicinal",
+  "vista": "de pie, visto de lado, con un balón medicinal",
+  "inicio": "balón sujeto con las dos manos por encima de la cabeza, cuerpo estirado",
+  "final": "lanzando el balón contra el suelo, tronco doblado hacia delante y brazos abajo"
  }
 ]

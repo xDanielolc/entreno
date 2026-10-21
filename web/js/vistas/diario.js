@@ -94,7 +94,8 @@ export function vistaDiario(contenedor) {
     tablaDias(d, fecha),
     resumen(d, hoy),
     graficas(d, necesidad),
-    h('label', { class: 'campo necesidad-sueno' },
+    // Dentro de su tarjeta, como lo demás (suelta al final parecía olvidada).
+    h('section', { class: 'tarjeta' }, h('label', { class: 'campo necesidad-sueno' },
       h('span', { class: 'etiqueta-campo' }, 'Lo que necesitas dormir (horas)'),
       h('input', { type: 'text', inputmode: 'decimal', id: 'diario-necesidad', value: String(necesidad).replace('.', ','),
         onchange: (ev) => {
@@ -102,7 +103,7 @@ export function vistaDiario(contenedor) {
           if (v >= 4 && v <= 12) estado.cambiar((x) => { x.perfil.necesidadSuenoH = v; });
         } }),
       h('small', { class: 'nota' }, (d.diario ?? []).filter((x) => calcularSueno(x)).length >= 2
-        ? 'Por defecto 8,5. Es la línea discontinua de la gráfica del sueño.' : 'Por defecto 8,5.')));
+        ? 'Por defecto 8,5. Es la línea discontinua de la gráfica del sueño.' : 'Por defecto 8,5.'))));
 }
 
 // Los últimos 14 días con algo apuntado; tocar uno lo abre arriba.
