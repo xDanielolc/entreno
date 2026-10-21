@@ -1217,29 +1217,39 @@
    "autor": "Gemini"
   },
   "Triángulo (Trikonasana)": {
-   "archivo": "imagenes/munecos/triangulo-trikonasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-triangulo-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-triangulo-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Mano al dedo gordo del pie (Utthita Hasta Padangusthasana)": {
-   "archivo": "imagenes/munecos/mano-al-dedo-gordo-del-pie-utthita-hasta-padangusthasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-mano-al-dedo-gordo-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-mano-al-dedo-gordo-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Ángulo lateral extendido (Utthita Parsvakonasana)": {
-   "archivo": "imagenes/munecos/angulo-lateral-extendido-utthita-parsvakonasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-angulo-lateral-extendido-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-angulo-lateral-extendido-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Ángulo lateral girado (Parivritta Baddha Parsvakonasana)": {
-   "archivo": "imagenes/munecos/angulo-lateral-girado-parivritta-baddha-parsvakonasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-angulo-lateral-girado-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-angulo-lateral-girado-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Triángulo girado (Parivritta Trikonasana)": {
-   "archivo": "imagenes/munecos/triangulo-girado-parivritta-trikonasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-triangulo-girado-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-triangulo-girado-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Sentada en cuclillas (Upavesasana)": {
    "archivo": "imagenes/ejercicios/ia/yoga-sentada-en-cuclillas-quieta.webp",

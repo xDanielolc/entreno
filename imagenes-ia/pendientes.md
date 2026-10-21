@@ -42,3 +42,5 @@ Pendiente de la revisión:
 - Dominadas negativas: usar la dominada buena con la animación invertida.
 - Zancadas hacia atrás: puede usar la animación de las zancadas.
 - Extensión de tríceps sobre la cabeza: con los dos brazos y de frente.
+- yoga-angulo-ligado-tumbado: sale en relajación (piernas estiradas), no con las plantas juntas.
+- yoga-medio-senor-de-los-peces: se perdió la descarga; repetir.

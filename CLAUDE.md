@@ -1106,5 +1106,5 @@ fase), tras probar la A.
   https://claude.ai/artifact/7vCe7PkKhYgXQEWjZeRkgf. Errores típicos de la IA en `peticion_ia.py`
   y en `imagenes-ia/pendientes.md`. Gemini se maneja sin ver la pantalla: la referencia por el
   portapapeles (Dan no copia nada mientras) y la descarga con un `<a download>` sobre el blob de la
-  imagen de la respuesta (`model-response img`), al momento. Almacén `entreno-imagenes-15`.
+  imagen de la respuesta (`model-response img`), al momento. Almacén `entreno-imagenes-16` (0.60.6: más yoga).
 
