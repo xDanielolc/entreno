@@ -65,36 +65,32 @@
  },
  "ejercicios": {
   "Press de banca": {
-   "archivo": "imagenes/ejercicios/anim/press-de-banca.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/press-de-banca.png",
+   "archivo": "imagenes/ejercicios/ia/press-de-banca.webp",
+   "estatica": "imagenes/ejercicios/ia/press-de-banca-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "bench-press"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Press de banca con mancuernas": {
-   "archivo": "imagenes/ejercicios/anim/press-de-banca-con-mancuernas.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/press-de-banca-con-mancuernas.png",
+   "archivo": "imagenes/ejercicios/ia/press-de-banca-con-mancuernas.webp",
+   "estatica": "imagenes/ejercicios/ia/press-de-banca-con-mancuernas-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "bench-press-dumbbell"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Press inclinado": {
-   "archivo": "imagenes/ejercicios/anim/press-inclinado.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/press-inclinado.png",
+   "archivo": "imagenes/ejercicios/ia/press-inclinado.webp",
+   "estatica": "imagenes/ejercicios/ia/press-inclinado-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "incline-bench-press"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Press inclinado con mancuernas": {
-   "archivo": "imagenes/ejercicios/anim/press-inclinado-con-mancuernas.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/press-inclinado-con-mancuernas.png",
+   "archivo": "imagenes/ejercicios/ia/press-inclinado-con-mancuernas.webp",
+   "estatica": "imagenes/ejercicios/ia/press-inclinado-con-mancuernas-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "incline-dumbbell-press"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Press declinado": {
    "archivo": "imagenes/ejercicios/anim/press-declinado.webp",
@@ -105,217 +101,207 @@
    "nombreEnFuente": "decline-barbell-bench-press"
   },
   "Press de pecho en máquina": {
-   "archivo": "imagenes/ejercicios/anim/press-de-pecho-en-maquina.webp",
-   "autor": "Everkinetic",
-   "estatica": null,
+   "archivo": "imagenes/ejercicios/ia/press-de-pecho-en-maquina.webp",
+   "estatica": "imagenes/ejercicios/ia/press-de-pecho-en-maquina-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "machine-bench-press"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Aperturas de pecho": {
-   "archivo": "imagenes/ejercicios/aperturas-de-pecho.png",
-   "autor": "wger",
-   "nombreEnWger": "Aperturas en Máquina para Pecho"
+   "archivo": "imagenes/ejercicios/ia/aperturas-de-pecho.webp",
+   "estatica": "imagenes/ejercicios/ia/aperturas-de-pecho-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Aperturas con mancuernas": {
-   "archivo": "imagenes/ejercicios/anim/aperturas-con-mancuernas.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/aperturas-con-mancuernas.png",
+   "archivo": "imagenes/ejercicios/ia/aperturas-con-mancuernas.webp",
+   "estatica": "imagenes/ejercicios/ia/aperturas-con-mancuernas-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "dumbbell-flys"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Fondos de tríceps": {
-   "archivo": "imagenes/ejercicios/anim/fondos-de-triceps-ek.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/fondos-de-triceps.png",
+   "archivo": "imagenes/ejercicios/ia/fondos-de-triceps.webp",
+   "estatica": "imagenes/ejercicios/ia/fondos-de-triceps-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "chest-dips"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Fondos asistidos": {
-   "archivo": "imagenes/ejercicios/anim/fondos-asistidos.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/fondos-asistidos.png",
+   "archivo": "imagenes/ejercicios/ia/fondos-asistidos.webp",
+   "estatica": "imagenes/ejercicios/ia/fondos-asistidos-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "chest-dips"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Press militar": {
-   "archivo": "imagenes/ejercicios/anim/press-militar-ek.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/press-militar.png",
+   "archivo": "imagenes/ejercicios/ia/press-militar.webp",
+   "estatica": "imagenes/ejercicios/ia/press-militar-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "seated-military-press"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Press de hombro con mancuernas": {
-   "archivo": "imagenes/ejercicios/anim/press-de-hombro-con-mancuernas.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/press-de-hombro-con-mancuernas.jpg",
+   "archivo": "imagenes/ejercicios/ia/press-de-hombro-con-mancuernas.webp",
+   "estatica": "imagenes/ejercicios/ia/press-de-hombro-con-mancuernas-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "one-arm-dumbbell-shoulder-press"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Press de hombro en máquina": {
-   "archivo": "imagenes/ejercicios/anim/press-de-hombro-en-maquina.webp",
-   "autor": "wger.de",
-   "nombreEnWger": "Press de hombro con maquina",
-   "estatica": "imagenes/ejercicios/press-de-hombro-en-maquina.png",
-   "animada": true
+   "archivo": "imagenes/ejercicios/ia/press-de-hombro-en-maquina.webp",
+   "estatica": "imagenes/ejercicios/ia/press-de-hombro-en-maquina-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Elevaciones laterales": {
-   "archivo": "imagenes/ejercicios/anim/elevaciones-laterales.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/elevaciones-laterales.png",
+   "archivo": "imagenes/ejercicios/ia/elevaciones-laterales.webp",
+   "estatica": "imagenes/ejercicios/ia/elevaciones-laterales-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "lateral-dumbbell-raises"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Elevaciones laterales en polea": {
-   "archivo": "imagenes/ejercicios/elevaciones-laterales-en-polea.jpg",
-   "autor": "carlos3c",
-   "nombreEnWger": "Elevaciones laterales en polea (a un brazo)"
+   "archivo": "imagenes/ejercicios/ia/elevaciones-laterales-en-polea.webp",
+   "estatica": "imagenes/ejercicios/ia/elevaciones-laterales-en-polea-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Elevaciones frontales": {
-   "archivo": "imagenes/ejercicios/anim/elevaciones-frontales.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/elevaciones-frontales.png",
+   "archivo": "imagenes/ejercicios/ia/elevaciones-frontales.webp",
+   "estatica": "imagenes/ejercicios/ia/elevaciones-frontales-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "front-dumbbell-raise"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Press cerrado": {
-   "archivo": "imagenes/ejercicios/anim/press-cerrado.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/press-cerrado.png",
+   "archivo": "imagenes/ejercicios/ia/press-cerrado.webp",
+   "estatica": "imagenes/ejercicios/ia/press-cerrado-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "close-grip-barbell-bench-press"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Press francés": {
-   "archivo": "imagenes/ejercicios/anim/press-frances.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/press-frances.png",
+   "archivo": "imagenes/ejercicios/ia/press-frances.webp",
+   "estatica": "imagenes/ejercicios/ia/press-frances-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "lying-triceps-press-with-barbell"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Extensión de tríceps en polea": {
-   "archivo": "imagenes/ejercicios/anim/extension-de-triceps-en-polea-ek.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/extension-de-triceps-en-polea.png",
+   "archivo": "imagenes/ejercicios/ia/extension-de-triceps-en-polea.webp",
+   "estatica": "imagenes/ejercicios/ia/extension-de-triceps-en-polea-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "triceps-pushdown-with-cable"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Extensión de tríceps sobre la cabeza": {
-   "archivo": "imagenes/ejercicios/anim/extension-de-triceps-sobre-la-cabeza.webp",
-   "autor": "Everkinetic",
-   "estatica": null,
+   "archivo": "imagenes/ejercicios/ia/extension-de-triceps-sobre-la-cabeza.webp",
+   "estatica": "imagenes/ejercicios/ia/extension-de-triceps-sobre-la-cabeza-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "standing-triceps-extension-2"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Flexiones": {
-   "archivo": "imagenes/ejercicios/anim/flexiones-ek.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/flexiones.png",
+   "archivo": "imagenes/ejercicios/ia/flexiones.webp",
+   "estatica": "imagenes/ejercicios/ia/flexiones-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "push-ups"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Flexiones en pica": {
-   "archivo": "imagenes/ejercicios/flexiones-en-pica.png",
-   "autor": "wger",
-   "nombreEnWger": "Flexiones de pica"
+   "archivo": "imagenes/ejercicios/ia/flexiones-en-pica.webp",
+   "estatica": "imagenes/ejercicios/ia/flexiones-en-pica-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Flexiones en pino": {
-   "archivo": "imagenes/ejercicios/flexiones-en-pino.png",
-   "autor": "wger",
-   "nombreEnWger": "Flexiones en pino"
+   "archivo": "imagenes/ejercicios/ia/flexiones-en-pino.webp",
+   "estatica": "imagenes/ejercicios/ia/flexiones-en-pino-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Dominadas": {
-   "archivo": "imagenes/ejercicios/anim/dominadas-ek.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/dominadas.jpg",
+   "archivo": "imagenes/ejercicios/ia/dominada.webp",
+   "estatica": "imagenes/ejercicios/ia/dominada-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "pull-ups"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Dominadas supinas": {
-   "archivo": "imagenes/ejercicios/anim/dominadas-supinas.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/dominadas-supinas.jpg",
+   "archivo": "imagenes/ejercicios/ia/dominadas-supinas.webp",
+   "estatica": "imagenes/ejercicios/ia/dominadas-supinas-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "narrow-parallel-grip-chin-ups"
+   "fuente": "ia",
+   "autor": "ChatGPT"
   },
   "Dominadas asistidas": {
-   "archivo": "imagenes/munecos/dominadas-asistidas.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/dominadas-asistidas.webp",
+   "estatica": "imagenes/ejercicios/ia/dominadas-asistidas-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "ChatGPT"
   },
   "Jalón al pecho": {
-   "archivo": "imagenes/ejercicios/anim/jalon-al-pecho-ek.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/jalon-al-pecho.png",
+   "archivo": "imagenes/ejercicios/ia/jalon-al-pecho.webp",
+   "estatica": "imagenes/ejercicios/ia/jalon-al-pecho-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "underhand-pull-downs"
+   "fuente": "ia",
+   "autor": "ChatGPT"
   },
   "Jalón con agarre estrecho": {
-   "archivo": "imagenes/ejercicios/anim/jalon-con-agarre-estrecho.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/jalon-con-agarre-estrecho.png",
+   "archivo": "imagenes/ejercicios/ia/jalon-con-agarre-estrecho.webp",
+   "estatica": "imagenes/ejercicios/ia/jalon-con-agarre-estrecho-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "v-bar-pull-down"
+   "fuente": "ia",
+   "autor": "ChatGPT"
   },
   "Remo en T": {
-   "archivo": "imagenes/ejercicios/anim/remo-en-t.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/remo-en-t.png",
+   "archivo": "imagenes/ejercicios/ia/remo-en-t.webp",
+   "estatica": "imagenes/ejercicios/ia/remo-en-t-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "t-bar-rows"
+   "fuente": "ia",
+   "autor": "ChatGPT"
   },
   "Remo en polea": {
-   "archivo": "imagenes/ejercicios/anim/remo-en-polea.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/remo-en-polea.jpg",
+   "archivo": "imagenes/ejercicios/ia/remo-en-polea.webp",
+   "estatica": "imagenes/ejercicios/ia/remo-en-polea-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "seated-cable-rows"
+   "fuente": "ia",
+   "autor": "ChatGPT"
   },
   "Remo en máquina": {
-   "archivo": "imagenes/ejercicios/anim/remo-en-maquina.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/remo-en-maquina.png",
+   "archivo": "imagenes/ejercicios/ia/remo-en-maquina.webp",
+   "estatica": "imagenes/ejercicios/ia/remo-en-maquina-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "seated-cable-rows"
+   "fuente": "ia",
+   "autor": "ChatGPT"
   },
   "Remo invertido": {
-   "archivo": "imagenes/ejercicios/anim/remo-invertido.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/remo-invertido.jpg",
+   "archivo": "imagenes/ejercicios/ia/remo-invertido.webp",
+   "estatica": "imagenes/ejercicios/ia/remo-invertido-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "body-row"
+   "fuente": "ia",
+   "autor": "ChatGPT"
   },
   "Face pull": {
-   "archivo": "imagenes/munecos/face-pull.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/face-pull.webp",
+   "estatica": "imagenes/ejercicios/ia/face-pull-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "ChatGPT"
   },
   "Remo al mentón": {
-   "archivo": "imagenes/ejercicios/anim/remo-al-menton.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/remo-al-menton.png",
+   "archivo": "imagenes/ejercicios/ia/remo-al-menton.webp",
+   "estatica": "imagenes/ejercicios/ia/remo-al-menton-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "upright-barbell-rows"
+   "fuente": "ia",
+   "autor": "ChatGPT"
   },
   "Encogimientos de trapecio": {
    "archivo": "imagenes/ejercicios/anim/encogimientos-de-trapecio.webp",
@@ -334,12 +320,11 @@
    "nombreEnFuente": "biceps-curls-with-barbell"
   },
   "Curl martillo": {
-   "archivo": "imagenes/ejercicios/anim/curl-martillo.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/curl-martillo.png",
+   "archivo": "imagenes/ejercicios/ia/curl-martillo.webp",
+   "estatica": "imagenes/ejercicios/ia/curl-martillo-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "biceps-hammer-curl-with-dumbbell"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Curl inclinado": {
    "archivo": "imagenes/ejercicios/anim/curl-inclinado-ek.webp",
@@ -363,9 +348,11 @@
    "fuente": "propia"
   },
   "Sentadilla": {
-   "archivo": "imagenes/munecos/sentadilla.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/sentadilla.webp",
+   "estatica": "imagenes/ejercicios/ia/sentadilla-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Sentadilla frontal": {
    "archivo": "imagenes/munecos/sentadilla-frontal.svg",
@@ -399,14 +386,18 @@
    "fuente": "propia"
   },
   "Peso muerto sumo": {
-   "archivo": "imagenes/munecos/peso-muerto-sumo.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/peso-muerto-sumo.webp",
+   "estatica": "imagenes/ejercicios/ia/peso-muerto-sumo-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Peso muerto rumano": {
-   "archivo": "imagenes/munecos/peso-muerto-rumano.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/peso-muerto-rumano.webp",
+   "estatica": "imagenes/ejercicios/ia/peso-muerto-rumano-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Zancadas": {
    "archivo": "imagenes/munecos/zancadas.svg",
@@ -443,12 +434,11 @@
    "nombreEnFuente": "lying-leg-curl-machine"
   },
   "Curl femoral sentado": {
-   "archivo": "imagenes/ejercicios/anim/curl-femoral-sentado.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/curl-femoral-sentado.png",
+   "archivo": "imagenes/ejercicios/ia/curl-femoral-sentado.webp",
+   "estatica": "imagenes/ejercicios/ia/curl-femoral-sentado-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "seated-leg-curl"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Elevación de gemelos": {
    "archivo": "imagenes/ejercicios/anim/elevacion-de-gemelos.webp",
@@ -512,9 +502,11 @@
    "fuente": "propia"
   },
   "Elevaciones de piernas": {
-   "archivo": "imagenes/munecos/elevacion-de-piernas-colgado.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia",
+   "archivo": "imagenes/ejercicios/ia/elevacion-de-piernas-colgado.webp",
+   "estatica": "imagenes/ejercicios/ia/elevacion-de-piernas-colgado-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini",
    "aliasDe": "Elevación de piernas colgado"
   },
   "Elevaciones de rodillas en paralelas": {
@@ -587,12 +579,11 @@
    "animada": true
   },
   "Pájaros con mancuernas": {
-   "archivo": "imagenes/ejercicios/anim/pajaros-con-mancuernas.webp",
-   "autor": "Everkinetic",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "bent-over-rear-deltoid-raise-with-head-on-bench",
-   "estatica": "imagenes/ejercicios/pajaros-con-mancuernas.png",
-   "animada": true
+   "archivo": "imagenes/ejercicios/ia/pajaros-con-mancuernas.webp",
+   "estatica": "imagenes/ejercicios/ia/pajaros-con-mancuernas-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Pájaros en máquina": {
    "archivo": "imagenes/ejercicios/anim/pajaros-en-maquina.webp",
@@ -804,12 +795,11 @@
    "fuente": "propia"
   },
   "Remo con barra": {
-   "archivo": "imagenes/ejercicios/anim/remo-con-barra.webp",
-   "autor": "Everkinetic",
-   "fuente": "everkinetic",
+   "archivo": "imagenes/ejercicios/ia/remo-con-barra.webp",
+   "estatica": "imagenes/ejercicios/ia/remo-con-barra-quieta.webp",
    "animada": true,
-   "nombreEnFuente": "reverse-grips-bent-over-barbell-rows",
-   "estatica": null
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Extensión de muñeca": {
    "archivo": "imagenes/munecos/extension-de-muneca.svg",
@@ -1412,14 +1402,18 @@
    "fuente": "propia"
   },
   "Rueda abdominal": {
-   "archivo": "imagenes/munecos/rueda-abdominal.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/rueda-abdominal.webp",
+   "estatica": "imagenes/ejercicios/ia/rueda-abdominal-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Cardio": {
-   "archivo": "imagenes/munecos/cardio.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/cardio.webp",
+   "estatica": "imagenes/ejercicios/ia/cardio-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "HIIT": {
    "archivo": "imagenes/munecos/hiit.svg",
@@ -1570,13 +1564,12 @@
    "aliasDe": "Colgarse de la barra"
   },
   "Jalón con cuerda": {
-   "archivo": "imagenes/ejercicios/anim/jalon-al-pecho-ek.webp",
-   "autor": "Everkinetic",
-   "nombreEnWger": "Jalón al pecho con agarre neutro",
-   "aliasDe": "Jalón al pecho",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "underhand-pull-downs",
-   "animada": true
+   "archivo": "imagenes/ejercicios/ia/jalon-al-pecho.webp",
+   "estatica": "imagenes/ejercicios/ia/jalon-al-pecho-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "ChatGPT",
+   "aliasDe": "Jalón al pecho"
   },
   "Curl bayesian en polea": {
    "archivo": "imagenes/ejercicios/anim/curl-en-polea.webp",
@@ -1607,41 +1600,36 @@
    "animada": true
   },
   "Jalón supino": {
-   "archivo": "imagenes/ejercicios/anim/jalon-al-pecho-ek.webp",
-   "autor": "Everkinetic",
-   "nombreEnWger": "Jalón al pecho con agarre neutro",
-   "aliasDe": "Jalón al pecho",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "underhand-pull-downs",
-   "animada": true
+   "archivo": "imagenes/ejercicios/ia/jalon-al-pecho.webp",
+   "estatica": "imagenes/ejercicios/ia/jalon-al-pecho-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "ChatGPT",
+   "aliasDe": "Jalón al pecho"
   },
   "JM press en multipower": {
-   "archivo": "imagenes/ejercicios/anim/press-frances.webp",
-   "autor": "Everkinetic",
-   "nombreEnWger": "Press Francés con Barra SZ",
-   "aliasDe": "Press francés",
-   "estatica": "imagenes/ejercicios/press-frances.png",
+   "archivo": "imagenes/ejercicios/ia/press-frances.webp",
+   "estatica": "imagenes/ejercicios/ia/press-frances-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "lying-triceps-press-with-barbell"
+   "fuente": "ia",
+   "autor": "Gemini",
+   "aliasDe": "Press francés"
   },
   "Extensión de tríceps unilateral en polea": {
-   "archivo": "imagenes/ejercicios/anim/extension-de-triceps-en-polea-ek.webp",
-   "autor": "Everkinetic",
-   "nombreEnWger": "Extension de triceps polea",
-   "aliasDe": "Extensión de tríceps en polea",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "triceps-pushdown-with-cable",
-   "animada": true
+   "archivo": "imagenes/ejercicios/ia/extension-de-triceps-en-polea.webp",
+   "estatica": "imagenes/ejercicios/ia/extension-de-triceps-en-polea-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini",
+   "aliasDe": "Extensión de tríceps en polea"
   },
   "Extensión de tríceps tipo katana": {
-   "archivo": "imagenes/ejercicios/anim/extension-de-triceps-en-polea-ek.webp",
-   "autor": "Everkinetic",
-   "nombreEnWger": "Extension de triceps polea",
-   "aliasDe": "Extensión de tríceps en polea",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "triceps-pushdown-with-cable",
-   "animada": true
+   "archivo": "imagenes/ejercicios/ia/extension-de-triceps-en-polea.webp",
+   "estatica": "imagenes/ejercicios/ia/extension-de-triceps-en-polea-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini",
+   "aliasDe": "Extensión de tríceps en polea"
   },
   "Patada de tríceps en polea": {
    "archivo": "imagenes/ejercicios/anim/patada-de-triceps.webp",
@@ -1653,95 +1641,84 @@
    "animada": true
   },
   "Press de hombro en multipower": {
-   "archivo": "imagenes/ejercicios/anim/press-militar-ek.webp",
-   "autor": "Everkinetic",
-   "nombreEnWger": "Press militar",
-   "aliasDe": "Press militar",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "seated-military-press",
-   "animada": true
+   "archivo": "imagenes/ejercicios/ia/press-militar.webp",
+   "estatica": "imagenes/ejercicios/ia/press-militar-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini",
+   "aliasDe": "Press militar"
   },
   "Press tras nuca": {
-   "archivo": "imagenes/ejercicios/anim/press-militar-ek.webp",
-   "autor": "Everkinetic",
-   "nombreEnWger": "Press militar",
-   "aliasDe": "Press militar",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "seated-military-press",
-   "animada": true
+   "archivo": "imagenes/ejercicios/ia/press-militar.webp",
+   "estatica": "imagenes/ejercicios/ia/press-militar-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini",
+   "aliasDe": "Press militar"
   },
   "Elevaciones laterales en máquina": {
-   "archivo": "imagenes/ejercicios/anim/elevaciones-laterales.webp",
-   "autor": "Everkinetic",
-   "nombreEnWger": "Lateral Raises",
-   "aliasDe": "Elevaciones laterales",
-   "estatica": "imagenes/ejercicios/elevaciones-laterales.png",
+   "archivo": "imagenes/ejercicios/ia/elevaciones-laterales.webp",
+   "estatica": "imagenes/ejercicios/ia/elevaciones-laterales-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "lateral-dumbbell-raises"
+   "fuente": "ia",
+   "autor": "Gemini",
+   "aliasDe": "Elevaciones laterales"
   },
   "Pájaros en polea": {
-   "archivo": "imagenes/ejercicios/anim/pajaros-con-mancuernas.webp",
-   "autor": "Everkinetic",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "bent-over-rear-deltoid-raise-with-head-on-bench",
-   "aliasDe": "Pájaros con mancuernas",
-   "estatica": "imagenes/ejercicios/pajaros-con-mancuernas.png",
-   "animada": true
+   "archivo": "imagenes/ejercicios/ia/pajaros-con-mancuernas.webp",
+   "estatica": "imagenes/ejercicios/ia/pajaros-con-mancuernas-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini",
+   "aliasDe": "Pájaros con mancuernas"
   },
   "Pull apart en polea": {
-   "archivo": "imagenes/munecos/face-pull.svg",
-   "autor": "dibujo propio de la app",
-   "nombreEnWger": "Dumbbell Bent Over Face Pull",
-   "aliasDe": "Face pull",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/face-pull.webp",
+   "estatica": "imagenes/ejercicios/ia/face-pull-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "ChatGPT",
+   "aliasDe": "Face pull"
   },
   "Remo abierto en polea": {
-   "archivo": "imagenes/ejercicios/anim/remo-en-polea.webp",
-   "autor": "Everkinetic",
-   "nombreEnWger": "Remo unilateral en polea",
-   "aliasDe": "Remo en polea",
-   "estatica": "imagenes/ejercicios/remo-en-polea.jpg",
+   "archivo": "imagenes/ejercicios/ia/remo-en-polea.webp",
+   "estatica": "imagenes/ejercicios/ia/remo-en-polea-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "seated-cable-rows"
+   "fuente": "ia",
+   "autor": "ChatGPT",
+   "aliasDe": "Remo en polea"
   },
   "Jalón unilateral en polea": {
-   "archivo": "imagenes/ejercicios/anim/jalon-al-pecho-ek.webp",
-   "autor": "Everkinetic",
-   "nombreEnWger": "Jalón al pecho con agarre neutro",
-   "aliasDe": "Jalón al pecho",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "underhand-pull-downs",
-   "animada": true
+   "archivo": "imagenes/ejercicios/ia/jalon-al-pecho.webp",
+   "estatica": "imagenes/ejercicios/ia/jalon-al-pecho-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "ChatGPT",
+   "aliasDe": "Jalón al pecho"
   },
   "Jalón tras nuca": {
-   "archivo": "imagenes/ejercicios/anim/jalon-al-pecho-ek.webp",
-   "autor": "Everkinetic",
-   "nombreEnWger": "Jalón al pecho con agarre neutro",
-   "aliasDe": "Jalón al pecho",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "underhand-pull-downs",
-   "animada": true
+   "archivo": "imagenes/ejercicios/ia/jalon-al-pecho.webp",
+   "estatica": "imagenes/ejercicios/ia/jalon-al-pecho-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "ChatGPT",
+   "aliasDe": "Jalón al pecho"
   },
   "Dominadas tras nuca": {
-   "archivo": "imagenes/ejercicios/anim/dominadas-ek.webp",
-   "autor": "Everkinetic",
-   "nombreEnWger": "Dominadas",
-   "aliasDe": "Dominadas",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "pull-ups",
-   "animada": true
+   "archivo": "imagenes/ejercicios/ia/dominada.webp",
+   "estatica": "imagenes/ejercicios/ia/dominada-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini",
+   "aliasDe": "Dominadas"
   },
   "Remo unilateral en polea": {
-   "archivo": "imagenes/ejercicios/anim/remo-en-polea.webp",
-   "autor": "Everkinetic",
-   "nombreEnWger": "Remo unilateral en polea",
-   "aliasDe": "Remo en polea",
-   "estatica": "imagenes/ejercicios/remo-en-polea.jpg",
+   "archivo": "imagenes/ejercicios/ia/remo-en-polea.webp",
+   "estatica": "imagenes/ejercicios/ia/remo-en-polea-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "seated-cable-rows"
+   "fuente": "ia",
+   "autor": "ChatGPT",
+   "aliasDe": "Remo en polea"
   },
   "Pullover con mancuerna": {
    "archivo": "imagenes/ejercicios/anim/pullover-en-polea.webp",
@@ -1772,14 +1749,12 @@
    "nombreEnFuente": "barbell-shrugs"
   },
   "Press de banca en multipower": {
-   "archivo": "imagenes/ejercicios/anim/press-de-banca.webp",
-   "autor": "Everkinetic",
-   "nombreEnWger": "Press de Banca",
-   "aliasDe": "Press de banca",
-   "estatica": "imagenes/ejercicios/press-de-banca.png",
+   "archivo": "imagenes/ejercicios/ia/press-de-banca.webp",
+   "estatica": "imagenes/ejercicios/ia/press-de-banca-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "bench-press"
+   "fuente": "ia",
+   "autor": "Gemini",
+   "aliasDe": "Press de banca"
   },
   "Press unilateral en polea": {
    "archivo": "imagenes/ejercicios/anim/cruces-en-polea.webp",
@@ -1809,20 +1784,20 @@
    "animada": true
   },
   "Fondos de pecho": {
-   "archivo": "imagenes/ejercicios/anim/fondos-de-triceps-ek.webp",
-   "autor": "Everkinetic",
-   "nombreEnWger": "Fondos",
-   "aliasDe": "Fondos de tríceps",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "chest-dips",
-   "animada": true
+   "archivo": "imagenes/ejercicios/ia/fondos-de-triceps.webp",
+   "estatica": "imagenes/ejercicios/ia/fondos-de-triceps-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini",
+   "aliasDe": "Fondos de tríceps"
   },
   "Peso muerto piernas rígidas": {
-   "archivo": "imagenes/munecos/peso-muerto-rumano.svg",
-   "autor": "dibujo propio de la app",
-   "nombreEnWger": "Peso muerto rumano con barra",
-   "aliasDe": "Peso muerto rumano",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/peso-muerto-rumano.webp",
+   "estatica": "imagenes/ejercicios/ia/peso-muerto-rumano-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini",
+   "aliasDe": "Peso muerto rumano"
   },
   "Curl femoral de pie": {
    "archivo": "imagenes/ejercicios/anim/curl-femoral-tumbado-ek.webp",
@@ -1850,11 +1825,12 @@
    "animada": true
   },
   "Pull through en polea": {
-   "archivo": "imagenes/munecos/peso-muerto-rumano.svg",
-   "autor": "dibujo propio de la app",
-   "nombreEnWger": "Peso muerto rumano con barra",
-   "aliasDe": "Peso muerto rumano",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/peso-muerto-rumano.webp",
+   "estatica": "imagenes/ejercicios/ia/peso-muerto-rumano-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini",
+   "aliasDe": "Peso muerto rumano"
   },
   "Crunch en suelo": {
    "archivo": "imagenes/ejercicios/anim/crunch-abdominal.webp",
@@ -1911,14 +1887,12 @@
    "aliasDe": "Mountain climbers"
   },
   "Press convergente en máquina": {
-   "archivo": "imagenes/ejercicios/anim/press-de-banca.webp",
-   "autor": "Everkinetic",
-   "nombreEnWger": "Press de Banca",
-   "aliasDe": "Press de banca",
-   "estatica": "imagenes/ejercicios/press-de-banca.png",
+   "archivo": "imagenes/ejercicios/ia/press-de-banca.webp",
+   "estatica": "imagenes/ejercicios/ia/press-de-banca-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "bench-press"
+   "fuente": "ia",
+   "autor": "Gemini",
+   "aliasDe": "Press de banca"
   },
   "Peso muerto con mancuernas": {
    "archivo": "imagenes/ejercicios/anim/peso-muerto-con-mancuernas.webp",
@@ -1929,12 +1903,12 @@
    "nombreEnFuente": "dumbbell-dead-lifts"
   },
   "Sentadilla con salto": {
-   "archivo": "imagenes/munecos/sentadilla.svg",
-   "autor": "dibujo propio de la app",
-   "nombreEnWger": "Sentadilla con disco",
-   "aliasDe": "Sentadilla",
-   "estatica": "imagenes/ejercicios/sentadilla.jpeg",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/sentadilla.webp",
+   "estatica": "imagenes/ejercicios/ia/sentadilla-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini",
+   "aliasDe": "Sentadilla"
   },
   "Zancadas con salto": {
    "archivo": "imagenes/munecos/zancadas.svg",
@@ -1962,22 +1936,20 @@
    "aliasDe": "Saltos al cajón"
   },
   "Flexiones con palmada": {
-   "archivo": "imagenes/ejercicios/anim/flexiones-ek.webp",
-   "autor": "Everkinetic",
-   "nombreEnWger": "Push-Up",
-   "aliasDe": "Flexiones",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "push-ups",
-   "animada": true
+   "archivo": "imagenes/ejercicios/ia/flexiones.webp",
+   "estatica": "imagenes/ejercicios/ia/flexiones-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini",
+   "aliasDe": "Flexiones"
   },
   "Fondos en paralelas con lastre": {
-   "archivo": "imagenes/ejercicios/anim/fondos-de-triceps-ek.webp",
-   "autor": "Everkinetic",
-   "nombreEnWger": "Fondos",
-   "aliasDe": "Fondos de tríceps",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "chest-dips",
-   "animada": true
+   "archivo": "imagenes/ejercicios/ia/fondos-de-triceps.webp",
+   "estatica": "imagenes/ejercicios/ia/fondos-de-triceps-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini",
+   "aliasDe": "Fondos de tríceps"
   },
   "Fondos en paralelas negativos": {
    "archivo": "imagenes/ejercicios/anim/fondos-en-paralelas-negativos.webp",
@@ -1993,12 +1965,11 @@
    "fuente": "propia"
   },
   "Dominadas negativas": {
-   "archivo": "imagenes/ejercicios/anim/dominadas-negativas.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/dominadas.jpg",
+   "archivo": "imagenes/ejercicios/ia/dominadas-negativas.webp",
+   "estatica": "imagenes/ejercicios/ia/dominadas-negativas-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "pull-ups"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Flexiones con lastre": {
    "archivo": "imagenes/munecos/flexiones-con-lastre.svg",
@@ -2006,26 +1977,26 @@
    "fuente": "propia"
   },
   "Pájaro a una mano": {
-   "archivo": "imagenes/ejercicios/anim/pajaros-con-mancuernas.webp",
-   "autor": "Everkinetic",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "bent-over-rear-deltoid-raise-with-head-on-bench",
-   "aliasDe": "Pájaros con mancuernas",
-   "estatica": "imagenes/ejercicios/pajaros-con-mancuernas.png",
-   "animada": true
+   "archivo": "imagenes/ejercicios/ia/pajaros-con-mancuernas.webp",
+   "estatica": "imagenes/ejercicios/ia/pajaros-con-mancuernas-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini",
+   "aliasDe": "Pájaros con mancuernas"
   },
   "Gemelo de pie con barra": {
-   "archivo": "imagenes/ejercicios/anim/gemelo-de-pie-con-barra.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/elevacion-de-gemelos.jpeg",
+   "archivo": "imagenes/ejercicios/ia/gemelo-de-pie-con-barra.webp",
+   "estatica": "imagenes/ejercicios/ia/gemelo-de-pie-con-barra-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "standing-barbell-calf-raise"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Elevación de piernas colgado": {
-   "archivo": "imagenes/munecos/elevacion-de-piernas-colgado.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/elevacion-de-piernas-colgado.webp",
+   "estatica": "imagenes/ejercicios/ia/elevacion-de-piernas-colgado-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Elevación de rodillas colgado": {
    "archivo": "imagenes/munecos/elevacion-de-rodillas-colgado.svg",

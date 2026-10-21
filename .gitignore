@@ -12,3 +12,7 @@ __pycache__/
 
 # Grabación original de los sonidos (el recorte está en web/sonidos)
 box impact.wav
+
+# Originales de los dibujos hechos con IA (pesan mucho; se quedan en el ordenador)
+imagenes-ia/gemini/
+imagenes-ia/chatgpt/

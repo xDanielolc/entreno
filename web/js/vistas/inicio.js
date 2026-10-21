@@ -6,7 +6,7 @@ import { anadir, aviso, h, hoyISO, leerNumero, modal, nuevoId } from '../ui.js';
 import { tarjetaRecuperacion, tarjetaSugerenciasAjuste } from './cuerpo.js';
 import { tarjetaInstalar } from './instalar.js';
 import { pista } from './tutorial.js';
-import { cuestionarioHecho, hacerCuestionario, rutinaRecomendada } from './cuestionario.js';
+import { cuestionarioCerrado, cuestionarioHecho, hacerCuestionario, rutinaRecomendada } from './cuestionario.js';
 import { PLANTILLAS } from '../plantillas.js';
 import { cuentaParaFatiga } from '../catalogo.js';
 import { nombreMusculo } from '../musculos.js';
@@ -135,7 +135,7 @@ export function vistaInicio(contenedor) {
   // Primera vez: ¿cuánto tutorial quieres? (no encima de otro cartel)
   // Primera vez: el cuestionario de bienvenida (nivel, objetivo, dónde,
   // tema). Si hay otro cartel abierto (el de modo prueba), espera.
-  if (!cuestionarioHecho(d) && !preguntandoTutorial) {
+  if (!cuestionarioHecho(d) && !cuestionarioCerrado() && !preguntandoTutorial) {
     preguntandoTutorial = true;
     const intento = setInterval(() => {
       if (document.querySelector('.modal-fondo')) return;

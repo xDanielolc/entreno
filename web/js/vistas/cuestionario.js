@@ -52,6 +52,16 @@ export function cuestionarioHecho(d) {
   return Boolean(d?.perfil?.cuestionario?.hecho);
 }
 
+// Si lo cierras sin acabar, en este dispositivo ya no sale solo al abrir la
+// app (se puede rehacer desde Aprender).
+const CLAVE_CERRADO = 'entreno-cuestionario-cerrado';
+export function cuestionarioCerrado() {
+  try { return localStorage.getItem(CLAVE_CERRADO) === '1'; } catch { return false; }
+}
+function marcarCerrado() {
+  try { localStorage.setItem(CLAVE_CERRADO, '1'); } catch { /* sin almacenamiento: volverá a salir */ }
+}
+
 // Enseña las preguntas una a una y guarda las respuestas.
 export function hacerCuestionario({ alTerminar } = {}) {
   const respuestas = { ...(estado.datos().perfil.cuestionario ?? {}) };
@@ -73,6 +83,9 @@ export function hacerCuestionario({ alTerminar } = {}) {
         } },
       h('div', {}, h('strong', {}, o.etiqueta), o.descripcion && h('div', { class: 'suave' }, o.descripcion)))),
       i > 0 && h('button', { class: 'boton enlace', onclick: () => { i -= 1; pintar(); } }, 'Anterior')));
+    const fondo = [...document.querySelectorAll('.modal-fondo')].at(-1);
+    fondo?.querySelector('.modal-cabecera .boton-icono')?.addEventListener('click', marcarCerrado);
+    fondo?.addEventListener('click', (e) => { if (e.target === fondo) marcarCerrado(); });
   };
 
   // Lo que contestas cambia cosas de verdad, y al final se dice cuáles.

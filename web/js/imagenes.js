@@ -1,4 +1,6 @@
-// Imágenes de los ejercicios. Vienen de tres sitios:
+// Imágenes de los ejercicios. Vienen de cuatro sitios:
+//   · dibujos hechos con IA (Gemini o ChatGPT) con el mismo hombre y estilo,
+//     el inicio y el final del movimiento (herramientas/imagenes_ia.py);
 //   · wger y Everkinetic, con licencia Creative Commons BY-SA
 //     (herramientas/descargar_imagenes.py);
 //   · muñecos propios para lo que ninguno dibuja: yoga, estiramientos,
@@ -47,6 +49,7 @@ function normalizar(texto) {
 // Pie de foto con el autor y la licencia de cada imagen.
 export function textoCredito(imagen) {
   if (imagen.fuente === 'propia') return 'Dibujo propio de la app, provisional hasta que lo pulamos con Design';
+  if (imagen.fuente === 'ia') return `Dibujo hecho con IA (${imagen.autor ?? 'Gemini'}) para la app`;
   if (imagen.fuente === 'everkinetic') return 'Imagen: Everkinetic · CC-BY-SA';
   return `Imagen: ${imagen.autor} · wger, CC-BY-SA`;
 }
