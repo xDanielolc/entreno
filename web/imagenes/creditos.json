@@ -1264,9 +1264,11 @@
    "fuente": "propia"
   },
   "Ángulo ligado (Baddha Konasana)": {
-   "archivo": "imagenes/munecos/angulo-ligado-baddha-konasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-angulo-ligado-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-angulo-ligado-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Ángulo ligado tumbado (Supta Baddha Konasana)": {
    "archivo": "imagenes/munecos/angulo-ligado-tumbado-supta-baddha-konasana.svg",
