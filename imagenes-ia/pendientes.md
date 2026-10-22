@@ -75,3 +75,4 @@ Pendiente de lo que pidió:
 - Rehacer: elevaciones laterales en polea, flexiones en pino (la foto de referencia mostraba dos vistas, no
   dos fases), fondos asistidos (el de antes es de paralelas).
 - Línea gruesa como la de Everkinetic en los de IA (crunch, elevaciones laterales).
+- flexiones-en-pino (22-10, con la pared): en la segunda fase el cuerpo se inclina y los pies resbalan por la pared, y la pared cambia de distancia. Descartado.

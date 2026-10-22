@@ -1125,3 +1125,12 @@ fase), tras probar la A.
   (`ANCLA_COMPLETO`). Al procesar un solo dibujo, `OTRO_DIBUJO` deshace los completados de otros:
   antes de publicar, el procesado entero. Almacén `entreno-imagenes-18`. Página de comparación con
   correcciones de un toque y «Borrar el otro» marcado por defecto.
+- 0.60.9 (22-10-2026): sus correcciones. `herramientas/reencajar.py` reencaja dibujos de Everkinetic
+  que «se teletransportaban» (zona quieta o desplazamiento medido a ojo, `mover`); la prensa, con la
+  persona quieta (lo pidió así). Arreglos con Gemini adjuntando el dibujo y pidiendo la corrección
+  (originales en `imagenes-ia/arreglos/`, fuera de Git): dominadas (y negativas = la dominada al revés,
+  `"invertir"` en peticiones.json), supinas (`"ancla": "barra-centrada"`), fondos de tríceps,
+  flexiones en pica, aperturas (placas), extensión de tríceps en máquina; nuevos: elevaciones
+  laterales en polea, fondos asistidos. `QUIETOS` (plancha lateral sin animar). Variantes nuevas en el
+  catálogo: «Press de hombro a una mano» y «Peso muerto rumano con mancuernas» (el dibujo de antes vía
+  `OTRO_DIBUJO`). Su elección en Design: estilo A (docs/pendientes-design.md). Almacén `entreno-imagenes-19`.

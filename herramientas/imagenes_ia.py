@@ -184,7 +184,24 @@ def sin_suelo(im):
     return im
 
 
-def procesar(origen, modo="pies", espejo=False, solo=False):
+def centrar_en_barra(partes):
+    """Una sola barra de lado a lado: al partir, cada postura se queda con un trozo de distinto largo.
+    Se recorta cada postura a lo mismo a cada lado del centro de la figura, así la barra mide igual."""
+    centros, anchos = [], []
+    for im in partes:
+        tinta = mascara(im, 200)
+        x0, y0, x1, y1 = tinta.getbbox()
+        _, barra_y = ancla(im, "barra")
+        # El cuerpo, por debajo de la barra (la barra cruza de lado a lado y movería el centro).
+        cuerpo = tinta.crop((x0, round(barra_y) + 12, x1, y1)).getbbox()
+        cx = x0 + (cuerpo[0] + cuerpo[2]) / 2
+        centros.append(cx)
+        anchos.append(min(cx, im.width - cx))
+    medio = min(anchos)
+    return [im.crop((round(cx - medio), 0, round(cx + medio), im.height)) for im, cx in zip(partes, centros)]
+
+
+def procesar(origen, modo="pies", espejo=False, solo=False, invertir=False):
     nombre = origen.stem.split("-", 1)[1]
     if origen.stem.startswith("completo-"):
         # Un dibujo hecho por una persona que venía cortado, completado por la IA: va aparte del de la IA.
@@ -197,7 +214,10 @@ def procesar(origen, modo="pies", espejo=False, solo=False):
         if origen.stem.startswith("completo-"):
             # Sin suelo antes de partir: una línea de suelo de lado a lado no deja hueco entre las dos posturas.
             im = sin_suelo(im)
-        inicio, final = (recortar(sin_suelo(x) if origen.stem.startswith("completo-") else x, 0) for x in partir(im))
+        partes = partir(im)
+        if modo == "barra-centrada":
+            partes, modo = centrar_en_barra(partes), "barra"
+        inicio, final = (recortar(sin_suelo(x) if origen.stem.startswith("completo-") else x, 0) for x in partes)
         if solo:
             # Las dos figuras salieron casi iguales (pasa al alternar piernas): basta la primera, quieta.
             quieta(inicio, fija)
@@ -205,6 +225,9 @@ def procesar(origen, modo="pies", espejo=False, solo=False):
         if espejo:
             # La IA dibujó la segunda figura mirando al otro lado: se le da la vuelta.
             final = final.transpose(Image.FLIP_LEFT_RIGHT)
+        if invertir:
+            # Empieza por la postura final (las negativas: arriba y bajar despacio).
+            inicio, final = final, inicio
         animar([inicio, final], SALIDA / f"{nombre}.webp", modo)
         quieta(inicio, fija)
         return nombre, True
@@ -216,7 +239,7 @@ def leer_tabla():
     """De peticiones.json: nombre del dibujo → {"ejercicios": [...], "ancla": ...}."""
     if not PETICIONES.exists():
         return {}
-    return {p["slug"]: {"ejercicios": [p["ejercicio"], *p.get("tambien", [])], "ancla": p.get("ancla", "pies"), "espejo": p.get("espejo", False), "solo": p.get("solo", False), "usar": p.get("usar"), "sinAlias": p.get("sinAlias", False)}
+    return {p["slug"]: {"ejercicios": [p["ejercicio"], *p.get("tambien", [])], "ancla": p.get("ancla", "pies"), "espejo": p.get("espejo", False), "solo": p.get("solo", False), "usar": p.get("usar"), "sinAlias": p.get("sinAlias", False), "invertir": p.get("invertir", False)}
             for p in json.loads(PETICIONES.read_text(encoding="utf8"))}
 
 
@@ -227,12 +250,20 @@ def ejercicios_de(entrada):
     return entrada if isinstance(entrada, list) else entrada.get("ejercicios", [])
 
 
+# Ejercicios que se aguantan quietos: dibujo sin animar (Dan, 22-10-2026: «en estática que no se mueva»).
+QUIETOS = {"Plancha lateral": "imagenes/ejercicios/anim/plancha-lateral-quieta.webp"}
+
+
 # Completados que no se apoyan en el suelo: se encajan por lo que no se mueve (las barras de los fondos).
 ANCLA_COMPLETO = {"fondos-asistidos": "encajar", "fondos-de-triceps-ek": "encajar", "fondos-en-paralelas-negativos": "encajar"}
 
 
 # El dibujo de antes de «Fondos asistidos» se ve como fondos en paralelas: Dan lo quiere para «Fondos de pecho».
-OTRO_DIBUJO = {"Fondos de pecho": "Fondos asistidos"}
+# Y los que eran dos variantes (comparativa del 22-10-2026): el dibujo de antes pasa a la otra variante.
+OTRO_DIBUJO = {"Fondos de pecho": "Fondos asistidos",
+               "Encogimientos de trapecio con barra": "Encogimientos de trapecio",
+               "Press de hombro a una mano": "Press de hombro con mancuernas",
+               "Peso muerto rumano con mancuernas": "Peso muerto con mancuernas"}
 
 
 def hecho_por_persona(datos):
@@ -292,6 +323,9 @@ def apuntar(hechos):
                 ejercicios[ej] = {**{k: v for k, v in datos.items() if k not in ("estatica", "animada")},
                                   "archivo": f"imagenes/ejercicios/ia/{nombre}.webp", "estatica": f"imagenes/ejercicios/ia/{nombre}-quieta.webp",
                                   "animada": animada, "completadoCon": "Gemini" if origen == "gemini" else "ChatGPT"}
+    for ej, archivo in QUIETOS.items():
+        if ej in ejercicios:
+            ejercicios[ej] = {**ejercicios[ej], "archivo": archivo, "estatica": archivo, "animada": False}
     CREDITOS.write_text(json.dumps(creditos, ensure_ascii=False, indent=1), encoding="utf8")
 
 
@@ -313,7 +347,7 @@ def main():
                 # Las dos posturas de un dibujo completado coinciden casi enteras: se encajan donde más líneas cuadran.
                 modo = ANCLA_COMPLETO.get(nombre, "encajar-suelo")
             opciones = entrada if isinstance(entrada, dict) else {}
-            nombre, animada = procesar(origen, modo, bool(opciones.get("espejo")), bool(opciones.get("solo")))
+            nombre, animada = procesar(origen, modo, bool(opciones.get("espejo")), bool(opciones.get("solo")), bool(opciones.get("invertir")))
             hechos.append((nombre, animada, carpeta.name))
             print(("animada " if animada else "quieta  ") + nombre)
     apuntar(hechos)

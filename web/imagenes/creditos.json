@@ -135,13 +135,11 @@
    "autor": "Gemini"
   },
   "Fondos asistidos": {
-   "archivo": "imagenes/ejercicios/ia/fondos-asistidos-completo.webp",
-   "autor": "Everkinetic",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "chest-dips",
-   "estatica": "imagenes/ejercicios/ia/fondos-asistidos-completo-quieta.webp",
+   "archivo": "imagenes/ejercicios/ia/fondos-asistidos.webp",
+   "estatica": "imagenes/ejercicios/ia/fondos-asistidos-quieta.webp",
    "animada": true,
-   "completadoCon": "Gemini"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Press militar": {
    "archivo": "imagenes/ejercicios/anim/press-militar-ek.webp",
@@ -152,13 +150,11 @@
    "nombreEnFuente": "seated-military-press"
   },
   "Press de hombro con mancuernas": {
-   "archivo": "imagenes/ejercicios/ia/press-de-hombro-con-mancuernas-completo.webp",
-   "autor": "Everkinetic",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "one-arm-dumbbell-shoulder-press",
-   "estatica": "imagenes/ejercicios/ia/press-de-hombro-con-mancuernas-completo-quieta.webp",
+   "archivo": "imagenes/ejercicios/ia/press-de-hombro-con-mancuernas.webp",
+   "estatica": "imagenes/ejercicios/ia/press-de-hombro-con-mancuernas-quieta.webp",
    "animada": true,
-   "completadoCon": "Gemini"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Press de hombro en máquina": {
    "archivo": "imagenes/ejercicios/anim/press-de-hombro-en-maquina.webp",
@@ -252,12 +248,11 @@
    "autor": "Gemini"
   },
   "Dominadas supinas": {
-   "archivo": "imagenes/ejercicios/anim/dominadas-supinas.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/dominadas-supinas.jpg",
+   "archivo": "imagenes/ejercicios/ia/dominadas-supinas.webp",
+   "estatica": "imagenes/ejercicios/ia/dominadas-supinas-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "narrow-parallel-grip-chin-ups"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Dominadas asistidas": {
    "archivo": "imagenes/munecos/dominadas-asistidas.svg",
@@ -327,13 +322,11 @@
    "completadoCon": "Gemini"
   },
   "Encogimientos de trapecio": {
-   "archivo": "imagenes/ejercicios/ia/encogimientos-de-trapecio-completo.webp",
-   "autor": "Everkinetic",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "barbell-shrugs",
-   "estatica": "imagenes/ejercicios/ia/encogimientos-de-trapecio-completo-quieta.webp",
+   "archivo": "imagenes/ejercicios/ia/encogimientos-de-trapecio.webp",
+   "estatica": "imagenes/ejercicios/ia/encogimientos-de-trapecio-quieta.webp",
    "animada": true,
-   "completadoCon": "Gemini"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Curl de bíceps con barra": {
    "archivo": "imagenes/ejercicios/ia/curl-de-biceps-con-barra-completo.webp",
@@ -507,12 +500,13 @@
    "completadoCon": "Gemini"
   },
   "Elevación de gemelos sentado": {
-   "archivo": "imagenes/ejercicios/anim/elevacion-de-gemelos-sentado.webp",
+   "archivo": "imagenes/ejercicios/ia/elevacion-de-gemelos-sentado-completo.webp",
    "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/elevacion-de-gemelos-sentado.jpeg",
-   "animada": true,
    "fuente": "everkinetic",
-   "nombreEnFuente": "seated-calf-raise-using-machine"
+   "nombreEnFuente": "seated-calf-raise-using-machine",
+   "estatica": "imagenes/ejercicios/ia/elevacion-de-gemelos-sentado-completo-quieta.webp",
+   "animada": true,
+   "completadoCon": "Gemini"
   },
   "Crunch abdominal": {
    "archivo": "imagenes/ejercicios/anim/crunch-abdominal.webp",
@@ -771,20 +765,19 @@
    "animada": true
   },
   "Crunch inverso": {
-   "archivo": "imagenes/ejercicios/anim/crunch-inverso.webp",
-   "autor": "Everkinetic",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "bent-knee-hip-raise",
-   "estatica": "imagenes/ejercicios/crunch-inverso.png",
-   "animada": true
+   "archivo": "imagenes/ejercicios/ia/crunch-inverso.webp",
+   "estatica": "imagenes/ejercicios/ia/crunch-inverso-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Plancha lateral": {
-   "archivo": "imagenes/ejercicios/anim/plancha-lateral.webp",
+   "archivo": "imagenes/ejercicios/anim/plancha-lateral-quieta.webp",
    "autor": "Everkinetic",
    "fuente": "everkinetic",
    "nombreEnFuente": "side-plank",
-   "estatica": "imagenes/ejercicios/plancha-lateral.png",
-   "animada": true
+   "estatica": "imagenes/ejercicios/anim/plancha-lateral-quieta.webp",
+   "animada": false
   },
   "Superman": {
    "archivo": "imagenes/ejercicios/anim/superman.webp",
@@ -2011,8 +2004,6 @@
   "Encogimientos de trapecio con barra": {
    "archivo": "imagenes/ejercicios/ia/encogimientos-de-trapecio-completo.webp",
    "autor": "Everkinetic",
-   "nombreEnWger": "Encogimientos de hombros con mancuernas",
-   "aliasDe": "Encogimientos de trapecio",
    "fuente": "everkinetic",
    "nombreEnFuente": "barbell-shrugs",
    "estatica": "imagenes/ejercicios/ia/encogimientos-de-trapecio-completo-quieta.webp",
@@ -2178,12 +2169,11 @@
    "nombreEnFuente": "bench-press"
   },
   "Peso muerto con mancuernas": {
-   "archivo": "imagenes/ejercicios/anim/peso-muerto-con-mancuernas.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/peso-muerto.jpeg",
+   "archivo": "imagenes/ejercicios/ia/peso-muerto-con-mancuernas.webp",
+   "estatica": "imagenes/ejercicios/ia/peso-muerto-con-mancuernas-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "dumbbell-dead-lifts"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Sentadilla con salto": {
    "archivo": "imagenes/munecos/sentadilla.svg",
@@ -2262,12 +2252,11 @@
    "autor": "Gemini"
   },
   "Dominadas negativas": {
-   "archivo": "imagenes/ejercicios/anim/dominadas-negativas.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/dominadas.jpg",
+   "archivo": "imagenes/ejercicios/ia/dominadas-negativas.webp",
+   "estatica": "imagenes/ejercicios/ia/dominadas-negativas-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "pull-ups"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Flexiones con lastre": {
    "archivo": "imagenes/munecos/flexiones-con-lastre.svg",
@@ -2407,6 +2396,23 @@
    "archivo": "imagenes/munecos/lanzamiento-de-balon-medicinal.svg",
    "autor": "dibujo propio de la app",
    "fuente": "propia"
+  },
+  "Press de hombro a una mano": {
+   "archivo": "imagenes/ejercicios/ia/press-de-hombro-con-mancuernas-completo.webp",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "one-arm-dumbbell-shoulder-press",
+   "estatica": "imagenes/ejercicios/ia/press-de-hombro-con-mancuernas-completo-quieta.webp",
+   "animada": true,
+   "completadoCon": "Gemini"
+  },
+  "Peso muerto rumano con mancuernas": {
+   "archivo": "imagenes/ejercicios/anim/peso-muerto-con-mancuernas.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/peso-muerto.jpeg",
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "dumbbell-dead-lifts"
   }
  }
 }

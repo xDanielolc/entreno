@@ -60,7 +60,8 @@
   "inicio": "arriba, barbilla por encima de la barra, codos flexionados",
   "final": "bajando despacio, a medio camino, codos a 90 grados",
   "ancla": "barra",
-  "usar": "antes"
+  "usar": "ia",
+  "invertir": true
  },
  {
   "slug": "curl-martillo",
@@ -117,7 +118,8 @@
   "inicio": "arriba con los brazos estirados sujetando el cuerpo, piernas algo flexionadas hacia atrás",
   "final": "abajo con los codos a 90 grados y el tronco un poco inclinado hacia delante",
   "usar": "ia",
-  "sinAlias": true
+  "sinAlias": true,
+  "ancla": "encajar"
  },
  {
   "slug": "peso-muerto-sumo",
@@ -206,8 +208,8 @@
   "vista": "de rodillas sobre el apoyo de una máquina de fondos asistidos, visto de lado",
   "inicio": "arriba con los brazos estirados en las asas",
   "final": "abajo con los codos a 90 grados",
-  "ancla": "atras",
-  "usar": "antes"
+  "ancla": "encajar",
+  "usar": "ia"
  },
  {
   "slug": "press-de-hombro-con-mancuernas",
@@ -215,7 +217,7 @@
   "vista": "sentado en un banco con respaldo vertical, visto de frente",
   "inicio": "mancuernas a la altura de las orejas, codos abajo",
   "final": "brazos estirados con las mancuernas por encima de la cabeza",
-  "usar": "antes"
+  "usar": "ia"
  },
  {
   "slug": "press-de-hombro-en-maquina",
@@ -300,8 +302,8 @@
   "vista": "en barra fija, visto de frente, palmas hacia la cara",
   "inicio": "colgado con los brazos estirados",
   "final": "barbilla por encima de la barra",
-  "ancla": "barra",
-  "usar": "antes"
+  "ancla": "barra-centrada",
+  "usar": "ia"
  },
  {
   "slug": "dominadas-asistidas",
@@ -383,7 +385,7 @@
   "inicio": "brazos colgando, hombros relajados",
   "final": "hombros subidos hacia las orejas, brazos estirados",
   "ancla": "cabeza",
-  "usar": "antes"
+  "usar": "ia"
  },
  {
   "slug": "curl-de-biceps-con-barra",
@@ -519,7 +521,8 @@
   "ejercicio": "Peso muerto con mancuernas",
   "vista": "visto de lado, una mancuerna en cada mano",
   "inicio": "agachado con la espalda recta y las mancuernas en el suelo junto a los pies",
-  "final": "de pie y erguido con las mancuernas a los lados de los muslos"
+  "final": "de pie y erguido con las mancuernas a los lados de los muslos",
+  "usar": "ia"
  },
  {
   "slug": "buenos-dias",
@@ -874,7 +877,8 @@
   "vista": "tumbado boca arriba en el suelo con las manos a los lados, visto de lado",
   "inicio": "rodillas dobladas a 90 grados encima de la cadera",
   "final": "cadera levantada del suelo, rodillas hacia el pecho",
-  "ancla": "atras"
+  "ancla": "atras",
+  "usar": "ia"
  },
  {
   "slug": "plancha",

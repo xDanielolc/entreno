@@ -60,3 +60,12 @@ Para que a Design no le pase lo mismo.
   negros puros de fondo).
 - La cebra que no salía era otra cosa: «Ver las series» no es una tabla sino
   una lista de barras, y la cebra solo se había puesto en las tablas.
+
+## Pantallas clave (22-10-2026)
+
+Lienzo de Design con Hoy y el entreno en dos estilos (https://claude.ai/artifact/A6Q3i9FGZcwg949bXZGnWi).
+Dan eligió el **A («ordenado»)**: lo de ahora más limpio. De ahí sale para la app: en Hoy, tarjeta
+«Hoy te toca» con el día, la lista corta de ejercicios con su objetivo y «Empezar» a todo el ancho;
+recuperación en barras finas por músculo con «¿Voy hoy?» debajo; últimos entrenamientos en dos filas.
+En el entreno: sugerencia «Hoy 112,5 kg × 4 dejando 2» con filo, casillas grandes y el descanso en una
+banda de tinta con −30 s / +30 s. Falta pasarlo al código cuando él lo pida.
