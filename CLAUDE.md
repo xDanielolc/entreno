@@ -1114,3 +1114,14 @@ fase), tras probar la A.
   petición y comprobando que el adjunto está antes de escribir. Los dibujos malos van a
   `imagenes-ia/descartes/` (fuera de Git) y se anotan en `imagenes-ia/pendientes.md`.
   Almacén `entreno-imagenes-17`.
+- 0.60.8 (22-10-2026, tras su comparativa): `"usar"` aplicado a sus 59 elecciones y descartados
+  (`imagenes-ia/descartes/`, que el procesado ya no lee) los dibujos de IA que no quiso. `"sinAlias"`
+  en peticiones.json (el dibujo no pasa a los alias) y `OTRO_DIBUJO` en imagenes_ia.py (el de
+  «Fondos asistidos» de antes es ahora el de «Fondos de pecho»). **Dibujos completados**: los de
+  Everkinetic venían cortados a media pierna; `completo-<nombre del anim>.png` (Gemini, pidiéndole
+  que complete sin tocar lo demás) sustituye a ese dibujo donde se use, con su licencia y
+  `completadoCon` (textoCredito lo dice). Se borran las líneas de suelo (`sin_suelo`) y se encaja
+  por las líneas que coinciden con el suelo quieto (`encajar-suelo`); los fondos, por las barras
+  (`ANCLA_COMPLETO`). Al procesar un solo dibujo, `OTRO_DIBUJO` deshace los completados de otros:
+  antes de publicar, el procesado entero. Almacén `entreno-imagenes-18`. Página de comparación con
+  correcciones de un toque y «Borrar el otro» marcado por defecto.

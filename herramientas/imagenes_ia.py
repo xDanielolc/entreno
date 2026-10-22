@@ -49,6 +49,12 @@ def partir(im):
         else:
             inicio = None
     if not mejor_tramo:
+        # Sin columna en blanco, pero casi: solo la cruza una línea de suelo inclinada. Se corta por la más limpia.
+        rango = range(int(ancho * 0.25), int(ancho * 0.75))
+        x = min(rango, key=lambda c: columnas[c])
+        if columnas[x] <= 3:
+            mejor_tramo = (x, x)
+    if not mejor_tramo:
         # A veces la IA pone una figura encima de la otra: entonces se corta por la fila en blanco.
         filas = [sum(1 for x in range(0, ancho, 2) if tinta.getpixel((x, y))) for y in range(alto)]
         tramo = max(((y0, y1) for y0 in range(int(alto * 0.25), int(alto * 0.75)) if filas[y0] == 0
@@ -130,6 +136,11 @@ def animar(posturas, salida, modo="pies", duraciones=(900, 900), tope=600, marge
     if modo == "encajar":
         sx, sy = encajar(*posturas)
         anclas = [(0, 0), (-sx, -sy)]
+    elif modo == "encajar-suelo":
+        # De lado, donde más líneas cuadran; de alto, el suelo en su sitio (al ponerse de puntillas el cuerpo sube).
+        sx, _ = encajar(*posturas)
+        abajo = [(mascara(im, 200).getbbox() or (0, 0, 0, im.height))[3] for im in posturas]
+        anclas = [(0, 0), (-sx, abajo[1] - abajo[0])]
     else:
         anclas = [ancla(im, modo) for im in posturas]
     cajas = [mascara(im, 200).getbbox() or (0, 0, im.width, im.height) for im in posturas]
@@ -161,14 +172,32 @@ def quieta(im, salida, tope=600):
     lienzo.save(salida, "WEBP", quality=82, method=6)
 
 
+def sin_suelo(im):
+    """Borra las líneas de suelo (filas largas de tinta en la parte de abajo): la IA las dibuja a alturas distintas."""
+    im = im.copy()
+    g = im.convert("L"); w, h = g.size; px = g.load()
+    for y in range(int(h * 0.75), h):
+        if sum(1 for x in range(w) if px[x, y] < 160) > w * 0.35:
+            for yy in range(max(0, y - 1), min(h, y + 2)):
+                for x in range(w):
+                    im.putpixel((x, yy), (255, 255, 255))
+    return im
+
+
 def procesar(origen, modo="pies", espejo=False, solo=False):
     nombre = origen.stem.split("-", 1)[1]
+    if origen.stem.startswith("completo-"):
+        # Un dibujo hecho por una persona que venía cortado, completado por la IA: va aparte del de la IA.
+        nombre += "-completo"
     # ChatGPT deja el fondo gris muy claro: lo casi blanco pasa a blanco puro.
     im = Image.open(origen).convert("RGB").point(lambda v: 255 if v > 232 else v)
     SALIDA.mkdir(parents=True, exist_ok=True)
     fija = SALIDA / f"{nombre}-quieta.webp"
-    if origen.stem.startswith("fases-"):
-        inicio, final = (recortar(x, 0) for x in partir(im))
+    if origen.stem.startswith(("fases-", "completo-")):
+        if origen.stem.startswith("completo-"):
+            # Sin suelo antes de partir: una línea de suelo de lado a lado no deja hueco entre las dos posturas.
+            im = sin_suelo(im)
+        inicio, final = (recortar(sin_suelo(x) if origen.stem.startswith("completo-") else x, 0) for x in partir(im))
         if solo:
             # Las dos figuras salieron casi iguales (pasa al alternar piernas): basta la primera, quieta.
             quieta(inicio, fija)
@@ -187,7 +216,7 @@ def leer_tabla():
     """De peticiones.json: nombre del dibujo → {"ejercicios": [...], "ancla": ...}."""
     if not PETICIONES.exists():
         return {}
-    return {p["slug"]: {"ejercicios": [p["ejercicio"], *p.get("tambien", [])], "ancla": p.get("ancla", "pies"), "espejo": p.get("espejo", False), "solo": p.get("solo", False), "usar": p.get("usar")}
+    return {p["slug"]: {"ejercicios": [p["ejercicio"], *p.get("tambien", [])], "ancla": p.get("ancla", "pies"), "espejo": p.get("espejo", False), "solo": p.get("solo", False), "usar": p.get("usar"), "sinAlias": p.get("sinAlias", False)}
             for p in json.loads(PETICIONES.read_text(encoding="utf8"))}
 
 
@@ -196,6 +225,14 @@ def ejercicios_de(entrada):
     if not entrada:
         return []
     return entrada if isinstance(entrada, list) else entrada.get("ejercicios", [])
+
+
+# Completados que no se apoyan en el suelo: se encajan por lo que no se mueve (las barras de los fondos).
+ANCLA_COMPLETO = {"fondos-asistidos": "encajar", "fondos-de-triceps-ek": "encajar", "fondos-en-paralelas-negativos": "encajar"}
+
+
+# El dibujo de antes de «Fondos asistidos» se ve como fondos en paralelas: Dan lo quiere para «Fondos de pecho».
+OTRO_DIBUJO = {"Fondos de pecho": "Fondos asistidos"}
 
 
 def hecho_por_persona(datos):
@@ -210,6 +247,8 @@ def apuntar(hechos):
     ejercicios = creditos["ejercicios"]
     antes = json.loads(ANTES.read_text(encoding="utf8"))["ejercicios"] if ANTES.exists() else {}
     for nombre, animada, origen in hechos:
+        if nombre.endswith("-completo"):
+            continue
         entrada = tabla.get(nombre) or {}
         for ej in ejercicios_de(entrada):
             previo = antes.get(ej)
@@ -232,10 +271,27 @@ def apuntar(hechos):
                 "autor": "Gemini" if origen == "gemini" else "ChatGPT",
             }
             ejercicios[ej] = datos
-            # Los alias (otro nombre del mismo ejercicio) copian la imagen.
+            # Los alias (otro nombre del mismo ejercicio) copian la imagen, salvo con "sinAlias"
+            # (Dan, 22-10-2026: el dibujo nuevo de fondos, solo para los de tríceps).
             for clave, otro in ejercicios.items():
-                if otro.get("aliasDe") == ej:
+                if otro.get("aliasDe") == ej and not entrada.get("sinAlias"):
                     ejercicios[clave] = {**datos, "aliasDe": ej}
+    # Dibujos que pasan a otro ejercicio por decisión de Dan (ejercicio → ejercicio cuyo dibujo de antes usa).
+    for destino, origen in OTRO_DIBUJO.items():
+        if origen in antes:
+            ejercicios[destino] = {k: v for k, v in antes[origen].items() if k != "aliasDe"}
+    # Dibujos hechos por una persona que venían cortados, completados por la IA: «completo-<nombre>»,
+    # con <nombre> el del dibujo animado de antes (web/imagenes/ejercicios/anim/<nombre>.webp). Sustituyen a ese
+    # dibujo donde se use, y no donde Dan eligió el de la IA.
+    for nombre, animada, origen in hechos:
+        if not nombre.endswith("-completo"):
+            continue
+        base = nombre[:-len("-completo")]
+        for ej, datos in list(ejercicios.items()):
+            if datos.get("archivo", "").endswith(f"/anim/{base}.webp"):
+                ejercicios[ej] = {**{k: v for k, v in datos.items() if k not in ("estatica", "animada")},
+                                  "archivo": f"imagenes/ejercicios/ia/{nombre}.webp", "estatica": f"imagenes/ejercicios/ia/{nombre}-quieta.webp",
+                                  "animada": animada, "completadoCon": "Gemini" if origen == "gemini" else "ChatGPT"}
     CREDITOS.write_text(json.dumps(creditos, ensure_ascii=False, indent=1), encoding="utf8")
 
 
@@ -246,15 +302,18 @@ def main():
     # «descartes» guarda los que salieron mal: no se usan.
     for carpeta in sorted(p for p in ORIGENES.iterdir() if p.is_dir() and p.name != "descartes"):
         for origen in sorted(carpeta.glob("*.jpg")) + sorted(carpeta.glob("*.png")):
-            if not origen.stem.startswith(("fases-", "quieto-")):
+            if not origen.stem.startswith(("fases-", "quieto-", "completo-")):
                 continue
             nombre = origen.stem.split("-", 1)[1]
             if filtro and nombre != filtro:
                 continue
             entrada = tabla.get(nombre)
             modo = entrada.get("ancla", "pies") if isinstance(entrada, dict) else "pies"
+            if origen.stem.startswith("completo-"):
+                # Las dos posturas de un dibujo completado coinciden casi enteras: se encajan donde más líneas cuadran.
+                modo = ANCLA_COMPLETO.get(nombre, "encajar-suelo")
             opciones = entrada if isinstance(entrada, dict) else {}
-            _, animada = procesar(origen, modo, bool(opciones.get("espejo")), bool(opciones.get("solo")))
+            nombre, animada = procesar(origen, modo, bool(opciones.get("espejo")), bool(opciones.get("solo")))
             hechos.append((nombre, animada, carpeta.name))
             print(("animada " if animada else "quieta  ") + nombre)
     apuntar(hechos)

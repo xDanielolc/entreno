@@ -42,9 +42,36 @@ Pendiente de la revisión:
 - Dominadas negativas: usar la dominada buena con la animación invertida.
 - Zancadas hacia atrás: puede usar la animación de las zancadas.
 - Extensión de tríceps sobre la cabeza: con los dos brazos y de frente.
-- yoga-chaturanga: sale en plancha alta con los brazos estirados, no con los codos a 90 grados. Segundo intento (codos a 90 grados en mayúsculas): sigue casi estirado.
-- yoga-rueda: sale boca abajo con la espalda arqueada, no boca arriba.
-- yoga-oreja-a-la-rodilla: sale un puente, no las piernas por encima de la cabeza.
-- yoga-sobre-los-hombros-sin-brazos: sale con las manos en la espalda (igual que la vela normal).
-- yoga-grulla-lateral: sale de pie, sin la postura.
-- yoga-tortuga-tumbada: sale sentado y encogido abrazando las rodillas, sin las piernas detrás de la nuca.
+- yoga-chaturanga: sale en plancha alta con los brazos estirados, no con los codos a 90 grados. Segundo intento (codos a 90 grados en mayúsculas): sigue casi estirado. Tercero (punto más bajo de una flexión): igual. Gemini no sabe dibujarla; queda el muñeco.
+- yoga-rueda: sale boca abajo con la espalda arqueada, no boca arriba. Resuelto el 22-10 con una petición más detallada.
+- yoga-oreja-a-la-rodilla: sale un puente, no las piernas por encima de la cabeza. Resuelto el 22-10 con una petición más detallada.
+- yoga-sobre-los-hombros-sin-brazos: sale con las manos en la espalda (igual que la vela normal). Resuelto el 22-10 con una petición más detallada.
+- yoga-grulla-lateral: sale de pie, sin la postura. Resuelto el 22-10 con una petición más detallada.
+- yoga-tortuga-tumbada: sale sentado y encogido abrazando las rodillas, sin las piernas detrás de la nuca. Segundo intento (piernas de bufanda): postura imposible. Gemini no sabe; queda el muñeco.
+
+## Comparativa del 22-10-2026 (sus 59 elecciones)
+
+Aplicado: `"usar"` en peticiones.json según lo que eligió; los dibujos de IA que descartó (eligió el de
+antes y no pidió conservar los dos) están en `imagenes-ia/descartes/`. El dibujo nuevo de fondos, solo
+para «Fondos de tríceps» (`"sinAlias"`); el antiguo de asistidos pasa a «Fondos de pecho» (`OTRO_DIBUJO`).
+Los dibujos de Everkinetic que venían cortados (piernas a medias) se completan con Gemini sin tocar lo
+demás: `completo-<nombre del anim>.png` en gemini/, sustituyen al de antes donde se use.
+
+Pendiente de lo que pidió:
+- Conservar los dos como variantes (ejercicios nuevos en el catálogo): crunch inverso / elevación de
+  piernas en el suelo; peso muerto rumano con mancuernas / peso muerto con mancuernas; encogimientos con
+  y sin mancuernas; press de hombro unilateral / bilateral; jalón cerrado (el de antes) / abierto (el nuevo,
+  corregirlo mucho); fondos de tríceps / fondos de tríceps en banco; crunch, curl martillo, elevaciones
+  laterales, press cerrado y press francés (le gustan los dos).
+- Teletransporte en dibujos de antes: abductores y aductores en máquina, elevación de piernas en el suelo,
+  fondos en banco. En los nuevos que eligió: flexiones en pica, fondos de tríceps.
+- Placas que no se mueven: aperturas de pecho (nuevo). Extensión de tríceps en máquina (nuevo): máquina que
+  cambia de tamaño, placas, agarre, más músculo y línea gruesa; si no se arregla, volver al de antes.
+- Dominadas: el nuevo, sin que el muñeco cambie de tamaño ni la barra se mueva; negativas = la dominada al
+  revés; supinas: corregir la barra del nuevo.
+- Prensa de piernas: animada al revés (debe moverse la persona y quedarse fija la máquina, o al revés: preguntar).
+- Plancha lateral: la de antes por defecto y en la dinámica; en la estática, que no se mueva.
+- Elevación de gemelos sentado: completar la máquina. Curl femoral sentado: el nuevo era de cuádriceps.
+- Rehacer: elevaciones laterales en polea, flexiones en pino (la foto de referencia mostraba dos vistas, no
+  dos fases), fondos asistidos (el de antes es de paralelas).
+- Línea gruesa como la de Everkinetic en los de IA (crunch, elevaciones laterales).
