@@ -665,7 +665,7 @@
    "estatica": "imagenes/ejercicios/ia/sentadilla-goblet-quieta.webp",
    "animada": true,
    "fuente": "ia",
-   "autor": "Gemini"
+   "autor": "ChatGPT"
   },
   "Sentadilla hack": {
    "archivo": "imagenes/ejercicios/anim/sentadilla-hack.webp",
@@ -974,7 +974,7 @@
    "estatica": "imagenes/ejercicios/ia/senderismo-quieta.webp",
    "animada": false,
    "fuente": "ia",
-   "autor": "Gemini"
+   "autor": "ChatGPT"
   },
   "Burpees": {
    "archivo": "imagenes/ejercicios/ia/burpees.webp",
@@ -988,7 +988,7 @@
    "estatica": "imagenes/ejercicios/ia/saltos-al-cajon-quieta.webp",
    "animada": true,
    "fuente": "ia",
-   "autor": "Gemini"
+   "autor": "ChatGPT"
   },
   "Estiramiento": {
    "archivo": "imagenes/ejercicios/ia/estiramiento-quieta.webp",
@@ -1112,14 +1112,14 @@
    "estatica": "imagenes/ejercicios/ia/sentadilla-profunda-mantenida-quieta.webp",
    "animada": false,
    "fuente": "ia",
-   "autor": "Gemini"
+   "autor": "ChatGPT"
   },
   "Sentadilla cosaca": {
    "archivo": "imagenes/ejercicios/ia/sentadilla-cosaca.webp",
    "estatica": "imagenes/ejercicios/ia/sentadilla-cosaca-quieta.webp",
    "animada": true,
    "fuente": "ia",
-   "autor": "Gemini"
+   "autor": "ChatGPT"
   },
   "Movilidad de muñeca": {
    "archivo": "imagenes/munecos/movilidad-de-muneca.svg",
@@ -2185,7 +2185,7 @@
    "estatica": "imagenes/ejercicios/ia/saltos-al-cajon-quieta.webp",
    "animada": true,
    "fuente": "ia",
-   "autor": "Gemini",
+   "autor": "ChatGPT",
    "aliasDe": "Saltos al cajón"
   },
   "Salto de longitud": {
@@ -2193,7 +2193,7 @@
    "estatica": "imagenes/ejercicios/ia/saltos-al-cajon-quieta.webp",
    "animada": true,
    "fuente": "ia",
-   "autor": "Gemini",
+   "autor": "ChatGPT",
    "aliasDe": "Saltos al cajón"
   },
   "Saltos a la pata coja": {
@@ -2201,7 +2201,7 @@
    "estatica": "imagenes/ejercicios/ia/saltos-al-cajon-quieta.webp",
    "animada": true,
    "fuente": "ia",
-   "autor": "Gemini",
+   "autor": "ChatGPT",
    "aliasDe": "Saltos al cajón"
   },
   "Flexiones con palmada": {

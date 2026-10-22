@@ -25,5 +25,5 @@ Conservar las imágenes originales; se pueden borrar las animaciones erróneas.
 - [ ] Puente de glúteo mejorado (comparar los tres). Remo al mentón nuevo con línea gruesa.
 - [ ] Remo en máquina y en polea (máquina que cambia, tamaño). Sentadilla hack (máquina, músculo).
 - [ ] Superman, crunch inverso, encogimientos: más músculo.
-- [ ] Todos los que eran muñeco: más músculo, cara lisa, trazo grueso. 52 de 132 hechos (sigue en el 52 de
-      cola-musculo.json, saltos al cajón). Animar los de cardio: Gemini no sabe alternar piernas.
+- [ ] Todos los que eran muñeco: más músculo, cara lisa, trazo grueso. 60 de 132 hechos (52 con Gemini, 8 con ChatGPT; sigue en el 60 de
+      cola-musculo.json, spinning). Si Gemini llega al tope, seguir con ChatGPT. Animar los de cardio: Gemini no sabe alternar piernas.

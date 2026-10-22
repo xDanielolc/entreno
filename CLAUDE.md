@@ -1145,3 +1145,8 @@ fase), tras probar la A.
   trazo más grueso; 52 de 132 hechos (el límite diario de Gemini son unas 100 imágenes). La página de
   revisión tiene «Rehacer entero: alucinación de la IA». Cola de pendientes en `imagenes-ia/cola.md`.
   Almacén `entreno-imagenes-20`.
+- 0.60.11 (22-10-2026): regla de Dan: si Gemini llega al tope, se sigue con ChatGPT (cuenta gratuita: unas 8
+  imágenes y se reabre al día siguiente a la misma hora). ChatGPT edita el dibujo pegado en el mensaje y la
+  imagen se baja con un `<a download>` sobre el blob de `img[alt^="Imagen generada"]`. 8 mejorados más con
+  ChatGPT (saltos al cajón, senderismo y sentadillas); originales en `imagenes-ia/chatgpt/`. Almacén
+  `entreno-imagenes-21`.
