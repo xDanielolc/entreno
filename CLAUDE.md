@@ -1134,3 +1134,14 @@ fase), tras probar la A.
   laterales en polea, fondos asistidos. `QUIETOS` (plancha lateral sin animar). Variantes nuevas en el
   catálogo: «Press de hombro a una mano» y «Peso muerto rumano con mancuernas» (el dibujo de antes vía
   `OTRO_DIBUJO`). Su elección en Design: estilo A (docs/pendientes-design.md). Almacén `entreno-imagenes-19`.
+- 0.60.10 (22-10-2026, noche): sus notas de la tercera revisión. Completados encajados por las piernas
+  (`encajar(..., desde=0.55)`) y sin líneas de suelo (`sin_suelo` busca el tramo largo en la cuarta parte de
+  abajo del dibujo). Opciones nuevas en peticiones.json: `"mover"` (retoque a ojo de la segunda postura) y
+  `"escala"` (la segunda figura salió de otro tamaño). Reencajados a ojo en `reencajar.py`: remo invertido,
+  plancha lateral (ahora la dinámica), sentadilla búlgara (la de barra), prensa. Variantes nuevas en el
+  catálogo: plancha lateral dinámica, press militar sentado, remo en polea al pecho, sentadilla búlgara con
+  barra (y «Pájaros en polea» se queda el dibujo de antes de los pájaros en máquina). **Mejora general** de
+  los que eran muñeco (`scratchpad cola-musculo.json`): Gemini redibuja cada uno con más músculo, cara lisa y
+  trazo más grueso; 52 de 132 hechos (el límite diario de Gemini son unas 100 imágenes). La página de
+  revisión tiene «Rehacer entero: alucinación de la IA». Cola de pendientes en `imagenes-ia/cola.md`.
+  Almacén `entreno-imagenes-20`.

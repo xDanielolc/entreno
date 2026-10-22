@@ -22,7 +22,11 @@ REENCAJAR = {
     "aductores-en-maquina": {"zona": (0.3, 0.0, 0.8, 0.35)},
     "elevaciones-de-piernas": {"mover": (-195, 85)},             # tumbado: cabeza sobre cabeza (medido a ojo)
     "fondos-en-banco": {"zona": (0.0, 0.3, 0.25, 1.0)},          # el cajón y los talones
-    "prensa-de-piernas": {"mover": (60, -60)},                   # el respaldo y la cabeza quietos;        # Dan: la persona quieta, se mueve la máquina
+    "remo-en-t": {"zona": (0.3, 0.75, 0.65, 1.0)},              # la plataforma de los pies
+    "remo-invertido": {"mover": (-12, 0)},                      # los talones en su sitio; la barra ya cuadra
+    "plancha-lateral": {"mover": (-18, 6)},                     # mano y pies quietos; sube la cadera
+    "sentadilla-bulgara": {"mover": (12, 66)},                  # el pie de delante quieto en el suelo
+    "prensa-de-piernas": {"mover": (68, -72)},                   # el respaldo y la cabeza quietos;        # Dan: la persona quieta, se mueve la máquina
 }
 
 

@@ -142,12 +142,11 @@
    "autor": "Gemini"
   },
   "Press militar": {
-   "archivo": "imagenes/ejercicios/anim/press-militar-ek.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/press-militar.png",
+   "archivo": "imagenes/ejercicios/ia/press-militar.webp",
+   "estatica": "imagenes/ejercicios/ia/press-militar-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "seated-military-press"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Press de hombro con mancuernas": {
    "archivo": "imagenes/ejercicios/ia/press-de-hombro-con-mancuernas.webp",
@@ -284,20 +283,18 @@
    "nombreEnFuente": "t-bar-rows"
   },
   "Remo en polea": {
-   "archivo": "imagenes/ejercicios/anim/remo-en-polea.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/remo-en-polea.jpg",
+   "archivo": "imagenes/ejercicios/ia/remo-en-polea.webp",
+   "estatica": "imagenes/ejercicios/ia/remo-en-polea-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "seated-cable-rows"
+   "fuente": "ia",
+   "autor": "ChatGPT"
   },
   "Remo en máquina": {
-   "archivo": "imagenes/ejercicios/anim/remo-en-maquina.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/remo-en-maquina.png",
+   "archivo": "imagenes/ejercicios/ia/remo-en-maquina.webp",
+   "estatica": "imagenes/ejercicios/ia/remo-en-maquina-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "seated-cable-rows"
+   "fuente": "ia",
+   "autor": "ChatGPT"
   },
   "Remo invertido": {
    "archivo": "imagenes/ejercicios/anim/remo-invertido.webp",
@@ -379,12 +376,11 @@
    "fuente": "propia"
   },
   "Sentadilla búlgara": {
-   "archivo": "imagenes/ejercicios/anim/sentadilla-bulgara.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/sentadilla-bulgara.png",
+   "archivo": "imagenes/ejercicios/ia/sentadilla-bulgara.webp",
+   "estatica": "imagenes/ejercicios/ia/sentadilla-bulgara-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "one-leg-squat-with-barbell"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Sentadilla en multipower": {
    "archivo": "imagenes/munecos/sentadilla-en-multipower.svg",
@@ -1891,22 +1887,20 @@
    "animada": true
   },
   "Press de hombro en multipower": {
-   "archivo": "imagenes/ejercicios/anim/press-militar-ek.webp",
-   "autor": "Everkinetic",
-   "nombreEnWger": "Press militar",
-   "aliasDe": "Press militar",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "seated-military-press",
-   "animada": true
+   "archivo": "imagenes/ejercicios/ia/press-militar.webp",
+   "estatica": "imagenes/ejercicios/ia/press-militar-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini",
+   "aliasDe": "Press militar"
   },
   "Press tras nuca": {
-   "archivo": "imagenes/ejercicios/anim/press-militar-ek.webp",
-   "autor": "Everkinetic",
-   "nombreEnWger": "Press militar",
-   "aliasDe": "Press militar",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "seated-military-press",
-   "animada": true
+   "archivo": "imagenes/ejercicios/ia/press-militar.webp",
+   "estatica": "imagenes/ejercicios/ia/press-militar-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini",
+   "aliasDe": "Press militar"
   },
   "Elevaciones laterales en máquina": {
    "archivo": "imagenes/ejercicios/ia/elevaciones-laterales-completo.webp",
@@ -1920,12 +1914,11 @@
    "completadoCon": "Gemini"
   },
   "Pájaros en polea": {
-   "archivo": "imagenes/ejercicios/anim/pajaros-con-mancuernas.webp",
+   "archivo": "imagenes/ejercicios/anim/pajaros-en-maquina.webp",
    "autor": "Everkinetic",
    "fuente": "everkinetic",
-   "nombreEnFuente": "bent-over-rear-deltoid-raise-with-head-on-bench",
-   "aliasDe": "Pájaros con mancuernas",
-   "estatica": "imagenes/ejercicios/pajaros-con-mancuernas.png",
+   "nombreEnFuente": "seated-rear-lateral-cable-raise",
+   "estatica": "imagenes/ejercicios/pajaros-en-maquina.png",
    "animada": true
   },
   "Pull apart en polea": {
@@ -1936,14 +1929,12 @@
    "fuente": "propia"
   },
   "Remo abierto en polea": {
-   "archivo": "imagenes/ejercicios/anim/remo-en-polea.webp",
-   "autor": "Everkinetic",
-   "nombreEnWger": "Remo unilateral en polea",
-   "aliasDe": "Remo en polea",
-   "estatica": "imagenes/ejercicios/remo-en-polea.jpg",
+   "archivo": "imagenes/ejercicios/ia/remo-en-polea.webp",
+   "estatica": "imagenes/ejercicios/ia/remo-en-polea-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "seated-cable-rows"
+   "fuente": "ia",
+   "autor": "ChatGPT",
+   "aliasDe": "Remo en polea"
   },
   "Jalón unilateral en polea": {
    "archivo": "imagenes/ejercicios/anim/jalon-al-pecho-ek.webp",
@@ -1972,14 +1963,12 @@
    "aliasDe": "Dominadas"
   },
   "Remo unilateral en polea": {
-   "archivo": "imagenes/ejercicios/anim/remo-en-polea.webp",
-   "autor": "Everkinetic",
-   "nombreEnWger": "Remo unilateral en polea",
-   "aliasDe": "Remo en polea",
-   "estatica": "imagenes/ejercicios/remo-en-polea.jpg",
+   "archivo": "imagenes/ejercicios/ia/remo-en-polea.webp",
+   "estatica": "imagenes/ejercicios/ia/remo-en-polea-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "seated-cable-rows"
+   "fuente": "ia",
+   "autor": "ChatGPT",
+   "aliasDe": "Remo en polea"
   },
   "Pullover con mancuerna": {
    "archivo": "imagenes/ejercicios/ia/pullover-en-polea-completo.webp",
@@ -2413,6 +2402,38 @@
    "animada": true,
    "fuente": "everkinetic",
    "nombreEnFuente": "dumbbell-dead-lifts"
+  },
+  "Press militar sentado": {
+   "archivo": "imagenes/ejercicios/anim/press-militar-ek.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/press-militar.png",
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "seated-military-press"
+  },
+  "Remo en polea al pecho": {
+   "archivo": "imagenes/ejercicios/anim/remo-en-polea.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/remo-en-polea.jpg",
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "seated-cable-rows"
+  },
+  "Sentadilla búlgara con barra": {
+   "archivo": "imagenes/ejercicios/anim/sentadilla-bulgara.webp",
+   "autor": "Everkinetic",
+   "estatica": "imagenes/ejercicios/sentadilla-bulgara.png",
+   "animada": true,
+   "fuente": "everkinetic",
+   "nombreEnFuente": "one-leg-squat-with-barbell"
+  },
+  "Plancha lateral dinámica": {
+   "archivo": "imagenes/ejercicios/anim/plancha-lateral.webp",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "side-plank",
+   "estatica": "imagenes/ejercicios/plancha-lateral.png",
+   "animada": true
   }
  }
 }

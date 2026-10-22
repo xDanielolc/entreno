@@ -115,14 +115,21 @@ def ancla(im, modo):
     return x0 + (fb[0] + fb[2]) / 2, (y1 if modo == "pies" else y0)
 
 
-def encajar(a, b, paso=2):
+def encajar(a, b, paso=2, desde=0.0):
     """Para las máquinas y bicis (lo grande que no se mueve es el aparato): el
     desplazamiento de `b` que más tinta hace coincidir con `a`, por
     correlación con la transformada de Fourier."""
     import numpy as np
     def m(im):
         g = mascara(im, 200).resize((im.width // paso, im.height // paso), Image.BOX)
-        return np.asarray(g, dtype=np.float32) / 255
+        arr = np.asarray(g, dtype=np.float32) / 255
+        if desde:
+            # Solo cuenta lo de abajo (piernas y pies, que no se mueven): los brazos despistan.
+            filas = np.nonzero(arr.sum(axis=1))[0]
+            if len(filas):
+                arr = arr.copy()
+                arr[: int(filas[0] + (filas[-1] - filas[0]) * desde)] = 0
+        return arr
     ma, mb = m(a), m(b)
     alto, ancho = ma.shape[0] + mb.shape[0], ma.shape[1] + mb.shape[1]
     corr = np.fft.irfft2(np.fft.rfft2(ma, (alto, ancho)) * np.conj(np.fft.rfft2(mb, (alto, ancho))), (alto, ancho))
@@ -132,17 +139,20 @@ def encajar(a, b, paso=2):
     return dx * paso, dy * paso
 
 
-def animar(posturas, salida, modo="pies", duraciones=(900, 900), tope=600, margen=24):
+def animar(posturas, salida, modo="pies", duraciones=(900, 900), tope=600, margen=24, mover=None):
     if modo == "encajar":
         sx, sy = encajar(*posturas)
         anclas = [(0, 0), (-sx, -sy)]
     elif modo == "encajar-suelo":
         # De lado, donde más líneas cuadran; de alto, el suelo en su sitio (al ponerse de puntillas el cuerpo sube).
-        sx, _ = encajar(*posturas)
+        sx, _ = encajar(*posturas, desde=0.55)
         abajo = [(mascara(im, 200).getbbox() or (0, 0, 0, im.height))[3] for im in posturas]
         anclas = [(0, 0), (-sx, abajo[1] - abajo[0])]
     else:
         anclas = [ancla(im, modo) for im in posturas]
+    if mover:
+        # Retoque a ojo («mover» en peticiones.json): la IA dibujó las posturas algo descolocadas.
+        anclas[1] = (anclas[1][0] - mover[0], anclas[1][1] - mover[1])
     cajas = [mascara(im, 200).getbbox() or (0, 0, im.width, im.height) for im in posturas]
     x0 = min(c[0] - a[0] for c, a in zip(cajas, anclas))
     y0 = min(c[1] - a[1] for c, a in zip(cajas, anclas))
@@ -173,14 +183,29 @@ def quieta(im, salida, tope=600):
 
 
 def sin_suelo(im):
-    """Borra las líneas de suelo (filas largas de tinta en la parte de abajo): la IA las dibuja a alturas distintas."""
+    """Borra las líneas de suelo (un tramo largo y seguido de tinta en la parte de abajo): la IA las dibuja
+    a alturas distintas en cada postura y en la animación «saltan». Solo se borra el tramo, no la fila
+    entera, para no comerse los pies."""
     im = im.copy()
     g = im.convert("L"); w, h = g.size; px = g.load()
-    for y in range(int(h * 0.75), h):
-        if sum(1 for x in range(w) if px[x, y] < 160) > w * 0.35:
-            for yy in range(max(0, y - 1), min(h, y + 2)):
-                for x in range(w):
-                    im.putpixel((x, yy), (255, 255, 255))
+    caja = mascara(im, 200).getbbox()
+    if not caja:
+        return im
+    # El suelo está en lo más bajo del dibujo: se busca en la cuarta parte de abajo de lo dibujado.
+    for y in range(int(caja[3] - (caja[3] - caja[1]) * 0.25), caja[3]):
+        x, mejor = 0, (0, 0, 0)
+        while x < w:
+            if px[x, y] < 200:
+                x0 = x
+                while x < w and px[x, y] < 200:
+                    x += 1
+                if x - x0 > mejor[0]:
+                    mejor = (x - x0, x0, x)
+            x += 1
+        if mejor[0] > w * 0.15:
+            for yy in range(max(0, y - 2), min(h, y + 3)):
+                for xx in range(mejor[1], mejor[2]):
+                    im.putpixel((xx, yy), (255, 255, 255))
     return im
 
 
@@ -201,7 +226,7 @@ def centrar_en_barra(partes):
     return [im.crop((round(cx - medio), 0, round(cx + medio), im.height)) for im, cx in zip(partes, centros)]
 
 
-def procesar(origen, modo="pies", espejo=False, solo=False, invertir=False):
+def procesar(origen, modo="pies", espejo=False, solo=False, invertir=False, mover=None, escala=None):
     nombre = origen.stem.split("-", 1)[1]
     if origen.stem.startswith("completo-"):
         # Un dibujo hecho por una persona que venía cortado, completado por la IA: va aparte del de la IA.
@@ -225,10 +250,13 @@ def procesar(origen, modo="pies", espejo=False, solo=False, invertir=False):
         if espejo:
             # La IA dibujó la segunda figura mirando al otro lado: se le da la vuelta.
             final = final.transpose(Image.FLIP_LEFT_RIGHT)
+        if escala:
+            # La IA dibujó la segunda figura más grande o más pequeña («escala» en peticiones.json, medida a ojo).
+            final = final.resize((round(final.width * escala), round(final.height * escala)), Image.LANCZOS)
         if invertir:
             # Empieza por la postura final (las negativas: arriba y bajar despacio).
             inicio, final = final, inicio
-        animar([inicio, final], SALIDA / f"{nombre}.webp", modo)
+        animar([inicio, final], SALIDA / f"{nombre}.webp", modo, mover=mover)
         quieta(inicio, fija)
         return nombre, True
     quieta(im, fija)
@@ -239,7 +267,7 @@ def leer_tabla():
     """De peticiones.json: nombre del dibujo → {"ejercicios": [...], "ancla": ...}."""
     if not PETICIONES.exists():
         return {}
-    return {p["slug"]: {"ejercicios": [p["ejercicio"], *p.get("tambien", [])], "ancla": p.get("ancla", "pies"), "espejo": p.get("espejo", False), "solo": p.get("solo", False), "usar": p.get("usar"), "sinAlias": p.get("sinAlias", False), "invertir": p.get("invertir", False)}
+    return {p["slug"]: {"ejercicios": [p["ejercicio"], *p.get("tambien", [])], "ancla": p.get("ancla", "pies"), "espejo": p.get("espejo", False), "solo": p.get("solo", False), "usar": p.get("usar"), "sinAlias": p.get("sinAlias", False), "invertir": p.get("invertir", False), "mover": p.get("mover"), "escala": p.get("escala")}
             for p in json.loads(PETICIONES.read_text(encoding="utf8"))}
 
 
@@ -263,7 +291,12 @@ ANCLA_COMPLETO = {"fondos-asistidos": "encajar", "fondos-de-triceps-ek": "encaja
 OTRO_DIBUJO = {"Fondos de pecho": "Fondos asistidos",
                "Encogimientos de trapecio con barra": "Encogimientos de trapecio",
                "Press de hombro a una mano": "Press de hombro con mancuernas",
-               "Peso muerto rumano con mancuernas": "Peso muerto con mancuernas"}
+               "Peso muerto rumano con mancuernas": "Peso muerto con mancuernas",
+               "Pájaros en polea": "Pájaros en máquina",
+               "Press militar sentado": "Press militar",
+               "Remo en polea al pecho": "Remo en polea",
+               "Sentadilla búlgara con barra": "Sentadilla búlgara",
+               "Plancha lateral dinámica": "Plancha lateral"}
 
 
 def hecho_por_persona(datos):
@@ -347,7 +380,7 @@ def main():
                 # Las dos posturas de un dibujo completado coinciden casi enteras: se encajan donde más líneas cuadran.
                 modo = ANCLA_COMPLETO.get(nombre, "encajar-suelo")
             opciones = entrada if isinstance(entrada, dict) else {}
-            nombre, animada = procesar(origen, modo, bool(opciones.get("espejo")), bool(opciones.get("solo")), bool(opciones.get("invertir")))
+            nombre, animada = procesar(origen, modo, bool(opciones.get("espejo")), bool(opciones.get("solo")), bool(opciones.get("invertir")), opciones.get("mover"), opciones.get("escala"))
             hechos.append((nombre, animada, carpeta.name))
             print(("animada " if animada else "quieta  ") + nombre)
     apuntar(hechos)

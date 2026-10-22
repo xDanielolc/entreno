@@ -21,7 +21,8 @@
   "inicio": "colgado con los brazos estirados, piernas juntas algo flexionadas",
   "final": "barbilla por encima de la barra, codos hacia abajo",
   "ancla": "barra",
-  "usar": "ia"
+  "usar": "ia",
+  "escala": 0.9
  },
  {
   "slug": "elevaciones-laterales",
@@ -51,7 +52,8 @@
   "ejercicio": "Press militar",
   "vista": "de pie, visto de frente",
   "inicio": "la barra con discos apoyada a la altura de las clavículas, codos delante",
-  "final": "la barra arriba con los brazos estirados por encima de la cabeza"
+  "final": "la barra arriba con los brazos estirados por encima de la cabeza",
+  "usar": "ia"
  },
  {
   "slug": "dominadas-negativas",
@@ -61,7 +63,8 @@
   "final": "bajando despacio, a medio camino, codos a 90 grados",
   "ancla": "barra",
   "usar": "ia",
-  "invertir": true
+  "invertir": true,
+  "escala": 0.9
  },
  {
   "slug": "curl-martillo",
@@ -285,7 +288,11 @@
   "inicio": "cadera muy alta formando una V invertida, brazos y piernas estirados",
   "final": "cabeza bajada casi hasta el suelo entre las manos, codos doblados",
   "ancla": "atras",
-  "usar": "ia"
+  "usar": "ia",
+  "mover": [
+   -15,
+   0
+  ]
  },
  {
   "slug": "flexiones-en-pino",
@@ -302,7 +309,7 @@
   "vista": "en barra fija, visto de frente, palmas hacia la cara",
   "inicio": "colgado con los brazos estirados",
   "final": "barbilla por encima de la barra",
-  "ancla": "barra-centrada",
+  "ancla": "barra",
   "usar": "ia"
  },
  {
@@ -345,7 +352,8 @@
   "vista": "sentado en una polea baja con los pies apoyados, visto de lado",
   "inicio": "brazos estirados hacia delante agarrando el asa",
   "final": "el asa llevada hasta el abdomen, codos atrás, espalda recta",
-  "ancla": "encajar"
+  "ancla": "encajar",
+  "usar": "ia"
  },
  {
   "slug": "remo-en-maquina",
@@ -353,7 +361,8 @@
   "vista": "sentado en una máquina de remo con el pecho apoyado, visto de lado",
   "inicio": "brazos estirados hacia delante en las asas",
   "final": "asas llevadas hacia el cuerpo, codos atrás",
-  "ancla": "encajar"
+  "ancla": "encajar",
+  "usar": "ia"
  },
  {
   "slug": "remo-invertido",
@@ -434,7 +443,8 @@
   "vista": "visto de lado, el pie de atrás apoyado en un banco, una mancuerna en cada mano",
   "inicio": "de pie con la pierna delantera casi estirada",
   "final": "rodilla de atrás casi tocando el suelo, muslo delantero paralelo al suelo",
-  "ancla": "encajar"
+  "ancla": "encajar",
+  "usar": "ia"
  },
  {
   "slug": "sentadilla-en-multipower",
