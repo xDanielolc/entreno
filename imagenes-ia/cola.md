@@ -61,7 +61,7 @@ IA (aparato que cambia, rehacer o corregir):
 - [ ] Peso muerto sumo: los pies abiertos desde el principio. Sentadilla: la mano que se funde con el hombro.
 - [ ] Curl en polea: el cable va de la polea hacia la derecha, no entre las piernas (él se ofrece a dibujarlo).
 App:
-- [ ] Posturas con nombre de yoga: el nombre de yoga también en el título (p. ej. isquios).
+- [x] Posturas con nombre de yoga: el nombre de yoga también en el título (p. ej. isquios).
 
 Hecho el 23-10 de madrugada (0.60.12): todo lo de «Código» de la cuarta revisión, y con IA: saltos al cajón, hip
 thrust, remo de cardio, multipower, esquí, face pull, dominadas asistidas, gato-camello, dominadas (y negativas),
@@ -92,10 +92,11 @@ corregir; cardio y animaciones de piernas alternas (3 imágenes: izquierda, ning
 - [x] Volver al de antes: ángulo en ocho, ángulo ligado tumbado, arco, cara de vaca, flexión amplia, plancha
       lateral del sabio, torsión abdominal, tortuga, remo al mentón, sentadilla hack (y reintentar), elevaciones
       laterales (y rehacer), peso muerto rumano (y clavar los pies).
-- [ ] Nombre de yoga en el título de las posturas (dijo que sí).
+- [x] Nombre de yoga en el título de las posturas (dijo que sí): 11 estiramientos y movilidad, 0.60.20.
 - [x] Cruces en polea: quitar a mano la línea de los pies. Pectoral en el marco: borrar la línea mano-pierna.
       Ángulo ligado: borrar las 4 marcas de la cara.
-- [ ] Press militar sentado: la imagen se corta un poco (lienzo). No borrar el otro (borrarOtro: false).
+- [x] Press militar sentado: «se parte por la mitad» (el tronco saltaba sobre las piernas fijas): encajado por
+      el respaldo y la cadera, 0.60.20. No borrar el otro (borrarOtro: false). Va a la «Sexta vuelta» para que lo vea.
 - [x] Remo de cardio: línea más gruesa e igual en las dos posturas.
 ## 2. Con IA, fácil (solo la cara lisa, sobre el dibujo elegido)
 - [ ] Nuevos: apana, arado, árbol boca abajo, banco dos apoyos, cadáver, camello, escorpión, oeste, flexión de

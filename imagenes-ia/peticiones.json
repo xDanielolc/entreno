@@ -1257,7 +1257,7 @@
  },
  {
   "slug": "estiramiento-de-isquios",
-  "ejercicio": "Estiramiento de isquios",
+  "ejercicio": "Estiramiento de isquios (Janu Sirsasana)",
   "vista": "sentado en el suelo, visto de lado",
   "postura": "una pierna estirada delante y la otra doblada con la planta en el muslo, tronco inclinado hacia la pierna estirada y manos hacia el pie"
  },
@@ -1269,7 +1269,7 @@
  },
  {
   "slug": "estiramiento-de-psoas-en-zancada",
-  "ejercicio": "Estiramiento de psoas en zancada",
+  "ejercicio": "Estiramiento de psoas en zancada (Anjaneyasana)",
   "vista": "visto de lado",
   "postura": "en zancada con la rodilla de atrás apoyada en el suelo, cadera empujada hacia delante, tronco erguido, manos en la cintura"
  },
@@ -1281,13 +1281,13 @@
  },
  {
   "slug": "estiramiento-de-gluteo-en-figura-de-4",
-  "ejercicio": "Estiramiento de glúteo en figura de 4",
+  "ejercicio": "Estiramiento de glúteo en figura de 4 (Supta Kapotasana)",
   "vista": "tumbado boca arriba, visto de lado",
   "postura": "un tobillo cruzado encima de la otra rodilla, tirando con las manos del muslo de la pierna de abajo hacia el pecho"
  },
  {
   "slug": "estiramiento-de-aductores-en-mariposa",
-  "ejercicio": "Estiramiento de aductores en mariposa",
+  "ejercicio": "Estiramiento de aductores en mariposa (Baddha Konasana)",
   "vista": "sentado en el suelo, visto de frente",
   "postura": "plantas de los pies juntas, rodillas abiertas hacia los lados, manos en los pies y codos empujando las rodillas"
  },
@@ -1332,7 +1332,7 @@
  },
  {
   "slug": "estiramiento-de-lumbares-con-rodillas-al-pecho",
-  "ejercicio": "Estiramiento de lumbares con rodillas al pecho",
+  "ejercicio": "Estiramiento de lumbares con rodillas al pecho (Apanasana)",
   "vista": "tumbado boca arriba, visto de lado",
   "postura": "las dos rodillas abrazadas contra el pecho"
  },
@@ -1358,13 +1358,13 @@
  },
  {
   "slug": "postura-del-sastre-apertura-lateral",
-  "ejercicio": "Postura del sastre (apertura lateral)",
+  "ejercicio": "Postura del sastre, apertura lateral (Upavistha Konasana)",
   "vista": "sentado en el suelo, visto de frente",
   "postura": "piernas muy abiertas hacia los lados y estiradas, tronco erguido, manos en el suelo delante"
  },
  {
   "slug": "zancada-hacia-el-split-frontal",
-  "ejercicio": "Zancada hacia el split frontal",
+  "ejercicio": "Zancada hacia el split frontal (Hanumanasana)",
   "vista": "visto de lado",
   "postura": "una pierna estirada delante con el talón en el suelo y la otra estirada detrás con la rodilla en el suelo, manos en el suelo a los lados"
  },
@@ -1382,7 +1382,7 @@
  },
  {
   "slug": "estiramiento-de-gluteo-en-paloma",
-  "ejercicio": "Estiramiento de glúteo en paloma",
+  "ejercicio": "Estiramiento de glúteo en paloma (Eka Pada Rajakapotasana)",
   "vista": "en el suelo, visto de lado",
   "postura": "una pierna doblada delante con la espinilla cruzada y la otra estirada atrás, tronco inclinado sobre la pierna de delante"
  },
@@ -1449,7 +1449,7 @@
  },
  {
   "slug": "sentadilla-profunda-mantenida",
-  "ejercicio": "Sentadilla profunda mantenida",
+  "ejercicio": "Sentadilla profunda mantenida (Malasana)",
   "vista": "visto de frente",
   "postura": "en cuclillas lo más abajo posible, talones en el suelo, codos empujando las rodillas por dentro, manos juntas"
  },
@@ -1476,7 +1476,7 @@
  },
  {
   "slug": "gato-camello",
-  "ejercicio": "Gato-camello",
+  "ejercicio": "Gato-camello (Marjaryasana-Bitilasana)",
   "vista": "a cuatro patas, visto de lado",
   "inicio": "espalda arqueada hacia arriba como un gato, cabeza abajo",
   "final": "espalda hundida hacia abajo, pecho y cabeza arriba",
@@ -1569,7 +1569,7 @@
  },
  {
   "slug": "cobra-en-el-suelo",
-  "ejercicio": "Cobra en el suelo",
+  "ejercicio": "Cobra en el suelo (Bhujangasana)",
   "vista": "tumbado boca abajo, visto de lado",
   "inicio": "manos junto al pecho, todo el cuerpo en el suelo",
   "final": "brazos estirados, pecho levantado, cadera en el suelo",

@@ -998,7 +998,7 @@
    "fuente": "ia",
    "autor": "Gemini"
   },
-  "Estiramiento de isquios": {
+  "Estiramiento de isquios (Janu Sirsasana)": {
    "archivo": "imagenes/ejercicios/ia/estiramiento-de-isquios-quieta.webp",
    "estatica": "imagenes/ejercicios/ia/estiramiento-de-isquios-quieta.webp",
    "animada": false,
@@ -1012,7 +1012,7 @@
    "fuente": "ia",
    "autor": "Gemini"
   },
-  "Estiramiento de psoas en zancada": {
+  "Estiramiento de psoas en zancada (Anjaneyasana)": {
    "archivo": "imagenes/ejercicios/ia/estiramiento-de-psoas-en-zancada-quieta.webp",
    "estatica": "imagenes/ejercicios/ia/estiramiento-de-psoas-en-zancada-quieta.webp",
    "animada": false,
@@ -1026,14 +1026,14 @@
    "fuente": "ia",
    "autor": "Gemini"
   },
-  "Estiramiento de glúteo en figura de 4": {
+  "Estiramiento de glúteo en figura de 4 (Supta Kapotasana)": {
    "archivo": "imagenes/ejercicios/ia/estiramiento-de-gluteo-en-figura-de-4-quieta.webp",
    "estatica": "imagenes/ejercicios/ia/estiramiento-de-gluteo-en-figura-de-4-quieta.webp",
    "animada": false,
    "fuente": "ia",
    "autor": "Gemini"
   },
-  "Estiramiento de aductores en mariposa": {
+  "Estiramiento de aductores en mariposa (Baddha Konasana)": {
    "archivo": "imagenes/ejercicios/ia/estiramiento-de-aductores-en-mariposa-quieta.webp",
    "estatica": "imagenes/ejercicios/ia/estiramiento-de-aductores-en-mariposa-quieta.webp",
    "animada": false,
@@ -1076,7 +1076,7 @@
    "autor": "dibujo propio de la app",
    "fuente": "propia"
   },
-  "Estiramiento de lumbares con rodillas al pecho": {
+  "Estiramiento de lumbares con rodillas al pecho (Apanasana)": {
    "archivo": "imagenes/munecos/estiramiento-de-lumbares-con-rodillas-al-pecho.svg",
    "autor": "dibujo propio de la app",
    "fuente": "propia"
@@ -1108,7 +1108,7 @@
    "autor": "dibujo propio de la app",
    "fuente": "propia"
   },
-  "Sentadilla profunda mantenida": {
+  "Sentadilla profunda mantenida (Malasana)": {
    "archivo": "imagenes/ejercicios/ia/sentadilla-profunda-mantenida-quieta.webp",
    "estatica": "imagenes/ejercicios/ia/sentadilla-profunda-mantenida-quieta.webp",
    "animada": false,
@@ -1132,7 +1132,7 @@
    "autor": "dibujo propio de la app",
    "fuente": "propia"
   },
-  "Gato-camello": {
+  "Gato-camello (Marjaryasana-Bitilasana)": {
    "archivo": "imagenes/ejercicios/ia/gato-camello.webp",
    "estatica": "imagenes/ejercicios/ia/gato-camello-quieta.webp",
    "animada": true,
@@ -1701,14 +1701,14 @@
    "fuente": "ia",
    "autor": "Gemini"
   },
-  "Postura del sastre (apertura lateral)": {
+  "Postura del sastre, apertura lateral (Upavistha Konasana)": {
    "archivo": "imagenes/ejercicios/ia/postura-del-sastre-apertura-lateral-quieta.webp",
    "estatica": "imagenes/ejercicios/ia/postura-del-sastre-apertura-lateral-quieta.webp",
    "animada": false,
    "fuente": "ia",
    "autor": "Gemini"
   },
-  "Zancada hacia el split frontal": {
+  "Zancada hacia el split frontal (Hanumanasana)": {
    "archivo": "imagenes/ejercicios/ia/zancada-hacia-el-split-frontal-quieta.webp",
    "estatica": "imagenes/ejercicios/ia/zancada-hacia-el-split-frontal-quieta.webp",
    "animada": false,
@@ -1745,7 +1745,7 @@
    "autor": "dibujo propio de la app",
    "fuente": "propia"
   },
-  "Cobra en el suelo": {
+  "Cobra en el suelo (Bhujangasana)": {
    "archivo": "imagenes/ejercicios/ia/cobra-en-el-suelo.webp",
    "estatica": "imagenes/ejercicios/ia/cobra-en-el-suelo-quieta.webp",
    "animada": true,
@@ -1759,7 +1759,7 @@
    "fuente": "ia",
    "autor": "Gemini"
   },
-  "Estiramiento de glúteo en paloma": {
+  "Estiramiento de glúteo en paloma (Eka Pada Rajakapotasana)": {
    "archivo": "imagenes/ejercicios/ia/estiramiento-de-gluteo-en-paloma-quieta.webp",
    "estatica": "imagenes/ejercicios/ia/estiramiento-de-gluteo-en-paloma-quieta.webp",
    "animada": false,

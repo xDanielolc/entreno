@@ -1190,3 +1190,7 @@ fase), tras probar la A.
   pone al tamaño de la primera antes de nada y `grosor` engorda y oscurece las dos (antes solo la primera: el
   remo de cardio tenía un trazo distinto en cada lado). 0.60.19: el cambio de tamaño va después de `invertir` (en la
   0.60.18 el hip thrust, los saltos al cajón y las negativas salían a menos resolución). Almacén `entreno-imagenes-29`.
+- 0.60.20: esquema v22. Los estiramientos y ejercicios de movilidad que son una postura de yoga llevan su nombre en
+  sánscrito en el título (`RENOMBRADOS_V22` en esquema.js: isquios = Janu Sirsasana, mariposa, sastre, split, paloma,
+  psoas, figura de 4, rodillas al pecho, gato-camello, cobra, sentadilla profunda); la migración renombra los tuyos.
+  Press militar sentado encajado por el respaldo y la cadera («se parte por la mitad»). Almacén `entreno-imagenes-30`.

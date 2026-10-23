@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 21;
+export const VERSION_ACTUAL = 22;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -537,6 +537,36 @@ const MIGRACIONES = {
     datos.version = 21;
     return datos;
   },
+  // v21 → v22: los estiramientos que son una postura de yoga llevan su nombre
+  // en sánscrito en el título (Dan, 23-10-2026). Se renombran los tuyos que
+  // aún se llamen como el catálogo de antes, salvo que ya tengas uno nuevo.
+  21: (datos) => {
+    const n = (s) => (s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+    const nombres = new Set(datos.ejercicios.map((ej) => n(ej.nombre)));
+    const cambio = new Map(Object.entries(RENOMBRADOS_V22).map(([a, b]) => [n(a), b]));
+    for (const ej of datos.ejercicios) {
+      const nuevo = cambio.get(n(ej.nombre));
+      if (nuevo && !nombres.has(n(nuevo))) ej.nombre = nuevo;
+      if (cambio.has(n(ej.fotoDe))) ej.fotoDe = cambio.get(n(ej.fotoDe));
+    }
+    datos.version = 22;
+    return datos;
+  },
+};
+
+// Nombres de antes → nombres de la v22 (no cambiar: lo usa una migración publicada).
+const RENOMBRADOS_V22 = {
+  'Estiramiento de isquios': 'Estiramiento de isquios (Janu Sirsasana)',
+  'Estiramiento de aductores en mariposa': 'Estiramiento de aductores en mariposa (Baddha Konasana)',
+  'Postura del sastre (apertura lateral)': 'Postura del sastre, apertura lateral (Upavistha Konasana)',
+  'Zancada hacia el split frontal': 'Zancada hacia el split frontal (Hanumanasana)',
+  'Estiramiento de glúteo en paloma': 'Estiramiento de glúteo en paloma (Eka Pada Rajakapotasana)',
+  'Estiramiento de psoas en zancada': 'Estiramiento de psoas en zancada (Anjaneyasana)',
+  'Estiramiento de glúteo en figura de 4': 'Estiramiento de glúteo en figura de 4 (Supta Kapotasana)',
+  'Estiramiento de lumbares con rodillas al pecho': 'Estiramiento de lumbares con rodillas al pecho (Apanasana)',
+  'Gato-camello': 'Gato-camello (Marjaryasana-Bitilasana)',
+  'Cobra en el suelo': 'Cobra en el suelo (Bhujangasana)',
+  'Sentadilla profunda mantenida': 'Sentadilla profunda mantenida (Malasana)',
 };
 
 // Programas clásicos. Cada uno dice qué series (peso y repeticiones) tocan en
