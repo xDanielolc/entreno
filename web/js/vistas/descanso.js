@@ -152,7 +152,6 @@ function pintar() {
     if (!finMs) continue;
     caja.querySelector('.descanso-tiempo').textContent = formatear(segundos);
     caja.querySelector('.descanso-motivo').textContent = motivo;
-    caja.querySelector('.descanso-alargar').textContent = pasoAlargar() === 30 ? '+30 s' : '+1 min';
     caja.classList.toggle('acabado', segundos === 0);
     pintarRespiracion(caja);
   }
@@ -250,31 +249,38 @@ function saltar() {
   }
 }
 
-// Con descansos cortos (estiramientos, bajadas) se añaden 30 s; si no, un minuto.
-const pasoAlargar = () => (totalSeg && totalSeg < 60 ? 30 : 60);
-
-function alargar() {
+// −30 s y +30 s a los lados del tiempo (estilo A, elegido por Dan el 22-10-2026).
+function alargar(paso = 30) {
   if (!finMs) return;
-  const paso = pasoAlargar();
   finMs = Math.max(finMs, Date.now()) + paso * 1000;
   alargadoSeg += paso;
   clearInterval(intervalo);
   intervalo = setInterval(pintar, 1000);
   pintar();
-  if (entreSeries() && totalSeg) {
-    proponer(totalSeg + alargadoSeg, `Un minuto más. ¿Dejar el descanso entre series en ${totalSeg + alargadoSeg} s?`);
+  if (entreSeries() && totalSeg && alargadoSeg > 0) {
+    proponer(totalSeg + alargadoSeg, `Has alargado el descanso. ¿Dejarlo entre series en ${totalSeg + alargadoSeg} s?`);
   }
+}
+
+function acortar() {
+  if (!finMs) return;
+  if (restante() <= 30) { saltar(); return; }
+  finMs -= 30_000;
+  alargadoSeg -= 30;
+  pintar();
 }
 
 export function barraDescanso() {
   const caja = h('div', { class: 'descanso', hidden: !finMs },
-    h('span', { class: 'descanso-tiempo' }, formatear(restante())),
-    h('span', { class: 'suave descanso-motivo' }, motivo),
+    h('button', { class: 'boton descanso-boton', onclick: acortar, 'aria-label': 'Treinta segundos menos' }, '−30 s'),
+    h('div', { class: 'descanso-centro' },
+      h('span', { class: 'descanso-motivo' }, motivo),
+      h('span', { class: 'descanso-tiempo' }, formatear(restante()))),
+    h('button', { class: 'boton descanso-boton', onclick: () => alargar(30), 'aria-label': 'Treinta segundos más' }, '+30 s'),
+    h('button', { class: 'boton descanso-boton descanso-saltar', onclick: saltar }, 'Saltar'),
     h('div', { class: 'respira', hidden: true },
       h('span', { class: 'circulo-respira', 'aria-hidden': 'true' }),
-      h('span', { class: 'texto-respira' })),
-    h('button', { class: 'boton enlace descanso-alargar', onclick: alargar }, pasoAlargar() === 30 ? '+30 s' : '+1 min'),
-    h('button', { class: 'boton enlace', onclick: saltar }, 'Saltar'));
+      h('span', { class: 'texto-respira' })));
   cajas.add(caja);
   return caja;
 }

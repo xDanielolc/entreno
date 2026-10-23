@@ -318,7 +318,6 @@ a { color: var(--acento); text-decoration-thickness: 1.5px; text-underline-offse
 .tabla-comparacion td { padding: 6px 4px; border-bottom: 1px solid var(--borde); vertical-align: top; }
 .tabla-comparacion tr.bien td:last-child { color: var(--bien); }
 .tabla-comparacion tr.mal td:last-child { color: var(--mal); }
-.descanso .boton.enlace { width: auto; min-height: 40px; padding: 4px 10px; }
 .glosario .explicacion { margin-top: 4px; }
 .intervalos { text-align: center; padding: 8px 0; }
 .intervalos-fase { font-size: 1.3rem; font-weight: 700; }
@@ -707,26 +706,35 @@ input, select, textarea { max-width: 100%; box-sizing: border-box; }
    Descanso
    -------------------------------------------------------------------------- */
 
+/* Estilo A (22-10-2026): una banda de tinta con −30 s y +30 s a los lados. */
 .descanso {
   position: sticky;
   top: 52px;
   z-index: 5;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 8px 14px;
+  gap: 8px;
+  padding: 10px 12px;
   margin-bottom: 12px;
-  border: 1px solid var(--acento);
+  border: 2px solid var(--acento);
   border-radius: var(--radio);
-  background: color-mix(in srgb, var(--acento-suave) 92%, transparent);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
+  background: var(--acento);
+  color: var(--acento-texto);
+  box-shadow: var(--sombra-alta);
 }
-
-.descanso .boton.enlace { width: auto; min-height: 40px; padding: 4px 10px; }
-.descanso-tiempo { font-size: 1.4rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.descanso-centro { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.descanso-motivo {
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  opacity: 0.7; overflow-wrap: anywhere;
+}
+.descanso-tiempo { font-size: 2rem; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.descanso .boton.descanso-boton {
+  flex: 0 0 auto; width: auto; min-width: 0; min-height: 44px; margin: 0; padding: 4px 12px;
+  border-radius: 999px; border: 1.5px solid color-mix(in srgb, var(--acento-texto) 30%, transparent);
+  background: transparent; color: var(--acento-texto); box-shadow: none; font-weight: 700; font-size: 0.9rem;
+}
 .descanso.acabado { border-color: var(--peligro); }
-.descanso.acabado .descanso-tiempo { color: var(--peligro); }
+.descanso.acabado .descanso-tiempo { color: color-mix(in srgb, var(--peligro) 55%, var(--acento-texto)); }
 
 /* Técnicas combinables y recámara */
 .tecnicas { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
@@ -1719,9 +1727,6 @@ div.sugerencia > span { display: block; }
 .boton-paso-grande { flex: 0 0 60px; min-height: 60px; font-size: 1.6rem; padding: 0; }
 .terminar-entreno.secundario { margin-top: 20px; }
 .descanso-campana { width: auto; min-width: 44px; font-size: 1.1rem; }
-/* La barra del descanso: el tiempo y los dos botones en una línea. */
-.descanso .boton.enlace { min-width: 0; margin: 0; flex: 0 0 auto; }
-.descanso .descanso-motivo { flex: 1 1 auto; }
 
 /* La serie de prueba del 1RM: un letrero claro en lugar del tipo de serie. */
 .insignia-prueba { display: inline-flex; align-items: center; min-height: 36px; padding: 4px 14px; border-radius: 999px;
@@ -2025,3 +2030,28 @@ html, body { overflow-x: clip; }
 /* «Escribir el tiempo a mano», debajo del reloj. */
 .tiempo-a-mano { display: block; margin: 8px auto 4px; }
 .grafica-peso text { font-family: var(--fuente-numeros); }
+
+/* --------------------------------------------------------------------------
+   Estilo A («ordenado», elegido por Dan el 22-10-2026): Hoy
+   -------------------------------------------------------------------------- */
+.saludo-hoy { text-align: center; margin: 4px 0 12px; }
+.saludo-hoy h1 { margin: 0; }
+.saludo-hoy p { margin: 4px 0 0; }
+.antetitulo {
+  font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--texto-suave); text-align: center;
+}
+.tarjeta-hoy { text-align: center; }
+.tarjeta-hoy h2 { margin: 4px 0 0; font-size: 1.4rem; font-weight: 800; }
+.tarjeta-hoy > p.suave { margin: 2px 0 10px; }
+.lista-hoy { list-style: none; margin: 0 0 12px; padding: 0; display: grid; gap: 6px; text-align: left; }
+.lista-hoy li {
+  display: flex; justify-content: space-between; align-items: center; gap: 10px;
+  background: var(--superficie-2); border-radius: var(--radio-pequeno); padding: 10px 12px;
+}
+.lista-hoy-nombre { font-weight: 600; min-width: 0; flex: 1 1 auto; overflow-wrap: anywhere; }
+.lista-hoy li > .suave { flex: 0 1 auto; text-align: right; font-size: 0.9rem; }
+.lista-hoy li.lista-hoy-mas { background: none; justify-content: center; padding: 2px; }
+.descanso .circulo-respira { background: var(--acento-texto); }
+/* Entreno: casillas grandes (estilo A). */
+.serie-valores .valor input { min-height: 56px; font-size: 1.375rem; font-weight: 800; }

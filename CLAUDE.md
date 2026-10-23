@@ -1194,3 +1194,9 @@ fase), tras probar la A.
   sánscrito en el título (`RENOMBRADOS_V22` en esquema.js: isquios = Janu Sirsasana, mariposa, sastre, split, paloma,
   psoas, figura de 4, rodillas al pecho, gato-camello, cobra, sentadilla profunda); la migración renombra los tuyos.
   Press militar sentado encajado por el respaldo y la cadera («se parte por la mitad»). Almacén `entreno-imagenes-30`.
+- 0.60.21: el estilo A de Design (que eligió el 22-10) pasa a la app. Hoy: saludo con la fecha, tarjeta «Hoy te
+  toca» con el día, la duración en la línea de debajo y los tres primeros ejercicios con sus series de trabajo
+  (`listaDelDia` en inicio.js, «y N más»), y dos últimos entrenamientos. Entreno: el descanso es una banda de tinta
+  con −30 s, el tiempo, +30 s y Saltar (`acortar`/`alargar(30)` en descanso.js; antes +1 min en los largos) y las
+  casillas de la serie, de 56 px.
+

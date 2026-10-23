@@ -1,7 +1,7 @@
 import * as estado from '../estado.js';
 import { sedeInicial } from '../sedes.js';
 import { barraModoPrueba } from '../modo-prueba.js';
-import { seriesDesdePlan } from '../series.js';
+import { planesDeItem, resumenPlanes, seriesDesdePlan } from '../series.js';
 import { anadir, aviso, h, hoyISO, leerNumero, modal, nuevoId } from '../ui.js';
 import { tarjetaRecuperacion, tarjetaSugerenciasAjuste } from './cuerpo.js';
 import { tarjetaInstalar } from './instalar.js';
@@ -110,6 +110,33 @@ function saludo(nombre) {
   return texto.replace(/\s{2,}/g, ' ').replace(/^(\p{L})/u, (m) => m.toUpperCase());
 }
 
+// La fecha de hoy debajo del saludo: «Jueves, 22 de octubre».
+function fechaDeHoy() {
+  const texto = new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
+  return texto.charAt(0).toUpperCase() + texto.slice(1);
+}
+
+// Los ejercicios del día en corto (estilo A): los tres primeros con sus series
+// de trabajo («3 × 4», «Bilbo + 2 × 6-8») y «y N más».
+function listaDelDia(d, dia) {
+  const items = dia.ejercicios
+    .map((item) => ({ item, ej: d.ejercicios.find((e) => e.id === item.ejercicioId) }))
+    .filter((x) => x.ej && !x.ej.borrado);
+  if (!items.length) return null;
+  const deTrabajo = (x) => planesDeItem(x.ej, x.item).filter((p) => !(p.calentamiento || p.tipo === 'calentamiento'));
+  // Primero los que llevan series de trabajo (el cardio y la movilidad del
+  // calentamiento general no dicen nada de qué toca hoy).
+  const fuertes = items.filter((x) => deTrabajo(x).length);
+  const muestra = (fuertes.length ? fuertes : items).slice(0, 3);
+  const resto = items.length - muestra.length;
+  return h('ul', { class: 'lista-hoy' },
+    muestra.map((x) => h('li', {},
+      h('span', { class: 'lista-hoy-nombre' }, x.ej.nombre),
+      deTrabajo(x).length > 0 && h('span', { class: 'suave' },
+        resumenPlanes(deTrabajo(x), x.ej).replace(/ \(\d+ en recámara\)/g, '')))),
+    resto > 0 && h('li', { class: 'lista-hoy-mas suave' }, `y ${resto} más`));
+}
+
 // Con el cuestionario hecho y sin rutinas: la prehecha que mejor encaja.
 function tarjetaRecomendacion(d) {
   const plantilla = PLANTILLAS.find((p) => p.id === rutinaRecomendada(d.perfil));
@@ -124,7 +151,7 @@ export function vistaInicio(contenedor) {
   const enCurso = d.sesiones.find((s) => s.estado === 'en-curso' && !s.borrada);
   const activos = d.ejercicios.filter((e) => !e.archivado);
   const recientes = d.sesiones.filter((s) => s.estado === 'terminada' && !s.borrada)
-    .sort(masRecienteAntes).slice(0, 3);
+    .sort(masRecienteAntes).slice(0, 2);
   const necesitaPeso = d.perfil.pesoCorporalKg == null
     && activos.some((e) => ['asistida', 'pesoCorporal'].includes(e.carga.tipo));
   const toca = queToca(d, recuperacionPorMusculo(d));
@@ -179,7 +206,9 @@ export function vistaInicio(contenedor) {
 
   anadir(contenedor,
     estado.esSinCuenta() && barraModoPrueba(),
-    h('h1', {}, saludo(d.perfil.nombre)),
+    h('div', { class: 'saludo-hoy' },
+      h('h1', {}, saludo(d.perfil.nombre)),
+      h('p', { class: 'suave' }, fechaDeHoy())),
     tarjetaInstalar(),
     preguntaAvisos(),
     pista('hoy', 'Qué toca hoy y cómo va tu recuperación. Si quieres más ayuda, en la pestaña «Aprender» están el tutorial y el glosario.'),
@@ -210,12 +239,14 @@ export function vistaInicio(contenedor) {
       : enCurso
       ? h('a', { class: 'boton grande', href: `#/sesion/${enCurso.id}` }, 'Continuar entrenamiento')
       : dia
-        ? h('section', { class: 'tarjeta' },
-          h('p', { class: 'suave' }, `${rutina.nombre} · ${toca.descansoHoy ? 'siguiente' : 'hoy toca'}`
-            + (toca.motivo ? ` (${toca.motivo})` : '')),
-          h('h2', {}, dia.nombre),
+        ? h('section', { class: 'tarjeta tarjeta-hoy' },
+          h('div', { class: 'antetitulo' }, toca.descansoHoy ? 'Lo siguiente' : 'Hoy te toca'),
+          // «Día 1: Torso · 65-70 min»: la duración pasa a la línea de debajo.
+          h('h2', {}, dia.nombre.replace(/\s*·\s*[\d-]+\s*min$/, '')),
+          h('p', { class: 'suave' }, [rutina.nombre, dia.nombre.match(/([\d-]+)\s*min$/)?.[1] && `unos ${dia.nombre.match(/([\d-]+)\s*min$/)[1]} min`,
+            toca.motivo].filter(Boolean).join(' · ')),
           avisoPlantillaNueva(rutina),
-          !dia.ejercicios.length && h('p', { class: 'suave' }, 'Este día no tiene ejercicios todavía'),
+          dia.ejercicios.length ? listaDelDia(d, dia) : h('p', { class: 'suave' }, 'Este día no tiene ejercicios todavía'),
           avisoCuandoToca(d, rutina, dia),
           h('button', { class: 'boton grande', onclick: () => empezarConRutina(dia) }, toca.descansoHoy ? 'Empezar igualmente' : 'Empezar'),
           h('button', { class: 'boton secundario', onclick: elegirDia }, 'Otro día de la rutina'),

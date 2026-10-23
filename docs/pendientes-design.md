@@ -68,4 +68,4 @@ Dan eligió el **A («ordenado»)**: lo de ahora más limpio. De ahí sale para 
 «Hoy te toca» con el día, la lista corta de ejercicios con su objetivo y «Empezar» a todo el ancho;
 recuperación en barras finas por músculo con «¿Voy hoy?» debajo; últimos entrenamientos en dos filas.
 En el entreno: sugerencia «Hoy 112,5 kg × 4 dejando 2» con filo, casillas grandes y el descanso en una
-banda de tinta con −30 s / +30 s. Falta pasarlo al código cuando él lo pida.
+banda de tinta con −30 s / +30 s. **Pasado al código en la 0.60.21** (23-10-2026).
