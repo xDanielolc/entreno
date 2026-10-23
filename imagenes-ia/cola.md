@@ -76,3 +76,5 @@ patada de glúteo. Quedan: press militar sentado (completar piernas y teletransp
 Hecho el 23-10 por la mañana (0.60.14): 30 de la cola «más músculo» (60 a 89). Quedan 42, del 90 (cabeza a la
 rodilla girada) al 131. Revisar: zancadas hacia atrás (rehacer: la IA gira la segunda figura de frente; sigue la
 de antes), montaña (sale sin pantalón), águila (pantalón a cuadros).
+Hecho el 23-10 a mediodía (0.60.15): la cola «más músculo» completa (del 90 al 131 y las zancadas hacia atrás de
+perfil). Revisar: héroe tendido (pantalón negro), cobra (perfil con oreja), rueda (la curva no se entiende).

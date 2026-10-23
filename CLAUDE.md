@@ -1173,3 +1173,7 @@ fase), tras probar la A.
   zancadas y 25 posturas de yoga); quedan 42 (yoga, desde «cabeza a la rodilla girada»). Gemini se reabre a las
   10:38; las dos cuentas de ChatGPT, agotadas. Las zancadas hacia atrás se quedan como estaban (la IA giraba la
   segunda figura de frente). Almacén `entreno-imagenes-24`.
+- 0.60.15 (23-10-2026, mediodía): **cola «más músculo» terminada** (132 de 132): las 42 posturas de yoga que
+  quedaban y las zancadas hacia atrás rehechas de perfil. Gemini a veces devuelve el dibujo sin tocar: se repite
+  con «Haz un dibujo nuevo a partir de este» y la postura descrita en palabras; «pantalón dibujado solo con línea,
+  sin relleno negro» evita el pantalón negro. Almacén `entreno-imagenes-25`.
