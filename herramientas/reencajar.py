@@ -45,7 +45,8 @@ REENCAJAR = {
     "dominadas-supinas": {"ia": True, "zona": (0.0, 0.0, 1.0, 0.1)},          # la barra y las manos
     "hip-thrust": {"ia": True, "zona": (0.0, 0.45, 0.35, 1.0)},               # el banco
     "face-pull": {"ia": True, "zona": (0.75, 0.0, 1.0, 1.0)},  # la columna (con las piernas fijas el muñeco se partía por la cintura)
-    "elevacion-de-gemelos-completo": {"ia": True, "zona": (0.0, 0.8, 1.0, 1.0)},  # el escalón
+    "elevacion-de-gemelos-completo": {"ia": True, "zona": (0.0, 0.8, 1.0, 1.0),    # el escalón
+                                      "subir": (0.73, 0.18, 24)},                   # 23-10, Dan: «que suba más»
     "puente-de-gluteo": {"ia": True, "zona": (0.0, 0.0, 0.35, 1.0)},          # la cabeza y los hombros en el suelo
     "encogimientos-de-trapecio": {"ia": True, "zona": (0.0, 0.9, 1.0, 1.0), "fijo_desde": 0.6},  # pies; piernas quietas
     "carrera": {"ia": True, "zona": (0.25, 0.0, 0.75, 0.4)},                  # cabeza y hombros (corre en el sitio)
@@ -91,7 +92,7 @@ def buscar(a, b, z, escala, centro, rango):
     return round(mejor_d[0] / escala), round(mejor_d[1] / escala)
 
 
-def reencajar(nombre, zona=None, rango=15, escala=0.25, mover=None, archivo=None, fijo_desde=None):
+def reencajar(nombre, zona=None, rango=15, escala=0.25, mover=None, archivo=None, fijo_desde=None, subir=None):
     """`archivo`: un WebP de la IA ya hecho (se reencaja tal cual); sin él, el animado de Everkinetic."""
     archivo_ia = archivo is not None
     fuente = Image.open(archivo) if archivo else original(nombre)
@@ -140,6 +141,20 @@ def reencajar(nombre, zona=None, rango=15, escala=0.25, mover=None, archivo=None
         c = tinta(salida[0]).getbbox()
         y = round(c[1] + (c[3] - c[1]) * fijo_desde)
         salida[1].paste(salida[0].crop((0, y, salida[0].width, salida[0].height)), (0, y))
+    if subir:
+        # La IA apenas levanta el cuerpo de puntillas (Dan: «que suba más»): en la segunda postura todo lo que
+        # queda por encima del tobillo sube `px` y el tramo bajo de las piernas se estira para llegar a los pies.
+        corte, tramo, px = subir
+        b2 = salida[1]
+        c = tinta(b2).getbbox()
+        yc = round(c[1] + (c[3] - c[1]) * corte)
+        s = round((c[3] - c[1]) * tramo)
+        px = min(px, c[1])
+        nueva = b2.copy()
+        nueva.paste(Image.new("RGB", (b2.width, yc), "white"), (0, 0))
+        nueva.paste(b2.crop((0, 0, b2.width, yc - s)), (0, -px))
+        nueva.paste(b2.crop((0, yc - s, b2.width, yc)).resize((b2.width, s + px), Image.LANCZOS), (0, yc - s - px))
+        salida[1] = nueva
     salida[0].save(archivo, "WEBP", save_all=True, append_images=salida[1:], duration=duraciones[:2], loop=0, quality=82, method=6)
     print(f"{nombre}: desplazada {dx}, {dy}")
     return True

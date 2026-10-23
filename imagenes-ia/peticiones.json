@@ -614,7 +614,7 @@
   "inicio": "talones bajados",
   "final": "talones subidos, de puntillas",
   "ancla": "encajar",
-  "usar": "antes"
+  "usar": "ia"
  },
  {
   "slug": "elevacion-de-tibiales",
@@ -2008,7 +2008,8 @@
  {
   "slug": "yoga-sobre-la-cabeza",
   "ejercicio": "Sobre la cabeza con apoyo (Salamba Sirsasana)",
-  "vista": "postura de yoga, visto de lado",
-  "postura": "vertical sobre la cabeza con los antebrazos en el suelo y las manos entrelazadas alrededor de la cabeza, piernas estiradas hacia el techo"
+  "vista": "postura de yoga, de frente y de lado (la animación alterna las dos vistas cada 2 s)",
+  "postura": "vertical sobre la cabeza con los antebrazos en el suelo y las manos entrelazadas alrededor de la cabeza, piernas estiradas hacia el techo",
+  "duracion": 2000
  }
 ]

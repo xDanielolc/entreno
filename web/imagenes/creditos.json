@@ -498,13 +498,11 @@
    "completadoCon": "Gemini"
   },
   "Elevación de gemelos sentado": {
-   "archivo": "imagenes/ejercicios/ia/elevacion-de-gemelos-sentado-completo.webp",
-   "autor": "Everkinetic",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "seated-calf-raise-using-machine",
-   "estatica": "imagenes/ejercicios/ia/elevacion-de-gemelos-sentado-completo-quieta.webp",
+   "archivo": "imagenes/ejercicios/ia/elevacion-de-gemelos-sentado.webp",
+   "estatica": "imagenes/ejercicios/ia/elevacion-de-gemelos-sentado-quieta.webp",
    "animada": true,
-   "completadoCon": "Gemini"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Crunch abdominal": {
    "archivo": "imagenes/ejercicios/anim/crunch-abdominal.webp",
@@ -1613,9 +1611,9 @@
    "autor": "Gemini"
   },
   "Sobre la cabeza con apoyo (Salamba Sirsasana)": {
-   "archivo": "imagenes/ejercicios/ia/yoga-sobre-la-cabeza-quieta.webp",
+   "archivo": "imagenes/ejercicios/ia/yoga-sobre-la-cabeza.webp",
    "estatica": "imagenes/ejercicios/ia/yoga-sobre-la-cabeza-quieta.webp",
-   "animada": false,
+   "animada": true,
    "fuente": "ia",
    "autor": "Gemini"
   },

@@ -1217,4 +1217,9 @@ fase), tras probar la A.
   patada de glúteo en polea (pasa a `usar: ia`), sentadilla hack (fuera de `CONGELADOS`), máquina de glúteo y esquí de fondo,
   todos con una captura de una foto con las dos posturas como modelo (método en `imagenes-ia/cola.md`). Elevaciones laterales
   con las piernas fijas (`fijo_desde`) y cabeza lisa. Almacén `entreno-imagenes-35`.
+- 0.60.27: gemelos sentado (el peso sube; `usar: ia`) y sentadilla en multipower (de frente) con foto de modelo; elevación de
+  gemelos que sube más (`subir` en reencajar.py: el cuerpo sube y el tramo bajo de las piernas se estira); «sobre la cabeza»
+  alterna vista de frente y de lado cada 2 s (`duracion` en peticiones.json); cabeza a la rodilla con la frente en la rodilla.
+  Preparado `tres-<nombre>` (tres figuras animadas 1-2-3-2) para correr y escalador, pero Gemini dibuja la 1 y la 3 iguales.
+  Almacén `entreno-imagenes-36`.
 

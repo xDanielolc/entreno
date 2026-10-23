@@ -22,7 +22,7 @@ import json
 import pathlib
 import sys
 
-from PIL import Image
+from PIL import Image, ImageSequence
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from animar_imagenes import mascara  # noqa: E402
@@ -244,6 +244,28 @@ def animar_mismo_lienzo(a, b, salida, tope=600, margen=24):
     marcos[0].save(salida, "WEBP", save_all=True, append_images=marcos[1:], duration=[900, 900], loop=0, quality=82, method=6)
 
 
+def partir_en_tres(im):
+    """Tres figuras en fila: corta por los dos huecos en blanco más anchos (uno en cada mitad)."""
+    tinta = mascara(im, 200)
+    ancho, alto = tinta.size
+    columnas = [sum(1 for y in range(0, alto, 2) if tinta.getpixel((x, y))) for x in range(ancho)]
+
+    def hueco(desde, hasta):
+        mejor, inicio, tramo = 0, None, (desde + hasta) // 2
+        for x in range(desde, hasta):
+            if columnas[x] <= 1:
+                inicio = x if inicio is None else inicio
+                if x - inicio > mejor:
+                    mejor, tramo = x - inicio, (inicio + x) // 2
+            else:
+                inicio = None
+        return tramo
+
+    c1 = hueco(int(ancho * 0.15), int(ancho * 0.5))
+    c2 = hueco(int(ancho * 0.5), int(ancho * 0.85))
+    return im.crop((0, 0, c1, alto)), im.crop((c1, 0, c2, alto)), im.crop((c2, 0, ancho, alto))
+
+
 def procesar(origen, modo="pies", espejo=False, solo=False, invertir=False, mover=None, escala=None, recorte=None, grosor=None):
     nombre = origen.stem.split("-", 1)[1]
     if origen.stem.startswith("completo-"):
@@ -275,8 +297,16 @@ def procesar(origen, modo="pies", espejo=False, solo=False, invertir=False, move
         animar_mismo_lienzo(im, segunda, SALIDA / f"{nombre}.webp")
         if nombre in REENCAJAR and REENCAJAR[nombre].get("ia"):
             op = REENCAJAR[nombre]
-            reencajar(nombre, op.get("zona"), mover=op.get("mover"), archivo=SALIDA / f"{nombre}.webp", fijo_desde=op.get("fijo_desde"))
+            reencajar(nombre, op.get("zona"), mover=op.get("mover"), archivo=SALIDA / f"{nombre}.webp", fijo_desde=op.get("fijo_desde"), subir=op.get("subir"))
         quieta(im, fija)
+        return nombre, True
+    if origen.stem.startswith("tres-"):
+        # «tres-<nombre>»: las dos piernas alternas (correr, escalador) en tres figuras: una pierna delante, el paso
+        # por el medio y la otra delante. Se anima ida y vuelta (1, 2, 3, 2), que es lo que la IA no sabe hacer con dos.
+        partes = [recortar(x, 0) for x in partir_en_tres(im)]
+        # Sin reencajar.py, que solo sabe de dos fotogramas: el ancla de peticiones.json basta.
+        animar([partes[0], partes[1], partes[2], partes[1]], SALIDA / f"{nombre}.webp", modo, duraciones=(450, 300, 450, 300), mover=mover)
+        quieta(partes[0], fija)
         return nombre, True
     if origen.stem.startswith(("fases-", "completo-")):
         if origen.stem.startswith("completo-"):
@@ -303,7 +333,7 @@ def procesar(origen, modo="pies", espejo=False, solo=False, invertir=False, move
         if nombre in REENCAJAR and REENCAJAR[nombre].get("ia"):
             # Afinado píxel a píxel por lo que no se mueve (herramientas/reencajar.py).
             op = REENCAJAR[nombre]
-            reencajar(nombre, op.get("zona"), mover=op.get("mover"), archivo=SALIDA / f"{nombre}.webp", fijo_desde=op.get("fijo_desde"))
+            reencajar(nombre, op.get("zona"), mover=op.get("mover"), archivo=SALIDA / f"{nombre}.webp", fijo_desde=op.get("fijo_desde"), subir=op.get("subir"))
         quieta(inicio, fija)
         return nombre, True
     if recorte:
@@ -317,7 +347,7 @@ def leer_tabla():
     """De peticiones.json: nombre del dibujo → {"ejercicios": [...], "ancla": ...}."""
     if not PETICIONES.exists():
         return {}
-    return {p["slug"]: {"ejercicios": [p["ejercicio"], *p.get("tambien", [])], "ancla": p.get("ancla", "pies"), "espejo": p.get("espejo", False), "solo": p.get("solo", False), "usar": p.get("usar"), "sinAlias": p.get("sinAlias", False), "invertir": p.get("invertir", False), "mover": p.get("mover"), "escala": p.get("escala"), "recorte": p.get("recorte"), "grosor": p.get("grosor")}
+    return {p["slug"]: {"ejercicios": [p["ejercicio"], *p.get("tambien", [])], "ancla": p.get("ancla", "pies"), "espejo": p.get("espejo", False), "solo": p.get("solo", False), "usar": p.get("usar"), "sinAlias": p.get("sinAlias", False), "invertir": p.get("invertir", False), "mover": p.get("mover"), "escala": p.get("escala"), "recorte": p.get("recorte"), "grosor": p.get("grosor"), "duracion": p.get("duracion")}
             for p in json.loads(PETICIONES.read_text(encoding="utf8"))}
 
 
@@ -423,7 +453,7 @@ def main():
     # «descartes» guarda los que salieron mal: no se usan.
     for carpeta in sorted(p for p in ORIGENES.iterdir() if p.is_dir() and p.name != "descartes"):
         for origen in sorted(carpeta.glob("*.jpg")) + sorted(carpeta.glob("*.png")):
-            if not origen.stem.startswith(("fases-", "quieto-", "completo-", "pasos-")):
+            if not origen.stem.startswith(("fases-", "quieto-", "completo-", "pasos-", "tres-")):
                 continue
             if origen.stem.startswith("pasos-") and not origen.stem.endswith("-1"):
                 continue
@@ -443,6 +473,13 @@ def main():
                 print("congelada " + salida)
                 continue
             nombre, animada = procesar(origen, modo, bool(opciones.get("espejo")), bool(opciones.get("solo")), bool(opciones.get("invertir")), opciones.get("mover"), opciones.get("escala"), opciones.get("recorte"), None if origen.stem.startswith("completo-") else opciones.get("grosor"))
+            if animada and opciones.get("duracion"):
+                # «duracion» en peticiones.json (ms por fotograma): dos vistas de una postura quieta que se alternan
+                # despacio (Dan: «sobre la cabeza, alternar las dos perspectivas cada 2 s»), no un movimiento.
+                anim = Image.open(SALIDA / f"{nombre}.webp")
+                marcos = [m.convert("RGB").copy() for m in ImageSequence.Iterator(anim)]
+                marcos[0].save(SALIDA / f"{nombre}.webp", "WEBP", save_all=True, append_images=marcos[1:],
+                               duration=opciones["duracion"], loop=0, quality=82, method=6)
             hechos.append((nombre, animada, carpeta.name))
             print(("animada " if animada else "quieta  ") + nombre)
     apuntar(hechos)
