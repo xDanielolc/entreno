@@ -38,7 +38,7 @@ REENCAJAR = {
     "curl-invertido-completo": {"ia": True, "zona": (0.0, 0.9, 1.0, 1.0), "fijo_desde": 0.62},     # los pies
     "curl-martillo-completo": {"ia": True, "zona": (0.0, 0.9, 1.0, 1.0), "fijo_desde": 0.62},
     "pullover-en-polea-completo": {"ia": True, "zona": (0.0, 0.9, 1.0, 1.0), "fijo_desde": 0.62},
-    "flexiones-en-pica": {"ia": True, "zona": (0.0, 0.8, 0.3, 1.0)},           # las puntas de los pies
+    "flexiones-en-pica": {"ia": True, "zona": (0.6, 0.85, 1.0, 1.0)},          # 23-10, Dan: las manos clavadas
     "sentadilla-goblet": {"ia": True, "zona": (0.0, 0.92, 1.0, 1.0)},          # los pies
     "puente-por-fases": {"ia": True, "zona": (0.6, 0.75, 1.0, 1.0)},           # los pies
     "mountain-climbers": {"ia": True, "zona": (0.72, 0.55, 1.0, 0.97)},        # las manos y los brazos

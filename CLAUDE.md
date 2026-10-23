@@ -1206,4 +1206,7 @@ fase), tras probar la A.
 - 0.60.23: sección 3 empezada: león y vela (sobre los hombros con apoyo) rehechos, gemelo en pared con el talón
   apoyado (hecho desde cero: editando, Gemini no cambia los pies). La paloma real no sale. Gemini al tope a las 17:30.
   Almacén `entreno-imagenes-32`.
+- 0.60.24: con la segunda cuenta de Gemini (u/1, condiciones aceptadas con el visto bueno de Dan): paloma real con la
+  página del libro de Kaminoff de modelo (`Literatura/`, fuera de Git; la pierna de más se borró a mano), cara lisa en
+  puente por fases, flexiones en pica (encajadas ahora por las manos) y tríceps en máquina. Almacén `entreno-imagenes-33`.
 

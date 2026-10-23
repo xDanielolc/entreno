@@ -113,9 +113,9 @@ petición (el pez levantaba la cabeza; la goblet sale «de huevo», que lo decid
 
 ## 3. Con IA, posturas y ejercicios
 - [x] León: no es la postura (ejemplo del libro). Paloma real y sobre los hombros con apoyo: rehacer.
-      0.60.23: león y vela rehechos. Paloma real NO sale: Gemini devuelve la de antes o la pone en zancada (3 intentos);
-      probar con el libro de yoga como ejemplo o con ChatGPT.
-- [ ] (gemelo hecho en 0.60.23 desde cero; editando no baja el talón. Falta el sóleo, igual: desde cero) Gemelo y sóleo en pared: el talón de atrás apoyado del todo (y le extraña la diferencia de la rodilla).
+      0.60.23: león y vela rehechos. 0.60.24: paloma real con la página del libro (Literatura/Anatomia-del-Yoga…, pág. 128
+      del PDF) de modelo; Gemini pintó una pierna de más y se borró a mano.
+- [ ] (gemelo hecho en 0.60.23 desde cero; editando no baja el talón. Sóleo: 2 intentos desde cero sin éxito, rodilla de atrás recta) Gemelo y sóleo en pared: el talón de atrás apoyado del todo (y le extraña la diferencia de la rodilla).
 - [ ] Estiramiento de antebrazo: variante nueva de flexores. Leñador en polea: variante nueva hacia arriba.
 - [ ] CARs de hombro → cambiar por «rotaciones de hombro con palo» (buscar ejemplos).
 - [ ] Dominadas: el tamaño cambia (como el muñeco de antes). Supinas = las dominadas nuevas cambiando solo el
@@ -127,6 +127,7 @@ petición (el pez levantaba la cabeza; la goblet sale «de huevo», que lo decid
       banco y los pies de ahora. Puente de glúteo: rehacer. Puente por fases: cabeza y brazos clavados; cara.
       Flexiones en pica: manos fijas, cara plana. Face pull: la máquina cambia y el muñeco se parte.
       Sentadilla en multipower: pies clavados; quitar el listón fino de la derecha.
+      0.60.24: cara lisa en puente por fases, flexiones en pica (y manos clavadas) y tríceps en máquina.
 - [ ] Press de hombro a una mano y elevaciones laterales: piernas sobre piernas, empezar del original.
 ## 4. Máquinas con foto de ejemplo
 - [ ] Dominadas asistidas, fondos asistidos, gemelos en multipower, pájaros en contractora, máquina de glúteo,
