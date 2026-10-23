@@ -79,3 +79,50 @@ de antes), montaña (sale sin pantalón), águila (pantalón a cuadros).
 Hecho el 23-10 a mediodía (0.60.15): la cola «más músculo» completa (del 90 al 131 y las zancadas hacia atrás de
 perfil). Revisar: héroe tendido (pantalón negro), cobra (perfil con oreja), rueda (la curva no se entiende).
 Hecho (0.60.16): press militar sentado completado y remo en polea al pecho sin teletransporte. **Cola vacía.**
+
+# Sexta revisión (23-10-2026, sus notas en la página de revisión, colección `comparar`)
+
+Reglas nuevas: cara SIEMPRE lisa (sin marcas; unificar orejas: mirar qué llevan la mayoría); bañador blanco
+(solo línea, nunca relleno); en máquinas darle a la IA una foto de ejemplo de la máquina de verdad y pedir que
+la pase a nuestro estilo; en posturas de yoga mal entendidas, darle de ejemplo el dibujo anterior o el libro;
+lo que la IA no sabe quitar (líneas sueltas, línea de suelo), a mano. Orden: primero lo que la IA sabe
+corregir; cardio y animaciones de piernas alternas (3 imágenes: izquierda, ninguna, derecha), lo último.
+
+## 1. Sin IA (código o a mano)
+- [ ] Volver al de antes: ángulo en ocho, ángulo ligado tumbado, arco, cara de vaca, flexión amplia, plancha
+      lateral del sabio, torsión abdominal, tortuga, remo al mentón, sentadilla hack (y reintentar), elevaciones
+      laterales (y rehacer), peso muerto rumano (y clavar los pies).
+- [ ] Nombre de yoga en el título de las posturas (dijo que sí).
+- [ ] Cruces en polea: quitar a mano la línea de los pies. Pectoral en el marco: borrar la línea mano-pierna.
+      Ángulo ligado: borrar las 4 marcas de la cara.
+- [ ] Press militar sentado: la imagen se corta un poco (lienzo). No borrar el otro (borrarOtro: false).
+- [ ] Remo de cardio: línea más gruesa e igual en las dos posturas.
+## 2. Con IA, fácil (solo la cara lisa, sobre el dibujo elegido)
+- [ ] Nuevos: apana, arado, árbol boca abajo, banco dos apoyos, cadáver, camello, escorpión, oeste, flexión de
+      pie, pavo real cola, triángulo, triángulo girado, medio señor de los peces, superman, sentadilla goblet,
+      elevador de la escápula, langosta, puente.
+- [ ] De antes (vuelven) con cara lisa: cobra, oreja a la rodilla, pavo real, perro boca abajo, pez, piernas
+      en la pared, plancha hacia arriba, sobre los hombros sin brazos.
+- [ ] Banco cuatro apoyos: cuerpo antiguo y cara nueva. Héroe tendido: bañador blanco. Sofá: falta bañador.
+      Montaña: con pantalón y manos/postura como el anterior. Silla: postura como el anterior (darle el anterior).
+## 3. Con IA, posturas y ejercicios
+- [ ] León: no es la postura (ejemplo del libro). Paloma real y sobre los hombros con apoyo: rehacer.
+- [ ] Gemelo y sóleo en pared: el talón de atrás apoyado del todo (y le extraña la diferencia de la rodilla).
+- [ ] Estiramiento de antebrazo: variante nueva de flexores. Leñador en polea: variante nueva hacia arriba.
+- [ ] CARs de hombro → cambiar por «rotaciones de hombro con palo» (buscar ejemplos).
+- [ ] Dominadas: el tamaño cambia (como el muñeco de antes). Supinas = las dominadas nuevas cambiando solo el
+      agarre (y las nuevas pasan a ser las pronas). Negativas: la dominada al revés.
+- [ ] Curl en polea: el cable siempre por la parte baja de la polea. Gemelos: que suba más (casi una cabeza).
+- [ ] Gemelos sentado: el peso sube al subir. Extensión de tríceps en máquina: el agarre no se da la vuelta,
+      las placas suben al extender; cara. Elevaciones laterales en polea: el brazo libre siempre al lado.
+- [ ] Encogimientos: encoge poco. Gato-camello: la espalda no se dobla. Hip thrust: el ejercicio de antes con el
+      banco y los pies de ahora. Puente de glúteo: rehacer. Puente por fases: cabeza y brazos clavados; cara.
+      Flexiones en pica: manos fijas, cara plana. Face pull: la máquina cambia y el muñeco se parte.
+      Sentadilla en multipower: pies clavados; quitar el listón fino de la derecha.
+- [ ] Press de hombro a una mano y elevaciones laterales: piernas sobre piernas, empezar del original.
+## 4. Máquinas con foto de ejemplo
+- [ ] Dominadas asistidas, fondos asistidos, gemelos en multipower, pájaros en contractora, máquina de glúteo,
+      remo en máquina, patada de glúteo en polea, esquí de fondo (máquina), sentadilla hack.
+## 5. Animaciones (lo último)
+- [ ] Mountain climbers y carrera (3 imágenes), elíptica (cada mano en su palanca), escalera, zancadas (las dos),
+      cabeza a la rodilla (meter la cabeza), sobre la cabeza (alternar las dos perspectivas cada 2 s).

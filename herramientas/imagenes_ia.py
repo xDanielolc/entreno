@@ -322,7 +322,7 @@ def ejercicios_de(entrada):
 
 # Ejercicios que se aguantan quietos: dibujo sin animar (Dan, 22-10-2026: «en estática que no se mueva»).
 # Dibujos que se quedan como están (Dan eligió la versión de antes en una revisión): no se rehacen.
-CONGELADOS = {"cruces-en-polea-completo"}   # 23-10: «estaba mejor el anterior» (el de la 0.60.9)
+CONGELADOS = {"cruces-en-polea-completo", "sentadilla-hack", "elevaciones-laterales-completo"}   # versiones anteriores que Dan prefiere (23-10)
 
 QUIETOS = {"Plancha lateral": "imagenes/ejercicios/anim/plancha-lateral-quieta.webp"}
 

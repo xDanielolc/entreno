@@ -1180,3 +1180,8 @@ fase), tras probar la A.
 - 0.60.16: los dos últimos arreglos de la lista: press militar sentado completado (piernas y pies con Gemini,
   `completo-press-militar-ek.png`, piernas y banco quietos con `fijo_desde`) y remo en polea al pecho reencajado
   por el banco (`reencajar.py`). Almacén `entreno-imagenes-26`.
+- 0.60.17 (23-10-2026, tarde): su sexta revisión, apuntada entera en `imagenes-ia/cola.md` («Sexta revisión»).
+  Vuelven los dibujos de antes que prefirió: 16 posturas de yoga (originales devueltos desde descartes),
+  sentadilla hack y elevaciones laterales (`CONGELADOS`), remo al mentón (sin `grosor`) y peso muerto rumano
+  (el de antes, pies clavados). Reglas nuevas en la memoria: cara lisa, bañador blanco, máquinas con foto de
+  ejemplo. Almacén `entreno-imagenes-27`.
