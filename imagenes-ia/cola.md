@@ -112,8 +112,10 @@ de la oreja)… de perfil, tampoco el saliente de la nariz ni de los labios». E
 petición (el pez levantaba la cabeza; la goblet sale «de huevo», que lo decida Dan).
 
 ## 3. Con IA, posturas y ejercicios
-- [ ] León: no es la postura (ejemplo del libro). Paloma real y sobre los hombros con apoyo: rehacer.
-- [ ] Gemelo y sóleo en pared: el talón de atrás apoyado del todo (y le extraña la diferencia de la rodilla).
+- [x] León: no es la postura (ejemplo del libro). Paloma real y sobre los hombros con apoyo: rehacer.
+      0.60.23: león y vela rehechos. Paloma real NO sale: Gemini devuelve la de antes o la pone en zancada (3 intentos);
+      probar con el libro de yoga como ejemplo o con ChatGPT.
+- [ ] (gemelo hecho en 0.60.23 desde cero; editando no baja el talón. Falta el sóleo, igual: desde cero) Gemelo y sóleo en pared: el talón de atrás apoyado del todo (y le extraña la diferencia de la rodilla).
 - [ ] Estiramiento de antebrazo: variante nueva de flexores. Leñador en polea: variante nueva hacia arriba.
 - [ ] CARs de hombro → cambiar por «rotaciones de hombro con palo» (buscar ejemplos).
 - [ ] Dominadas: el tamaño cambia (como el muñeco de antes). Supinas = las dominadas nuevas cambiando solo el

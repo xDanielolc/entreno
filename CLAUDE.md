@@ -1203,4 +1203,7 @@ fase), tras probar la A.
   escápula), pantalón blanco en héroe tendido y sofá, banco sobre cuatro apoyos con el cuerpo de antes, montaña y silla
   con la postura de antes (pasándole el dibujo viejo de modelo). Revisión en el grupo «Sexta vuelta» de la página de
   comparación. Almacén `entreno-imagenes-31`.
+- 0.60.23: sección 3 empezada: león y vela (sobre los hombros con apoyo) rehechos, gemelo en pared con el talón
+  apoyado (hecho desde cero: editando, Gemini no cambia los pies). La paloma real no sale. Gemini al tope a las 17:30.
+  Almacén `entreno-imagenes-32`.
 
