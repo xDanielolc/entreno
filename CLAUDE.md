@@ -1199,4 +1199,8 @@ fase), tras probar la A.
   (`listaDelDia` en inicio.js, «y N más»), y dos últimos entrenamientos. Entreno: el descanso es una banda de tinta
   con −30 s, el tiempo, +30 s y Saltar (`acortar`/`alargar(30)` en descanso.js; antes +1 min en los largos) y las
   casillas de la serie, de 56 px.
+- 0.60.22: sexta revisión, sección 2 hecha con Gemini: cara lisa en 27 dibujos (yoga, superman, goblet, elevador de la
+  escápula), pantalón blanco en héroe tendido y sofá, banco sobre cuatro apoyos con el cuerpo de antes, montaña y silla
+  con la postura de antes (pasándole el dibujo viejo de modelo). Revisión en el grupo «Sexta vuelta» de la página de
+  comparación. Almacén `entreno-imagenes-31`.
 

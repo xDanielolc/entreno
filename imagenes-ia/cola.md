@@ -99,13 +99,18 @@ corregir; cardio y animaciones de piernas alternas (3 imágenes: izquierda, ning
       el respaldo y la cadera, 0.60.20. No borrar el otro (borrarOtro: false). Va a la «Sexta vuelta» para que lo vea.
 - [x] Remo de cardio: línea más gruesa e igual en las dos posturas.
 ## 2. Con IA, fácil (solo la cara lisa, sobre el dibujo elegido)
-- [ ] Nuevos: apana, arado, árbol boca abajo, banco dos apoyos, cadáver, camello, escorpión, oeste, flexión de
+- [x] Nuevos: apana, arado, árbol boca abajo, banco dos apoyos, cadáver, camello, escorpión, oeste, flexión de
       pie, pavo real cola, triángulo, triángulo girado, medio señor de los peces, superman, sentadilla goblet,
       elevador de la escápula, langosta, puente.
-- [ ] De antes (vuelven) con cara lisa: cobra, oreja a la rodilla, pavo real, perro boca abajo, pez, piernas
+- [x] De antes (vuelven) con cara lisa: cobra, oreja a la rodilla, pavo real, perro boca abajo, pez, piernas
       en la pared, plancha hacia arriba, sobre los hombros sin brazos.
-- [ ] Banco cuatro apoyos: cuerpo antiguo y cara nueva. Héroe tendido: bañador blanco. Sofá: falta bañador.
+- [x] Banco cuatro apoyos: cuerpo antiguo y cara nueva. Héroe tendido: bañador blanco. Sofá: falta bañador.
       Montaña: con pantalón y manos/postura como el anterior. Silla: postura como el anterior (darle el anterior).
+Hecho el 23-10 por la tarde (0.60.22): toda la sección 2 con Gemini. Prompt que funciona a la primera casi siempre:
+«Haz un dibujo nuevo a partir de este, idéntico en postura… pero con la cabeza completamente lisa… sin oreja (ni la curva
+de la oreja)… de perfil, tampoco el saliente de la nariz ni de los labios». El pez y la goblet necesitaron una segunda
+petición (el pez levantaba la cabeza; la goblet sale «de huevo», que lo decida Dan).
+
 ## 3. Con IA, posturas y ejercicios
 - [ ] León: no es la postura (ejemplo del libro). Paloma real y sobre los hombros con apoyo: rehacer.
 - [ ] Gemelo y sóleo en pared: el talón de atrás apoyado del todo (y le extraña la diferencia de la rodilla).
