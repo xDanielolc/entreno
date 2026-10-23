@@ -89,14 +89,14 @@ lo que la IA no sabe quitar (líneas sueltas, línea de suelo), a mano. Orden: p
 corregir; cardio y animaciones de piernas alternas (3 imágenes: izquierda, ninguna, derecha), lo último.
 
 ## 1. Sin IA (código o a mano)
-- [ ] Volver al de antes: ángulo en ocho, ángulo ligado tumbado, arco, cara de vaca, flexión amplia, plancha
+- [x] Volver al de antes: ángulo en ocho, ángulo ligado tumbado, arco, cara de vaca, flexión amplia, plancha
       lateral del sabio, torsión abdominal, tortuga, remo al mentón, sentadilla hack (y reintentar), elevaciones
       laterales (y rehacer), peso muerto rumano (y clavar los pies).
 - [ ] Nombre de yoga en el título de las posturas (dijo que sí).
-- [ ] Cruces en polea: quitar a mano la línea de los pies. Pectoral en el marco: borrar la línea mano-pierna.
+- [x] Cruces en polea: quitar a mano la línea de los pies. Pectoral en el marco: borrar la línea mano-pierna.
       Ángulo ligado: borrar las 4 marcas de la cara.
 - [ ] Press militar sentado: la imagen se corta un poco (lienzo). No borrar el otro (borrarOtro: false).
-- [ ] Remo de cardio: línea más gruesa e igual en las dos posturas.
+- [x] Remo de cardio: línea más gruesa e igual en las dos posturas.
 ## 2. Con IA, fácil (solo la cara lisa, sobre el dibujo elegido)
 - [ ] Nuevos: apana, arado, árbol boca abajo, banco dos apoyos, cadáver, camello, escorpión, oeste, flexión de
       pie, pavo real cola, triángulo, triángulo girado, medio señor de los peces, superman, sentadilla goblet,

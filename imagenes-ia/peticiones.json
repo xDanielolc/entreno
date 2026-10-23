@@ -1103,7 +1103,8 @@
   "inicio": "rodillas dobladas cerca del pecho, brazos estirados hacia delante agarrando el asa",
   "final": "piernas estiradas, tronco algo inclinado hacia atrás y el asa junto al abdomen",
   "ancla": "encajar",
-  "usar": "antes"
+  "usar": "antes",
+  "grosor": 3
  },
  {
   "slug": "natacion",

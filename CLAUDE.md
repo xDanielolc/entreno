@@ -1185,3 +1185,7 @@ fase), tras probar la A.
   sentadilla hack y elevaciones laterales (`CONGELADOS`), remo al mentón (sin `grosor`) y peso muerto rumano
   (el de antes, pies clavados). Reglas nuevas en la memoria: cara lisa, bañador blanco, máquinas con foto de
   ejemplo. Almacén `entreno-imagenes-27`.
+- 0.60.18: retoques a mano: suelo de los cruces en polea y línea suelta del pectoral en el marco borrados
+  (están en `CONGELADOS`, que ahora vale también para dibujos quietos). En los `pasos-` la segunda postura se
+  pone al tamaño de la primera antes de nada y `grosor` engorda y oscurece las dos (antes solo la primera: el
+  remo de cardio tenía un trazo distinto en cada lado). Almacén `entreno-imagenes-28`.

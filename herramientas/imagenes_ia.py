@@ -262,6 +262,14 @@ def procesar(origen, modo="pies", espejo=False, solo=False, invertir=False, move
         nombre = origen.stem[len("pasos-"):-2]
         fija = SALIDA / f"{nombre}-quieta.webp"
         segunda = Image.open(origen.with_name(origen.stem[:-2] + "-2" + origen.suffix)).convert("RGB").point(lambda v: 255 if v > 232 else v)
+        # Al tamaño de la primera antes de nada: la IA devuelve la segunda más grande y, al reducirla, el trazo
+        # quedaba más fino (Dan: «la línea igual en ambos lados de la animación»).
+        segunda = segunda.resize(im.size, Image.LANCZOS)
+        if grosor:
+            # La IA a veces dibuja la segunda en gris: se oscurece el trazo y se engorda igual que la primera.
+            from PIL import ImageFilter
+            segunda = segunda.point(lambda v: 0 if v < 150 else (255 if v > 235 else int((v - 150) * 3)))
+            segunda = segunda.filter(ImageFilter.MinFilter(grosor))
         if invertir:
             im, segunda = segunda, im
         animar_mismo_lienzo(im, segunda, SALIDA / f"{nombre}.webp")
@@ -322,7 +330,8 @@ def ejercicios_de(entrada):
 
 # Ejercicios que se aguantan quietos: dibujo sin animar (Dan, 22-10-2026: «en estática que no se mueva»).
 # Dibujos que se quedan como están (Dan eligió la versión de antes en una revisión): no se rehacen.
-CONGELADOS = {"cruces-en-polea-completo", "sentadilla-hack", "elevaciones-laterales-completo"}   # versiones anteriores que Dan prefiere (23-10)
+CONGELADOS = {"cruces-en-polea-completo", "sentadilla-hack", "elevaciones-laterales-completo",
+              "estiramiento-de-pectoral-en-el-marco-de-la-puerta"}  # versiones que Dan prefiere o retocadas a mano (23-10)
 
 QUIETOS = {"Plancha lateral": "imagenes/ejercicios/anim/plancha-lateral-quieta.webp"}
 
@@ -430,7 +439,7 @@ def main():
             salida = nombre + ("-completo" if origen.stem.startswith("completo-") else "")
             if salida in CONGELADOS:
                 # Dan prefirió una versión anterior: el WebP se queda como está en Git.
-                hechos.append((salida, True, carpeta.name))
+                hechos.append((salida, not origen.stem.startswith("quieto-"), carpeta.name))
                 print("congelada " + salida)
                 continue
             nombre, animada = procesar(origen, modo, bool(opciones.get("espejo")), bool(opciones.get("solo")), bool(opciones.get("invertir")), opciones.get("mover"), opciones.get("escala"), opciones.get("recorte"), None if origen.stem.startswith("completo-") else opciones.get("grosor"))
