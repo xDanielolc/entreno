@@ -1188,4 +1188,5 @@ fase), tras probar la A.
 - 0.60.18: retoques a mano: suelo de los cruces en polea y línea suelta del pectoral en el marco borrados
   (están en `CONGELADOS`, que ahora vale también para dibujos quietos). En los `pasos-` la segunda postura se
   pone al tamaño de la primera antes de nada y `grosor` engorda y oscurece las dos (antes solo la primera: el
-  remo de cardio tenía un trazo distinto en cada lado). Almacén `entreno-imagenes-28`.
+  remo de cardio tenía un trazo distinto en cada lado). 0.60.19: el cambio de tamaño va después de `invertir` (en la
+  0.60.18 el hip thrust, los saltos al cajón y las negativas salían a menos resolución). Almacén `entreno-imagenes-29`.

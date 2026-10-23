@@ -264,14 +264,14 @@ def procesar(origen, modo="pies", espejo=False, solo=False, invertir=False, move
         segunda = Image.open(origen.with_name(origen.stem[:-2] + "-2" + origen.suffix)).convert("RGB").point(lambda v: 255 if v > 232 else v)
         # Al tamaño de la primera antes de nada: la IA devuelve la segunda más grande y, al reducirla, el trazo
         # quedaba más fino (Dan: «la línea igual en ambos lados de la animación»).
+        if invertir:
+            im, segunda = segunda, im
         segunda = segunda.resize(im.size, Image.LANCZOS)
         if grosor:
             # La IA a veces dibuja la segunda en gris: se oscurece el trazo y se engorda igual que la primera.
             from PIL import ImageFilter
             segunda = segunda.point(lambda v: 0 if v < 150 else (255 if v > 235 else int((v - 150) * 3)))
             segunda = segunda.filter(ImageFilter.MinFilter(grosor))
-        if invertir:
-            im, segunda = segunda, im
         animar_mismo_lienzo(im, segunda, SALIDA / f"{nombre}.webp")
         if nombre in REENCAJAR and REENCAJAR[nombre].get("ia"):
             op = REENCAJAR[nombre]
