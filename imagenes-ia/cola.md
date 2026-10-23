@@ -116,8 +116,10 @@ petición (el pez levantaba la cabeza; la goblet sale «de huevo», que lo decid
       0.60.23: león y vela rehechos. 0.60.24: paloma real con la página del libro (Literatura/Anatomia-del-Yoga…, pág. 128
       del PDF) de modelo; Gemini pintó una pierna de más y se borró a mano.
 - [ ] (gemelo hecho en 0.60.23 desde cero; editando no baja el talón. Sóleo: 2 intentos desde cero sin éxito, rodilla de atrás recta) Gemelo y sóleo en pared: el talón de atrás apoyado del todo (y le extraña la diferencia de la rodilla).
-- [ ] Estiramiento de antebrazo: variante nueva de flexores. Leñador en polea: variante nueva hacia arriba.
-- [ ] CARs de hombro → cambiar por «rotaciones de hombro con palo» (buscar ejemplos).
+- [x] Estiramiento de antebrazo: variante nueva de flexores. Leñador en polea: variante nueva hacia arriba.
+      0.60.25: «Estiramiento de antebrazo (flexores)» y «Leñador en polea hacia arriba» en el catálogo, con dibujo nuevo.
+- [x] CARs de hombro → cambiar por «rotaciones de hombro con palo» (buscar ejemplos).
+      0.60.25: esquema v23, CARs y «Dislocaciones con pica» pasan a «Rotaciones de hombro con palo», dibujo nuevo de frente.
 - [ ] Dominadas: el tamaño cambia (como el muñeco de antes). Supinas = las dominadas nuevas cambiando solo el
       agarre (y las nuevas pasan a ser las pronas). Negativas: la dominada al revés.
 - [ ] Curl en polea: el cable siempre por la parte baja de la polea. Gemelos: que suba más (casi una cabeza).
@@ -128,6 +130,9 @@ petición (el pez levantaba la cabeza; la goblet sale «de huevo», que lo decid
       Flexiones en pica: manos fijas, cara plana. Face pull: la máquina cambia y el muñeco se parte.
       Sentadilla en multipower: pies clavados; quitar el listón fino de la derecha.
       0.60.24: cara lisa en puente por fases, flexiones en pica (y manos clavadas) y tríceps en máquina.
+      0.60.25: gato-camello (espalda muy redonda → muy hundida), puente de glúteo rehecho (cadera del suelo a arriba),
+      encogimientos que suben de verdad, face pull que ya no se parte (sin las piernas fijas). Las dominadas en una
+      sola imagen salen iguales arriba y abajo: pendientes.
 - [ ] Press de hombro a una mano y elevaciones laterales: piernas sobre piernas, empezar del original.
 ## 4. Máquinas con foto de ejemplo
 - [ ] Dominadas asistidas, fondos asistidos, gemelos en multipower, pájaros en contractora, máquina de glúteo,

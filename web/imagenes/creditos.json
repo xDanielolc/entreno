@@ -2443,6 +2443,27 @@
    "animada": true,
    "fuente": "ia",
    "autor": "Gemini"
+  },
+  "Estiramiento de antebrazo (flexores)": {
+   "archivo": "imagenes/ejercicios/ia/estiramiento-de-antebrazo-flexores-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/estiramiento-de-antebrazo-flexores-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
+  },
+  "Leñador en polea hacia arriba": {
+   "archivo": "imagenes/ejercicios/ia/lenador-en-polea-hacia-arriba.webp",
+   "estatica": "imagenes/ejercicios/ia/lenador-en-polea-hacia-arriba-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
+  },
+  "Rotaciones de hombro con palo": {
+   "archivo": "imagenes/ejercicios/ia/rotaciones-de-hombro-con-palo.webp",
+   "estatica": "imagenes/ejercicios/ia/rotaciones-de-hombro-con-palo-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   }
  }
 }

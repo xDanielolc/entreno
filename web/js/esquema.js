@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 22;
+export const VERSION_ACTUAL = 23;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -552,6 +552,29 @@ const MIGRACIONES = {
     datos.version = 22;
     return datos;
   },
+  // v22 → v23: los CARs de hombro y las dislocaciones con pica pasan a ser
+  // «Rotaciones de hombro con palo» (Dan, 23-10-2026). Igual que la anterior.
+  22: (datos) => {
+    const n = (s) => (s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+    const nombres = new Set(datos.ejercicios.map((ej) => n(ej.nombre)));
+    const cambio = new Map(Object.entries(RENOMBRADOS_V23).map(([a, b]) => [n(a), b]));
+    for (const ej of datos.ejercicios) {
+      const nuevo = cambio.get(n(ej.nombre));
+      if (nuevo && !nombres.has(n(nuevo))) {
+        ej.nombre = nuevo;
+        nombres.add(n(nuevo));
+      }
+      if (cambio.has(n(ej.fotoDe))) ej.fotoDe = cambio.get(n(ej.fotoDe));
+    }
+    datos.version = 23;
+    return datos;
+  },
+};
+
+// Nombres de antes → nombres de la v23 (no cambiar: lo usa una migración publicada).
+const RENOMBRADOS_V23 = {
+  'CARs de hombro': 'Rotaciones de hombro con palo',
+  'Dislocaciones con pica': 'Rotaciones de hombro con palo',
 };
 
 // Nombres de antes → nombres de la v22 (no cambiar: lo usa una migración publicada).

@@ -585,3 +585,4 @@ la vez, a veces sin cobertura):
   mínimo como % del 1RM; con `pesoMinimo`, manda el más alto ese día.
 - **v21 (0.58.0).** Campo opcional `aviso` en cada ejercicio de un día de rutina: una nota que se ve siempre en el entreno (en el texto de una rutina, un paréntesis que empieza por «!»).
 - **v22 (0.60.20).** Los estiramientos que son una postura de yoga llevan el nombre en sánscrito en el título («Estiramiento de isquios (Janu Sirsasana)»); la migración renombra los tuyos que se llamen como el catálogo de antes (y `fotoDe`).
+- **v23 (0.60.25).** «CARs de hombro» y «Dislocaciones con pica» pasan a llamarse «Rotaciones de hombro con palo» (si tienes los dos, el segundo se queda con su nombre).

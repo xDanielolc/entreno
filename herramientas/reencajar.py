@@ -44,7 +44,7 @@ REENCAJAR = {
     "mountain-climbers": {"ia": True, "zona": (0.72, 0.55, 1.0, 0.97)},        # las manos y los brazos
     "dominadas-supinas": {"ia": True, "zona": (0.0, 0.0, 1.0, 0.1)},          # la barra y las manos
     "hip-thrust": {"ia": True, "zona": (0.0, 0.45, 0.35, 1.0)},               # el banco
-    "face-pull": {"ia": True, "zona": (0.75, 0.0, 1.0, 1.0), "fijo_desde": 0.55},  # la columna; piernas quietas
+    "face-pull": {"ia": True, "zona": (0.75, 0.0, 1.0, 1.0)},  # la columna (con las piernas fijas el muñeco se partía por la cintura)
     "elevacion-de-gemelos-completo": {"ia": True, "zona": (0.0, 0.8, 1.0, 1.0)},  # el escalón
     "puente-de-gluteo": {"ia": True, "zona": (0.0, 0.0, 0.35, 1.0)},          # la cabeza y los hombros en el suelo
     "encogimientos-de-trapecio": {"ia": True, "zona": (0.0, 0.9, 1.0, 1.0), "fijo_desde": 0.6},  # pies; piernas quietas
@@ -53,6 +53,9 @@ REENCAJAR = {
     "peso-muerto-rumano": {"ia": True, "zona": (0.0, 0.9, 1.0, 1.0)},      # 23-10: el de antes con los pies clavados
     # 23-10, Dan: «se parte por la mitad»: encajado por el respaldo y la cadera (por los pies, el tronco saltaba).
     "press-militar-ek-completo": {"ia": True, "zona": (0.2, 0.36, 0.8, 0.52), "fijo_desde": 0.55},
+    # 23-10, Dan: «piernas sobre piernas»: las dos posturas con las mismas piernas.
+    "elevaciones-laterales-completo": {"ia": True, "zona": (0.0, 0.9, 1.0, 1.0), "fijo_desde": 0.6},
+    "press-de-hombro-con-mancuernas-completo": {"ia": True, "zona": (0.0, 0.9, 1.0, 1.0), "fijo_desde": 0.6},
 }
 
 

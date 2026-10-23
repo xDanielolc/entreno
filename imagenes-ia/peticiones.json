@@ -17,12 +17,11 @@
  {
   "slug": "dominada",
   "ejercicio": "Dominadas",
-  "vista": "en barra fija, vista de tres cuartos por detrás, agarre prono algo más ancho que los hombros",
+  "vista": "en barra fija, visto por detrás, agarre prono algo más ancho que los hombros",
   "inicio": "colgado con los brazos estirados, piernas juntas algo flexionadas",
   "final": "barbilla por encima de la barra, codos hacia abajo",
   "ancla": "barra",
-  "usar": "ia",
-  "escala": 0.9
+  "usar": "ia"
  },
  {
   "slug": "elevaciones-laterales",
@@ -58,13 +57,12 @@
  {
   "slug": "dominadas-negativas",
   "ejercicio": "Dominadas negativas",
-  "vista": "colgado de una barra fija, visto de tres cuartos por detrás",
+  "vista": "en barra fija, visto por detrás, agarre prono algo más ancho que los hombros",
   "inicio": "arriba, barbilla por encima de la barra, codos flexionados",
   "final": "bajando despacio, a medio camino, codos a 90 grados",
   "ancla": "barra",
   "usar": "ia",
-  "invertir": true,
-  "escala": 0.9
+  "invertir": true
  },
  {
   "slug": "curl-martillo",
@@ -945,6 +943,14 @@
   "usar": "antes"
  },
  {
+  "slug": "lenador-en-polea-hacia-arriba",
+  "ejercicio": "Leñador en polea hacia arriba",
+  "vista": "de pie de lado a una polea baja, agarrando el asa con las dos manos, visto de frente",
+  "inicio": "brazos estirados abajo junto a la rodilla, tronco girado hacia la polea",
+  "final": "brazos estirados subidos en diagonal por encima del hombro contrario",
+  "usar": "ia"
+ },
+ {
   "slug": "lenador-con-mancuerna",
   "ejercicio": "Leñador con mancuerna",
   "vista": "de pie, agarrando una mancuerna con las dos manos, visto de frente",
@@ -1331,6 +1337,13 @@
   "usar": "antes"
  },
  {
+  "slug": "estiramiento-de-antebrazo-flexores",
+  "ejercicio": "Estiramiento de antebrazo (flexores)",
+  "vista": "de pie, visto de lado",
+  "postura": "un brazo estirado por delante con la palma hacia delante y los dedos hacia arriba, la otra mano tirando de los dedos hacia el cuerpo",
+  "usar": "ia"
+ },
+ {
   "slug": "estiramiento-de-lumbares-con-rodillas-al-pecho",
   "ejercicio": "Estiramiento de lumbares con rodillas al pecho (Apanasana)",
   "vista": "tumbado boca arriba, visto de lado",
@@ -1399,13 +1412,6 @@
   "postura": "sentado sobre los talones con los dedos de los pies doblados hacia arriba apoyados en el suelo"
  },
  {
-  "slug": "cars-de-hombro",
-  "ejercicio": "CARs de hombro",
-  "vista": "de pie, visto de lado",
-  "inicio": "un brazo estirado delante a la altura del hombro",
-  "final": "ese brazo estirado arriba y atrás, dibujando el círculo más grande posible"
- },
- {
   "slug": "movilidad-dinamica-de-torso",
   "ejercicio": "Movilidad dinámica de torso",
   "vista": "de pie, visto de frente",
@@ -1427,11 +1433,13 @@
   "final": "esa rodilla llevada hacia atrás, dibujando un círculo con la cadera"
  },
  {
-  "slug": "dislocaciones-con-pica",
-  "ejercicio": "Dislocaciones con pica",
-  "vista": "de pie con un palo largo agarrado con las manos muy separadas, visto de lado",
+  "slug": "rotaciones-de-hombro-con-palo",
+  "ejercicio": "Rotaciones de hombro con palo",
+  "vista": "de pie, visto de frente, con un palo largo agarrado con las manos muy separadas",
   "inicio": "brazos estirados con el palo delante de los muslos",
-  "final": "brazos estirados con el palo detrás, a la altura de los glúteos, pasando por encima de la cabeza"
+  "final": "brazos estirados en V con el palo por encima de la cabeza",
+  "usar": "ia",
+  "ancla": "cabeza"
  },
  {
   "slug": "tobillo-con-rodilla-a-la-pared",

@@ -1209,4 +1209,8 @@ fase), tras probar la A.
 - 0.60.24: con la segunda cuenta de Gemini (u/1, condiciones aceptadas con el visto bueno de Dan): paloma real con la
   página del libro de Kaminoff de modelo (`Literatura/`, fuera de Git; la pierna de más se borró a mano), cara lisa en
   puente por fases, flexiones en pica (encajadas ahora por las manos) y tríceps en máquina. Almacén `entreno-imagenes-33`.
+- 0.60.25: esquema v23 («CARs de hombro» y «Dislocaciones con pica» → «Rotaciones de hombro con palo», `RENOMBRADOS_V23`);
+  variantes nuevas «Estiramiento de antebrazo (flexores)» y «Leñador en polea hacia arriba». Rehechos gato-camello, puente de
+  glúteo, encogimientos y dominadas (y negativas) con las dos posturas en una imagen; face pull sin piernas fijas. Aprendido:
+  editando, Gemini no cambia posturas; pidiendo las dos figuras en una sola imagen sí, y del mismo tamaño. Almacén `entreno-imagenes-34`.
 

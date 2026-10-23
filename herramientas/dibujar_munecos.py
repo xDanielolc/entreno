@@ -315,9 +315,8 @@ MUNECOS = {
     "Estiramiento de lumbares con rodillas al pecho (Apanasana)": P(TUMBADO_ARRIBA, a1=(-45, -10), l1=(-120, -20, -60), l2=(-125, -25, -60)),
 
     # --- Movilidad ---------------------------------------------------------
-    "CARs de hombro": P(DE_PIE, a1=(-120, -120), objetos=[("arco", "hombro", 30)]),
     "CARs de cadera": P(CUADRUPEDIA, l1=(40, 110, 180), objetos=[("arco", "cadera", 20)]),
-    "Dislocaciones con pica": P(DE_PIE, a1=(-110, -110), a2=(-112, -112), objetos=[("disco", "mano1", 3)]),
+    "Rotaciones de hombro con palo": P(DE_PIE, a1=(-110, -110), a2=(-112, -112), objetos=[("disco", "mano1", 3)]),
     "Tobillo con rodilla a la pared": P(DE_PIE, a1=(-10, -10), l1=(0, 70, 0), l2=(120, 180, 180), objetos=[("linea", (40, -40), (40, 44))]),
     "Rotación torácica en libro abierto": P(t=180, a1=(-90, -90), a2=(0, 0), l1=(20, 110, 180), l2=(25, 115, 180)),
     "Sentadilla profunda mantenida (Malasana)": P(t=-75, a1=(10, 10), l1=(-10, 105, 0), l2=(-5, 110, 0)),
