@@ -1226,4 +1226,7 @@ fase), tras probar la A.
   muñeco), dominadas supinas por detrás como las pronas y mountain climbers en tres posturas (`tres-`, ahora
   separadas por manchas de trazo con scipy: la IA las junta tanto que no hay columna en blanco) y carrera que alterna
   rodillas (lámina de modelo). Almacén `entreno-imagenes-37`.
+- 0.60.29: zancadas (las dos) con el pie quieto clavado (`mover` en reencajar.py), escalera sin fin animada con lámina de
+  modelo (`escala` para igualar las dos máquinas; `usar: ia`), gemelos en multipower que suben más (`subir`). La elíptica no
+  sale: Gemini pinta las dos máquinas en espejo y, al darle la vuelta, las dos posturas quedan iguales. Almacén `entreno-imagenes-38`.
 

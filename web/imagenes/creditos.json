@@ -2315,9 +2315,11 @@
    "fuente": "propia"
   },
   "Escalera sin fin": {
-   "archivo": "imagenes/munecos/escalera-sin-fin.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/escalera-sin-fin.webp",
+   "estatica": "imagenes/ejercicios/ia/escalera-sin-fin-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Esquí de fondo (máquina)": {
    "archivo": "imagenes/munecos/esqui-de-fondo-maquina.svg",

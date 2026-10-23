@@ -1176,7 +1176,8 @@
   "inicio": "un pie arriba en el escalón y el otro abajo",
   "final": "los pies al revés",
   "ancla": "encajar",
-  "usar": "antes"
+  "usar": "ia",
+  "escala": 0.965
  },
  {
   "slug": "esqui-de-fondo-maquina",

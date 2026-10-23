@@ -55,6 +55,13 @@ REENCAJAR = {
     # 23-10, Dan: «se parte por la mitad»: encajado por el respaldo y la cadera (por los pies, el tronco saltaba).
     "press-militar-ek-completo": {"ia": True, "zona": (0.2, 0.36, 0.8, 0.52), "fijo_desde": 0.55},
     # 23-10, Dan: «piernas sobre piernas»: las dos posturas con las mismas piernas.
+    # 23-10, Dan: las zancadas «saltan». Adelante: el pie de atrás se queda donde estaba de pie (medido a ojo: la
+    # bola del pie). Atrás: el pie de delante clavado, afinado píxel a píxel sobre el pie quieto.
+    "escalera-sin-fin": {"ia": True, "zona": (0.0, 0.75, 1.0, 1.0)},         # la base de la máquina
+    # Dan: «que suba más»; los postes son rectas verticales y estirarlos no se nota, la barra sube con los hombros.
+    "elevacion-de-gemelos-en-multipower-completo": {"ia": True, "zona": (0.0, 0.88, 1.0, 1.0), "subir": (0.86, 0.2, 22)},
+    "zancadas": {"ia": True, "mover": (180, 0)},
+    "zancadas-hacia-atras": {"ia": True, "zona": (300, 555, 420, 600), "mover": (-78, 0)},
     "elevaciones-laterales-completo": {"ia": True, "zona": (0.0, 0.9, 1.0, 1.0), "fijo_desde": 0.6},
     "press-de-hombro-con-mancuernas-completo": {"ia": True, "zona": (0.0, 0.9, 1.0, 1.0), "fijo_desde": 0.6},
 }
