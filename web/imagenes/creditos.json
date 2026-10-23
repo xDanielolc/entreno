@@ -2405,12 +2405,13 @@
    "nombreEnFuente": "dumbbell-dead-lifts"
   },
   "Press militar sentado": {
-   "archivo": "imagenes/ejercicios/anim/press-militar-ek.webp",
+   "archivo": "imagenes/ejercicios/ia/press-militar-ek-completo.webp",
    "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/press-militar.png",
-   "animada": true,
    "fuente": "everkinetic",
-   "nombreEnFuente": "seated-military-press"
+   "nombreEnFuente": "seated-military-press",
+   "estatica": "imagenes/ejercicios/ia/press-militar-ek-completo-quieta.webp",
+   "animada": true,
+   "completadoCon": "Gemini"
   },
   "Remo en polea al pecho": {
    "archivo": "imagenes/ejercicios/anim/remo-en-polea.webp",

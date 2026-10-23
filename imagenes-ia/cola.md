@@ -78,3 +78,4 @@ rodilla girada) al 131. Revisar: zancadas hacia atrás (rehacer: la IA gira la s
 de antes), montaña (sale sin pantalón), águila (pantalón a cuadros).
 Hecho el 23-10 a mediodía (0.60.15): la cola «más músculo» completa (del 90 al 131 y las zancadas hacia atrás de
 perfil). Revisar: héroe tendido (pantalón negro), cobra (perfil con oreja), rueda (la curva no se entiende).
+Hecho (0.60.16): press militar sentado completado y remo en polea al pecho sin teletransporte. **Cola vacía.**

@@ -1177,3 +1177,6 @@ fase), tras probar la A.
   quedaban y las zancadas hacia atrás rehechas de perfil. Gemini a veces devuelve el dibujo sin tocar: se repite
   con «Haz un dibujo nuevo a partir de este» y la postura descrita en palabras; «pantalón dibujado solo con línea,
   sin relleno negro» evita el pantalón negro. Almacén `entreno-imagenes-25`.
+- 0.60.16: los dos últimos arreglos de la lista: press militar sentado completado (piernas y pies con Gemini,
+  `completo-press-militar-ek.png`, piernas y banco quietos con `fijo_desde`) y remo en polea al pecho reencajado
+  por el banco (`reencajar.py`). Almacén `entreno-imagenes-26`.

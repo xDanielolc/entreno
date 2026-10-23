@@ -32,6 +32,7 @@ REENCAJAR = {
     # 23-10, Dan: «el respaldo, la línea más a la izquierda, y la de más abajo, la de la prensa, no se mueven».
     # Medido sobre la rejilla: (62, -55); el (68, -72) de antes dejaba 17 píxeles de salto.
     "prensa-de-piernas": {"mover": (62, -55), "zona": (70, 195, 250, 300)},
+    "remo-en-polea": {"zona": (0.05, 0.62, 0.8, 0.8)},                 # 23-10: el banco (la variante «al pecho»)
     # Dibujos de la IA («ia»: los reencaja imagenes_ia.py al hacerlos). 23-10, Dan: «un pequeño desplazamiento
     # lateral»: lo apoyado (pies, manos, rodillas) tiene que quedar clavado.
     "curl-invertido-completo": {"ia": True, "zona": (0.0, 0.9, 1.0, 1.0), "fijo_desde": 0.62},     # los pies
@@ -49,6 +50,7 @@ REENCAJAR = {
     "encogimientos-de-trapecio": {"ia": True, "zona": (0.0, 0.9, 1.0, 1.0), "fijo_desde": 0.6},  # pies; piernas quietas
     "carrera": {"ia": True, "zona": (0.25, 0.0, 0.75, 0.4)},                  # cabeza y hombros (corre en el sitio)
     "remo-de-cardio": {"ia": True, "zona": (0.0, 0.0, 0.3, 1.0)},             # el volante y las patas de delante
+    "press-militar-ek-completo": {"ia": True, "zona": (0.0, 0.85, 1.0, 1.0), "fijo_desde": 0.55},  # pies; piernas quietas
 }
 
 
