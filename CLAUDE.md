@@ -1169,3 +1169,7 @@ fase), tras probar la A.
   los dos pasos en la MISMA conversación de Gemini (primero «más músculo» o el aparato, luego «sobre esta última
   imagen, cambia solo la postura»): salen del mismo lienzo y el hombre es el mismo. Gemini cambia poco las
   posturas en máquinas (hack, puente, gemelos): recorrido corto. Almacén `entreno-imagenes-23`.
+- 0.60.14 (23-10-2026, mañana): 30 dibujos más de la cola «más músculo» (spinning, sprints, trineo, split,
+  zancadas y 25 posturas de yoga); quedan 42 (yoga, desde «cabeza a la rodilla girada»). Gemini se reabre a las
+  10:38; las dos cuentas de ChatGPT, agotadas. Las zancadas hacia atrás se quedan como estaban (la IA giraba la
+  segunda figura de frente). Almacén `entreno-imagenes-24`.

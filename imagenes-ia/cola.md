@@ -73,3 +73,6 @@ Hecho el 23-10 por la mañana (0.60.13): press militar de pie, puente de glúteo
 crunch inverso, encogimientos, hack, superman, pájaros en contractora, gemelos en multipower, fondos negativos y
 patada de glúteo. Quedan: press militar sentado (completar piernas y teletransporte), remo en polea al pecho
 (teletransporte del de Everkinetic) y los 72 de la cola «más músculo» (sobre todo yoga). Animar cardio: no sale con ninguna IA.
+Hecho el 23-10 por la mañana (0.60.14): 30 de la cola «más músculo» (60 a 89). Quedan 42, del 90 (cabeza a la
+rodilla girada) al 131. Revisar: zancadas hacia atrás (rehacer: la IA gira la segunda figura de frente; sigue la
+de antes), montaña (sale sin pantalón), águila (pantalón a cuadros).
