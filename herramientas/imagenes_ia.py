@@ -245,25 +245,22 @@ def animar_mismo_lienzo(a, b, salida, tope=600, margen=24):
 
 
 def partir_en_tres(im):
-    """Tres figuras en fila: corta por los dos huecos en blanco más anchos (uno en cada mitad)."""
-    tinta = mascara(im, 200)
-    ancho, alto = tinta.size
-    columnas = [sum(1 for y in range(0, alto, 2) if tinta.getpixel((x, y))) for x in range(ancho)]
-
-    def hueco(desde, hasta):
-        mejor, inicio, tramo = 0, None, (desde + hasta) // 2
-        for x in range(desde, hasta):
-            if columnas[x] <= 1:
-                inicio = x if inicio is None else inicio
-                if x - inicio > mejor:
-                    mejor, tramo = x - inicio, (inicio + x) // 2
-            else:
-                inicio = None
-        return tramo
-
-    c1 = hueco(int(ancho * 0.15), int(ancho * 0.5))
-    c2 = hueco(int(ancho * 0.5), int(ancho * 0.85))
-    return im.crop((0, 0, c1, alto)), im.crop((c1, 0, c2, alto)), im.crop((c2, 0, ancho, alto))
+    """Tres figuras en fila. La IA las junta tanto que la cabeza de una queda encima de los pies de la siguiente
+    (no hay columna en blanco): se separan por manchas de trazo unidas y cada figura sale sola, sobre blanco."""
+    import numpy as np
+    from scipy import ndimage
+    tinta = np.array(im.convert("L")) < 200
+    unida = ndimage.binary_dilation(tinta, iterations=3)
+    etiquetas, n = ndimage.label(unida)
+    tamanos = ndimage.sum(unida, etiquetas, range(1, n + 1))
+    mayores = sorted(np.argsort(tamanos)[-3:] + 1, key=lambda e: ndimage.center_of_mass(unida, etiquetas, e)[1])
+    partes = []
+    for e in mayores:
+        dentro = etiquetas == e
+        sola = np.where(dentro, np.array(im.convert("RGB")).transpose(2, 0, 1), 255).transpose(1, 2, 0).astype("uint8")
+        ys, xs = np.nonzero(dentro)
+        partes.append(Image.fromarray(sola).crop((xs.min(), ys.min(), xs.max() + 1, ys.max() + 1)))
+    return partes
 
 
 def procesar(origen, modo="pies", espejo=False, solo=False, invertir=False, mover=None, escala=None, recorte=None, grosor=None):

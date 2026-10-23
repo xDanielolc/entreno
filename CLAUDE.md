@@ -1222,4 +1222,8 @@ fase), tras probar la A.
   alterna vista de frente y de lado cada 2 s (`duracion` en peticiones.json); cabeza a la rodilla con la frente en la rodilla.
   Preparado `tres-<nombre>` (tres figuras animadas 1-2-3-2) para correr y escalador, pero Gemini dibuja la 1 y la 3 iguales.
   Almacén `entreno-imagenes-36`.
+- 0.60.28: sóleo en pared por fin con las dos rodillas dobladas y los talones apoyados (lámina de modelo; deja de usarse el
+  muñeco), dominadas supinas por detrás como las pronas y mountain climbers en tres posturas (`tres-`, ahora
+  separadas por manchas de trazo con scipy: la IA las junta tanto que no hay columna en blanco) y carrera que alterna
+  rodillas (lámina de modelo). Almacén `entreno-imagenes-37`.
 

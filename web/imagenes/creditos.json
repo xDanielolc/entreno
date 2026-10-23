@@ -933,7 +933,7 @@
    "estatica": "imagenes/ejercicios/ia/carrera-quieta.webp",
    "animada": true,
    "fuente": "ia",
-   "autor": "ChatGPT"
+   "autor": "Gemini"
   },
   "Bicicleta": {
    "archivo": "imagenes/ejercicios/ia/bicicleta-quieta.webp",
@@ -1669,9 +1669,11 @@
    "fuente": "propia"
   },
   "Estiramiento de sóleo en pared": {
-   "archivo": "imagenes/munecos/estiramiento-de-soleo-en-pared.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/estiramiento-de-soleo-en-pared-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/estiramiento-de-soleo-en-pared-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Rotación torácica en cuadrupedia": {
    "archivo": "imagenes/munecos/rotacion-toracica-en-cuadrupedia.svg",
@@ -2141,7 +2143,7 @@
    "estatica": "imagenes/ejercicios/ia/mountain-climbers-quieta.webp",
    "animada": true,
    "fuente": "ia",
-   "autor": "ChatGPT",
+   "autor": "Gemini",
    "aliasDe": "Mountain climbers"
   },
   "Press convergente en máquina": {
@@ -2369,7 +2371,7 @@
    "estatica": "imagenes/ejercicios/ia/mountain-climbers-quieta.webp",
    "animada": true,
    "fuente": "ia",
-   "autor": "ChatGPT"
+   "autor": "Gemini"
   },
   "Kettlebell swing": {
    "archivo": "imagenes/ejercicios/ia/kettlebell-swing.webp",

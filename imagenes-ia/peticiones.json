@@ -304,7 +304,7 @@
  {
   "slug": "dominadas-supinas",
   "ejercicio": "Dominadas supinas",
-  "vista": "en barra fija, visto de frente, palmas hacia la cara",
+  "vista": "en barra fija, visto por detrás, palmas hacia la cara",
   "inicio": "colgado con los brazos estirados",
   "final": "barbilla por encima de la barra",
   "ancla": "barra",
@@ -1084,7 +1084,8 @@
   "vista": "corriendo, visto de lado",
   "inicio": "zancada con la pierna derecha adelantada y el brazo izquierdo delante",
   "final": "zancada con la pierna izquierda adelantada y el brazo derecho delante",
-  "solo": true
+  "ancla": "cabeza",
+  "usar": "ia"
  },
  {
   "slug": "bicicleta",
@@ -1353,8 +1354,7 @@
   "slug": "estiramiento-de-soleo-en-pared",
   "ejercicio": "Estiramiento de sóleo en pared",
   "vista": "frente a una pared, visto de lado",
-  "postura": "manos en la pared, un pie atrás con el talón en el suelo y esa rodilla doblada",
-  "usar": "antes"
+  "postura": "manos en la pared, un pie atrás con el talón en el suelo y esa rodilla doblada"
  },
  {
   "slug": "estiramiento-de-trapecio-superior",

@@ -145,9 +145,11 @@ petición (el pez levantaba la cabeza; la goblet sale «de huevo», que lo decid
       multipower (pies y listón), tríceps en máquina (agarre y placas), curl en polea (cable), elevación de gemelos
       (que suba más), sóleo y supinas (Gemini no sabe; probar con ChatGPT).
       0.60.27: hechos gemelos sentado, sentadilla en multipower, elevación de gemelos (sube más). Quedan: gemelos en
-      multipower, sóleo, supinas.
+      multipower, sóleo, supinas. 0.60.28: sóleo y supinas hechos. Solo queda gemelos en multipower.
 ## 5. Animaciones (lo último)
 - [ ] Mountain climbers y carrera (3 imágenes), elíptica (cada mano en su palanca), escalera, zancadas (las dos),
       cabeza a la rodilla (meter la cabeza), sobre la cabeza (alternar las dos perspectivas cada 2 s).
       0.60.27: hechos cabeza a la rodilla y sobre la cabeza. Para correr hay `tres-<nombre>` en imagenes_ia.py, pero
       Gemini pinta la primera y la tercera figura iguales (no alterna piernas): probar con ChatGPT.
+      0.60.28: mountain climbers en tres posturas hecho con una lámina de modelo (las dos posturas alternas de la lámina
+      y una plancha en medio). Para la carrera, probar igual: lámina con las dos zancadas.
