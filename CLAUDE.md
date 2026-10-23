@@ -1150,3 +1150,16 @@ fase), tras probar la A.
   imagen se baja con un `<a download>` sobre el blob de `img[alt^="Imagen generada"]`. 8 mejorados más con
   ChatGPT (saltos al cajón, senderismo y sentadillas); originales en `imagenes-ia/chatgpt/`. Almacén
   `entreno-imagenes-21`.
+- 0.60.12 (23-10-2026, de madrugada): su cuarta revisión. **Encaje píxel a píxel**: `reencajar.py` buscaba de
+  4 en 4 píxeles (de ahí los «mini teletransportes»); ahora afina a 1 píxel, parte del original de Git (repetirlo
+  no desplaza dos veces), admite `mover` + `zona` y `fijo_desde` (la segunda postura lleva desde esa altura lo
+  mismo que la primera: piernas de los completados) y lo usan también los dibujos de la IA («ia»: True, lo llama
+  imagenes_ia.py). Comprobar siempre con la superposición rojo/azul (scratchpad `superponer.py`).
+  **Método de dos pasos** contra «la máquina cambia»: se recorta la postura 1 y se pide a la IA «edita esta
+  imagen, cambia solo la postura»; `pasos-<slug>-1.png` y `-2.png` en imagenes-ia/<ia>/ (sin encajar: mismo
+  lienzo). Ninguna IA sabe alternar piernas o brazos (carrera, escalera, elíptica, natación). Opciones nuevas en
+  peticiones.json: `recorte` (fracciones) y `grosor` (engorda el trazo; no se aplica al completo-). `CONGELADOS`
+  en imagenes_ia.py (se queda el WebP de Git). Catálogo: «Leñador con mancuerna». Gemini: la subida va por el
+  input de archivo del menú «+» (el portapapeles de Windows estaba bloqueado) y la descarga con un clic real en
+  «Descargar imagen a tamaño completo» (las descargas por código las bloquea Chrome tras unas pocas).
+  Almacén `entreno-imagenes-22`.

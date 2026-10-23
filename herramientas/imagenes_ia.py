@@ -244,13 +244,17 @@ def animar_mismo_lienzo(a, b, salida, tope=600, margen=24):
     marcos[0].save(salida, "WEBP", save_all=True, append_images=marcos[1:], duration=[900, 900], loop=0, quality=82, method=6)
 
 
-def procesar(origen, modo="pies", espejo=False, solo=False, invertir=False, mover=None, escala=None, recorte=None):
+def procesar(origen, modo="pies", espejo=False, solo=False, invertir=False, mover=None, escala=None, recorte=None, grosor=None):
     nombre = origen.stem.split("-", 1)[1]
     if origen.stem.startswith("completo-"):
         # Un dibujo hecho por una persona que venía cortado, completado por la IA: va aparte del de la IA.
         nombre += "-completo"
     # ChatGPT deja el fondo gris muy claro: lo casi blanco pasa a blanco puro.
     im = Image.open(origen).convert("RGB").point(lambda v: 255 if v > 232 else v)
+    if grosor:
+        # «grosor» en peticiones.json: engorda el trazo (Dan quería la línea más gruesa en algún dibujo).
+        from PIL import ImageFilter
+        im = im.filter(ImageFilter.MinFilter(grosor))
     SALIDA.mkdir(parents=True, exist_ok=True)
     fija = SALIDA / f"{nombre}-quieta.webp"
     if origen.stem.startswith("pasos-"):
@@ -305,7 +309,7 @@ def leer_tabla():
     """De peticiones.json: nombre del dibujo → {"ejercicios": [...], "ancla": ...}."""
     if not PETICIONES.exists():
         return {}
-    return {p["slug"]: {"ejercicios": [p["ejercicio"], *p.get("tambien", [])], "ancla": p.get("ancla", "pies"), "espejo": p.get("espejo", False), "solo": p.get("solo", False), "usar": p.get("usar"), "sinAlias": p.get("sinAlias", False), "invertir": p.get("invertir", False), "mover": p.get("mover"), "escala": p.get("escala"), "recorte": p.get("recorte")}
+    return {p["slug"]: {"ejercicios": [p["ejercicio"], *p.get("tambien", [])], "ancla": p.get("ancla", "pies"), "espejo": p.get("espejo", False), "solo": p.get("solo", False), "usar": p.get("usar"), "sinAlias": p.get("sinAlias", False), "invertir": p.get("invertir", False), "mover": p.get("mover"), "escala": p.get("escala"), "recorte": p.get("recorte"), "grosor": p.get("grosor")}
             for p in json.loads(PETICIONES.read_text(encoding="utf8"))}
 
 
@@ -429,7 +433,7 @@ def main():
                 hechos.append((salida, True, carpeta.name))
                 print("congelada " + salida)
                 continue
-            nombre, animada = procesar(origen, modo, bool(opciones.get("espejo")), bool(opciones.get("solo")), bool(opciones.get("invertir")), opciones.get("mover"), opciones.get("escala"), opciones.get("recorte"))
+            nombre, animada = procesar(origen, modo, bool(opciones.get("espejo")), bool(opciones.get("solo")), bool(opciones.get("invertir")), opciones.get("mover"), opciones.get("escala"), opciones.get("recorte"), None if origen.stem.startswith("completo-") else opciones.get("grosor"))
             hechos.append((nombre, animada, carpeta.name))
             print(("animada " if animada else "quieta  ") + nombre)
     apuntar(hechos)

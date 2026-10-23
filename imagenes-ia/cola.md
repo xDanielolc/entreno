@@ -62,3 +62,14 @@ IA (aparato que cambia, rehacer o corregir):
 - [ ] Curl en polea: el cable va de la polea hacia la derecha, no entre las piernas (él se ofrece a dibujarlo).
 App:
 - [ ] Posturas con nombre de yoga: el nombre de yoga también en el título (p. ej. isquios).
+
+Hecho el 23-10 de madrugada (0.60.12): todo lo de «Código» de la cuarta revisión, y con IA: saltos al cajón, hip
+thrust, remo de cardio, multipower, esquí, face pull, dominadas asistidas, gato-camello, dominadas (y negativas),
+supinas, mountain climbers, gemelos (escalón), gemelos sentado, CARs, máquina de glúteo, rumano, sumo, leñador
+(polea nuevo + variante mancuerna), curl en polea, sentadilla (mano), caras, pectoral en el marco, gemelo y
+sóleo, elevador de la escápula, sofá (recorte), polea lateral, tríceps en máquina, fondos asistidos (se inclina,
+no baja), elevaciones laterales y press a una mano (completados), remo al mentón (grueso).
+Quedan (Gemini se reabre a las 5:36): press militar de pie y sentado, puente de glúteo (y comparar los tres),
+remo en máquina, remo en polea, crunch inverso y encogimientos (músculo), sentadilla hack, superman, pájaros en
+contractora (nuevo), gemelos en multipower, fondos negativos (solo piernas), patada de glúteo; y los 72 de la
+cola «más músculo» (sobre todo yoga). Animar cardio: no sale con ninguna IA.

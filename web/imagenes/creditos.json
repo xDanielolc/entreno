@@ -172,9 +172,11 @@
    "completadoCon": "Gemini"
   },
   "Elevaciones laterales en polea": {
-   "archivo": "imagenes/ejercicios/elevaciones-laterales-en-polea.jpg",
-   "autor": "carlos3c",
-   "nombreEnWger": "Elevaciones laterales en polea (a un brazo)"
+   "archivo": "imagenes/ejercicios/ia/elevaciones-laterales-en-polea.webp",
+   "estatica": "imagenes/ejercicios/ia/elevaciones-laterales-en-polea-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Elevaciones frontales": {
    "archivo": "imagenes/ejercicios/ia/elevaciones-frontales-completo.webp",
