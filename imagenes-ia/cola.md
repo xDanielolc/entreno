@@ -137,6 +137,13 @@ petición (el pez levantaba la cabeza; la goblet sale «de huevo», que lo decid
 ## 4. Máquinas con foto de ejemplo
 - [ ] Dominadas asistidas, fondos asistidos, gemelos en multipower, pájaros en contractora, máquina de glúteo,
       remo en máquina, patada de glúteo en polea, esquí de fondo (máquina), sentadilla hack.
+      0.60.26: hechas todas salvo gemelos en multipower (no sube). Método: captura de pantalla de una foto o lámina con
+      las dos posturas (Bing Imágenes; nunca FitnessProgramer), se adjunta a Gemini y «Convierte esta imagen en una
+      ilustración técnica… mantén EXACTAMENTE la misma máquina… sustituye a la persona por nuestro hombre». Si las dos
+      posturas se solapan en la foto, se separan antes con un hueco blanco. Capturas en scratchpad/modelos.
+      Pendientes de esta sección y de la 3: gemelos en multipower, gemelos sentado (el peso no sube), sentadilla en
+      multipower (pies y listón), tríceps en máquina (agarre y placas), curl en polea (cable), elevación de gemelos
+      (que suba más), sóleo y supinas (Gemini no sabe; probar con ChatGPT).
 ## 5. Animaciones (lo último)
 - [ ] Mountain climbers y carrera (3 imágenes), elíptica (cada mano en su palanca), escalera, zancadas (las dos),
       cabeza a la rodilla (meter la cabeza), sobre la cabeza (alternar las dos perspectivas cada 2 s).

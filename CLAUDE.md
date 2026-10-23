@@ -1213,4 +1213,8 @@ fase), tras probar la A.
   variantes nuevas «Estiramiento de antebrazo (flexores)» y «Leñador en polea hacia arriba». Rehechos gato-camello, puente de
   glúteo, encogimientos y dominadas (y negativas) con las dos posturas en una imagen; face pull sin piernas fijas. Aprendido:
   editando, Gemini no cambia posturas; pidiendo las dos figuras en una sola imagen sí, y del mismo tamaño. Almacén `entreno-imagenes-34`.
+- 0.60.26: sección 4 (máquinas con foto de ejemplo): dominadas y fondos asistidos, pájaros en contractora, remo en máquina,
+  patada de glúteo en polea (pasa a `usar: ia`), sentadilla hack (fuera de `CONGELADOS`), máquina de glúteo y esquí de fondo,
+  todos con una captura de una foto con las dos posturas como modelo (método en `imagenes-ia/cola.md`). Elevaciones laterales
+  con las piernas fijas (`fijo_desde`) y cabeza lisa. Almacén `entreno-imagenes-35`.
 

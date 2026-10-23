@@ -316,7 +316,7 @@
   "vista": "de rodillas en el apoyo de una máquina de dominadas asistidas, visto de lado",
   "inicio": "colgado con los brazos estirados",
   "final": "barbilla por encima de la barra",
-  "ancla": "pies",
+  "ancla": "encajar",
   "usar": "antes"
  },
  {
@@ -563,7 +563,7 @@
   "inicio": "las dos piernas juntas",
   "final": "la pierna de la tobillera estirada hacia atrás y arriba",
   "ancla": "encajar",
-  "usar": "antes"
+  "usar": "ia"
  },
  {
   "slug": "maquina-de-gluteo",

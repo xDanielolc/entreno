@@ -709,13 +709,11 @@
    "animada": true
   },
   "Patada de glúteo en polea": {
-   "archivo": "imagenes/ejercicios/ia/patada-de-gluteo-en-polea-completo.webp",
-   "autor": "Everkinetic",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "one-legged-cable-kickback",
-   "estatica": "imagenes/ejercicios/ia/patada-de-gluteo-en-polea-completo-quieta.webp",
+   "archivo": "imagenes/ejercicios/ia/patada-de-gluteo-en-polea.webp",
+   "estatica": "imagenes/ejercicios/ia/patada-de-gluteo-en-polea-quieta.webp",
    "animada": true,
-   "completadoCon": "Gemini"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Máquina de glúteo": {
    "archivo": "imagenes/munecos/maquina-de-gluteo.svg",
