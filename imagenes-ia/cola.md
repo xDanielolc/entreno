@@ -69,7 +69,7 @@ supinas, mountain climbers, gemelos (escalón), gemelos sentado, CARs, máquina 
 (polea nuevo + variante mancuerna), curl en polea, sentadilla (mano), caras, pectoral en el marco, gemelo y
 sóleo, elevador de la escápula, sofá (recorte), polea lateral, tríceps en máquina, fondos asistidos (se inclina,
 no baja), elevaciones laterales y press a una mano (completados), remo al mentón (grueso).
-Quedan (Gemini se reabre a las 5:36): press militar de pie y sentado, puente de glúteo (y comparar los tres),
-remo en máquina, remo en polea, crunch inverso y encogimientos (músculo), sentadilla hack, superman, pájaros en
-contractora (nuevo), gemelos en multipower, fondos negativos (solo piernas), patada de glúteo; y los 72 de la
-cola «más músculo» (sobre todo yoga). Animar cardio: no sale con ninguna IA.
+Hecho el 23-10 por la mañana (0.60.13): press militar de pie, puente de glúteo, remos en máquina y en polea,
+crunch inverso, encogimientos, hack, superman, pájaros en contractora, gemelos en multipower, fondos negativos y
+patada de glúteo. Quedan: press militar sentado (completar piernas y teletransporte), remo en polea al pecho
+(teletransporte del de Everkinetic) y los 72 de la cola «más músculo» (sobre todo yoga). Animar cardio: no sale con ninguna IA.

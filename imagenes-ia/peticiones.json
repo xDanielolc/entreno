@@ -724,7 +724,8 @@
   "vista": "sentado de cara al respaldo en una máquina contractora, visto de frente desde detrás",
   "inicio": "brazos estirados por delante agarrando las asas",
   "final": "brazos abiertos hacia atrás en cruz",
-  "ancla": "encajar"
+  "ancla": "encajar",
+  "usar": "ia"
  },
  {
   "slug": "curl-de-biceps-con-mancuernas",

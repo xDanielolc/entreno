@@ -1163,3 +1163,9 @@ fase), tras probar la A.
   input de archivo del menú «+» (el portapapeles de Windows estaba bloqueado) y la descarga con un clic real en
   «Descargar imagen a tamaño completo» (las descargas por código las bloquea Chrome tras unas pocas).
   Almacén `entreno-imagenes-22`.
+- 0.60.13 (23-10-2026, mañana): los 12 arreglos que quedaban de su cuarta revisión (press militar, puente de
+  glúteo, remos en máquina y en polea, crunch inverso, encogimientos, hack, superman, gemelos en multipower,
+  fondos negativos solo con piernas, patada de glúteo, pájaros en contractora nuevo con `usar: ia`). Truco: hacer
+  los dos pasos en la MISMA conversación de Gemini (primero «más músculo» o el aparato, luego «sobre esta última
+  imagen, cambia solo la postura»): salen del mismo lienzo y el hombre es el mismo. Gemini cambia poco las
+  posturas en máquinas (hack, puente, gemelos): recorrido corto. Almacén `entreno-imagenes-23`.

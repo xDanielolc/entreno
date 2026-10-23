@@ -289,14 +289,14 @@
    "estatica": "imagenes/ejercicios/ia/remo-en-polea-quieta.webp",
    "animada": true,
    "fuente": "ia",
-   "autor": "ChatGPT"
+   "autor": "Gemini"
   },
   "Remo en máquina": {
    "archivo": "imagenes/ejercicios/ia/remo-en-maquina.webp",
    "estatica": "imagenes/ejercicios/ia/remo-en-maquina-quieta.webp",
    "animada": true,
    "fuente": "ia",
-   "autor": "ChatGPT"
+   "autor": "Gemini"
   },
   "Remo invertido": {
    "archivo": "imagenes/ejercicios/anim/remo-invertido.webp",
@@ -613,12 +613,11 @@
    "animada": true
   },
   "Pájaros en máquina": {
-   "archivo": "imagenes/ejercicios/anim/pajaros-en-maquina.webp",
-   "autor": "Everkinetic",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "seated-rear-lateral-cable-raise",
-   "estatica": "imagenes/ejercicios/pajaros-en-maquina.png",
-   "animada": true
+   "archivo": "imagenes/ejercicios/ia/pajaros-en-maquina.webp",
+   "estatica": "imagenes/ejercicios/ia/pajaros-en-maquina-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Curl de bíceps con mancuernas": {
    "archivo": "imagenes/ejercicios/ia/curl-de-biceps-con-mancuernas-completo.webp",
@@ -1935,7 +1934,7 @@
    "estatica": "imagenes/ejercicios/ia/remo-en-polea-quieta.webp",
    "animada": true,
    "fuente": "ia",
-   "autor": "ChatGPT",
+   "autor": "Gemini",
    "aliasDe": "Remo en polea"
   },
   "Jalón unilateral en polea": {
@@ -1969,7 +1968,7 @@
    "estatica": "imagenes/ejercicios/ia/remo-en-polea-quieta.webp",
    "animada": true,
    "fuente": "ia",
-   "autor": "ChatGPT",
+   "autor": "Gemini",
    "aliasDe": "Remo en polea"
   },
   "Pullover con mancuerna": {

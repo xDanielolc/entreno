@@ -45,6 +45,8 @@ REENCAJAR = {
     "hip-thrust": {"ia": True, "zona": (0.0, 0.45, 0.35, 1.0)},               # el banco
     "face-pull": {"ia": True, "zona": (0.75, 0.0, 1.0, 1.0), "fijo_desde": 0.55},  # la columna; piernas quietas
     "elevacion-de-gemelos-completo": {"ia": True, "zona": (0.0, 0.8, 1.0, 1.0)},  # el escalón
+    "puente-de-gluteo": {"ia": True, "zona": (0.0, 0.0, 0.35, 1.0)},          # la cabeza y los hombros en el suelo
+    "encogimientos-de-trapecio": {"ia": True, "zona": (0.0, 0.9, 1.0, 1.0), "fijo_desde": 0.6},  # pies; piernas quietas
     "carrera": {"ia": True, "zona": (0.25, 0.0, 0.75, 0.4)},                  # cabeza y hombros (corre en el sitio)
     "remo-de-cardio": {"ia": True, "zona": (0.0, 0.0, 0.3, 1.0)},             # el volante y las patas de delante
 }
