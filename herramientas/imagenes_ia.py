@@ -28,6 +28,8 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from animar_imagenes import mascara  # noqa: E402
 
 RAIZ = pathlib.Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(RAIZ / "herramientas"))
+from reencajar import REENCAJAR, reencajar  # noqa: E402
 ORIGENES = RAIZ / "imagenes-ia"
 SALIDA = RAIZ / "web" / "imagenes" / "ejercicios" / "ia"
 CREDITOS = RAIZ / "web" / "imagenes" / "creditos.json"
@@ -226,7 +228,23 @@ def centrar_en_barra(partes):
     return [im.crop((round(cx - medio), 0, round(cx + medio), im.height)) for im, cx in zip(partes, centros)]
 
 
-def procesar(origen, modo="pies", espejo=False, solo=False, invertir=False, mover=None, escala=None):
+def animar_mismo_lienzo(a, b, salida, tope=600, margen=24):
+    """Dos posturas dibujadas sobre el mismo lienzo (la segunda es la primera editada por la IA: «cambia solo la
+    postura»): el aparato ya está en su sitio en las dos, así que no se encajan, solo se recortan juntas."""
+    b = b.resize(a.size, Image.LANCZOS)
+    cajas = [mascara(im, 200).getbbox() for im in (a, b)]
+    x0, y0 = min(c[0] for c in cajas), min(c[1] for c in cajas)
+    x1, y1 = max(c[2] for c in cajas), max(c[3] for c in cajas)
+    lado = max(x1 - x0, y1 - y0) + 2 * margen
+    marcos = []
+    for im in (a, b):
+        lienzo = Image.new("RGB", (lado, lado), "white")
+        lienzo.paste(im.crop((x0, y0, x1, y1)), ((lado - (x1 - x0)) // 2, (lado - (y1 - y0)) // 2))
+        marcos.append(lienzo.resize((tope, tope), Image.LANCZOS) if lado > tope else lienzo)
+    marcos[0].save(salida, "WEBP", save_all=True, append_images=marcos[1:], duration=[900, 900], loop=0, quality=82, method=6)
+
+
+def procesar(origen, modo="pies", espejo=False, solo=False, invertir=False, mover=None, escala=None, recorte=None):
     nombre = origen.stem.split("-", 1)[1]
     if origen.stem.startswith("completo-"):
         # Un dibujo hecho por una persona que venía cortado, completado por la IA: va aparte del de la IA.
@@ -235,6 +253,19 @@ def procesar(origen, modo="pies", espejo=False, solo=False, invertir=False, move
     im = Image.open(origen).convert("RGB").point(lambda v: 255 if v > 232 else v)
     SALIDA.mkdir(parents=True, exist_ok=True)
     fija = SALIDA / f"{nombre}-quieta.webp"
+    if origen.stem.startswith("pasos-"):
+        # «pasos-<nombre>-1» y «-2»: la segunda es la primera con solo la postura cambiada (mismo aparato).
+        nombre = origen.stem[len("pasos-"):-2]
+        fija = SALIDA / f"{nombre}-quieta.webp"
+        segunda = Image.open(origen.with_name(origen.stem[:-2] + "-2" + origen.suffix)).convert("RGB").point(lambda v: 255 if v > 232 else v)
+        if invertir:
+            im, segunda = segunda, im
+        animar_mismo_lienzo(im, segunda, SALIDA / f"{nombre}.webp")
+        if nombre in REENCAJAR and REENCAJAR[nombre].get("ia"):
+            op = REENCAJAR[nombre]
+            reencajar(nombre, op.get("zona"), mover=op.get("mover"), archivo=SALIDA / f"{nombre}.webp", fijo_desde=op.get("fijo_desde"))
+        quieta(im, fija)
+        return nombre, True
     if origen.stem.startswith(("fases-", "completo-")):
         if origen.stem.startswith("completo-"):
             # Sin suelo antes de partir: una línea de suelo de lado a lado no deja hueco entre las dos posturas.
@@ -257,8 +288,15 @@ def procesar(origen, modo="pies", espejo=False, solo=False, invertir=False, move
             # Empieza por la postura final (las negativas: arriba y bajar despacio).
             inicio, final = final, inicio
         animar([inicio, final], SALIDA / f"{nombre}.webp", modo, mover=mover)
+        if nombre in REENCAJAR and REENCAJAR[nombre].get("ia"):
+            # Afinado píxel a píxel por lo que no se mueve (herramientas/reencajar.py).
+            op = REENCAJAR[nombre]
+            reencajar(nombre, op.get("zona"), mover=op.get("mover"), archivo=SALIDA / f"{nombre}.webp", fijo_desde=op.get("fijo_desde"))
         quieta(inicio, fija)
         return nombre, True
+    if recorte:
+        # «recorte» en peticiones.json (fracciones izquierda, arriba, derecha, abajo): quitar aparato o aire de sobra.
+        im = im.crop((round(im.width * recorte[0]), round(im.height * recorte[1]), round(im.width * recorte[2]), round(im.height * recorte[3])))
     quieta(im, fija)
     return nombre, False
 
@@ -267,7 +305,7 @@ def leer_tabla():
     """De peticiones.json: nombre del dibujo → {"ejercicios": [...], "ancla": ...}."""
     if not PETICIONES.exists():
         return {}
-    return {p["slug"]: {"ejercicios": [p["ejercicio"], *p.get("tambien", [])], "ancla": p.get("ancla", "pies"), "espejo": p.get("espejo", False), "solo": p.get("solo", False), "usar": p.get("usar"), "sinAlias": p.get("sinAlias", False), "invertir": p.get("invertir", False), "mover": p.get("mover"), "escala": p.get("escala")}
+    return {p["slug"]: {"ejercicios": [p["ejercicio"], *p.get("tambien", [])], "ancla": p.get("ancla", "pies"), "espejo": p.get("espejo", False), "solo": p.get("solo", False), "usar": p.get("usar"), "sinAlias": p.get("sinAlias", False), "invertir": p.get("invertir", False), "mover": p.get("mover"), "escala": p.get("escala"), "recorte": p.get("recorte")}
             for p in json.loads(PETICIONES.read_text(encoding="utf8"))}
 
 
@@ -279,6 +317,9 @@ def ejercicios_de(entrada):
 
 
 # Ejercicios que se aguantan quietos: dibujo sin animar (Dan, 22-10-2026: «en estática que no se mueva»).
+# Dibujos que se quedan como están (Dan eligió la versión de antes en una revisión): no se rehacen.
+CONGELADOS = {"cruces-en-polea-completo"}   # 23-10: «estaba mejor el anterior» (el de la 0.60.9)
+
 QUIETOS = {"Plancha lateral": "imagenes/ejercicios/anim/plancha-lateral-quieta.webp"}
 
 
@@ -369,9 +410,11 @@ def main():
     # «descartes» guarda los que salieron mal: no se usan.
     for carpeta in sorted(p for p in ORIGENES.iterdir() if p.is_dir() and p.name != "descartes"):
         for origen in sorted(carpeta.glob("*.jpg")) + sorted(carpeta.glob("*.png")):
-            if not origen.stem.startswith(("fases-", "quieto-", "completo-")):
+            if not origen.stem.startswith(("fases-", "quieto-", "completo-", "pasos-")):
                 continue
-            nombre = origen.stem.split("-", 1)[1]
+            if origen.stem.startswith("pasos-") and not origen.stem.endswith("-1"):
+                continue
+            nombre = origen.stem[len("pasos-"):-2] if origen.stem.startswith("pasos-") else origen.stem.split("-", 1)[1]
             if filtro and nombre != filtro:
                 continue
             entrada = tabla.get(nombre)
@@ -380,7 +423,13 @@ def main():
                 # Las dos posturas de un dibujo completado coinciden casi enteras: se encajan donde más líneas cuadran.
                 modo = ANCLA_COMPLETO.get(nombre, "encajar-suelo")
             opciones = entrada if isinstance(entrada, dict) else {}
-            nombre, animada = procesar(origen, modo, bool(opciones.get("espejo")), bool(opciones.get("solo")), bool(opciones.get("invertir")), opciones.get("mover"), opciones.get("escala"))
+            salida = nombre + ("-completo" if origen.stem.startswith("completo-") else "")
+            if salida in CONGELADOS:
+                # Dan prefirió una versión anterior: el WebP se queda como está en Git.
+                hechos.append((salida, True, carpeta.name))
+                print("congelada " + salida)
+                continue
+            nombre, animada = procesar(origen, modo, bool(opciones.get("espejo")), bool(opciones.get("solo")), bool(opciones.get("invertir")), opciones.get("mover"), opciones.get("escala"), opciones.get("recorte"))
             hechos.append((nombre, animada, carpeta.name))
             print(("animada " if animada else "quieta  ") + nombre)
     apuntar(hechos)

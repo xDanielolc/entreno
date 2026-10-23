@@ -932,11 +932,11 @@
    "fuente": "propia"
   },
   "Carrera": {
-   "archivo": "imagenes/ejercicios/ia/carrera-quieta.webp",
+   "archivo": "imagenes/ejercicios/ia/carrera.webp",
    "estatica": "imagenes/ejercicios/ia/carrera-quieta.webp",
-   "animada": false,
+   "animada": true,
    "fuente": "ia",
-   "autor": "Gemini"
+   "autor": "ChatGPT"
   },
   "Bicicleta": {
    "archivo": "imagenes/ejercicios/ia/bicicleta-quieta.webp",
@@ -988,7 +988,7 @@
    "estatica": "imagenes/ejercicios/ia/saltos-al-cajon-quieta.webp",
    "animada": true,
    "fuente": "ia",
-   "autor": "ChatGPT"
+   "autor": "Gemini"
   },
   "Estiramiento": {
    "archivo": "imagenes/ejercicios/ia/estiramiento-quieta.webp",
@@ -2144,7 +2144,7 @@
    "estatica": "imagenes/ejercicios/ia/mountain-climbers-quieta.webp",
    "animada": true,
    "fuente": "ia",
-   "autor": "Gemini",
+   "autor": "ChatGPT",
    "aliasDe": "Mountain climbers"
   },
   "Press convergente en máquina": {
@@ -2185,7 +2185,7 @@
    "estatica": "imagenes/ejercicios/ia/saltos-al-cajon-quieta.webp",
    "animada": true,
    "fuente": "ia",
-   "autor": "ChatGPT",
+   "autor": "Gemini",
    "aliasDe": "Saltos al cajón"
   },
   "Salto de longitud": {
@@ -2193,7 +2193,7 @@
    "estatica": "imagenes/ejercicios/ia/saltos-al-cajon-quieta.webp",
    "animada": true,
    "fuente": "ia",
-   "autor": "ChatGPT",
+   "autor": "Gemini",
    "aliasDe": "Saltos al cajón"
   },
   "Saltos a la pata coja": {
@@ -2201,7 +2201,7 @@
    "estatica": "imagenes/ejercicios/ia/saltos-al-cajon-quieta.webp",
    "animada": true,
    "fuente": "ia",
-   "autor": "ChatGPT",
+   "autor": "Gemini",
    "aliasDe": "Saltos al cajón"
   },
   "Flexiones con palmada": {
@@ -2372,7 +2372,7 @@
    "estatica": "imagenes/ejercicios/ia/mountain-climbers-quieta.webp",
    "animada": true,
    "fuente": "ia",
-   "autor": "Gemini"
+   "autor": "ChatGPT"
   },
   "Kettlebell swing": {
    "archivo": "imagenes/ejercicios/ia/kettlebell-swing.webp",
@@ -2434,6 +2434,13 @@
    "nombreEnFuente": "side-plank",
    "estatica": "imagenes/ejercicios/plancha-lateral.png",
    "animada": true
+  },
+  "Leñador con mancuerna": {
+   "archivo": "imagenes/ejercicios/ia/lenador-con-mancuerna.webp",
+   "estatica": "imagenes/ejercicios/ia/lenador-con-mancuerna-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   }
  }
 }

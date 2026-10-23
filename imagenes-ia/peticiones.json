@@ -486,7 +486,8 @@
   "inicio": "cadera abajo casi tocando el suelo",
   "final": "cadera arriba, cuerpo recto de los hombros a las rodillas",
   "ancla": "encajar",
-  "usar": "antes"
+  "usar": "antes",
+  "invertir": true
  },
  {
   "slug": "puente-de-gluteo",
@@ -943,6 +944,13 @@
   "usar": "antes"
  },
  {
+  "slug": "lenador-con-mancuerna",
+  "ejercicio": "Leñador con mancuerna",
+  "vista": "de pie, agarrando una mancuerna con las dos manos, visto de frente",
+  "inicio": "brazos estirados arriba por encima de un hombro, tronco girado",
+  "final": "brazos estirados bajados en diagonal hasta la cadera contraria, tronco girado"
+ },
+ {
   "slug": "giros-rusos",
   "ejercicio": "Giros rusos",
   "vista": "sentado en el suelo con las rodillas dobladas y los pies levantados, tronco inclinado hacia atrás, con un disco en las manos, visto de frente",
@@ -1236,7 +1244,8 @@
   "vista": "delante de un cajón alto, visto de lado",
   "inicio": "agachado con los brazos atrás, a punto de saltar",
   "final": "de pie encima del cajón con las rodillas un poco dobladas",
-  "ancla": "encajar"
+  "ancla": "encajar",
+  "invertir": true
  },
  {
   "slug": "estiramiento",
@@ -1361,7 +1370,13 @@
   "slug": "estiramiento-del-sofa-couch-stretch",
   "ejercicio": "Estiramiento del sofá (couch stretch)",
   "vista": "visto de lado, junto a un sofá",
-  "postura": "rodilla de atrás en el suelo junto al sofá con el empeine apoyado en el respaldo, la otra pierna delante doblada, tronco erguido"
+  "postura": "rodilla de atrás en el suelo junto al sofá con el empeine apoyado en el respaldo, la otra pierna delante doblada, tronco erguido",
+  "recorte": [
+   0.14,
+   0.0,
+   0.8,
+   1.0
+  ]
  },
  {
   "slug": "estiramiento-de-gluteo-en-paloma",

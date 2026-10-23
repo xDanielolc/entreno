@@ -166,6 +166,7 @@ export const CATALOGO = [
   ej('Superman', 'core', 'suelo', ['lumbar'], ['gluteo'], corporal),
   ej('Rueda abdominal', 'core', 'rueda', ['abdomen'], ['oblicuos', 'dorsal'], corporal),
   ej('Leñador en polea', 'core', 'polea', ['oblicuos'], ['abdomen']),
+  ej('Leñador con mancuerna', 'core', 'mancuernas', ['oblicuos'], ['abdomen', 'hombro']),
   ej('Giros rusos', 'core', 'disco', ['oblicuos'], ['abdomen']),
   ej('Press pallof', 'core', 'polea', ['oblicuos'], ['abdomen'], { esfuerzo: 'tiempo' }),
   // Elevaciones de piernas: se levantan las dos piernas, un 32 % del peso (Winter 2009, tablas de Dempster).
