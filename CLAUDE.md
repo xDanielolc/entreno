@@ -1231,4 +1231,7 @@ fase), tras probar la A.
   sale: Gemini pinta las dos máquinas en espejo y, al darle la vuelta, las dos posturas quedan iguales. Almacén `entreno-imagenes-38`.
 - 0.60.30 (24-10-2026): Diario con días pasados (Dan: «ayer se me olvidó»): flechas ‹ › de día en día, calendario
   (`input type=date`, como mucho hoy) y «Apuntar ayer»; `desplazarDia()` en vistas/diario.js. Sin cambio de esquema.
+- 0.60.31: cara lisa en las dos zancadas con ChatGPT («Edita esta imagen sin redibujarla… cambia SOLO las cabezas»: al
+  contrario que Gemini, conserva el cuerpo). La elíptica tampoco sale con ChatGPT (dibuja las dos posturas iguales):
+  sigue quieta. Almacén `entreno-imagenes-39`.
 

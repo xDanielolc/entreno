@@ -423,7 +423,7 @@
    "estatica": "imagenes/ejercicios/ia/zancadas-quieta.webp",
    "animada": true,
    "fuente": "ia",
-   "autor": "Gemini"
+   "autor": "ChatGPT"
   },
   "Hip thrust": {
    "archivo": "imagenes/munecos/hip-thrust.svg",
@@ -696,7 +696,7 @@
    "estatica": "imagenes/ejercicios/ia/zancadas-hacia-atras-quieta.webp",
    "animada": true,
    "fuente": "ia",
-   "autor": "Gemini"
+   "autor": "ChatGPT"
   },
   "Subida al cajón": {
    "archivo": "imagenes/ejercicios/anim/subida-al-cajon.webp",
@@ -2176,7 +2176,7 @@
    "estatica": "imagenes/ejercicios/ia/zancadas-quieta.webp",
    "animada": true,
    "fuente": "ia",
-   "autor": "Gemini",
+   "autor": "ChatGPT",
    "aliasDe": "Zancadas"
   },
   "Salto vertical": {

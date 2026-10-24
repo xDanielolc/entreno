@@ -156,3 +156,4 @@ petición (el pez levantaba la cabeza; la goblet sale «de huevo», que lo decid
       0.60.28: carrera alternando rodillas. 0.60.29: zancadas con el pie quieto, escalera animada, gemelos en multipower
       que suben más. Queda la elíptica (Gemini la pinta en espejo) y la cara lisa de las zancadas (al alisarla les quita
       músculo).
+      0.60.31: zancadas con cara lisa (ChatGPT). La elíptica tampoco sale con ChatGPT: se queda quieta.
