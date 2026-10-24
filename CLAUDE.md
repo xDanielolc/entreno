@@ -1229,4 +1229,6 @@ fase), tras probar la A.
 - 0.60.29: zancadas (las dos) con el pie quieto clavado (`mover` en reencajar.py), escalera sin fin animada con lámina de
   modelo (`escala` para igualar las dos máquinas; `usar: ia`), gemelos en multipower que suben más (`subir`). La elíptica no
   sale: Gemini pinta las dos máquinas en espejo y, al darle la vuelta, las dos posturas quedan iguales. Almacén `entreno-imagenes-38`.
+- 0.60.30 (24-10-2026): Diario con días pasados (Dan: «ayer se me olvidó»): flechas ‹ › de día en día, calendario
+  (`input type=date`, como mucho hoy) y «Apuntar ayer»; `desplazarDia()` en vistas/diario.js. Sin cambio de esquema.
 

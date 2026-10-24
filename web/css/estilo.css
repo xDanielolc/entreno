@@ -2055,3 +2055,10 @@ html, body { overflow-x: clip; }
 .descanso .circulo-respira { background: var(--acento-texto); }
 /* Entreno: casillas grandes (estilo A). */
 .serie-valores .valor input { min-height: 56px; font-size: 1.375rem; font-weight: 800; }
+
+/* Diario: cambiar de día (‹ fecha ›) para apuntar días pasados. */
+.diario-navegar { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 4px 0 8px; }
+.diario-navegar .boton { min-width: 48px; font-size: 1.4rem; padding: 4px 12px; }
+.diario-navegar .boton:disabled { opacity: 0.35; }
+.diario-fecha { flex: 1; max-width: 220px; text-align: center; min-height: 44px; }
+.diario-atajos { margin-top: 4px; margin-bottom: 8px; }

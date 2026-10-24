@@ -56,12 +56,25 @@ export function vistaDiario(contenedor) {
 
   const fila = (...hijos) => h('div', { class: 'fila-campos' }, ...hijos);
 
+  // Días pasados (Dan: «ayer se me olvidó pero lo recuerdo perfectamente»): flechas de día en día,
+  // calendario para saltar a cualquier fecha y «Ayer» de un toque. No se puede ir más allá de hoy.
+  const irA = (iso) => { diaElegido = !iso || iso >= hoy ? null : iso; estado.emitir('vista'); };
+  const ayer = desplazarDia(hoy, -1);
+  const tituloDia = fecha === hoy ? 'Hoy' : fecha === ayer ? `Ayer, ${fechaCorta(fecha)}` : fechaCorta(fecha);
+
   anadir(contenedor,
     h('h1', {}, 'Diario'),
     h('section', { class: 'tarjeta diario-peso' },
-      h('div', { class: 'cabecera-tarjeta' },
-        h('h2', { class: 'crece' }, fecha === hoy ? 'Hoy' : fechaCorta(fecha)),
-        fecha !== hoy && h('button', { type: 'button', class: 'boton secundario', onclick: () => { diaElegido = null; estado.emitir('vista'); } }, 'Volver a hoy')),
+      h('div', { class: 'cabecera-tarjeta' }, h('h2', { class: 'crece' }, tituloDia)),
+      h('div', { class: 'diario-navegar' },
+        h('button', { type: 'button', class: 'boton secundario', 'aria-label': 'Día anterior', onclick: () => irA(desplazarDia(fecha, -1)) }, '‹'),
+        h('input', { type: 'date', class: 'diario-fecha', 'aria-label': 'Elegir el día', value: fecha, max: hoy,
+          onchange: (ev) => irA(ev.target.value) }),
+        h('button', { type: 'button', class: 'boton secundario', 'aria-label': 'Día siguiente', disabled: fecha === hoy,
+          onclick: () => irA(desplazarDia(fecha, 1)) }, '›')),
+      h('div', { class: 'fila-botones diario-atajos' },
+        fecha !== ayer && h('button', { type: 'button', class: 'boton secundario', onclick: () => irA(ayer) }, 'Apuntar ayer'),
+        fecha !== hoy && h('button', { type: 'button', class: 'boton secundario', onclick: () => irA(null) }, 'Volver a hoy')),
       h('label', { class: 'campo' }, h('span', { class: 'etiqueta-campo' }, 'Peso'), h('span', { class: 'con-unidad' }, pesoCaja, h('small', { class: 'suave' }, 'kg')))),
     h('section', { class: 'tarjeta diario-dia' },
       h('h2', {}, 'Esta noche'),
@@ -104,6 +117,13 @@ export function vistaDiario(contenedor) {
         } }),
       h('small', { class: 'nota' }, (d.diario ?? []).filter((x) => calcularSueno(x)).length >= 2
         ? 'Por defecto 8,5. Es la línea discontinua de la gráfica del sueño.' : 'Por defecto 8,5.'))));
+}
+
+// «2026-10-23» más o menos n días (a mediodía, para que el cambio de hora no salte un día).
+function desplazarDia(iso, n) {
+  const t = new Date(`${iso}T12:00:00`);
+  t.setDate(t.getDate() + n);
+  return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`;
 }
 
 // Los últimos 14 días con algo apuntado; tocar uno lo abre arriba.
