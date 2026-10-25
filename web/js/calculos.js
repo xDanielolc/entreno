@@ -307,9 +307,11 @@ function hermanosDe(ejercicio, plan) {
   const f = firma(plan);
   return new Set((ejercicio.series ?? []).filter((p) => !p.calentamiento && firma(p) === f).map((p) => p.id));
 }
-// ¿Esta serie hecha es una serie máxima (por su regla)?
+// ¿Esta serie hecha es una serie máxima de verdad? Por su regla y por lo
+// hecho: una «máxima» de 8 repeticiones (el remo de Dan el 25-10, con el 1RM
+// de partida mal) no es una máxima y no manda.
 export function esSerieMaxima(ejercicio, serie) {
-  return esMaxima((ejercicio?.series ?? []).find((p) => p.id === serie?.planId));
+  return esMaxima((ejercicio?.series ?? []).find((p) => p.id === serie?.planId)) && serie.esfuerzo > 0 && serie.esfuerzo <= 3;
 }
 // La recámara corrige el porcentaje entre sesiones (borrador 14, apartado 5):
 // si en la última sesión todas las series de bajada llegaron al tope del rango

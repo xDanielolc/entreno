@@ -1276,3 +1276,4 @@ fase), tras probar la A.
   se apunta, dé más o menos). Datos de Dan pasados a la versión 7 de la rutina en su Chrome: «Pájaro a una mano con el
   brazo estirado» partido con lo del 25-10, `bilboMinReps` 22 y el corte de sus Bilbo a 22, fuera el descanso de 195 s
   que tenía el remo en todo el ejercicio.
+- 0.61.2: una «máxima» de más de 3 repeticiones no cuenta como máxima (las del 25-10 salieron de 8 y 6).
