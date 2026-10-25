@@ -211,8 +211,11 @@ export function rmReciente(datos, ejercicio, semanas = 8, { excluirSesion } = {}
   // la recámara se calcula peor y el 1RM sale torcido (Halperin 2022; Dan,
   // borrador 14: «el 1RM de la banca no debe salir del 82,5 × 17»). Solo si
   // no hay ninguna corta valen las largas, y entonces `corta` es false.
+  // Y si hay una serie máxima en el plazo, manda la última: es la medida más
+  // fiable (borrador 14, apartado 5: «el de la serie máxima es el que manda»).
   let mejor = null;
   let mejorCorta = null;
+  let ultimaMaxima = null;
   for (const x of seriesDeEjercicio(datos, ejercicio.id, { excluirSesion })) {
     if (x.sesion.fecha < corte || x.serie.tipo === 'calentamiento') continue;
     const rm = rmSinTramos(datos, ejercicio, x.serie);
@@ -220,7 +223,9 @@ export function rmReciente(datos, ejercicio, semanas = 8, { excluirSesion } = {}
     const dato = { valor: redondear(rm, 1), fecha: x.sesion.fecha, serie: x.serie };
     if (!mejor || rm > mejor.valor) mejor = dato;
     if (valeParaReferencia(ejercicio, x.serie) && (!mejorCorta || rm > mejorCorta.valor)) mejorCorta = dato;
+    if (esSerieMaxima(ejercicio, x.serie) && (!ultimaMaxima || x.sesion.fecha >= ultimaMaxima.fecha)) ultimaMaxima = dato;
   }
+  if (ultimaMaxima) return { ...ultimaMaxima, corta: true, maxima: true };
   if (mejorCorta) return { ...mejorCorta, corta: true };
   if (mejor) return { ...mejor, corta: false };
   const siempre = rmDeReferencia(datos, ejercicio, { excluirSesion, referencia: true });
@@ -240,6 +245,7 @@ export function rmDelEjercicio(datos, ejercicio, { sesion = null, antesDe = null
   const base = rmReciente(datos, ejercicio, 8, { excluirSesion: sesion?.id });
   let hoyLarga = null;
   let hoyCorta = null;
+  let hoyMaxima = null;
   (sesion?.ejercicios ?? []).forEach((entrada, i) => {
     if (entrada.ejercicioId !== ejercicio.id) return;
     entrada.series.forEach((s, j) => {
@@ -249,8 +255,11 @@ export function rmDelEjercicio(datos, ejercicio, { sesion = null, antesDe = null
       if (!rm) return;
       if (!hoyLarga || rm > hoyLarga.valor) hoyLarga = { valor: redondear(rm, 1), serie: s };
       if (valeParaReferencia(ejercicio, s) && (!hoyCorta || rm > hoyCorta.valor)) hoyCorta = { valor: redondear(rm, 1), serie: s };
+      if (esSerieMaxima(ejercicio, s)) hoyMaxima = { valor: redondear(rm, 1), serie: s };
     });
   });
+  // La serie máxima de hoy manda siempre, dé más o menos: es la medida del día.
+  if (hoyMaxima) return { valor: hoyMaxima.valor, origen: 'hoy', serie: hoyMaxima.serie, corta: true, maxima: true };
   // Una serie corta de hoy manda sobre una base que sale de series largas,
   // aunque dé menos: es más fiable. Con base corta, solo si da más.
   const hoy = base?.corta ? hoyCorta : (hoyCorta ?? hoyLarga);
@@ -297,6 +306,10 @@ function hermanosDe(ejercicio, plan) {
   const firma = (p) => JSON.stringify([p.progresion?.porRM ?? null, p.progresion?.objetivoEsfuerzo ?? p.objetivoEsfuerzo, p.tecnicas ?? []]);
   const f = firma(plan);
   return new Set((ejercicio.series ?? []).filter((p) => !p.calentamiento && firma(p) === f).map((p) => p.id));
+}
+// ¿Esta serie hecha es una serie máxima (por su regla)?
+export function esSerieMaxima(ejercicio, serie) {
+  return esMaxima((ejercicio?.series ?? []).find((p) => p.id === serie?.planId));
 }
 // La recámara corrige el porcentaje entre sesiones (borrador 14, apartado 5):
 // si en la última sesión todas las series de bajada llegaron al tope del rango

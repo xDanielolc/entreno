@@ -1272,3 +1272,7 @@ fase), tras probar la A.
   estirado» en el catálogo (misma foto). Nota de la descendente: la última bajada, hasta 0-1 en recámara.
 - `proximoDia` reconoce el día por sus ejercicios si el id ya no existe (sus entrenos viejos apuntaban a días
   rehechos y la app volvía al día 1). Sonido de la presentación adelantado 0,12 s (`ADELANTO_S`).
+- 0.61.1: la última serie máxima manda en el 1RM de referencia (`esSerieMaxima`; en el entreno, la de hoy en cuanto
+  se apunta, dé más o menos). Datos de Dan pasados a la versión 7 de la rutina en su Chrome: «Pájaro a una mano con el
+  brazo estirado» partido con lo del 25-10, `bilboMinReps` 22 y el corte de sus Bilbo a 22, fuera el descanso de 195 s
+  que tenía el remo en todo el ejercicio.

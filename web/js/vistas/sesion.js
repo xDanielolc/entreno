@@ -659,7 +659,7 @@ export function vistaSesion(contenedor, { id }) {
       ayuda('Tu 1RM en este ejercicio', [
         origen,
         'El 1RM es el peso con el que harías una sola repetición. La app usa uno solo por ejercicio para calcular los pesos y los porcentajes.',
-        'Sale de tu mejor serie de 12 repeticiones o menos de las últimas 8 semanas, sin contar las Bilbo: por encima de 12 la recámara se calcula peor. Solo si no tienes ninguna así valen las largas. Si nunca has hecho el ejercicio, vale el que pongas a mano; si tampoco hay, la primera serie hace de prueba.',
+        'Sale de tu mejor serie de 12 repeticiones o menos de las últimas 8 semanas, sin contar las Bilbo: por encima de 12 la recámara se calcula peor. Solo si no tienes ninguna así valen las largas. Si has hecho una serie máxima, manda la última (la de hoy, en cuanto la apuntes): es la medida más fiable. Si nunca has hecho el ejercicio, vale el que pongas a mano; si tampoco hay, la primera serie hace de prueba.',
         'Si hoy haces una serie corta que da más (o la base salía de series largas), manda la de hoy, y las series de debajo cuyo peso puso la app se ajustan solas mientras no hayas hecho ninguna de ellas (las que hayas cambiado tú, no).',
         'No cuentan los calentamientos ni las series con más de 5 en recámara: lejos del fallo, la estimación se equivoca mucho.']),
       (!rm || rm.origen === 'manual') && ej.carga?.tipo !== 'pesoCorporal'
