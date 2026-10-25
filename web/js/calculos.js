@@ -758,7 +758,10 @@ export function pesosDeMaquina(desde, hasta, paso) {
 
 // 1RM de referencia para los porcentajes: el mejor del ciclo en curso y, si
 // no hay, el mejor de todo el historial del ejercicio.
-export function rmDeReferencia(datos, ejercicio, { cicloN, excluirSesion, referencia = false } = {}) {
+// Como el resto de la app, prefiere las series de 12 o menos sin Bilbo
+// (borrador 14): si no, una serie de doble progresión nueva salía del 1RM de
+// una serie de 17 repeticiones.
+export function rmDeReferencia(datos, ejercicio, { cicloN, excluirSesion, referencia = true } = {}) {
   const series = seriesDeEjercicio(datos, ejercicio.id, { excluirSesion });
   const delCiclo = cicloN != null ? series.filter((x) => x.entrada.cicloN === cicloN) : [];
   let candidatas = delCiclo.length ? delCiclo : series;

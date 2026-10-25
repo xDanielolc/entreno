@@ -1278,3 +1278,7 @@ fase), tras probar la A.
   que tenía el remo en todo el ejercicio.
 - 0.61.2: una «máxima» de más de 3 repeticiones no cuenta como máxima (las del 25-10 salieron de 8 y 6).
 - 0.61.3: «la última vez» de una serie de trabajo ya no puede ser un calentamiento apuntado con su plan.
+- 0.61.4: `rmDeReferencia` prefiere por defecto las series de 12 o menos sin Bilbo (`referencia = true`): las series
+  nuevas de doble progresión y las descendentes salían del 1RM de una serie de 17. En los datos de Dan, las series del
+  25-10 hechas con el 1RM inflado (banca 95 × 1 y 80 × 2, martillo descendente a 15 kg) se desengancharon de su plan
+  (`planIdAntes` guarda el de antes) para que no hagan de «la última vez»; siguen contando para el 1RM.
