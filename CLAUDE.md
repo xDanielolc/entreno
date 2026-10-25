@@ -1277,3 +1277,4 @@ fase), tras probar la A.
   brazo estirado» partido con lo del 25-10, `bilboMinReps` 22 y el corte de sus Bilbo a 22, fuera el descanso de 195 s
   que tenía el remo en todo el ejercicio.
 - 0.61.2: una «máxima» de más de 3 repeticiones no cuenta como máxima (las del 25-10 salieron de 8 y 6).
+- 0.61.3: «la última vez» de una serie de trabajo ya no puede ser un calentamiento apuntado con su plan.

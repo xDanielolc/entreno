@@ -107,7 +107,10 @@ export function registrosDelCiclo(datos, ejercicio, plan, cicloN, { excluirSesio
 export function sugerenciaSerie(datos, ejercicio, plan, { excluirSesion, rmHoy = null } = {}) {
   const prog = plan.progresion || { tipo: 'libre' };
   const sobre = prog.sobre || (ejercicio.carga?.tipo === 'ninguna' ? 'esfuerzo' : 'carga');
-  const historial = seriesDeEjercicio(datos, ejercicio.id, { excluirSesion, planId: plan.id });
+  // Un calentamiento apuntado con el plan de una serie de trabajo (pasaba al
+  // cambiarle el tipo) no es «la última vez» de esa serie: daba 20 kg × 14.
+  const historial = seriesDeEjercicio(datos, ejercicio.id, { excluirSesion, planId: plan.id })
+    .filter((x) => plan.calentamiento || x.serie.tipo !== 'calentamiento');
   const ultima = historial.at(-1) ?? null;
   // Si esta serie es nueva pero el ejercicio ya se ha hecho, se parte de la
   // última carga conocida: así una serie descendente recién creada no sale vacía.
