@@ -92,7 +92,18 @@ export function proximoDia(datos, rutina) {
     .filter((s) => !s.borrada && s.rutinaId === rutina.id && s.diaRutinaId)
     .sort((a, b) => (a.fecha + (a.inicio || '')).localeCompare(b.fecha + (b.inicio || '')));
   const ultimo = hechas.at(-1);
-  const i = rutina.dias.findIndex((x) => x.id === ultimo?.diaRutinaId);
+  let i = rutina.dias.findIndex((x) => x.id === ultimo?.diaRutinaId);
+  // Si ese día ya no existe (la rutina se rehízo al actualizarla), se busca
+  // el día con más ejercicios en común. Si no, volvía al día 1 (Dan: «no me
+  // pone en mi día»).
+  if (i < 0 && ultimo) {
+    const hechos = new Set(ultimo.ejercicios.map((x) => x.ejercicioId));
+    let mejor = 0;
+    rutina.dias.forEach((dia, k) => {
+      const comunes = dia.ejercicios.filter((x) => hechos.has(x.ejercicioId)).length;
+      if (comunes > mejor) { mejor = comunes; i = k; }
+    });
+  }
   return rutina.dias[(i + 1) % rutina.dias.length] ?? rutina.dias[0];
 }
 

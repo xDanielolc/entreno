@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 23;
+export const VERSION_ACTUAL = 24;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -567,6 +567,13 @@ const MIGRACIONES = {
       if (cambio.has(n(ej.fotoDe))) ej.fotoDe = cambio.get(n(ej.fotoDe));
     }
     datos.version = 23;
+    return datos;
+  },
+  // v23 → v24: campos nuevos, todos opcionales: `plan.descansoSegundos` (el
+  // descanso guardado para ese tipo de serie), `perfil.bilboRepsMax`,
+  // `perfil.bilboRecamara` y `perfil.redondeoMancuernasKg`. Nada que convertir.
+  23: (datos) => {
+    datos.version = 24;
     return datos;
   },
 };

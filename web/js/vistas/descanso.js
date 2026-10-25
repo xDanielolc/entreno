@@ -230,12 +230,18 @@ function proponer(segundos, texto) {
   const clave = `${ej?.id ?? 'todos'}-${segundos}`;
   if (ofrecido === clave) return;
   ofrecido = clave;
-  aviso(ej ? texto.replace('el descanso entre series', `el descanso de ${ej.nombre}`) : texto, { accion: { texto: `Sí, ${formatear(segundos)}`, fn: () => {
+  // Se guarda en ese tipo de serie (la máxima, las de bajada…), no en todo el
+  // ejercicio: Dan cambia el de la máxima y el de las bajadas por separado.
+  const donde = ej ? `${ej.etiqueta ? `${ej.etiqueta} de ` : ''}${ej.nombre}` : null;
+  aviso(ej ? texto.replace('el descanso entre series', `el descanso ${donde}`) : texto, { accion: { texto: `Sí, ${formatear(segundos)}`, fn: () => {
     estado.cambiar((x) => {
       const e = ej && x.ejercicios.find((y) => y.id === ej.id);
-      if (e) e.descansoSegundos = segundos; else x.perfil.descansoSegundos = segundos;
+      if (!e) { x.perfil.descansoSegundos = segundos; return; }
+      const planes = (e.series || []).filter((p) => ej.planes?.includes(p.id));
+      if (planes.length) for (const p of planes) p.descansoSegundos = segundos;
+      else e.descansoSegundos = segundos;
     });
-    aviso(ej ? `Descanso de ${ej.nombre}: ${formatear(segundos)} a partir de ahora, en todas sus series. Se cambia en su ficha (Ajustes finos).` : `Descanso entre series: ${formatear(segundos)}.`);
+    aviso(ej ? `Descanso ${donde}: ${formatear(segundos)} a partir de ahora.` : `Descanso entre series: ${formatear(segundos)}.`);
   } } });
 }
 

@@ -9,6 +9,8 @@ const CLAVE = 'entreno-presentacion';
 export const DURACION_MS = 4400;
 // Fuera más de esto, al volver se repite la presentación.
 const AUSENCIA_PARA_REPETIR_MS = 20 * 60 * 1000;
+// Segundos que se adelantan los sonidos sobre lo que dice el navegador.
+const ADELANTO_S = 0.12;
 
 // Cuándo suena cada cosa, en segundos desde que arranca. Salen de los
 // fotogramas clave del CSS (estilo.css, «Presentación al abrir»): la pesa
@@ -123,7 +125,9 @@ function preparar(variante) {
   };
   const programar = () => {
     if (audio.state !== 'running') { audio.close().catch(() => {}); return; }
-    const retraso = (audio.outputLatency || 0) + (audio.baseLatency || 0);
+    // Dan lo oía tarde en su móvil: Android no cuenta toda la latencia del
+    // altavoz, así que se adelanta un poco más (ADELANTO_S).
+    const retraso = (audio.outputLatency || 0) + (audio.baseLatency || 0) + ADELANTO_S;
     const ahora = audio.currentTime;
     // Cada golpe se programa medio segundo antes de sonar: así, si la grabación
     // ya está lista, suena ella (los golpes de la caja llegan pasados 2 s).

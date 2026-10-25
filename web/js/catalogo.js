@@ -93,6 +93,7 @@ export const CATALOGO = [
   ej('Face pull', 'tirón', 'polea', ['hombroPosterior'], ['trapecio']),
   ej('Pájaros con mancuernas', 'tirón', 'mancuernas', ['hombroPosterior'], ['trapecio']),
   ej('Pájaro a una mano', 'tirón', 'mancuerna', ['hombroPosterior'], ['trapecio']),
+  ej('Pájaro a una mano con el brazo estirado', 'tirón', 'mancuerna', ['hombroPosterior'], ['trapecio']),
   ej('Pájaros en máquina', 'tirón', 'máquina', ['hombroPosterior'], ['trapecio']),
   ej('Remo al mentón', 'tirón', 'barra', ['trapecio'], ['hombro', 'biceps']),
   ej('Encogimientos de trapecio', 'tirón', 'mancuernas', ['trapecio'], ['antebrazoFlexor']),

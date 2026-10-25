@@ -6,7 +6,7 @@ import { crearPlanesRapidos } from '../rapidas.js';
 import { nombreRegla, planesDeItem, seriesDesdePlan } from '../series.js';
 import {
   aPesoDisponible, cargaCorporal, cargaDesdeLectura, conMancuernas, recamaraBilbo, repsMaxBilbo, unLado, esfuerzoTotal, formatearNumero,
-  pasoDe, pesoDePlan, recamaraPorDefectoDe, redondear, rmDelEjercicio, rmDeReferencia, seriesDeEjercicio, sugerenciaSerie, trabajoSerie, tramosPropuestos, usaTramos,
+  esBajada, esMaxima, pasoDe, pesoDePlan, recamaraPorDefectoDe, redondear, rmDelEjercicio, rmDeReferencia, seriesDeEjercicio, sugerenciaSerie, trabajoSerie, tramosPropuestos, usaTramos,
 } from '../calculos.js';
 import { modeloDe, pesoParaReps, repsParaIgualar, rmDeSerie } from '../formula1rm.js';
 import { guiaTrasPrueba, marcarVista, pintarGuia, pista } from './tutorial.js';
@@ -659,8 +659,8 @@ export function vistaSesion(contenedor, { id }) {
       ayuda('Tu 1RM en este ejercicio', [
         origen,
         'El 1RM es el peso con el que harías una sola repetición. La app usa uno solo por ejercicio para calcular los pesos y los porcentajes.',
-        'Sale de tu mejor serie de las últimas 8 semanas (las series largas suelen dar menos, así que casi nunca mandan). Si nunca has hecho el ejercicio, vale el que pongas a mano; si tampoco hay, la primera serie hace de prueba.',
-        'Si hoy haces una serie que da más, manda la de hoy, y las series de debajo cuyo peso puso la app se ajustan solas (las que hayas cambiado tú, no).',
+        'Sale de tu mejor serie de 12 repeticiones o menos de las últimas 8 semanas, sin contar las Bilbo: por encima de 12 la recámara se calcula peor. Solo si no tienes ninguna así valen las largas. Si nunca has hecho el ejercicio, vale el que pongas a mano; si tampoco hay, la primera serie hace de prueba.',
+        'Si hoy haces una serie corta que da más (o la base salía de series largas), manda la de hoy, y las series de debajo cuyo peso puso la app se ajustan solas mientras no hayas hecho ninguna de ellas (las que hayas cambiado tú, no).',
         'No cuentan los calentamientos ni las series con más de 5 en recámara: lejos del fallo, la estimación se equivoca mucho.']),
       (!rm || rm.origen === 'manual') && ej.carga?.tipo !== 'pesoCorporal'
         && h('button', { type: 'button', class: 'boton enlace', onclick: () => ponerRMaMano(ej, null) }, rm ? 'Cambiar' : 'Lo sé'));
@@ -719,6 +719,17 @@ export function vistaSesion(contenedor, { id }) {
       lista.push(`Programa ${PROGRAMAS[prog.programa]?.etiqueta ?? ''}: el peso y las repeticiones de hoy los marca el programa según la sesión en la que vas.`);
       return lista;
     }
+    if (prog.tipo === 'carga' && esBajada(plan)) {
+      lista.push(`Serie de bajada: el peso es el ${prog.porRM.valor} % de tu 1RM${rm ? ` (${n(Math.round(rm.valor))} kg${deDonde})` : ''} y pide ${tr} repeticiones${rec ? ` dejando ${rec} en recámara` : ''}.`);
+      lista.push('Es normal que de una serie a otra salgan menos repeticiones por el cansancio: dentro del rango está bien. A mitad del ejercicio la app no sube el peso; solo te propone bajarlo si una serie acaba con 0-1 en recámara por debajo del rango, y tú decides.');
+      lista.push('Entre sesiones, la recámara corrige el peso: si todas las series llegaron al tope del rango con 3 o más en recámara, la próxima vez un salto más; si alguna se quedó por debajo, se repite el peso, y dos sesiones seguidas así, un salto menos.');
+      return lista;
+    }
+    if (prog.tipo === 'carga' && esMaxima(plan)) {
+      lista.push(`Serie máxima: ${prog.porRM.valor === 1 ? 'una repetición' : `como mucho ${prog.porRM.valor} repeticiones`} dejando 1-2 en recámara, con el peso que te da tu 1RM${rm ? ` (${n(Math.round(rm.valor))} kg${deDonde})` : ''}.`);
+      lista.push('Aunque te sobren, no hagas más: apunta la recámara que te quedó y la próxima vez el peso sube solo. Si te sobran 3 o más, puedes dejar la barra, subir un 5-10 % y hacer otra sola (como aproximación).');
+      return lista;
+    }
     if (prog.tipo === 'carga' && prog.porRM) {
       lista.push(`El peso sale de tu mejor 1RM de las últimas ${prog.porRM.semanas ?? 8} semanas${rm ? ` (${n(Math.round(rm.valor))} kg)` : ''}: ${prog.porRM.fija === 'pct' ? `el ${prog.porRM.valor} % de él` : `el que te deja hacer ${prog.porRM.valor}${rec ? ` dejando ${rec} en recámara` : ''}`}.`);
       lista.push('Si te haces más fuerte, el 1RM sube y el peso sube solo.');
@@ -775,9 +786,9 @@ export function vistaSesion(contenedor, { id }) {
     const idx = i ?? sesion.ejercicios.indexOf(entrada);
     const rmAntes = entrada ? rmDelEjercicio(d, ej, { sesion, antesDe: { i: idx, j } }) : null;
     const primeraDeTrabajo = entrada ? entrada.series.findIndex((x) => x.tipo !== 'calentamiento') : -1;
-    const tarjetaPrueba = (texto) => h('div', { class: 'tarjeta-prueba' }, h('p', {}, texto),
+    const tarjetaPrueba = (texto, { quitar = true } = {}) => h('div', { class: 'tarjeta-prueba' }, h('p', {}, texto),
       h('button', { type: 'button', class: 'boton enlace', onclick: () => ponerRMaMano(ej, serie) }, 'Ya sé mi 1RM: lo meto a mano'),
-      entrada && quitarPorPrueba(ej, entrada, idx));
+      quitar && entrada && quitarPorPrueba(ej, entrada, idx));
 
     // Sin ningún 1RM (ni de antes ni de hoy): la primera serie de trabajo es
     // la prueba y las demás esperan a ella.
@@ -801,6 +812,15 @@ export function vistaSesion(contenedor, { id }) {
       }
     }
 
+    // Serie máxima sin un 1RM de series cortas: sube por las aproximaciones.
+    if (s.subirAproximaciones && !serie.hecha && !rmAntes?.corta) {
+      return tarjetaPrueba('Aún no tienes un 1RM de series de 12 o menos, y la máxima no puede salir de series largas. '
+        + 'Sube por las aproximaciones: añade solas de más (con «+ Serie suelta» como calentamiento), cada una un 5-10 % más pesada, '
+        + 'hasta un peso con el que salgan 1-2 dejando 1-2 en recámara. Esa es tu máxima: apúntala aquí y de ella salen los pesos de las bajadas.', { quitar: false });
+    }
+    if (s.esperaMaxima && !serie.hecha && !rmAntes?.corta) {
+      return h('p', { class: 'sugerencia' }, `Espera a la serie máxima: con ella se pone el peso de esta serie (${s.rango?.[0]}-${s.rango?.[1]} repeticiones).`);
+    }
     const partes = [];
     const lineas = [];
     if (s.prueba && !serie.hecha && !rmAntes) {
@@ -929,8 +949,12 @@ export function vistaSesion(contenedor, { id }) {
       if (serie.carga != null && !serie.cargaAuto) return;
       const nuevo = prog.porRM || (prog.tipo === 'carga' && !sugerenciaSerie(datos, e, plan, { excluirSesion: id }).ultima);
       if (!nuevo) return;
+      // A mitad del ejercicio el peso no se toca solo (borrador 14): en cuanto
+      // hay una serie hecha con esta misma regla, las demás se quedan como
+      // están. Bajarlo lo propone la app y lo decides tú.
+      if (entrada.series.some((x, k) => k !== j && x.hecha && mismaReglaEn(e, x, serie))) return;
       if (serie.carga != null && serie.rmUsado?.valor && Math.abs(serie.rmUsado.valor - rm.valor) < 0.5) return;
-      const peso = pesoDePlan(datos, e, plan, rm.valor);
+      const peso = pesoDePlan(datos, e, plan, rm.valor, { excluirSesion: id });
       if (!(peso > 0) || (peso === serie.carga && serie.rmUsado?.valor === rm.valor)) return;
       cambio = true;
       if (aplicar) {
@@ -1090,26 +1114,19 @@ export function vistaSesion(contenedor, { id }) {
     const plan = planDe(ej, serie);
     const prog = plan?.progresion;
     if (prog?.tipo !== 'carga') return null;
+    // Solo se propone BAJAR, y solo si la serie anterior de esta misma regla
+    // acabó por debajo del rango con 0-1 en recámara (borrador 14). Subir,
+    // nunca a mitad del ejercicio: las subidas van a la sesión siguiente.
     const previa = entrada.series.slice(0, j).reverse().find((x) => x.hecha && x.tipo !== 'calentamiento' && !x.tramos?.length && x.carga > 0 && x.esfuerzo > 0);
-    if (!previa || previa.recamara == null) return null;
+    if (!previa || previa.recamara == null || previa.recamara > 1 || !mismaRegla(ej, previa, serie)) return null;
+    const [min] = prog.objetivoEsfuerzo ?? plan.objetivoEsfuerzo ?? [];
+    if (min == null || esfuerzoTotal(previa) >= min) return null;
     const rm = rmDeSerie(d, ej, previa, esfuerzoTotal(previa));
     if (!(rm > 0)) return null;
-    let propuesto = null;
-    if (prog.porRM) propuesto = pesoDePlan(d, ej, plan, rm);
-    else {
-      // Doble progresión: si la anterior llegó arriba del rango con su recámara,
-      // más peso y vuelta al mínimo; si no llegó al mínimo, menos.
-      const [min, max] = prog.objetivoEsfuerzo ?? plan.objetivoEsfuerzo ?? [];
-      if (min == null || max == null || !mismaRegla(ej, previa, serie)) return null;
-      const hizo = esfuerzoTotal(previa);
-      const arriba = hizo >= max && previa.recamara >= (prog.recamaraMin ?? 0);
-      if (!arriba && hizo >= min) return null;
-      propuesto = aPesoDisponible(ej, pesoParaReps(modeloDe(d, ej), rm, min, recamaraPorDefectoDe(d, ej, plan)), { rm });
-      if (arriba ? propuesto <= serie.carga : propuesto >= serie.carga) return null;
-    }
-    if (!(propuesto > 0) || Math.abs(propuesto - serie.carga) < pasoDe(ej) - 0.01) return null;
+    const propuesto = aPesoDisponible(ej, pesoParaReps(modeloDe(d, ej), rm, min, recamaraPorDefectoDe(d, ej, plan)), { rm });
+    if (!(propuesto > 0) || propuesto >= serie.carga - pasoDe(ej) + 0.01) return null;
     const n = formatearNumero;
-    const bajar = propuesto < serie.carga;
+    const bajar = true;
     // Si sigues con el mismo peso, lo realista hoy son menos repeticiones (o más, si vas fuerte):
     // las que salen con el 1RM de hoy y la recámara de la regla (Dan: «pretender que salgan las
     // mismas a pesar del cansancio es un error»).
@@ -1136,11 +1153,11 @@ export function vistaSesion(contenedor, { id }) {
     });
     const objetivo = serie.objetivo ?? (prog.objetivoEsfuerzo ?? plan.objetivoEsfuerzo ?? [])[0] ?? null;
     return h('div', { class: 'aviso-serie' },
-      h('p', {}, h('strong', {}, bajar ? 'Hoy vas más cansado de lo previsto. ' : 'Hoy vas más fuerte de lo previsto. '),
-        `Tu serie anterior (${textoSerie(ej, previa)}) equivale a un 1RM de ${n(Math.round(rm))} kg`
-        + (rmPrevisto ? `, y esta serie estaba pensada para ${n(Math.round(rmPrevisto))} kg. ` : '. ')
-        + (objetivo ? `Para hacer las ${n(objetivo)} previstas, ${bajar ? 'baja' : 'sube'} a ${n(propuesto)} kg` : `Te toca ${n(propuesto)} kg`)
-        + `; si sigues con ${n(serie.carga)} kg, lo realista hoy son ${repsHoy}. Solo cambia esta serie y las que quedan de hoy: la rutina sigue igual.`),
+      h('p', {}, h('strong', {}, 'La serie anterior se quedó por debajo del rango. '),
+        `Hiciste ${textoSerie(ej, previa)}, menos de ${n(min)} y casi al fallo`
+        + (rmPrevisto ? ` (hoy rindes como con un 1RM de ${n(Math.round(rm))} kg; la serie contaba con ${n(Math.round(rmPrevisto))}). ` : '. ')
+        + (objetivo ? `Para llegar a ${n(objetivo)}, puedes bajar a ${n(propuesto)} kg` : `Puedes bajar a ${n(propuesto)} kg`)
+        + `; si sigues con ${n(serie.carga)} kg, lo realista hoy son ${repsHoy}. Tú decides. Solo cambia lo que queda de hoy: la rutina sigue igual.`),
       h('div', { class: 'fila-botones' },
         h('button', { type: 'button', class: 'boton', onclick: usar }, `${bajar ? 'Bajar' : 'Subir'} a ${n(propuesto)} kg`),
         h('button', { type: 'button', class: 'boton secundario', onclick: seguir }, `Seguir con ${n(serie.carga)} × ${repsHoy}`)),
@@ -1148,6 +1165,15 @@ export function vistaSesion(contenedor, { id }) {
         estado.cambiar((x) => { x.perfil.avisosEntreno = { ...x.perfil.avisosEntreno, rmHoy: false }; });
         aviso('Ya no te lo propongo. Se vuelve a poner en Ajustes → Entrenamiento y series.');
       }, { clase: 'pequeno' }));
+  }
+
+  // Igual que mismaRegla, pero con el ejercicio que se le pase (en ajustes()
+  // se trabaja sobre una copia de los datos).
+  function mismaReglaEn(e, a, b) {
+    if (a.planId === b.planId) return true;
+    const pa = (e.series || []).find((p) => p.id === a.planId); const pb = (e.series || []).find((p) => p.id === b.planId);
+    const firma = (p) => p && JSON.stringify([p.tipo, p.progresion?.tipo, p.progresion?.objetivoEsfuerzo ?? p.objetivoEsfuerzo, p.progresion?.porRM ?? null, p.tecnicas ?? []]);
+    return Boolean(pa && pb) && firma(pa) === firma(pb);
   }
 
   // Dos series con la misma regla (las de «3 × 6-8» llevan un plan cada una).
@@ -1421,7 +1447,18 @@ export function vistaSesion(contenedor, { id }) {
   // Un calentamiento no lleva marca.
   function pintarMarca(marca, serie, ej) {
     const esfuerzo = esfuerzoTotal(serie);
-    if (serie.objetivo == null || esfuerzo == null || serie.tipo === 'calentamiento') { marca.textContent = ''; marca.className = 'marca'; return; }
+    const conRango = ej && esBajada(planDe(ej, serie));
+    if ((serie.objetivo == null && !conRango) || esfuerzo == null || serie.tipo === 'calentamiento') { marca.textContent = ''; marca.className = 'marca'; return; }
+    // Series de bajada: que las repeticiones bajen por la fatiga es normal;
+    // dentro del rango está bien (borrador 14).
+    const planS = ej ? planDe(ej, serie) : null;
+    if (esBajada(planS)) {
+      const [min, max] = planS.progresion.objetivoEsfuerzo;
+      const dentro = esfuerzo >= min;
+      marca.textContent = dentro ? `✓ dentro del rango (${min}-${max})` : `✗ por debajo de ${min}`;
+      marca.className = `marca ${dentro ? 'bien' : 'mal'}`;
+      return;
+    }
     const ok = esfuerzo >= serie.objetivo;
     // «Superado / no superado» solo cuando el objetivo es ganar a la última vez; si sale de la regla
     // (el mínimo del rango, el 1RM, lo realista de hoy), se dice «objetivo» (Dan no entendía el
@@ -1635,6 +1672,7 @@ export function vistaSesion(contenedor, { id }) {
           'A mano: escribes los kilos tú y no cambian aunque cambie tu 1RM.',
           '% del 1RM: la app pone los kilos según tu 1RM, y los recalcula al apuntar la serie de arriba.'])),
       h('p', { class: 'aviso-texto aviso-bajada' }, avisoPrimeraBajada(d, ej, serie) ?? ''),
+      tramos.tecnica === 'drop-set' && h('p', { class: 'nota-por-lado' }, 'Cada bajada, todas las que puedas: la última, hasta 0-1 en recámara.'),
       // Cabecera y filas en la misma rejilla: cada título queda justo encima
       // de su columna (y un hueco encima de las ✕).
       h('div', { class: `tramo cabecera-tramos${conCarga ? '' : ' sin-carga'}${conAntes ? ' con-antes' : ''}`, 'aria-hidden': 'true' },
@@ -1800,21 +1838,30 @@ export function vistaSesion(contenedor, { id }) {
       if (seg) arrancarDescanso(seg, { texto: 'entre estiramientos' });
       return;
     }
-    // Cada ejercicio puede tener su descanso (ficha, Ajustes finos). Si no,
-    // lo pide la serie: tras una serie máxima, 4 min (3-5); entre series de
-    // fuerza (6 o menos con 2 en recámara), 3 min; si no, el de Ajustes.
-    const seg = ej.descansoSegundos ?? descansoDeSerie(ej, serie) ?? d.perfil.descansoSegundos;
-    if (seg) arrancarDescanso(seg, { ejercicio: { id: ej.id, nombre: ej.nombre } });
+    // Manda el descanso que hayas guardado para ese tipo de serie (al cambiarlo
+    // en el entreno), luego el del ejercicio (ficha, Ajustes finos), luego el
+    // que pide el tipo de serie (borrador 14) y, si no, el de Ajustes.
+    const plan = serie ? planDe(ej, serie) : null;
+    const tipo = tipoDescanso(ej, plan);
+    const seg = plan?.descansoSegundos ?? ej.descansoSegundos ?? tipo?.seg ?? d.perfil.descansoSegundos;
+    const hermanos = plan ? (ej.series || []).filter((p) => mismaReglaEn(ej, { planId: p.id }, { planId: plan.id })).map((p) => p.id) : [];
+    if (seg) arrancarDescanso(seg, { ejercicio: { id: ej.id, nombre: ej.nombre, planes: hermanos, etiqueta: tipo?.etiqueta ?? null } });
   }
 
-  function descansoDeSerie(ej, serie) {
-    const plan = serie ? planDe(ej, serie) : null;
+  // El descanso que pide cada tipo de serie (borrador 14 de Dan): 3 min tras
+  // la máxima, 2-3 entre series de bajada, 2 en las normales, 60-90 s en los
+  // accesorios y 45-60 s en los racimos.
+  function tipoDescanso(ej, plan) {
     const prog = plan?.progresion ?? {};
-    const max = (prog.objetivoEsfuerzo ?? plan?.objetivoEsfuerzo)?.[1] ?? prog.porRM?.valor;
-    if (!plan || prog.tipo !== 'carga' || max == null) return null;
-    if (max <= 2) return 240;
-    if (max <= 6 && (prog.recamaraMin ?? 0) >= 2) return 180;
-    return null;
+    if (!plan || plan.calentamiento) return null;
+    if (prog.tipo === 'bilbo') return { seg: 120, etiqueta: 'tras la Bilbo' };
+    const max = (prog.objetivoEsfuerzo ?? plan.objetivoEsfuerzo)?.[1] ?? prog.porRM?.valor;
+    if (max == null) return null;
+    if (esMaxima(plan)) return { seg: 180, etiqueta: 'tras la serie máxima' };
+    if (esBajada(plan) || (max <= 6 && (prog.recamaraMin ?? 0) >= 2)) return { seg: 150, etiqueta: 'entre series de bajada' };
+    if (max <= 2 && !prog.porRM) return { seg: 50, etiqueta: 'entre racimos' };
+    if (max <= 10) return { seg: 120, etiqueta: 'entre estas series' };
+    return { seg: 75, etiqueta: 'entre estas series' };
   }
 
   // Tras tocar una serie normal (peso, porcentaje, repeticiones o recámara),

@@ -1248,3 +1248,27 @@ fase), tras probar la A.
   última vez de esa serie, «?» que explica los grises, comparación «frente a esta serie la última vez (fecha)», el
   descanso ofrece guardar el cambio también al acabar (no solo al saltarlo) y «¿Cómo llegas?» pregunta además por los
   músculos que aún se recuperan de entrenos recientes.
+
+## Ronda 0.61.0 (26-10-2026): su borrador 14
+
+`datos-privados/rutina-dan-borrador-14.md` sustituye al 13. Esquema v24 (todo opcional: `plan.descansoSegundos`,
+`perfil.bilboRepsMax`, `perfil.bilboRecamara`, `perfil.redondeoMancuernasKg`).
+- **1RM de referencia**: `rmReciente` vuelve a preferir series de 12 o menos sin Bilbo (`valeParaReferencia`; Dan lo
+  pidió en el borrador 14, deshace lo de la 0.59) y marca `corta`; en el entreno, una serie corta de hoy manda sobre
+  una base de series largas aunque dé menos (`rmDelEjercicio`).
+- **Serie máxima** (`esMaxima`): objetivo como mucho sus repeticiones (2); sin 1RM de series cortas,
+  `subirAproximaciones` (tarjeta: subir con solas de más). **Bajadas** (`esBajada`: porRM pct con rango): esperan a
+  la máxima si el 1RM es de series largas (`esperaMaxima`), marca «dentro del rango», sin «superar», y
+  `corregidoPorRecamara()` entre sesiones (todas arriba con 3+ en recámara: un salto más; alguna por debajo: repite;
+  dos seguidas: un salto menos). A mitad del ejercicio el peso no cambia solo (ajustes() se para en cuanto hay una
+  serie de la misma regla hecha) y `propuestaPorRMDeHoy` solo propone BAJAR, si la anterior de esa regla acabó por
+  debajo del rango con 0-1 en recámara.
+- Bilbo: `BILBO_REPS_MAX_POR_DEFECTO` 23; Dan con `bilboMinReps` 22.
+- Descansos por tipo (`tipoDescanso` en sesion.js): máxima 3 min, bajadas 2:30, Bilbo y normales 2 min, accesorios
+  1:15, racimos 50 s. Lo que cambias en el entreno se guarda en ese tipo de serie (`plan.descansoSegundos` de todos
+  los planes de la misma regla), no en el ejercicio entero.
+- Prehecha «Fuerza sin máquinas» versión 7 (borrador 14: día 3 nuevo, 3 × 3-5 en los básicos pesados, militar 2 × 3-5,
+  racimos 4 × 1-2, fondos negativos, sin laterales el día 3, duraciones nuevas). «Pájaro a una mano con el brazo
+  estirado» en el catálogo (misma foto). Nota de la descendente: la última bajada, hasta 0-1 en recámara.
+- `proximoDia` reconoce el día por sus ejercicios si el id ya no existe (sus entrenos viejos apuntaban a días
+  rehechos y la app volvía al día 1). Sonido de la presentación adelantado 0,12 s (`ADELANTO_S`).

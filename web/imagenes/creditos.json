@@ -2464,6 +2464,15 @@
    "animada": true,
    "fuente": "ia",
    "autor": "Gemini"
+  },
+  "Pájaro a una mano con el brazo estirado": {
+   "archivo": "imagenes/ejercicios/anim/pajaros-con-mancuernas.webp",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "bent-over-rear-deltoid-raise-with-head-on-bench",
+   "aliasDe": "Pájaros con mancuernas",
+   "estatica": "imagenes/ejercicios/pajaros-con-mancuernas.png",
+   "animada": true
   }
  }
 }
