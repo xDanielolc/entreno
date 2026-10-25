@@ -1837,6 +1837,7 @@ body.entreno-a-pantalla .contenido.con-barra-entreno { padding-bottom: calc(var(
 .linea-1rm > span:first-child { flex: 1; min-width: 12em; }
 .linea-1rm strong { color: var(--texto); }
 .linea-1rm .boton.enlace { min-width: 0; margin: 0; }
+.nota-por-lado { margin: -4px 0 10px; color: var(--texto-suave); font-size: .9em; text-align: center; }
 .sin-series { margin: 8px 0 0; }
 /* El «?» de la esquina de abajo a la derecha de una tarjeta. */
 .con-ayuda-esquina { position: relative; padding-bottom: 46px; }

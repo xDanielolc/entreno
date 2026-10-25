@@ -1235,3 +1235,16 @@ fase), tras probar la A.
   contrario que Gemini, conserva el cuerpo). La elíptica tampoco sale con ChatGPT (dibuja las dos posturas iguales):
   sigue quieta. Almacén `entreno-imagenes-39`.
 
+- 0.60.32 (25-10-2026, sus notas del To Do de su entreno): **1RM con pesos ligeros y mancuernas**: el divisor de
+  Marzagao no baja del de 10 kg (`PESO_MINIMO_DIVISOR`: 2 kg × 10 daba 14 kg de 1RM) y con dos mancuernas usa la carga
+  de las dos (`modelo.escala`, `escalaDe` en formula1rm.js; curl martillo 10 × 9 pasa de 17 a 15 kg). `unLado()` y
+  `conMancuernas()` en calculos.js; mancuernas de 2 en 2 (`perfil.redondeoMancuernasKg`) y nota «peso de una mancuerna /
+  de un solo lado» en la tarjeta (`notaPorLado`). Serie descendente: arranca como mucho al peso del fallo en el máximo
+  de su rango (`inicioDeTramos` en series.js) y las bajadas nunca repiten peso; el «?» explica por qué no hay recámara.
+  **Bilbo**: tope de repeticiones por día (`perfil.bilboRepsMax`, 22: el peso sube si la escalera pediría más,
+  `subidoPorTope`), recámara de los ciclos (`perfil.bilboRecamara`, 2) y objetivo que SUPERA el 1RM anterior (floor + 1),
+  ambos en Ajustes → Ciclos; `conMargen` usa el tope en vez de 30. Entreno: 1RM de la cabecera al momento
+  (`refrescar1RM`), propuesta por cansancio rehecha («Seguir con C × R», `objetivoDe: 'hoy'`), «superado» solo frente a la
+  última vez de esa serie, «?» que explica los grises, comparación «frente a esta serie la última vez (fecha)», el
+  descanso ofrece guardar el cambio también al acabar (no solo al saltarlo) y «¿Cómo llegas?» pregunta además por los
+  músculos que aún se recuperan de entrenos recientes.

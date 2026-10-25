@@ -57,7 +57,9 @@ export function comparacionSerie(datos, ej, serie, { excluirSesion } = {}) {
   const partes = [`${hoy.nombre} ${formatearNumero(redondear(hoy.valor, 1))}${hoy.unidad ? ` ${hoy.unidad}` : ''}`];
 
   const mAnterior = anterior && medida(datos, ej, anterior.serie);
-  if (mAnterior) partes.push(`${diferencia(hoy.valor, mAnterior.valor)} frente a la última vez`);
+  // Con su fecha: Dan no sabía si comparaba con la serie de arriba (cansado) o con el otro día.
+  const dia = anterior?.sesion?.fecha ? ` (${anterior.sesion.fecha.slice(8, 10)}/${anterior.sesion.fecha.slice(5, 7)})` : '';
+  if (mAnterior) partes.push(`${diferencia(hoy.valor, mAnterior.valor)} frente a esta serie la última vez${dia}`);
   const mCiclo = delCicloAnterior && medida(datos, ej, delCicloAnterior.serie);
   if (mCiclo) partes.push(`${diferencia(hoy.valor, mCiclo.valor)} frente al día ${serie.diaCiclo} del ciclo ${serie.cicloN - 1}`);
   // Sin nada con qué comparar no se dice nada: el 1RM del ejercicio ya sale

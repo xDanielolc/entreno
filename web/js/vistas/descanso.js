@@ -142,6 +142,9 @@ function pintar() {
     // (con el sonido del móvil) solo si no se ve la app o no ha podido vibrar.
     const vibro = avisar();
     if (entreSeries() && (document.visibilityState !== 'visible' || !vibro)) notificar('¡Descanso terminado!', 'A por la siguiente serie.');
+    // Si lo habías cambiado con −30 s / +30 s, al acabar se ofrece quedárselo (Dan: «solo me
+    // ofrece cambiar el descanso si lo salto, pero no si lo modifico»).
+    if (entreSeries() && totalSeg && Math.abs(alargadoSeg) >= 15) ofrecerCambiado(totalSeg + alargadoSeg);
   } else if (finMs && entreSeries() && segundos % 15 === 0) {
     // Cada 15 s se actualiza la misma notificación con lo que queda.
     notificar(`Descanso: ${formatear(segundos)}`, 'Te aviso cuando acabe.', { silencio: true });
@@ -227,13 +230,19 @@ function proponer(segundos, texto) {
   const clave = `${ej?.id ?? 'todos'}-${segundos}`;
   if (ofrecido === clave) return;
   ofrecido = clave;
-  aviso(ej ? texto.replace('el descanso entre series', `el descanso de ${ej.nombre}`) : texto, { accion: { texto: `Sí, ${segundos} s`, fn: () => {
+  aviso(ej ? texto.replace('el descanso entre series', `el descanso de ${ej.nombre}`) : texto, { accion: { texto: `Sí, ${formatear(segundos)}`, fn: () => {
     estado.cambiar((x) => {
       const e = ej && x.ejercicios.find((y) => y.id === ej.id);
       if (e) e.descansoSegundos = segundos; else x.perfil.descansoSegundos = segundos;
     });
-    aviso(ej ? `Descanso de ${ej.nombre}: ${segundos} s. Se cambia en su ficha (Ajustes finos).` : `Descanso entre series: ${segundos} s.`);
+    aviso(ej ? `Descanso de ${ej.nombre}: ${formatear(segundos)} a partir de ahora, en todas sus series. Se cambia en su ficha (Ajustes finos).` : `Descanso entre series: ${formatear(segundos)}.`);
   } } });
+}
+
+function ofrecerCambiado(segundos) {
+  const seg = Math.max(15, Math.round(segundos / 15) * 15);
+  if (seg === totalSeg) return;
+  proponer(seg, `Has dejado el descanso en ${formatear(seg)} en vez de ${formatear(totalSeg)}. ¿Quedártelo así para el descanso entre series?`);
 }
 
 function saltar() {
@@ -244,9 +253,9 @@ function saltar() {
   if (!era || !totalSeg) return;
   const propuesto = Math.max(15, Math.round(usado / 15) * 15);
   // Se ofrece siempre que lo cortes con margen (10 s o más antes de acabar).
-  if (usado >= 10 && quedaban >= 10 && propuesto < totalSeg) {
-    proponer(propuesto, `Descanso saltado a los ${usado} s de ${totalSeg}. ¿Dejar el descanso entre series en ${propuesto} s?`);
-  }
+  if (usado >= 10 && quedaban >= 10 && propuesto !== totalSeg) {
+    proponer(propuesto, `Has descansado ${formatear(usado)} de ${formatear(totalSeg)}. ¿Dejar el descanso entre series en ${formatear(propuesto)}?`);
+  } else if (Math.abs(alargadoSeg) >= 15) ofrecerCambiado(totalSeg + alargadoSeg);
 }
 
 // −30 s y +30 s a los lados del tiempo (estilo A, elegido por Dan el 22-10-2026).
@@ -257,9 +266,6 @@ function alargar(paso = 30) {
   clearInterval(intervalo);
   intervalo = setInterval(pintar, 1000);
   pintar();
-  if (entreSeries() && totalSeg && alargadoSeg > 0) {
-    proponer(totalSeg + alargadoSeg, `Has alargado el descanso. ¿Dejarlo entre series en ${totalSeg + alargadoSeg} s?`);
-  }
 }
 
 function acortar() {

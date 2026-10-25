@@ -378,7 +378,7 @@ function sugerenciaBilbo(datos, ejercicio, plan, { excluirSesion, sobre, rmHoy =
   const dia = ultimaDelCiclo ? ultimaDelCiclo.dia + 1 : 1;
   if (dia > ciclo.escalera.length) return { cicloN: ciclo.n, cicloTerminado: true, ultimaDelCiclo };
 
-  const valor = ciclo.escalera[dia - 1];
+  const valorEscalera = ciclo.escalera[dia - 1];
   const resultado = { cicloN: ciclo.n, dia, diasCiclo: ciclo.escalera.length, ultimaDelCiclo };
 
   const genEsf = ciclo.generador ?? {};
@@ -387,10 +387,10 @@ function sugerenciaBilbo(datos, ejercicio, plan, { excluirSesion, sobre, rmHoy =
     // al llegar al máximo del corte.
     const corte = prog.corte ?? {};
     const hechoAntes = ultimaDelCiclo ? esfuerzoTotal(ultimaDelCiclo.serie) : null;
-    return { ...resultado, carga: null, esfuerzoObjetivo: valor, objetivosExtra: objetivosExtra(genEsf, dia),
+    return { ...resultado, carga: null, esfuerzoObjetivo: valorEscalera, objetivosExtra: objetivosExtra(genEsf, dia),
       cicloAgotado: Boolean(corte.esfuerzoMax && hechoAntes != null && hechoAntes >= corte.esfuerzoMax) };
   }
-  // Objetivo: las repeticiones que igualan el 1RM del día anterior, con la
+  // Objetivo: las repeticiones que superan el 1RM del día anterior, con la
   // fórmula del ejercicio y descontando la recámara que sueles dejar.
   // El primer día de un ciclo nuevo se compara con la última serie del anterior.
   const referencia = ultimaDelCiclo?.serie ?? seriesDeEjercicio(datos, ejercicio.id, { excluirSesion, planId: plan.id }).at(-1)?.serie ?? null;
@@ -399,13 +399,26 @@ function sugerenciaBilbo(datos, ejercicio, plan, { excluirSesion, sobre, rmHoy =
   // o el que pusiste a mano).
   const rmAnterior = referencia ? rmDeSerie(datos, ejercicio, referencia, esfuerzoTotal(referencia))
     : (rmHoy ?? rmDeReferencia(datos, ejercicio, { excluirSesion })?.valor ?? null);
-  const recamara = recamaraDe(plan.tecnicas, ejercicio.recamaraPorDefecto ?? datos.perfil.recamaraPorDefecto ?? 1);
+  const recamara = recamaraDe(plan.tecnicas, recamaraBilbo(datos));
+  const gen = ciclo.generador ?? {};
+  // Tope de repeticiones (Dan: «no quiero 30 repes de banca»): si el peso de
+  // la escalera pediría más de las máximas, ese día va al peso con el que
+  // harías las máximas dejando la recámara de los ciclos. La escalera sigue
+  // igual y, en cuanto vuelve a pesar más, manda ella.
+  let valor = valorEscalera;
+  let subidoPorTope = false;
+  if (rmAnterior && valor > 0 && !gen.incrementoEsfuerzo && !gen.fases?.length) {
+    const suelo = pesoParaReps(modeloDe(datos, ejercicio), rmAnterior, repsMaxBilbo(datos), recamara);
+    const sueloDisponible = suelo > 0 ? aPesoDisponible(ejercicio, suelo, { hacia: 'arriba' }) : 0;
+    if (sueloDisponible > valor) { valor = sueloDisponible; subidoPorTope = true; }
+  }
   const reps = rmAnterior && valor > 0 ? repsParaIgualar(modeloDe(datos, ejercicio), rmAnterior, valor, recamara) : null;
-  // Repeticiones enteras y con tope: por encima de 40 el peso es demasiado bajo.
-  let objetivoSuperar = reps != null ? Math.min(40, Math.ceil(Math.max(0, reps))) : null;
+  // El objetivo SUPERA el 1RM anterior (Dan: «no quiero igualar la serie
+  // anterior, sino superarla»): la repetición entera siguiente a la que lo
+  // iguala. Con tope de 40: por encima, el peso es demasiado bajo.
+  let objetivoSuperar = reps != null ? Math.min(40, Math.floor(Math.max(0, reps) + 1e-6) + 1) : null;
   // Si además marcaste que suban las repeticiones, manda esa escalera: el
   // objetivo del día sale de lo que pusiste, no de igualar el 1RM.
-  const gen = ciclo.generador ?? {};
   if (gen.incrementoEsfuerzo) {
     objetivoSuperar = Math.round((gen.inicialEsfuerzo ?? 8)
       + gen.incrementoEsfuerzo * Math.floor((dia - 1) / Math.max(1, gen.cada ?? 1)));
@@ -448,7 +461,7 @@ function sugerenciaBilbo(datos, ejercicio, plan, { excluirSesion, sobre, rmHoy =
     if (r) cicloPrevio = { cicloN: c.n, dia: r.dia, carga: r.serie.carga, esfuerzo: esfuerzoTotal(r.serie), mismoPeso: Math.abs((r.serie.carga ?? -1) - valor) < 0.01 };
     break;
   }
-  return { ...resultado, carga: valor, objetivoSuperar, objetivosExtra: objetivosExtra(gen, dia), fase, rmObjetivo: rmAnterior,
+  return { ...resultado, carga: valor, subidoPorTope, objetivoSuperar, objetivosExtra: objetivosExtra(gen, dia), fase, rmObjetivo: rmAnterior,
     sinAnterior: !referencia,
     pesoBajo: reps != null && reps > 40, cicloAgotado: agotado, cicloPrevio, refAnterior: referencia };
 }
@@ -553,6 +566,14 @@ export const REDONDEO_POR_DEFECTO = 2.5;
 export const REDONDEOS = [0.5, 1, 1.25, 2, 2.5, 5];
 let redondeoGlobal = REDONDEO_POR_DEFECTO;
 export function fijarRedondeo(kg) { redondeoGlobal = kg > 0 ? kg : REDONDEO_POR_DEFECTO; }
+// Las mancuernas van aparte: en el gimnasio de Dan, de 2 en 2 kg (`perfil.redondeoMancuernasKg`).
+export const REDONDEO_MANCUERNAS_POR_DEFECTO = 2;
+let redondeoMancuernas = REDONDEO_MANCUERNAS_POR_DEFECTO;
+export function fijarRedondeoMancuernas(kg) { redondeoMancuernas = kg > 0 ? kg : REDONDEO_MANCUERNAS_POR_DEFECTO; }
+// De un solo lado (un brazo o una pierna): se apuntan el peso y las
+// repeticiones de un lado.
+export function unLado(ejercicio) { return /(a una mano|a un brazo|a una pierna|unilateral)/i.test(ejercicio?.nombre ?? ''); }
+export function conMancuernas(ejercicio) { return /mancuerna/i.test(materialDe(ejercicio) ?? '') || /mancuerna/i.test(ejercicio?.nombre ?? ''); }
 // Calentamientos de 10 en 10 kg (decisión práctica de Dan: sin cuentas al
 // calentar). Se quita en Ajustes y entonces van con el % exacto.
 let calentamientoRedondo = true;
@@ -572,9 +593,17 @@ export function pesoMinimoDe(ejercicio, rm = null) {
 // Las repeticiones en recámara que pide una serie si no lo dice su regla ni
 // el ejercicio: 2 en fuerza (series de 6 o menos, o programas de fuerza) y 1
 // en hipertrofia (o lo que pongas en Ajustes, si es más).
+// Ciclos: repeticiones máximas de un día (el peso nunca baja del que las da)
+// y recámara con la que se hacen. Valores de Dan (25-10-2026): 22 y 2.
+export const BILBO_REPS_MAX_POR_DEFECTO = 22;
+export const BILBO_RECAMARA_POR_DEFECTO = 2;
+export function repsMaxBilbo(datos) { return datos?.perfil?.bilboRepsMax ?? BILBO_REPS_MAX_POR_DEFECTO; }
+export function recamaraBilbo(datos) { return datos?.perfil?.bilboRecamara ?? BILBO_RECAMARA_POR_DEFECTO; }
+
 export function recamaraPorDefectoDe(datos, ejercicio, plan) {
   const prog = plan?.progresion ?? {};
   if (prog.recamaraMin != null) return prog.recamaraMin;
+  if (prog.tipo === 'bilbo') return recamaraBilbo(datos);
   if (ejercicio?.recamaraPorDefecto != null) return ejercicio.recamaraPorDefecto;
   const general = datos?.perfil?.recamaraPorDefecto ?? 1;
   const max = (prog.objetivoEsfuerzo ?? plan?.objetivoEsfuerzo)?.[1];
@@ -591,7 +620,10 @@ export function materialDe(ejercicio) {
   if (!materialPorNombre.has(clave)) materialPorNombre.set(clave, CATALOGO.find((c) => normalizar(c.nombre) === clave)?.material ?? null);
   return materialPorNombre.get(clave);
 }
-export function pasoDe(ejercicio) { return ejercicio?.redondeoKg > 0 ? ejercicio.redondeoKg : redondeoGlobal; }
+export function pasoDe(ejercicio) {
+  if (ejercicio?.redondeoKg > 0) return ejercicio.redondeoKg;
+  return conMancuernas(ejercicio) ? redondeoMancuernas : redondeoGlobal;
+}
 
 // Redondea al salto de disco: en el gimnasio no hay 25,6 kg.
 export function aPasoDeDisco(kg, paso = redondeoGlobal) {

@@ -5,10 +5,10 @@ import { abrirAsistenteSeries } from './configurar-series.js';
 import { crearPlanesRapidos } from '../rapidas.js';
 import { nombreRegla, planesDeItem, seriesDesdePlan } from '../series.js';
 import {
-  aPesoDisponible, cargaCorporal, cargaDesdeLectura, esfuerzoTotal, formatearNumero,
+  aPesoDisponible, cargaCorporal, cargaDesdeLectura, conMancuernas, recamaraBilbo, repsMaxBilbo, unLado, esfuerzoTotal, formatearNumero,
   pasoDe, pesoDePlan, recamaraPorDefectoDe, redondear, rmDelEjercicio, rmDeReferencia, seriesDeEjercicio, sugerenciaSerie, trabajoSerie, tramosPropuestos, usaTramos,
 } from '../calculos.js';
-import { modeloDe, pesoParaReps, rmDeSerie } from '../formula1rm.js';
+import { modeloDe, pesoParaReps, repsParaIgualar, rmDeSerie } from '../formula1rm.js';
 import { guiaTrasPrueba, marcarVista, pintarGuia, pista } from './tutorial.js';
 import { queEs } from './glosario.js';
 import { relojEnMarcha, relojSerie } from './reloj-serie.js';
@@ -415,7 +415,11 @@ export function vistaSesion(contenedor, { id }) {
     const previsto = recuperacionPorMusculo(d, sesion.inicio ? new Date(sesion.inicio) : new Date());
     const respuestas = sesion.sensaciones ?? {};
     const lista = ORDEN_MUSCULOS.filter((m) => musculos.has(m));
-    const todas = lista.every((m) => respuestas[m]);
+    // También los que aún se están recuperando de entrenos recientes (Dan:
+    // «me pregunta por los de ese día pero no por los de otros, y así nunca
+    // vamos a estimar bien si me recupero rápido»). Son opcionales.
+    const recientes = ORDEN_MUSCULOS.filter((m) => !musculos.has(m) && previsto[m] && previsto[m].porcentaje < 95);
+    const todas = [...lista, ...recientes].every((m) => respuestas[m]);
     if (todas) {
       const quedan = Math.ceil(10 - (Date.now() - (sesion.sensacionesListas ?? 0)) / 1000);
       if (quedan <= 0) return null;
@@ -437,9 +441,10 @@ export function vistaSesion(contenedor, { id }) {
       h('summary', {}, todas ? 'Cómo llegas: apuntado' : '¿Cómo llegas hoy? (opcional)'),
       h('p', { class: 'nota' }, 'Puntúa de 0 a 10 cómo de recuperado notas cada músculo: 0, nada; 5, a medias; 10, del todo. '
         + 'Sirve para ajustar el mapa de recuperación a tu ritmo.'),
-      lista.map((m) => {
+      [...lista, ...recientes].map((m, k) => {
         const puesta = respuestas[m] ? puntuacionSentida(respuestas[m]) : null;
-        return h('div', { class: 'fila-sensacion' },
+        const titulo = k === lista.length && h('p', { class: 'nota' }, 'Y lo que entrenaste hace poco y aún se recupera (si quieres):');
+        return h('div', { class: 'fila-sensacion' }, titulo,
           h('div', { class: 'cabecera-sensacion' },
             h('strong', {}, nombreMusculo(m, { corto: true })),
             h('small', { class: 'suave' }, `la app calcula ${Math.round(previsto[m].porcentaje / 10)} de 10`)),
@@ -451,7 +456,7 @@ export function vistaSesion(contenedor, { id }) {
                 cambiarSesion((x) => {
                   x.sensaciones ??= {};
                   x.sensaciones[m] = { sentida: n, prevista: previsto[m].porcentaje, factor: factorPersonal(d, m) };
-                  if (lista.every((y) => x.sensaciones[y])) x.sensacionesListas = Date.now();
+                  if ([...lista, ...recientes].every((y) => x.sensaciones[y])) x.sensacionesListas = Date.now();
                 });
                 estado.cambiar((x) => { x.perfil.comoLlegasSaltos = 0; }, { tecleo: true });
               },
@@ -553,6 +558,7 @@ export function vistaSesion(contenedor, { id }) {
       enCurso && avisoRecuperacion(ej),
 
       referencia1RM(ej),
+      notaPorLado(ej),
 
       indice === 0 && enCurso && !sesion.tutorial && pista('sesion-datos', ['estiramiento', 'movilidad', 'yoga'].includes(tipoDeEjercicio(ej))
         ? 'Apunta cada estiramiento al acabarlo: los segundos que has aguantado y, si te apoyas con la mano, hasta dónde llegas. '
@@ -628,6 +634,15 @@ export function vistaSesion(contenedor, { id }) {
       } });
   }
 
+  // Qué se apunta en los ejercicios con mancuernas o de un solo lado: el
+  // peso de una mancuerna y las repeticiones de un lado (Dan dudaba).
+  function notaPorLado(ej) {
+    if (!['peso', 'asistida'].includes(ej.carga?.tipo) && ej.esfuerzo?.tipo !== 'repeticiones') return null;
+    if (unLado(ej)) return h('p', { class: 'nota-por-lado' }, 'Apunta el peso y las repeticiones de un solo lado; con el otro, las mismas.');
+    if (ej.carga?.tipo === 'peso' && conMancuernas(ej)) return h('p', { class: 'nota-por-lado' }, 'El peso es el de una mancuerna (lo que lleva cada mano), no la suma de las dos.');
+    return null;
+  }
+
   // El 1RM del ejercicio: uno solo, el mismo con el que se calculan los
   // pesos y los porcentajes de esta pantalla, y de dónde sale.
   function referencia1RM(ej) {
@@ -640,7 +655,7 @@ export function vistaSesion(contenedor, { id }) {
         : rm.origen === 'manual' ? ['Ahora es ', resaltado('el que pusiste a mano'), '.']
           : ['Ahora sale de ', resaltado(rm.serie ? `tu entrenamiento del ${fechaCorta(rm.fecha)}: ${textoSerie(ej, rm.serie)}` : 'tu mejor serie de siempre'), '.'];
     return h('div', { class: 'linea-1rm' },
-      h('span', {}, 'Tu 1RM: ', h('strong', {}, rm ? `${formatearNumero(Math.round(rm.valor))} kg` : 'aún no lo sabe la app')),
+      h('span', {}, 'Tu 1RM: ', h('strong', { 'data-rm-ejercicio': ej.id }, rm ? `${formatearNumero(Math.round(rm.valor))} kg` : 'aún no lo sabe la app')),
       ayuda('Tu 1RM en este ejercicio', [
         origen,
         'El 1RM es el peso con el que harías una sola repetición. La app usa uno solo por ejercicio para calcular los pesos y los porcentajes.',
@@ -656,6 +671,8 @@ export function vistaSesion(contenedor, { id }) {
     const linea = lineaSugerenciaBase(ej, serie, entrada, j, i);
     if (!linea || !linea.classList?.contains('sugerencia')) return linea;
     const razones = porQueHoy(ej, serie, entrada, j, i);
+    // Dan: «las marcas grises no sé de dónde salen».
+    if (razones.length) razones.push('Los números en gris de las casillas vacías son solo una pista y no se guardan: en repeticiones, el objetivo de hoy (o lo de la última vez); en recámara, la de la última vez o, si no la hay, la de esta regla. Si no escribes nada, la casilla queda vacía.');
     if (razones.length) {
       linea.classList.add('con-porque');
       linea.append(h('span', { class: 'porque' }, ayuda('Por qué hoy esto', razones)));
@@ -679,6 +696,11 @@ export function vistaSesion(contenedor, { id }) {
     const deDonde = !rm ? '' : rm.origen === 'hoy' ? ' (sale de una serie de hoy)' : rm.origen === 'manual' ? ' (el que pusiste a mano)' : ' (tu mejor serie de las últimas 8 semanas)';
     const rec = prog.recamaraMin;
     const lista = [];
+    // Dan: «¿por qué no hay recámara en una descendente?».
+    if ((plan.tecnicas ?? []).includes('drop-set')) {
+      lista.push('Serie descendente: haces todas las que puedas, bajas el peso sin descansar y sigues. Cada parte va al fallo (o a 1 de él), y por eso no se apunta recámara: lo que la hace eficaz es llegar al límite varias veces en poco tiempo.');
+      lista.push('La primera parte va como mucho al 80 % de tu 1RM (se cambia en Ajustes) y nunca tan pesada que no llegues al máximo de su rango.');
+    }
     if (serie.tipo === 'calentamiento') {
       lista.push(s.pct > 0 && rm ? `Calentamiento al ${s.pct} % de tu 1RM de ${n(Math.round(rm.valor))} kg${deDonde}.`
         : s.pct === 0 ? 'Calentamiento con la barra sola.' : 'Calentamiento: un peso ligero.');
@@ -687,8 +709,9 @@ export function vistaSesion(contenedor, { id }) {
     }
     if (prog.tipo === 'bilbo') {
       lista.push('Esta serie va en un ciclo (Bilbo): cada sesión el peso sube un poco y haces todas las que puedas.');
-      if (s.ultimaDelCiclo || s.refAnterior) lista.push('El objetivo son las repeticiones que, con el peso de hoy, igualan el 1RM que sacaste la última vez: si las haces, eres más fuerte.');
-      else if (serie.objetivo != null) lista.push(`Es la primera sesión del ciclo: el objetivo son las repeticiones que igualan tu 1RM${rm ? ` de ${n(Math.round(rm.valor))} kg` : ''} con este peso.`);
+      if (s.ultimaDelCiclo || s.refAnterior) lista.push(`El objetivo son las repeticiones que, con el peso de hoy, superan el 1RM que sacaste la última vez (una más de las que lo igualarían), dejando ${recamaraBilbo(d)} en recámara: si las haces, eres más fuerte.`);
+      else if (serie.objetivo != null) lista.push(`Es la primera sesión del ciclo: el objetivo son las repeticiones que superan tu 1RM${rm ? ` de ${n(Math.round(rm.valor))} kg` : ''} con este peso.`);
+      if (s.subidoPorTope) lista.push(`Hoy el peso sube más que el de la escalera del ciclo: con el de la escalera te tocarían más de ${repsMaxBilbo(d)} repeticiones, y ese es el máximo (se cambia en Ajustes → Ciclos).`);
       lista.push('Cuando el objetivo baja de 15 repeticiones, el ciclo se acaba y empieza otro más ligero, partiendo de lo mejor que hiciste.');
       return lista;
     }
@@ -806,7 +829,7 @@ export function vistaSesion(contenedor, { id }) {
         } else if (serie.objetivo != null) {
           const rmObj = serie.rmObjetivo ?? s.rmObjetivo;
           lineas.push(h('span', { class: 'compara' }, '↑ Objetivo: ', h('strong', {}, `${formatearNumero(serie.objetivo)} ${uEsf}`),
-            rmObj ? ` (las que igualan tu 1RM de ${formatearNumero(Math.round(rmObj))} kg)` : ''));
+            rmObj ? ` (las que superan tu 1RM de ${formatearNumero(Math.round(rmObj))} kg)` : ''));
         }
         if (s.cicloPrevio) {
           const p = s.cicloPrevio;
@@ -936,12 +959,21 @@ export function vistaSesion(contenedor, { id }) {
     const estadoPrueba = `${Boolean(prueba?.hecha)}`;
     const cambiaPrueba = pruebasVistas.has(i) && pruebasVistas.get(i) !== estadoPrueba;
     pruebasVistas.set(i, estadoPrueba);
+    // El 1RM de la cabecera cambia al momento (Dan: «no cambia al instante, sino al cambiar de página»).
+    refrescar1RM(datos, s, e);
     if (!ajustes(datos, s, e, i, false) && !cambiaPrueba) return;
     estado.cambiar((x) => {
       const s2 = x.sesiones.find((y) => y.id === id);
       const e2 = x.ejercicios.find((y) => y.id === ej.id);
       ajustes(x, s2, e2, i, true);
     });
+  }
+
+  function refrescar1RM(datos, s, e) {
+    const rm = rmDelEjercicio(datos, e, { sesion: s });
+    for (const el of document.querySelectorAll(`[data-rm-ejercicio="${e.id}"]`)) {
+      el.textContent = rm ? `${formatearNumero(Math.round(rm.valor))} kg` : 'aún no lo sabe la app';
+    }
   }
 
   // El 1RM a mano desde el entrenamiento: se guarda en el ejercicio (con su
@@ -1077,6 +1109,22 @@ export function vistaSesion(contenedor, { id }) {
     }
     if (!(propuesto > 0) || Math.abs(propuesto - serie.carga) < pasoDe(ej) - 0.01) return null;
     const n = formatearNumero;
+    const bajar = propuesto < serie.carga;
+    // Si sigues con el mismo peso, lo realista hoy son menos repeticiones (o más, si vas fuerte):
+    // las que salen con el 1RM de hoy y la recámara de la regla (Dan: «pretender que salgan las
+    // mismas a pesar del cansancio es un error»).
+    const recamaraRegla = recamaraPorDefectoDe(d, ej, plan);
+    const repsHoy = Math.max(1, Math.floor(repsParaIgualar(modeloDe(d, ej), rm, serie.carga, recamaraRegla) ?? 0));
+    const rmPrevisto = serie.rmUsado?.valor ?? rmDelEjercicio(d, ej, { sesion })?.valor ?? null;
+    const seguir = () => cambiarSesion((s) => {
+      const lista = s.ejercicios[i].series;
+      for (let k = j; k < lista.length; k++) {
+        const x = lista[k];
+        if (x.hecha || !mismaRegla(ej, x, serie) || Math.abs((x.carga ?? 0) - serie.carga) > 0.01) continue;
+        x.objetivo = repsHoy; x.objetivoDe = 'hoy';
+      }
+      lista[j].propuestaVista = true;
+    });
     const usar = () => cambiarSesion((s) => {
       const lista = s.ejercicios[i].series;
       for (let k = j; k < lista.length; k++) {
@@ -1086,13 +1134,16 @@ export function vistaSesion(contenedor, { id }) {
       }
       lista[j].propuestaVista = true;
     });
+    const objetivo = serie.objetivo ?? (prog.objetivoEsfuerzo ?? plan.objetivoEsfuerzo ?? [])[0] ?? null;
     return h('div', { class: 'aviso-serie' },
-      h('p', {}, `Con la serie anterior, ${textoSerie(ej, previa)}, tu 1RM de hoy sale en ${n(Math.round(rm))} kg. `
-        + `Para esta saldrían ${n(propuesto)} kg en vez de ${n(serie.carga)}.`),
+      h('p', {}, h('strong', {}, bajar ? 'Hoy vas más cansado de lo previsto. ' : 'Hoy vas más fuerte de lo previsto. '),
+        `Tu serie anterior (${textoSerie(ej, previa)}) equivale a un 1RM de ${n(Math.round(rm))} kg`
+        + (rmPrevisto ? `, y esta serie estaba pensada para ${n(Math.round(rmPrevisto))} kg. ` : '. ')
+        + (objetivo ? `Para hacer las ${n(objetivo)} previstas, ${bajar ? 'baja' : 'sube'} a ${n(propuesto)} kg` : `Te toca ${n(propuesto)} kg`)
+        + `; si sigues con ${n(serie.carga)} kg, lo realista hoy son ${repsHoy}. Solo cambia esta serie y las que quedan de hoy: la rutina sigue igual.`),
       h('div', { class: 'fila-botones' },
-        h('button', { type: 'button', class: 'boton', onclick: usar }, `Usar ${n(propuesto)} kg`),
-        h('button', { type: 'button', class: 'boton secundario', onclick: () => cambiarSesion((s) => { s.ejercicios[i].series[j].propuestaVista = true; }) },
-          `Seguir con ${n(serie.carga)}`)),
+        h('button', { type: 'button', class: 'boton', onclick: usar }, `${bajar ? 'Bajar' : 'Subir'} a ${n(propuesto)} kg`),
+        h('button', { type: 'button', class: 'boton secundario', onclick: seguir }, `Seguir con ${n(serie.carga)} × ${repsHoy}`)),
       deslizarParaConfirmar('Desliza para no proponérmelo más', () => {
         estado.cambiar((x) => { x.perfil.avisosEntreno = { ...x.perfil.avisosEntreno, rmHoy: false }; });
         aviso('Ya no te lo propongo. Se vuelve a poner en Ajustes → Entrenamiento y series.');
@@ -1318,7 +1369,7 @@ export function vistaSesion(contenedor, { id }) {
     if (esPrueba(ej, entrada, j, i)) {
       return h('div', { class: 'serie-cabecera' },
         h('span', { class: 'insignia-prueba' }, serie.hecha ? 'Prueba de 1RM hecha' : 'Prueba de 1RM'),
-        marcaObjetivo(serie));
+        marcaObjetivo(ej, serie));
     }
     const plan = planDe(ej, serie);
     const nombreLibre = plan && !plan.calentamiento ? `Programación: ${nombreRegla(plan).split(':')[0]}` : 'Sin objetivo';
@@ -1348,7 +1399,7 @@ export function vistaSesion(contenedor, { id }) {
         x.tramos = tramosDe(nuevas) ? (x.tramos ?? tramosPropuestos(x, planDe(ej, x), null, d.perfil)) : null;
       })),
 
-      marcaObjetivo(serie),
+      marcaObjetivo(ej, serie),
 
       h('button', { type: 'button', class: 'boton-icono boton-bocadillo', 'aria-label': 'Comentario de esta serie', title: 'Comentar',
         onclick: (e) => {
@@ -1360,19 +1411,23 @@ export function vistaSesion(contenedor, { id }) {
       h('button', { class: 'boton-icono borrar-serie', 'aria-label': 'Borrar serie', onclick: () => borrarSerie(i, j) }, icono('papelera')));
   }
 
-  function marcaObjetivo(serie) {
+  function marcaObjetivo(ej, serie) {
     const marca = h('span', { class: 'marca' });
-    pintarMarca(marca, serie);
+    pintarMarca(marca, serie, ej);
     return marca;
   }
 
   // «Superado» solo si había una vez anterior; la primera vez, «objetivo».
   // Un calentamiento no lleva marca.
-  function pintarMarca(marca, serie) {
+  function pintarMarca(marca, serie, ej) {
     const esfuerzo = esfuerzoTotal(serie);
     if (serie.objetivo == null || esfuerzo == null || serie.tipo === 'calentamiento') { marca.textContent = ''; marca.className = 'marca'; return; }
     const ok = esfuerzo >= serie.objetivo;
-    marca.textContent = serie.objetivoDe === 'rm' ? (ok ? '✓ objetivo cumplido' : '✗ por debajo del objetivo') : (ok ? '✓ superado' : '✗ no superado');
+    // «Superado / no superado» solo cuando el objetivo es ganar a la última vez; si sale de la regla
+    // (el mínimo del rango, el 1RM, lo realista de hoy), se dice «objetivo» (Dan no entendía el
+    // «no superado» en una serie que nunca había hecho).
+    const frenteAUltima = !serie.objetivoDe && ej != null && ultimaDe(ej, serie) != null;
+    marca.textContent = frenteAUltima ? (ok ? '✓ superado' : '✗ no superado') : (ok ? '✓ objetivo cumplido' : '✗ por debajo del objetivo');
     marca.className = `marca ${ok ? 'bien' : 'mal'}`;
   }
 
@@ -1816,7 +1871,7 @@ export function vistaSesion(contenedor, { id }) {
     const caja = input.closest('.serie');
     caja?.classList.toggle('hecha', serie.hecha);
     const marca = caja?.querySelector('.marca');
-    if (marca) pintarMarca(marca, serie);
+    if (marca) pintarMarca(marca, serie, ej);
     const comparacion = caja?.querySelector('.comparacion');
     if (comparacion && ej) comparacion.textContent = comparacionSerie(d, ej, serie, { excluirSesion: id });
   }
@@ -1870,7 +1925,8 @@ export function vistaSesion(contenedor, { id }) {
       // «¿Cómo llegas?» de los músculos que ya no entrenas hoy, fuera.
       if (s.sensaciones) {
         const quedan = new Set(s.ejercicios.flatMap((x) => datos.ejercicios.find((e) => e.id === x.ejercicioId)?.musculos?.principales ?? []));
-        for (const m of Object.keys(s.sensaciones)) if (!quedan.has(m)) delete s.sensaciones[m];
+        const delQuitado = datos.ejercicios.find((e) => e.id === quitada?.ejercicioId)?.musculos?.principales ?? [];
+        for (const m of delQuitado) if (!quedan.has(m)) delete s.sensaciones[m];
       }
     });
     if (posicion != null && posicion >= sesion.ejercicios.length) irA(sesion.ejercicios.length - 1);

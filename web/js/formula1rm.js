@@ -26,6 +26,8 @@
 // repeticiones de las que predice el estudio con el mismo porcentaje; por
 // debajo de 1, menos.
 
+import { conMancuernas, unLado } from './calculos.js';
+
 const redondear = (n, d = 2) => Math.round(n * 10 ** d) / 10 ** d;
 
 export const FORMULAS = {
@@ -34,9 +36,16 @@ export const FORMULAS = {
 };
 
 const EXPONENTE_ESTUDIO = 0.85;
+// Por debajo de 10 kg el divisor se hunde (con 2 kg sale 0,6) y la fórmula
+// deja de tener sentido: 2 kg × 10 daba un 1RM de 14 kg y 4 kg × 4, de 6.
+// El estudio apenas tiene series tan ligeras, así que se corta ahí.
+const PESO_MINIMO_DIVISOR = 10;
 
-function divisorSegunPeso(peso) {
-  return Math.max(0.5, 4.58 * Math.log(peso) - 2.55);
+// `escala`: con dos mancuernas el estudio cuenta la carga total (las dos),
+// pero tú apuntas el peso de una. Sin esto, el curl martillo con 10 kg × 9
+// daba 17 kg de 1RM y con 15 kg no salían ni dos.
+function divisorSegunPeso(peso, escala = 1) {
+  return Math.max(0.5, 4.58 * Math.log(Math.max(PESO_MINIMO_DIVISOR, peso * escala)) - 2.55);
 }
 
 // Repeticiones que cuenta la fórmula: hasta el fallo, salvo en Epley.
@@ -50,7 +59,7 @@ export function estimar1RM(modelo, peso, reps, recamara = 0) {
   const r = repsDeSerie(modelo, reps, recamara);
   // 'epley' es la de las hojas de cálculo: variante de Epley con 0,03 (Epley usa 1/30).
   if (modelo.tipo === 'epley') return peso * (1 + r * 0.03);
-  const k = modelo.divisor ?? divisorSegunPeso(peso) * (modelo.factor ?? 1);
+  const k = modelo.divisor ?? divisorSegunPeso(peso, modelo.escala) * (modelo.factor ?? 1);
   const g = modelo.exponente ?? EXPONENTE_ESTUDIO;
   return peso * (1 + (r - 1) ** g / k);
 }
@@ -61,7 +70,7 @@ export function repsParaIgualar(modelo, rm, peso, recamara = 0) {
   if (!(rm > 0) || !(peso > 0)) return null;
   if (modelo.tipo === 'epley') return (rm - peso) / (peso * 0.03);
   if (rm <= peso) return Math.max(0, 1 - (recamara ?? 0));
-  const k = modelo.divisor ?? divisorSegunPeso(peso) * (modelo.factor ?? 1);
+  const k = modelo.divisor ?? divisorSegunPeso(peso, modelo.escala) * (modelo.factor ?? 1);
   const g = modelo.exponente ?? EXPONENTE_ESTUDIO;
   const hastaFallo = 1 + (k * (rm / peso - 1)) ** (1 / g);
   return hastaFallo - Math.max(0, recamara ?? 0);
@@ -148,17 +157,18 @@ export function calibrar(datos, ejercicio) {
   if (memoria.has(clave)) return memoria.get(clave);
 
   const grupos = ventanas(seriesParaCalibrar(datos, ejercicio));
-  let resultado = { modelo: { tipo: 'personal', factor: 1 }, factor: 1, factorDatos: null, ventanas: 0, confianza: 0 };
+  const escala = escalaDe(ejercicio);
+  let resultado = { modelo: { tipo: 'personal', factor: 1, escala }, factor: 1, factorDatos: null, ventanas: 0, confianza: 0 };
   if (grupos.length) {
-    let mejor = { factor: 1, error: inconsistencia({ tipo: 'personal', factor: 1 }, grupos) };
+    let mejor = { factor: 1, error: inconsistencia({ tipo: 'personal', factor: 1, escala }, grupos) };
     for (let f = 0.4; f <= 2.5001; f += 0.01) {
-      const error = inconsistencia({ tipo: 'personal', factor: f }, grupos);
+      const error = inconsistencia({ tipo: 'personal', factor: f, escala }, grupos);
       if (error < mejor.error - 1e-9) mejor = { factor: f, error };
     }
     const confianza = grupos.length / (grupos.length + PRUDENCIA);
     const factor = redondear(1 + (mejor.factor - 1) * confianza, 2);
     resultado = {
-      modelo: { tipo: 'personal', factor }, factor, factorDatos: redondear(mejor.factor, 2),
+      modelo: { tipo: 'personal', factor, escala }, factor, factorDatos: redondear(mejor.factor, 2),
       ventanas: grupos.length, confianza: Math.round(confianza * 100),
     };
   }
@@ -167,10 +177,15 @@ export function calibrar(datos, ejercicio) {
   return resultado;
 }
 
+// 2 si el ejercicio se hace con dos mancuernas (una en cada mano).
+function escalaDe(ejercicio) {
+  return conMancuernas(ejercicio) && !unLado(ejercicio) ? 2 : 1;
+}
+
 // El modelo que usa un ejercicio según la fórmula elegida en su ficha.
 export function modeloDe(datos, ejercicio) {
   const formula = ejercicio?.formula1RM ?? 'personal';
-  if (formula === 'peso') return { tipo: 'peso' };
+  if (formula === 'peso') return { tipo: 'peso', escala: escalaDe(ejercicio) };
   return calibrar(datos, ejercicio).modelo;
 }
 

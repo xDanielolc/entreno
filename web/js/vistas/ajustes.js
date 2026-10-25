@@ -1,7 +1,7 @@
 import { icono } from '../iconos.js';
 import { apuntarPeso } from '../peso.js';
 import { creditosCargados } from '../imagenes.js';
-import { REDONDEO_POR_DEFECTO, formatearNumero } from '../calculos.js';
+import { BILBO_RECAMARA_POR_DEFECTO, BILBO_REPS_MAX_POR_DEFECTO, REDONDEO_MANCUERNAS_POR_DEFECTO, REDONDEO_POR_DEFECTO, formatearNumero } from '../calculos.js';
 import * as estado from '../estado.js';
 import { apartarCopia, copiasAparte, desconectar, eliminarCuenta, juntarCopia, rehacerCopiasLegibles, sincronizar, situacionActual } from '../sincronizacion.js';
 import { apartadoPlegable, modal, selector } from '../ui.js';
@@ -172,6 +172,8 @@ export function vistaAjustes(contenedor) {
         + '(quedarse a una del fallo rinde casi igual y cansa menos). Aparece ya puesto y se apunta aparte: «45 kg × 12 + 1».'),
       numeroAjuste('Los pesos que propone la app van de (kg)', d.perfil.redondeoKg ?? REDONDEO_POR_DEFECTO,
         (x, v) => { x.perfil.redondeoKg = v > 0 ? v : REDONDEO_POR_DEFECTO; }),
+      numeroAjuste('Las mancuernas van de (kg)', d.perfil.redondeoMancuernasKg ?? REDONDEO_MANCUERNAS_POR_DEFECTO,
+        (x, v) => { x.perfil.redondeoMancuernasKg = v > 0 ? v : REDONDEO_MANCUERNAS_POR_DEFECTO; }),
       h('small', { class: 'nota' }, `Viene puesto ${formatearNumero(REDONDEO_POR_DEFECTO)}: el disco más pequeño habitual (1,25 kg) por los dos lados. `
         + 'Pon 0,25 si tienes microdiscos, 5 si en tu gimnasio no hay menos. Cada ejercicio puede llevar el suyo en «Ajustes finos» '
         + 'de su ficha (mancuernas de 2 en 2, por ejemplo).'),
@@ -238,7 +240,13 @@ export function vistaAjustes(contenedor) {
         + 'sube un poco. Empezar bajo deja margen para superarte muchos días seguidos con series largas.'),
       numeroAjuste('El ciclo se agota cuando el objetivo baja de (repeticiones)', d.perfil.bilboMinReps ?? 15,
         (x, v) => { x.perfil.bilboMinReps = v; }),
-      h('small', { class: 'nota' }, 'Cuando el peso del día pide menos repeticiones que estas, la app avisa de que toca ciclo nuevo.')),
+      h('small', { class: 'nota' }, 'Cuando el peso del día pide menos repeticiones que estas, la app avisa de que toca ciclo nuevo.'),
+      numeroAjuste('Como mucho, repeticiones en un día', d.perfil.bilboRepsMax ?? BILBO_REPS_MAX_POR_DEFECTO,
+        (x, v) => { x.perfil.bilboRepsMax = v; }),
+      h('small', { class: 'nota' }, 'El peso de un día nunca baja del que te daría estas repeticiones: así no te toca una serie de 30.'),
+      numeroAjuste('Recámara en los ciclos', d.perfil.bilboRecamara ?? BILBO_RECAMARA_POR_DEFECTO,
+        (x, v) => { x.perfil.bilboRecamara = v; }),
+      h('small', { class: 'nota' }, 'Las repeticiones que dejas sin hacer en cada serie de un ciclo. Con 2 cansa menos y el objetivo ya las descuenta.')),
 
     seccionSedes(d, apartado),
 

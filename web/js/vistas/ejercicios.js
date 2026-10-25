@@ -1424,7 +1424,7 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
       bloque('¿Qué mejoras cada sesión?', resumenMejora(),
         ayuda('Qué mejoras cada sesión', [
           'Marca lo que quieres que suba sesión a sesión: el peso, las repeticiones, o las dos cosas a la vez.',
-          'Si solo sube el peso, tu meta es hacer todas las repeticiones que puedas; la app te dice cuántas igualarían el día anterior.',
+          'Si solo sube el peso, tu meta es hacer todas las repeticiones que puedas; la app te dice cuántas superan al día anterior.',
           'Si sube también la repetición, mandas tú: cada sesión pide más peso y más repeticiones.',
           'Si solo suben las repeticiones (peso a 0), el peso se queda y cada sesión pide una más.',
           'Repeticiones por fases: cada fase pide sus repeticiones durante tantas sesiones (15, luego 10, luego 5, como el HST). '

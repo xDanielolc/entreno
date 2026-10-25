@@ -14,7 +14,7 @@
 //     valor) | 'manual', porcentaje }.
 // Además se puede cortar o alargar a mano desde la ficha.
 
-import { aPesoDisponible, esperaPrueba, formatearNumero, generarEscalera, mejorRMDelCiclo, modeloDeEjercicio, rmDePrueba, rmDeReferencia } from './calculos.js';
+import { aPesoDisponible, esperaPrueba, recamaraBilbo, repsMaxBilbo, formatearNumero, generarEscalera, mejorRMDelCiclo, modeloDeEjercicio, rmDePrueba, rmDeReferencia } from './calculos.js';
 import { pesoParaReps } from './formula1rm.js';
 
 // La fecha de hoy en hora local (no UTC): entre las 0:00 y las 2:00 en España
@@ -94,12 +94,12 @@ function valorDeInicio(datos, ejercicio, inicio, rm, prog = null) {
 // Un ciclo no puede empezar tan pesado que el primer día ya no llegues al
 // mínimo de repeticiones (se acabaría nada más empezar). En ejercicios en
 // los que se aguantan pocas repeticiones con el 50 % (cruces en polea, por
-// ejemplo), el inicio baja hasta el peso con el que harías el doble del
-// mínimo (30 si el mínimo es 15).
+// ejemplo), el inicio baja hasta el peso con el que harías las repeticiones
+// máximas de los ciclos (22 por defecto) dejando su recámara (2). Antes era
+// el doble del mínimo (30), y Dan no quiere tantas.
 function conMargen(datos, ejercicio, prog, rm, valor) {
   if (!(valor > 0) || !(rm > 0) || prog?.sobre === 'esfuerzo') return valor;
-  const minimo = prog?.corte?.esfuerzoMin ?? datos.perfil.bilboMinReps ?? 15;
-  const techo = pesoParaReps(modeloDeEjercicio(datos, ejercicio), rm, minimo * 2, 0);
+  const techo = pesoParaReps(modeloDeEjercicio(datos, ejercicio), rm, repsMaxBilbo(datos), recamaraBilbo(datos));
   return techo ? Math.min(valor, techo) : valor;
 }
 

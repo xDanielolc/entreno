@@ -3,12 +3,12 @@
 // serie descendente, las bajadas propuestas.
 
 import {
-  aPesoDisponible, cargaCorporal, esfuerzoTotal, lecturaDesdeCarga, redondear, rmDeReferencia, saltoAjustado, sugerenciaSerie,
+  aPesoDisponible, cargaCorporal, esfuerzoTotal, pasoDe, lecturaDesdeCarga, redondear, rmDeReferencia, saltoAjustado, sugerenciaSerie,
   tramosPropuestos, usaTramos,
   recamaraPorDefectoDe,
 } from './calculos.js';
 import { recamaraDe, tramosDe } from './esquema.js';
-import { modeloDe, repsParaIgualar, rmDeSerie } from './formula1rm.js';
+import { modeloDe, pesoParaReps, repsParaIgualar, rmDeSerie } from './formula1rm.js';
 import { nuevoId } from './ui.js';
 import { aplicarPreset, empezarCicloNuevo, prepararCiclo, renovarSiToca } from './ciclos.js';
 import { progresionPorDefecto, serieNuevaPlantilla } from './esquema.js';
@@ -131,7 +131,7 @@ export function crearSerieDesdePlan(datos, ejercicio, plan, { excluirSesion, rmH
     serie.cargaAuto = true;
     if (s.rmUsado) serie.rmUsado = { valor: s.rmUsado };
   }
-  // Primera vez en un ciclo: el objetivo son las repeticiones que igualan tu 1RM.
+  // Primera vez en un ciclo: el objetivo son las repeticiones que superan tu 1RM.
   if (s.modo === 'bilbo' && s.sinAnterior && serie.objetivo != null) {
     serie.objetivoDe = 'rm';
     serie.rmObjetivo = s.rmObjetivo ?? null;
@@ -143,10 +143,10 @@ export function crearSerieDesdePlan(datos, ejercicio, plan, { excluirSesion, rmH
   }
   if (usaTramos(plan.tecnicas)) {
     // Una serie descendente suele arrancar a un porcentaje del 1RM (80 % por defecto).
-    const inicio = plan.tramoInicio ?? datos.perfil.dropSet?.inicioPorcentaje ?? null;
-    if (serie.carga == null && inicio) {
+    if (serie.carga == null) {
       const rm = rmDeReferencia(datos, ejercicio, { cicloN: serie.cicloN, excluirSesion });
-      if (rm) serie.carga = aPesoDisponible(ejercicio, (rm.valor * inicio) / 100);
+      const inicio = rm ? inicioDeTramos(datos, ejercicio, plan, rm.valor) : null;
+      if (inicio) serie.carga = aPesoDisponible(ejercicio, (rm.valor * inicio) / 100);
     }
     serie.tramos = tramosPropuestos(serie, plan, s.ultima?.serie ?? null, datos.perfil);
     // Cada tramo guarda su porcentaje del 1RM: así, cuando hoy hagas la serie
@@ -303,6 +303,19 @@ export function origenModoCarga(datos, ejercicio, serie, sesion = null) {
   return 'de Ajustes';
 }
 
+// El % del 1RM por el que arranca una serie descendente. El de la serie,
+// si lo tiene; si no, el de Ajustes (80 %), pero sin pasar del peso con el
+// que llegarías al fallo en el máximo de su rango: con «8-12» y el 80 % solo
+// salían 5 (el curl martillo de Dan, 25-10-2026).
+export function inicioDeTramos(datos, ejercicio, plan, rm) {
+  if (plan?.tramoInicio != null) return plan.tramoInicio;
+  const general = datos.perfil.dropSet?.inicioPorcentaje ?? 80;
+  const max = (plan?.progresion?.objetivoEsfuerzo ?? plan?.objetivoEsfuerzo)?.[1];
+  if (!(max > 1) || !(rm > 0)) return general;
+  const peso = pesoParaReps(modeloDe(datos, ejercicio), rm, max, 0);
+  return peso > 0 ? Math.min(general, redondear((peso / rm) * 100, 1)) : general;
+}
+
 // Recalcula los kilos de los tramos en modo 'rm' de las series que aún no
 // has empezado. Da igual en qué orden hayas tocado las casillas: los kilos
 // siempre salen de porcentaje × 1RM. Devuelve las series que ha tocado.
@@ -314,7 +327,7 @@ export function recalcularTramos(datos, ejercicio, entrada, { excluirSesion, ses
     const rm = rmParaTramos(datos, ejercicio, entrada, j, { excluirSesion });
     if (!rm) return;
     const plan = (ejercicio.series || []).find((p) => p.id === serie.planId);
-    const inicio = plan?.tramoInicio ?? datos.perfil.dropSet?.inicioPorcentaje ?? 80;
+    const inicio = inicioDeTramos(datos, ejercicio, plan, rm.valor);
     const salto = saltoDeTramo(datos, ejercicio, serie);
     // Los tramos sin porcentaje bajan desde el primero, de salto en salto.
     const primero = serie.tramos[0]?.pct ?? inicio;
@@ -325,6 +338,13 @@ export function recalcularTramos(datos, ejercicio, entrada, { excluirSesion, ses
         tramo.pct = redondear((kilos / rm.valor) * 100, 1);
       }
       tramo.carga = aPesoDisponible(ejercicio, (rm.valor * tramo.pct) / 100);
+      // Con mancuernas de 2 en 2, dos bajadas seguidas podían redondear al
+      // mismo peso (6 y 6): cada una baja al menos un salto de mancuerna.
+      const antes = serie.tramos[k - 1]?.carga;
+      if (antes != null && tramo.carga >= antes) {
+        const menos = ejercicio.pesosMaquina?.length ? aPesoDisponible(ejercicio, antes, { hacia: 'abajo' }) : aPesoDisponible(ejercicio, antes - pasoDe(ejercicio));
+        if (menos > 0 && menos < antes) tramo.carga = menos;
+      }
     });
     serie.carga = serie.tramos[0]?.carga ?? serie.carga;
     serie.rmUsado = rm;
