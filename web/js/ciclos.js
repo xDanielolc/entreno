@@ -94,12 +94,13 @@ function valorDeInicio(datos, ejercicio, inicio, rm, prog = null) {
 // Un ciclo no puede empezar tan pesado que el primer día ya no llegues al
 // mínimo de repeticiones (se acabaría nada más empezar). En ejercicios en
 // los que se aguantan pocas repeticiones con el 50 % (cruces en polea, por
-// ejemplo), el inicio baja hasta el peso con el que harías las repeticiones
-// máximas de los ciclos (22 por defecto) dejando su recámara (2). Antes era
-// el doble del mínimo (30), y Dan no quiere tantas.
+// ejemplo), el inicio baja hasta el peso con el que harías una menos de las
+// repeticiones máximas de los ciclos (24 de 25) dejando su recámara (2): así
+// el primer día salen 23-25. Antes era el doble del mínimo (30), y Dan no
+// quiere tantas.
 function conMargen(datos, ejercicio, prog, rm, valor) {
   if (!(valor > 0) || !(rm > 0) || prog?.sobre === 'esfuerzo') return valor;
-  const techo = pesoParaReps(modeloDeEjercicio(datos, ejercicio), rm, repsMaxBilbo(datos), recamaraBilbo(datos));
+  const techo = pesoParaReps(modeloDeEjercicio(datos, ejercicio), rm, Math.max(1, repsMaxBilbo(datos) - 1), recamaraBilbo(datos));
   return techo ? Math.min(valor, techo) : valor;
 }
 

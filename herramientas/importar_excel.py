@@ -303,6 +303,11 @@ def construir(informe):
             continue
         ctx = sede_y_contexto(origen, ruta)
         nombre, nota_nombre = nombre_de_archivo(ruta)
+        # Los pájaros de los Excel eran con el codo doblado; en la app, desde
+        # el 25-10-2026, son con el brazo estirado: van aparte, sin mezclar
+        # historial ni 1RM (Dan, borrador 14).
+        if "pajaro" in normalizar(nombre) and not re.search(r"maquina|polea|contractora|cable", normalizar(nombre)):
+            nombre = "Pájaro con codo doblado"
         ej_id = "ej_" + slug(nombre) + ("_" + ctx["sede"].removeprefix("sede_") if ctx["sede"] else "")
 
         ej = ejercicios.setdefault(ej_id, {

@@ -25,7 +25,7 @@ import {
   avisoPrimeraBajada, crearSerieDesdePlan, entradaDeEjercicio, modoCargaDe, origenModoCarga, recalcularTramos, saltoDeTramo,
   serieSuelta,
 } from '../series.js';
-import { anadir, aviso, confirmar, deslizarParaConfirmar, fechaLarga, h, formatearTiempo, horario, leerNumero, leerTiempo } from '../ui.js';
+import { anadir, aviso, nuevoId, confirmar, deslizarParaConfirmar, fechaLarga, h, formatearTiempo, horario, leerNumero, leerTiempo } from '../ui.js';
 import { DESCANSO_ESTIRAMIENTOS_POR_DEFECTO, arrancarDescanso, arrancarRespiracion, barraDescanso, descansoDeTramo, preguntaAvisos } from './descanso.js';
 import { cuentaParaFatiga, tipoDeEjercicio } from '../catalogo.js';
 import { ASISTENCIAS, ESCALA_MANO, PROGRAMAS, TECNICAS_ESTIRAMIENTO, extraDeSerie, medidasDe, unidadMedida } from '../esquema.js';
@@ -726,8 +726,8 @@ export function vistaSesion(contenedor, { id }) {
       return lista;
     }
     if (prog.tipo === 'carga' && esMaxima(plan)) {
-      lista.push(`Serie máxima: ${prog.porRM.valor === 1 ? 'una repetición' : `como mucho ${prog.porRM.valor} repeticiones`} dejando 1-2 en recámara, con el peso que te da tu 1RM${rm ? ` (${n(Math.round(rm.valor))} kg${deDonde})` : ''}.`);
-      lista.push('Aunque te sobren, no hagas más: apunta la recámara que te quedó y la próxima vez el peso sube solo. Si te sobran 3 o más, puedes dejar la barra, subir un 5-10 % y hacer otra sola (como aproximación).');
+      lista.push(`Serie máxima: 1-2 repeticiones que acaben a 1-2 del fallo, con el peso que te da tu 1RM${rm ? ` (${n(Math.round(rm.valor))} kg${deDonde})` : ''}.`);
+      lista.push('Si apuntas 3 o más en recámara, la app te propone dejar la barra, subir un 5-10 % y hacer otra sola, hasta que la sola quede a 1-2 del fallo. Las solas de más cuentan como aproximaciones: la máxima que vale es la última.');
       return lista;
     }
     if (prog.tipo === 'carga' && prog.porRM) {
@@ -815,8 +815,8 @@ export function vistaSesion(contenedor, { id }) {
     // Serie máxima sin un 1RM de series cortas: sube por las aproximaciones.
     if (s.subirAproximaciones && !serie.hecha && !rmAntes?.corta) {
       return tarjetaPrueba('Aún no tienes un 1RM de series de 12 o menos, y la máxima no puede salir de series largas. '
-        + 'Sube por las aproximaciones: añade solas de más (con «+ Serie suelta» como calentamiento), cada una un 5-10 % más pesada, '
-        + 'hasta un peso con el que salgan 1-2 dejando 1-2 en recámara. Esa es tu máxima: apúntala aquí y de ella salen los pesos de las bajadas.', { quitar: false });
+        + 'Sube por las aproximaciones y haz aquí una sola con un peso que creas de 1-2 dejando 1-2 en recámara. Si te sobran 3 o más, '
+        + 'la app te propondrá subir y hacer otra sola. La última es tu máxima, y de ella salen los pesos de las bajadas.', { quitar: false });
     }
     if (s.esperaMaxima && !serie.hecha && !rmAntes?.corta) {
       return h('p', { class: 'sugerencia' }, `Espera a la serie máxima: con ella se pone el peso de esta serie (${s.rango?.[0]}-${s.rango?.[1]} repeticiones).`);
@@ -1044,6 +1044,7 @@ export function vistaSesion(contenedor, { id }) {
     const toca = enCurso && entrada && !serie.hecha && (unaSerie || entrada.series.findIndex((x) => !x.hecha) === j);
     return h('div', { class: `serie ${serie.hecha ? 'hecha' : ''}`, 'data-serie': j },
       toca && olvidoRecamara(ej, entrada, i, j),
+      enCurso && entrada && otraSola(ej, entrada, i, j, serie),
       toca && propuestaPorRMDeHoy(ej, entrada, i, j, serie),
       lineaSugerencia(ej, serie, entrada, j, i),
       cabeceraSerie(ej, i, j, serie, entrada),
@@ -1174,6 +1175,34 @@ export function vistaSesion(contenedor, { id }) {
     const pa = (e.series || []).find((p) => p.id === a.planId); const pb = (e.series || []).find((p) => p.id === b.planId);
     const firma = (p) => p && JSON.stringify([p.tipo, p.progresion?.tipo, p.progresion?.objetivoEsfuerzo ?? p.objetivoEsfuerzo, p.progresion?.porRM ?? null, p.tecnicas ?? []]);
     return Boolean(pa && pb) && firma(pa) === firma(pb);
+  }
+
+  // Serie máxima con 3 o más en recámara: la app propone dejar la barra,
+  // subir un 5-10 % y hacer otra sola (borrador 14, corrección del 26-10). La
+  // de ahora pasa a aproximación y la nueva es la máxima que vale.
+  function otraSola(ej, entrada, i, j, serie) {
+    const plan = planDe(ej, serie);
+    if (!serie.hecha || serie.solaVista || serie.tipo === 'calentamiento' || !esMaxima(plan)
+      || !(serie.recamara >= 3) || !(serie.carga > 0)) return null;
+    // Solo la última máxima del ejercicio.
+    if (entrada.series.some((x, k) => k > j && x.tipo !== 'calentamiento' && x.planId === serie.planId)) return null;
+    const pct = serie.recamara >= 4 ? 10 : 5;
+    const nuevo = Math.max(aPesoDisponible(ej, serie.carga * (1 + pct / 100)), aPesoDisponible(ej, serie.carga, { hacia: 'arriba' }));
+    const n = formatearNumero;
+    const otra = () => cambiarSesion((s) => {
+      const lista = s.ejercicios[i].series;
+      const actual = lista[j];
+      actual.tipoAntes = actual.tipo;
+      actual.tipo = 'calentamiento';
+      lista.splice(j + 1, 0, { ...structuredClone(actual), id: nuevoId('s'), tipo: actual.tipoAntes, tipoAntes: undefined,
+        carga: nuevo, cargaAMano: true, cargaAuto: undefined, esfuerzo: null, recamara: null, hecha: false, hechaA: null, solaVista: false });
+    });
+    return h('div', { class: 'aviso-serie' },
+      h('p', {}, h('strong', {}, `Te han sobrado ${serie.recamara}. `),
+        `Deja la barra, sube un ${pct} % y haz otra sola: ${n(nuevo)} kg. Esta cuenta como aproximación y la máxima que vale es la última.`),
+      h('div', { class: 'fila-botones' },
+        h('button', { type: 'button', class: 'boton', onclick: otra }, `Otra sola a ${n(nuevo)} kg`),
+        h('button', { type: 'button', class: 'boton secundario', onclick: () => cambiarSesion((s) => { s.ejercicios[i].series[j].solaVista = true; }) }, 'Me quedo con esta')));
   }
 
   // Dos series con la misma regla (las de «3 × 6-8» llevan un plan cada una).
@@ -1848,17 +1877,17 @@ export function vistaSesion(contenedor, { id }) {
     if (seg) arrancarDescanso(seg, { ejercicio: { id: ej.id, nombre: ej.nombre, planes: hermanos, etiqueta: tipo?.etiqueta ?? null } });
   }
 
-  // El descanso que pide cada tipo de serie (borrador 14 de Dan): 3 min tras
-  // la máxima, 2-3 entre series de bajada, 2 en las normales, 60-90 s en los
-  // accesorios y 45-60 s en los racimos.
+  // El descanso que pide cada tipo de serie (borrador 14 de Dan): 2 min en
+  // todo lo pesado (tras la máxima, entre series de bajada, en las normales y
+  // tras la Bilbo), 60-90 s en los accesorios y 45-60 s en los racimos.
   function tipoDescanso(ej, plan) {
     const prog = plan?.progresion ?? {};
     if (!plan || plan.calentamiento) return null;
     if (prog.tipo === 'bilbo') return { seg: 120, etiqueta: 'tras la Bilbo' };
     const max = (prog.objetivoEsfuerzo ?? plan.objetivoEsfuerzo)?.[1] ?? prog.porRM?.valor;
     if (max == null) return null;
-    if (esMaxima(plan)) return { seg: 180, etiqueta: 'tras la serie máxima' };
-    if (esBajada(plan) || (max <= 6 && (prog.recamaraMin ?? 0) >= 2)) return { seg: 150, etiqueta: 'entre series de bajada' };
+    if (esMaxima(plan)) return { seg: 120, etiqueta: 'tras la serie máxima' };
+    if (esBajada(plan) || (max <= 6 && (prog.recamaraMin ?? 0) >= 2)) return { seg: 120, etiqueta: 'entre series de bajada' };
     if (max <= 2 && !prog.porRM) return { seg: 50, etiqueta: 'entre racimos' };
     if (max <= 10) return { seg: 120, etiqueta: 'entre estas series' };
     return { seg: 75, etiqueta: 'entre estas series' };
@@ -2084,7 +2113,7 @@ function horaEnFecha(iso, fecha, minutosMas = 0) {
 
 // Entre aproximaciones, solo lo que se tarda en cambiar discos (sin
 // temporizador); antes de la primera serie de trabajo, 2-3 min.
-const DESCANSO_ANTES_DE_PESADA = 150;
+const DESCANSO_ANTES_DE_PESADA = 120;
 
 function planDe(ej, serie) {
   return (ej.series || []).find((p) => p.id === serie.planId) ?? null;

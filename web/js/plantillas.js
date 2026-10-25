@@ -41,7 +41,7 @@ export const PLANTILLAS = [
     id: 'fuerza-sin-maquinas',
     // Sube este número cada vez que cambie la rutina: las rutinas hechas con
     // una versión anterior ofrecen actualizarse.
-    version: 7,
+    version: 8,
     nombre: 'Fuerza sin máquinas: cuatro días',
     autor: 'Dan (su rutina de 10-2026)',
     resumen: 'Dos días de torso y dos de pierna, solo con barra, mancuernas y tu peso. Cada básico tiene un día pesado '
@@ -62,49 +62,50 @@ export const PLANTILLAS = [
       + 'Calentamiento, en este orden: general (10 min de cardio suave los días de pierna, que son el cardio de la semana; 5 min '
       + 'de bici o andar los de torso), 3 min de movilidad de pie y las aproximaciones de cada básico justo antes de él: como mucho '
       + '3, seguidas, muy lejos del fallo, sin contar como volumen. Nunca estires un músculo 60 s o más seguidos antes de un básico '
-      + 'pesado. Los básicos pesados: serie máxima de 1-2 con 1-2 en recámara (nunca más de 2 repeticiones: la que mide tu 1RM) y '
+      + 'pesado. Los básicos pesados: serie máxima de 1-2 repeticiones a 1-2 del fallo (la que mide tu 1RM; si te sobran 3 o más, la app te propone subir y hacer otra sola) y '
       + 'series de bajada de 3-5 al 80 % con 2 en recámara; sus kilos salen de tu 1RM estimado de series de 12 o menos, y la recámara '
-      + 'lo corrige de una sesión a la siguiente (a mitad del ejercicio el peso no sube). La Bilbo, de 25 a 22 repeticiones con 2 en '
-      + 'recámara, superando la anterior. El día moderado, el rumano y los accesorios, en doble progresión. Descansos: 3 min tras la '
-      + 'máxima, 2-3 min entre series de bajada, 2 min en las normales, 60-90 s en los accesorios y 45-60 s en los racimos. Con '
+      + 'lo corrige de una sesión a la siguiente (a mitad del ejercicio el peso no sube). La Bilbo, de 23-25 a 15 repeticiones con 2 en '
+      + 'recámara, superando la anterior. El día moderado, el rumano y los accesorios, en doble progresión. Descansos: 2 min en todo lo '
+      + 'pesado (antes y después de la máxima, entre series de bajada y en las normales de la Bilbo), las aproximaciones seguidas, '
+      + '60-90 s en los accesorios y 45-60 s en los racimos. Con '
       + 'mancuernas, los kilos son por mancuerna y las repeticiones, por brazo. El curl femoral sentado, en su ficha, «de un solo sitio».',
     ...deTexto(`Día 1: Torso, banca pesada · 60-70 min
 Cardio: calentamiento 5 min (bici o andar rápido, a ritmo de poder hablar)
 Movilidad dinámica de torso: calentamiento 3 min (de pie y sin pausas: círculos de brazos, 10 en cada sentido; palo, barra vacía o toalla por encima de la cabeza de delante a atrás, 10; giros de tronco con el palo en los hombros, 10 por lado. Nunca estires 60 s o más seguidos un músculo antes de un básico pesado: si lo pide, menos de 60 s y después las aproximaciones)
-Press de banca: calentamiento 1 × 5 al 30 % + calentamiento 1 × 3 al 60 % + calentamiento 1 × 1 al 80 % + máxima 1-2 según tu 1RM + 3 × 3-5 al 80 % con 2 en recámara (aproximaciones seguidas, solo lo que tardes en cambiar discos; 2-3 min antes de la máxima; máxima a un 90 %: 1-2 repeticiones con 1-2 en recámara, nunca más de 2; si te sobran 3 o más, sube un 5-10 % y haz otra sola; 3 min; bajada al 80 % con 2 en recámara, 2-3 min; que bajen las repeticiones por la fatiga es normal)
-Remo con barra: Bilbo + 2 × 8-10 con 2 en recámara (la Bilbo hace de aproximación: de 25 a 22 repeticiones con 2 en recámara, superando la anterior; normales con 2-3 en recámara, 2 min)
+Press de banca: calentamiento 1 × 5 al 30 % + calentamiento 1 × 3 al 60 % + calentamiento 1 × 1 al 80 % + máxima 1-2 según tu 1RM + 3 × 3-5 al 80 % con 2 en recámara (aproximaciones seguidas, solo lo que tardes en cambiar discos; 2 min antes de la máxima; máxima a un 90 %: 1-2 repeticiones que acaben a 1-2 del fallo; si te sobran 3 o más, deja la barra, sube un 5-10 % y haz otra sola, que cuenta como aproximación: vale la última; 2 min; bajada al 80 % con 2 en recámara, 2 min; que bajen las repeticiones por la fatiga es normal)
+Remo con barra: Bilbo + 2 × 8-10 con 2 en recámara (la Bilbo hace de aproximación: de 23-25 a 15 repeticiones con 2 en recámara, superando la anterior; normales con 2-3 en recámara, 2 min)
 Press militar: Bilbo + 2 × 8-10 con 2 en recámara (igual que el remo)
 Dominadas negativas: 3 × 3-5 (bajada de 3-5 s; sube con salto o desde un banco; 2 min)
 Curl martillo: 2 × 8-12 con 1 en recámara, serie descendente en la última (alterno, con mancuernas: kilos por mancuerna y repeticiones por brazo; la descendente, hasta 0-1 en recámara; 90 s)
 Extensión de tríceps sobre la cabeza: 2 × 8-12 con 1 en recámara, serie descendente en la última (con mancuerna; la descendente, hasta 0-1 en recámara; 90 s)
 Elevaciones laterales: 2 × 12-15 con 1 en recámara (60-90 s)
-Pájaro a una mano con el brazo estirado: 2 × 12-15 con 1 en recámara (por brazo; 60 s)
+Pájaro a una mano: 2 × 12-15 con 1 en recámara (con el brazo estirado; por brazo; 60 s)
 
 Día 2: Pierna, sentadilla pesada · 70-75 min
 Cardio: calentamiento 10 min (suave: bici, cinta o andar rápido, a ritmo de poder hablar; es el calentamiento general y el cardio de la semana a la vez)
 Movilidad dinámica de pierna: calentamiento 3 min (de pie y sin pausas: balanceos de pierna adelante y atrás, 10 por pierna; laterales, 10 por pierna; sentadilla profunda sin peso con 2 s abajo, 8; bisagra de cadera sin peso, 8. Nunca estires 60 s o más seguidos un músculo antes de un básico pesado)
-Sentadilla: calentamiento 1 × 5 al 30 % + calentamiento 1 × 3 al 60 % + calentamiento 1 × 1 al 80 % + máxima 1-2 según tu 1RM + 3 × 3-5 al 80 % con 2 en recámara (aproximaciones seguidas, solo lo que tardes en cambiar discos; 2-3 min antes de la máxima; máxima a un 90 %: 1-2 repeticiones con 1-2 en recámara, nunca más de 2; si te sobran 3 o más, sube un 5-10 % y haz otra sola; 3 min; bajada al 80 % con 2 en recámara, 2-3 min; que bajen las repeticiones por la fatiga es normal)
+Sentadilla: calentamiento 1 × 5 al 30 % + calentamiento 1 × 3 al 60 % + calentamiento 1 × 1 al 80 % + máxima 1-2 según tu 1RM + 3 × 3-5 al 80 % con 2 en recámara (aproximaciones seguidas, solo lo que tardes en cambiar discos; 2 min antes de la máxima; máxima a un 90 %: 1-2 repeticiones que acaben a 1-2 del fallo; si te sobran 3 o más, deja la barra, sube un 5-10 % y haz otra sola, que cuenta como aproximación: vale la última; 2 min; bajada al 80 % con 2 en recámara, 2 min; que bajen las repeticiones por la fatiga es normal)
 Gemelo de pie con barra: 3 × 10-15 con 1 en recámara (justo después de la sentadilla, con la barra en la espalda; 90 s)
-Peso muerto rumano: calentamiento 1 × 5 al 50 % + 3 × 6-8 con 2 en recámara (desde arriba, rodillas algo flexionadas; 2-3 en recámara; 2-3 min)
+Peso muerto rumano: calentamiento 1 × 5 al 50 % + 3 × 6-8 con 2 en recámara (desde arriba, rodillas algo flexionadas; 2-3 en recámara; 2 min)
 Curl femoral sentado: 2 × 8-12 con 1 en recámara (90 s; en su ficha, «de un solo sitio»)
 Rueda abdominal: 2 × 8-12 (60-90 s)
 
 Día 3: Torso, remo pesado · 65-75 min
 Cardio: calentamiento 5 min (bici o andar rápido, a ritmo de poder hablar)
 Movilidad dinámica de torso: calentamiento 3 min (de pie y sin pausas: círculos de brazos, 10 en cada sentido; palo, barra vacía o toalla por encima de la cabeza de delante a atrás, 10; giros de tronco con el palo en los hombros, 10 por lado. Nunca estires 60 s o más seguidos un músculo antes de un básico pesado: si lo pide, menos de 60 s y después las aproximaciones)
-Remo con barra: calentamiento 1 × 5 al 30 % + calentamiento 1 × 3 al 60 % + calentamiento 1 × 1 al 80 % + máxima 1-2 según tu 1RM + 3 × 3-5 al 80 % con 2 en recámara (aproximaciones seguidas, solo lo que tardes en cambiar discos; 2-3 min antes de la máxima; máxima a un 90 %: 1-2 repeticiones con 1-2 en recámara, nunca más de 2; si te sobran 3 o más, sube un 5-10 % y haz otra sola; 3 min; bajada al 80 % con 2 en recámara, 2-3 min; que bajen las repeticiones por la fatiga es normal)
-Press de banca: Bilbo + 2 × 6-8 con 2 en recámara (va antes que el militar para no llegar con el hombro cargado; la Bilbo hace de aproximación: de 25 a 22 repeticiones con 2 en recámara, superando la anterior; normales con 2-3 en recámara, 2 min)
-Press militar: calentamiento 1 × 1 al 70 % + máxima 1-2 según tu 1RM + 2 × 3-5 al 80 % con 2 en recámara (ya llegas caliente de la banca: una sola aproximación; 2-3 min antes de la máxima; máxima a un 90 %, 1-2 con 1-2 en recámara, nunca más de 2; 3 min; bajada con 2 en recámara, 2-3 min)
+Remo con barra: calentamiento 1 × 5 al 30 % + calentamiento 1 × 3 al 60 % + calentamiento 1 × 1 al 80 % + máxima 1-2 según tu 1RM + 3 × 3-5 al 80 % con 2 en recámara (aproximaciones seguidas, solo lo que tardes en cambiar discos; 2 min antes de la máxima; máxima a un 90 %: 1-2 repeticiones que acaben a 1-2 del fallo; si te sobran 3 o más, deja la barra, sube un 5-10 % y haz otra sola, que cuenta como aproximación: vale la última; 2 min; bajada al 80 % con 2 en recámara, 2 min; que bajen las repeticiones por la fatiga es normal)
+Press de banca: Bilbo + 2 × 6-8 con 2 en recámara (va antes que el militar para no llegar con el hombro cargado; la Bilbo hace de aproximación: de 23-25 a 15 repeticiones con 2 en recámara, superando la anterior; normales con 2-3 en recámara, 2 min)
+Press militar: calentamiento 1 × 1 al 70 % + máxima 1-2 según tu 1RM + 2 × 3-5 al 80 % con 2 en recámara (ya llegas caliente de la banca: una sola aproximación; 2 min antes de la máxima; máxima a un 90 %, 1-2 con 1-2 en recámara, y si sobran, otra sola con más peso; 2 min; bajada con 2 en recámara, 2 min)
 Dominadas: 4 × 1-2 (en racimo: 45-60 s entre series, sin llegar al fallo; cuando salgan 3 seguidas, 3 × 3)
 Curl martillo: 2 × 8-12 con 1 en recámara, serie descendente en la última (alterno, con mancuernas: kilos por mancuerna y repeticiones por brazo; la descendente, hasta 0-1 en recámara; 90 s)
 Fondos en paralelas negativos: 2 × 3-5 (bajada de 3-5 s; subes con los pies en un banco o de un salto; cuando hagas 5 con 5 s de bajada, prueba fondos normales; 2 min)
-Pájaro a una mano con el brazo estirado: 2 × 12-15 con 1 en recámara (por brazo; con el brazo estirado pide menos peso; 60 s)
+Pájaro a una mano: 2 × 12-15 con 1 en recámara (con el brazo estirado desde el 25-10: pide menos peso; por brazo; 60 s)
 
 Día 4: Pierna, peso muerto pesado · 75 min
 Cardio: calentamiento 10 min (como el día 2)
 Movilidad dinámica de pierna: calentamiento 3 min (de pie y sin pausas: balanceos de pierna adelante y atrás, 10 por pierna; laterales, 10 por pierna; sentadilla profunda sin peso con 2 s abajo, 8; bisagra de cadera sin peso, 8; sentadilla sumo sin peso con 2 s abajo, 8. Nunca estires 60 s o más seguidos un músculo antes de un básico pesado)
-Peso muerto sumo: calentamiento 1 × 5 al 30 % + calentamiento 1 × 3 al 60 % + calentamiento 1 × 1 al 80 % + máxima 1-2 según tu 1RM + 3 × 2-4 al 80 % con 2 en recámara (la primera aproximación, con los discos grandes más ligeros del gimnasio si el 30 % se queda corto, porque se tira desde el suelo; aproximaciones seguidas, solo lo que tardes en cambiar discos; 2-3 min antes de la máxima; máxima a un 90 %: 1-2 repeticiones con 1-2 en recámara, nunca más de 2; si te sobran 3 o más, sube un 5-10 % y haz otra sola; 3 min; bajada al 80 % con 2 en recámara, 2-3 min; que bajen las repeticiones por la fatiga es normal)
-Sentadilla: calentamiento 1 × 5 al 50 % + 3 × 6-8 con 2 en recámara (al 70-75 %; la aproximación, seguida; 2-3 min)
+Peso muerto sumo: calentamiento 1 × 5 al 30 % + calentamiento 1 × 3 al 60 % + calentamiento 1 × 1 al 80 % + máxima 1-2 según tu 1RM + 3 × 2-4 al 80 % con 2 en recámara (la primera aproximación, con los discos grandes más ligeros del gimnasio si el 30 % se queda corto, porque se tira desde el suelo; aproximaciones seguidas, solo lo que tardes en cambiar discos; 2 min antes de la máxima; máxima a un 90 %: 1-2 repeticiones que acaben a 1-2 del fallo; si te sobran 3 o más, deja la barra, sube un 5-10 % y haz otra sola, que cuenta como aproximación: vale la última; 2 min; bajada al 80 % con 2 en recámara, 2 min; que bajen las repeticiones por la fatiga es normal)
+Sentadilla: calentamiento 1 × 5 al 50 % + 3 × 6-8 con 2 en recámara (al 70-75 %; la aproximación, seguida; 2 min)
 Gemelo de pie con barra: 3 × 10-15 con 1 en recámara (justo después de la sentadilla; 90 s)
 Curl femoral sentado: 3 × 8-12 con 1 en recámara (90 s)
 Elevación de piernas colgado: 2 × 8-12 (piernas estiradas; 60-90 s)`),

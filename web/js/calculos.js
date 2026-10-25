@@ -688,9 +688,10 @@ export function pesoMinimoDe(ejercicio, rm = null) {
 // Las repeticiones en recámara que pide una serie si no lo dice su regla ni
 // el ejercicio: 2 en fuerza (series de 6 o menos, o programas de fuerza) y 1
 // en hipertrofia (o lo que pongas en Ajustes, si es más).
-// Ciclos: repeticiones máximas de un día (el peso nunca baja del que las da)
-// y recámara con la que se hacen. Valores de Dan (borrador 14): 23 y 2.
-export const BILBO_REPS_MAX_POR_DEFECTO = 23;
+// Ciclos: repeticiones máximas de un día (el peso nunca baja del que las da;
+// el ciclo empieza una por debajo) y recámara con la que se hacen. Valores de
+// Dan (borrador 14): de 23-25 repeticiones, nunca 30, con 2 en recámara.
+export const BILBO_REPS_MAX_POR_DEFECTO = 25;
 export const BILBO_RECAMARA_POR_DEFECTO = 2;
 export function repsMaxBilbo(datos) { return datos?.perfil?.bilboRepsMax ?? BILBO_REPS_MAX_POR_DEFECTO; }
 export function recamaraBilbo(datos) { return datos?.perfil?.bilboRecamara ?? BILBO_RECAMARA_POR_DEFECTO; }

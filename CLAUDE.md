@@ -1282,3 +1282,11 @@ fase), tras probar la A.
   nuevas de doble progresión y las descendentes salían del 1RM de una serie de 17. En los datos de Dan, las series del
   25-10 hechas con el 1RM inflado (banca 95 × 1 y 80 × 2, martillo descendente a 15 kg) se desengancharon de su plan
   (`planIdAntes` guarda el de antes) para que no hagan de «la última vez»; siguen contando para el 1RM.
+- 0.61.5 (26-10-2026, su corrección al borrador 14): máxima de 1-2 a 1-2 del fallo; con 3 o más en recámara,
+  `otraSola()` (sesion.js) propone subir un 5 % (10 % con 4 o más) y hacer otra sola: la de antes pasa a calentamiento
+  (`tipoAntes`) y la nueva es la que vale. Descansos: 2 min en todo lo pesado (`DESCANSO_ANTES_DE_PESADA` 120, máxima y
+  bajadas 120). Bilbo: suelo de siempre (15), techo 25 (`BILBO_REPS_MAX_POR_DEFECTO`; el ciclo empieza en el peso de 24
+  con 2 en recámara, `conMargen`). El pájaro de la app es «Pájaro a una mano» (con el brazo estirado desde el 25-10); lo
+  de antes y lo que venga de los Excel va a «Pájaro con codo doblado» (catálogo, créditos e `importar_excel.py`).
+  Prehecha versión 8. Ojo: dentro de la nota de un ejercicio (entre paréntesis) no puede ir otro paréntesis: el
+  lector cierra la nota en el primero y lo demás lo lee como series.
