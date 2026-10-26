@@ -195,17 +195,21 @@ function tarjetaRutina(r) {
     r.activa && h('span', { class: 'etiqueta' }, 'Activa'));
 }
 
+// Una frase para celebrar que empiezas una rutina (Dan: media línea, sin sermones).
+const FRASES_RUTINA_NUEVA = ['¡A por ella!', 'Lo difícil era empezar.', 'Primer paso dado.',
+  'Hoy empieza algo bueno.', 'Constancia antes que intensidad.'];
+
 function tarjetaPlantilla(d, plantilla) {
   const yaEsta = d.rutinas.some((r) => r.plantilla === plantilla.id);
   async function anadir() {
     const nuevos = ejerciciosNuevos(d, plantilla);
-    const si = await confirmar(`¿Añadir «${plantilla.nombre}» a tus rutinas?`
-      + (nuevos.length ? ` Se crearán ${nuevos.length} ejercicios que aún no tienes: ${nuevos.join(', ')}.` : ' Ya tienes todos sus ejercicios.'),
+    const si = await confirmar(`¿Añadir «${plantilla.nombre}»?`
+      + (nuevos.length ? ` Trae ${nuevos.length === 1 ? 'un ejercicio nuevo' : `${nuevos.length} ejercicios nuevos`}.` : ''),
     { si: 'Añadir' });
     if (!si) return;
     let id;
     estado.cambiar((datos) => { id = anadirPlantilla(datos, plantilla); });
-    aviso('Rutina añadida. Revisa los pesos de partida en cada ejercicio.');
+    aviso(`Rutina añadida. ${FRASES_RUTINA_NUEVA[Math.floor(Math.random() * FRASES_RUTINA_NUEVA.length)]}`);
     location.hash = `#/rutina/${id}`;
   }
   return h('article', { class: 'tarjeta plantilla' },
