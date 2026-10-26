@@ -8,7 +8,7 @@
 // (Dan prefirió quitar la etiqueta del final de cada línea).
 
 import {
-  esfuerzoTotal, formatearNumero, records, registrosDelCiclo, seriesDeEjercicio, trabajoSerie, valeParaRM,
+  esfuerzoTotal, formatearNumero, records, registrosDelCiclo, seriesDeEjercicio, trabajoSerie, valeParaReferencia, valeParaRM,
 } from '../calculos.js';
 import { rmDeSerie } from '../formula1rm.js';
 import { recomendacionesGenerales } from '../recomendaciones.js';
@@ -54,7 +54,9 @@ function texto(contenido, props) {
 // Gráfica de líneas
 // ---------------------------------------------------------------------------
 
-export function graficaLineas({ titulo, series, unidad, etiquetaX = 'Día del ciclo' }) {
+// `textoX`: cómo se escribe cada valor del eje X (por defecto, el número; en
+// el historial, la fecha).
+export function graficaLineas({ titulo, series, unidad, etiquetaX = 'Día del ciclo', textoX = (x) => x }) {
   const conDatos = series.filter((s) => s.puntos.length);
   if (!conDatos.length) return null;
 
@@ -73,6 +75,8 @@ export function graficaLineas({ titulo, series, unidad, etiquetaX = 'Día del ci
 
   const marcasY = [y0 + (y1 - y0) * 0.1, (y0 + y1) / 2, y1 - (y1 - y0) * 0.1];
   const marcasX = [...new Set([xMin, Math.round((xMin + xMax) / 2), xMax])];
+  // Con fechas, las de los extremos se arriman hacia dentro para que quepan.
+  const anclaX = (v) => (textoX(v) === v ? 'middle' : v === xMin ? 'start' : v === xMax ? 'end' : 'middle');
 
   const grafico = nodo('svg', {
     viewBox: `0 0 ${ANCHO} ${ALTO}`, class: 'grafica', role: 'img',
@@ -81,7 +85,7 @@ export function graficaLineas({ titulo, series, unidad, etiquetaX = 'Día del ci
   // Rejilla, discreta
   marcasY.map((v) => nodo('line', { x1: MARGEN.izquierda, x2: ANCHO - MARGEN.derecha, y1: py(v), y2: py(v), class: 'rejilla' })),
   marcasY.map((v) => texto(formatearNumero(Math.round(v)), { x: MARGEN.izquierda - 6, y: py(v) + 3, class: 'eje', 'text-anchor': 'end' })),
-  marcasX.map((v) => texto(v, { x: px(v), y: ALTO - 8, class: 'eje', 'text-anchor': 'middle' })),
+  marcasX.map((v) => texto(textoX(v), { x: px(v), y: ALTO - 8, class: 'eje', 'text-anchor': anclaX(v) })),
 
   // Una línea por ciclo, con sus puntos y su etiqueta al final
   conDatos.map((s) => {
@@ -89,7 +93,7 @@ export function graficaLineas({ titulo, series, unidad, etiquetaX = 'Día del ci
     return nodo('g', { class: 'serie-grafica', style: `--color:${s.color}` },
       !s.discontinua && nodo('path', { d, class: 'linea' }),
       !s.discontinua && s.puntos.map((p) => nodo('circle', { cx: px(p.x), cy: py(p.y), r: 4, class: 'punto' },
-        etiquetaEmergente(`${s.nombre} · ${etiquetaX.toLowerCase()} ${p.x}: ${formatearNumero(p.y)} ${unidad}`))),
+        etiquetaEmergente(`${s.nombre} · ${etiquetaX.toLowerCase()} ${textoX(p.x)}: ${formatearNumero(p.y)} ${unidad}`))),
       s.discontinua && nodo('path', { d, class: 'linea discontinua' }));
   }));
 
@@ -99,19 +103,19 @@ export function graficaLineas({ titulo, series, unidad, etiquetaX = 'Día del ci
     h('p', { class: 'nota centrado' }, etiquetaX),
     h('div', { class: 'leyenda' }, conDatos.map((s) => h('span', { class: 'leyenda-item' },
       h('span', { class: 'leyenda-color', style: `background:${s.color}` }), s.nombre))),
-    tablaDeDatos(conDatos.filter((s) => !s.discontinua), unidad, etiquetaX));
+    tablaDeDatos(conDatos.filter((s) => !s.discontinua), unidad, etiquetaX, textoX));
 }
 
 // Los mismos datos en forma de tabla: para leerlos exactos y para quien no
 // pueda ver la gráfica.
-function tablaDeDatos(series, unidad, etiquetaX) {
+function tablaDeDatos(series, unidad, etiquetaX, textoX = (x) => x) {
   const xs = [...new Set(series.flatMap((s) => s.puntos.map((p) => p.x)))].sort((a, b) => a - b);
   return h('details', { class: 'tabla-datos' },
     h('summary', {}, 'Ver los números'),
     h('table', {},
       h('thead', {}, h('tr', {}, h('th', {}, etiquetaX), series.map((s) => h('th', {}, s.nombre)))),
       h('tbody', {}, xs.map((x) => h('tr', {},
-        h('th', {}, x),
+        h('th', {}, textoX(x)),
         series.map((s) => h('td', {}, formatearNumero(s.puntos.find((p) => p.x === x)?.y) || '—')))))));
 }
 
@@ -144,17 +148,52 @@ function tendencia(puntos) {
   return { porMes: pendiente * 30, en: (dias) => my + pendiente * (dias - mx) };
 }
 
-function graficaHistorial(datos, ejercicio, paleta) {
+// Qué fechas se ven en «Todo el historial» (Dan: «un selector para ver todo
+// desde el inicio, cada ciclo y unas fechas por defecto: 1 mes, 3 meses, 1 año»).
+const RANGOS = [['todo', 'Todo'], ['12', '1 año'], ['3', '3 meses'], ['1', '1 mes'], ['desde', 'Desde…']];
+let rango = 'todo';
+let rangoDesde = null;
+
+function desdeDelRango() {
+  if (rango === 'todo') return null;
+  if (rango === 'desde') return rangoDesde;
+  const d = new Date();
+  d.setMonth(d.getMonth() - Number(rango));
+  return d.toISOString().slice(0, 10);
+}
+
+function selectorRango(repintar) {
+  return h('div', { class: 'rango-fechas' },
+    h('div', { class: 'fila-marcas compacta', role: 'group', 'aria-label': 'Fechas que se ven' }, RANGOS.map(([k, texto]) =>
+      h('button', { type: 'button', class: `boton-marca${rango === k ? ' activo' : ''}`, 'aria-pressed': String(rango === k),
+        onclick: () => { rango = k; repintar(); } }, texto))),
+    rango === 'desde' && h('input', { type: 'date', value: rangoDesde ?? '', max: new Date().toISOString().slice(0, 10), 'aria-label': 'Desde qué día',
+      onchange: (e) => { rangoDesde = e.target.value || null; repintar(); } }));
+}
+
+// El mejor 1RM de cada día, en kg, desde una fecha (o de siempre).
+function mejorPorDia(datos, ejercicio, vale, desde) {
   const porDia = new Map();
-  const vale = (serie) => valeParaRM(serie);
   for (const x of seriesDeEjercicio(datos, ejercicio.id)) {
-    if (!vale(x.serie)) continue;
+    if (!vale(x.serie) || (desde && x.sesion.fecha < desde)) continue;
     const v = rmDeSerie(datos, ejercicio, x.serie, esfuerzoTotal(x.serie));
     if (v != null) porDia.set(x.sesion.fecha, Math.max(porDia.get(x.sesion.fecha) ?? 0, v));
   }
+  return porDia;
+}
+
+function graficaHistorial(datos, ejercicio, paleta, repintar) {
+  const desde = desdeDelRango();
+  // Las series largas (más de 12, o las Bilbo) estiman peor el 1RM: si hay
+  // bastantes días con series cortas, la gráfica y la tendencia salen solo de
+  // ellas (Dan: «los cálculos pasados se basan en altas repeticiones»).
+  const cortas = mejorPorDia(datos, ejercicio, (s) => valeParaReferencia(ejercicio, s), desde);
+  const soloCortas = cortas.size >= 4;
+  const porDia = soloCortas ? cortas : mejorPorDia(datos, ejercicio, valeParaRM, desde);
+  const vale = (serie) => valeParaRM(serie);
   const fechas = [...porDia.keys()].sort();
   // El primer día ya hay gráfica: el 1RM que sale de cada serie de ese día.
-  if (fechas.length === 1) {
+  if (fechas.length === 1 && rango === 'todo') {
     const puntos = seriesDeEjercicio(datos, ejercicio.id).filter((x) => vale(x.serie))
       .map((x) => rmDeSerie(datos, ejercicio, x.serie, esfuerzoTotal(x.serie))).filter((v) => v != null)
       .map((v, k) => ({ x: k + 1, y: Math.round(v * 10) / 10 }));
@@ -164,20 +203,29 @@ function graficaHistorial(datos, ejercicio, paleta) {
       graficaLineas({ titulo: 'Tu 1RM estimado en cada serie', unidad: 'kg', etiquetaX: 'Serie',
         series: [{ nombre: '1RM de la serie', color: paleta[0], puntos }] })];
   }
-  if (fechas.length < 2) return null;
+  if (fechas.length < 2) {
+    return [selectorRango(repintar), h('p', { class: 'suave centrado' }, 'En estas fechas hay menos de dos días con este ejercicio.')];
+  }
+  // El eje X son días de verdad (no «entrenamiento 1, 2, 3…»): así se ve
+  // cuándo entrenaste y la tendencia es por mes de calendario.
   const t0 = new Date(fechas[0]).getTime();
-  const puntos = fechas.map((f, i) => ({ x: i + 1, y: Math.round(porDia.get(f) * 10) / 10, dias: (new Date(f).getTime() - t0) / 86_400_000 }));
+  const diaDe = (f) => Math.round((new Date(f).getTime() - t0) / 86_400_000);
+  const fechaDe = (dias) => fechaCorta(new Date(t0 + dias * 86_400_000).toISOString().slice(0, 10));
+  const puntos = fechas.map((f) => ({ x: diaDe(f), y: Math.round(porDia.get(f) * 10) / 10, dias: diaDe(f) }));
   const t = tendencia(puntos);
   const texto = !t ? 'Con 4 días o más verás si tu 1RM va a mejor.'
     : Math.abs(t.porMes) < 0.5 ? 'Tu 1RM está estable.'
       : t.porMes > 0 ? `Tu 1RM sube unos ${formatearNumero(Math.round(t.porMes * 10) / 10)} kg al mes.`
         : `Tu 1RM baja unos ${formatearNumero(Math.round(-t.porMes * 10) / 10)} kg al mes: revisa descanso y recuperación.`;
   return [
+    selectorRango(repintar),
     h('p', { class: `tendencia ${t && t.porMes >= 0.5 ? 'sube' : t && t.porMes <= -0.5 ? 'baja' : ''}` }, texto),
+    soloCortas && h('p', { class: 'nota centrado' }, 'Con tus series de 12 repeticiones o menos, que estiman mejor el 1RM.'),
     graficaLineas({
       titulo: 'Tu mejor 1RM estimado de cada día',
       unidad: 'kg',
-      etiquetaX: 'Entrenamiento',
+      etiquetaX: 'Fecha',
+      textoX: fechaDe,
       series: [
         { nombre: 'Mejor 1RM del día', color: paleta[0], puntos: puntos.map(({ x, y }) => ({ x, y })) },
         t && { nombre: 'Tendencia', color: paleta[1], discontinua: true,
@@ -186,7 +234,18 @@ function graficaHistorial(datos, ejercicio, paleta) {
     })];
 }
 
+// Se repinta sola al cambiar de vista o de fechas (también dentro de un
+// cartel, donde repintar la pantalla de detrás no serviría).
 export function seccionProgreso(datos, ejercicio) {
+  const primera = construirProgreso(datos, ejercicio, () => {});
+  if (!primera) return null;
+  const caja = h('div', { class: 'progreso-caja' });
+  const repintar = () => caja.replaceChildren(construirProgreso(datos, ejercicio, repintar) ?? '');
+  repintar();
+  return caja;
+}
+
+function construirProgreso(datos, ejercicio, repintar) {
   const planes = (ejercicio.series || []).filter((p) => p.progresion?.tipo === 'bilbo');
   const paleta = colores();
   const r = records(datos, ejercicio.id);
@@ -195,7 +254,7 @@ export function seccionProgreso(datos, ejercicio) {
   const vista = conCiclos ? vistaProgreso : 'historial';
 
   const graficas = [];
-  if (vista === 'historial' && ejercicio.carga?.tipo !== 'ninguna') graficas.push(...(graficaHistorial(datos, ejercicio, paleta) ?? []));
+  if (vista === 'historial' && ejercicio.carga?.tipo !== 'ninguna') graficas.push(...(graficaHistorial(datos, ejercicio, paleta, repintar) ?? []));
   for (const plan of vista === 'ciclos' ? planes : []) {
     const ciclos = (plan.progresion.ciclos || [])
       .map((c) => ({ c, registros: registrosDelCiclo(datos, ejercicio, plan, c.n) }))
@@ -237,7 +296,7 @@ export function seccionProgreso(datos, ejercicio) {
     avisos.map((x) => h('p', { class: 'aviso-texto' }, x.texto)),
     conCiclos && h('div', { class: 'fila-marcas compacta' }, [['historial', 'Todo el historial'], ['ciclos', 'Por ciclos']].map(([k, texto]) =>
       h('button', { type: 'button', class: `boton-marca${vista === k ? ' activo' : ''}`, 'aria-pressed': String(vista === k),
-        onclick: () => { vistaProgreso = k; dispatchEvent(new HashChangeEvent('hashchange')); } }, texto))),
+        onclick: () => { vistaProgreso = k; repintar(); } }, texto))),
     h('div', { class: 'tarjetas-record' },
       r.mejor1RM && h('div', { class: 'tarjeta record' },
         h('span', { class: 'suave' }, 'Récord de 1RM estimado'),
@@ -257,8 +316,9 @@ export function seccionProgreso(datos, ejercicio) {
 // fecha, ciclo, lo que hiciste, el 1RM del día y tus comentarios.
 function tablaEntrenamientos(datos, ejercicio) {
   const dias = new Map();
+  const desde = desdeDelRango();
   for (const x of seriesDeEjercicio(datos, ejercicio.id)) {
-    if (x.serie.tipo === 'calentamiento') continue;
+    if (x.serie.tipo === 'calentamiento' || (desde && x.sesion.fecha < desde)) continue;
     if (!dias.has(x.sesion.id)) dias.set(x.sesion.id, { sesion: x.sesion, entrada: x.entrada, series: [] });
     dias.get(x.sesion.id).series.push(x.serie);
   }
@@ -284,5 +344,5 @@ function tablaEntrenamientos(datos, ejercicio) {
           conCarga && h('td', {}, rm ? formatearNumero(Math.round(rm * 10) / 10) : '—'),
           h('td', { class: 'comentario' }, notas.join(' · ') || ''));
       })))),
-    h('p', { class: 'nota centrado' }, 'Ciclo: número de ciclo · día. Calentamientos fuera.'));
+    h('p', { class: 'nota centrado' }, 'Lo más reciente arriba. Ciclo: número de ciclo · día (lo de tus Excel juntado con este ejercicio va sin ciclo). Calentamientos fuera.'));
 }

@@ -1394,3 +1394,21 @@ mudo. El tema se guarda también en localStorage (`entreno-tema`, `aplicarTema`)
 - 0.65.1: curl nórdico con dibujo propio, por fin, hecho con ChatGPT (cuerpo recto de las rodillas a la cabeza, mismo
   aparato en las dos posturas; la colchoneta de la segunda copiada de la primera, en `CONGELADOS`). Dan deja usar
   ChatGPT siempre que convenga para los dibujos.
+
+## Ronda 0.66.0 (26-10-2026): lo que quedaba de su revisión de la noche
+
+- Bilbo: con reinicio `rm-ciclo`, un ciclo de menos de 3 sesiones ya no decide el peso del siguiente (manda el 1RM de
+  referencia, `inicialSiguiente` en ciclos.js): a Dan un 65 × 7 del primer día le dejó el ciclo nuevo en 40 kg. El
+  primer día de un ciclo dice «Para superar el 1RM de la última vez» (el peso es otro).
+- Progreso (graficas.js): eje X con fechas (antes «entrenamiento 1, 2…», que no cuadraba con la tabla), fechas a la
+  vista (Todo, 1 año, 3 meses, 1 mes, Desde… → `rango`), gráfica y tendencia solo con series de 12 o menos si hay
+  4 días o más (`valeParaReferencia`), y la sección se repinta sola (`construirProgreso`, también en el cartel del
+  entreno).
+- Comentarios de las celdas de sus Excel: `texto_comentario()` en importar_excel.py (clásicos y encadenados) →
+  `serie.nota`; `ponerNotas()` en importar.js los añade también a lo ya cargado (misma sesión, ejercicio y serie
+  por orden). Hay que volver a cargar el JSON en Ajustes → Cuenta.
+- Descanso: la barra se va sola a los 3 s de acabar.
+- Temas: fuera Heavy metal (también su vídeo; `metal` guardado vale como «Como el móvil»), bola de discoteca junto
+  al nombre en el ochentero (`.marca-app::after`), lluvia de letras de Matrix al cambiar de pantalla en el tema
+  Terminal (`lluvia-matrix.js`, nada con «reducir movimiento»). Botones del mapa más cortos («Esta semana», «Menos
+  entrenado»).

@@ -24,6 +24,7 @@ import { vistaPruebaPresentacion } from './vistas/prueba-presentacion.js';
 import { vistaGuiaEstilo } from './vistas/guia-estilo.js';
 import { aplicarTema } from './vistas/cuestionario.js';
 import { mostrarPresentacion, repetirAlVolver } from './presentacion.js';
+import { lluviaAlCambiar } from './lluvia-matrix.js';
 
 // La última pantalla se recuerda: si el móvil cierra la app en mitad de un
 // entrenamiento, al volver se abre donde estabas.
@@ -177,6 +178,8 @@ estado.suscribir((motivo) => {
 });
 
 window.addEventListener('hashchange', renderizar);
+window.addEventListener('hashchange', lluviaAlCambiar);
+lluviaAlCambiar();
 
 async function arrancar() {
   registrarServiceWorker();

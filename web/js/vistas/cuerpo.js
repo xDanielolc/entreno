@@ -125,8 +125,10 @@ function tarjetaSugerencia(d, s) {
 // Qué enseña el mapa. Se recuerda mientras la app esté abierta.
 const MODOS_MAPA = {
   recuperacion: 'Recuperación',
-  semana: 'Qué entrenar esta semana',
-  menos: 'Lo que menos entrenas',
+  // Cortos para que quepan en una o dos líneas con cualquier tema y letra
+  // (Dan veía salirse los botones); el «?» de la esquina lleva el nombre largo.
+  semana: 'Esta semana',
+  menos: 'Menos entrenado',
 };
 let modoMapa = 'recuperacion';
 

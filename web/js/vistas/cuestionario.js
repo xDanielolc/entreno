@@ -29,7 +29,7 @@ export const PREGUNTAS = [
     claro: { etiqueta: 'Tema claro' },
     oscuro: { etiqueta: 'Tema oscuro' },
     sistema: { etiqueta: 'Como el móvil', descripcion: 'Sigue el ajuste del sistema.' },
-    otro: { etiqueta: 'Otro con más carácter', descripcion: 'Años 50, pixel art, arcano, heavy metal, terminal u ochentero: se elige en Ajustes → Personalización.' },
+    otro: { etiqueta: 'Otro con más carácter', descripcion: 'Años 50, pixel art, arcano, terminal u ochentero: se elige en Ajustes → Personalización.' },
   } },
 ];
 
@@ -42,7 +42,6 @@ export const TEMAS = {
   fallout: { etiqueta: 'Años 50', descripcion: 'Un diner americano: rojo cereza, crema, cromo y damero.' },
   pixel: { etiqueta: 'Pixel art', descripcion: 'Cielo, tierra y hierba de videojuego, con bordes de bloque.' },
   arcano: { etiqueta: 'Arcano', descripcion: 'Piedra ocre, pergamino, oro y runas que brillan.', oscuro: true },
-  metal: { etiqueta: 'Heavy metal', descripcion: 'Negro, plata y rojo sangre.', oscuro: true },
   matrix: { etiqueta: 'Terminal', descripcion: 'Verde fósforo sobre negro, con cursor.', oscuro: true },
   ochentero: { etiqueta: 'Gimnasio ochentero', descripcion: 'Neón rosa y cian sobre azul noche.', oscuro: true },
 };

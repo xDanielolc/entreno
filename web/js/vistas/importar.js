@@ -183,6 +183,7 @@ function vistaPrevia(importado) {
   const ya = new Set(datos.sesiones.map((s) => s.importId).filter(Boolean));
   const nuevas = importado.sesiones.filter((s) => !ya.has(s.id));
   const filas = propuesta(importado, datos);
+  const notas = notasPorPoner(structuredClone(datos), importado, filas);
   const fechas = importado.sesiones.map((s) => s.fecha).filter(Boolean).sort();
   const opciones = [['aparte', 'Aparte (archivado)'],
     ...datos.ejercicios.filter((e) => !e.borrado).map((e) => [e.id, e.nombre]).sort((a, b) => a[1].localeCompare(b[1], 'es'))];
@@ -193,17 +194,18 @@ function vistaPrevia(importado) {
   pintar();
   const cerrar = modal('Historial de tus Excel', h('div', { class: 'formulario' },
     h('p', {}, `${importado.sesiones.length} días entrenados, del ${fechaCorta(fechas[0])} al ${fechaCorta(fechas.at(-1))}.`
-      + (nuevas.length < importado.sesiones.length ? ` Ya tenías cargados ${importado.sesiones.length - nuevas.length}; se añaden ${nuevas.length}.` : '')),
+      + (nuevas.length < importado.sesiones.length ? ` Ya tenías cargados ${importado.sesiones.length - nuevas.length}; se añaden ${nuevas.length}.` : '')
+      + (notas ? ` Y ${notas} comentarios de tus celdas que aún no tenías.` : '')),
     h('p', { class: 'nota' }, 'Los básicos de peso libre se juntan con tu ejercicio de ahora; lo demás entra aparte, archivado, con su sitio en el nombre. '
       + 'Lo cargado se ve en el historial y las gráficas, pero no cambia tu 1RM de referencia ni el ajuste de la fórmula. Antes de cargar se guarda una copia de tus datos en Drive.'),
     lista,
     h('div', { class: 'fila-botones' },
       h('button', { class: 'boton secundario', onclick: () => cerrar() }, 'Cancelar'),
-      h('button', { class: 'boton', disabled: !nuevas.length, onclick: async () => {
-        if (!(await confirmar(`¿Cargar ${nuevas.length} días de tus Excel?`, { si: 'Cargar' }))) return;
+      h('button', { class: 'boton', disabled: !nuevas.length && !notas, onclick: async () => {
+        if (!(await confirmar(nuevas.length ? `¿Cargar ${nuevas.length} días de tus Excel?` : `¿Añadir ${notas} comentarios de tus Excel?`, { si: 'Cargar' }))) return;
         cerrar();
         await cargar(importado, filas);
-      } }, nuevas.length ? 'Cargar' : 'Ya está todo cargado'))));
+      } }, nuevas.length || notas ? 'Cargar' : 'Ya está todo cargado'))));
 }
 
 async function cargar(importado, filas) {
@@ -217,7 +219,8 @@ async function cargar(importado, filas) {
   }
   let resultado = null;
   estado.cambiar((x) => { resultado = juntarImportado(x, importado, filas); });
-  aviso(`Cargados ${resultado.sesiones} días y ${resultado.series} series; ${resultado.ejerciciosNuevos} ejercicios nuevos, archivados.`);
+  aviso(`Cargados ${resultado.sesiones} días y ${resultado.series} series; ${resultado.ejerciciosNuevos} ejercicios nuevos, archivados.`
+    + (resultado.notas ? ` ${resultado.notas} comentarios de tus celdas añadidos.` : ''));
 }
 
 // Junta el historial importado con los datos (dentro de estado.cambiar).
@@ -269,5 +272,36 @@ export function juntarImportado(x, importado, filas) {
     sesiones += 1;
     series += ejercicios.reduce((n, e) => n + e.series.length, 0);
   }
-  return { sesiones, series, ejerciciosNuevos };
+  const notas = ponerNotas(x, importado, destino);
+  return { sesiones, series, ejerciciosNuevos, notas };
+}
+
+// Los comentarios de las celdas de los Excel (desde la 0.66.0) en lo que ya
+// estaba cargado: misma sesión, mismo ejercicio y misma serie, por orden. No
+// pisa un comentario que ya tenga la serie.
+function ponerNotas(x, importado, destino) {
+  let puestas = 0;
+  for (const s of importado.sesiones) {
+    const mia = x.sesiones.find((m) => m.importId === s.id);
+    if (!mia) continue;
+    const entradas = s.ejercicios.filter((e) => destino.has(e.ejercicioId));
+    entradas.forEach((e, k) => {
+      const suya = mia.ejercicios[k];
+      if (!suya || suya.ejercicioId !== destino.get(e.ejercicioId)) return;
+      e.series.forEach((z, j) => {
+        if (z.nota && suya.series[j] && !suya.series[j].nota) { suya.series[j].nota = z.nota; puestas += 1; }
+      });
+    });
+  }
+  return puestas;
+}
+
+// Cuántos comentarios añadiría cargar este archivo (sobre una copia).
+function notasPorPoner(copia, importado, filas) {
+  const destino = new Map();
+  for (const f of filas) {
+    const id = f.destino !== 'aparte' ? f.destino : copia.ejercicios.find((e) => e.importId === f.ej.id)?.id;
+    if (id) destino.set(f.ej.id, id);
+  }
+  return ponerNotas(copia, importado, destino);
 }

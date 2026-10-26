@@ -1861,7 +1861,7 @@ body.entreno-a-pantalla .contenido.con-barra-entreno { padding-bottom: calc(var(
 .modal-ampliado.tumbado .cuerpos.ampliado .cuerpo { height: 100%; width: auto; }
 .modal-ampliado.tumbado .modal-cabecera { position: relative; z-index: 1; }
 .arana-boton, .imagen-ampliable { display: block; width: 100%; padding: 0; border: 0; background: none; cursor: zoom-in; font: inherit; color: inherit; }
-.modos-mapa .boton-marca { display: flex; align-items: center; justify-content: center; }
+.modos-mapa .boton-marca { display: flex; align-items: center; justify-content: center; min-width: 0; }
 a, button { -webkit-touch-callout: none; }
 .contador-series { scroll-margin-top: 72px; }
 /* Calentamiento: una franja con un botón por serie de aproximación. */
@@ -2139,22 +2139,6 @@ html, body { overflow-x: clip; }
 :root[data-tema="arcano"] h1, :root[data-tema="arcano"] h2 { color: #d8a650; letter-spacing: .02em; }
 :root[data-tema="arcano"] .boton:not(.secundario) { box-shadow: 0 0 14px -2px rgb(95 240 207 / 55%); }
 
-/* 4. Heavy metal: negro, plata y rojo sangre; títulos contundentes. */
-:root[data-tema="metal"] {
-  color-scheme: dark;
-  --fondo: #090909; --superficie: #151515; --superficie-2: #222222; --borde: #3a3a3a;
-  --texto: #f2f2f2; --texto-suave: #b0b0b0;
-  --acento: #c4161c; --acento-texto: #ffffff; --acento-suave: #2c1212; --acento-fuerte: #ff2a2a;
-  --peligro: #ff7a45; --bien: #72d27f; --mal: #ff7a45; --aviso: #ffd166; --aviso-fondo: #33290f;
-  --cartel-fondo: #222222; --cartel-texto: #f2f2f2; --cartel-borde: #c0c0c0;
-  --radio: 3px; --radio-pequeno: 2px;
-  --sombra: 0 0 0 1px #2e2e2e, 0 6px 16px -8px rgb(0 0 0 / 80%); --sombra-alta: 0 10px 30px -8px rgb(0 0 0 / 85%);
-}
-:root[data-tema="metal"] h1, :root[data-tema="metal"] h2, :root[data-tema="metal"] .marca-app {
-  font-family: Impact, "Arial Black", "Haettenschweiler", sans-serif; font-weight: 400; text-transform: uppercase; letter-spacing: .05em;
-}
-:root[data-tema="metal"] h1 { color: #e6e6e6; text-shadow: 0 2px 0 #7a0c0c; }
-
 /* 5. Terminal con toque Matrix: verde fósforo sobre negro, letra de
    máquina y un cursor que parpadea tras el título. */
 :root[data-tema="matrix"] {
@@ -2173,6 +2157,7 @@ html, body { overflow-x: clip; }
 @keyframes cursor-matrix { 50% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { :root[data-tema="matrix"] h1::after { animation: none; } }
 :root[data-tema="matrix"] body { text-shadow: 0 0 6px rgb(61 255 122 / 25%); }
+.lluvia-matrix { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 1000; pointer-events: none; }
 :root[data-tema="matrix"] h1 { font-family: Georgia, "Times New Roman", serif; letter-spacing: .03em;
   text-shadow: 0 0 10px rgb(61 255 122 / 70%), 0 0 22px rgb(61 255 122 / 35%); }
 
@@ -2190,9 +2175,28 @@ html, body { overflow-x: clip; }
 :root[data-tema="ochentero"] h1 { font-style: italic; text-transform: uppercase; letter-spacing: .03em;
   color: var(--acento); text-shadow: 0 0 10px rgb(255 62 165 / 55%), 2px 2px 0 #34f0cb; }
 :root[data-tema="ochentero"] h2 { color: #34f0cb; }
+/* La bola de discoteca que pidió Dan (26-10), al lado del nombre de la app: espejitos en rejilla
+   y un brillo que cambia de color despacio. Sin movimiento si el móvil lo pide. */
+:root[data-tema="ochentero"] .marca-app::after {
+  content: ""; display: inline-block; width: 22px; height: 22px; margin-left: 10px; border-radius: 50%; vertical-align: middle;
+  background:
+    radial-gradient(circle at 32% 30%, rgb(255 255 255 / 95%) 0 2px, transparent 4px),
+    repeating-linear-gradient(0deg, rgb(17 10 44 / 55%) 0 1px, transparent 1px 4.5px),
+    repeating-linear-gradient(90deg, rgb(17 10 44 / 55%) 0 1px, transparent 1px 4.5px),
+    conic-gradient(from 0deg, #f6f1ff, #34f0cb, #c9c3e6, #ff3ea5, #f6f1ff, #ffd23f, #c9c3e6, #f6f1ff);
+  box-shadow: 0 0 10px rgb(255 62 165 / 55%), 0 0 20px rgb(52 240 203 / 30%);
+  animation: bola-disco 6s linear infinite;
+}
+@keyframes bola-disco { to { filter: hue-rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { :root[data-tema="ochentero"] .marca-app::after { animation: none; } }
 /* Botones y casillas sin forma de píldora en los temas de esquinas duras. */
-:root:is([data-tema="pixel"], [data-tema="matrix"], [data-tema="metal"]) :is(.boton, .boton-marca, .boton-paso, .chip, input, textarea, .modal) {
+:root:is([data-tema="pixel"], [data-tema="matrix"]) :is(.boton, .boton-marca, .boton-paso, .chip, input, textarea, .modal) {
   border-radius: var(--radio-pequeno);
 }
 /* En los temas de letra de máquina, los nombres de la barra de abajo no caben con esa letra: van con la normal. */
 :root:is([data-tema="pixel"], [data-tema="matrix"]) .navegacion a { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; letter-spacing: -.01em; }
+
+/* Fechas que se ven en el progreso de un ejercicio (0.66.0). */
+.rango-fechas { display: grid; justify-items: center; gap: 8px; margin: 6px 0 10px; }
+.rango-fechas .fila-marcas { justify-content: center; }
+.rango-fechas input[type="date"] { max-width: 12em; text-align: center; }

@@ -184,6 +184,21 @@ def numero(valor):
     return None
 
 
+def texto_comentario(celda):
+    """El texto de un comentario de celda, sin el autor ni el aviso de Excel
+    de los comentarios encadenados («[Threaded comment] … Comment: texto»)."""
+    if not celda.comment:
+        return None
+    t = celda.comment.text or ""
+    if "[Threaded comment]" in t:
+        partes = re.split(r"\n(?:Comment|Reply):\n", t)[1:]
+        t = " / ".join(" ".join(p.split()) for p in partes)
+    else:
+        t = re.sub(r"^[^\n:]{1,40}:\n", "", t)      # «Autor:» del comentario clásico
+        t = " ".join(t.split())
+    return t or None
+
+
 def leer_bloques(hoja):
     """Localiza los bloques de ciclo por las columnas «Fecha» de la cabecera."""
     columnas = [(c, tipo_columna(hoja.cell(FILA_CABECERA, c).value))
@@ -222,8 +237,16 @@ def leer_archivo(ruta):
                 continue
             fecha, aprox = a_fecha(hoja.cell(fila, mapa["fecha"]).value)
             lectura = numero(hoja.cell(fila, mapa["lectura"]).value) if "lectura" in mapa else None
+            # Los comentarios de las celdas de ese día (fecha, peso, repeticiones…): Dan los
+            # ponía en cualquiera de ellas.
+            notas = []
+            for col in sorted(set(mapa.values())):
+                t = texto_comentario(hoja.cell(fila, col))
+                if t and t not in notas:
+                    notas.append(t)
             registros.append({"dia": dia, "fecha": fecha, "fechaAproximada": aprox,
-                              "carga": carga, "lectura": lectura, "esfuerzo": esfuerzo})
+                              "carga": carga, "lectura": lectura, "esfuerzo": esfuerzo,
+                              "nota": " · ".join(notas) or None})
         ciclos.append({
             "esfuerzo": "tiempo" if "esfuerzo_segundos" in mapa else "repeticiones",
             "carga": "altura" if "carga_altura" in mapa else "peso",
@@ -353,7 +376,13 @@ def finalizar_ejercicio(ej, informe):
     unicos = []
     for c in ciclos:
         claves = {clave_registro(r) for r in c["registros"]}
-        if claves and any(claves <= {clave_registro(r) for r in u["registros"]} for u in unicos):
+        dueno = next((u for u in unicos if claves and claves <= {clave_registro(r) for r in u["registros"]}), None)
+        if dueno:
+            # Los comentarios de la copia que se descarta pasan a la que se queda.
+            por_clave = {clave_registro(r): r for r in dueno["registros"]}
+            for r in c["registros"]:
+                if r.get("nota") and not por_clave[clave_registro(r)].get("nota"):
+                    por_clave[clave_registro(r)]["nota"] = r["nota"]
             informe["ciclosDuplicados"] += 1
             continue
         unicos.append(c)
@@ -450,6 +479,7 @@ def construir_sesiones(resultado, informe):
                     "lectura": r["lectura"],
                     "esfuerzo": r["esfuerzo"],
                     "hecha": True,
+                    **({"nota": r["nota"]} if r.get("nota") else {}),
                 })
     return sorted(sesiones.values(), key=lambda s: (s["fecha"], s["sedeId"]))
 

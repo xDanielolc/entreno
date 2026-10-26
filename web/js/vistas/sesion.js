@@ -844,7 +844,9 @@ export function vistaSesion(contenedor, { id }) {
         // no hay última vez: el objetivo son las repeticiones que igualan tu 1RM.
         const ult = s.ultimaDelCiclo ?? (s.refAnterior ? { serie: s.refAnterior } : null);
         if (ult) {
-          lineas.push(h('span', { class: 'compara' }, '↑ Para superar la última vez', ` (${textoSerie(ej, ult.serie)})`, ': ',
+          // El primer día de un ciclo el peso es otro: se supera el 1RM de la
+          // última vez, no sus repeticiones (Dan veía a la vez «bajado» y «superado»).
+          lineas.push(h('span', { class: 'compara' }, s.ultimaDelCiclo ? '↑ Para superar la última vez' : '↑ Para superar el 1RM de la última vez', ` (${textoSerie(ej, ult.serie)})`, ': ',
             h('strong', {}, serie.objetivo != null ? `${formatearNumero(serie.objetivo)} ${uEsf}` : '—')));
         } else if (serie.objetivo != null) {
           const rmObj = serie.rmObjetivo ?? s.rmObjetivo;

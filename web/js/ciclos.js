@@ -14,7 +14,7 @@
 //     valor) | 'manual', porcentaje }.
 // Además se puede cortar o alargar a mano desde la ficha.
 
-import { aPesoDisponible, esperaPrueba, recamaraBilbo, repsMaxBilbo, formatearNumero, generarEscalera, mejorRMDelCiclo, modeloDeEjercicio, rmDePrueba, rmDeReferencia } from './calculos.js';
+import { aPesoDisponible, esperaPrueba, recamaraBilbo, repsMaxBilbo, formatearNumero, generarEscalera, mejorRMDelCiclo, modeloDeEjercicio, registrosDelCiclo, rmDePrueba, rmDeReferencia } from './calculos.js';
 import { pesoParaReps } from './formula1rm.js';
 
 // La fecha de hoy en hora local (no UTC): entre las 0:00 y las 2:00 en España
@@ -211,7 +211,10 @@ export function inicialSiguiente(datos, ejercicio, prog, ultimoValor, plan = nul
   if (r.modo === 'rm-ciclo' && plan) {
     // Lo de Bilbo: el ciclo que acaba deja un 1RM nuevo, y el siguiente
     // arranca a un porcentaje de ese, no del de todo el historial.
-    const rm = mejorRMDelCiclo(datos, ejercicio, plan, prog.cicloActual);
+    // Un ciclo de una o dos sesiones no ha demostrado nada: manda el 1RM de
+    // referencia (a Dan, un 65 × 7 del primer día le dejó el siguiente en 40 kg).
+    const sesiones = registrosDelCiclo(datos, ejercicio, plan, prog.cicloActual).length;
+    const rm = sesiones >= 3 ? mejorRMDelCiclo(datos, ejercicio, plan, prog.cicloActual) : null;
     if (rm) return aPesoDisponible(ejercicio, conMargen(datos, ejercicio, prog, rm, rm * ((r.porcentaje ?? 50) / 100)));
   }
   if (r.modo === 'porcentaje' || r.modo === 'rm-ciclo') {

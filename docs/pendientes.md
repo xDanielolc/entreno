@@ -363,3 +363,14 @@ Pasado a `pendientes-design.md`. Se deja aquí lo que ya había, como historia.
   el nombre necesita migración (los entrenamientos guardan el ejercicio) y alias en creditos.json.
 - Plancha: la estática debe decir que es estática; la dinámica y la de arrastre de kettlebell,
   con su propia animación.
+
+## Ronda 0.66 (26-10-2026)
+
+- [ ] **Etiqueta «multiarticular» en el catálogo** (idea de Dan vía la conversación del sueño): contar los
+  ejercicios multiarticulares y no solo los cinco básicos; el resumen del sueño (`esBasico` en diario.js) podría
+  usarla cuando exista.
+- [ ] **1RM de referencia y días malos** (Dan, revisión de la noche): ¿la última máxima manda aunque ese día
+  estuvieras cansado? Él propone la media de las 3 últimas. Pendiente de que elija.
+- [ ] **Elíptica animada** (Dan): pedir a la IA que anime el brazo que falta y alternar las imágenes con la central;
+  antes, comprobar que las palancas cuadran con el brazo que toca. Si no sale, se queda quieta.
+- [ ] Muñeco del cuerpo y dibujos de cada tema (cables en Terminal, como Axiom Verge): con Design, al final.

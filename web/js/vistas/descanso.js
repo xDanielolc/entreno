@@ -157,6 +157,10 @@ function pintar() {
     // Si lo habías cambiado con −30 s / +30 s, al acabar se ofrece quedárselo (Dan: «solo me
     // ofrece cambiar el descanso si lo salto, pero no si lo modifico»).
     if (entreSeries() && totalSeg && Math.abs(alargadoSeg) >= 15) ofrecerCambiado(totalSeg + alargadoSeg);
+    // A los 3 s de acabar, la barra se va sola (Dan: «es molesto tenerle que dar
+    // a Saltar para que me deje de seguir»). La notificación se queda.
+    const fin = finMs;
+    setTimeout(() => { if (finMs === fin && restante() === 0) { finMs = null; respiracion = null; pintar(); } }, 3000);
   } else if (finMs && entreSeries() && segundos % 15 === 0) {
     // Cada 15 s se actualiza la misma notificación con lo que queda.
     notificar(`Descanso: ${formatear(segundos)}`, 'Te aviso cuando acabe.', { silencio: true });

@@ -38,7 +38,7 @@ CHROME = Path(r"C:\Program Files\Google\Chrome\Application\chrome.exe")
 
 # Tema → (data-tema, ¿oscuro?). «claro» y «oscuro» son también los de «Como el móvil».
 TEMAS = {"claro": False, "oscuro": True, "fallout": False, "pixel": False,
-         "arcano": True, "metal": True, "matrix": True, "ochentero": True}
+         "arcano": True, "matrix": True, "ochentero": True}
 ANCHO, ALTO, ESCALA = 360, 780, 2        # píxeles CSS de un móvil y densidad: el vídeo sale de 720 × 1560
 FPS = 30
 DURACION = 3.95                           # luego la app funde la pantalla (0,4 s) sobre el último fotograma

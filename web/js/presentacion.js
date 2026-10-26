@@ -33,7 +33,7 @@ export function variantePresentacion() {
 // En un vídeo el reproductor del móvil pone la imagen a la par con el sonido,
 // también con cascos Bluetooth, que con la animación y el sonido por separado
 // sonaban tarde. Solo la variante «cae», con el móvil en vertical.
-const TEMAS_CON_VIDEO = ['claro', 'oscuro', 'fallout', 'pixel', 'arcano', 'metal', 'matrix', 'ochentero'];
+const TEMAS_CON_VIDEO = ['claro', 'oscuro', 'fallout', 'pixel', 'arcano', 'matrix', 'ochentero'];
 export const CLAVE_TEMA = 'entreno-tema';
 const ESPERA_VIDEO_MS = 800;
 
