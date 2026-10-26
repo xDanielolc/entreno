@@ -256,9 +256,11 @@
    "autor": "Gemini"
   },
   "Dominadas asistidas": {
-   "archivo": "imagenes/munecos/dominadas-asistidas.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/dominadas-asistidas.webp",
+   "estatica": "imagenes/ejercicios/ia/dominadas-asistidas-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Jalón al pecho": {
    "archivo": "imagenes/ejercicios/anim/jalon-al-pecho-ek.webp",
@@ -307,9 +309,11 @@
    "nombreEnFuente": "body-row"
   },
   "Face pull": {
-   "archivo": "imagenes/munecos/face-pull.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/face-pull.webp",
+   "estatica": "imagenes/ejercicios/ia/face-pull-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Remo al mentón": {
    "archivo": "imagenes/ejercicios/ia/remo-al-menton-completo.webp",
@@ -368,14 +372,18 @@
    "fuente": "propia"
   },
   "Sentadilla": {
-   "archivo": "imagenes/munecos/sentadilla.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/sentadilla.webp",
+   "estatica": "imagenes/ejercicios/ia/sentadilla-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Sentadilla frontal": {
-   "archivo": "imagenes/munecos/sentadilla-frontal.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/sentadilla-frontal.webp",
+   "estatica": "imagenes/ejercicios/ia/sentadilla-frontal-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "ChatGPT"
   },
   "Sentadilla búlgara": {
    "archivo": "imagenes/ejercicios/ia/sentadilla-bulgara.webp",
@@ -385,9 +393,11 @@
    "autor": "Gemini"
   },
   "Sentadilla en multipower": {
-   "archivo": "imagenes/munecos/sentadilla-en-multipower.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/sentadilla-en-multipower.webp",
+   "estatica": "imagenes/ejercicios/ia/sentadilla-en-multipower-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Prensa de piernas": {
    "archivo": "imagenes/ejercicios/anim/prensa-de-piernas.webp",
@@ -714,9 +724,11 @@
    "autor": "Gemini"
   },
   "Máquina de glúteo": {
-   "archivo": "imagenes/munecos/maquina-de-gluteo.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/maquina-de-gluteo.webp",
+   "estatica": "imagenes/ejercicios/ia/maquina-de-gluteo-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Abductores en máquina": {
    "archivo": "imagenes/ejercicios/anim/abductores-en-maquina.webp",
@@ -895,9 +907,11 @@
    "autor": "Gemini"
   },
   "Leñador en polea": {
-   "archivo": "imagenes/munecos/lenador-en-polea.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/lenador-en-polea.webp",
+   "estatica": "imagenes/ejercicios/ia/lenador-en-polea-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Giros rusos": {
    "archivo": "imagenes/munecos/giros-rusos.svg",
@@ -948,9 +962,11 @@
    "fuente": "propia"
   },
   "Remo de cardio": {
-   "archivo": "imagenes/munecos/remo-de-cardio.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/remo-de-cardio.webp",
+   "estatica": "imagenes/ejercicios/ia/remo-de-cardio-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Natación": {
    "archivo": "imagenes/ejercicios/ia/natacion-quieta.webp",
@@ -1037,14 +1053,18 @@
    "autor": "Gemini"
   },
   "Estiramiento de pectoral en el marco de la puerta": {
-   "archivo": "imagenes/munecos/estiramiento-de-pectoral-en-el-marco-de-la-puerta.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/estiramiento-de-pectoral-en-el-marco-de-la-puerta-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/estiramiento-de-pectoral-en-el-marco-de-la-puerta-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "ChatGPT"
   },
   "Estiramiento de dorsal": {
-   "archivo": "imagenes/munecos/estiramiento-de-dorsal.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/estiramiento-de-dorsal-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/estiramiento-de-dorsal-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Estiramiento de tríceps": {
    "archivo": "imagenes/ejercicios/ia/estiramiento-de-triceps-quieta.webp",
@@ -1068,9 +1088,11 @@
    "autor": "Gemini"
   },
   "Estiramiento de antebrazo": {
-   "archivo": "imagenes/munecos/estiramiento-de-antebrazo.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/estiramiento-de-antebrazo-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/estiramiento-de-antebrazo-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Estiramiento de lumbares con rodillas al pecho (Apanasana)": {
    "archivo": "imagenes/munecos/estiramiento-de-lumbares-con-rodillas-al-pecho.svg",
@@ -1681,9 +1703,11 @@
    "fuente": "propia"
   },
   "Estiramiento de trapecio superior": {
-   "archivo": "imagenes/munecos/estiramiento-de-trapecio-superior.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/estiramiento-de-trapecio-superior-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/estiramiento-de-trapecio-superior-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Estiramiento del elevador de la escápula": {
    "archivo": "imagenes/ejercicios/ia/estiramiento-del-elevador-de-la-escapula-quieta.webp",
@@ -1921,11 +1945,12 @@
    "animada": true
   },
   "Pull apart en polea": {
-   "archivo": "imagenes/munecos/face-pull.svg",
-   "autor": "dibujo propio de la app",
-   "nombreEnWger": "Dumbbell Bent Over Face Pull",
-   "aliasDe": "Face pull",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/face-pull.webp",
+   "estatica": "imagenes/ejercicios/ia/face-pull-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini",
+   "aliasDe": "Face pull"
   },
   "Remo abierto en polea": {
    "archivo": "imagenes/ejercicios/ia/remo-en-polea.webp",
@@ -2164,12 +2189,12 @@
    "autor": "Gemini"
   },
   "Sentadilla con salto": {
-   "archivo": "imagenes/munecos/sentadilla.svg",
-   "autor": "dibujo propio de la app",
-   "nombreEnWger": "Sentadilla con disco",
-   "aliasDe": "Sentadilla",
-   "estatica": "imagenes/ejercicios/sentadilla.jpeg",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/sentadilla.webp",
+   "estatica": "imagenes/ejercicios/ia/sentadilla-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini",
+   "aliasDe": "Sentadilla"
   },
   "Zancadas con salto": {
    "archivo": "imagenes/ejercicios/ia/zancadas.webp",
@@ -2289,9 +2314,11 @@
    "animada": true
   },
   "Cinta de correr": {
-   "archivo": "imagenes/munecos/cinta-de-correr.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/cinta-de-correr-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/cinta-de-correr-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Bicicleta estática": {
    "archivo": "imagenes/ejercicios/ia/bicicleta-estatica-quieta.webp",
@@ -2308,9 +2335,11 @@
    "autor": "Gemini"
   },
   "Cinta de andar en cuesta": {
-   "archivo": "imagenes/munecos/cinta-de-andar-en-cuesta.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/cinta-de-andar-en-cuesta-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/cinta-de-andar-en-cuesta-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Escalera sin fin": {
    "archivo": "imagenes/ejercicios/ia/escalera-sin-fin.webp",
@@ -2320,9 +2349,11 @@
    "autor": "Gemini"
   },
   "Esquí de fondo (máquina)": {
-   "archivo": "imagenes/munecos/esqui-de-fondo-maquina.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/esqui-de-fondo-maquina.webp",
+   "estatica": "imagenes/ejercicios/ia/esqui-de-fondo-maquina-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Patinaje": {
    "archivo": "imagenes/ejercicios/ia/patinaje-quieta.webp",

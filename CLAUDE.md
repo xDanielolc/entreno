@@ -1342,3 +1342,10 @@ Hecho por la conversación «Reducir horas de sueño sin perjuicio» y publicado
 (medias de 7 días, jet lag social, variación de horas, repeticiones de los básicos frente a la semana anterior) y
 tarjeta en Inicio con la hora de acostarse de la semana (adelanto de 15 min por semana, nunca menos de 7 h de sueño
 real). Campos en Ajustes → Perfil (`camposSueno`). Ver docs/pendientes.md, sección 0d.
+- 0.64.1: quince ejercicios enseñaban el muñeco viejo aunque Dan había elegido el dibujo nuevo en la revisión de «más
+  músculo» (sentadilla y su alias con salto, sentadilla frontal y en multipower, face pull y pull apart, dominadas
+  asistidas, máquina de glúteo, leñador en polea, remo de cardio, esquí, las dos cintas y cuatro estiramientos): en
+  peticiones.json seguían con `usar: antes` de la primera comparativa (0.60.8) y esa elección mandaba. Ahora
+  `usar: ia` y creditos.json apuntado a mano (sin el procesado entero, que deshace los completados). Antes de dar por
+  buena una elección de Dan, mirar su última revisión (prefijos de la colección `comparar`: 1ª, corr-, mej-, c3-, c4-,
+  m5-): «corr-» con «nueva» es el dibujo de persona corregido, no el de IA. Almacén `entreno-imagenes-41`.

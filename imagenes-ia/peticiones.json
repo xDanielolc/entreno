@@ -5,7 +5,7 @@
   "vista": "vista de perfil, barra apoyada en la parte alta de la espalda",
   "inicio": "de pie, piernas estiradas, barra con discos sobre los hombros",
   "final": "abajo, muslos paralelos al suelo, cadera atrás, tronco recto algo inclinado hacia delante, talones apoyados",
-  "usar": "antes"
+  "usar": "ia"
  },
  {
   "slug": "peso-muerto-rumano",
@@ -317,7 +317,7 @@
   "inicio": "colgado con los brazos estirados",
   "final": "barbilla por encima de la barra",
   "ancla": "encajar",
-  "usar": "antes"
+  "usar": "ia"
  },
  {
   "slug": "jalon-al-pecho",
@@ -376,7 +376,7 @@
   "vista": "de pie frente a una polea alta con una cuerda, visto de lado",
   "inicio": "brazos estirados hacia la polea",
   "final": "cuerda llevada hacia la cara, codos altos y abiertos",
-  "usar": "antes"
+  "usar": "ia"
  },
  {
   "slug": "remo-al-menton",
@@ -433,7 +433,7 @@
   "vista": "visto de lado, la barra apoyada delante de los hombros con los codos altos",
   "inicio": "de pie con las piernas estiradas",
   "final": "abajo, muslos paralelos al suelo, tronco muy erguido",
-  "usar": "antes"
+  "usar": "ia"
  },
  {
   "slug": "sentadilla-bulgara",
@@ -451,7 +451,7 @@
   "inicio": "de pie con la barra guiada en la espalda",
   "final": "abajo con los muslos paralelos al suelo",
   "ancla": "encajar",
-  "usar": "antes"
+  "usar": "ia"
  },
  {
   "slug": "prensa-de-piernas",
@@ -572,7 +572,7 @@
   "inicio": "la pierna libre doblada debajo del cuerpo",
   "final": "la pierna libre empujando la plataforma hacia atrás y arriba, casi estirada",
   "ancla": "encajar",
-  "usar": "antes"
+  "usar": "ia"
  },
  {
   "slug": "extension-de-cuadriceps",
@@ -940,7 +940,7 @@
   "vista": "de pie de lado a una polea alta, agarrando el asa con las dos manos, visto de frente",
   "inicio": "brazos estirados arriba hacia la polea, tronco girado hacia ella",
   "final": "brazos estirados bajados en diagonal hasta la cadera contraria, tronco girado",
-  "usar": "antes"
+  "usar": "ia"
  },
  {
   "slug": "lenador-en-polea-hacia-arriba",
@@ -1110,7 +1110,7 @@
   "inicio": "rodillas dobladas cerca del pecho, brazos estirados hacia delante agarrando el asa",
   "final": "piernas estiradas, tronco algo inclinado hacia atrás y el asa junto al abdomen",
   "ancla": "encajar",
-  "usar": "antes",
+  "usar": "ia",
   "grosor": 3
  },
  {
@@ -1141,7 +1141,7 @@
   "inicio": "zancada con la pierna derecha adelantada",
   "final": "zancada con la pierna izquierda adelantada",
   "ancla": "encajar",
-  "usar": "antes"
+  "usar": "ia"
  },
  {
   "slug": "bicicleta-estatica",
@@ -1167,7 +1167,7 @@
   "inicio": "paso con la pierna derecha adelantada",
   "final": "paso con la pierna izquierda adelantada",
   "ancla": "encajar",
-  "usar": "antes"
+  "usar": "ia"
  },
  {
   "slug": "escalera-sin-fin",
@@ -1186,7 +1186,7 @@
   "inicio": "brazos estirados arriba agarrando las asas",
   "final": "tronco doblado y brazos tirados hacia abajo hasta los muslos",
   "ancla": "encajar",
-  "usar": "antes"
+  "usar": "ia"
  },
  {
   "slug": "patinaje",
@@ -1304,14 +1304,14 @@
   "ejercicio": "Estiramiento de pectoral en el marco de la puerta",
   "vista": "de pie en el marco de una puerta, visto de lado",
   "postura": "antebrazo apoyado en el marco con el codo a la altura del hombro, el cuerpo girado y adelantado",
-  "usar": "antes"
+  "usar": "ia"
  },
  {
   "slug": "estiramiento-de-dorsal",
   "ejercicio": "Estiramiento de dorsal",
   "vista": "de rodillas en el suelo, visto de lado",
   "postura": "sentado sobre los talones con los brazos estirados por delante en el suelo, la frente cerca del suelo",
-  "usar": "antes"
+  "usar": "ia"
  },
  {
   "slug": "estiramiento-de-triceps",
@@ -1336,7 +1336,7 @@
   "ejercicio": "Estiramiento de antebrazo",
   "vista": "de pie, visto de lado",
   "postura": "un brazo estirado por delante con la palma hacia fuera y los dedos hacia abajo, la otra mano tirando de los dedos hacia el cuerpo",
-  "usar": "antes"
+  "usar": "ia"
  },
  {
   "slug": "estiramiento-de-antebrazo-flexores",
@@ -1362,7 +1362,7 @@
   "ejercicio": "Estiramiento de trapecio superior",
   "vista": "sentado, visto de frente",
   "postura": "la cabeza inclinada a un lado y un poco hacia delante, la mano de ese lado tirando suave de la cabeza, el otro hombro bajado",
-  "usar": "antes"
+  "usar": "ia"
  },
  {
   "slug": "estiramiento-del-elevador-de-la-escapula",
