@@ -12,7 +12,7 @@ const CACHE = `entreno-${VERSION}`;
 // Las imágenes van en un almacén aparte que NO se borra al actualizar la app:
 // así se ven sin conexión aunque haya salido una versión nueva.
 // Si cambian las imágenes, se sube el número y los móviles bajan las nuevas.
-const CACHE_IMAGENES = 'entreno-imagenes-41';  // el mismo nombre en app.js (guardarImagenesParaSinConexion)
+const CACHE_IMAGENES = 'entreno-imagenes-42';  // el mismo nombre en app.js (guardarImagenesParaSinConexion)
 
 const ARCHIVOS = [
   './',

@@ -1363,3 +1363,5 @@ Hecha desde la conversación de la investigación «Elasticidad» (carpeta «Inv
 en zancada 6 × 45 s (1-3 un lado, 4-6 el otro); apertura lateral 2 × 60 s; pectoral en marco de puerta 6 × 45 s;
 dorsal 2 × 60 s; prueba mensual opcional en la zancada hacia el split frontal (cm ingle-suelo). Fuentes en `porQue`.
 Solo se tocaron plantillas.js, version.js, sw.js y este archivo.
+- 0.64.3: pájaro a una mano con el banco quieto (en la segunda postura, el banco es el de la primera salvo donde cuelga
+  la mancuerna); en `CONGELADOS`. Almacén `entreno-imagenes-42`.
