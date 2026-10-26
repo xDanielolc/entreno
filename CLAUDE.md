@@ -1334,3 +1334,11 @@ fase), tras probar la A.
   «Otro con más carácter». OJO: en ajustes.js se publicó solo este cambio (índice preparado con `git update-index
   --cacheinfo` sobre la versión de HEAD); en el archivo de trabajo siguen los campos del plan de sueño que la sesión
   del sueño dejó sin publicar (y su esquema v25 en esquema.js).
+
+## Ronda 0.64.0 (26-10-2026): el plan de sueño, publicado
+
+Hecho por la conversación «Reducir horas de sueño sin perjuicio» y publicado desde aquí a petición de Dan. Esquema v25
+(`perfil.levantarseObjetivo` «HH:MM» y `perfil.inicioPlanSueno` «YYYY-MM-DD», opcionales). Diario con resumen semanal
+(medias de 7 días, jet lag social, variación de horas, repeticiones de los básicos frente a la semana anterior) y
+tarjeta en Inicio con la hora de acostarse de la semana (adelanto de 15 min por semana, nunca menos de 7 h de sueño
+real). Campos en Ajustes → Perfil (`camposSueno`). Ver docs/pendientes.md, sección 0d.

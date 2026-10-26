@@ -1,18 +1,26 @@
 // Pantalla «Diario» (#/diario): el peso y el sueño de cada día, la sensación
-// al levantarte y, debajo, la semana resumida junto a tus repeticiones en los
-// básicos. La sensación se guarda como dato, pero no decide nada sola.
+// al levantarte y, debajo, el resumen de los últimos 7 días con datos (medias,
+// jet lag social, regularidad y tus repeticiones en los básicos). La sensación
+// se guarda como dato, pero no decide nada sola.
+//
+// De aquí sale también la tarjeta de Inicio con la hora de acostarse de esta
+// semana (`tarjetaHoraAcostarse`).
 import * as estado from '../estado.js';
 import { formatearNumero } from '../calculos.js';
 import { apuntarPeso, quitarPeso } from '../peso.js';
 import {
-  ALCOHOL, NECESIDAD_SUENO_POR_DEFECTO, SENSACIONES, apuntarEnDiario, calcularSueno, entradaDe, lunesDe, resumenSemana,
-  semanaAnterior, textoHoras,
+  ADELANTO_SEMANAL_MIN, ALCOHOL, NECESIDAD_SUENO_POR_DEFECTO, SENSACIONES, SUENO_MINIMO_H, apuntarEnDiario, calcularSueno,
+  entradaDe, horaAcostarse, resumenUltimos7, textoHoras,
 } from '../diario.js';
 import { colores, graficaLineas } from './graficas.js';
 import { anadir, aviso, ayuda, fechaCorta, h, hoyISO, leerNumero } from '../ui.js';
 
 // El día que se edita arriba (por defecto, hoy). Se elige tocando una fila.
 let diaElegido = null;
+
+// `titulo-con-ayuda` es una fila flexible: para centrar el título con su «?»
+// hace falta esto. Va en línea porque `estilo.css` lo lleva otra tanda.
+const CENTRAR = 'justify-content: center';
 
 export function vistaDiario(contenedor) {
   const d = estado.datos();
@@ -149,33 +157,78 @@ function tablaDias(d, elegida) {
       })))));
 }
 
-// Esta semana frente a la anterior.
+// Resumen semanal: los últimos 7 días con datos, un número por línea.
 function resumen(d, hoy) {
-  const lunes = lunesDe(hoy);
-  const a = resumenSemana(d, lunes);
-  const b = resumenSemana(d, semanaAnterior(lunes));
-  if (!a.dias && !b.dias) return null;
+  const r = resumenUltimos7(d, hoy);
+  if (!r.dias) return null;
   const pct = (x) => (x == null ? '—' : `${Math.round(x * 100)} %`);
-  const signo = (x) => (x == null ? '—' : `${x > 0 ? '+' : x < 0 ? '−' : ''}${textoHoras(Math.abs(x))}`);
+  const conSigno = (min) => (min == null ? '—' : `${min > 0 ? '+' : ''}${textoHoras(min)}`);
+  const cambio = r.cambioReps == null ? '' : ` (${r.cambioReps >= 0 ? '+' : '−'}${Math.round(Math.abs(r.cambioReps) * 100)} %)`;
   const filas = [
-    ['Sueño real (media)', textoHoras(a.sueno), textoHoras(b.sueno)],
-    ['Eficiencia', pct(a.eficiencia), pct(b.eficiencia)],
-    ['Pulso nocturno', a.pulso ? `${Math.round(a.pulso)} lpm` : '—', b.pulso ? `${Math.round(b.pulso)} lpm` : '—'],
-    ['Cómo te levantas', a.sensacion ? formatearNumero(Math.round(a.sensacion * 10) / 10) : '—', b.sensacion ? formatearNumero(Math.round(b.sensacion * 10) / 10) : '—'],
-    ['Fin de semana frente a laborables', signo(a.findeExtra), signo(b.findeExtra)],
-    ['Repeticiones en básicos', a.reps ? `${a.reps}${a.cambioReps != null ? ` (${a.cambioReps >= 0 ? '+' : '−'}${Math.round(Math.abs(a.cambioReps) * 100)} %)` : ''}` : '—',
-      b.reps ? `${b.reps}${b.cambioReps != null ? ` (${b.cambioReps >= 0 ? '+' : '−'}${Math.round(Math.abs(b.cambioReps) * 100)} %)` : ''}` : '—'],
+    ['Sueño real (media)', textoHoras(r.real)],
+    ['Tiempo en cama', textoHoras(r.enCama)],
+    ['Eficiencia', pct(r.eficiencia)],
+    ['Pulso nocturno', r.pulso ? `${Math.round(r.pulso)} lpm` : '—'],
+    ['Cómo te levantas', r.sensacion ? `${formatearNumero(Math.round(r.sensacion * 10) / 10)} de 5` : '—'],
+    ['Jet lag social', conSigno(r.jetLagSocial)],
+    ['Se mueve: acostarse', textoHoras(r.variacionAcostarse)],
+    ['Se mueve: levantarse', textoHoras(r.variacionLevantarse)],
+    ['Reps en básicos', r.reps == null ? '—' : `${r.reps}${cambio}`],
   ];
   return h('section', { class: 'tarjeta' },
-    h('div', { class: 'titulo-con-ayuda' }, h('h2', {}, 'Tu semana'),
-      ayuda('Tu semana', [
+    // Los estilos van en línea: `estilo.css` lo lleva otra tanda de cambios.
+    h('div', { class: 'titulo-con-ayuda', style: CENTRAR }, h('h2', {}, 'Resumen semanal'),
+      ayuda('Resumen semanal', [
+        `Los últimos 7 días que tienes apuntados (ahora ${r.dias}${r.dias === 1 ? ' día' : ' días'}).`,
         'Sueño real: tiempo en cama menos lo que tardas en dormirte, lo que estás despierto y lo que remoloneas. Eficiencia normal: 85 % o más (Ohayon 2004).',
-        'Fin de semana frente a laborables: si duermes más de una hora de más el fin de semana, arrastras deuda de sueño (Roenneberg 2012).',
-        'Repeticiones en básicos: las de tus series de trabajo de banca, sentadilla, peso muerto, remo y press militar, y en paréntesis el cambio frente a la semana anterior. Dormir poco se nota antes en el volumen que aguantas que en tu 1RM (Cook 2012; Knowles 2022).',
+        'Jet lag social: el punto medio del sueño del fin de semana (las noches del viernes y del sábado) menos el de los días laborables. El punto medio es la hora a la que te duermes más la mitad del sueño real. Dormir más de 1 h extra el fin de semana indica deuda de sueño acumulada (Roenneberg 2012).',
+        'Se mueve: cuánto bailan la hora de acostarse y la de levantarse en esos 7 días (la más tardía menos la más temprana). Importa más de lo que parece: la regularidad del sueño predice la mortalidad mejor que la duración (Windred 2024, UK Biobank, 60 977 personas con acelerómetro).',
+        'Reps en básicos: las repeticiones de tus series de trabajo de press de banca, sentadilla, peso muerto, remo con barra y press militar, y entre paréntesis el cambio frente a los 7 días anteriores. Dormir poco se nota antes en el volumen que aguantas que en tu 1RM (Cook 2012; Knowles 2022).',
       ])),
     h('table', { class: 'tabla-musculos tabla-semana' },
-      h('thead', {}, h('tr', {}, h('th', {}, ''), h('th', {}, 'Esta semana'), h('th', {}, 'La anterior'))),
-      h('tbody', {}, filas.map(([t, x, y]) => h('tr', {}, h('td', {}, t), h('td', {}, x), h('td', {}, y))))));
+      h('tbody', {}, filas.map(([t, x]) => h('tr', {}, h('td', {}, t), h('td', {}, x))))),
+    h('p', { class: 'nota' }, r.desde === r.hasta
+      ? `Un solo día apuntado: ${fechaCorta(r.desde)}.`
+      : `Del ${fechaCorta(r.desde)} al ${fechaCorta(r.hasta)}.`));
+}
+
+// La tarjeta de Inicio con la hora de acostarse de esta semana y las dos que
+// la acompañan. Si faltan los ajustes o no hay noches suficientes, dice qué
+// falta; nunca da un número inventado.
+export function tarjetaHoraAcostarse(d, hoy = hoyISO()) {
+  const p = horaAcostarse(d, hoy);
+  if (p.falta === 'ajustes') {
+    // Sin los ajustes puestos, la tarjeta solo aparece si ya usas el diario.
+    if (!(d.diario ?? []).length) return null;
+    const que = p.sinHora && p.sinInicio ? 'la hora a la que quieres levantarte y la fecha de inicio del plan'
+      : p.sinHora ? 'la hora a la que quieres levantarte' : 'la fecha de inicio del plan';
+    return h('section', { class: 'tarjeta aviso-tarjeta' },
+      h('div', { class: 'antetitulo' }, 'Hora de acostarse'),
+      h('p', {}, `Para calcularla falta ${que}, en Ajustes → Perfil.`),
+      h('a', { class: 'boton', href: '#/ajustes' }, 'Ir a Ajustes'));
+  }
+  if (p.falta === 'datos') {
+    return h('section', { class: 'tarjeta aviso-tarjeta' },
+      h('div', { class: 'antetitulo' }, 'Hora de acostarse'),
+      h('p', {}, `Hacen falta al menos 3 noches apuntadas para saber a qué hora te acuestas de verdad (llevas ${p.noches}).`),
+      h('a', { class: 'boton', href: '#/diario' }, 'Apuntar la noche'));
+  }
+  return h('section', { class: 'tarjeta', style: 'text-align: center' },
+    h('div', { class: 'antetitulo' }, p.semanas ? `Hora de acostarse · semana ${p.semanas + 1}` : 'Hora de acostarse'),
+    h('h2', { style: 'margin: 2px 0 6px; font-size: 2rem; font-variant-numeric: tabular-nums' }, p.hora),
+    h('p', { class: 'calculo-sueno' },
+      h('span', {}, 'Pantallas fuera ', h('strong', {}, p.pantallas)),
+      h('span', {}, 'Cenar antes de ', h('strong', {}, p.cena)),
+      h('span', {}, 'Arriba a las ', h('strong', {}, p.levantarse))),
+    p.recortada && h('p', { class: 'aviso-texto' },
+      `Más tarde no: con tu hora de levantarte, acostarte a las ${p.hora} ya es el límite para dormir ${SUENO_MINIMO_H} h de verdad.`),
+    h('div', { class: 'titulo-con-ayuda', style: CENTRAR },
+      h('span', { class: 'etiqueta-campo' }, 'De dónde sale'),
+      ayuda('Hora de acostarse', [
+        `Se parte de la hora a la que te acuestas de verdad (${p.base}, la media de tu primera semana apuntada) y se adelanta ${ADELANTO_SEMANAL_MIN} min por semana desde la fecha de inicio del plan, hasta llegar a las ${p.objetivo} (tu hora de levantarte menos lo que necesitas dormir). Redondeado a múltiplos de 5 min.`,
+        'Las tres cosas van juntas porque juntas se probaron: hora fija de acostarse, pantallas fuera 2 h antes y cenar temprano adelantaron unas 2 h la fase de 22 personas en 3 semanas, sin que perdieran sueño (Facer-Childs 2019).',
+        `Nunca se propone una hora que deje menos de ${SUENO_MINIMO_H} h de sueño real, el mínimo del consenso de la American Academy of Sleep Medicine (Watson 2015). Con esta hora te quedan ${textoHoras(p.enCama)} en cama y unas ${textoHoras(p.real)} de sueño real, descontando los ${p.perdidas} min que sueles perder entre dormirte, despertares y remoloneo.`,
+      ])));
 }
 
 // Sueño real de cada noche con la línea de lo que necesitas y, aparte, el pulso.

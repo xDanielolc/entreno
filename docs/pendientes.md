@@ -111,6 +111,43 @@ fuentes). Hacer la fase A primero: permite empezar la línea base del plan.
       tiempo en cama, sueño real y eficiencia, sensación 1-5, alcohol,
       pulso nocturno), resumen semanal con repeticiones de los básicos,
       gráfica, esquema v18 con `diario[]` y `perfil.necesidadSuenoH`.
+- [x] **Fase A bis, pedida por Dan el 26-10-2026** con el diario ya en uso
+      (6 noches: 8,36 h de sueño real, 94,9 % de eficiencia y hora de
+      acostarse entre la 01:10 y las 03:10; duerme bien y a deshora).
+      1. **Resumen semanal en el Diario**: medias de los últimos 7 días de
+         sueño real, tiempo en cama, eficiencia, pulso nocturno y sensación;
+         diferencia entre el punto medio del sueño del fin de semana y el de
+         los laborables (jet lag social, Roenneberg 2012); variación de la
+         hora de acostarse y de levantarse (la mayor menos la menor), porque
+         la regularidad predice la mortalidad mejor que la duración (Windred
+         2024); y repeticiones totales de las series de trabajo de los
+         básicos de la semana frente a la anterior, sacadas de `sesiones`.
+         Una pantalla a 375 px, sin scroll horizontal.
+      2. **Aviso de hora de acostarse**: en Ajustes, hora de levantarse
+         objetivo y fecha de inicio; la app calcula la hora de acostarse de
+         esta semana (objetivo menos `perfil.necesidadSuenoH`, adelantando
+         15-30 min por semana desde la hora actual) y la enseña en Inicio
+         con las dos que la acompañan: cortar pantallas 2 h antes y cenar
+         antes de las 21:00 (paquete de Facer-Childs 2019). Nunca propone
+         una hora que deje menos de 7 h de sueño real (Watson 2015).
+      El encargo original (`docs/encargo-diario-y-test.md`) ya no está en el
+      repositorio; la investigación completa sigue en
+      «IA y automatizaciones\Investigación sueño».
+      **Hecho (esquema v25).** El «Resumen semanal» del Diario calcula sobre
+      los 7 últimos apuntes del diario (`resumenUltimos7` en `diario.js`) y
+      saca, un número por línea: medias de sueño real, tiempo en cama,
+      eficiencia, pulso y sensación; jet lag social en horas y minutos;
+      cuánto se mueven la hora de acostarse y la de levantarse; y las
+      repeticiones de trabajo en los básicos frente a los 7 días anteriores
+      (un guion si no tienes ninguno de los básicos). Los básicos se
+      reconocen por el nombre tolerando variantes, dejando fuera los
+      estiramientos y las posturas de yoga. En Ajustes → Perfil están la hora
+      de levantarse objetivo, la fecha de inicio y la necesidad de sueño; con
+      ellas, la tarjeta de Inicio da la hora de acostarse de esta semana
+      (`horaAcostarse`), con pantallas 2 h antes y cena antes de las 21:00, y
+      el tope de 7 h de sueño real con su aviso de una línea. Si faltan los
+      ajustes o hay menos de 3 noches, la tarjeta dice qué falta en vez de
+      inventar un número. Queda pendiente de que Dan lo vea en el móvil.
 - [ ] Fase B: PVT de 3 min, Karolinska, Epworth, línea base de 14 días,
       semáforo dominical, enlace con «¿Voy hoy?», tema «Sueño y
       rendimiento» en `bibliografia.js` (y corregir la cifra de Craven).

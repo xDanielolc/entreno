@@ -586,3 +586,17 @@ la vez, a veces sin cobertura):
 - **v21 (0.58.0).** Campo opcional `aviso` en cada ejercicio de un día de rutina: una nota que se ve siempre en el entreno (en el texto de una rutina, un paréntesis que empieza por «!»).
 - **v22 (0.60.20).** Los estiramientos que son una postura de yoga llevan el nombre en sánscrito en el título («Estiramiento de isquios (Janu Sirsasana)»); la migración renombra los tuyos que se llamen como el catálogo de antes (y `fotoDe`).
 - **v23 (0.60.25).** «CARs de hombro» y «Dislocaciones con pica» pasan a llamarse «Rotaciones de hombro con palo» (si tienes los dos, el segundo se queda con su nombre).
+- **v24 (0.61.0).** Campos nuevos opcionales, sin nada que convertir:
+  `plan.descansoSegundos` (el descanso guardado para ese tipo de serie),
+  `perfil.bilboRepsMax`, `perfil.bilboRecamara` y
+  `perfil.redondeoMancuernasKg`.
+- **v25 (fase A bis del Diario).** El plan de sueño. Dos campos nuevos
+  opcionales del perfil: `levantarseObjetivo` («HH:MM»: la hora a la que
+  quieres levantarte) e `inicioPlanSueno` («YYYY-MM-DD»: cuándo empieza el
+  plan). Nada que convertir: los archivos antiguos los reciben vacíos y, sin
+  ellos, la tarjeta de Inicio dice qué falta en vez de calcular una hora.
+  Con ellos y con `perfil.necesidadSuenoH`, `horaAcostarse` (en
+  `web/js/diario.js`) calcula la hora de acostarse de esta semana: parte de la
+  media de la primera semana apuntada y la adelanta 15 min por semana sin
+  pasarse de la hora objetivo, con un tope que nunca deja menos de 7 h de
+  sueño real. Nada de esto se guarda: se calcula al pintar.

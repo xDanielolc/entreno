@@ -16,6 +16,7 @@ import { renovarAlTocar } from '../sincronizacion.js';
 import { voyHoy } from './voy-hoy.js';
 import { preguntaAvisos } from './descanso.js';
 import { apuntarPeso } from '../peso.js';
+import { tarjetaHoraAcostarse } from './diario.js';
 
 // Lo que ya enseña el muñeco de Cuerpo (series por músculo) no se repite aquí.
 const YA_SE_VE = new Set(['volumen-bajo', 'volumen-bien']);
@@ -283,6 +284,8 @@ export function vistaInicio(contenedor) {
     avisosDeHoy(d),
     tarjetaRecuperacion(d, { compacta: true,
       extra: h('button', { class: 'boton secundario', onclick: () => voyHoy(d, dia) }, '¿Voy hoy? ¿Cansancio o pereza?') }),
+
+    tarjetaHoraAcostarse(d),
 
     recientes.length > 0 && seccionRecientes(d, recientes));
 }

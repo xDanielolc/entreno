@@ -4,7 +4,8 @@ import { creditosCargados } from '../imagenes.js';
 import { BILBO_RECAMARA_POR_DEFECTO, BILBO_REPS_MAX_POR_DEFECTO, REDONDEO_MANCUERNAS_POR_DEFECTO, REDONDEO_POR_DEFECTO, formatearNumero } from '../calculos.js';
 import * as estado from '../estado.js';
 import { apartarCopia, copiasAparte, desconectar, eliminarCuenta, juntarCopia, rehacerCopiasLegibles, sincronizar, situacionActual } from '../sincronizacion.js';
-import { apartadoPlegable, modal, selector } from '../ui.js';
+import { apartadoPlegable, ayuda, modal, selector } from '../ui.js';
+import { ADELANTO_SEMANAL_MIN, NECESIDAD_SUENO_POR_DEFECTO, SUENO_MINIMO_H } from '../diario.js';
 import { VERSION_APP } from '../version.js';
 import { anadir, aviso, confirmar, h, hoyISO, leerNumero } from '../ui.js';
 import { DESCANSO_ESTIRAMIENTOS_POR_DEFECTO, DESCANSO_TRAMOS_POR_DEFECTO, RESPIRACION_POR_DEFECTO, activarNotificaciones, probarAviso, puedeNotificar } from './descanso.js';
@@ -67,7 +68,8 @@ export function vistaAjustes(contenedor) {
         h('input', { type: 'text', inputmode: 'decimal', value: d.perfil.pesoCorporalKg ?? '',
           onchange: (e) => estado.cambiar((x) => { apuntarPeso(x, leerNumero(e.target.value)); }) }),
         h('small', { class: 'nota' },
-          'Para calcular la carga en flexiones, dominadas y máquinas asistidas. Se apunta con la fecha de hoy; el historial, en Cuerpo.'))),
+          'Para calcular la carga en flexiones, dominadas y máquinas asistidas. Se apunta con la fecha de hoy; el historial, en Cuerpo.')),
+      camposSueno(d)),
 
     apartado('Personalización',
       h('div', { class: 'campo' },
@@ -356,6 +358,45 @@ function seccionSedes(d, apartado) {
     h('button', { class: 'boton secundario', onclick: () => estado.cambiar((x) => {
       x.sedes.push(nuevaSede(sedes.length ? `Sitio ${sedes.length + 1}` : 'Mi gimnasio'));
     }) }, '+ Añadir sitio'));
+}
+
+// El plan de sueño: a qué hora quieres levantarte, cuándo empieza el plan y
+// cuánto necesitas dormir. Con esas tres cosas, Inicio calcula la hora de
+// acostarse de esta semana (`horaAcostarse` en `diario.js`).
+function camposSueno(d) {
+  const necesidad = d.perfil.necesidadSuenoH ?? NECESIDAD_SUENO_POR_DEFECTO;
+  return [
+    // El estilo va en línea (centrar el título con su «?»): `estilo.css` lo
+    // lleva otra tanda de cambios.
+    h('div', { class: 'titulo-con-ayuda', style: 'justify-content: center' },
+      h('span', { class: 'etiqueta-campo' }, 'Plan de sueño'),
+      ayuda('Plan de sueño', [
+        'Con la hora a la que quieres levantarte y la fecha de inicio, Inicio te dice a qué hora acostarte esta semana: '
+        + `parte de la hora a la que te acuestas de verdad y la adelanta ${ADELANTO_SEMANAL_MIN} min cada semana, hasta `
+        + 'llegar a tu hora de levantarte menos lo que necesitas dormir.',
+        'Van con ella las dos horas que la acompañan: pantallas fuera 2 h antes y cenar antes de las 21:00. Juntas '
+        + 'adelantaron unas 2 h la fase de 22 personas en 3 semanas, sin que perdieran sueño (Facer-Childs 2019).',
+        `Nunca se propone una hora que deje menos de ${SUENO_MINIMO_H} h de sueño real (Watson 2015).`,
+      ])),
+    h('label', { class: 'campo' },
+      h('span', { class: 'etiqueta-campo' }, 'Hora de levantarse objetivo'),
+      h('input', { type: 'time', value: d.perfil.levantarseObjetivo ?? '',
+        onchange: (e) => estado.cambiar((x) => { x.perfil.levantarseObjetivo = e.target.value || null; }) })),
+    h('label', { class: 'campo' },
+      h('span', { class: 'etiqueta-campo' }, 'Fecha de inicio del plan'),
+      h('input', { type: 'date', value: d.perfil.inicioPlanSueno ?? '',
+        onchange: (e) => estado.cambiar((x) => { x.perfil.inicioPlanSueno = e.target.value || null; }) })),
+    h('label', { class: 'campo' },
+      h('span', { class: 'etiqueta-campo' }, 'Lo que necesitas dormir (horas)'),
+      h('input', { type: 'text', inputmode: 'decimal', value: String(necesidad).replace('.', ','),
+        onchange: (e) => {
+          const v = leerNumero(e.target.value);
+          if (v >= 4 && v <= 12) estado.cambiar((x) => { x.perfil.necesidadSuenoH = v; });
+          else aviso('Pon entre 4 y 12 horas.', { tipo: 'error' });
+        } }),
+      h('small', { class: 'nota' }, 'Por defecto 8,5. Es la misma casilla que hay en el Diario.')),
+    h('a', { class: 'boton secundario', href: '#/diario' }, 'Ir al Diario'),
+  ];
 }
 
 // Casilla numérica de Ajustes que guarda al teclear.

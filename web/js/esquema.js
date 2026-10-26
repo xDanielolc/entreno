@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 24;
+export const VERSION_ACTUAL = 25;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -220,6 +220,8 @@ export function archivoNuevo({ nombre = '', correo = null } = {}) {
       redondeoKg: 2.5,
       prehechos: [],
       necesidadSuenoH: 8.5,
+      levantarseObjetivo: null,
+      inicioPlanSueno: null,
     },
     sedes: [],
     ejercicios: [],
@@ -574,6 +576,17 @@ const MIGRACIONES = {
   // `perfil.bilboRecamara` y `perfil.redondeoMancuernasKg`. Nada que convertir.
   23: (datos) => {
     datos.version = 24;
+    return datos;
+  },
+  // v24 → v25: el plan de sueño. Dos campos nuevos opcionales del perfil,
+  // `levantarseObjetivo` («HH:MM», la hora a la que quieres levantarte) e
+  // `inicioPlanSueno` («YYYY-MM-DD», cuándo empieza el plan). Se quedan vacíos
+  // hasta que los pongas en Ajustes: sin ellos la tarjeta de Inicio dice qué
+  // falta en vez de calcular nada.
+  24: (datos) => {
+    datos.perfil.levantarseObjetivo ??= null;
+    datos.perfil.inicioPlanSueno ??= null;
+    datos.version = 25;
     return datos;
   },
 };
