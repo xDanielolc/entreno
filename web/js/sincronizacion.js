@@ -249,6 +249,14 @@ function propiedades(d) {
   return { revision: String(d.revision), version: String(d.version) };
 }
 
+// Guarda en Drive una copia de los datos de ahora, que luego sale en Ajustes →
+// «Recuperar algo de una copia guardada aparte». Se usa antes de cambios
+// grandes (cargar el historial de los Excel).
+export async function guardarCopiaAparte(motivo) {
+  const datos = estado.datos();
+  await drive.crear(`entrenamiento-v${datos.version}-copia-${motivo}-${marcaTiempo()}.json`, datos, { copia: motivo });
+}
+
 function marcaTiempo() {
   return new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-');
 }

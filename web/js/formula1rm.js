@@ -108,7 +108,8 @@ function seriesParaCalibrar(datos, ejercicio) {
   for (const sesion of datos.sesiones) {
     // El entrenamiento en curso no cuenta: si no, el 1RM de cada serie
     // cambiaría mientras apuntas las de debajo.
-    if (sesion.borrada || !sesion.fecha || sesion.estado === 'en-curso') continue;
+    // Ni lo cargado de los Excel: no apuntaban la recámara.
+    if (sesion.borrada || !sesion.fecha || sesion.estado === 'en-curso' || sesion.origen === 'importado-excel') continue;
     for (const entrada of sesion.ejercicios) {
       if (entrada.ejercicioId !== ejercicio.id) continue;
       for (const s of entrada.series) {

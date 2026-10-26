@@ -1290,3 +1290,14 @@ fase), tras probar la A.
   de antes y lo que venga de los Excel va a «Pájaro con codo doblado» (catálogo, créditos e `importar_excel.py`).
   Prehecha versión 8. Ojo: dentro de la nota de un ejercicio (entre paréntesis) no puede ir otro paréntesis: el
   lector cierra la nota en el primero y lo demás lo lee como series.
+
+## Ronda 0.62.0 (26-10-2026, noche sin Dan): historial de los Excel
+
+- `vistas/importar.js`: Ajustes → Cuenta → «Cargar el historial de mis Excel» lee el JSON de
+  `herramientas/importar_excel.py`, lo migra y lo junta (`juntarImportado`, idempotente por `importId`). Los básicos
+  de peso libre (`JUNTAR_CON`) se juntan con su ejercicio de la app; lo demás, archivado y con su sitio en el nombre;
+  sitios «Madrid (gimnasio de antes)» y «Asturias» archivados. Antes, `guardarCopiaAparte('antes-de-importar')` en Drive.
+- Las sesiones con `origen: 'importado-excel'` no cuentan para `rmReciente` ni para la calibración de la fórmula.
+- `datos-privados/origenes.json` apuntaba a carpetas que Dan renombró («Entrenamientos Madrid» y «Entrenamientos
+  Asturias»); corregido (el de antes, `origenes-antes-26-10.json`). Importación nueva: 415 días hasta el 06-10-2026
+  (la de septiembre queda en `entrenamiento-importado-17-09.json`).

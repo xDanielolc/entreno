@@ -220,7 +220,8 @@ export function rmReciente(datos, ejercicio, semanas = 8, { excluirSesion } = {}
   let mejorCorta = null;
   let ultimaMaxima = null;
   for (const x of seriesDeEjercicio(datos, ejercicio.id, { excluirSesion })) {
-    if (x.sesion.fecha < corte || x.serie.tipo === 'calentamiento') continue;
+    // Lo cargado de los Excel no mueve tus pesos de ahora (otro gimnasio, otra forma de apuntar).
+    if (x.sesion.fecha < corte || x.serie.tipo === 'calentamiento' || x.sesion.origen === 'importado-excel') continue;
     const rm = rmSinTramos(datos, ejercicio, x.serie);
     if (!rm) continue;
     const dato = { valor: redondear(rm, 1), fecha: x.sesion.fecha, serie: x.serie };

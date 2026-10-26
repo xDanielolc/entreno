@@ -2063,3 +2063,8 @@ html, body { overflow-x: clip; }
 .diario-navegar .boton:disabled { opacity: 0.35; }
 .diario-fecha { flex: 1; max-width: 220px; text-align: center; min-height: 44px; }
 .diario-atajos { margin-top: 4px; margin-bottom: 8px; }
+
+/* Cargar el historial de los Excel */
+.lista-importar { display: grid; gap: 8px; max-height: 50vh; overflow-y: auto; }
+.fila-importar { display: grid; gap: 4px; padding: 8px 0; border-bottom: 1px solid var(--borde); text-align: left; }
+.fila-importar .selector-abrir { justify-self: start; max-width: 100%; }

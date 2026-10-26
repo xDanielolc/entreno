@@ -16,6 +16,7 @@ import { tramosPorDefecto } from '../calculos.js';
 import { FORMAS_DROP_SET, FORMA_DROP_SET_POR_DEFECTO } from '../recuperacion.js';
 import { MODOS_GLOSARIO, modoGlosario } from './glosario.js';
 import { pista } from './tutorial.js';
+import { botonImportar } from './importar.js';
 import { MODOS_ENTRENO } from './sesion.js';
 import { aplicarTema, hacerCuestionario } from './cuestionario.js';
 
@@ -102,6 +103,9 @@ export function vistaAjustes(contenedor) {
         setTimeout(() => URL.revokeObjectURL(url), 2000);
       } }, 'Descargar el Excel de progresión'),
       !sinCuenta && h('button', { class: 'boton enlace', onclick: verCopiasAparte }, 'Recuperar algo de una copia guardada aparte'),
+      h('p', { class: 'nota' }, 'Si llevabas tus entrenamientos en hojas de cálculo, puedes cargar su historial (el archivo que prepara el '
+        + 'programa de importar). Se junta con lo que ya tienes, sin pisar nada.'),
+      botonImportar(),
       h('button', { class: 'boton enlace', onclick: salir }, sinCuenta ? 'Salir del modo de prueba' : 'Salir de la cuenta')),
 
     // Los intervalos que guardaste desde el cronómetro de HIIT: aquí se ven
