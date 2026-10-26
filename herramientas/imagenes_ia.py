@@ -359,7 +359,9 @@ def ejercicios_de(entrada):
 # Dibujos que se quedan como están (Dan eligió la versión de antes en una revisión): no se rehacen.
 CONGELADOS = {"cruces-en-polea-completo",
               "estiramiento-de-pectoral-en-el-marco-de-la-puerta",  # versiones que Dan prefiere o retocadas a mano (23-10)
-              "pajaro-a-una-mano"}  # el banco de la segunda postura copiado de la primera (26-10)
+              "pajaro-a-una-mano",  # el banco de la segunda postura copiado de la primera (26-10)
+              "fondos-de-triceps",  # nuevo (26-10): las patas, la base y la punta de las barras copiadas de la primera
+              "dominadas-neutras"}  # el asa de la segunda postura alargada como la de la primera (26-10)
 
 QUIETOS = {"Plancha lateral": "imagenes/ejercicios/anim/plancha-lateral-quieta.webp"}
 

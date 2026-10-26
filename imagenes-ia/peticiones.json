@@ -18,7 +18,7 @@
   "slug": "dominada",
   "ejercicio": "Dominadas",
   "vista": "en barra fija, visto por detrás, agarre prono algo más ancho que los hombros",
-  "inicio": "colgado con los brazos estirados, piernas juntas algo flexionadas",
+  "inicio": "colgado del todo con los brazos completamente estirados",
   "final": "barbilla por encima de la barra, codos hacia abajo",
   "ancla": "barra",
   "usar": "ia"
@@ -28,8 +28,9 @@
   "ejercicio": "Elevaciones laterales",
   "vista": "con mancuernas, de pie y de frente",
   "inicio": "brazos a los lados del cuerpo con una mancuerna en cada mano junto a los muslos",
-  "final": "brazos abiertos en cruz a la altura de los hombros, codos un poco flexionados",
-  "usar": "antes"
+  "final": "brazos abiertos en T a la altura de los hombros, codos casi rectos, palmas hacia el suelo",
+  "usar": "ia",
+  "ancla": "pies"
  },
  {
   "slug": "press-de-banca",
@@ -304,10 +305,19 @@
  {
   "slug": "dominadas-supinas",
   "ejercicio": "Dominadas supinas",
-  "vista": "en barra fija, visto por detrás, palmas hacia la cara",
-  "inicio": "colgado con los brazos estirados",
+  "vista": "en barra fija, visto de frente, agarre supino a la anchura de los hombros (palmas hacia la cara)",
+  "inicio": "colgado del todo con los brazos completamente estirados",
   "final": "barbilla por encima de la barra",
   "ancla": "barra",
+  "usar": "ia"
+ },
+ {
+  "slug": "dominadas-neutras",
+  "ejercicio": "Dominadas neutras",
+  "vista": "de perfil, en una barra de dominadas con dos asas paralelas (agarre neutro, palmas enfrentadas)",
+  "inicio": "colgado del todo con los brazos completamente estirados",
+  "final": "barbilla por encima de las asas, codos pegados a los costados",
+  "ancla": "encajar",
   "usar": "ia"
  },
  {
@@ -1101,7 +1111,8 @@
   "inicio": "pierna derecha adelantada y brazo izquierdo empujando el asa",
   "final": "pierna izquierda adelantada y brazo derecho empujando el asa",
   "ancla": "encajar",
-  "usar": "antes"
+  "usar": "ia",
+  "modelo": "foto de una elíptica de lado que mandó Dan (26-10); una sola postura, quieta"
  },
  {
   "slug": "remo-de-cardio",

@@ -77,6 +77,7 @@ export const CATALOGO = [
   // --- Tirón --------------------------------------------------------------
   ej('Dominadas', 'tirón', 'barra fija', ['dorsal'], ['biceps', 'antebrazoFlexor'], corporal),
   ej('Dominadas supinas', 'tirón', 'barra fija', ['dorsal', 'biceps'], ['antebrazoFlexor'], corporal),
+  ej('Dominadas neutras', 'tirón', 'barra fija', ['dorsal'], ['biceps', 'antebrazoFlexor'], corporal),
   ej('Dominadas asistidas', 'tirón', 'máquina', ['dorsal'], ['biceps', 'antebrazoFlexor'], { carga: 'asistida' }),
   ej('Dominadas con lastre', 'tirón', 'barra fija', ['dorsal'], ['biceps', 'antebrazoFlexor'], corporal),
   ej('Dominadas negativas', 'tirón', 'barra fija', ['dorsal'], ['biceps', 'antebrazoFlexor'], corporal),

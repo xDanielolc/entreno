@@ -166,3 +166,15 @@ petición (el pez levantaba la cabeza; la goblet sale «de huevo», que lo decid
       Probar con una lámina de modelo con las dos posturas, o con ChatGPT.
 - [ ] Unos 40 ejercicios siguen con muñeco y sin dibujo de IA (tibiales, Copenhague, press Arnold, movilidad…): no
       entraron en la cola «más músculo».
+
+# 26-10-2026, sus notas de la mañana (0.64.6)
+- [x] Fondos de tríceps: rehechos con Gemini; las manos, las barras, las patas y la base quietas (copiadas de la primera
+      postura, `CONGELADOS`).
+- [x] Dominadas pronas: colgado del todo (una figura sola con Gemini, juntada con la de arriba a la misma escala por las
+      manos) y negativas sacadas de ella.
+- [x] Dominadas supinas: de frente, agarre estrecho con las palmas hacia la cara, colgado del todo; sin postes.
+- [x] Dominadas neutras (ejercicio nuevo en el catálogo): de perfil, asas paralelas; el asa de la segunda postura
+      alargada como la de la primera.
+- [x] Elevaciones laterales: rehechas enteras (en T, sin curl, piernas quietas).
+- [x] Elíptica: con la foto de modelo que mandó Dan; quieta (una sola postura).
+- Lo de antes, para comparar, en `imagenes-ia/antes-26-10/` (fuera de Git).

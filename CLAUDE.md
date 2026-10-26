@@ -1371,3 +1371,8 @@ Solo se tocaron plantillas.js, version.js, sw.js y este archivo.
   damero bajo la barra de arriba); «Pixel art», el cielo, la tierra y la hierba de Owlboy con el lila de Axiom Verge;
   «Arcano», piedra ocre, pergamino, oro y runas turquesa que brillan (carta modernista y mago del mosaico). Terminal:
   título con serifa y brillo como el cartel de Matrix. En pixel y terminal, la barra de abajo con letra normal (no cabía).
+- 0.64.6 (26-10-2026): sus notas de los dibujos. Fondos de tríceps sin manos que se mueven, dominadas pronas que cuelgan
+  del todo (y negativas), supinas de frente con agarre estrecho, «Dominadas neutras» nuevas en el catálogo (de perfil,
+  asas paralelas), elevaciones laterales rehechas enteras y elíptica con su foto de modelo (quieta). Gemini no cambia la
+  postura editando: la postura que falta se pide en conversación nueva con solo la referencia de estilo, o las dos en
+  una lámina. Lo anterior, en `imagenes-ia/antes-26-10/` (fuera de Git). Almacén `entreno-imagenes-43`.

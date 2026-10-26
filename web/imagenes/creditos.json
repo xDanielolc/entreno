@@ -163,13 +163,11 @@
    "animada": true
   },
   "Elevaciones laterales": {
-   "archivo": "imagenes/ejercicios/ia/elevaciones-laterales-completo.webp",
-   "autor": "Everkinetic",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "lateral-dumbbell-raises",
-   "estatica": "imagenes/ejercicios/ia/elevaciones-laterales-completo-quieta.webp",
+   "archivo": "imagenes/ejercicios/ia/elevaciones-laterales.webp",
+   "estatica": "imagenes/ejercicios/ia/elevaciones-laterales-quieta.webp",
    "animada": true,
-   "completadoCon": "Gemini"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Elevaciones laterales en polea": {
    "archivo": "imagenes/ejercicios/ia/elevaciones-laterales-en-polea.webp",
@@ -251,6 +249,13 @@
   "Dominadas supinas": {
    "archivo": "imagenes/ejercicios/ia/dominadas-supinas.webp",
    "estatica": "imagenes/ejercicios/ia/dominadas-supinas-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
+  },
+  "Dominadas neutras": {
+   "archivo": "imagenes/ejercicios/ia/dominadas-neutras.webp",
+   "estatica": "imagenes/ejercicios/ia/dominadas-neutras-quieta.webp",
    "animada": true,
    "fuente": "ia",
    "autor": "Gemini"
@@ -957,9 +962,11 @@
    "autor": "Gemini"
   },
   "Elíptica": {
-   "archivo": "imagenes/munecos/eliptica.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/eliptica-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/eliptica-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Remo de cardio": {
    "archivo": "imagenes/ejercicios/ia/remo-de-cardio.webp",
@@ -1926,15 +1933,12 @@
    "aliasDe": "Press militar"
   },
   "Elevaciones laterales en máquina": {
-   "archivo": "imagenes/ejercicios/ia/elevaciones-laterales-completo.webp",
-   "autor": "Everkinetic",
-   "nombreEnWger": "Lateral Raises",
-   "aliasDe": "Elevaciones laterales",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "lateral-dumbbell-raises",
-   "estatica": "imagenes/ejercicios/ia/elevaciones-laterales-completo-quieta.webp",
+   "archivo": "imagenes/ejercicios/ia/elevaciones-laterales.webp",
+   "estatica": "imagenes/ejercicios/ia/elevaciones-laterales-quieta.webp",
    "animada": true,
-   "completadoCon": "Gemini"
+   "fuente": "ia",
+   "autor": "Gemini",
+   "aliasDe": "Elevaciones laterales"
   },
   "Pájaros en polea": {
    "archivo": "imagenes/ejercicios/anim/pajaros-en-maquina.webp",
