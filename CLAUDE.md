@@ -1367,3 +1367,7 @@ Solo se tocaron plantillas.js, version.js, sw.js y este archivo.
   la mancuerna); en `CONGELADOS`. Almacén `entreno-imagenes-42`.
 - 0.64.4: «Sin músculos» solo en ejercicios de fuerza (salía en su Cardio). «Movilidad dinámica de torso» y «de
   pierna» con dibujo por alias (rotaciones de hombro con palo y sentadilla profunda mantenida).
+- 0.64.5: tres temas rehechos con las referencias de Dan: «Años 50» es ahora un diner (rojo cereza, crema, cromo,
+  damero bajo la barra de arriba); «Pixel art», el cielo, la tierra y la hierba de Owlboy con el lila de Axiom Verge;
+  «Arcano», piedra ocre, pergamino, oro y runas turquesa que brillan (carta modernista y mago del mosaico). Terminal:
+  título con serifa y brillo como el cartel de Matrix. En pixel y terminal, la barra de abajo con letra normal (no cabía).

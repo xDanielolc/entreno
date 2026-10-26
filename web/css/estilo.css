@@ -2083,32 +2083,35 @@ html, body { overflow-x: clip; }
 :root[data-fondo="oscuro"] .tarjeta input, :root[data-fondo="oscuro"] .tarjeta select,
 :root[data-fondo="oscuro"] .tarjeta textarea { background: var(--superficie-2); }
 
-/* 1. Años 50, tipo Fallout: papel de manual técnico, verde oliva y ámbar. */
+/* 1. Años 50: un diner americano (su referencia del 26-10): rojo cereza de los asientos, crema, cromo,
+   ámbar de gramola y el damero blanco y negro del suelo bajo la barra de arriba. */
 :root[data-tema="fallout"] {
   color-scheme: light;
-  --fondo: #e8dcbc; --superficie: #f6eed6; --superficie-2: #e2d5ae; --borde: #b6a274;
-  --texto: #29271a; --texto-suave: #5a5436;
-  --acento: #4a5a1c; --acento-texto: #f6eed6; --acento-suave: #dcd6a2; --acento-fuerte: #323e0c;
-  --peligro: #a12f1b; --bien: #3d6a1c; --mal: #a12f1b; --aviso: #845400; --aviso-fondo: #f1d891;
-  --cartel-fondo: #29271a; --cartel-texto: #f6eed6; --cartel-borde: #4a5a1c;
-  --radio: 6px; --radio-pequeno: 4px;
-  --sombra: 2px 2px 0 rgb(41 39 26 / 22%); --sombra-alta: 4px 4px 0 rgb(41 39 26 / 30%);
-  --fuente: "Rockwell", "Courier New", Courier, serif;
+  --fondo: #fbf5ea; --superficie: #ffffff; --superficie-2: #f2e8d6; --borde: #d7c6a6;
+  --texto: #1a1a1a; --texto-suave: #5b5248;
+  --acento: #c3132c; --acento-texto: #ffffff; --acento-suave: #fbe0e3; --acento-fuerte: #8f0c1f;
+  --peligro: #a0101f; --bien: #1f7a5c; --mal: #a0101f; --aviso: #9a6300; --aviso-fondo: #ffe8b0;
+  --cartel-fondo: #1a1a1a; --cartel-texto: #fbf5ea; --cartel-borde: #c3132c;
+  --radio: 14px; --radio-pequeno: 10px;
+  --sombra: 0 2px 0 #d7c6a6, 0 6px 16px -8px rgb(26 26 26 / 25%); --sombra-alta: 0 10px 26px -8px rgb(26 26 26 / 35%);
+  --fuente: "Trebuchet MS", "Arial Rounded MT Bold", "Segoe UI", sans-serif;
 }
-:root[data-tema="fallout"] h1, :root[data-tema="fallout"] h2 { text-transform: uppercase; letter-spacing: .04em; }
+:root[data-tema="fallout"] h1, :root[data-tema="fallout"] h2 { text-transform: uppercase; letter-spacing: .04em; color: var(--acento); }
 :root[data-tema="fallout"] .tarjeta { border: 1.5px solid var(--borde); }
+:root[data-tema="fallout"] .barra-superior { border-bottom: 8px solid transparent;
+  border-image: repeating-linear-gradient(90deg, #1a1a1a 0 12px, #ffffff 12px 24px) 8; }
 
-/* 2. Pixel art: colores planos (paleta tipo consola de 8 bits), bordes
-   duros sin redondeo, sombras de bloque y letra de terminal. */
+/* 2. Pixel art: el cielo, la tierra y la hierba de Owlboy y el lila de Axiom Verge (sus referencias),
+   bordes duros sin redondeo, sombras de bloque y letra de terminal. */
 :root[data-tema="pixel"] {
   color-scheme: light;
-  --fondo: #fff1e8; --superficie: #ffffff; --superficie-2: #ffe3cf; --borde: #1d2b53;
-  --texto: #1d2b53; --texto-suave: #5f574f;
-  --acento: #1d6fd6; --acento-texto: #ffffff; --acento-suave: #c2e3ff; --acento-fuerte: #1d2b53;
-  --peligro: #d1003f; --bien: #00804c; --mal: #d1003f; --aviso: #9a4a1f; --aviso-fondo: #fff3a0;
-  --cartel-fondo: #1d2b53; --cartel-texto: #fff1e8; --cartel-borde: #1d2b53;
+  --fondo: #bfe3ff; --superficie: #fff8e8; --superficie-2: #f1e3c4; --borde: #3b2a1f;
+  --texto: #2a1d14; --texto-suave: #5e4a3a;
+  --acento: #3e8f3e; --acento-texto: #ffffff; --acento-suave: #d6f0c9; --acento-fuerte: #2a2140;
+  --peligro: #c2273b; --bien: #2e7d32; --mal: #c2273b; --aviso: #8a4f1d; --aviso-fondo: #ffe9a8;
+  --cartel-fondo: #2a2140; --cartel-texto: #f2e6ff; --cartel-borde: #b48ce6;
   --radio: 0px; --radio-pequeno: 0px;
-  --sombra: 4px 4px 0 #1d2b53; --sombra-alta: 6px 6px 0 #1d2b53;
+  --sombra: 4px 4px 0 #3b2a1f; --sombra-alta: 6px 6px 0 #3b2a1f;
   --fuente: "Lucida Console", Consolas, "Courier New", monospace;
   --fuente-numeros: "Lucida Console", Consolas, "Courier New", monospace;
 }
@@ -2116,19 +2119,21 @@ html, body { overflow-x: clip; }
 :root[data-tema="pixel"] .boton, :root[data-tema="pixel"] .boton-marca { border: 3px solid var(--borde); box-shadow: 3px 3px 0 var(--borde); }
 :root[data-tema="pixel"] h1, :root[data-tema="pixel"] h2 { text-transform: uppercase; letter-spacing: .06em; }
 
-/* 3. Arcano: morados profundos, oro viejo y letra de grimorio. */
+/* 3. Arcano: sus referencias, una carta modernista en sepia y oro y un mago en un mosaico ocre con runas
+   turquesa que brillan: fondo de piedra oscura, texto de pergamino, acento de runa y títulos de oro. */
 :root[data-tema="arcano"] {
   color-scheme: dark;
-  --fondo: #130c21; --superficie: #1e1432; --superficie-2: #2a1d45; --borde: #45346a;
-  --texto: #efe6ff; --texto-suave: #b8a7d8;
-  --acento: #d4af37; --acento-texto: #130c21; --acento-suave: #3a2a55; --acento-fuerte: #f0cf63;
-  --peligro: #ff8096; --bien: #7fd8a3; --mal: #ff8096; --aviso: #f0cf63; --aviso-fondo: #3a2c14;
-  --cartel-fondo: #2a1d45; --cartel-texto: #efe6ff; --cartel-borde: #d4af37;
+  --fondo: #1b140d; --superficie: #271d14; --superficie-2: #34271b; --borde: #5c4730;
+  --texto: #f3e6cc; --texto-suave: #c8b38e;
+  --acento: #5ff0cf; --acento-texto: #0f2520; --acento-suave: #1f3a33; --acento-fuerte: #a3fbe7;
+  --peligro: #ff8f7a; --bien: #8fd694; --mal: #ff8f7a; --aviso: #e7b65a; --aviso-fondo: #3a2b14;
+  --cartel-fondo: #34271b; --cartel-texto: #f3e6cc; --cartel-borde: #d8a650;
   --radio: 12px; --radio-pequeno: 8px;
-  --sombra: 0 0 0 1px rgb(212 175 55 / 18%), 0 8px 22px -10px rgb(0 0 0 / 70%); --sombra-alta: 0 12px 34px -8px rgb(0 0 0 / 75%);
+  --sombra: 0 0 0 1px rgb(216 166 80 / 25%), 0 8px 22px -10px rgb(0 0 0 / 70%); --sombra-alta: 0 0 26px -6px rgb(95 240 207 / 35%);
   --fuente: "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
 }
-:root[data-tema="arcano"] h1 { color: var(--acento-fuerte); letter-spacing: .02em; }
+:root[data-tema="arcano"] h1, :root[data-tema="arcano"] h2 { color: #d8a650; letter-spacing: .02em; }
+:root[data-tema="arcano"] .boton:not(.secundario) { box-shadow: 0 0 14px -2px rgb(95 240 207 / 55%); }
 
 /* 4. Heavy metal: negro, plata y rojo sangre; títulos contundentes. */
 :root[data-tema="metal"] {
@@ -2164,6 +2169,8 @@ html, body { overflow-x: clip; }
 @keyframes cursor-matrix { 50% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { :root[data-tema="matrix"] h1::after { animation: none; } }
 :root[data-tema="matrix"] body { text-shadow: 0 0 6px rgb(61 255 122 / 25%); }
+:root[data-tema="matrix"] h1 { font-family: Georgia, "Times New Roman", serif; letter-spacing: .03em;
+  text-shadow: 0 0 10px rgb(61 255 122 / 70%), 0 0 22px rgb(61 255 122 / 35%); }
 
 /* 6. Gimnasio ochentero: neón rosa y cian sobre azul noche. */
 :root[data-tema="ochentero"] {
@@ -2180,6 +2187,8 @@ html, body { overflow-x: clip; }
   color: var(--acento); text-shadow: 0 0 10px rgb(255 62 165 / 55%), 2px 2px 0 #34f0cb; }
 :root[data-tema="ochentero"] h2 { color: #34f0cb; }
 /* Botones y casillas sin forma de píldora en los temas de esquinas duras. */
-:root:is([data-tema="pixel"], [data-tema="matrix"], [data-tema="metal"], [data-tema="fallout"]) :is(.boton, .boton-marca, .boton-paso, .chip, input, textarea, .modal) {
+:root:is([data-tema="pixel"], [data-tema="matrix"], [data-tema="metal"]) :is(.boton, .boton-marca, .boton-paso, .chip, input, textarea, .modal) {
   border-radius: var(--radio-pequeno);
 }
+/* En los temas de letra de máquina, los nombres de la barra de abajo no caben con esa letra: van con la normal. */
+:root:is([data-tema="pixel"], [data-tema="matrix"]) .navegacion a { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; letter-spacing: -.01em; }
