@@ -1637,6 +1637,10 @@ div.sugerencia > span { display: block; }
 }
 #presentacion.en-marcha { animation: presentacion-fuera .4s ease-in 3.95s forwards; }
 #presentacion .escena { position: relative; width: 240px; height: 140px; }
+/* La presentación en vídeo (presentacion.js): ocupa toda la pantalla y, en cuanto
+   arranca, tapa la animación de debajo. */
+#presentacion .video-presentacion { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+#presentacion.con-video .escena { visibility: hidden; }
 #presentacion .caja {
   position: absolute; left: 50%; top: 50%; width: 64px; height: 64px; margin: -32px 0 0 -32px;
   border-radius: 18px; background: var(--acento); box-shadow: 0 10px 28px -8px color-mix(in srgb, var(--acento) 70%, transparent);

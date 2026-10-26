@@ -1379,3 +1379,15 @@ Solo se tocaron plantillas.js, version.js, sw.js y este archivo.
   quietas desde más abajo (`fijo_desde` 0,72: con 0,58 se copiaban trozos de las mancuernas). Almacén `entreno-imagenes-44`.
 - 0.64.8: al añadir una rutina prehecha, la pregunta es corta («¿Añadir «X»? Trae N ejercicios nuevos.», sin la lista) y
   el aviso, «Rutina añadida.» con una frase de ánimo al azar (`FRASES_RUTINA_NUEVA` en rutinas.js).
+
+## Ronda 0.65.0 (26-10-2026): la presentación en vídeo
+
+Con cascos Bluetooth el sonido de la presentación llegaba tarde (el móvil informa mal de ese retraso). Ahora es un
+vídeo por tema (`web/imagenes/presentacion/<tema>.webm`, AV1 + Opus, unos 18 KB cada uno): el reproductor del móvil
+pone la imagen a la par con el sonido. Se fabrican con `herramientas/video_presentacion.py` (Chrome sin ventana,
+fotograma a fotograma desde la animación CSS de siempre, el mismo sonido que presentacion.js y ffmpeg de
+`imageio-ffmpeg`; necesita `pip install --user imageio-ffmpeg websocket-client`): si cambia la animación o un tema,
+volver a lanzarlo. En la app (`conVideo` en presentacion.js): solo la variante «cae», con el móvil en vertical, si el
+navegador reproduce AV1 y el vídeo llega en 0,8 s (va por el almacén de imágenes del service worker, así que desde la
+segunda vez sale al momento); si no, la animación CSS con sonido de siempre. Con sonido si el navegador deja; si no,
+mudo. El tema se guarda también en localStorage (`entreno-tema`, `aplicarTema`) y index.html lo pone antes de pintar.

@@ -6,6 +6,7 @@ import * as estado from '../estado.js';
 import { h, modal } from '../ui.js';
 import { TIPOS_SEDE, nuevaSede } from '../sedes.js';
 import { fijarNivel, iniciarGuia } from './tutorial.js';
+import { CLAVE_TEMA } from '../presentacion.js';
 
 export const PREGUNTAS = [
   { clave: 'experiencia', titulo: '¿Cuánto sabes de entrenar?', opciones: {
@@ -51,6 +52,9 @@ export function aplicarTema(tema) {
   if (tema && tema !== 'sistema' && TEMAS[tema]) raiz.dataset.tema = tema;
   else delete raiz.dataset.tema;
   if (TEMAS[tema]?.oscuro) raiz.dataset.fondo = 'oscuro'; else delete raiz.dataset.fondo;
+  // Copia en el navegador: al abrir, la presentación y el fondo salen ya con el
+  // tema, antes de que carguen los datos (index.html y presentacion.js).
+  try { if (raiz.dataset.tema) localStorage.setItem(CLAVE_TEMA, raiz.dataset.tema); else localStorage.removeItem(CLAVE_TEMA); } catch { /* nada */ }
   // La barra del navegador del móvil, del color del fondo del tema.
   requestAnimationFrame(() => {
     const fondo = getComputedStyle(raiz).getPropertyValue('--fondo').trim();

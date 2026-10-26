@@ -29,6 +29,43 @@ export function variantePresentacion() {
   try { return localStorage.getItem(CLAVE) || 'cae'; } catch { return 'cae'; }
 }
 
+// La presentación grabada en vídeo, una por tema (herramientas/video_presentacion.py).
+// En un vídeo el reproductor del móvil pone la imagen a la par con el sonido,
+// también con cascos Bluetooth, que con la animación y el sonido por separado
+// sonaban tarde. Solo la variante «cae», con el móvil en vertical.
+const TEMAS_CON_VIDEO = ['claro', 'oscuro', 'fallout', 'pixel', 'arcano', 'metal', 'matrix', 'ochentero'];
+export const CLAVE_TEMA = 'entreno-tema';
+const ESPERA_VIDEO_MS = 800;
+
+function videoDelTema() {
+  let tema = null;
+  try { tema = localStorage.getItem(CLAVE_TEMA); } catch { /* nada */ }
+  if (!TEMAS_CON_VIDEO.includes(tema)) tema = matchMedia('(prefers-color-scheme: dark)').matches ? 'oscuro' : 'claro';
+  return `./imagenes/presentacion/${tema}.webm`;
+}
+
+// Intenta poner el vídeo; si no está a tiempo o no se puede, devuelve false.
+async function conVideo(p, arrancar) {
+  if (innerWidth > innerHeight) return false;
+  const prueba = document.createElement('video');
+  if (!prueba.canPlayType('video/webm; codecs="av01.0.05M.08, opus"')) return false;
+  const datos = await Promise.race([
+    fetch(videoDelTema()).then((r) => (r.ok ? r.blob() : null)).catch(() => null),
+    new Promise((ok) => setTimeout(() => ok(null), ESPERA_VIDEO_MS)),
+  ]);
+  if (!datos || !p.isConnected) return false;
+  const video = Object.assign(document.createElement('video'), { playsInline: true, preload: 'auto', src: URL.createObjectURL(datos) });
+  video.className = 'video-presentacion';
+  video.addEventListener('playing', () => { p.classList.add('con-video'); arrancar(null); }, { once: true });
+  p.append(video);
+  // Con sonido si el navegador lo deja (en la app instalada, sí); si no, mudo.
+  try { await video.play(); } catch {
+    video.muted = true;
+    try { await video.play(); } catch { video.remove(); return false; }
+  }
+  return true;
+}
+
 const PLANTILLA = (variante) => `<div id="presentacion" class="${variante}" aria-hidden="true"><div class="escena"><div class="caja"></div>
   <div class="pesa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M6.5 7.5v9M3.5 10v4"/><path d="M17.5 7.5v9M20.5 10v4"/><path d="M6.5 12h11"/></svg></div><div class="nombre">Entreno</div></div></div>`;
@@ -51,9 +88,12 @@ export function mostrarPresentacion(variante = variantePresentacion(), { nueva =
     setTimeout(quitar, quieto ? 1300 : DURACION_MS);
   };
   if (quieto) { arrancar(null); return; }
-  // Animación y sonido salen juntos: se espera (como mucho 0,2 s) a que el
-  // audio esté listo y en ese instante arrancan los dos.
-  preparar(p.className.trim() || variante).then(arrancar);
+  const v = p.className.replace('en-marcha', '').trim() || variante;
+  // Si no hay vídeo, animación y sonido salen juntos: se espera (como mucho
+  // 0,2 s) a que el audio esté listo y en ese instante arrancan los dos.
+  const sinVideo = () => preparar(v).then(arrancar);
+  if (v !== 'cae') { sinVideo(); return; }
+  conVideo(p, arrancar).then((hay) => { if (!hay && p.isConnected) sinVideo(); });
 }
 
 // Al volver a la app tras más de 20 minutos fuera, se repite.
