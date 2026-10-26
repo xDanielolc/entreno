@@ -157,3 +157,12 @@ petición (el pez levantaba la cabeza; la goblet sale «de huevo», que lo decid
       que suben más. Queda la elíptica (Gemini la pinta en espejo) y la cara lisa de las zancadas (al alisarla les quita
       músculo).
       0.60.31: zancadas con cara lisa (ChatGPT). La elíptica tampoco sale con ChatGPT: se queda quieta.
+
+# Noche del 25 al 26-10-2026
+- [x] Pájaro a una mano (brazo estirado, un brazo) con Gemini; banco de la segunda postura copiado de la primera.
+- [x] Quince dibujos que Dan eligió «nueva» en la revisión de «más músculo» y seguían con el muñeco (`usar: antes` de
+      la 0.60.8): ahora `usar: ia` (0.64.1).
+- [ ] Curl nórdico: tres intentos con Gemini (descartes/fases-curl-nordico-*): dobla la cadera o despega las rodillas.
+      Probar con una lámina de modelo con las dos posturas, o con ChatGPT.
+- [ ] Unos 40 ejercicios siguen con muñeco y sin dibujo de IA (tibiales, Copenhague, press Arnold, movilidad…): no
+      entraron en la cola «más músculo».
