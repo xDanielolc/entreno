@@ -668,7 +668,10 @@ let redondeoMancuernas = REDONDEO_MANCUERNAS_POR_DEFECTO;
 export function fijarRedondeoMancuernas(kg) { redondeoMancuernas = kg > 0 ? kg : REDONDEO_MANCUERNAS_POR_DEFECTO; }
 // De un solo lado (un brazo o una pierna): se apuntan el peso y las
 // repeticiones de un lado.
-export function unLado(ejercicio) { return /(a una mano|a un brazo|a una pierna|unilateral)/i.test(ejercicio?.nombre ?? ''); }
+export function unLado(ejercicio) {
+  if (typeof ejercicio?.unilateral === 'boolean') return ejercicio.unilateral;   // lo elegido en Ajustes finos
+  return /(a una mano|a un brazo|a una pierna|unilateral)/i.test(ejercicio?.nombre ?? '');
+}
 export function conMancuernas(ejercicio) { return /mancuerna/i.test(materialDe(ejercicio) ?? '') || /mancuerna/i.test(ejercicio?.nombre ?? ''); }
 // Calentamientos de 10 en 10 kg (decisión práctica de Dan: sin cuentas al
 // calentar). Se quita en Ajustes y entonces van con el % exacto.

@@ -1327,3 +1327,6 @@ fase), tras probar la A.
   pierna) y la última serie «todas las que puedas»; el HST de Haycock tiene un cuarto bloque y 7-10 días de
   desentrenamiento que la app no hace. Bilbo y la serie máxima/bajadas explicadas como funcionan desde el borrador 14.
   Falta lo mismo en `PROGRAMAS` de esquema.js (el 5×5 dice «de StrongLifts y de Bill Starr»).
+- 0.63.5: «¿Se hace de un solo lado?» en Ajustes finos (`ej.unilateral`, opcional: true/false; sin él, por el nombre);
+  `unLado()` lo respeta (nota de la tarjeta y escala del 1RM). El texto del descanso de la ficha explica los descansos
+  por tipo de serie.

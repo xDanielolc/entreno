@@ -471,9 +471,16 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         && campo('… o un % de tu 1RM',
           numeroInput(borrador.pesoMinimoPct, (v) => { borrador.pesoMinimoPct = v > 0 && v < 100 ? v : null; }),
           h('small', { class: 'nota' }, 'Vacío = sin %. Si pones los dos, manda el que sea más alto ese día.')),
+        borrador.carga.tipo !== 'ninguna' && campo('¿Se hace de un solo lado?', selector([['auto', 'Según el nombre'],
+          ['si', 'Sí, a una mano o una pierna'], ['no', 'No, los dos lados a la vez']],
+          borrador.unilateral === true ? 'si' : borrador.unilateral === false ? 'no' : 'auto',
+          (v) => { if (v === 'auto') delete borrador.unilateral; else borrador.unilateral = v === 'si'; repintar(); }, { titulo: '¿De un solo lado?' }),
+          h('small', { class: 'nota' }, 'De un solo lado, apuntas el peso y las repeticiones de un lado. Con dos mancuernas, el peso de una. '
+            + 'Según el nombre: la app lo deduce de «a una mano», «a una pierna» o «unilateral».')),
         campo('Descanso entre series en este ejercicio (segundos)',
           numeroInput(borrador.descansoSegundos, (v) => { borrador.descansoSegundos = v ?? undefined; }),
-          h('small', { class: 'nota' }, `Vacío = lo de Ajustes (${d.perfil.descansoSegundos ?? 'sin descanso'} s). Al saltar o alargar un descanso, la app te ofrece guardarlo aquí.`)),
+          h('small', { class: 'nota' }, 'Vacío = el de cada tipo de serie (2 min en lo pesado, 1:15 en accesorios, 50 s en racimos), o el que hayas '
+            + 'guardado para ese tipo de serie al cambiarlo en el entreno. Si pones un número aquí, manda en todas las series de este ejercicio.')),
         campo('Notas', h('textarea', { rows: 3, value: borrador.notas || '',
           oninput: (e) => { borrador.notas = e.target.value; } }))),
 
