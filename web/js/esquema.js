@@ -606,21 +606,23 @@ export const PROGRAMAS = {
   '5x5': {
     etiqueta: '5×5',
     descripcion: 'Cinco series de cinco con el mismo peso. Cada sesión que las completas, sube el incremento; si fallas tres '
-      + 'sesiones seguidas, baja un 10 % y vuelve a subir. Es el esquema de StrongLifts y de Bill Starr.',
+      + 'sesiones seguidas, baja un 10 % y vuelve a subir. Es la regla de StrongLifts 5×5 (el 5×5 original de Bill Starr subía el '
+      + 'peso de serie en serie).',
     inicial: 'Peso de la primera sesión',
   },
   '531': {
     etiqueta: '5/3/1 (Wendler)',
     descripcion: 'Ciclos de cuatro sesiones por ejercicio: semana de 5 (65-75-85 %), de 3 (70-80-90 %), de 5/3/1 (75-85-95 %) '
       + 'y descarga (40-50-60 %). Los porcentajes son de tu máximo de entrenamiento (el 90 % de tu 1RM), que sube el incremento '
-      + 'cada ciclo. La última serie de cada sesión es «las que puedas» (mínimo las marcadas).',
+      + 'cada ciclo (Wendler: 2,5 kg en torso, 5 kg en pierna). La última serie de cada sesión es «las que puedas» (mínimo las marcadas).',
     inicial: 'Máximo de entrenamiento (90 % de tu 1RM)',
   },
   hst: {
     etiqueta: 'HST',
     descripcion: 'Bloques de seis sesiones: primero a 15 repeticiones, luego a 10 y luego a 5. Dentro de cada bloque el peso sube '
       + 'cada sesión hasta llegar a tu máximo de esas repeticiones en la sexta. Dos series por sesión. Al acabar los tres bloques, '
-      + 'se repite con los máximos subidos el incremento.',
+      + 'se repite con los máximos subidos el incremento. El HST de Haycock tiene además un cuarto bloque y 7-10 días sin entrenar '
+      + 'al acabar; eso lo decides tú.',
     inicial: 'Tu 15RM (peso con el que haces 15 justas)',
   },
 };
