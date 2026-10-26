@@ -2502,6 +2502,22 @@
    "aliasDe": "Pájaros con mancuernas",
    "estatica": "imagenes/ejercicios/pajaros-con-mancuernas.png",
    "animada": true
+  },
+  "Movilidad dinámica de torso": {
+   "archivo": "imagenes/ejercicios/ia/rotaciones-de-hombro-con-palo.webp",
+   "estatica": "imagenes/ejercicios/ia/rotaciones-de-hombro-con-palo-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini",
+   "aliasDe": "Rotaciones de hombro con palo"
+  },
+  "Movilidad dinámica de pierna": {
+   "archivo": "imagenes/ejercicios/ia/sentadilla-profunda-mantenida-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/sentadilla-profunda-mantenida-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "ChatGPT",
+   "aliasDe": "Sentadilla profunda mantenida (Malasana)"
   }
  }
 }

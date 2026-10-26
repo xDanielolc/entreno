@@ -136,7 +136,8 @@ function tarjetaEjercicio(datos, ej) {
     cuenta.set(texto, (cuenta.get(texto) ?? 0) + 1);
   }
   const partes = [...cuenta].map(([texto, n]) => (n > 1 ? `${n} × ${texto}` : texto));
-  const sinMusculos = !ej.musculos?.principales?.length;
+  // El cardio y la movilidad pueden ir sin músculo principal (Dan veía «Sin músculos» en su Cardio).
+  const sinMusculos = !ej.musculos?.principales?.length && tipoDeEjercicio(ej) === 'fuerza';
   return tarjetaItem(ej, {
     href: `#/ejercicio/${ej.id}`,
     clase: ej.archivado ? 'archivado' : '',

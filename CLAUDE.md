@@ -1365,3 +1365,5 @@ dorsal 2 × 60 s; prueba mensual opcional en la zancada hacia el split frontal (
 Solo se tocaron plantillas.js, version.js, sw.js y este archivo.
 - 0.64.3: pájaro a una mano con el banco quieto (en la segunda postura, el banco es el de la primera salvo donde cuelga
   la mancuerna); en `CONGELADOS`. Almacén `entreno-imagenes-42`.
+- 0.64.4: «Sin músculos» solo en ejercicios de fuerza (salía en su Cardio). «Movilidad dinámica de torso» y «de
+  pierna» con dibujo por alias (rotaciones de hombro con palo y sentadilla profunda mantenida).
