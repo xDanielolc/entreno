@@ -14,7 +14,9 @@
   <link rel="stylesheet" href="css/estilo.css">
   <!-- El tema guardado, antes de pintar nada: así la presentación sale ya con sus colores. -->
   <script>try { var t = localStorage.getItem('entreno-tema'); if (t && t !== 'metal') { document.documentElement.dataset.tema = t;
-    if (/^(oscuro|arcano|matrix|ochentero)$/.test(t)) document.documentElement.dataset.fondo = 'oscuro'; } } catch (e) {}</script>
+    if (/^(oscuro|arcano|matrix|ochentero)$/.test(t)) document.documentElement.dataset.fondo = 'oscuro'; } } catch (e) {}
+    /* El vídeo de la presentación se grabó a 360 × 780 y llena la pantalla: la escena de antes de que arranque, al mismo tamaño. */
+    if (innerHeight > innerWidth) document.documentElement.style.setProperty('--ajuste-video', Math.max(innerWidth / 360, innerHeight / 780));</script>
   <script type="module" src="js/app.js"></script>
 </head>
 <body>

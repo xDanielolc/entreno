@@ -1423,3 +1423,9 @@ mudo. El tema se guarda también en localStorage (`entreno-tema`, `aplicarTema`)
   esquema v26 (`diario[].pvt[]`, `perfil.avisarPvt`, `perfil.avisarPvtHora`), aviso de la mañana en Ajustes →
   Descansos (`avisoTestAtencion` en ajustes.js) y tarjeta en Hoy. Sin `periodicsync` en sw.js: el aviso solo llega
   con la app abierta. Reparto con esa conversación: sueño suyo, ejercicio mío; ella avisa y yo publico.
+- 0.67.1 (27-10-2026): presentación más grande (escena al 140 %), sin salto al arrancar el vídeo (index.html pone
+  `--ajuste-video` = cuánto se estira el vídeo de 360 × 780 para llenar la pantalla, y la escena de antes se escala
+  igual) y nítida (vídeos a 1080 × 2340 y crf 30, unos 30 KB). Bilbo: sin un ciclo de 3 sesiones que valga, el
+  siguiente empieza con el peso con el que hiciste las repeticiones de tope en una Bilbo de los últimos 3 meses
+  (`pesoBilboDemostrado` en ciclos.js, Excel incluidos): la fórmula se queda corta con muchas repeticiones. El ciclo de
+  banca de Dan, rehecho en su cuenta desde 55 kg (su 55 × 25 del 06-10). Almacén `entreno-imagenes-45` (vídeos nuevos).

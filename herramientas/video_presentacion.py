@@ -39,7 +39,7 @@ CHROME = Path(r"C:\Program Files\Google\Chrome\Application\chrome.exe")
 # Tema → (data-tema, ¿oscuro?). «claro» y «oscuro» son también los de «Como el móvil».
 TEMAS = {"claro": False, "oscuro": True, "fallout": False, "pixel": False,
          "arcano": True, "matrix": True, "ochentero": True}
-ANCHO, ALTO, ESCALA = 360, 780, 2        # píxeles CSS de un móvil y densidad: el vídeo sale de 720 × 1560
+ANCHO, ALTO, ESCALA = 360, 780, 3        # píxeles CSS de un móvil y densidad: el vídeo sale de 1080 × 2340 (con 2 no era nítido)
 FPS = 30
 DURACION = 3.95                           # luego la app funde la pantalla (0,4 s) sobre el último fotograma
 PUERTO = 9339
@@ -154,7 +154,7 @@ def grabar(chrome, tema, carpeta):
 def codificar(fotogramas, sonido, destino):
     ffmpeg = imageio_ffmpeg.get_ffmpeg_exe()
     subprocess.run([ffmpeg, "-y", "-loglevel", "error", "-framerate", str(FPS), "-i", str(fotogramas / "%04d.png"),
-                    "-i", str(sonido), "-c:v", "libaom-av1", "-crf", "42", "-b:v", "0", "-cpu-used", "4", "-row-mt", "1",
+                    "-i", str(sonido), "-c:v", "libaom-av1", "-crf", "30", "-b:v", "0", "-cpu-used", "4", "-row-mt", "1",
                     "-pix_fmt", "yuv420p", "-c:a", "libopus", "-b:a", "32k", "-ac", "1", "-shortest", str(destino)],
                    check=True)
 

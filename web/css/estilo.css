@@ -1636,7 +1636,9 @@ div.sugerencia > span { display: block; }
   background: var(--fondo); color: var(--texto);
 }
 #presentacion.en-marcha { animation: presentacion-fuera .4s ease-in 3.95s forwards; }
-#presentacion .escena { position: relative; width: 240px; height: 140px; }
+/* Todo al 140 % (Dan: «se ve pequeña») y, en el móvil en vertical, al tamaño al que el vídeo
+   llena la pantalla (--ajuste-video, de index.html): así no hay salto cuando arranca el vídeo. */
+#presentacion .escena { position: relative; width: 240px; height: 140px; scale: calc(1.4 * var(--ajuste-video, 1)); }
 /* La presentación en vídeo (presentacion.js): ocupa toda la pantalla y, en cuanto
    arranca, tapa la animación de debajo. */
 #presentacion .video-presentacion { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }

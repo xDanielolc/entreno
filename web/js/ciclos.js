@@ -14,7 +14,7 @@
 //     valor) | 'manual', porcentaje }.
 // Además se puede cortar o alargar a mano desde la ficha.
 
-import { aPesoDisponible, esperaPrueba, recamaraBilbo, repsMaxBilbo, formatearNumero, generarEscalera, mejorRMDelCiclo, modeloDeEjercicio, registrosDelCiclo, rmDePrueba, rmDeReferencia } from './calculos.js';
+import { aPesoDisponible, esfuerzoTotal, esSerieBilbo, esperaPrueba, recamaraBilbo, seriesDeEjercicio, repsMaxBilbo, formatearNumero, generarEscalera, mejorRMDelCiclo, modeloDeEjercicio, registrosDelCiclo, rmDePrueba, rmDeReferencia } from './calculos.js';
 import { pesoParaReps } from './formula1rm.js';
 
 // La fecha de hoy en hora local (no UTC): entre las 0:00 y las 2:00 en España
@@ -216,12 +216,31 @@ export function inicialSiguiente(datos, ejercicio, prog, ultimoValor, plan = nul
     const sesiones = registrosDelCiclo(datos, ejercicio, plan, prog.cicloActual).length;
     const rm = sesiones >= 3 ? mejorRMDelCiclo(datos, ejercicio, plan, prog.cicloActual) : null;
     if (rm) return aPesoDisponible(ejercicio, conMargen(datos, ejercicio, prog, rm, rm * ((r.porcentaje ?? 50) / 100)));
+    // Sin un ciclo que valga, lo que ya has demostrado: el mayor peso con el que hiciste
+    // las repeticiones de tope en una Bilbo de los últimos 3 meses (las de tus Excel
+    // incluidas). Es más fiable que la fórmula, que con muchas repeticiones se queda corta.
+    const demostrado = pesoBilboDemostrado(datos, ejercicio);
+    if (demostrado) return aPesoDisponible(ejercicio, demostrado);
   }
   if (r.modo === 'porcentaje' || r.modo === 'rm-ciclo') {
     const rm = rmDeReferencia(datos, ejercicio)?.valor;
     if (rm) return aPesoDisponible(ejercicio, conMargen(datos, ejercicio, prog, rm, rm * ((r.porcentaje ?? 50) / 100)));
   }
   return anterior;
+}
+
+const DIAS_BILBO_DEMOSTRADO = 90;
+function pesoBilboDemostrado(datos, ejercicio) {
+  const reps = repsMaxBilbo(datos);
+  const desde = new Date(Date.now() - DIAS_BILBO_DEMOSTRADO * 86_400_000).toISOString().slice(0, 10);
+  let mejor = null;
+  for (const x of seriesDeEjercicio(datos, ejercicio.id)) {
+    if (x.sesion.fecha < desde || !x.serie.hecha || !(x.serie.carga > 0)) continue;
+    if (x.serie.tipo !== 'bilbo' && !esSerieBilbo(ejercicio, x.serie)) continue;
+    if ((esfuerzoTotal(x.serie) ?? 0) + (x.serie.recamara ?? 0) < reps) continue;
+    if (mejor == null || x.serie.carga > mejor) mejor = x.serie.carga;
+  }
+  return mejor;
 }
 
 // Añade un ciclo nuevo a la progresión (mutando). Devuelve el ciclo.
