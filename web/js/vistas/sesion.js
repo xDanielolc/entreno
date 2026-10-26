@@ -6,7 +6,7 @@ import { crearPlanesRapidos } from '../rapidas.js';
 import { nombreRegla, planesDeItem, seriesDesdePlan } from '../series.js';
 import {
   aPesoDisponible, cargaCorporal, cargaDesdeLectura, conMancuernas, recamaraBilbo, repsMaxBilbo, unLado, esfuerzoTotal, formatearNumero,
-  esBajada, esMaxima, pasoDe, pesoDePlan, recamaraPorDefectoDe, redondear, rmDelEjercicio, rmDeReferencia, seriesDeEjercicio, sugerenciaSerie, trabajoSerie, tramosPropuestos, usaTramos,
+  esBajada, esMaxima, pasoDe, pesoDePlan, recamaraPorDefectoDe, records, redondear, rmDelEjercicio, rmDeReferencia, seriesDeEjercicio, sugerenciaSerie, trabajoSerie, tramosPropuestos, usaTramos,
 } from '../calculos.js';
 import { modeloDe, pesoParaReps, repsParaIgualar, rmDeSerie } from '../formula1rm.js';
 import { guiaTrasPrueba, marcarVista, pintarGuia, pista } from './tutorial.js';
@@ -654,15 +654,21 @@ export function vistaSesion(contenedor, { id }) {
       : rm.origen === 'hoy' ? ['Ahora sale de ', resaltado(`tu serie de hoy: ${textoSerie(ej, rm.serie)}`), '.']
         : rm.origen === 'manual' ? ['Ahora es ', resaltado('el que pusiste a mano'), '.']
           : ['Ahora sale de ', resaltado(rm.serie ? `tu entrenamiento del ${fechaCorta(rm.fecha)}: ${textoSerie(ej, rm.serie)}` : 'tu mejor serie de siempre'), '.'];
+    // Al lado, tu mejor de siempre, para comparar (Dan, 26-10: «también quiero comparación con el absoluto»).
+    const absoluto = records(d, ej.id).mejor1RM;
+    const conAbsoluto = rm && absoluto && Math.round(absoluto.valor) > Math.round(rm.valor);
     return h('div', { class: 'linea-1rm' },
-      h('span', {}, 'Tu 1RM: ', h('strong', { 'data-rm-ejercicio': ej.id }, rm ? `${formatearNumero(Math.round(rm.valor))} kg` : 'aún no lo sabe la app')),
+      h('span', {}, 'Tu 1RM: ', h('strong', { 'data-rm-ejercicio': ej.id }, rm ? `${formatearNumero(Math.round(rm.valor))} kg` : 'aún no lo sabe la app'),
+        conAbsoluto ? h('span', { class: 'suave' }, ` · récord ${formatearNumero(Math.round(absoluto.valor))} kg (${fechaCorta(absoluto.fecha)})`) : null),
       ayuda('Tu 1RM en este ejercicio', [
         origen,
         'El 1RM es el peso con el que harías una sola repetición. La app usa uno solo por ejercicio para calcular los pesos y los porcentajes.',
-        'Sale de tu mejor serie de 12 repeticiones o menos de las últimas 8 semanas, sin contar las Bilbo: por encima de 12 la recámara se calcula peor. Solo si no tienes ninguna así valen las largas. Si has hecho una serie máxima, manda la última (la de hoy, en cuanto la apuntes): es la medida más fiable. Si nunca has hecho el ejercicio, vale el que pongas a mano; si tampoco hay, la primera serie hace de prueba.',
+        'Sale de tu mejor serie de 12 repeticiones o menos de las últimas 8 semanas, sin contar las Bilbo: por encima de 12 la recámara se calcula peor. Solo si no tienes ninguna así valen las largas. Si has hecho series máximas, manda la mejor de las 3 últimas (la de hoy cuenta en cuanto la apuntes): es la medida más fiable y así un día malo no te baja el peso. Si nunca has hecho el ejercicio, vale el que pongas a mano; si tampoco hay, la primera serie hace de prueba.',
         'Si hoy haces una serie corta que da más (o la base salía de series largas), manda la de hoy, y las series de debajo cuyo peso puso la app se ajustan solas mientras no hayas hecho ninguna de ellas (las que hayas cambiado tú, no).',
+        'El récord es tu mejor 1RM estimado de siempre, solo para comparar: no cambia los pesos.',
+        'Si hoy estás cansado, «Cambiar» pone otro 1RM y las series que te quedan se rehacen con él.',
         'No cuentan los calentamientos ni las series con más de 5 en recámara: lejos del fallo, la estimación se equivoca mucho.']),
-      (!rm || rm.origen === 'manual') && ej.carga?.tipo !== 'pesoCorporal'
+      ej.carga?.tipo !== 'pesoCorporal'
         && h('button', { type: 'button', class: 'boton enlace', onclick: () => ponerRMaMano(ej, null) }, rm ? 'Cambiar' : 'Lo sé'));
   }
 

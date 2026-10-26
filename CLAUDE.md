@@ -1412,3 +1412,14 @@ mudo. El tema se guarda también en localStorage (`entreno-tema`, `aplicarTema`)
   al nombre en el ochentero (`.marca-app::after`), lluvia de letras de Matrix al cambiar de pantalla en el tema
   Terminal (`lluvia-matrix.js`, nada con «reducir movimiento»). Botones del mapa más cortos («Esta semana», «Menos
   entrenado»).
+
+## Ronda 0.67.0 (26-10-2026): 1RM de las 3 últimas máximas y test de atención
+
+- 1RM de referencia (`rmReciente`, `rmDelEjercicio` en calculos.js): con series máximas, manda la mejor de las 3
+  últimas sesiones con máxima (`MAXIMAS_QUE_CUENTAN`); la de hoy cuenta como una de ellas. Un día malo no baja el
+  peso. En el entreno, junto a «Tu 1RM», el récord de siempre para comparar (`records`). «Cambiar» sale siempre: un
+  1RM puesto a mano hoy manda en ese entreno (salvo una máxima apuntada después).
+- Test de atención (PVT) en el Diario, hecho por la conversación del sueño y publicado desde aquí: `vistas/pvt.js`,
+  esquema v26 (`diario[].pvt[]`, `perfil.avisarPvt`, `perfil.avisarPvtHora`), aviso de la mañana en Ajustes →
+  Descansos (`avisoTestAtencion` en ajustes.js) y tarjeta en Hoy. Sin `periodicsync` en sw.js: el aviso solo llega
+  con la app abierta. Reparto con esa conversación: sueño suyo, ejercicio mío; ella avisa y yo publico.

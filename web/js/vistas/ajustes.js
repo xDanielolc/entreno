@@ -5,7 +5,8 @@ import { BILBO_RECAMARA_POR_DEFECTO, BILBO_REPS_MAX_POR_DEFECTO, REDONDEO_MANCUE
 import * as estado from '../estado.js';
 import { apartarCopia, copiasAparte, desconectar, eliminarCuenta, juntarCopia, rehacerCopiasLegibles, sincronizar, situacionActual } from '../sincronizacion.js';
 import { apartadoPlegable, ayuda, modal, selector } from '../ui.js';
-import { ADELANTO_SEMANAL_MIN, NECESIDAD_SUENO_POR_DEFECTO, SUENO_MINIMO_H } from '../diario.js';
+import { ADELANTO_SEMANAL_MIN, NECESIDAD_SUENO_POR_DEFECTO, SUENO_MINIMO_H, horaAvisoPvt } from '../diario.js';
+import { activarAvisoPvt, programarAvisoPvt, quitarAvisoPvt } from './pvt.js';
 import { VERSION_APP } from '../version.js';
 import { anadir, aviso, confirmar, h, hoyISO, leerNumero } from '../ui.js';
 import { DESCANSO_ESTIRAMIENTOS_POR_DEFECTO, DESCANSO_TRAMOS_POR_DEFECTO, RESPIRACION_POR_DEFECTO, activarNotificaciones, probarAviso, puedeNotificar } from './descanso.js';
@@ -20,6 +21,34 @@ import { pista } from './tutorial.js';
 import { botonImportar } from './importar.js';
 import { MODOS_ENTRENO } from './sesion.js';
 import { TEMAS, aplicarTema, hacerCuestionario } from './cuestionario.js';
+
+// Aviso de la mañana para hacer el test de atención del Diario. Una web no se
+// despierta sola con el navegador cerrado, así que el texto no promete más de
+// lo que puede: con la app abierta suena a su hora y, si no, queda la tarjeta
+// de «hoy no lo has hecho» en Hoy y en el Diario.
+function avisoTestAtencion(d) {
+  const permiso = puedeNotificar() ? Notification.permission : 'no';
+  const activo = Boolean(d.perfil.avisarPvt) && permiso === 'granted';
+  const hora = horaAvisoPvt(d);
+  const texto = activo ? `¡Te aviso a las ${hora ?? '--:--'} para el test de atención!`
+    : d.perfil.avisarPvt && permiso === 'denied' ? 'Este móvil tiene bloqueados los avisos de la app'
+      : d.perfil.avisarPvt ? 'Falta el permiso en este móvil: tocar para darlo'
+        : 'Sin aviso del test de atención: tocar para activarlo';
+  return [
+    h('h3', {}, 'Test de atención por la mañana'),
+    h('div', { class: 'fila-marcas compacta' },
+      h('button', { type: 'button', class: `boton-marca${activo ? ' activo' : ''}`, 'aria-pressed': String(activo),
+        onclick: async () => { if (activo) { quitarAvisoPvt(); return; } await activarAvisoPvt(); } }, texto)),
+    activo && h('label', { class: 'campo' },
+      h('span', { class: 'etiqueta-campo' }, 'Hora del aviso'),
+      h('input', { type: 'time', value: hora ?? '',
+        onchange: (ev) => { estado.cambiar((x) => { x.perfil.avisarPvtHora = ev.target.value || null; }); programarAvisoPvt(); } })),
+    h('small', { class: 'nota' }, !hora
+      ? 'Sin hora: pon en Perfil la hora a la que quieres levantarte y el aviso saldrá media hora después.'
+      : 'Media hora después de tu hora de levantarte, salvo que pongas otra. Solo avisa si ese día aún no has hecho el test. '
+        + 'Con el navegador cerrado puede no llegar; entonces lo verás en Hoy y en el Diario al abrir la app.'),
+  ];
+}
 
 // Ajustes: lo importante arriba (perfil y cuenta) y el resto en apartados
 // plegados, para que no se vea todo de golpe.
@@ -167,7 +196,11 @@ export function vistaAjustes(contenedor) {
         numeroAjuste('Coger aire (s)', d.perfil.respiracion?.inspirar ?? RESPIRACION_POR_DEFECTO.inspirar,
           (x, v) => { x.perfil.respiracion = { ...RESPIRACION_POR_DEFECTO, ...x.perfil.respiracion, inspirar: v }; }),
         numeroAjuste('Soltarlo (s)', d.perfil.respiracion?.espirar ?? RESPIRACION_POR_DEFECTO.espirar,
-          (x, v) => { x.perfil.respiracion = { ...RESPIRACION_POR_DEFECTO, ...x.perfil.respiracion, espirar: v }; }))),
+          (x, v) => { x.perfil.respiracion = { ...RESPIRACION_POR_DEFECTO, ...x.perfil.respiracion, espirar: v }; })),
+      // --- Aviso del test de atención (PVT), por la mañana. Mismo patrón que
+      // el aviso del descanso de aquí arriba: el permiso es de este móvil y el
+      // ajuste viaja con la cuenta. El test está en el Diario.
+      avisoTestAtencion(d)),
 
     apartado('Entrenamiento y series',
       h('div', { class: 'campo' },

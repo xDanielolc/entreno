@@ -600,3 +600,28 @@ la vez, a veces sin cobertura):
   media de la primera semana apuntada y la adelanta 15 min por semana sin
   pasarse de la hora objetivo, con un tope que nunca deja menos de 7 h de
   sueño real. Nada de esto se guarda: se calcula al pintar.
+
+- **v26 (fase B del Diario: el test de atención).** Cada día del diario puede
+  llevar `pvt[]`, una **lista** (puede haber más de un test al día: uno por la
+  mañana y otro por la tarde). Cada test es
+  `{ hora: "09:14", modo, velocidad, mediaMs, lapsos, falsos }`: la hora a la
+  que se hizo, la duración (`modo`: `"min3"`, `"min5"` o `"min10"`), la
+  velocidad de respuesta en respuestas por segundo (la media de 1/TR, con tres
+  decimales), el tiempo de reacción medio en milisegundos, el número de lapsos
+  y el de falsos toques. Nada más se guarda: las medias, la media móvil de 7
+  tests, la línea base y la comparación se calculan al pintar
+  (`web/js/diario.js`, `MODOS_PVT`).
+  Las tres duraciones **no se mezclan nunca**: 3 min con intervalos de 1 a 4 s
+  y lapso por encima de 355 ms; 5 y 10 min con intervalos de 2 a 10 s y lapso
+  por encima de 500 ms. Por defecto, 5 min, que es la única con un cambio
+  mínimo detectable publicado (Thompson 2022; por debajo del 11-12 % no es un
+  cambio, es ruido). En gente descansada el de 3 min y el de 10 ni se parecen
+  (r = 0,134; Antler 2022) y no hay baremos de ninguna versión (Taillard 2024,
+  PMID 38401239): la comparación es siempre con uno mismo. El dato principal
+  es la velocidad, porque con 7 h en cama baja aunque los lapsos no suban
+  (Belenky 2003).
+  En el perfil, dos campos nuevos opcionales para el recordatorio de la
+  mañana: `avisarPvt` (true, false o null si aún no se ha contestado) y
+  `avisarPvtHora` («HH:MM»; sin ella, media hora después de
+  `levantarseObjetivo`). Nada que convertir: los archivos de antes llegan sin
+  tests y sin aviso.

@@ -3,16 +3,19 @@
 // jet lag social, regularidad y tus repeticiones en los básicos). La sensación
 // se guarda como dato, pero no decide nada sola.
 //
-// De aquí sale también la tarjeta de Inicio con la hora de acostarse de esta
-// semana (`tarjetaHoraAcostarse`).
+// De aquí salen también las dos tarjetas de Inicio: la hora de acostarse de
+// esta semana (`tarjetaHoraAcostarse`) y el recordatorio del test de atención
+// (`tarjetaPvtPendiente`). El test en sí está en `vistas/pvt.js`.
 import * as estado from '../estado.js';
 import { formatearNumero } from '../calculos.js';
 import { apuntarPeso, quitarPeso } from '../peso.js';
 import {
-  ADELANTO_SEMANAL_MIN, ALCOHOL, NECESIDAD_SUENO_POR_DEFECTO, SENSACIONES, SUENO_MINIMO_H, apuntarEnDiario, calcularSueno,
-  entradaDe, horaAcostarse, resumenUltimos7, textoHoras,
+  ADELANTO_SEMANAL_MIN, ALCOHOL, MODOS_PVT, MODO_PVT_POR_DEFECTO, NECESIDAD_SUENO_POR_DEFECTO, SENSACIONES, SUENO_MINIMO_H,
+  apuntarEnDiario, calcularSueno, datosModoPVT, entradaDe, faltaPvtHoy, horaAcostarse, horaAvisoPvt, modoPVT, pvtDelDia,
+  resumenUltimos7, testsPVT, textoHoras,
 } from '../diario.js';
 import { colores, graficaLineas } from './graficas.js';
+import { abrirPVT, activarAvisoPvt, avisoPvtActivo, faltaPermisoPvt, programarAvisoPvt, puedeAvisarPvt } from './pvt.js';
 import { anadir, aviso, ayuda, fechaCorta, h, hoyISO, leerNumero } from '../ui.js';
 
 // El día que se edita arriba (por defecto, hoy). Se elige tocando una fila.
@@ -25,6 +28,8 @@ const CENTRAR = 'justify-content: center';
 export function vistaDiario(contenedor) {
   const d = estado.datos();
   const hoy = hoyISO();
+  // Con la app abierta, el aviso de la mañana se programa aquí (y en Hoy).
+  programarAvisoPvt();
   const fecha = diaElegido ?? hoy;
   const e = entradaDe(d, fecha) ?? {};
   const peso = (d.perfil.pesos ?? []).find((p) => p.fecha === fecha)?.kg ?? null;
@@ -112,6 +117,7 @@ export function vistaDiario(contenedor) {
         document.querySelector('.tabla-diario')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } }, 'Guardar el día')),
 
+    tarjetaPVT(d, fecha, hoy),
     tablaDias(d, fecha),
     resumen(d, hoy),
     graficas(d, necesidad),
@@ -157,6 +163,85 @@ function tablaDias(d, elegida) {
       })))));
 }
 
+// ---------------------------------------------------------------------------
+// Test de atención (PVT)
+// ---------------------------------------------------------------------------
+
+const AYUDA_PVT = [
+  'Sale un contador en el centro de la pantalla en momentos al azar y tocas lo antes posible. Mide lo despierto que estás de verdad, que es otra cosa que lo despierto que te sientes: la sensación se acostumbra a dormir poco mientras el rendimiento sigue cayendo (Van Dongen 2003).',
+  'El dato principal es la velocidad de respuesta (respuestas por segundo: la media de 1 dividido entre cada tiempo de reacción). Los lapsos, que son las reacciones tan lentas que cuentan como despiste, se apuntan pero sirven de poco en alguien descansado: con 7 h en cama la velocidad baja y los lapsos no suben (Belenky 2003), así que mirando solo los lapsos un recorte de sueño parece gratis cuando no lo es.',
+  'Tres duraciones: 3, 5 y 10 minutos. Viene marcada la de 5 porque es la única con un cambio mínimo detectable publicado (Thompson 2022): por debajo de un 11-12 % de diferencia no es un cambio, es ruido. Sus números no se mezclan nunca entre sí: en gente descansada el de 3 min y el de 10 ni siquiera se parecen (r = 0,134; Antler 2022, 83 adultos).',
+  'No hay baremos publicados de ninguna versión (Taillard 2024, PMID 38401239): te comparas contigo y con nadie más. Y tocar una pantalla táctil añade unos 68 ms (Arsintescu 2017), así que hazlo siempre con el mismo móvil y en la misma postura, a la misma hora, antes del té o el café.',
+  'La app decide sobre la media de tus últimos 7 tests, nunca sobre un día suelto, y tu línea base son tus primeros 21 días de tests.',
+];
+
+// En el día de hoy: el botón para hacerlo, lo que hayas hecho ya y el aviso de
+// la mañana. En un día pasado, solo lo que hubo (el test se hace en directo).
+function tarjetaPVT(d, fecha, hoy) {
+  const hechos = pvtDelDia(d, fecha);
+  const esHoy = fecha === hoy;
+  const porDefecto = datosModoPVT(MODO_PVT_POR_DEFECTO);
+  return h('section', { class: 'tarjeta' },
+    h('div', { class: 'titulo-con-ayuda', style: CENTRAR }, h('h2', {}, 'Test de atención'),
+      ayuda('Test de atención', AYUDA_PVT)),
+    hechos.length ? tablaPVT(hechos) : h('p', { class: 'nota' }, esHoy
+      ? `Hoy todavía no lo has hecho. Son ${porDefecto.minutos} minutos (o 3, o 10: lo eliges al empezar).`
+      : 'Ese día no hiciste ninguno.'),
+    esHoy
+      ? h('button', { type: 'button', class: 'boton grande', onclick: () => abrirPVT({ alCerrar: () => estado.emitir('vista') }) },
+        hechos.length ? 'Hacer otro test' : 'Hacer el test')
+      : h('p', { class: 'nota' }, 'El test se apunta en el día en que se hace.'),
+    esHoy && filaAvisoPVT(d));
+}
+
+// Velocidad con coma decimal, que es como escribe los números la app.
+const velocidadTexto = (v) => (v > 0 ? formatearNumero(Math.round(v * 100) / 100) : '—');
+
+// Los falsos toques no salen aquí (sí en los resultados del test): con seis
+// columnas la tabla no cabe en 375 px.
+function tablaPVT(hechos) {
+  return h('div', { class: 'tabla-desliza' }, h('table', { class: 'tabla-musculos' },
+    h('thead', {}, h('tr', {}, ['Hora', 'Dura', 'Velocidad', 'Reacción', 'Lapsos'].map((t) => h('th', {}, t)))),
+    h('tbody', {}, hechos.map((t) => h('tr', {},
+      h('td', {}, t.hora ?? '—'),
+      h('td', {}, datosModoPVT(modoPVT(t)).corto),
+      h('td', {}, velocidadTexto(t.velocidad)),
+      h('td', {}, t.mediaMs != null ? `${t.mediaMs} ms` : '—'),
+      h('td', {}, String(t.lapsos ?? '—')))))));
+}
+
+// Activar aquí el aviso de la mañana, que es donde se nombra el test (regla de
+// Dan: una opción va donde se nombra). El interruptor completo, con su hora,
+// está en Ajustes → Descansos; aquí no se repite para no tener dos mandos de
+// lo mismo. Los textos no prometen más de lo que una web puede: con el
+// navegador cerrado el aviso puede no llegar, y entonces queda la tarjeta.
+function filaAvisoPVT(d) {
+  if (!puedeAvisarPvt()) return null;
+  const hora = horaAvisoPvt(d);
+  if (avisoPvtActivo()) {
+    return h('p', { class: 'nota' }, hora
+      ? `Te aviso a las ${hora} si no lo has hecho. Se cambia en Ajustes → Descansos.`
+      : 'Aviso puesto. Para saber a qué hora, pon la hora de levantarte en Ajustes → Perfil.');
+  }
+  return h('div', {},
+    h('button', { type: 'button', class: 'boton secundario', onclick: () => activarAvisoPvt() },
+      faltaPermisoPvt() ? 'Falta el permiso en este aparato: darlo' : 'Avísame por la mañana'),
+    h('p', { class: 'nota' }, hora
+      ? `Te avisaría a las ${hora}, si no lo has hecho ya.`
+      : 'Para saber a qué hora, pon la hora de levantarte en Ajustes → Perfil.'));
+}
+
+// La tarjeta de Hoy: lo único que no falla nunca. Solo aparece si ya usas el
+// test (si no, el Diario es quien lo propone) y mientras no esté hecho.
+export function tarjetaPvtPendiente(d, hoy = hoyISO()) {
+  programarAvisoPvt();
+  if (!testsPVT(d).length || !faltaPvtHoy(d, hoy)) return null;
+  return h('section', { class: 'tarjeta aviso-tarjeta', style: 'text-align: center' },
+    h('div', { class: 'antetitulo' }, 'Test de atención'),
+    h('p', {}, `Hoy no lo has hecho todavía. Son ${datosModoPVT(MODO_PVT_POR_DEFECTO).minutos} minutos, antes del té o el café.`),
+    h('button', { type: 'button', class: 'boton', onclick: () => abrirPVT({ alCerrar: () => estado.emitir('vista') }) }, 'Hacer el test'));
+}
+
 // Resumen semanal: los últimos 7 días con datos, un número por línea.
 function resumen(d, hoy) {
   const r = resumenUltimos7(d, hoy);
@@ -175,6 +260,16 @@ function resumen(d, hoy) {
     ['Se mueve: levantarse', textoHoras(r.variacionLevantarse)],
     ['Reps en básicos', r.reps == null ? '—' : `${r.reps}${cambio}`],
   ];
+  // Los tests de atención, cada duración en su línea: un lapso de 3 min no es
+  // un lapso de 10 min, así que no se promedian juntos ni se mezclan. Primero
+  // la velocidad, que es el dato que se mueve cuando se duerme poco.
+  for (const [clave, m] of Object.entries(MODOS_PVT)) {
+    const x = r.pvt?.[clave];
+    if (!x) continue;
+    filas.push([`Velocidad (${m.corto})`, x.velocidad == null ? '—' : `${velocidadTexto(x.velocidad)} resp/s`]);
+    filas.push([`Reacción (${m.corto})`, x.mediaMs == null ? '—' : `${Math.round(x.mediaMs)} ms`]);
+    filas.push([`Lapsos (${m.corto})`, x.lapsos == null ? '—' : formatearNumero(Math.round(x.lapsos * 10) / 10)]);
+  }
   return h('section', { class: 'tarjeta' },
     // Los estilos van en línea: `estilo.css` lo lleva otra tanda de cambios.
     h('div', { class: 'titulo-con-ayuda', style: CENTRAR }, h('h2', {}, 'Resumen semanal'),
@@ -184,6 +279,7 @@ function resumen(d, hoy) {
         'Jet lag social: el punto medio del sueño del fin de semana (las noches del viernes y del sábado) menos el de los días laborables. El punto medio es la hora a la que te duermes más la mitad del sueño real. Dormir más de 1 h extra el fin de semana indica deuda de sueño acumulada (Roenneberg 2012).',
         'Se mueve: cuánto bailan la hora de acostarse y la de levantarse en esos 7 días (la más tardía menos la más temprana). Importa más de lo que parece: la regularidad del sueño predice la mortalidad mejor que la duración (Windred 2024, UK Biobank, 60 977 personas con acelerómetro).',
         'Reps en básicos: las repeticiones de tus series de trabajo de press de banca, sentadilla, peso muerto, remo con barra y press militar, y entre paréntesis el cambio frente a los 7 días anteriores. Dormir poco se nota antes en el volumen que aguantas que en tu 1RM (Cook 2012; Knowles 2022).',
+        'Test de atención: la velocidad (respuestas por segundo), la reacción media y los lapsos de esos días, con una línea por duración. Las duraciones no se promedian nunca juntas: sus umbrales de lapso son distintos (355 y 500 ms) y en gente descansada el de 3 min y el de 10 ni siquiera se parecen (Antler 2022). La velocidad va primero porque es la que baja al dormir menos, mientras que los lapsos pueden no moverse (Belenky 2003).',
       ])),
     h('table', { class: 'tabla-musculos tabla-semana' },
       h('tbody', {}, filas.map(([t, x]) => h('tr', {}, h('td', {}, t), h('td', {}, x))))),

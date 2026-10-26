@@ -148,9 +148,43 @@ fuentes). Hacer la fase A primero: permite empezar la línea base del plan.
       el tope de 7 h de sueño real con su aviso de una línea. Si faltan los
       ajustes o hay menos de 3 noches, la tarjeta dice qué falta en vez de
       inventar un número. Queda pendiente de que Dan lo vea en el móvil.
-- [ ] Fase B: PVT de 3 min, Karolinska, Epworth, línea base de 14 días,
-      semáforo dominical, enlace con «¿Voy hoy?», tema «Sueño y
-      rendimiento» en `bibliografia.js` (y corregir la cifra de Craven).
+- [x] **Fase B, primera parte: el test de atención (PVT).** Hecho (esquema
+      v26). Pantalla propia a oscuras desde el Diario (`web/js/vistas/pvt.js`),
+      con **tres duraciones** elegibles antes de empezar: 3 min (intervalos de
+      1 a 4 s, lapso por encima de 355 ms), 5 min y 10 min (de 2 a 10 s, lapso
+      por encima de 500 ms). **Por defecto, 5 min.** Los tiempos se miden con
+      `performance.now()`; mantener el dedo apoyado no cuenta; salir a mitad o
+      irse a segundo plano descarta el test entero sin guardar nada; se pide
+      `navigator.wakeLock` con su try/catch.
+      El dato principal es la **velocidad de respuesta** (respuestas por
+      segundo, la media de 1/TR), con el tiempo de reacción y los lapsos
+      debajo: con 7 h en cama la velocidad baja pero los lapsos no suben
+      (Belenky 2003). Cada resultado guarda su duración y **las tres no se
+      mezclan nunca** (en gente descansada el de 3 min y el de 10 ni se
+      parecen, r = 0,134; Antler 2022). Se decide sobre la media de los
+      últimos 7 tests, con línea base de los días 8 al 21 y un umbral de
+      cambio real del 11-12 % (Thompson 2022); por debajo, variación normal.
+      Detrás del «?» de los resultados: no hay baremos publicados de ninguna
+      versión (Taillard 2024) y la pantalla táctil añade unos 68 ms
+      (Arsintescu 2017), así que no se cambia de móvil ni se compara con
+      estudios. Los tests se guardan en el día del diario (`pvt[]`, puede
+      haber varios al día) y el resumen semanal lleva velocidad, reacción y
+      lapsos con una línea por duración.
+      **Recordatorio de la mañana**: `perfil.avisarPvt` y `perfil.avisarPvtHora`
+      (por defecto, media hora después de la hora de levantarse), interruptor
+      en Ajustes → Descansos y activación también en el Diario. Una web no se
+      despierta sola con el navegador cerrado: se programa el aviso con la app
+      abierta y se registra `periodicSync` si existe, y lo que no falla es la
+      tarjeta de «hoy no lo has hecho» en Hoy y en el Diario.
+- [ ] **Fase B, lo que queda**: Karolinska, Epworth, semáforo dominical,
+      enlace con «¿Voy hoy?», tema «Sueño y rendimiento» en `bibliografia.js`
+      (y corregir la cifra de Craven). Al PVT le falta, cuando Dan lo haya
+      usado: gráfica de la velocidad por días y, si la quiere, la fila del
+      test en la tabla de 14 días del Diario.
+- [ ] `web/sw.js` (lo publica la otra sesión): añadir `./js/vistas/pvt.js` a
+      `ARCHIVOS`, o sin conexión fallará el Diario. Y, si se quiere que el
+      aviso de la mañana pueda llegar con la app cerrada, escuchar
+      `periodicsync` con la etiqueta `pvt-manana`.
 - [ ] Fase C: prueba de la cama ampliada y plan de adelanto de fase.
 
 ## 1. La app funcionando en condiciones

@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 25;
+export const VERSION_ACTUAL = 26;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -222,6 +222,8 @@ export function archivoNuevo({ nombre = '', correo = null } = {}) {
       necesidadSuenoH: 8.5,
       levantarseObjetivo: null,
       inicioPlanSueno: null,
+      avisarPvt: null,
+      avisarPvtHora: null,
     },
     sedes: [],
     ejercicios: [],
@@ -587,6 +589,21 @@ const MIGRACIONES = {
     datos.perfil.levantarseObjetivo ??= null;
     datos.perfil.inicioPlanSueno ??= null;
     datos.version = 25;
+    return datos;
+  },
+  // v25 → v26: el test de atención (PVT). En cada día del diario, `pvt[]`: una
+  // lista, porque puede haber más de un test al día. Cada uno es
+  // `{ hora, modo, velocidad, mediaMs, lapsos, falsos }`, con `modo` 'min3',
+  // 'min5' o 'min10' (la duración) y la velocidad en respuestas por segundo,
+  // que es el dato principal. Los números de las tres duraciones no se mezclan
+  // nunca. En el perfil, `avisarPvt` (el recordatorio de la mañana) y
+  // `avisarPvtHora` («HH:MM»; sin ella, media hora después de
+  // `levantarseObjetivo`). Nada que convertir: los archivos de antes empiezan
+  // sin tests y sin aviso.
+  25: (datos) => {
+    datos.perfil.avisarPvt ??= null;
+    datos.perfil.avisarPvtHora ??= null;
+    datos.version = 26;
     return datos;
   },
 };

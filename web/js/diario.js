@@ -102,12 +102,18 @@ export function entradaDe(datos, fecha) {
   return (datos.diario ?? []).find((x) => x.fecha === fecha) ?? null;
 }
 
-// Cambia `datos` (dentro de estado.cambiar). Crea la entrada si no existe y
-// la quita si se queda sin nada.
-export function apuntarEnDiario(datos, fecha, campo, valor) {
+// La entrada de ese día, creándola si no existe (dentro de estado.cambiar).
+function entradaOCrear(datos, fecha) {
   datos.diario ??= [];
   let e = datos.diario.find((x) => x.fecha === fecha);
   if (!e) { e = { id: fecha, fecha }; datos.diario.push(e); datos.diario.sort((a, b) => a.fecha.localeCompare(b.fecha)); }
+  return e;
+}
+
+// Cambia `datos` (dentro de estado.cambiar). Crea la entrada si no existe y
+// la quita si se queda sin nada.
+export function apuntarEnDiario(datos, fecha, campo, valor) {
+  const e = entradaOCrear(datos, fecha);
   if (valor == null || valor === '') delete e[campo]; else e[campo] = valor;
   if (Object.keys(e).every((k) => k === 'id' || k === 'fecha')) datos.diario = datos.diario.filter((x) => x !== e);
 }
@@ -187,6 +193,8 @@ export function resumenUltimos7(datos, hoy = hoyISO()) {
     reps,
     repsAntes,
     cambioReps: reps != null && repsAntes ? (reps - repsAntes) / repsAntes : null,
+    // Los tests de atención de esos mismos días, cada versión por su lado.
+    pvt: mediasPVT(dias.flatMap((e) => (e.pvt ?? []).map((t) => ({ ...t, fecha: e.fecha })))),
   };
 }
 
@@ -244,4 +252,181 @@ export function horaAcostarse(datos, hoy = hoyISO()) {
     enCama: arriba - propuesta,
     real: Math.max(0, arriba - propuesta - perdidas),
   };
+}
+
+// ---------------------------------------------------------------------------
+// Test de atención (PVT): tres duraciones y la velocidad como dato principal
+// ---------------------------------------------------------------------------
+//
+// PVT es «psychomotor vigilance task», tarea de vigilancia psicomotora: sale
+// un contador en momentos al azar y hay que tocar cuanto antes.
+//
+// Por qué está montado así, que no es un capricho:
+//   · **No hay baremos publicados** de ninguna versión del PVT (Taillard 2024,
+//     Neurophysiol Clin, PMID 38401239). No existe el «300 ms es lo normal»:
+//     cada uno se compara consigo mismo y con nada más.
+//   · **Tres duraciones**: 3 min (intervalos de 1 a 4 s, lapso por encima de
+//     355 ms), 5 min y 10 min (intervalos de 2 a 10 s, lapso por encima de
+//     500 ms). Por defecto, 5 min: es la única versión con un cambio mínimo
+//     detectable publicado (Thompson 2022: fiabilidad 0,79-0,83 y error
+//     típico del 4,1-4,4 %), o sea, la única con la que se puede decir si una
+//     diferencia es de verdad o es ruido. En gente descansada el de 3 min y
+//     el de 10 no se parecen (r = 0,134, sin significación; Antler 2022, 83
+//     adultos), así que sus números NO se mezclan nunca: cada duración va por
+//     su lado en el resumen, en la media móvil y en la línea base.
+//   · **La velocidad manda**: es la media de 1 dividido entre cada tiempo de
+//     reacción en segundos (respuestas por segundo; se promedian los
+//     inversos, no se invierte la media, que es como se hace en el PVT). Los
+//     lapsos no sirven para seguir a alguien descansado: la mediana es de 0 o
+//     1 por sesión y Thompson 2022 no pudo ni estimar su fiabilidad. Y, sobre
+//     todo, con 7 h en cama la velocidad baja pero los lapsos no suben
+//     (Belenky 2003): mirando lapsos, un recorte de sueño parece gratis
+//     cuando no lo es.
+//   · **Se decide sobre medias de 7 tests, no sobre un día suelto**, y solo se
+//     llama cambio a lo que pasa del 11-12 % respecto a la base (2,77 × el
+//     error típico de Thompson 2022, el cambio mínimo detectable).
+//   · **La línea base son los días 1 al 21** (decisión de Dan, 26-10-2026). El
+//     PVT no tiene curva de aprendizaje (Langner 2023; Graw 2004), pero los
+//     primeros días hay ruido de familiarización y no hay nada publicado
+//     sobre cuántos hacen falta.
+export const MODOS_PVT = {
+  min3: { etiqueta: '3 min', corto: '3 min', minutos: 3, duracionMs: 3 * 60 * 1000, isiMinMs: 1000, isiMaxMs: 4000, lapsoMs: 355, esperaMaxMs: 10_000 },
+  min5: { etiqueta: '5 min', corto: '5 min', minutos: 5, duracionMs: 5 * 60 * 1000, isiMinMs: 2000, isiMaxMs: 10_000, lapsoMs: 500, esperaMaxMs: 30_000 },
+  min10: { etiqueta: '10 min', corto: '10 min', minutos: 10, duracionMs: 10 * 60 * 1000, isiMinMs: 2000, isiMaxMs: 10_000, lapsoMs: 500, esperaMaxMs: 30_000 },
+};
+export const MODO_PVT_POR_DEFECTO = 'min5';
+// Por debajo de esto no hay reacción posible: es haberse adelantado.
+export const ANTICIPACION_PVT_MS = 100;
+// Cambio mínimo detectable: 2,77 × el error típico del 4,1-4,4 % de Thompson
+// 2022. Por debajo, es la variación normal de uno mismo.
+export const CAMBIO_REAL_PVT = 0.115;
+// Sobre cuántos tests se decide, y qué días forman la línea base.
+export const TESTS_MEDIA_MOVIL = 7;
+export const DIA_INICIO_BASE = 1;
+export const DIA_FIN_BASE = 21;
+export const TESTS_MINIMOS_BASE = 5;
+// El aviso de la mañana, si no se pone otra hora: media hora después de la
+// hora de levantarse que ya está en el perfil.
+export const AVISO_PVT_TRAS_LEVANTARSE_MIN = 30;
+
+export const modoPVT = (test) => (MODOS_PVT[test?.modo] ? test.modo : MODO_PVT_POR_DEFECTO);
+export const datosModoPVT = (modo) => MODOS_PVT[modo] ?? MODOS_PVT[MODO_PVT_POR_DEFECTO];
+
+// Velocidad de respuesta en respuestas por segundo, a partir de los tiempos de
+// reacción en milisegundos. Se promedian los inversos (1/TR), que es como se
+// calcula en el PVT; no se invierte la media.
+export function velocidadDeTiempos(ms) {
+  const buenos = ms.filter((x) => x > 0);
+  return buenos.length ? media(buenos.map((x) => 1000 / x)) : null;
+}
+
+// Guarda un test en el día que toque (dentro de estado.cambiar). Es una lista:
+// puede haber más de uno al día (uno por la mañana y otro por la tarde).
+export function apuntarPVT(datos, fecha, test) {
+  const e = entradaOCrear(datos, fecha);
+  (e.pvt ??= []).push(test);
+}
+
+// Todos los tests apuntados, del más antiguo al más reciente, cada uno con su
+// fecha. Con `modo`, solo los de esa duración.
+export function testsPVT(datos, modo = null) {
+  return (datos?.diario ?? [])
+    .slice()
+    .sort((a, b) => a.fecha.localeCompare(b.fecha))
+    .flatMap((e) => (e.pvt ?? []).map((t) => ({ ...t, fecha: e.fecha })))
+    .filter((t) => !modo || modoPVT(t) === modo);
+}
+
+// Los tests de un día concreto, en el orden en que se hicieron.
+export function pvtDelDia(datos, fecha) {
+  return (entradaDe(datos ?? {}, fecha)?.pvt ?? []).map((t) => ({ ...t, fecha }));
+}
+
+function resumirTests(tests) {
+  return {
+    tests: tests.length,
+    velocidad: media(tests.map((t) => t.velocidad).filter((v) => v > 0)),
+    mediaMs: media(tests.map((t) => t.mediaMs).filter((v) => v > 0)),
+    lapsos: media(tests.map((t) => t.lapsos).filter((v) => v != null)),
+  };
+}
+
+// Medias de una lista de tests, cada duración por su lado. Devuelve un objeto
+// con una entrada por modo, null en los que no tengan ningún test.
+export function mediasPVT(tests) {
+  const salida = {};
+  for (const modo of Object.keys(MODOS_PVT)) {
+    const suyos = tests.filter((t) => modoPVT(t) === modo);
+    salida[modo] = suyos.length ? resumirTests(suyos) : null;
+  }
+  return salida;
+}
+
+// La media móvil: los últimos 7 tests de esa duración, el de hoy incluido. Es
+// sobre esto sobre lo que se mira si algo ha cambiado, nunca sobre un día.
+export function mediaMovilPVT(datos, modo) {
+  const suyos = testsPVT(datos, modo).slice(-TESTS_MEDIA_MOVIL);
+  return suyos.length ? { ...resumirTests(suyos), desde: suyos[0].fecha, hasta: suyos.at(-1).fecha } : null;
+}
+
+// Tu línea base de una duración: los tests de los días 1 al 21 contando desde
+// el primero que hiciste de esa duración. Dan eligió el 26-10-2026 contar desde
+// el primer día en vez de tirar la primera semana, para tener base antes; el
+// test no tiene curva de aprendizaje (Langner 2023; Graw 2004), así que el
+// riesgo es solo el ruido de los primeros días. Devuelve
+// { falta: 'dias' | 'tests', … } mientras no se pueda calcular: antes que un
+// número flojo, ninguno.
+export function baseDePVT(datos, modo) {
+  const todos = testsPVT(datos, modo);
+  if (!todos.length) return { falta: 'dias', tests: 0, dias: 0 };
+  const primero = todos[0].fecha;
+  const desde = masDias(primero, DIA_INICIO_BASE - 1);
+  const hasta = masDias(primero, DIA_FIN_BASE - 1);
+  const dentro = todos.filter((t) => t.fecha >= desde && t.fecha <= hasta && t.velocidad > 0);
+  if (dentro.length < TESTS_MINIMOS_BASE) {
+    return { falta: 'tests', desde, hasta, primero, tests: dentro.length };
+  }
+  // Primero se promedia cada día (puede tener dos tests) y luego los días.
+  const porDia = new Map();
+  for (const t of dentro) {
+    if (!porDia.has(t.fecha)) porDia.set(t.fecha, []);
+    porDia.get(t.fecha).push(t);
+  }
+  const dias = [...porDia.values()];
+  return {
+    modo,
+    dias: dias.length,
+    tests: dentro.length,
+    desde,
+    hasta,
+    primero,
+    velocidad: media(dias.map((ts) => media(ts.map((t) => t.velocidad)))),
+    mediaMs: media(dias.map((ts) => media(ts.map((t) => t.mediaMs).filter((v) => v > 0))).filter((v) => v != null)),
+    lapsos: media(dias.map((ts) => media(ts.map((t) => t.lapsos ?? 0)))),
+  };
+}
+
+// Una velocidad frente a la línea base. `cambio` es la diferencia relativa
+// (positivo = más rápido que la base) y `real` dice si pasa del cambio mínimo
+// detectable; por debajo de eso es la variación normal de cualquiera.
+export function compararConBase(velocidad, base) {
+  if (!(velocidad > 0) || !base || base.falta || !(base.velocidad > 0)) return null;
+  const cambio = (velocidad - base.velocidad) / base.velocidad;
+  return { base, cambio, real: Math.abs(cambio) >= CAMBIO_REAL_PVT, masLento: cambio < 0 };
+}
+
+// La hora del aviso de la mañana: la que se haya puesto o, si no, media hora
+// después de la hora de levantarse objetivo del perfil. null si no hay ninguna
+// de las dos (entonces no se puede avisar y la app no lo promete).
+export function horaAvisoPvt(datos) {
+  const p = datos?.perfil ?? {};
+  if (/^\d{1,2}:\d{2}$/.test(p.avisarPvtHora ?? '')) return p.avisarPvtHora;
+  const arriba = minutos(p.levantarseObjetivo);
+  return arriba == null ? null : textoHora(arriba + AVISO_PVT_TRAS_LEVANTARSE_MIN);
+}
+
+// ¿Falta el test de hoy? Cuenta cualquiera de las duraciones: el recordatorio
+// es para no olvidarse, no para exigir una en concreto.
+export function faltaPvtHoy(datos, fecha = hoyISO()) {
+  return pvtDelDia(datos, fecha).length === 0;
 }
