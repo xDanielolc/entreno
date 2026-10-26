@@ -1354,3 +1354,12 @@ real). Campos en Ajustes → Perfil (`camposSueno`). Ver docs/pendientes.md, sec
   máquina asistida). En el ordenador ya no sale «¿Te aviso cuando acabe cada descanso?» (solo con pantalla táctil,
   `enMovil()` en descanso.js); si el permiso no llega, la tarjeta se va y el aviso dice «el navegador» y cómo
   cambiarlo.
+
+## 0.64.3 (26-10-2026): prehecha «Flexibilidad: spagat y hombro»
+
+Hecha desde la conversación de la investigación «Elasticidad» (carpeta «Investigación flexibilidad», plan personal y
+`RUTINA_app_flexibilidad.md`). `flexibilidad-spagat-y-hombro` en plantillas.js, tipo flexibilidad, un solo día de unos
+20 min para casa, 4 veces por semana: CARs de cadera; isquios (Janu Sirsasana, la postura que a Dan le va bien) y psoas
+en zancada 6 × 45 s (1-3 un lado, 4-6 el otro); apertura lateral 2 × 60 s; pectoral en marco de puerta 6 × 45 s;
+dorsal 2 × 60 s; prueba mensual opcional en la zancada hacia el split frontal (cm ingle-suelo). Fuentes en `porQue`.
+Solo se tocaron plantillas.js, version.js, sw.js y este archivo.

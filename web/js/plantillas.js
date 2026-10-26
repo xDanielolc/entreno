@@ -386,6 +386,45 @@ Elevación de piernas colgado: 2 × 8-12 (piernas estiradas; 60-90 s)`),
     ],
   },
   {
+    id: 'flexibilidad-spagat-y-hombro',
+    tipo: 'flexibilidad',
+    version: 1,
+    nombre: 'Flexibilidad: spagat y hombro',
+    autor: 'Dan (investigación «Elasticidad», 10-2026)',
+    resumen: 'Una sesión de unos 20 minutos para casa, cuatro veces por semana: primero el spagat frontal (isquios y psoas), '
+      + 'después la apertura lateral, el pectoral y el dorsal. Con los estiramientos cortos de los descansos del gimnasio, '
+      + 'cada músculo suma unos 10 minutos por semana.',
+    porQue: 'Estirar con regularidad mejora el rango con un efecto grande (Konrad 2024), y estático y contraer-relajar rinden igual. '
+      + 'Lo primero que cambia es la tolerancia del sistema nervioso; el músculo se ablanda después, con semanas de tensión clara '
+      + '(Freitas 2018; Takeuchi 2023). La ganancia se estanca hacia los 10 minutos por semana y músculo (Ingram 2025), aunque el '
+      + 'metaanálisis más grande no ve diferencias por dosis dentro de lo habitual (Konrad 2024). 30-45 segundos por serie bastan '
+      + '(Bandy 1994) y el dolor no da más rango (Muanjai 2017). Isquios con la espalda recta: con la espalda redonda el isquio gana '
+      + 'menos (Sullivan 1992). El frontal va primero porque es la meta principal; el lateral puede toparse con el hueso en las '
+      + 'caderas con choque femoroacetabular (Tannast 2007). Decisiones prácticas sin estudio propio: el orden, el reparto de series '
+      + 'y los 10 segundos entre series.',
+    comoSeHace: 'Cuatro veces por semana, por la tarde (nunca en la primera hora tras levantarte), mejor tras moverte un poco. '
+      + 'Intensidad 6-7 sobre 10, en la panza del músculo, nunca en la articulación. En Ajustes, pon 10 s de descanso entre '
+      + 'estiramientos. Si un día vas justo, recorta el final, no el principio. Para y consúltalo si notas un pinchazo profundo en la '
+      + 'ingle, dolor junto al hueso de la nalga, hormigueo por la pierna o un chasquido. La prueba del final es opcional: hazla una '
+      + 'vez al mes, a la misma hora, y apunta los centímetros de la ingle al suelo.',
+    dias: [
+      { nombre: 'Spagat y hombro', ejercicios: [
+        e('CARs de cadera', [t(60)], { nota: 'Calentar: círculos grandes y lentos, 3 por lado' }),
+        e('Estiramiento de isquios (Janu Sirsasana)', [t(45), t(45), t(45), t(45), t(45), t(45)],
+          { nota: 'Series 1-3 una pierna, 4-6 la otra. Pecho hacia la rodilla con la espalda recta, sin redondear' }),
+        e('Estiramiento de psoas en zancada (Anjaneyasana)', [t(45), t(45), t(45), t(45), t(45), t(45)],
+          { nota: 'Series 1-3 un lado, 4-6 el otro. Rodilla de atrás en el suelo; mete la cola y aprieta el glúteo antes de avanzar' }),
+        e('Postura del sastre, apertura lateral (Upavistha Konasana)', [t(60), t(60)],
+          { nota: 'Tronco hacia delante desde la cadera con la espalda recta; ladrillo bajo las manos si hace falta' }),
+        e('Estiramiento de pectoral en el marco de la puerta', [t(45), t(45), t(45), t(45), t(45), t(45)],
+          { nota: 'Series 1-3 un lado, 4-6 el otro. Brazo a 90°; sin dolor de hombro' }),
+        e('Estiramiento de dorsal', [t(60), t(60)], { nota: 'De rodillas, codos en una silla, pecho hacia el suelo' }),
+        e('Zancada hacia el split frontal (Hanumanasana)', [t(30)],
+          { opcional: true, nota: 'Prueba, una vez al mes: centímetros de la ingle al suelo, cada pierna' }),
+      ] },
+    ],
+  },
+  {
     id: 'cardio-tres-dias',
     tipo: 'cardio',
     nombre: 'Cardio: tres días',
