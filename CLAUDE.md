@@ -1321,3 +1321,4 @@ fase), tras probar la A.
 - 0.63.2: limpieza: fuera el código muerto (`buscarEnCatalogo`, `recomendacionesDeSesion`, `listaRecomendaciones`,
   `rutinaActiva`, `elegirNivel`); la ✕ de los intervalos propios es un botón de verdad, al lado de la opción
   (`.opcion-con-quitar`), y se llega con el teclado.
+- 0.63.3: `calibrar()` se memoriza por las series que usa (antes por `datos.revision`, que cambia con cada tecla).

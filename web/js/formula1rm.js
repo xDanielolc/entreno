@@ -154,11 +154,15 @@ const memoria = new Map();
 // Calibra el factor personal de un ejercicio. Devuelve el modelo y un
 // informe para enseñarlo en la ficha y en Ajustes.
 export function calibrar(datos, ejercicio) {
-  const clave = `${ejercicio.id}:${datos.revision}`;
+  // La clave son las propias series (y la escala), no la revisión de los datos:
+  // así, mientras apuntas un entreno (que no cuenta), no se rehace la búsqueda
+  // con cada tecla.
+  const series = seriesParaCalibrar(datos, ejercicio);
+  const escala = escalaDe(ejercicio);
+  const clave = `${ejercicio.id}:${escala}:${series.map((s) => `${s.fecha}/${s.peso}/${s.reps}/${s.recamara}`).join(',')}`;
   if (memoria.has(clave)) return memoria.get(clave);
 
-  const grupos = ventanas(seriesParaCalibrar(datos, ejercicio));
-  const escala = escalaDe(ejercicio);
+  const grupos = ventanas(series);
   let resultado = { modelo: { tipo: 'personal', factor: 1, escala }, factor: 1, factorDatos: null, ventanas: 0, confianza: 0 };
   if (grupos.length) {
     let mejor = { factor: 1, error: inconsistencia({ tipo: 'personal', factor: 1, escala }, grupos) };
