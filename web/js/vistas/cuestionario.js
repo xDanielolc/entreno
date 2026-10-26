@@ -28,6 +28,7 @@ export const PREGUNTAS = [
     claro: { etiqueta: 'Tema claro' },
     oscuro: { etiqueta: 'Tema oscuro' },
     sistema: { etiqueta: 'Como el móvil', descripcion: 'Sigue el ajuste del sistema.' },
+    otro: { etiqueta: 'Otro con más carácter', descripcion: 'Años 50, pixel art, arcano, heavy metal, terminal u ochentero: se elige en Ajustes → Personalización.' },
   } },
 ];
 

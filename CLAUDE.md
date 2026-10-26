@@ -1330,3 +1330,7 @@ fase), tras probar la A.
 - 0.63.5: «¿Se hace de un solo lado?» en Ajustes finos (`ej.unilateral`, opcional: true/false; sin él, por el nombre);
   `unLado()` lo respeta (nota de la tarjeta y escala del 1RM). El texto del descanso de la ficha explica los descansos
   por tipo de serie.
+- 0.63.6: los seis temas se eligen en Ajustes → Personalización (`opciones(TEMAS, …)`) y el cuestionario ofrece
+  «Otro con más carácter». OJO: en ajustes.js se publicó solo este cambio (índice preparado con `git update-index
+  --cacheinfo` sobre la versión de HEAD); en el archivo de trabajo siguen los campos del plan de sueño que la sesión
+  del sueño dejó sin publicar (y su esquema v25 en esquema.js).

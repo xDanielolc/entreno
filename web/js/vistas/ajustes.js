@@ -18,7 +18,7 @@ import { MODOS_GLOSARIO, modoGlosario } from './glosario.js';
 import { pista } from './tutorial.js';
 import { botonImportar } from './importar.js';
 import { MODOS_ENTRENO } from './sesion.js';
-import { aplicarTema, hacerCuestionario } from './cuestionario.js';
+import { TEMAS, aplicarTema, hacerCuestionario } from './cuestionario.js';
 
 // Ajustes: lo importante arriba (perfil y cuenta) y el resto en apartados
 // plegados, para que no se vea todo de golpe.
@@ -72,9 +72,10 @@ export function vistaAjustes(contenedor) {
     apartado('Personalización',
       h('div', { class: 'campo' },
         h('span', { class: 'etiqueta-campo' }, 'Tema'),
-        opciones({ claro: { etiqueta: 'Claro' }, oscuro: { etiqueta: 'Oscuro' }, sistema: { etiqueta: 'Como el móvil' } }, d.perfil.tema ?? 'sistema',
+        opciones(TEMAS, d.perfil.tema ?? 'sistema',
           (t) => { estado.cambiar((x) => { x.perfil.tema = t; }); aplicarTema(t); }, { compacto: true }),
-        h('small', { class: 'nota' }, 'El diseño con nombre e icono propios llegará más adelante.'))),
+        h('small', { class: 'nota' }, 'Claro, oscuro o como el móvil, y seis con más carácter. Los de fantasía son un primer intento: '
+          + 'si alguno se lee mal en tu móvil, dímelo con una captura.'))),
 
     apartado('Cuenta y copia de seguridad',
       sinCuenta
