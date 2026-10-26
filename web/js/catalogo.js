@@ -495,12 +495,6 @@ export function completarDesdeCatalogo(datos) {
   return n;
 }
 
-export function buscarEnCatalogo(texto) {
-  const f = normalizar(texto);
-  if (!f) return CATALOGO;
-  return CATALOGO.filter((e) => normalizar(`${e.nombre} ${e.grupo} ${e.material} ${e.familia ?? ''}`).includes(f));
-}
-
 export function normalizar(texto) {
   return (texto || '').normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
 }

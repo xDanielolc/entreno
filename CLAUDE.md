@@ -1318,3 +1318,6 @@ fase), tras probar la A.
   entero tampoco los recupera. `creditos.json` vuelve al de la 0.62.0 más el pájaro. OJO: ahora mismo
   `imagenes_ia.py` (entero o de uno) no reproduce esas cinco entradas «-completo»: tras procesar, comparar
   creditos.json con el de antes y restaurar lo que cambie sin querer.
+- 0.63.2: limpieza: fuera el código muerto (`buscarEnCatalogo`, `recomendacionesDeSesion`, `listaRecomendaciones`,
+  `rutinaActiva`, `elegirNivel`); la ✕ de los intervalos propios es un botón de verdad, al lado de la opción
+  (`.opcion-con-quitar`), y se llega con el teclado.

@@ -22,10 +22,6 @@ import { nombreMusculo } from '../musculos.js';
 import { pista } from './tutorial.js';
 import { conGlosario } from './glosario.js';
 
-export function rutinaActiva(datos) {
-  return datos.rutinas.find((r) => r.activa && r.dias.length) ?? null;
-}
-
 // Puede haber varias rutinas activas a la vez (una de gimnasio y otra de
 // casa, por ejemplo).
 export function rutinasActivas(datos) {

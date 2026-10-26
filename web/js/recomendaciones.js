@@ -50,57 +50,6 @@ function terminadas(datos) {
 // De una sesión concreta (al terminar)
 // ---------------------------------------------------------------------------
 
-export function recomendacionesDeSesion(datos, sesion) {
-  const lista = [];
-  const hoy = seriesPorMusculoDeSesion(datos, sesion);
-  const semana = seriesSemanales(datos);
-  const dureza = durezaSemanal(datos);
-  // El volumen semanal solo se juzga con una semana medio hecha: tras la
-  // primera sesión de la semana no tiene sentido decir que falta volumen.
-  const sesionesSemana = terminadas(datos).filter((s) => horasDesdeSesion(s) <= 7 * DIA).length;
-  const inicio = sesion.inicio ? new Date(sesion.inicio) : new Date();
-  const antes = recuperacionPorMusculo({ ...datos, sesiones: datos.sesiones.filter((s) => s.id !== sesion.id) }, inicio);
-
-  for (const m of ORDEN_MUSCULOS) {
-    const nHoy = hoy.get(m);
-    if (!nHoy) continue;
-    const nombre = nombreMusculo(m);
-    const previo = antes[m]?.porcentaje ?? 100;
-    // 1. Poca distancia entre entrenamientos (en lumbares, también como secundario).
-    if (previo < 60 && (nHoy >= 1 || m === 'lumbar')) {
-      lista.push(r('poca-distancia', 'aviso', `${nombre} estaba al ${previo} % cuando lo volviste a entrenar. `
-        + 'Deja más tiempo entre las sesiones que lo cargan: espera a que el mapa lo marque en verde.'));
-    }
-    // 5. Demasiadas series de un músculo en una sola sesión.
-    if (nHoy > 10) {
-      lista.push(r('sesion-cargada', 'consejo', `Hoy has hecho ${series(Math.round(nHoy * 10) / 10)} de ${nombre}. `
-        + 'Pasadas unas 10 en la misma sesión, rinden menos: repártelas en dos días.'));
-    }
-    // 3 y 4. Volumen de la semana (solo de lo que ha sido principal hoy).
-    if (nHoy < 1 || sesionesSemana < 3) continue;
-    const n = Math.round((semana[m] ?? 0) * 10) / 10;
-    const { minimo } = minimoDe(dureza, m);
-    if (n < minimo) {
-      lista.push(r('volumen-bajo', 'consejo', `${nombre}: llevas ${formatearNumero(n)} de ${minimo} series esta semana; te faltan unas ${Math.ceil(minimo - n)}.`));
-    } else if (n > MAXIMO) {
-      lista.push(r('volumen-alto', 'aviso', `${nombre}: ${series(n)} en siete días. Por encima de ${MAXIMO} se gana poco más y sube la fatiga: `
-        + 'recorta series o reparte la carga en más días.'));
-    } else {
-      lista.push(r('volumen-bien', 'bien', `${nombre}: ${series(n)} esta semana, en su sitio.`));
-    }
-  }
-
-  // 18. Duración.
-  const minutos = sesion.inicio && sesion.fin ? (new Date(sesion.fin) - new Date(sesion.inicio)) / 60000 : null;
-  if (minutos > 120) {
-    lista.push(r('sesion-larga', 'consejo', `Este entrenamiento ha durado ${Math.round(minutos)} minutos. Más allá de hora y media `
-      + 'suele bajar la calidad de las últimas series; si te pasa a menudo, reparte ejercicios en otro día.'));
-  }
-  // 11 y 12. Cercanía al fallo de hoy.
-  lista.push(...esfuerzo(datos, [sesion], 'hoy'));
-  return ordenar(lista);
-}
-
 // ---------------------------------------------------------------------------
 // Generales (pestaña Cuerpo)
 // ---------------------------------------------------------------------------

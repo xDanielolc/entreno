@@ -82,19 +82,6 @@ export function pista(clave, texto, { siempre = false, icono: simbolo = 'bombill
   return caja;
 }
 
-// Cartel para elegir cuánto quieres que te guíe (desde Aprender).
-export function elegirNivel({ alElegir } = {}) {
-  const cerrar = modal('¿Cuánto te explico?', h('div', { class: 'tutorial-niveles' },
-    Object.entries(NIVELES).map(([clave, n]) => h('button', { class: 'tarjeta fila-enlace', onclick: () => {
-      fijarNivel(clave);
-      cerrar();
-      alElegir?.(clave);
-      if (clave !== 'ninguno') iniciarGuia();
-    } },
-    h('div', {}, h('strong', {}, n.etiqueta), h('div', { class: 'suave' }, n.descripcion))))));
-  return cerrar;
-}
-
 // ---------------------------------------------------------------------------
 // Guías paso a paso: un panel abajo que te lleva por las pantallas
 // ---------------------------------------------------------------------------

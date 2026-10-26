@@ -375,14 +375,6 @@ function tarjetaAjustePersonal(d) {
       }))));
 }
 
-// Qué conviene cambiar, según tus últimos entrenamientos.
-export function listaRecomendaciones(lista) {
-  const icono = { aviso: '⚠', consejo: '→', bien: '✓' };
-  return h('ul', { class: 'recomendaciones' }, lista.map((x) => h('li', { class: x.nivel },
-    h('span', { class: 'icono-rec', 'aria-hidden': 'true' }, icono[x.nivel]),
-    x.enlace ? h('a', { href: x.enlace }, conGlosario(x.texto)) : h('span', {}, conGlosario(x.texto)))));
-}
-
 // La página no se amplía con dos dedos (molesta al apuntar); el mapa sí: al
 // tocarlo se abre grande (y se tumba si tumbas el móvil).
 function cuerposAmpliables(estados, titulo) {

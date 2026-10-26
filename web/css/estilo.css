@@ -1063,7 +1063,8 @@ body:has(.modal-fondo) .guia { display: none; }
 .guia .guia-prueba { display: block; width: 100%; margin: 4px 0 10px; text-align: center; }
 
 /* La ✕ para quitar unos intervalos tuyos, dentro de su boton. */
-.opcion .quitar-mio { margin-left: 8px; color: var(--texto-suave); cursor: pointer; padding: 0 4px; }
+.opcion-con-quitar { display: inline-flex; align-items: center; gap: 2px; }
+.quitar-mio { min-width: 40px; min-height: 40px; border: none; background: transparent; color: var(--texto-suave); cursor: pointer; padding: 0 4px; border-radius: var(--radio-pequeno); }
 
 /* El número de cada bajada sobra: ya van en orden y roba sitio. */
 .tramo-n { display: none; }

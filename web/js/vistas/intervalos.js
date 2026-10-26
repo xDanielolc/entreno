@@ -70,18 +70,22 @@ export function abrirIntervalos({ alTerminar, alElegir } = {}) {
         oninput: (e) => { config[clave] = Math.max(0, Math.round(Number(String(e.target.value).replace(',', '.')) || 0)); config.preset = 'personalizado'; } }));
     cerrar = modal('Intervalos', h('div', { class: 'formulario intervalos-config' },
       h('p', { class: 'nota' }, 'Tramos cortos a tope y descansos, varias veces seguidas. Elige uno o pon el tuyo. ', queEs('hiit')),
-      h('div', { class: 'opciones compacto', role: 'radiogroup' }, Object.entries(todos()).map(([k, p]) => h('button', {
-        type: 'button', role: 'radio', 'aria-checked': String(k === config.preset), class: `opcion ${k === config.preset ? 'elegida' : ''}`,
-        onclick: () => { Object.assign(config, { trabajo: p.trabajo, descanso: p.descanso, rondas: p.rondas, preset: k }); pintarConfig(); },
-      }, h('strong', {}, p.etiqueta),
-      // Los tuyos se pueden quitar desde aquí mismo.
-      k.startsWith('mio-') && h('span', { class: 'quitar-mio', role: 'button', tabindex: '0', title: 'Quitar estos intervalos',
-        onclick: (e) => {
-          e.preventDefault(); e.stopPropagation();
-          estado.cambiar((x) => { x.perfil.hiitPropios = (x.perfil.hiitPropios ?? []).filter((y) => y.nombre !== p.nombre); }, { tecleo: true });
-          if (config.preset === k) config.preset = 'tabata';
-          pintarConfig();
-        } }, icono('cerrar'))))),
+      h('div', { class: 'opciones compacto', role: 'radiogroup' }, Object.entries(todos()).map(([k, p]) => {
+        const opcion = h('button', {
+          type: 'button', role: 'radio', 'aria-checked': String(k === config.preset), class: `opcion ${k === config.preset ? 'elegida' : ''}`,
+          onclick: () => { Object.assign(config, { trabajo: p.trabajo, descanso: p.descanso, rondas: p.rondas, preset: k }); pintarConfig(); },
+        }, h('strong', {}, p.etiqueta));
+        if (!k.startsWith('mio-')) return opcion;
+        // Los tuyos se pueden quitar desde aquí mismo, con su propio botón (antes era
+        // un texto dentro del botón de la opción y no se llegaba con el teclado).
+        return h('span', { class: 'opcion-con-quitar' }, opcion,
+          h('button', { type: 'button', class: 'quitar-mio', 'aria-label': `Quitar los intervalos ${p.etiqueta}`, title: 'Quitar estos intervalos',
+            onclick: () => {
+              estado.cambiar((x) => { x.perfil.hiitPropios = (x.perfil.hiitPropios ?? []).filter((y) => y.nombre !== p.nombre); }, { tecleo: true });
+              if (config.preset === k) config.preset = 'tabata';
+              pintarConfig();
+            } }, icono('cerrar')));
+      })),
       h('p', { class: 'nota' }, todos()[config.preset]?.descripcion ?? ''),
       h('div', { class: 'fila-campos' },
         campo('Trabajo (s)', 'trabajo'), campo('Descanso (s)', 'descanso'), campo('Rondas', 'rondas')),
