@@ -32,20 +32,33 @@ function comoDecideLaApp() {
       h('dd', {}, 'Entre 6 y 10 repeticiones (de 10 a 15 si empiezas). Con el mismo peso subes repeticiones; cuando llegas '
         + 'arriba en todas las series, la app sube el peso y vuelves abajo.'),
       h('dt', {}, 'Bilbo / incremento de peso lineal (fuerza)'),
-      h('dd', {}, 'El peso sube 2,5 kg cada sesión y tú haces todas las repeticiones que puedas. Cuando ya solo te salen 15, '
-        + 'el ciclo se acaba y el siguiente empieza al 50 % del mejor 1RM que hayas hecho en él. Respaldo: un solo ensayo '
+      h('dd', {}, 'El peso sube 2,5 kg cada sesión y tú haces todas las repeticiones que puedas dejando 2 en recámara; el objetivo '
+        + 'es superar el 1RM de la Bilbo anterior (una repetición más de las que lo igualarían). El ciclo empieza con el peso que te '
+        + 'da unas 24 repeticiones (nunca más de 25) y, cuando el objetivo baja de 15, se acaba y el siguiente vuelve a empezar desde '
+        + 'el mejor 1RM que hayas hecho en él. Los números se cambian en Ajustes → Ciclos. Respaldo: un solo ensayo '
         + '(González-Alcázar 2025) muestra que una serie ligera y rápida no perjudica el 1RM en entrenados; no que sea mejor ni que '
         + 'el ciclo completo funcione. Las cifras (50 %, 2,5 kg, 15) son decisiones prácticas, y juntarlo con un 3×5 también: '
         + 'la parte que sube el 1RM con más respaldo es la pesada.'),
+      h('dt', {}, 'Serie máxima y series de bajada (según tu 1RM)'),
+      h('dd', {}, 'La serie máxima son 1-2 repeticiones que acaban a 1-2 del fallo, con el peso que te da tu 1RM; si te sobran 3 o '
+        + 'más, la app te propone subir un 5-10 % y hacer otra sola, y vale la última. Es la que mide tu 1RM. Las de bajada van a un '
+        + 'porcentaje de ese 1RM (el 80 %, por ejemplo) con un rango de repeticiones: que salgan menos por el cansancio es normal. '
+        + 'A mitad del ejercicio el peso no sube; entre sesiones, la recámara lo corrige: todas arriba con 3 o más en recámara, un '
+        + 'salto más; alguna por debajo, se repite; dos veces seguidas, un salto menos.'),
       h('dt', {}, '5×5'),
       h('dd', {}, 'Cinco series de cinco con el mismo peso. Si las completas, la próxima sesión sube; si fallas tres seguidas, '
-        + 'baja un 10 %. El primer peso lo calcula la app: el que te dejaría 3 repeticiones en recámara haciendo 5.'),
+        + 'baja un 10 %. Es la regla de StrongLifts 5×5; el 5×5 original de Bill Starr (1976) iba subiendo el peso de serie en serie '
+        + 'hasta una última más pesada. El primer peso lo calcula la app: el que te dejaría 3 repeticiones en recámara haciendo 5.'),
       h('dt', {}, '5/3/1'),
-      h('dd', {}, 'Cuatro «semanas»: de 5, de 3, de 5/3/1 y descarga, con porcentajes del 90 % de tu 1RM. La semana avanza '
-        + 'cada tantas sesiones de ese ejercicio como veces lo hagas a la semana (se pone en la ficha).'),
+      h('dd', {}, 'Cuatro «semanas»: de 5, de 3, de 5/3/1 y descarga, con porcentajes de tu máximo de entrenamiento (el 90 % de '
+        + 'tu 1RM), y la última serie de cada semana, todas las que puedas. Cada vuelta, Wendler sube ese máximo 2,5 kg en los '
+        + 'ejercicios de torso y 5 kg en los de pierna (en la ficha, el incremento). La semana avanza cada tantas sesiones de ese '
+        + 'ejercicio como veces lo hagas a la semana (se pone en la ficha).'),
       h('dt', {}, 'HST'),
       h('dd', {}, 'Tres bloques de seis sesiones: a 15, a 10 y a 5 repeticiones, con el peso subiendo dentro de cada bloque. '
-        + 'El peso de partida es tu 15RM, calculado con tu 1RM. Seis sesiones son dos semanas si lo haces tres veces por semana.'),
+        + 'El peso de partida es tu 15RM, calculado con tu 1RM. Seis sesiones son dos semanas si lo haces tres veces por semana. '
+        + 'El HST de Haycock añade un cuarto bloque (más de 5 o negativas) y, al acabar, 7 a 10 días sin entrenar (el '
+        + '«desentrenamiento estratégico»); la app hace los tres primeros y vuelve a empezar, y el descanso lo decides tú.'),
       h('dt', {}, 'Personalizar'),
       h('dd', {}, 'En blanco: eliges qué mejora cada sesión (peso, repeticiones, tiempo, distancia, o repeticiones por fases '
         + 'como 15, 10 y 5), cuándo se acaba el ciclo (con cuántas condiciones) y por dónde empieza el siguiente.')),

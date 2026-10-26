@@ -255,7 +255,9 @@ export const BIBLIOGRAFIA = [
   },
   {
     tema: 'Programas con nombre: 5×5, 5/3/1, HST y Heavy Duty',
-    dice: 'La app trae estos programas tal como los publicaron sus autores (Starr y StrongLifts, Wendler, Haycock, Mentzer).',
+    dice: 'La app trae estos programas como los publicaron sus autores (StrongLifts, Wendler, Haycock, Mentzer), con dos simplificaciones: '
+      + 'el 5×5 es el de StrongLifts (el de Bill Starr subía el peso de serie en serie) y el HST se queda en sus tres primeros bloques, '
+      + 'sin el cuarto ni los días de desentrenamiento.',
     matiz: 'Ninguno tiene un estudio propio que lo compare con otro: son programas de entrenadores, de libros y webs. Sus cifras '
       + '(5×5, el 90 % del 1RM, los bloques de 15-10-5, una serie al fallo) son decisiones prácticas. Lo que sí está estudiado son '
       + 'sus principios: pesos altos y varias series para el 1RM; variar la carga dentro de la semana ayuda en entrenados '

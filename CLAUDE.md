@@ -1322,3 +1322,8 @@ fase), tras probar la A.
   `rutinaActiva`, `elegirNivel`); la ✕ de los intervalos propios es un botón de verdad, al lado de la opción
   (`.opcion-con-quitar`), y se llega con el teclado.
 - 0.63.3: `calibrar()` se memoriza por las series que usa (antes por `datos.revision`, que cambia con cada tecla).
+- 0.63.4: explicaciones de las progresiones repasadas con sus fuentes (Aprender y bibliografía): el 5×5 es la regla de
+  StrongLifts (el de Bill Starr subía el peso de serie en serie); 5/3/1 con el incremento de Wendler (2,5 kg torso, 5 kg
+  pierna) y la última serie «todas las que puedas»; el HST de Haycock tiene un cuarto bloque y 7-10 días de
+  desentrenamiento que la app no hace. Bilbo y la serie máxima/bajadas explicadas como funcionan desde el borrador 14.
+  Falta lo mismo en `PROGRAMAS` de esquema.js (el 5×5 dice «de StrongLifts y de Bill Starr»).
