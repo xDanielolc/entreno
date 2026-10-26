@@ -2012,5 +2012,14 @@
   "vista": "postura de yoga, de frente y de lado (la animación alterna las dos vistas cada 2 s)",
   "postura": "vertical sobre la cabeza con los antebrazos en el suelo y las manos entrelazadas alrededor de la cabeza, piernas estiradas hacia el techo",
   "duracion": 2000
+ },
+ {
+  "slug": "pajaro-a-una-mano",
+  "ejercicio": "Pájaro a una mano",
+  "vista": "de pie con el tronco inclinado hacia delante, visto de frente",
+  "inicio": "tronco inclinado casi horizontal, rodillas un poco flexionadas, la mano izquierda apoyada en el muslo izquierdo, el brazo derecho estirado colgando hacia el suelo con UNA sola mancuerna (en todo el dibujo hay una sola mancuerna, en la mano derecha)",
+  "final": "el brazo derecho, estirado del todo y sin doblar el codo, abierto hacia el lado hasta la altura del hombro; la mano izquierda sigue apoyada en el muslo y el tronco no se mueve",
+  "ancla": "encajar",
+  "usar": "ia"
  }
 ]

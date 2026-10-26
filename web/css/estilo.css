@@ -2068,3 +2068,117 @@ html, body { overflow-x: clip; }
 .lista-importar { display: grid; gap: 8px; max-height: 50vh; overflow-y: auto; }
 .fila-importar { display: grid; gap: 4px; padding: 8px 0; border-bottom: 1px solid var(--borde); text-align: left; }
 .fila-importar .selector-abrir { justify-self: start; max-width: 100%; }
+
+/* ==========================================================================
+   Temas de fantasía (0.63.0, hechos por Claude Code de noche, a falta de su
+   repaso con Claude Design). Cada tema es un bloque de tokens y, si hace
+   falta, unos pocos retoques que solo tocan lo suyo. `aplicarTema()` pone
+   data-tema y, además, data-fondo="oscuro" en los temas oscuros: así los
+   retoques que la app tenía solo para el tema oscuro valen también aquí.
+   Fuentes del sistema (nada externo: la app va sin conexión).
+   ========================================================================== */
+
+:root[data-fondo="oscuro"] .boton.secundario { background: var(--superficie-2); }
+:root[data-fondo="oscuro"] .tarjeta input, :root[data-fondo="oscuro"] .tarjeta select,
+:root[data-fondo="oscuro"] .tarjeta textarea { background: var(--superficie-2); }
+
+/* 1. Años 50, tipo Fallout: papel de manual técnico, verde oliva y ámbar. */
+:root[data-tema="fallout"] {
+  color-scheme: light;
+  --fondo: #e8dcbc; --superficie: #f6eed6; --superficie-2: #e2d5ae; --borde: #b6a274;
+  --texto: #29271a; --texto-suave: #5a5436;
+  --acento: #4a5a1c; --acento-texto: #f6eed6; --acento-suave: #dcd6a2; --acento-fuerte: #323e0c;
+  --peligro: #a12f1b; --bien: #3d6a1c; --mal: #a12f1b; --aviso: #845400; --aviso-fondo: #f1d891;
+  --cartel-fondo: #29271a; --cartel-texto: #f6eed6; --cartel-borde: #4a5a1c;
+  --radio: 6px; --radio-pequeno: 4px;
+  --sombra: 2px 2px 0 rgb(41 39 26 / 22%); --sombra-alta: 4px 4px 0 rgb(41 39 26 / 30%);
+  --fuente: "Rockwell", "Courier New", Courier, serif;
+}
+:root[data-tema="fallout"] h1, :root[data-tema="fallout"] h2 { text-transform: uppercase; letter-spacing: .04em; }
+:root[data-tema="fallout"] .tarjeta { border: 1.5px solid var(--borde); }
+
+/* 2. Pixel art: colores planos (paleta tipo consola de 8 bits), bordes
+   duros sin redondeo, sombras de bloque y letra de terminal. */
+:root[data-tema="pixel"] {
+  color-scheme: light;
+  --fondo: #fff1e8; --superficie: #ffffff; --superficie-2: #ffe3cf; --borde: #1d2b53;
+  --texto: #1d2b53; --texto-suave: #5f574f;
+  --acento: #1d6fd6; --acento-texto: #ffffff; --acento-suave: #c2e3ff; --acento-fuerte: #1d2b53;
+  --peligro: #d1003f; --bien: #00804c; --mal: #d1003f; --aviso: #9a4a1f; --aviso-fondo: #fff3a0;
+  --cartel-fondo: #1d2b53; --cartel-texto: #fff1e8; --cartel-borde: #1d2b53;
+  --radio: 0px; --radio-pequeno: 0px;
+  --sombra: 4px 4px 0 #1d2b53; --sombra-alta: 6px 6px 0 #1d2b53;
+  --fuente: "Lucida Console", Consolas, "Courier New", monospace;
+  --fuente-numeros: "Lucida Console", Consolas, "Courier New", monospace;
+}
+:root[data-tema="pixel"] .tarjeta { border: 3px solid var(--borde); }
+:root[data-tema="pixel"] .boton, :root[data-tema="pixel"] .boton-marca { border: 3px solid var(--borde); box-shadow: 3px 3px 0 var(--borde); }
+:root[data-tema="pixel"] h1, :root[data-tema="pixel"] h2 { text-transform: uppercase; letter-spacing: .06em; }
+
+/* 3. Arcano: morados profundos, oro viejo y letra de grimorio. */
+:root[data-tema="arcano"] {
+  color-scheme: dark;
+  --fondo: #130c21; --superficie: #1e1432; --superficie-2: #2a1d45; --borde: #45346a;
+  --texto: #efe6ff; --texto-suave: #b8a7d8;
+  --acento: #d4af37; --acento-texto: #130c21; --acento-suave: #3a2a55; --acento-fuerte: #f0cf63;
+  --peligro: #ff8096; --bien: #7fd8a3; --mal: #ff8096; --aviso: #f0cf63; --aviso-fondo: #3a2c14;
+  --cartel-fondo: #2a1d45; --cartel-texto: #efe6ff; --cartel-borde: #d4af37;
+  --radio: 12px; --radio-pequeno: 8px;
+  --sombra: 0 0 0 1px rgb(212 175 55 / 18%), 0 8px 22px -10px rgb(0 0 0 / 70%); --sombra-alta: 0 12px 34px -8px rgb(0 0 0 / 75%);
+  --fuente: "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+}
+:root[data-tema="arcano"] h1 { color: var(--acento-fuerte); letter-spacing: .02em; }
+
+/* 4. Heavy metal: negro, plata y rojo sangre; títulos contundentes. */
+:root[data-tema="metal"] {
+  color-scheme: dark;
+  --fondo: #090909; --superficie: #151515; --superficie-2: #222222; --borde: #3a3a3a;
+  --texto: #f2f2f2; --texto-suave: #b0b0b0;
+  --acento: #c4161c; --acento-texto: #ffffff; --acento-suave: #2c1212; --acento-fuerte: #ff2a2a;
+  --peligro: #ff7a45; --bien: #72d27f; --mal: #ff7a45; --aviso: #ffd166; --aviso-fondo: #33290f;
+  --cartel-fondo: #222222; --cartel-texto: #f2f2f2; --cartel-borde: #c0c0c0;
+  --radio: 3px; --radio-pequeno: 2px;
+  --sombra: 0 0 0 1px #2e2e2e, 0 6px 16px -8px rgb(0 0 0 / 80%); --sombra-alta: 0 10px 30px -8px rgb(0 0 0 / 85%);
+}
+:root[data-tema="metal"] h1, :root[data-tema="metal"] h2, :root[data-tema="metal"] .marca-app {
+  font-family: Impact, "Arial Black", "Haettenschweiler", sans-serif; font-weight: 400; text-transform: uppercase; letter-spacing: .05em;
+}
+:root[data-tema="metal"] h1 { color: #e6e6e6; text-shadow: 0 2px 0 #7a0c0c; }
+
+/* 5. Terminal con toque Matrix: verde fósforo sobre negro, letra de
+   máquina y un cursor que parpadea tras el título. */
+:root[data-tema="matrix"] {
+  color-scheme: dark;
+  --fondo: #000000; --superficie: #04110a; --superficie-2: #0a2014; --borde: #1d5230;
+  --texto: #3dff7a; --texto-suave: #22b956;
+  --acento: #3dff7a; --acento-texto: #001a08; --acento-suave: #0d2e18; --acento-fuerte: #8dffb0;
+  --peligro: #ff5c5c; --bien: #3dff7a; --mal: #ff5c5c; --aviso: #e9ff4d; --aviso-fondo: #202a05;
+  --cartel-fondo: #0a2014; --cartel-texto: #3dff7a; --cartel-borde: #3dff7a;
+  --radio: 2px; --radio-pequeno: 2px;
+  --sombra: 0 0 0 1px #1d5230; --sombra-alta: 0 0 18px rgb(61 255 122 / 22%);
+  --fuente: Consolas, "Lucida Console", "Courier New", monospace;
+  --fuente-numeros: Consolas, "Lucida Console", "Courier New", monospace;
+}
+:root[data-tema="matrix"] h1::after { content: "▌"; margin-left: .15em; animation: cursor-matrix 1.1s steps(1) infinite; }
+@keyframes cursor-matrix { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { :root[data-tema="matrix"] h1::after { animation: none; } }
+:root[data-tema="matrix"] body { text-shadow: 0 0 6px rgb(61 255 122 / 25%); }
+
+/* 6. Gimnasio ochentero: neón rosa y cian sobre azul noche. */
+:root[data-tema="ochentero"] {
+  color-scheme: dark;
+  --fondo: #110a2c; --superficie: #1b1144; --superficie-2: #28195c; --borde: #48308c;
+  --texto: #f6f1ff; --texto-suave: #bcaee9;
+  --acento: #ff3ea5; --acento-texto: #110a2c; --acento-suave: #3a1a5a; --acento-fuerte: #ff7ac4;
+  --peligro: #ff6b6b; --bien: #34f0cb; --mal: #ff6b6b; --aviso: #ffd23f; --aviso-fondo: #3a2f12;
+  --cartel-fondo: #28195c; --cartel-texto: #f6f1ff; --cartel-borde: #34f0cb;
+  --radio: 14px; --radio-pequeno: 10px;
+  --sombra: 0 0 0 1px rgb(52 240 203 / 20%), 0 0 18px -6px rgb(255 62 165 / 45%); --sombra-alta: 0 0 30px -6px rgb(255 62 165 / 55%);
+}
+:root[data-tema="ochentero"] h1 { font-style: italic; text-transform: uppercase; letter-spacing: .03em;
+  color: var(--acento); text-shadow: 0 0 10px rgb(255 62 165 / 55%), 2px 2px 0 #34f0cb; }
+:root[data-tema="ochentero"] h2 { color: #34f0cb; }
+/* Botones y casillas sin forma de píldora en los temas de esquinas duras. */
+:root:is([data-tema="pixel"], [data-tema="matrix"], [data-tema="metal"], [data-tema="fallout"]) :is(.boton, .boton-marca, .boton-paso, .chip, input, textarea, .modal) {
+  border-radius: var(--radio-pequeno);
+}

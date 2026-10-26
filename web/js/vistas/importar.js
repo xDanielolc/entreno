@@ -73,6 +73,8 @@ function propuesta(importado, datos) {
 }
 
 function vistaPrevia(importado) {
+  // Algunos navegadores avisan dos veces del archivo elegido: un solo cartel.
+  if (document.querySelector('.modal-fondo .lista-importar')) return;
   const datos = estado.datos();
   const ya = new Set(datos.sesiones.map((s) => s.importId).filter(Boolean));
   const nuevas = importado.sesiones.filter((s) => !ya.has(s.id));

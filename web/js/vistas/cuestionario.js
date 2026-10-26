@@ -31,10 +31,33 @@ export const PREGUNTAS = [
   } },
 ];
 
+// Todos los temas: los dos de siempre, el del móvil y los de fantasía
+// (estilo.css, «Temas de fantasía»). `oscuro`: si el tema es de fondo oscuro.
+export const TEMAS = {
+  sistema: { etiqueta: 'Como el móvil' },
+  claro: { etiqueta: 'Claro' },
+  oscuro: { etiqueta: 'Oscuro', oscuro: true },
+  fallout: { etiqueta: 'Años 50', descripcion: 'Manual técnico antiguo: papel, verde oliva y ámbar.' },
+  pixel: { etiqueta: 'Pixel art', descripcion: 'Colores planos y bordes de bloque.' },
+  arcano: { etiqueta: 'Arcano', descripcion: 'Morado profundo y oro, como un grimorio.', oscuro: true },
+  metal: { etiqueta: 'Heavy metal', descripcion: 'Negro, plata y rojo sangre.', oscuro: true },
+  matrix: { etiqueta: 'Terminal', descripcion: 'Verde fósforo sobre negro, con cursor.', oscuro: true },
+  ochentero: { etiqueta: 'Gimnasio ochentero', descripcion: 'Neón rosa y cian sobre azul noche.', oscuro: true },
+};
+
 export function aplicarTema(tema) {
   const raiz = document.documentElement;
-  if (tema === 'claro' || tema === 'oscuro') raiz.dataset.tema = tema;
+  if (tema && tema !== 'sistema' && TEMAS[tema]) raiz.dataset.tema = tema;
   else delete raiz.dataset.tema;
+  if (TEMAS[tema]?.oscuro) raiz.dataset.fondo = 'oscuro'; else delete raiz.dataset.fondo;
+  // La barra del navegador del móvil, del color del fondo del tema.
+  requestAnimationFrame(() => {
+    const fondo = getComputedStyle(raiz).getPropertyValue('--fondo').trim();
+    for (const meta of document.querySelectorAll('meta[name="theme-color"]')) {
+      if (!meta.dataset.original) meta.dataset.original = meta.content;
+      meta.content = raiz.dataset.tema ? fondo : meta.dataset.original;
+    }
+  });
 }
 
 // Qué rutina prehecha encaja con lo que ha contestado.
@@ -94,7 +117,7 @@ export function hacerCuestionario({ alTerminar } = {}) {
     const nivel = respuestas.experiencia === 'avanzado' ? 'avanzado' : 'basico';
     estado.cambiar((x) => {
       x.perfil.cuestionario = { ...respuestas, hecho: true };
-      x.perfil.tema = respuestas.tema ?? 'sistema';
+      x.perfil.tema = respuestas.tema && respuestas.tema !== 'otro' ? respuestas.tema : (x.perfil.tema ?? 'sistema');
       // Quien dice saber bastante no quiere «?» detrás de cada palabra.
       x.perfil.glosario = respuestas.experiencia === 'avanzado' ? 'ninguno' : 'siempre';
       // Quien empieza se queda más lejos del fallo: rinde casi igual y se

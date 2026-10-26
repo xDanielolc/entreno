@@ -1301,3 +1301,15 @@ fase), tras probar la A.
 - `datos-privados/origenes.json` apuntaba a carpetas que Dan renombró («Entrenamientos Madrid» y «Entrenamientos
   Asturias»); corregido (el de antes, `origenes-antes-26-10.json`). Importación nueva: 415 días hasta el 06-10-2026
   (la de septiembre queda en `entrenamiento-importado-17-09.json`).
+
+## Ronda 0.63.0 (26-10-2026, noche): temas de fantasía y pájaro a una mano
+
+- Seis temas en CSS (final de estilo.css, «Temas de fantasía»): `fallout`, `pixel`, `arcano`, `metal`, `matrix`,
+  `ochentero`. `TEMAS` y `aplicarTema()` en cuestionario.js: pone `data-tema` y, en los oscuros, `data-fondo="oscuro"`
+  (los retoques que solo valían para `[data-tema="oscuro"]` tienen su copia con `[data-fondo="oscuro"]`), y pinta la
+  barra del móvil (`theme-color`) del fondo del tema. Fuentes del sistema. Falta el selector en Ajustes →
+  Personalización (ajustes.js lo tenía la sesión del sueño esa noche) y la prueba de Dan en oscuro forzado.
+- «Pájaro a una mano» con dibujo propio de Gemini (un brazo, el estirado, mano apoyada en un banco; `usar: ia`,
+  `ancla: encajar`); el de antes (pájaros con mancuernas, Everkinetic) sigue para «Pájaro con codo doblado».
+  Intentos descartados en `imagenes-ia/descartes/fases-pajaro-a-una-mano-*`. Almacén `entreno-imagenes-40`.
+- imagenes_ia.py necesita numpy: se lanza con el `python` del sistema, no con el de `herramientas/.venv`.

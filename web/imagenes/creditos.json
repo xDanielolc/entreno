@@ -1990,13 +1990,12 @@
    "completadoCon": "Gemini"
   },
   "Encogimientos de trapecio con barra": {
-   "archivo": "imagenes/ejercicios/ia/encogimientos-de-trapecio-completo.webp",
+   "archivo": "imagenes/ejercicios/anim/encogimientos-de-trapecio.webp",
    "autor": "Everkinetic",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "barbell-shrugs",
-   "estatica": "imagenes/ejercicios/ia/encogimientos-de-trapecio-completo-quieta.webp",
+   "estatica": "imagenes/ejercicios/encogimientos-de-trapecio.png",
    "animada": true,
-   "completadoCon": "Gemini"
+   "fuente": "everkinetic",
+   "nombreEnFuente": "barbell-shrugs"
   },
   "Press de banca en multipower": {
    "archivo": "imagenes/ejercicios/anim/press-de-banca.webp",
@@ -2039,13 +2038,12 @@
    "completadoCon": "Gemini"
   },
   "Fondos de pecho": {
-   "archivo": "imagenes/ejercicios/ia/fondos-asistidos-completo.webp",
+   "archivo": "imagenes/ejercicios/anim/fondos-asistidos.webp",
    "autor": "Everkinetic",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "chest-dips",
-   "estatica": "imagenes/ejercicios/ia/fondos-asistidos-completo-quieta.webp",
+   "estatica": "imagenes/ejercicios/fondos-asistidos.png",
    "animada": true,
-   "completadoCon": "Gemini"
+   "fuente": "everkinetic",
+   "nombreEnFuente": "chest-dips"
   },
   "Peso muerto piernas rígidas": {
    "archivo": "imagenes/ejercicios/ia/peso-muerto-rumano.webp",
@@ -2252,13 +2250,11 @@
    "fuente": "propia"
   },
   "Pájaro a una mano": {
-   "archivo": "imagenes/ejercicios/anim/pajaros-con-mancuernas.webp",
-   "autor": "Everkinetic",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "bent-over-rear-deltoid-raise-with-head-on-bench",
-   "aliasDe": "Pájaros con mancuernas",
-   "estatica": "imagenes/ejercicios/pajaros-con-mancuernas.png",
-   "animada": true
+   "archivo": "imagenes/ejercicios/ia/pajaro-a-una-mano.webp",
+   "estatica": "imagenes/ejercicios/ia/pajaro-a-una-mano-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Gemelo de pie con barra": {
    "archivo": "imagenes/ejercicios/ia/gemelo-de-pie-con-barra-completo.webp",
@@ -2388,13 +2384,12 @@
    "fuente": "propia"
   },
   "Press de hombro a una mano": {
-   "archivo": "imagenes/ejercicios/ia/press-de-hombro-con-mancuernas-completo.webp",
+   "archivo": "imagenes/ejercicios/anim/press-de-hombro-con-mancuernas.webp",
    "autor": "Everkinetic",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "one-arm-dumbbell-shoulder-press",
-   "estatica": "imagenes/ejercicios/ia/press-de-hombro-con-mancuernas-completo-quieta.webp",
+   "estatica": "imagenes/ejercicios/press-de-hombro-con-mancuernas.jpg",
    "animada": true,
-   "completadoCon": "Gemini"
+   "fuente": "everkinetic",
+   "nombreEnFuente": "one-arm-dumbbell-shoulder-press"
   },
   "Peso muerto rumano con mancuernas": {
    "archivo": "imagenes/ejercicios/anim/peso-muerto-con-mancuernas.webp",
@@ -2405,13 +2400,12 @@
    "nombreEnFuente": "dumbbell-dead-lifts"
   },
   "Press militar sentado": {
-   "archivo": "imagenes/ejercicios/ia/press-militar-ek-completo.webp",
+   "archivo": "imagenes/ejercicios/anim/press-militar-ek.webp",
    "autor": "Everkinetic",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "seated-military-press",
-   "estatica": "imagenes/ejercicios/ia/press-militar-ek-completo-quieta.webp",
+   "estatica": "imagenes/ejercicios/press-militar.png",
    "animada": true,
-   "completadoCon": "Gemini"
+   "fuente": "everkinetic",
+   "nombreEnFuente": "seated-military-press"
   },
   "Remo en polea al pecho": {
    "archivo": "imagenes/ejercicios/anim/remo-en-polea.webp",
