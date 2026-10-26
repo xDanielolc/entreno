@@ -162,7 +162,7 @@ petición (el pez levantaba la cabeza; la goblet sale «de huevo», que lo decid
 - [x] Pájaro a una mano (brazo estirado, un brazo) con Gemini; banco de la segunda postura copiado de la primera.
 - [x] Quince dibujos que Dan eligió «nueva» en la revisión de «más músculo» y seguían con el muñeco (`usar: antes` de
       la 0.60.8): ahora `usar: ia` (0.64.1).
-- [ ] Curl nórdico: tres intentos con Gemini (descartes/fases-curl-nordico-*): dobla la cadera o despega las rodillas.
+- [x] Curl nórdico: hecho con ChatGPT el 26-10 (0.65.1). Antes, tres intentos con Gemini (descartes/fases-curl-nordico-*): dobla la cadera o despega las rodillas.
       Probar con una lámina de modelo con las dos posturas, o con ChatGPT.
 - [ ] Unos 40 ejercicios siguen con muñeco y sin dibujo de IA (tibiales, Copenhague, press Arnold, movilidad…): no
       entraron en la cola «más músculo».

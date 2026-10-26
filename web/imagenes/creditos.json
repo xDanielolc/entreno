@@ -873,9 +873,11 @@
    "fuente": "propia"
   },
   "Curl nórdico": {
-   "archivo": "imagenes/munecos/curl-nordico.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/curl-nordico.webp",
+   "estatica": "imagenes/ejercicios/ia/curl-nordico-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "ChatGPT"
   },
   "Elevación de tibiales": {
    "archivo": "imagenes/munecos/elevacion-de-tibiales.svg",

@@ -1391,3 +1391,6 @@ volver a lanzarlo. En la app (`conVideo` en presentacion.js): solo la variante �
 navegador reproduce AV1 y el vídeo llega en 0,8 s (va por el almacén de imágenes del service worker, así que desde la
 segunda vez sale al momento); si no, la animación CSS con sonido de siempre. Con sonido si el navegador deja; si no,
 mudo. El tema se guarda también en localStorage (`entreno-tema`, `aplicarTema`) y index.html lo pone antes de pintar.
+- 0.65.1: curl nórdico con dibujo propio, por fin, hecho con ChatGPT (cuerpo recto de las rodillas a la cabeza, mismo
+  aparato en las dos posturas; la colchoneta de la segunda copiada de la primera, en `CONGELADOS`). Dan deja usar
+  ChatGPT siempre que convenga para los dibujos.

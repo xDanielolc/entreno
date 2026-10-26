@@ -607,7 +607,9 @@
   "ejercicio": "Curl nórdico",
   "vista": "de rodillas en una colchoneta con los tobillos sujetos por detrás, visto de lado",
   "inicio": "cuerpo recto y vertical de las rodillas a la cabeza",
-  "final": "cuerpo recto inclinado hacia delante casi hasta el suelo, manos preparadas para frenar"
+  "final": "cuerpo recto inclinado hacia delante casi hasta el suelo, manos preparadas para frenar",
+  "usar": "ia",
+  "ancla": "encajar"
  },
  {
   "slug": "elevacion-de-gemelos",
