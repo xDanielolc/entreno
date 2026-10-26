@@ -16,7 +16,7 @@
 
 import * as estado from '../estado.js';
 import { migrar, necesitaMigrar, validar } from '../esquema.js';
-import { normalizar } from '../catalogo.js';
+import { CATALOGO, normalizar } from '../catalogo.js';
 import { guardarCopiaAparte } from '../sincronizacion.js';
 import { aviso, confirmar, fechaCorta, h, modal, nuevoId, selector } from '../ui.js';
 
@@ -33,6 +33,110 @@ const JUNTAR_CON = {
   'curl de biceps martillo': 'Curl martillo',
   'pajaro con codo doblado': 'Pájaro con codo doblado',
 };
+
+// Cada nombre de los Excel con su ejercicio del catálogo: de ahí salen el
+// dibujo y los músculos de los que entran aparte (con los nombres de los
+// Excel no se encontraba ninguno). «Dominadas» y «Fondos de tríceps» eran en
+// máquina asistida (apuntaba los «Kg máq»).
+export const COMO_EN_CATALOGO = {
+  'Abducción GLUTEO': 'Abductores en máquina',
+  'Abductores en máquina': 'Abductores en máquina',
+  'Abs libres': 'Crunch en suelo',
+  'Abs rueda': 'Rueda abdominal',
+  'Adducción': 'Aductores en máquina',
+  'Aductores en máquina': 'Aductores en máquina',
+  'Biceps banco 45º': 'Curl inclinado',
+  'Bíceps máquina': 'Curl de bíceps en máquina',
+  'Crunch abdominal': 'Crunch abdominal',
+  'Crunch abdominal EN DISCOS': 'Crunch lastrado',
+  'Curl bíceps martillo': 'Curl martillo',
+  'Curl bíceps máquina': 'Curl de bíceps en máquina',
+  'Curl bíceps pesas': 'Curl de bíceps con mancuernas',
+  'Curl de bíceps en polea': 'Curl en polea',
+  'Curl de bíceps martillo': 'Curl martillo',
+  'Curl isquios sentado': 'Curl femoral sentado',
+  'Curl isquios tumbado': 'Curl femoral tumbado',
+  'Dominada polea una mano': 'Jalón unilateral en polea',
+  'Dominadas': 'Dominadas asistidas',
+  'Dominadas VIEJAS': 'Dominadas asistidas',
+  'Dominadas libres': 'Dominadas',
+  'Elevación de gemelo recto': 'Elevación de gemelos',
+  'Facepull': 'Face pull',
+  'Flexiones': 'Flexiones',
+  'Flexiones a una mano': 'Flexiones a una mano',
+  'Flexiones de rodillas': 'Flexiones',
+  'Fondos de triceps VIEJO nor sive mal hecho': 'Fondos asistidos',
+  'Fondos de tríceps': 'Fondos asistidos',
+  'Gemelo doblado barra': 'Elevación de gemelos sentado',
+  'Gemelo doblado máquina': 'Elevación de gemelos sentado',
+  'Gemelo prensa': 'Elevación de gemelos en prensa',
+  'Gemelo recto prensa': 'Elevación de gemelos en prensa',
+  'Hiperextensión': 'Hiperextensiones',
+  'Jalón al pecho': 'Jalón al pecho',
+  'Jalón en polea': 'Jalón al pecho',
+  'Lateral de hombro mancuerna': 'Elevaciones laterales',
+  'Laterales de hombro': 'Elevaciones laterales',
+  'Laterales de hombro en máquina': 'Elevaciones laterales en máquina',
+  'Laterales de hombro en polea': 'Elevaciones laterales en polea',
+  'Laterales de hombro máquina': 'Elevaciones laterales en máquina',
+  'Leg curl isquios': 'Curl femoral tumbado',
+  'Leñador con poleas': 'Leñador en polea',
+  'Leñador en polea': 'Leñador en polea',
+  'Máquina de abs': 'Crunch en polea',
+  'Máquina de glúteos': 'Máquina de glúteo',
+  'Máquina espalda baja': 'Hiperextensiones',
+  'Paseos del granjero': 'Paseo del granjero',
+  'Peso muerto': 'Peso muerto',
+  'Peso muerto VIEJO': 'Peso muerto',
+  'Prensa': 'Prensa de piernas',
+  'Prensa HORIZONTAL': 'Prensa de piernas',
+  'Prensa SOLO SI ES PRIMERO': 'Prensa de piernas',
+  'Press banca': 'Press de banca',
+  'Press militar': 'Press militar',
+  'Press militar en máquina': 'Press de hombro en máquina',
+  'Press pallof': 'Press pallof',
+  'Pulldown': 'Pullover en polea',
+  'Pájaro con codo doblado': 'Pájaro con codo doblado',
+  'Pájaros en máquina': 'Pájaros en máquina',
+  'Pájaros en polea': 'Pájaros en polea',
+  'Remo barra': 'Remo con barra',
+  'Remo en barra': 'Remo con barra',
+  'Remo en máquina NEUTRA': 'Remo en máquina',
+  'Remo en polea': 'Remo en polea',
+  'Remo libre': 'Remo invertido',
+  'Remo neutro máquina': 'Remo en máquina',
+  'Remo pendlay dorsal cerrado erectores': 'Remo con barra',
+  'Remo pendlay mancuerna': 'Remo con mancuerna',
+  'Remo upper back': 'Remo abierto en polea',
+  'Remo upper back en polea': 'Remo abierto en polea',
+  'Remos en polea': 'Remo en polea',
+  'Remos en polea 2 trapecio escapulas': 'Remo en polea',
+  'Sentadilla': 'Sentadilla',
+  'Sentadillas libres': 'Air squat',
+  'Tirón vertical en máquina': 'Jalón al pecho',
+  'Trapecio en barra': 'Encogimientos de trapecio con barra',
+  'Trapecios multipower NO CUENTA BARRA': 'Encogimientos de trapecio',
+  'Tríceps en máquina': 'Extensión de tríceps en máquina',
+};
+
+// Rellena el dibujo (fotoDe), los músculos, el grupo y el material de los
+// ejercicios cargados de los Excel que no los tengan. Devuelve cuántos.
+export function completarImportados(x) {
+  let n = 0;
+  for (const e of x.ejercicios) {
+    if (!e.importId) continue;
+    const base = (e.nombre ?? '').replace(/ \((Madrid|Asturias)\)$/, '');
+    const nombre = COMO_EN_CATALOGO[base];
+    const c = nombre && CATALOGO.find((y) => normalizar(y.nombre) === normalizar(nombre));
+    if (!c) continue;
+    e.fotoDe = c.nombre;
+    if (!e.musculos?.principales?.length) e.musculos = structuredClone(c.musculos);
+    e.material ??= c.material;
+    if (!e.grupo) e.grupo = c.grupo;
+    n += 1;
+  }
+  return n;
+}
 
 // Nombre que se enseña de cada sitio de los Excel.
 const NOMBRE_SITIO = { sede_habitual: 'Madrid', sede_asturias: 'Asturias' };
@@ -145,6 +249,7 @@ export function juntarImportado(x, importado, filas) {
     }
     destino.set(f.ej.id, mio.id);
   }
+  completarImportados(x);
   let sesiones = 0;
   let series = 0;
   for (const s of importado.sesiones) {

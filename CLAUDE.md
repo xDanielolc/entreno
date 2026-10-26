@@ -1349,3 +1349,8 @@ real). Campos en Ajustes → Perfil (`camposSueno`). Ver docs/pendientes.md, sec
   `usar: ia` y creditos.json apuntado a mano (sin el procesado entero, que deshace los completados). Antes de dar por
   buena una elección de Dan, mirar su última revisión (prefijos de la colección `comparar`: 1ª, corr-, mej-, c3-, c4-,
   m5-): «corr-» con «nueva» es el dibujo de persona corregido, no el de IA. Almacén `entreno-imagenes-41`.
+- 0.64.2: los ejercicios cargados de los Excel toman dibujo, músculos, grupo y material del catálogo
+  (`COMO_EN_CATALOGO` y `completarImportados()` en importar.js; «Dominadas» y «Fondos de tríceps» de los Excel eran en
+  máquina asistida). En el ordenador ya no sale «¿Te aviso cuando acabe cada descanso?» (solo con pantalla táctil,
+  `enMovil()` en descanso.js); si el permiso no llega, la tarjeta se va y el aviso dice «el navegador» y cómo
+  cambiarlo.
