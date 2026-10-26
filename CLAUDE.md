@@ -1375,4 +1375,5 @@ Solo se tocaron plantillas.js, version.js, sw.js y este archivo.
   del todo (y negativas), supinas de frente con agarre estrecho, «Dominadas neutras» nuevas en el catálogo (de perfil,
   asas paralelas), elevaciones laterales rehechas enteras y elíptica con su foto de modelo (quieta). Gemini no cambia la
   postura editando: la postura que falta se pide en conversación nueva con solo la referencia de estilo, o las dos en
-  una lámina. Lo anterior, en `imagenes-ia/antes-26-10/` (fuera de Git). Almacén `entreno-imagenes-43`.
+  una lámina. Lo anterior, en `imagenes-ia/antes-26-10/` (fuera de Git). 0.64.7: en las laterales, las piernas
+  quietas desde más abajo (`fijo_desde` 0,72: con 0,58 se copiaban trozos de las mancuernas). Almacén `entreno-imagenes-44`.

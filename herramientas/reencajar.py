@@ -46,7 +46,7 @@ REENCAJAR = {
     "dominada": {"ia": True, "zona": (160, 20, 230, 85), "mover": (-15, 0)},   # la mano izquierda en la barra (26-10)
     "dominadas-negativas": {"ia": True, "zona": (175, 20, 240, 85), "mover": (8, 0)},
     "dominadas-neutras": {"ia": True},
-    "elevaciones-laterales": {"ia": True, "zona": (0.0, 0.6, 1.0, 1.0), "fijo_desde": 0.58},  # rehecha entera (26-10): las piernas quietas
+    "elevaciones-laterales": {"ia": True, "zona": (0.0, 0.6, 1.0, 1.0), "fijo_desde": 0.72},  # rehecha entera (26-10): las piernas quietas, por debajo de las mancuernas
     "fondos-de-triceps": {"ia": True, "zona": (0.5, 0.45, 1.0, 1.0)},         # las patas y la base de las paralelas (26-10)
     "hip-thrust": {"ia": True, "zona": (0.0, 0.45, 0.35, 1.0)},               # el banco
     "face-pull": {"ia": True, "zona": (0.75, 0.0, 1.0, 1.0)},  # la columna (con las piernas fijas el muñeco se partía por la cintura)
