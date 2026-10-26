@@ -1313,3 +1313,8 @@ fase), tras probar la A.
   `ancla: encajar`); el de antes (pájaros con mancuernas, Everkinetic) sigue para «Pájaro con codo doblado».
   Intentos descartados en `imagenes-ia/descartes/fases-pajaro-a-una-mano-*`. Almacén `entreno-imagenes-40`.
 - imagenes_ia.py necesita numpy: se lanza con el `python` del sistema, no con el de `herramientas/.venv`.
+- 0.63.1: la 0.63.0 publicó por error cinco dibujos de antes (encogimientos de trapecio, fondos asistidos, press de
+  hombro con mancuernas, press militar sentado y su alias): el procesado de un solo dibujo los deshacía y el procesado
+  entero tampoco los recupera. `creditos.json` vuelve al de la 0.62.0 más el pájaro. OJO: ahora mismo
+  `imagenes_ia.py` (entero o de uno) no reproduce esas cinco entradas «-completo»: tras procesar, comparar
+  creditos.json con el de antes y restaurar lo que cambie sin querer.
