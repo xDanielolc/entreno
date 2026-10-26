@@ -176,6 +176,28 @@ fuentes). Hacer la fase A primero: permite empezar la línea base del plan.
       despierta sola con el navegador cerrado: se programa el aviso con la app
       abierta y se registra `periodicSync` si existe, y lo que no falla es la
       tarjeta de «hoy no lo has hecho» en Hoy y en el Diario.
+- [x] **El test encadenado al diario** (pedido por Dan el 26-10-2026:
+      «molaría que inicie el contador al llenar mi diario de sueño para hacer
+      el test»). Son las dos cosas de la mañana seguidas: apunta la noche y se
+      encuentra el test delante sin buscarlo. Cuando el diario de **hoy** tiene
+      las horas de la noche (las que hacen falta para calcular el sueño) y hoy
+      no hay ningún test hecho, sale un cartel, «Te toca el test de atención»,
+      con una línea de que son 5 minutos, una cuenta atrás visible de 5 s y dos
+      botones: «Empezar ya (5 min)» y «Ahora no». Al llegar a cero arranca
+      solo y entra **directo** al test en la duración de siempre (5 min), sin
+      volver a preguntarla (`abrirPVT({ directo: true })`); elegir duración
+      sigue estando en «Hacer el test» del Diario. Nunca de golpe y sin avisar:
+      el test mide tiempos de reacción y pillarle desprevenido estropea la
+      medida. Se cancela con «Ahora no», con la X o tocando fuera, y entonces
+      no se insiste: queda la tarjeta de siempre de «hoy no lo has hecho», sin
+      segundas ventanas. Sale al llegar a la pantalla del Diario o al tocar
+      «Guardar el día», nunca en mitad de lo que estás escribiendo, y **una
+      sola vez al día**: el día en que se ofreció se guarda en el aparato
+      (localStorage `entreno-pvt-ofrecido`) y no en los datos, así que el
+      esquema sigue en v26. Si ya hizo el test antes de rellenar el diario, no
+      sale nada; si el aviso de la mañana (`perfil.avisarPvt`) está activado,
+      el cartel dice que es el del aviso. En `web/js/vistas/pvt.js`
+      (`ofrecerPvtTrasDiario`) y `web/js/vistas/diario.js`.
 - [ ] **Fase B, lo que queda**: Karolinska, Epworth, semáforo dominical,
       enlace con «¿Voy hoy?», tema «Sueño y rendimiento» en `bibliografia.js`
       (y corregir la cifra de Craven). Al PVT le falta, cuando Dan lo haya

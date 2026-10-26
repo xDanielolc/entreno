@@ -15,11 +15,17 @@ import {
   resumenUltimos7, testsPVT, textoHoras,
 } from '../diario.js';
 import { colores, graficaLineas } from './graficas.js';
-import { abrirPVT, activarAvisoPvt, avisoPvtActivo, faltaPermisoPvt, programarAvisoPvt, puedeAvisarPvt } from './pvt.js';
+import { abrirPVT, activarAvisoPvt, avisoPvtActivo, faltaPermisoPvt, ofrecerPvtTrasDiario, programarAvisoPvt, puedeAvisarPvt } from './pvt.js';
 import { anadir, aviso, ayuda, fechaCorta, h, hoyISO, leerNumero } from '../ui.js';
 
 // El día que se edita arriba (por defecto, hoy). Se elige tocando una fila.
 let diaElegido = null;
+
+// El cartel del test se ofrece al llegar a esta pantalla, no en cada
+// repintado: la vista se repinta al tocar una estrella, al cambiar de día o
+// al guardar, y un cartel saltando mientras escribes sería insufrible.
+let acabaDeLlegar = true;
+window.addEventListener('hashchange', () => { acabaDeLlegar = true; });
 
 // `titulo-con-ayuda` es una fila flexible: para centrar el título con su «?»
 // hace falta esto. Va en línea porque `estilo.css` lo lleva otra tanda.
@@ -113,6 +119,10 @@ export function vistaDiario(contenedor) {
       // Se guarda solo, pero un botón da tranquilidad: confirma y lleva a la tabla.
       h('button', { type: 'button', class: 'boton grande', onclick: () => {
         document.activeElement?.blur?.();
+        // Es el momento de «ya he acabado de rellenarlo»: si con esto el
+        // diario de hoy queda lleno, aquí sale el cartel del test, y entonces
+        // es él quien confirma (el aviso de abajo quedaría detrás del cartel).
+        if (fecha === hoy && ofrecerPvtTrasDiario({ alCerrar: () => estado.emitir('vista') })) return;
         aviso(entradaDe(estado.datos(), fecha) ? `Guardado: ${fecha === hoy ? 'hoy' : fechaCorta(fecha)}.` : 'No hay nada que guardar todavía.');
         document.querySelector('.tabla-diario')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } }, 'Guardar el día')),
@@ -131,6 +141,14 @@ export function vistaDiario(contenedor) {
         } }),
       h('small', { class: 'nota' }, (d.diario ?? []).filter((x) => calcularSueno(x)).length >= 2
         ? 'Por defecto 8,5. Es la línea discontinua de la gráfica del sueño.' : 'Por defecto 8,5.'))));
+
+  // Si el diario de hoy ya está lleno y el test de hoy sigue sin hacer, el
+  // cartel del test (con su cuenta atrás) sale al llegar aquí. Solo una vez
+  // al día: de eso se encarga `ofrecerPvtTrasDiario`.
+  if (acabaDeLlegar) {
+    acabaDeLlegar = false;
+    ofrecerPvtTrasDiario({ alCerrar: () => estado.emitir('vista') });
+  }
 }
 
 // «2026-10-23» más o menos n días (a mediodía, para que el cambio de hora no salte un día).

@@ -1429,3 +1429,6 @@ mudo. El tema se guarda también en localStorage (`entreno-tema`, `aplicarTema`)
   siguiente empieza con el peso con el que hiciste las repeticiones de tope en una Bilbo de los últimos 3 meses
   (`pesoBilboDemostrado` en ciclos.js, Excel incluidos): la fórmula se queda corta con muchas repeticiones. El ciclo de
   banca de Dan, rehecho en su cuenta desde 55 kg (su 55 × 25 del 06-10). Almacén `entreno-imagenes-45` (vídeos nuevos).
+- 0.67.2: al dejar completo el diario de sueño de la mañana, si aún no hay test de atención, un cartel con cuenta
+  atrás de 5 s lo arranca solo en el modo de 5 min («Ahora no», la ✕ o tocar fuera lo quitan hasta el día siguiente;
+  lo «ya ofrecido» va en localStorage). Hecho por la conversación del sueño (vistas/pvt.js y vistas/diario.js).

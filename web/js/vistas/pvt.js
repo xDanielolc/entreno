@@ -37,10 +37,10 @@ import * as estado from '../estado.js';
 import { formatearNumero } from '../calculos.js';
 import {
   ANTICIPACION_PVT_MS, DIA_FIN_BASE, MODOS_PVT, MODO_PVT_POR_DEFECTO,
-  TESTS_MEDIA_MOVIL, TESTS_MINIMOS_BASE, apuntarPVT, baseDePVT, compararConBase, datosModoPVT, faltaPvtHoy,
-  horaAvisoPvt, mediaMovilPVT, velocidadDeTiempos,
+  TESTS_MEDIA_MOVIL, TESTS_MINIMOS_BASE, apuntarPVT, baseDePVT, calcularSueno, compararConBase, datosModoPVT, entradaDe,
+  faltaPvtHoy, horaAvisoPvt, mediaMovilPVT, velocidadDeTiempos,
 } from '../diario.js';
-import { anadir, aviso, ayuda, confirmar, fechaCorta, h, hoyISO } from '../ui.js';
+import { anadir, aviso, ayuda, confirmar, fechaCorta, h, hoyISO, modal } from '../ui.js';
 
 const RESULTADO_MS = 500;
 const FALSO_MS = 700;
@@ -105,7 +105,10 @@ const POR_QUE_ASI = [
   `Por eso la app decide sobre la media de tus últimos ${TESTS_MEDIA_MOVIL} tests, nunca sobre un día suelto, y tu línea base son tus primeros ${DIA_FIN_BASE} días de tests.`,
 ];
 
-export function abrirPVT({ modo = MODO_PVT_POR_DEFECTO, alCerrar } = {}) {
+// Con `directo: true` el test empieza sin pasar por la pantalla de la
+// duración: es el camino que viene del diario, donde la duración ya está
+// decidida (la de siempre) y preguntarla otra vez sería un paso de más.
+export function abrirPVT({ modo = MODO_PVT_POR_DEFECTO, directo = false, alCerrar } = {}) {
   const capa = h('div', { class: 'pvt-capa', role: 'application', 'aria-label': 'Test de atención', style: CAPA });
   const cuerpo = h('div', { style: CUERPO });
   const barra = h('span', { style: 'display: block; height: 100%; width: 0; background: var(--cartel-texto); opacity: .35; transition: width .4s linear;' });
@@ -404,8 +407,89 @@ export function abrirPVT({ modo = MODO_PVT_POR_DEFECTO, alCerrar } = {}) {
       h('strong', { style: 'font-size: 1.2rem; font-variant-numeric: tabular-nums; white-space: nowrap;' }, valor));
   }
 
-  pintarIntro();
+  if (directo) empezar(); else pintarIntro();
   return cerrar;
+}
+
+// ---------------------------------------------------------------------------
+// El test justo después del diario (la rutina de la mañana)
+// ---------------------------------------------------------------------------
+//
+// Dan, 26-10-2026: «molaría que inicie el contador al llenar mi diario de
+// sueño para hacer el test». Son las dos cosas de la mañana, encadenadas:
+// apunta la noche y se encuentra el test delante sin buscarlo.
+//
+// Nunca de golpe, y esto no es un detalle: el test mide tiempos de reacción,
+// así que pillarle desprevenido con el móvil en la mano estropea la medida y
+// deja un dato malo en el historial. Por eso sale un cartel que dice lo que
+// toca, cuenta hasta cinco a la vista y arranca solo al llegar a cero. Se
+// cancela con «Ahora no», con la X o tocando fuera, y si lo deja no se
+// insiste más: queda la tarjeta de siempre de «hoy no lo has hecho».
+//
+// Una vez al día y se acabó. El día en que se ofreció se guarda en este
+// aparato (localStorage) y no en los datos de la cuenta: es una decisión del
+// momento, no historial, y así no cambia la forma del archivo.
+export const CUENTA_ATRAS_PVT_S = 5;
+const CLAVE_OFRECIDO = 'entreno-pvt-ofrecido';
+let ofrecidoEnSesion = null;   // respaldo si el navegador no deja guardar
+
+function ofrecidoHoy(hoy) {
+  if (ofrecidoEnSesion === hoy) return true;
+  try { return localStorage.getItem(CLAVE_OFRECIDO) === hoy; } catch { return false; }
+}
+
+function apuntarOfrecido(hoy) {
+  ofrecidoEnSesion = hoy;
+  try { localStorage.setItem(CLAVE_OFRECIDO, hoy); } catch { /* sin localStorage: queda el de esta sesión */ }
+}
+
+// Saca el cartel si toca: el diario de hoy tiene las horas de la noche (las
+// que hacen falta para calcular el sueño), hoy no hay ningún test hecho y hoy
+// no se ha ofrecido ya. Devuelve si ha salido.
+export function ofrecerPvtTrasDiario({ alCerrar } = {}) {
+  const hoy = hoyISO();
+  const d = estado.datos();
+  if (!calcularSueno(entradaDe(d ?? {}, hoy) ?? {})) return false;
+  if (!faltaPvtHoy(d, hoy) || ofrecidoHoy(hoy)) return false;
+  // Si ya hay otro cartel o el propio test delante, ni se ofrece ni se gasta
+  // el turno del día: se volverá a mirar la próxima vez.
+  if (document.querySelector('.modal-fondo, .pvt-capa')) return false;
+  apuntarOfrecido(hoy);
+
+  const cual = datosModoPVT(MODO_PVT_POR_DEFECTO);
+  // La cuenta atrás, grande y en su propia línea. Va en línea porque
+  // `estilo.css` lo lleva otra tanda de cambios (reparto del 26-10-2026).
+  // Sin `aria-live`: un número que cambia cada segundo lo cantaría cinco
+  // veces seguidas. El lector de pantalla lee la línea de abajo, que dice lo
+  // mismo con palabras.
+  const cuenta = h('p', { style: 'margin: 14px 0 0; font-size: 1.7rem; font-weight: 800; font-variant-numeric: tabular-nums;' },
+    `Empieza en ${CUENTA_ATRAS_PVT_S}…`);
+  const fin = Date.now() + CUENTA_ATRAS_PVT_S * 1000;
+  let reloj = null;
+  const parar = () => { clearInterval(reloj); reloj = null; };
+  const lanzar = () => { parar(); cerrar(); abrirPVT({ directo: true, alCerrar }); };
+
+  const cerrar = modal('Te toca el test de atención', h('div', { style: 'text-align: center' },
+    h('p', { class: 'nota' }, avisoPvtActivo()
+      ? 'Es el test de hoy, el mismo del aviso de la mañana.'
+      : 'Es el test de hoy. Va justo después del diario, antes del té o el café.'),
+    h('p', {}, `Son ${cual.minutos} minutos. Toca la pantalla en cuanto veas el número.`),
+    cuenta,
+    h('p', { class: 'nota' }, 'Empieza solo al llegar a cero. Si no te viene bien, «Ahora no» o toca fuera del cartel.'),
+    h('button', { type: 'button', class: 'boton grande', onclick: lanzar }, `Empezar ya (${cual.corto})`),
+    // A todo el ancho, debajo del grande: los dos botones del cartel se tocan
+    // igual de fácil y no compiten por el sitio a 375 px.
+    h('button', { type: 'button', class: 'boton secundario', style: 'width: 100%', onclick: () => { parar(); cerrar(); } }, 'Ahora no')));
+
+  reloj = setInterval(() => {
+    // Cerrado con la X o tocando fuera: `modal` no avisa de eso, pero el
+    // cartel ya no está en la página. Se mira antes de lanzar nada.
+    if (!cuenta.isConnected) { parar(); return; }
+    const quedan = Math.ceil((fin - Date.now()) / 1000);
+    if (quedan <= 0) { lanzar(); return; }
+    cuenta.textContent = `Empieza en ${quedan}…`;
+  }, 200);
+  return true;
 }
 
 // ---------------------------------------------------------------------------
