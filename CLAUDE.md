@@ -1539,3 +1539,6 @@ Esquema v28 (`medidas[]`, `fotos[]`, y en el perfil `medidasPropias`, `recordsHo
 - 0.69.3: los últimos muñecos en vector con dibujo por alias en creditos.json: HIIT = burpees, Tabata = jumping jacks,
   «Dislocaciones con pica» = rotaciones de hombro con palo y rodillas al pecho tumbado = Apana (el mismo dibujo).
   Solo queda la tortuga tumbada (Supta Kurmasana). Almacén `entreno-imagenes-50`.
+- 0.69.4: tortuga tumbada (Supta Kurmasana) con dibujo de Gemini, por fin: con la lámina del libro de Kaminoff de modelo
+  (`imagenes-ia/arreglos/modelo-tortuga-tumbada.png`, fuera de Git) y después la cabeza lisa en conversación nueva. Ya no
+  queda ningún ejercicio con muñeco en vector. Almacén `entreno-imagenes-51`.

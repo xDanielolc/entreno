@@ -1408,9 +1408,11 @@
    "autor": "Gemini"
   },
   "Tortuga tumbada (Supta Kurmasana)": {
-   "archivo": "imagenes/munecos/tortuga-tumbada-supta-kurmasana.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-tortuga-tumbada-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-tortuga-tumbada-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Gran sello (Mahamudra)": {
    "archivo": "imagenes/ejercicios/ia/yoga-gran-sello-quieta.webp",
