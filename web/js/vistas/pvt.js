@@ -102,7 +102,7 @@ const POR_QUE_ASI = [
   `Tocar una pantalla táctil añade unos ${RETRASO_TACTIL_MS} ms frente a pulsar un botón de verdad (Arsintescu 2017). Para que tus números se puedan comparar entre sí, hazlo siempre con el mismo móvil, en la misma postura y con el mismo dedo, y no los compares con los de ningún estudio.`,
   'El dato principal es la velocidad de respuesta: la media de 1 dividido entre cada tiempo de reacción en segundos. Con 7 h en cama la velocidad baja pero los lapsos no suben (Belenky 2003), así que mirando solo los lapsos un recorte de sueño parece gratis cuando no lo es.',
   `Las tres duraciones no se mezclan nunca: en gente descansada el de 3 min y el de 10 ni siquiera se parecen (r = 0,134; Antler 2022). El de 5 min viene marcado porque es el único con un cambio mínimo detectable publicado (Thompson 2022): por debajo de un ${UMBRAL_TEXTO} de diferencia es ruido, no un cambio.`,
-  `Por eso la app decide sobre la media de tus últimos ${TESTS_MEDIA_MOVIL} tests, nunca sobre un día suelto, y tu línea base son tus primeros ${DIA_FIN_BASE} días de tests.`,
+  `Por eso la app decide sobre la media de tus últimos ${TESTS_MEDIA_MOVIL} tests, nunca sobre un día suelto. Y tu línea base la forman tus primeros ${TESTS_MINIMOS_BASE} tests, con un plazo de ${DIA_FIN_BASE} días desde el primero para hacerlos.`,
 ];
 
 // Con `directo: true` el test empieza sin pasar por la pantalla de la
@@ -389,9 +389,11 @@ export function abrirPVT({ modo = MODO_PVT_POR_DEFECTO, directo = false, alCerra
   function lineaBase(frente, base, cual) {
     if (!frente) {
       if (base?.falta === 'tests' && base.desde) {
-        return `Tu línea base saldrá de tus primeros ${DIA_FIN_BASE} días de tests (del ${fechaCorta(base.desde)} al ${fechaCorta(base.hasta)}); hacen falta ${TESTS_MINIMOS_BASE} y llevas ${base.tests}.`;
+        const faltan = TESTS_MINIMOS_BASE - base.tests;
+        const cuantos = faltan === 1 ? 'el que falta' : `los ${faltan} que faltan`;
+        return `Todavía no tienes línea base: hacen falta ${TESTS_MINIMOS_BASE} tests y llevas ${base.tests}. Tienes hasta el ${fechaCorta(base.hasta)} para hacer ${cuantos}, y no hace falta uno cada día.`;
       }
-      return `Aún no hay línea base: se hace con los tests de ${cual.corto} de tus primeros ${DIA_FIN_BASE} días.`;
+      return `Aún no hay línea base: se hace con los primeros ${TESTS_MINIMOS_BASE} tests de ${cual.corto} que hagas.`;
     }
     const pct = Math.round(Math.abs(frente.cambio) * 100);
     const base5 = `tu base de ${cual.corto} son ${velocidadTexto(frente.base.velocidad)} resp/s (${frente.base.dias} días)`;

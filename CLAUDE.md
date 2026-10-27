@@ -1432,3 +1432,5 @@ mudo. El tema se guarda también en localStorage (`entreno-tema`, `aplicarTema`)
 - 0.67.2: al dejar completo el diario de sueño de la mañana, si aún no hay test de atención, un cartel con cuenta
   atrás de 5 s lo arranca solo en el modo de 5 min («Ahora no», la ✕ o tocar fuera lo quitan hasta el día siguiente;
   lo «ya ofrecido» va en localStorage). Hecho por la conversación del sueño (vistas/pvt.js y vistas/diario.js).
+- 0.67.3: textos de la línea base del test de atención aclarados (Dan no entendía «primeros 21 días… hacen falta 5»):
+  la base son los primeros 5 tests y 21 días es el plazo para hacerlos. Hecho por la conversación del sueño.

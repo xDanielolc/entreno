@@ -190,7 +190,7 @@ const AYUDA_PVT = [
   'El dato principal es la velocidad de respuesta (respuestas por segundo: la media de 1 dividido entre cada tiempo de reacción). Los lapsos, que son las reacciones tan lentas que cuentan como despiste, se apuntan pero sirven de poco en alguien descansado: con 7 h en cama la velocidad baja y los lapsos no suben (Belenky 2003), así que mirando solo los lapsos un recorte de sueño parece gratis cuando no lo es.',
   'Tres duraciones: 3, 5 y 10 minutos. Viene marcada la de 5 porque es la única con un cambio mínimo detectable publicado (Thompson 2022): por debajo de un 11-12 % de diferencia no es un cambio, es ruido. Sus números no se mezclan nunca entre sí: en gente descansada el de 3 min y el de 10 ni siquiera se parecen (r = 0,134; Antler 2022, 83 adultos).',
   'No hay baremos publicados de ninguna versión (Taillard 2024, PMID 38401239): te comparas contigo y con nadie más. Y tocar una pantalla táctil añade unos 68 ms (Arsintescu 2017), así que hazlo siempre con el mismo móvil y en la misma postura, a la misma hora, antes del té o el café.',
-  'La app decide sobre la media de tus últimos 7 tests, nunca sobre un día suelto, y tu línea base son tus primeros 21 días de tests.',
+  'La app decide sobre la media de tus últimos 7 tests, nunca sobre un día suelto. Y tu línea base la forman tus primeros 5 tests, con un plazo de 21 días desde el primero para hacerlos.',
 ];
 
 // En el día de hoy: el botón para hacerlo, lo que hayas hecho ya y el aviso de
