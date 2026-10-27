@@ -148,7 +148,7 @@ export function hacerCuestionario({ alTerminar } = {}) {
         ? 'Te lo explico todo, con notas en cada pantalla, y dejo puesta una recámara de 2 (más lejos del fallo mientras coges técnica).'
         : 'Te lo explico todo, con notas cortas en cada pantalla.');
     if (r.donde) lineas.push(`He creado tu sitio: ${TIPOS_SEDE[r.donde]?.etiqueta}. Cada entrenamiento se guardará ahí.`);
-    lineas.push(`La rutina que te recomiendo en «Hoy» va con lo que buscas (${PREGUNTAS[1].opciones[r.objetivo]?.etiqueta.toLowerCase() ?? 'tu objetivo'}).`);
+    lineas.push(`La rutina que te recomiendo en «Entrenar» va con lo que buscas (${PREGUNTAS[1].opciones[r.objetivo]?.etiqueta.toLowerCase() ?? 'tu objetivo'}).`);
     lineas.push('Todo esto se cambia luego en Ajustes y en Aprender; nada queda fijo.');
     const cerrarR = modal('Listo, queda así', h('div', {},
       h('ul', {}, lineas.map((x) => h('li', {}, x))),

@@ -802,7 +802,7 @@ export function vistaSesion(contenedor, { id }) {
     const textoRango = (r) => (r ? (r[0] === r[1] ? String(r[0]) : `${r[0]}-${r[1]}`) : '');
     // El rango con su unidad: «8-12 reps», o «30 s» / «1:00-1:30» si es tiempo
     // (antes salía «30 min:s»).
-    const conUnidad = (v) => (esTiempo(ej) ? textoEsfuerzo(ej, v) : `${conUnidad(v)}`);
+    const conUnidad = (v) => (esTiempo(ej) ? textoEsfuerzo(ej, v) : `${v} ${uEsf}`);
     const rangoConUnidad = (r) => (!r ? '' : esTiempo(ej)
       ? (r[0] === r[1] ? textoEsfuerzo(ej, r[0]) : `${textoEsfuerzo(ej, r[0])}-${textoEsfuerzo(ej, r[1])}`)
       : `${textoRango(r)} ${uEsf}`);

@@ -79,6 +79,6 @@ export function tarjetaRetos(d) {
           h('strong', {}, hecho ? `¡Cumplido! (${texto(r, r.hecho)})` : `${texto(r, r.hecho)}`)),
         h('span', { class: 'carril' }, h('span', { class: 'relleno', style: `width:${pct}%` })));
     }),
-    h('button', { type: 'button', class: 'ayuda-esquina boton-icono', 'aria-label': 'Quitar los retos de Hoy',
+    h('button', { type: 'button', class: 'ayuda-esquina boton-icono', 'aria-label': 'Quitar los retos de Entrenar',
       title: 'Quitar los retos', onclick: () => estado.cambiar((x) => { x.perfil.retos = false; }) }, icono('cerrar')));
 }

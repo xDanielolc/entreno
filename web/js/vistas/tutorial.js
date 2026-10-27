@@ -93,7 +93,7 @@ export const GUIAS = {
     titulo: 'Bienvenida',
     resumen: 'De qué va la app, lo que ya viene hecho y tu primer entrenamiento guiado. Empieza por aquí.',
     pasos: [
-      { ruta: '#/', titulo: 'Hoy', selector: 'main .boton.grande',
+      { ruta: '#/', titulo: 'Entrenar', selector: 'main .boton.grande',
         texto: 'Esta es la idea de la app: entras, te dice qué toca hoy y tú solo apuntas lo que haces. El peso y las '
           + 'repeticiones los calcula ella con tu historial. No tienes que acordarte de nada ni llevar cuentas.',
         corto: 'Inicio: qué toca hoy, tu recuperación y el botón para empezar.' },

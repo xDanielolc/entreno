@@ -1532,3 +1532,7 @@ Esquema v28 (`medidas[]`, `fotos[]`, y en el perfil `medidasPropias`, `recordsHo
   (`usar: ia`). Flojos, para su revisión: press Arnold (codos abiertos), movilidad de muñeca (dedos hacia delante),
   rotación tibial (flechitas), libro abierto (esterilla torcida). Lo de antes, en `imagenes-ia/antes-27-10/`.
   Almacén `entreno-imagenes-49`.
+- 0.69.2 (28-10-2026, urgente): el entreno no se abría («Maximum call stack size exceeded»): en la 0.68.0 un reemplazo
+  global dejó `conUnidad` llamándose a sí misma en `lineaSugerenciaBase` (sesion.js); salía en cuanto una serie tenía
+  objetivo. Ver en grande: en vertical se desliza dentro del cartel (el cuerpo de espaldas quedaba cortado debajo) y lo
+  de detrás ya no se mueve (`body:has(.modal-fondo)`). Pestañas renombradas: Hoy → «Entrenar» y Diario → «Sueño».

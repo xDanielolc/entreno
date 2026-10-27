@@ -46,7 +46,7 @@ function avisoTestAtencion(d) {
     h('small', { class: 'nota' }, !hora
       ? 'Sin hora: pon en Perfil la hora a la que quieres levantarte y el aviso saldrá media hora después.'
       : 'Media hora después de tu hora de levantarte, salvo que pongas otra. Solo avisa si ese día aún no has hecho el test. '
-        + 'Con el navegador cerrado puede no llegar; entonces lo verás en Hoy y en el Diario al abrir la app.'),
+        + 'Con el navegador cerrado puede no llegar; entonces lo verás en Entrenar y en Sueño al abrir la app.'),
   ];
 }
 
@@ -108,7 +108,7 @@ export function vistaAjustes(contenedor) {
         h('small', { class: 'nota' }, 'Claro, oscuro o como el móvil, y seis con más carácter. Los de fantasía son un primer intento: '
           + 'si alguno se lee mal en tu móvil, dímelo con una captura.')),
       h('div', { class: 'campo' },
-        h('span', { class: 'etiqueta-campo' }, 'Retos del mes en Hoy'),
+        h('span', { class: 'etiqueta-campo' }, 'Retos del mes en Entrenar'),
         opciones({ si: 'Sí', no: 'No' }, d.perfil.retos === false ? 'no' : 'si',
           (v) => estado.cambiar((x) => { if (v === 'no') x.perfil.retos = false; else delete x.perfil.retos; }), { compacto: true }),
         h('small', { class: 'nota' }, 'Entrenamientos, kilos y minutos del mes, un poco por encima de tu media.'))),
@@ -434,8 +434,8 @@ function camposSueno(d) {
           if (v >= 4 && v <= 12) estado.cambiar((x) => { x.perfil.necesidadSuenoH = v; });
           else aviso('Pon entre 4 y 12 horas.', { tipo: 'error' });
         } }),
-      h('small', { class: 'nota' }, 'Por defecto 8,5. Es la misma casilla que hay en el Diario.')),
-    h('a', { class: 'boton secundario', href: '#/diario' }, 'Ir al Diario'),
+      h('small', { class: 'nota' }, 'Por defecto 8,5. Es la misma casilla que hay en Sueño.')),
+    h('a', { class: 'boton secundario', href: '#/diario' }, 'Ir a Sueño'),
   ];
 }
 

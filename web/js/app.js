@@ -58,9 +58,9 @@ const RUTAS = [
 ];
 
 const PESTANAS = [
-  { id: 'inicio', texto: 'Hoy', href: '#/' },
+  { id: 'inicio', texto: 'Entrenar', href: '#/' },
   { id: 'cuerpo', texto: 'Cuerpo', href: '#/cuerpo' },
-  { id: 'diario', texto: 'Diario', href: '#/diario' },
+  { id: 'diario', texto: 'Sueño', href: '#/diario' },
   { id: 'ejercicios', texto: 'Ejercicios', href: '#/ejercicios' },
   { id: 'historial', texto: 'Historial', href: '#/historial' },
   { id: 'aprender', texto: 'Aprender', href: '#/aprender' },

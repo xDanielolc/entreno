@@ -36,7 +36,7 @@ export function tarjetaRecordsHoy(d, { enPagina = false } = {}) {
 // Elegir qué récords salen en Hoy y de qué tipo (peso, repeticiones…).
 function elegirRecordsHoy(d) {
   const caja = h('div', { class: 'elegir-records' });
-  const cerrar = modal('Récords en Hoy', caja);
+  const cerrar = modal('Récords en Entrenar', caja);
   const pintar = () => {
     const actuales = recordsParaHoy(estado.datos()).map(({ ejercicioId, tipo }) => ({ ejercicioId, tipo }));
     const guardar = (lista) => estado.cambiar((x) => { x.perfil.recordsHoy = lista; });
