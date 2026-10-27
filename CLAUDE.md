@@ -1478,3 +1478,13 @@ Encargo de la conversación de flexibilidad tras la prueba de Dan (notas en su T
 - «Hoy: 30 min:s» → «Hoy: 30 s» (`conUnidad`/`rangoConUnidad` en `lineaSugerenciaBase`).
 - OJO al editar con `python - <<'EOF'` desde la herramienta: «\b» y «\n» llegan como «\b» y «\n» (un retroceso o un
   salto de línea de verdad). Para reemplazos con barras, script en el scratchpad con Write.
+- 0.68.1: dibujos de sus rutinas de estirar (Gemini, todos con la cabeza lisa): gato-camello con la espalda muy redonda y muy
+  hundida y manos y rodillas quietas, Y-T-W de pie en bisagra de cadera, extensión torácica en silla (nuevo), flexión lateral
+  de cuello activa (la IA inclinaba las dos cabezas al mismo lado: la segunda figura es la primera en espejo), CARs de cadera
+  vistos desde atrás, psoas con la rodilla de atrás en el suelo sobre un cojín, apertura lateral moderada sobre un cojín e
+  isométrico de cuello hacia delante (nuevo, mano en la frente). «Isométricos de cuello» (ahora el lateral) usa el dibujo de
+  Everkinetic de la flexión lateral, y «hacia atrás», el que tenía antes. Lo de antes, en `imagenes-ia/antes-27-10/`; los
+  intentos malos, en `descartes/`. Para quitar orejas, lo que funciona: conversación NUEVA de Gemini con el dibujo adjunto y
+  «Haz un dibujo nuevo a partir de este, idéntico en todo… cambia SOLO las cabezas»; en la misma conversación se inventa otro
+  dibujo. La descarga más fiable: clic en la imagen (abre el editor) y su botón de descargar arriba a la derecha.
+  `creditos.json` se ajusta a mano tras procesar (el procesado deshace los cinco «-completo»). Almacén `entreno-imagenes-46`.

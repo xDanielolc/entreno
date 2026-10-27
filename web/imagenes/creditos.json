@@ -822,12 +822,13 @@
    "animada": true
   },
   "Isométricos de cuello": {
-   "archivo": "imagenes/ejercicios/anim/isometricos-de-cuello.webp",
+   "archivo": "imagenes/ejercicios/anim/flexion-lateral-de-cuello.webp",
    "autor": "Everkinetic",
    "fuente": "everkinetic",
-   "nombreEnFuente": "static-neck-flexion-extension",
-   "estatica": "imagenes/ejercicios/isometricos-de-cuello.png",
-   "animada": true
+   "nombreEnFuente": "static-neck-side-flexion",
+   "estatica": "imagenes/ejercicios/flexion-lateral-de-cuello.png",
+   "animada": true,
+   "aliasDe": "Flexión lateral de cuello"
   },
   "Bicicleta de aire": {
    "archivo": "imagenes/ejercicios/anim/bicicleta-de-aire.webp",
@@ -1116,9 +1117,11 @@
    "autor": "Gemini"
   },
   "CARs de cadera": {
-   "archivo": "imagenes/munecos/cars-de-cadera.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/cars-de-cadera.webp",
+   "estatica": "imagenes/ejercicios/ia/cars-de-cadera-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Dislocaciones con pica": {
    "archivo": "imagenes/munecos/dislocaciones-con-pica.svg",
@@ -1762,9 +1765,11 @@
    "fuente": "propia"
   },
   "Flexión lateral de cuello activa": {
-   "archivo": "imagenes/munecos/flexion-lateral-de-cuello-activa.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/flexion-lateral-de-cuello-activa.webp",
+   "estatica": "imagenes/ejercicios/ia/flexion-lateral-de-cuello-activa-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Extensión torácica sobre rodillo": {
    "archivo": "imagenes/munecos/extension-toracica-sobre-rodillo.svg",
@@ -1772,9 +1777,11 @@
    "fuente": "propia"
   },
   "Elevaciones Y-T-W": {
-   "archivo": "imagenes/munecos/elevaciones-y-t-w.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/elevaciones-y-t-w.webp",
+   "estatica": "imagenes/ejercicios/ia/elevaciones-y-t-w-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Cobra en el suelo (Bhujangasana)": {
    "archivo": "imagenes/ejercicios/ia/cobra-en-el-suelo.webp",
@@ -2524,6 +2531,28 @@
    "fuente": "ia",
    "autor": "ChatGPT",
    "aliasDe": "Sentadilla profunda mantenida (Malasana)"
+  },
+  "Extensión torácica en silla": {
+   "archivo": "imagenes/ejercicios/ia/extension-toracica-en-silla.webp",
+   "estatica": "imagenes/ejercicios/ia/extension-toracica-en-silla-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
+  },
+  "Isométrico de cuello hacia delante": {
+   "archivo": "imagenes/ejercicios/ia/isometrico-de-cuello-hacia-delante-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/isometrico-de-cuello-hacia-delante-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
+  },
+  "Isométrico de cuello hacia atrás": {
+   "archivo": "imagenes/ejercicios/anim/isometricos-de-cuello.webp",
+   "autor": "Everkinetic",
+   "fuente": "everkinetic",
+   "nombreEnFuente": "static-neck-flexion-extension",
+   "estatica": "imagenes/ejercicios/isometricos-de-cuello.png",
+   "animada": true
   }
  }
 }

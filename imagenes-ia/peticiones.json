@@ -1292,7 +1292,8 @@
   "slug": "estiramiento-de-psoas-en-zancada",
   "ejercicio": "Estiramiento de psoas en zancada (Anjaneyasana)",
   "vista": "visto de lado",
-  "postura": "en zancada con la rodilla de atrás apoyada en el suelo, cadera empujada hacia delante, tronco erguido, manos en la cintura"
+  "postura": "zancada baja: la rodilla de atrás APOYADA en el suelo sobre un cojín doblado y el empeine de ese pie apoyado en el suelo (no de puntillas), la rodilla de delante doblada a 90 grados justo encima del tobillo, el tronco erguido, las dos manos sobre la rodilla de delante y la cadera un poco adelantada",
+  "usar": "ia"
  },
  {
   "slug": "estiramiento-de-gemelo-en-pared",
@@ -1387,7 +1388,8 @@
   "slug": "postura-del-sastre-apertura-lateral",
   "ejercicio": "Postura del sastre, apertura lateral (Upavistha Konasana)",
   "vista": "sentado en el suelo, visto de frente",
-  "postura": "piernas muy abiertas hacia los lados y estiradas, tronco erguido, manos en el suelo delante"
+  "postura": "sentado sobre un cojín, las piernas estiradas y abiertas hacia los lados en un ángulo MODERADO de unos 70 grados entre ellas (nada de spagat), las rodillas y los dedos de los pies mirando al techo, el tronco erguido y las manos apoyadas en el suelo por detrás de la cadera",
+  "usar": "ia"
  },
  {
   "slug": "zancada-hacia-el-split-frontal",
@@ -1417,13 +1419,15 @@
   "slug": "estiramiento-del-empeine",
   "ejercicio": "Estiramiento del empeine",
   "vista": "de rodillas en el suelo, visto de lado",
-  "postura": "sentado sobre los talones con los empeines apoyados en el suelo y las manos detrás, tronco algo inclinado hacia atrás"
+  "usar": "ia",
+  "postura": "sentado sobre los talones con los empeines apoyados planos en el suelo (las plantas de los pies miran al techo), el tronco erguido y las manos sobre los muslos"
  },
  {
   "slug": "estiramiento-de-los-dedos-del-pie",
   "ejercicio": "Estiramiento de los dedos del pie",
   "vista": "de rodillas en el suelo, visto de lado",
-  "postura": "sentado sobre los talones con los dedos de los pies doblados hacia arriba apoyados en el suelo"
+  "usar": "ia",
+  "postura": "sentado sobre los talones, con los dedos de los pies doblados hacia arriba apoyados en el suelo (como en puntillas de rodillas), el tronco erguido y las manos sobre los muslos"
  },
  {
   "slug": "movilidad-dinamica-de-torso",
@@ -1442,9 +1446,11 @@
  {
   "slug": "cars-de-cadera",
   "ejercicio": "CARs de cadera",
-  "vista": "a cuatro patas, visto de lado",
-  "inicio": "una rodilla levantada hacia el lado",
-  "final": "esa rodilla llevada hacia atrás, dibujando un círculo con la cadera"
+  "vista": "a cuatro patas, visto desde atrás en diagonal (tres cuartos), manos bajo los hombros y rodillas bajo la cadera",
+  "inicio": "las dos rodillas en el suelo",
+  "final": "una rodilla levantada y abierta hacia el lado hasta la altura de la cadera, con la rodilla doblada a 90 grados (como un perro junto a una farola); las manos y la otra rodilla no se mueven",
+  "ancla": "pies",
+  "usar": "ia"
  },
  {
   "slug": "rotaciones-de-hombro-con-palo",
@@ -1458,9 +1464,11 @@
  {
   "slug": "tobillo-con-rodilla-a-la-pared",
   "ejercicio": "Tobillo con rodilla a la pared",
-  "vista": "frente a una pared, en zancada, visto de lado",
-  "inicio": "el pie de delante a un palmo de la pared, la rodilla recta",
-  "final": "la rodilla de delante tocando la pared sin levantar el talón"
+  "vista": "de pie frente a una pared en una zancada corta, visto de lado, las manos apoyadas en la pared",
+  "usar": "ia",
+  "inicio": "el pie de delante a unos centímetros de la pared, la rodilla de delante recta",
+  "final": "la rodilla de delante doblada hacia delante hasta tocar la pared, el talón de ese pie sigue apoyado en el suelo",
+  "ancla": "pies"
  },
  {
   "slug": "rotacion-toracica-en-libro-abierto",
@@ -1492,17 +1500,20 @@
  {
   "slug": "rotacion-90-90",
   "ejercicio": "Rotación 90/90",
-  "vista": "sentado en el suelo con las dos rodillas dobladas a 90 grados, visto de frente",
-  "inicio": "las dos rodillas caídas hacia la izquierda",
-  "final": "las dos rodillas caídas hacia la derecha"
+  "vista": "sentado en el suelo, visto de frente, las manos apoyadas en el suelo por detrás",
+  "usar": "ia",
+  "inicio": "las dos piernas dobladas a 90 grados y tumbadas hacia la izquierda: la de delante con el muslo hacia delante y la de atrás con el muslo hacia el lado, como una Z",
+  "final": "las dos rodillas giradas hacia la derecha: ahora la pierna de delante y la de atrás forman la misma Z hacia el otro lado",
+  "ancla": "pies"
  },
  {
   "slug": "gato-camello",
   "ejercicio": "Gato-camello (Marjaryasana-Bitilasana)",
-  "vista": "a cuatro patas, visto de lado",
-  "inicio": "espalda arqueada hacia arriba como un gato, cabeza abajo",
-  "final": "espalda hundida hacia abajo, pecho y cabeza arriba",
-  "ancla": "delante"
+  "vista": "a cuatro patas, visto de lado, manos justo debajo de los hombros y rodillas justo debajo de la cadera; las manos, las rodillas y los pies están EXACTAMENTE en el mismo sitio en las dos figuras",
+  "inicio": "espalda MUY redondeada hacia el techo, como un gato asustado, la cabeza colgando mirando al ombligo",
+  "final": "espalda MUY hundida hacia el suelo, la tripa cae hacia el suelo, el pecho adelantado y la mirada al frente",
+  "ancla": "pies",
+  "usar": "ia"
  },
  {
   "slug": "deslizamiento-neural-nerve-floss",
@@ -1514,30 +1525,38 @@
  {
   "slug": "deslizamiento-neural-ciatico",
   "ejercicio": "Deslizamiento neural ciático",
-  "vista": "tumbado boca arriba sujetando un muslo con las manos, visto de lado",
-  "inicio": "la rodilla doblada a 90 grados",
-  "final": "la pierna estirada hacia el techo con el pie flexionado"
+  "vista": "sentado en el borde de una silla, visto de lado, las manos en la silla",
+  "usar": "ia",
+  "inicio": "una rodilla doblada con el pie en el suelo y la cabeza mirando hacia abajo",
+  "final": "esa pierna estirada al frente con la punta del pie hacia arriba y la cabeza mirando hacia arriba",
+  "ancla": "pies"
  },
  {
   "slug": "deslizamiento-neural-cervical",
   "ejercicio": "Deslizamiento neural cervical",
   "vista": "de pie, visto de frente",
-  "inicio": "un brazo abierto al lado con la palma arriba y la cabeza inclinada hacia ese brazo",
-  "final": "la muñeca doblada hacia abajo y la cabeza inclinada hacia el otro lado"
+  "usar": "ia",
+  "inicio": "un brazo estirado hacia el lado con la palma hacia arriba y la cabeza inclinada hacia ese brazo",
+  "final": "la muñeca doblada con los dedos hacia el suelo y la cabeza inclinada hacia el otro lado",
+  "ancla": "pies"
  },
  {
   "slug": "rotacion-tibial-con-rodilla-flexionada",
   "ejercicio": "Rotación tibial con rodilla flexionada",
-  "vista": "sentado en una silla, visto de frente",
-  "inicio": "el pie girado hacia dentro con la rodilla quieta",
-  "final": "el pie girado hacia fuera con la rodilla quieta"
+  "vista": "sentado en una silla, visto de frente, los dos pies apoyados en el suelo y las rodillas dobladas a 90 grados",
+  "usar": "ia",
+  "inicio": "la punta de un pie girada hacia dentro, el talón en el mismo sitio",
+  "final": "la punta de ese pie girada hacia fuera, el talón en el mismo sitio; la rodilla no se mueve",
+  "ancla": "pies"
  },
  {
   "slug": "rotacion-toracica-en-cuadrupedia",
   "ejercicio": "Rotación torácica en cuadrupedia",
-  "vista": "a cuatro patas con una mano en la nuca, visto de lado",
-  "inicio": "el codo bajado hacia la otra mano",
-  "final": "el codo levantado hacia el techo, el pecho girado"
+  "vista": "a cuatro patas, visto de lado, una mano detrás de la cabeza",
+  "usar": "ia",
+  "inicio": "el codo de esa mano apunta al suelo, el tronco girado hacia abajo",
+  "final": "el codo apunta al techo, el pecho girado hacia ese lado; la otra mano y las rodillas no se mueven",
+  "ancla": "pies"
  },
  {
   "slug": "puente-por-fases",
@@ -1550,30 +1569,38 @@
  {
   "slug": "rotacion-externa-de-hombro-con-banda",
   "ejercicio": "Rotación externa de hombro con banda",
-  "vista": "de pie con una banda elástica entre las manos, codos pegados al cuerpo y doblados a 90 grados, visto de frente",
-  "inicio": "antebrazos hacia delante, manos juntas",
-  "final": "antebrazos abiertos hacia fuera estirando la banda"
+  "vista": "de pie, visto de frente, una banda elástica sujeta con las dos manos",
+  "usar": "ia",
+  "inicio": "los codos pegados a la cintura y doblados a 90 grados, las manos juntas delante de la tripa",
+  "final": "los codos siguen pegados a la cintura y las manos se separan hacia los lados abriendo la banda, los antebrazos giran hacia fuera",
+  "ancla": "pies"
  },
  {
   "slug": "rotacion-interna-de-hombro-con-toalla",
   "ejercicio": "Rotación interna de hombro con toalla",
-  "vista": "de pie con una toalla detrás de la espalda, visto de lado",
-  "inicio": "una mano arriba detrás de la cabeza y otra abajo detrás de la espalda agarrando la toalla",
-  "final": "la mano de arriba tirando de la toalla hacia arriba"
+  "vista": "de pie, visto de espaldas",
+  "usar": "ia",
+  "inicio": "una mano por encima del hombro sujeta un extremo de una toalla que cuelga por la espalda y la otra mano la coge por abajo, a la altura de la cadera",
+  "final": "la mano de arriba tira de la toalla hacia arriba y la mano de abajo sube por la espalda",
+  "ancla": "pies"
  },
  {
   "slug": "retraccion-cervical-chin-tuck",
   "ejercicio": "Retracción cervical (chin tuck)",
-  "vista": "sentado, visto de lado",
-  "inicio": "la cabeza adelantada",
-  "final": "la barbilla metida hacia atrás, la cabeza alineada con los hombros"
+  "vista": "sentado en un taburete, visto de lado, la espalda recta",
+  "usar": "ia",
+  "inicio": "la cabeza adelantada, con la barbilla por delante del pecho",
+  "final": "la cabeza llevada hacia atrás en horizontal, metiendo la barbilla (papada), la mirada al frente, sin inclinar la cabeza",
+  "ancla": "pies"
  },
  {
   "slug": "flexion-lateral-de-cuello-activa",
   "ejercicio": "Flexión lateral de cuello activa",
-  "vista": "sentado, visto de frente",
-  "inicio": "la cabeza inclinada hacia el hombro derecho",
-  "final": "la cabeza inclinada hacia el hombro izquierdo"
+  "vista": "sentado en un taburete, visto de frente, las manos apoyadas sobre los muslos (no tocan la cabeza)",
+  "inicio": "la cabeza inclinada hacia el hombro derecho, la oreja cerca del hombro, sin subir el hombro",
+  "final": "la cabeza inclinada hacia el hombro izquierdo, la oreja cerca del hombro, sin subir el hombro",
+  "ancla": "pies",
+  "usar": "ia"
  },
  {
   "slug": "extension-toracica-sobre-rodillo",
@@ -1585,9 +1612,10 @@
  {
   "slug": "elevaciones-y-t-w",
   "ejercicio": "Elevaciones Y-T-W",
-  "vista": "tumbado boca abajo en un banco inclinado, visto de frente desde arriba",
-  "inicio": "brazos levantados en forma de Y",
-  "final": "brazos abiertos en forma de T"
+  "vista": "de pie, inclinado hacia delante desde la cadera con la espalda recta (el tronco casi paralelo al suelo) y las rodillas un poco dobladas, visto de tres cuartos por delante",
+  "inicio": "los dos brazos colgando rectos hacia el suelo, por debajo de los hombros",
+  "final": "los dos brazos levantados rectos por delante de la cabeza formando una Y, a la altura de la espalda, pulgares hacia arriba",
+  "usar": "ia"
  },
  {
   "slug": "cobra-en-el-suelo",
@@ -1600,15 +1628,18 @@
  {
   "slug": "flexion-y-extension-de-dedos-del-pie",
   "ejercicio": "Flexión y extensión de dedos del pie",
-  "vista": "sentado, visto de lado, se ve el pie",
-  "inicio": "dedos del pie doblados hacia abajo",
-  "final": "dedos del pie levantados hacia arriba"
+  "vista": "sentado en una silla, visto de lado, los pies descalzos apoyados en el suelo",
+  "usar": "ia",
+  "inicio": "los dedos de un pie levantados hacia arriba, la planta y el talón en el suelo",
+  "final": "los dedos de ese pie encogidos hacia abajo agarrando el suelo",
+  "ancla": "pies"
  },
  {
   "slug": "isometrico-de-flexion-plantar",
   "ejercicio": "Isométrico de flexión plantar",
-  "vista": "de pie junto a una pared, visto de lado",
-  "postura": "de puntillas sobre una pierna, aguantando, con una mano en la pared"
+  "vista": "de pie junto a una pared, visto de lado, una mano en la pared",
+  "usar": "ia",
+  "postura": "de puntillas sobre una sola pierna, aguantando arriba, la otra pierna doblada por detrás"
  },
  {
   "slug": "liberacion-con-rodillo",
@@ -2033,6 +2064,22 @@
   "inicio": "tronco inclinado casi horizontal, rodillas un poco flexionadas, la mano izquierda apoyada en el muslo izquierdo, el brazo derecho estirado colgando hacia el suelo con UNA sola mancuerna (en todo el dibujo hay una sola mancuerna, en la mano derecha)",
   "final": "el brazo derecho, estirado del todo y sin doblar el codo, abierto hacia el lado hasta la altura del hombro; la mano izquierda sigue apoyada en el muslo y el tronco no se mueve",
   "ancla": "encajar",
+  "usar": "ia"
+ },
+ {
+  "slug": "extension-toracica-en-silla",
+  "ejercicio": "Extensión torácica en silla",
+  "vista": "sentado en una silla de cuatro patas con el respaldo bajo (le llega a mitad de la espalda), visto de lado; la silla es idéntica y está en el mismo sitio en las dos figuras",
+  "inicio": "manos entrelazadas detrás de la cabeza, codos hacia delante, espalda recta apoyada en el respaldo",
+  "final": "la parte alta de la espalda arqueada hacia atrás por encima del borde del respaldo, codos abiertos, mirada al techo; la cadera no se mueve del asiento",
+  "ancla": "encajar",
+  "usar": "ia"
+ },
+ {
+  "slug": "isometrico-de-cuello-hacia-delante",
+  "ejercicio": "Isométrico de cuello hacia delante",
+  "vista": "de frente, solo desde la cintura hacia arriba",
+  "postura": "una mano con la palma en la frente empujando la cabeza hacia atrás mientras la cabeza empuja hacia delante, sin moverse; el otro brazo relajado",
   "usar": "ia"
  }
 ]
