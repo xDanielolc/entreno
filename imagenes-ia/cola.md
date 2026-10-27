@@ -178,3 +178,24 @@ petición (el pez levantaba la cabeza; la goblet sale «de huevo», que lo decid
 - [x] Elevaciones laterales: rehechas enteras (en T, sin curl, piernas quietas).
 - [x] Elíptica: con la foto de modelo que mandó Dan; quieta (una sola postura).
 - Lo de antes, para comparar, en `imagenes-ia/antes-26-10/` (fuera de Git).
+
+## Repaso de orejas (27-10-2026)
+Con oreja o perfil de cara a la vista (quitar con Gemini, conversación nueva con el dibujo adjunto):
+- air-squat-quieta.webp: Air squat
+- bicicleta-estatica-quieta.webp: Bicicleta estática
+- boxeo-quieta.webp: Boxeo
+- burpees-quieta.webp: Burpees
+- fondos-asistidos-quieta.webp: Fondos asistidos
+- peso-muerto-con-mancuernas-quieta.webp: Peso muerto con mancuernas
+- plancha-quieta.webp: Plancha
+- remo-de-cardio-quieta.webp: Remo de cardio
+- sentadilla-bulgara-quieta.webp: Sentadilla búlgara
+- sentadilla-frontal-quieta.webp: Sentadilla frontal
+Con bultitos de oreja a los lados (de frente o de espaldas):
+- dominadas-negativas-quieta.webp: Dominadas negativas
+- elevaciones-laterales-en-polea-quieta.webp: Elevaciones laterales en polea
+- elevaciones-laterales-quieta.webp: Elevaciones laterales
+- encogimientos-de-trapecio-quieta.webp: Encogimientos de trapecio
+- sentadilla-en-multipower-quieta.webp: Sentadilla en multipower
+- sentadilla-quieta.webp: Sentadilla
+Sin mirar de cerca (cabeza pequeña o tumbados): el resto se ve liso en las láminas a 300 px.
