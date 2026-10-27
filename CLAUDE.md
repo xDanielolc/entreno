@@ -1536,3 +1536,6 @@ Esquema v28 (`medidas[]`, `fotos[]`, y en el perfil `medidasPropias`, `recordsHo
   global dejó `conUnidad` llamándose a sí misma en `lineaSugerenciaBase` (sesion.js); salía en cuanto una serie tenía
   objetivo. Ver en grande: en vertical se desliza dentro del cartel (el cuerpo de espaldas quedaba cortado debajo) y lo
   de detrás ya no se mueve (`body:has(.modal-fondo)`). Pestañas renombradas: Hoy → «Entrenar» y Diario → «Sueño».
+- 0.69.3: los últimos muñecos en vector con dibujo por alias en creditos.json: HIIT = burpees, Tabata = jumping jacks,
+  «Dislocaciones con pica» = rotaciones de hombro con palo y rodillas al pecho tumbado = Apana (el mismo dibujo).
+  Solo queda la tortuga tumbada (Supta Kurmasana). Almacén `entreno-imagenes-50`.

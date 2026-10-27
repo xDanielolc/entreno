@@ -1133,9 +1133,12 @@
    "autor": "Gemini"
   },
   "Estiramiento de lumbares con rodillas al pecho (Apanasana)": {
-   "archivo": "imagenes/munecos/estiramiento-de-lumbares-con-rodillas-al-pecho.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/yoga-apana-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/yoga-apana-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini",
+   "aliasDe": "Apana (Apanasana)"
   },
   "CARs de hombro": {
    "archivo": "imagenes/ejercicios/ia/cars-de-hombro.webp",
@@ -1152,9 +1155,12 @@
    "autor": "Gemini"
   },
   "Dislocaciones con pica": {
-   "archivo": "imagenes/munecos/dislocaciones-con-pica.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/rotaciones-de-hombro-con-palo.webp",
+   "estatica": "imagenes/ejercicios/ia/rotaciones-de-hombro-con-palo-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini",
+   "aliasDe": "Rotaciones de hombro con palo"
   },
   "Tobillo con rodilla a la pared": {
    "archivo": "imagenes/ejercicios/ia/tobillo-con-rodilla-a-la-pared.webp",
@@ -1708,14 +1714,20 @@
    "autor": "Gemini"
   },
   "HIIT": {
-   "archivo": "imagenes/munecos/hiit.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/burpees.webp",
+   "estatica": "imagenes/ejercicios/ia/burpees-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini",
+   "aliasDe": "Burpees"
   },
   "Tabata": {
-   "archivo": "imagenes/munecos/tabata.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/jumping-jacks.webp",
+   "estatica": "imagenes/ejercicios/ia/jumping-jacks-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini",
+   "aliasDe": "Jumping jacks"
   },
   "Jumping jacks": {
    "archivo": "imagenes/ejercicios/ia/jumping-jacks.webp",
