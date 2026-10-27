@@ -633,3 +633,16 @@ la vez, a veces sin cobertura):
   sin ella, lo dice `web/js/medidas-estiramiento.js`. La medida de cada serie
   sigue en `serie.estiramiento.cm` o `serie.estiramiento.nivel`. Nada que
   convertir.
+- **v28 (medidas del cuerpo y fotos de progreso, 27-10-2026).** Dos
+  colecciones nuevas que se funden con Drive como las demás:
+  `medidas[]` ({ `id`, `fecha` «YYYY-MM-DD», `clave`, `valor` }: `grasa` en %,
+  `kcal`, y perímetros en cm como `cuello`, `hombros`, `pecho`, `biceps-izq`,
+  `biceps-der`, `antebrazo-izq`, `antebrazo-der`, `cintura`, `caderas`,
+  `muslo-izq`, `muslo-der`, `pantorrilla-izq`, `pantorrilla-der`, o la clave
+  de una medida tuya; el peso sigue en `perfil.pesos`) y `fotos[]` ({ `id`,
+  `fecha`, `nota`, `driveId`, `borrada` }: la imagen va aparte, en el móvil y
+  en la carpeta de la app en Drive, no dentro del JSON). En el perfil,
+  opcionales: `medidasPropias` ([{ `clave`, `nombre`, `unidad` }]),
+  `recordsHoy` ([{ `ejercicioId`, `tipo` }], los récords que salen en Hoy; sin
+  él, los de los básicos) y `retos` (`false` quita los retos del mes de Hoy).
+  Nada que convertir.

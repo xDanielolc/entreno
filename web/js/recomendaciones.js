@@ -343,7 +343,7 @@ function pesoSinActualizar(datos, recientes, ahora) {
   const dias = ultima ? Math.floor((ahora - new Date(`${ultima}T12:00:00`)) / (DIA * 3_600_000)) : null;
   if (dias != null && dias < 30) return [];
   return [r('peso', 'consejo', `${dias == null ? 'Aún no has apuntado tu peso' : `Hace ${dias} días que no apuntas tu peso`}: `
-    + 'tus flexiones, dominadas y fondos se calculan con él. Apúntalo en Cuerpo.', { enlace: '#/cuerpo' })];
+    + 'tus flexiones, dominadas y fondos se calculan con él. Apúntalo en Cuerpo → Medidas.', { enlace: '#/cuerpo/medidas' })];
 }
 
 // 29. Llegas cansado a varios músculos en varias sesiones seguidas.

@@ -84,7 +84,7 @@ export function vistaAjustes(contenedor) {
   const apartado = apartadoPlegable;
 
   anadir(contenedor,
-    h('h1', {}, 'Ajustes'),
+    // Sin título: la pestaña de abajo ya lo dice (Dan, 27-10-2026).
     pista('ajustes', 'Todo va en apartados plegados: toca uno para abrirlo. Las explicaciones, el glosario y el '
       + 'tutorial están en la pestaña «Aprender».'),
     apartado('Perfil',
@@ -106,7 +106,12 @@ export function vistaAjustes(contenedor) {
         opciones(TEMAS, d.perfil.tema ?? 'sistema',
           (t) => { estado.cambiar((x) => { x.perfil.tema = t; }); aplicarTema(t); }, { compacto: true }),
         h('small', { class: 'nota' }, 'Claro, oscuro o como el móvil, y seis con más carácter. Los de fantasía son un primer intento: '
-          + 'si alguno se lee mal en tu móvil, dímelo con una captura.'))),
+          + 'si alguno se lee mal en tu móvil, dímelo con una captura.')),
+      h('div', { class: 'campo' },
+        h('span', { class: 'etiqueta-campo' }, 'Retos del mes en Hoy'),
+        opciones({ si: 'Sí', no: 'No' }, d.perfil.retos === false ? 'no' : 'si',
+          (v) => estado.cambiar((x) => { if (v === 'no') x.perfil.retos = false; else delete x.perfil.retos; }), { compacto: true }),
+        h('small', { class: 'nota' }, 'Entrenamientos, kilos y minutos del mes, un poco por encima de tu media.'))),
 
     apartado('Cuenta y copia de seguridad',
       sinCuenta
@@ -340,7 +345,9 @@ export function vistaAjustes(contenedor) {
       botonFinal.textContent = 'Un momento…';
       try {
         if (accion === 'borrar') {
+          const fotosEnDrive = (estado.datos().fotos ?? []).map((f) => f.driveId).filter(Boolean);
           estado.vaciarDatos();
+          await import('../fotos.js').then((m) => m.borrarTodas(fotosEnDrive)).catch(() => {});
           cerrar();
           if (!sinCuenta) await sincronizar({ interactivo: true });
           aviso('Todos tus datos se han borrado.');

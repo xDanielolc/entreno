@@ -134,6 +134,8 @@ async function sincronizarArchivo() {
     ordenado = true;
     drive.ordenarCarpeta().catch(() => { ordenado = false; });
   }
+  // Las fotos de progreso van aparte, cada una en su archivo.
+  import('./fotos.js').then((m) => m.subirPendientes()).catch(() => {});
   const revisionRemota = Number(remoto.appProperties?.revision ?? -1);
   const conocida = meta.fileId === fileId ? meta.revisionRemota : null;
   let conflicto = false;
@@ -229,6 +231,7 @@ export async function eliminarCuenta() {
   }
   estado.cerrarUsuario();
   await local.borrarUsuario(usuario);
+  await import('./fotos.js').then((m) => m.borrarTodasLocales()).catch(() => {});
   fijar('desconectada');
   return borrados;
 }

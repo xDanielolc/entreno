@@ -4,7 +4,7 @@
 // y dos periodos (esta semana, este mes).
 
 import { formatearNumero } from '../calculos.js';
-import { MUSCULOS, TREN_INFERIOR, TREN_SUPERIOR } from '../musculos.js';
+import { MUSCULOS, TREN_INFERIOR, TREN_SUPERIOR, musculoRecortado } from '../musculos.js';
 import { durezaSemanal, seriesEnDias } from '../recuperacion.js';
 import { ampliar, h } from '../ui.js';
 import { pista } from './tutorial.js';
@@ -58,7 +58,7 @@ export function tarjetaEquilibrio(d) {
     const valores = ejes.map(([nombre, musculos]) => {
       const hechas = musculos.reduce((t, m) => t + (series[m] ?? 0), 0);
       const objetivo = musculos.reduce((t, m) => t + objetivoSeries(d, m, dureza).n, 0) * semanas;
-      return { nombre, hechas, objetivo, pct: objetivo ? hechas / objetivo : 0 };
+      return { nombre, musculos, hechas, objetivo, pct: objetivo ? hechas / objetivo : 0 };
     });
     const total = valores.reduce((t, v) => t + v.hechas, 0);
     // Radio: en «Zonas», frente al objetivo (el anillo discontinuo es el 100 %);
@@ -86,8 +86,8 @@ export function tarjetaEquilibrio(d) {
           'días')),
       total
         ? h('button', { type: 'button', class: 'arana-boton', 'aria-label': 'Ver el equilibrio en grande',
-          onclick: () => ampliar('Equilibrio', () => arana(valores.map((v) => ({ ...v, r: radio(v) })), porObjetivo ? Math.sqrt(1 / 1.5) : null)) },
-        arana(valores.map((v) => ({ ...v, r: radio(v) })), porObjetivo ? Math.sqrt(1 / 1.5) : null))
+          onclick: () => ampliar('Equilibrio', () => arana(valores.map((v) => ({ ...v, r: radio(v) })), porObjetivo ? Math.sqrt(1 / 1.5) : null, { dibujos: modo === 'zonas' })) },
+        arana(valores.map((v) => ({ ...v, r: radio(v) })), porObjetivo ? Math.sqrt(1 / 1.5) : null, { dibujos: modo === 'zonas' }))
         : h('p', { class: 'suave centrado' }, `Sin series ${dias === 7 ? 'esta semana' : dias === 30 ? 'este mes' : `en los últimos ${dias} días`}.`),
       total > 0 && h('ul', { class: 'nota lista-equilibrio' }, conclusiones(valores, porObjetivo).map((t) => h('li', {}, t))),
     ].filter(Boolean));
@@ -128,8 +128,10 @@ function conclusiones(valores, porObjetivo) {
   return lista;
 }
 
-// El gráfico de araña, en SVG.
-function arana(valores, anilloObjetivo) {
+// El gráfico de araña, en SVG. Con `dibujos`, en vez del nombre de cada zona
+// sale su trozo de muñeco con el músculo en rojo (como Lyfta, con nuestro
+// muñeco; Dan, 27-10-2026).
+function arana(valores, anilloObjetivo, { dibujos = false, sinEtiquetas = false } = {}) {
   const NS = 'http://www.w3.org/2000/svg';
   const nodo = (tag, attrs = {}, ...hijos) => {
     const e = document.createElementNS(NS, tag);
@@ -145,6 +147,18 @@ function arana(valores, anilloObjetivo) {
   };
   const poligono = (r) => valores.map((_, i) => punto(i, typeof r === 'function' ? r(i) : r).map((x) => x.toFixed(1)).join(',')).join(' ');
   // Márgenes anchos a los lados para que las etiquetas quepan en el móvil.
+  if (dibujos) {
+    // Más margen alrededor: los dibujos van fuera de la red.
+    const [x0, y0, ancho, alto] = [-120, -120, T + 240, T + 240];
+    const grafico = arana(valores, anilloObjetivo, { sinEtiquetas: true });
+    grafico.setAttribute('viewBox', `${x0} ${y0} ${ancho} ${alto}`);
+    return h('div', { class: 'arana-con-dibujos' }, grafico, valores.map((v, i) => {
+      const [x, y] = punto(i, 1.48);
+      return h('span', { class: 'arana-dibujo', title: v.nombre,
+        style: `left:${((x - x0) / ancho) * 100}%;top:${((y - y0) / alto) * 100}%` },
+      musculoRecortado(v.musculos), h('small', {}, v.nombre));
+    }));
+  }
   return nodo('svg', { viewBox: `-78 -34 ${T + 156} ${T + 68}`, class: 'arana', role: 'img',
     'aria-label': valores.map((v) => `${v.nombre}: ${formatearNumero(Math.round(v.hechas * 10) / 10)} series`).join('. ') },
   [0.25, 0.5, 0.75, 1].map((r) => nodo('polygon', { points: poligono(r), class: 'arana-red' })),
@@ -152,7 +166,7 @@ function arana(valores, anilloObjetivo) {
   anilloObjetivo && nodo('polygon', { points: poligono(anilloObjetivo), class: 'arana-objetivo' }),
   nodo('polygon', { points: poligono((i) => valores[i].r), class: 'arana-valor' }),
   valores.map((v, i) => { const [x, y] = punto(i, v.r); return nodo('circle', { cx: x, cy: y, r: 3.5, class: 'arana-punto' }); }),
-  valores.map((v, i) => {
+  !sinEtiquetas && valores.map((v, i) => {
     const [x, y] = punto(i, 1.1);
     const ancla = Math.abs(x - C) < 8 ? 'middle' : x > C ? 'start' : 'end';
     return nodo('text', { x, y: y + 4, 'text-anchor': ancla, class: 'arana-etiqueta' }, v.nombre);

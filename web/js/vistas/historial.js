@@ -3,6 +3,7 @@ import { sedeInicial } from '../sedes.js';
 import { anadir, fechaLarga, h, hoyISO, modal, nuevoId, selector, horario } from '../ui.js';
 import { TIPOS_EJERCICIO, normalizar, tipoDeEjercicio } from '../catalogo.js';
 import { MUSCULOS, ORDEN_MUSCULOS } from '../musculos.js';
+import { tiraInferior } from './tira.js';
 
 // Lo que buscas en el historial se recuerda mientras la app esté abierta.
 const filtro = { texto: '', rutina: '', tipo: '', musculo: '', mes: '' };
@@ -50,8 +51,14 @@ export function masRecienteAntes(a, b) {
   return (b.fecha + (b.inicio || '')).localeCompare(a.fecha + (a.inicio || ''));
 }
 
-export function vistaHistorial(contenedor) {
+export function vistaHistorial(contenedor, { apartado } = {}) {
   const d = estado.datos();
+  // Dos apartados en la tira de abajo: la lista y el calendario (Dan, 27-10-2026).
+  const tira = tiraInferior([
+    { texto: 'Lista', icono: 'lista', href: '#/historial', activo: apartado !== 'calendario' },
+    { texto: 'Calendario', icono: 'calendario', href: '#/historial/calendario', activo: apartado === 'calendario' },
+  ], { etiqueta: 'Apartados del historial' });
+  if (apartado === 'calendario') { anadir(contenedor, vistaCalendario(d), tira); return; }
   const sesiones = d.sesiones.filter((s) => !s.borrada).sort(masRecienteAntes);
   const papelera = d.sesiones.filter((s) => s.borrada).sort(masRecienteAntes);
   // Para pasar a la app entrenamientos de otros días (cardio antiguo, por
@@ -114,8 +121,8 @@ export function vistaHistorial(contenedor) {
   pintarLista();
 
   anadir(contenedor,
-    h('div', { class: 'cabecera-vista' },
-      h('h1', {}, 'Historial'),
+    // Sin título: la pestaña de abajo ya dice «Historial».
+    h('div', { class: 'cabecera-vista sin-titulo' },
       h('button', { class: 'boton secundario', onclick: anadirPasado }, '+ De otro día')),
     sesiones.length > 3 && h('div', { class: 'filtros-ejercicios' },
       h('div', { class: 'fila-buscador' },
@@ -127,5 +134,75 @@ export function vistaHistorial(contenedor) {
     papelera.length > 0 && h('details', { class: 'papelera' },
       h('summary', {}, `Papelera (${papelera.length})`),
       h('p', { class: 'nota' }, 'Los entrenamientos borrados se quedan aquí. Ábrelos para recuperarlos.'),
-      papelera.map((s) => resumenSesion(d, s))));
+      papelera.map((s) => resumenSesion(d, s))),
+    tira);
+}
+
+// ---------------------------------------------------------------------------
+// Calendario del mes con los días entrenados y la racha de semanas (como en
+// Lyfta). Se pasa de mes con las flechas; tocar un día entrenado lo abre.
+// ---------------------------------------------------------------------------
+
+let mesCalendario = null;     // «YYYY-MM» que se ve; null = el de hoy
+const DIAS_SEMANA = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+const iso = (f) => `${f.getFullYear()}-${String(f.getMonth() + 1).padStart(2, '0')}-${String(f.getDate()).padStart(2, '0')}`;
+const lunesDe = (f) => new Date(f.getFullYear(), f.getMonth(), f.getDate() - ((f.getDay() + 6) % 7));
+
+// Semanas seguidas con al menos un entrenamiento, contando esta (si ya has
+// entrenado) o la anterior.
+export function rachaDeSemanas(fechas) {
+  const semanas = new Set([...fechas].map((x) => iso(lunesDe(new Date(`${x}T12:00:00`)))));
+  let lunes = lunesDe(new Date());
+  if (!semanas.has(iso(lunes))) lunes = new Date(lunes.getFullYear(), lunes.getMonth(), lunes.getDate() - 7);
+  let n = 0;
+  while (semanas.has(iso(lunes))) { n += 1; lunes = new Date(lunes.getFullYear(), lunes.getMonth(), lunes.getDate() - 7); }
+  return n;
+}
+
+function vistaCalendario(d) {
+  const caja = h('div', {});
+  const sesiones = d.sesiones.filter((s) => !s.borrada && !s.tutorial && s.ejercicios.some((e) => e.series.some((x) => x.hecha)));
+  const porDia = new Map();
+  for (const s of sesiones) porDia.set(s.fecha, [...(porDia.get(s.fecha) ?? []), s]);
+  const racha = rachaDeSemanas(porDia.keys());
+  const pintar = () => {
+    const hoy = new Date();
+    const [a, m] = (mesCalendario ?? iso(hoy).slice(0, 7)).split('-').map(Number);
+    const primero = new Date(a, m - 1, 1);
+    const inicio = lunesDe(primero);
+    const am = `${a}-${String(m).padStart(2, '0')}`;
+    const delMes = sesiones.filter((s) => s.fecha.startsWith(am)).length;
+    const filas = [];
+    for (let lunes = inicio; lunes.getMonth() === m - 1 || lunes < primero; lunes = new Date(lunes.getFullYear(), lunes.getMonth(), lunes.getDate() + 7)) {
+      const dias = [...Array(7)].map((_, k) => new Date(lunes.getFullYear(), lunes.getMonth(), lunes.getDate() + k));
+      const entrenada = dias.some((x) => porDia.has(iso(x)));
+      filas.push(h('div', { class: 'semana-calendario' },
+        dias.map((x) => {
+          const clave = iso(x);
+          const del = porDia.get(clave);
+          const fuera = x.getMonth() !== m - 1;
+          const clase = `dia-calendario${fuera ? ' fuera' : ''}${del ? ' entrenado' : ''}${clave === iso(hoy) ? ' hoy' : ''}`;
+          return del
+            ? h('a', { class: clase, href: `#/sesion/${del.at(-1).id}`, 'aria-label': `${fechaLarga(clave)}: ${del.length} ${del.length === 1 ? 'entrenamiento' : 'entrenamientos'}` }, String(x.getDate()))
+            : h('span', { class: clase }, String(x.getDate()));
+        }),
+        h('span', { class: `racha-semana${entrenada ? ' si' : ''}`, 'aria-label': entrenada ? 'Semana entrenada' : 'Semana sin entrenar' }, entrenada ? '✓' : '')));
+      if (filas.length > 6) break;
+    }
+    const mover = (k) => { const f = new Date(a, m - 1 + k, 1); mesCalendario = iso(f).slice(0, 7); pintar(); };
+    caja.replaceChildren(
+      h('div', { class: 'cifras-calendario' },
+        h('div', { class: 'tarjeta cifra-calendario' }, h('strong', {}, String(racha)), h('span', {}, racha === 1 ? 'semana seguida entrenando' : 'semanas seguidas entrenando')),
+        h('div', { class: 'tarjeta cifra-calendario' }, h('strong', {}, String(delMes)), h('span', {}, delMes === 1 ? 'entrenamiento este mes' : 'entrenamientos este mes'))),
+      h('section', { class: 'tarjeta calendario' },
+        h('div', { class: 'cabecera-calendario' },
+          h('button', { type: 'button', class: 'boton-icono', 'aria-label': 'Mes anterior', onclick: () => mover(-1) }, '‹'),
+          h('h2', {}, `${MESES[m - 1].charAt(0).toUpperCase()}${MESES[m - 1].slice(1)} de ${a}`),
+          h('button', { type: 'button', class: 'boton-icono', 'aria-label': 'Mes siguiente', disabled: am >= iso(hoy).slice(0, 7), onclick: () => mover(1) }, '›')),
+        h('div', { class: 'semana-calendario cabecera' }, DIAS_SEMANA.map((x) => h('span', {}, x)), h('span', { 'aria-hidden': 'true' }, '')),
+        filas,
+        h('p', { class: 'nota centrado' }, 'Toca un día marcado para abrir ese entrenamiento. A la derecha, las semanas en las que entrenaste.')));
+  };
+  pintar();
+  return caja;
 }

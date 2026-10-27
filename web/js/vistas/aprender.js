@@ -165,7 +165,7 @@ function tutorial(d) {
 export function vistaAprender(contenedor) {
   const d = estado.datos();
   anadir(contenedor,
-    h('h1', {}, 'Aprender'),
+    // Sin título: la pestaña de abajo ya lo dice (Dan, 27-10-2026).
     h('p', { class: 'suave' }, 'Todo lo que la app explica, junto: el tutorial, qué significa cada palabra y cómo decide lo que te toca.'),
     tutorial(d),
     apartado('Glosario', h('p', { class: 'nota' }, 'Qué significa cada palabra, explicado desde cero.'), listaGlosario()),

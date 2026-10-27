@@ -44,11 +44,11 @@ const RUTAS = [
     vista: (contenedor, { paraSesion }) => vistaFormularioEjercicio(contenedor, { id: 'nuevo', paraSesion }) },
   { patron: /^#\/ejercicio\/([\w-]+)$/, vista: vistaFormularioEjercicio, pestana: 'ejercicios', params: ['id'] },
   { patron: /^#\/sesion\/([\w-]+)$/, vista: vistaSesion, pestana: 'inicio', params: ['id'] },
-  { patron: /^#\/cuerpo$/, vista: vistaCuerpo, pestana: 'cuerpo' },
+  { patron: /^#\/cuerpo(?:\/(\w+))?$/, vista: vistaCuerpo, pestana: 'cuerpo', params: ['apartado'] },
   { patron: /^#\/diario$/, vista: vistaDiario, pestana: 'diario' },
   { patron: /^#\/rutinas$/, vista: vistaRutinas, pestana: 'inicio' },
   { patron: /^#\/rutina\/([\w-]+)$/, vista: vistaFormularioRutina, pestana: 'inicio', params: ['id'] },
-  { patron: /^#\/historial$/, vista: vistaHistorial, pestana: 'historial' },
+  { patron: /^#\/historial(?:\/(\w+))?$/, vista: vistaHistorial, pestana: 'historial', params: ['apartado'] },
   { patron: /^#\/ajustes$/, vista: vistaAjustes, pestana: 'ajustes' },
   { patron: /^#\/aprender$/, vista: vistaAprender, pestana: 'aprender' },
   { patron: /^#\/prueba-colores$/, vista: vistaPruebaColores, pestana: 'ajustes' },
@@ -88,7 +88,7 @@ function renderizar() {
   renderizar.ultimaRuta = location.hash;
   principal.replaceChildren();
   principal.className = 'contenido';
-  document.body.classList.remove('entreno-a-pantalla', 'hay-barra-entreno');
+  document.body.classList.remove('entreno-a-pantalla', 'hay-barra-entreno', 'hay-tira');
 
   if (!estado.usuario()) {
     navegacion.hidden = true;
@@ -109,7 +109,7 @@ function renderizar() {
     console.error(e);
     principal.append(h('p', { class: 'tarjeta' }, `Algo ha fallado al mostrar esta pantalla: ${e.message}`));
   }
-  if (['ejercicios', 'historial'].includes(ruta.pestana)) recordarEnPestana(ruta.pestana, location.hash || '#/');
+  if (['ejercicios', 'historial', 'cuerpo'].includes(ruta.pestana)) recordarEnPestana(ruta.pestana, location.hash || '#/');
   pintarNavegacion(ruta.pestana);
   pintarIndicador();
   pintarBandaEntreno();
@@ -239,7 +239,7 @@ async function guardarImagenesParaSinConexion() {
     const capas = Object.entries(MUSCULOS).flatMap(([clave, m]) => m.vistas.map((v) => archivoCapa(clave, v)));
     const cuerpo = ['imagenes/musculos/cuerpo-delante.svg', 'imagenes/musculos/cuerpo-detras.svg'];
     // El mismo nombre que CACHE_IMAGENES en sw.js: si no, el service worker lo borra.
-    const cache = await caches.open('entreno-imagenes-47');
+    const cache = await caches.open('entreno-imagenes-48');
     for (const ruta of [...cuerpo, ...capas, ...mios]) {
       if (!(await cache.match(ruta, { ignoreSearch: true }))) {
         const r = await fetch(ruta).catch(() => null);

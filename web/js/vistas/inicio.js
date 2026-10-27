@@ -17,6 +17,8 @@ import { voyHoy } from './voy-hoy.js';
 import { preguntaAvisos } from './descanso.js';
 import { apuntarPeso } from '../peso.js';
 import { tarjetaHoraAcostarse, tarjetaPvtPendiente } from './diario.js';
+import { tarjetaRecordsHoy } from './records.js';
+import { tarjetaRetos } from './cifras.js';
 
 // Lo que ya enseña el muñeco de Cuerpo (series por músculo) no se repite aquí.
 const YA_SE_VE = new Set(['volumen-bajo', 'volumen-bien']);
@@ -284,6 +286,10 @@ export function vistaInicio(contenedor) {
     avisosDeHoy(d),
     tarjetaRecuperacion(d, { compacta: true,
       extra: h('button', { class: 'boton secundario', onclick: () => voyHoy(d, dia) }, '¿Voy hoy? ¿Cansancio o pereza?') }),
+
+    // Récords y retos a la vista: motivan (ideas de Lyfta, Dan, 27-10-2026).
+    activos.length > 0 && tarjetaRecordsHoy(d),
+    activos.length > 0 && tarjetaRetos(d),
 
     tarjetaHoraAcostarse(d),
     tarjetaPvtPendiente(d),

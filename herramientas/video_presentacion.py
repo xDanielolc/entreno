@@ -89,7 +89,10 @@ def fabricar_sonido(destino):
         w.writeframes((sonido * 32767).astype(np.int16).tobytes())
 
 
+# Sin la etiqueta viewport, Chrome en modo móvil pinta la página a 980 px de ancho y
+# todo salía a un tercio de su tamaño (la pesa «se ve súper pequeña», Dan, 27-10-2026).
 PAGINA = """<!doctype html><html lang="es"{atributos}><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="{css}">
 <style>#presentacion.en-marcha {{ animation: none !important; }} body {{ margin: 0; }}</style></head>
 <body><div id="presentacion" class="cae en-marcha"><div class="escena"><div class="caja"></div>

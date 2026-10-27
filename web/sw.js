@@ -7,12 +7,12 @@
 // Solo se ocupa del CÓDIGO de la app. Los datos del usuario nunca pasan por
 // aquí: viven en el dispositivo (IndexedDB) y en su Google Drive.
 
-const VERSION = '0.68.2';
+const VERSION = '0.69.0';
 const CACHE = `entreno-${VERSION}`;
 // Las imágenes van en un almacén aparte que NO se borra al actualizar la app:
 // así se ven sin conexión aunque haya salido una versión nueva.
 // Si cambian las imágenes, se sube el número y los móviles bajan las nuevas.
-const CACHE_IMAGENES = 'entreno-imagenes-47';  // el mismo nombre en app.js (guardarImagenesParaSinConexion)
+const CACHE_IMAGENES = 'entreno-imagenes-48';  // el mismo nombre en app.js (guardarImagenesParaSinConexion)
 
 const ARCHIVOS = [
   './',
@@ -34,6 +34,8 @@ const ARCHIVOS = [
   './js/lluvia-matrix.js',
   './js/vistas/pvt.js',
   './js/peso.js',
+  './js/records.js',
+  './js/fotos.js',
   './js/diario.js',
   './js/presentacion.js',
   './js/vistas/diario.js',
@@ -81,6 +83,11 @@ const ARCHIVOS = [
   './js/vistas/selector-ejercicios.js',
   './js/vistas/sesion.js',
   './js/vistas/tecnicas.js',
+  './js/vistas/tira.js',
+  './js/vistas/records.js',
+  './js/vistas/medidas.js',
+  './js/vistas/fotos-progreso.js',
+  './js/vistas/cifras.js',
   './js/vistas/tutorial.js',
   './js/vistas/aprender.js',
   './js/vistas/glosario.js',

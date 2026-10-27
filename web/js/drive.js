@@ -112,6 +112,12 @@ export async function descargar(id) {
   return r.json();
 }
 
+// Un archivo binario (las fotos de progreso), como Blob.
+export async function descargarBinario(id) {
+  const r = await peticion(`${API}/files/${id}?alt=media`);
+  return r.blob();
+}
+
 // contenido: un objeto (se guarda como JSON) o un texto ya hecho (CSV…).
 function cuerpoMultiparte(metadatosArchivo, contenido, mime = 'application/json') {
   const limite = `limite${crypto.getRandomValues(new Uint32Array(1))[0]}`;

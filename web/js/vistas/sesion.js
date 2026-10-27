@@ -565,7 +565,6 @@ export function vistaSesion(contenedor, { id }) {
       enCurso && avisoRecuperacion(ej),
 
       referencia1RM(ej),
-      notaPorLado(ej),
 
       indice === 0 && enCurso && !sesion.tutorial && pista('sesion-datos', ['estiramiento', 'movilidad', 'yoga'].includes(tipoDeEjercicio(ej))
         ? 'Apunta cada estiramiento al acabarlo: los segundos que has aguantado y, si te apoyas con la mano, hasta dónde llegas. '
@@ -658,12 +657,19 @@ export function vistaSesion(contenedor, { id }) {
   }
 
   // Qué se apunta en los ejercicios con mancuernas o de un solo lado: el
-  // peso de una mancuerna y las repeticiones de un lado (Dan dudaba).
-  function notaPorLado(ej) {
-    if (!['peso', 'asistida'].includes(ej.carga?.tipo) && ej.esfuerzo?.tipo !== 'repeticiones') return null;
-    if (unLado(ej)) return h('p', { class: 'nota-por-lado' }, 'Apunta el peso y las repeticiones de un solo lado; con el otro, las mismas.');
-    if (ej.carga?.tipo === 'peso' && conMancuernas(ej)) return h('p', { class: 'nota-por-lado' }, 'El peso es el de una mancuerna (lo que lleva cada mano), no la suma de las dos.');
-    return null;
+  // peso de una mancuerna y las repeticiones de un lado (Dan dudaba). Va en
+  // el nombre de la casilla, «kg ×2» o «kg/lado», con su «?» (como el «×2»
+  // de Lyfta; Dan, 27-10-2026), en vez de una línea aparte.
+  function etiquetaPeso(ej) {
+    const unidad = unidadCarga(ej);
+    if (!['peso', 'asistida'].includes(ej.carga?.tipo)) return unidad;
+    if (unLado(ej)) {
+      return [`${unidad}/lado`, ayuda('Peso de un lado', 'Apunta el peso y las repeticiones de un solo lado; con el otro, las mismas.')];
+    }
+    if (ej.carga?.tipo === 'peso' && conMancuernas(ej)) {
+      return [`${unidad} ×2`, ayuda('Peso de una mancuerna', 'El peso es el de una mancuerna (lo que lleva cada mano), no la suma de las dos. Por eso «×2»: levantas dos.')];
+    }
+    return unidad;
   }
 
   // El 1RM del ejercicio: uno solo, el mismo con el que se calculan los
@@ -1709,7 +1715,7 @@ export function vistaSesion(contenedor, { id }) {
       return h('label', { class: 'valor' }, h('span', { class: 'et' }, `Distancia/Altura (${unidadCarga(ej)})`), kilos);
     }
     return h('div', { class: 'carga-con-porcentaje' },
-      h('label', { class: 'valor' }, tramo == null && h('span', { class: 'et' }, unidadCarga(ej)), kilos),
+      h('label', { class: 'valor' }, tramo == null && h('span', { class: 'et' }, etiquetaPeso(ej)), kilos),
       h('label', { class: 'valor' }, tramo == null && h('span', { class: 'et' }, '% 1RM'), porcentaje));
   }
 

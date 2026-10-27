@@ -1617,8 +1617,8 @@ div.sugerencia > span { display: block; }
 .aviso-color { color: var(--aviso); }
 
 /* --------------------------------------------------------------------------
-   Presentación al abrir (20-10-2026). La pesa sale grande del centro y salta hacia atrás
-   de la pantalla y la caja del logo la atrapa. Todo espera a que el código
+   Presentación al abrir (20-10-2026). La pesa entra botando desde la izquierda
+   y la caja del logo la atrapa. Todo espera a que el código
    ponga «en-marcha» (presentacion.js): así la animación y los sonidos salen
    a la vez. Dos variantes, que se eligen en #/prueba-presentacion:
      · «cae»: la caja cae del cielo, aterriza sobre su esquina derecha
@@ -1644,38 +1644,38 @@ div.sugerencia > span { display: block; }
 #presentacion .video-presentacion { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 #presentacion.con-video .escena { visibility: hidden; }
 #presentacion .caja {
-  position: absolute; left: 50%; top: 50%; width: 64px; height: 64px; margin: -32px 0 0 -32px;
-  border-radius: 18px; background: var(--acento); box-shadow: 0 10px 28px -8px color-mix(in srgb, var(--acento) 70%, transparent);
+  position: absolute; left: 50%; top: 50%; width: 92px; height: 92px; margin: -46px 0 0 -46px;
+  border-radius: 26px; background: var(--acento); box-shadow: 0 10px 28px -8px color-mix(in srgb, var(--acento) 70%, transparent);
   transform-origin: 100% 100%; opacity: 0;
 }
 #presentacion .pesa {
-  position: absolute; left: 50%; top: 50%; width: 46px; height: 46px; margin: -23px 0 0 -23px; z-index: 1;
+  position: absolute; left: 50%; top: 50%; width: 66px; height: 66px; margin: -33px 0 0 -33px; z-index: 1;
   color: var(--acento); transform-origin: 50% 90%; opacity: 0;
   animation: pesa-saltar 1.8s linear both, pesa-dentro .15s linear 2.14s forwards;
 }
 #presentacion .pesa svg { width: 100%; height: 100%; display: block; }
 #presentacion .nombre {
-  position: absolute; left: 0; right: 0; top: 50%; margin-top: 46px; text-align: center; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em;
+  position: absolute; left: 0; right: 0; top: 50%; margin-top: 62px; text-align: center; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em;
   opacity: 0; transform: translateY(8px);
   animation: nombre-entrar .45s ease-out 3s both;
 }
 /* Hasta que el código no la pone en marcha, todo quieto (y la pesa, fuera). */
 #presentacion:not(.en-marcha) .pesa, #presentacion:not(.en-marcha) .caja, #presentacion:not(.en-marcha) .nombre { animation-play-state: paused; }
 
-/* Los saltos: la pesa empieza grande en el centro (donde la deja la pantalla
-   de arranque del móvil) y salta hacia atrás, cada vez más pequeña, con tres
-   botes; se aplasta al caer. Cada tramo lleva su curva: sube frenando y baja
-   acelerando. Los botes tocan el suelo al 30, 60 y 84 % (presentacion.js). */
+/* Los saltos: la pesa entra desde la izquierda, ya a su tamaño, con tres
+   botes hasta el centro; se aplasta al caer. Cada tramo lleva su curva: sube
+   frenando y baja acelerando. Los botes tocan el suelo al 30, 60 y 84 %
+   (presentacion.js). Antes salía grande del centro y saltaba hacia atrás
+   encogiendo; Dan lo veía raro y la pesa acababa muy pequeña (27-10-2026). */
 @keyframes pesa-saltar {
-  0%   { transform: translateY(0) scale(2.6); opacity: 1; animation-timing-function: cubic-bezier(.2,.6,.4,1); }
-  14%  { transform: translateY(-70px) scale(2.15); animation-timing-function: cubic-bezier(.5,0,1,.6); }
-  30%  { transform: translateY(0) scale(2.05, 1.5); animation-timing-function: ease-out; }
-  34%  { transform: translateY(-4px) scale(1.7); animation-timing-function: cubic-bezier(.2,.6,.4,1); }
-  46%  { transform: translateY(-46px) scale(1.42); animation-timing-function: cubic-bezier(.5,0,1,.6); }
-  60%  { transform: translateY(0) scale(1.5, 1.1); animation-timing-function: ease-out; }
-  64%  { transform: translateY(-3px) scale(1.22); animation-timing-function: cubic-bezier(.2,.6,.4,1); }
-  73%  { transform: translateY(-22px) scale(1.1); animation-timing-function: cubic-bezier(.5,0,1,.6); }
-  84%  { transform: translateY(0) scale(1.14, .86); animation-timing-function: ease-out; }
+  0%   { transform: translate(-175px, -90px) rotate(-20deg); opacity: 1; animation-timing-function: cubic-bezier(.5,0,1,.6); }
+  30%  { transform: translate(-96px, 0) scale(1.18, .8); animation-timing-function: ease-out; }
+  34%  { transform: translate(-88px, -4px) scale(.96, 1.04); animation-timing-function: cubic-bezier(.2,.6,.4,1); }
+  46%  { transform: translate(-60px, -48px) rotate(8deg); animation-timing-function: cubic-bezier(.5,0,1,.6); }
+  60%  { transform: translate(-32px, 0) scale(1.14, .84); animation-timing-function: ease-out; }
+  64%  { transform: translate(-26px, -3px) scale(.97, 1.03); animation-timing-function: cubic-bezier(.2,.6,.4,1); }
+  73%  { transform: translate(-12px, -22px) rotate(4deg); animation-timing-function: cubic-bezier(.5,0,1,.6); }
+  84%  { transform: translate(0, 0) scale(1.1, .88); animation-timing-function: ease-out; }
   92%  { transform: translateY(-2px) scale(.98, 1.02); }
   100% { transform: translateY(0) scale(1, 1); opacity: 1; }
 }
@@ -1694,7 +1694,7 @@ div.sugerencia > span { display: block; }
 /* Mientras está inclinada sobre la esquina, la pesa se mueve con ella. */
 #presentacion.cae .pesa { animation: pesa-saltar 1.8s linear both, pesa-dentro .15s linear 2.14s forwards, pesa-con-caja .91s linear 2.14s; }
 @keyframes pesa-con-caja {
-  0%   { transform: translate(5px, -3px) rotate(14deg); animation-timing-function: cubic-bezier(.55,0,1,.45); }
+  0%   { transform: translate(7px, -4px) rotate(14deg); animation-timing-function: cubic-bezier(.55,0,1,.45); }
   31%  { transform: none; }
   100% { transform: none; }
 }
@@ -2212,3 +2212,144 @@ html, body { overflow-x: clip; }
 .fila-estiramiento > * { flex: 1 1 140px; min-width: 0; }
 .pregunta-sede .fila-botones { flex-wrap: wrap; margin-top: 8px; }
 .pregunta-sede .fila-botones > * { min-width: 0; }
+
+/* --------------------------------------------------------------------------
+   Ronda 0.69 (27-10-2026): ideas de Lyfta.
+   -------------------------------------------------------------------------- */
+/* Tira de apartados abajo, encima de las pestañas (Cuerpo, Historial y los
+   filtros de Ejercicios). */
+.tira-inferior { position: fixed; left: 0; right: 0; bottom: calc(66px + env(safe-area-inset-bottom)); z-index: 9;
+  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; padding: 6px 8px; max-width: 640px; margin: 0 auto;
+  background: color-mix(in srgb, var(--fondo) 92%, transparent); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  border-top: 1px solid color-mix(in srgb, var(--borde) 70%, transparent); }
+.tira-boton { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 48px;
+  padding: 4px 2px; border: 0; border-radius: 12px; background: transparent; color: var(--texto-suave); font: inherit;
+  font-size: .74rem; font-weight: 600; text-decoration: none; text-align: center; line-height: 1.1; cursor: pointer; min-width: 0; }
+.tira-boton .icono svg { width: 20px; height: 20px; }
+.tira-boton .tira-texto { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tira-boton.activo { background: var(--acento-suave); color: var(--acento-fuerte, var(--acento)); }
+body.hay-tira .contenido { padding-bottom: calc(160px + env(safe-area-inset-bottom)); }
+body.entreno-a-pantalla .tira-inferior { display: none; }
+.cabecera-vista.sin-titulo { justify-content: flex-end; }
+.fila-filtros-visual { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin: 6px 0; }
+.fila-filtros-visual .tira-boton { background: var(--superficie-2); }
+.fila-filtros-visual .tira-boton.activo { background: var(--acento-suave); }
+.filtros-ejercicios .modos-vista { justify-content: center; margin: 8px 0; }
+.quitar-filtros { display: block; margin: 4px auto 8px; }
+
+/* Hojas de los filtros: dibujos en rejilla. */
+.rejilla-visual { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.opcion-visual { display: grid; justify-items: center; gap: 4px; padding: 8px 4px; border-radius: 14px; border: 1.5px solid transparent;
+  background: var(--superficie-2); color: var(--texto); font: inherit; font-size: .82rem; font-weight: 600; text-align: center; cursor: pointer; }
+.opcion-visual.activo { border-color: var(--acento); background: var(--acento-suave); }
+.opcion-visual .recorte-musculo { width: 100%; max-width: 96px; }
+.icono-grande { display: inline-flex; width: 64px; height: 64px; align-items: center; justify-content: center; }
+.icono-grande svg { width: 48px; height: 48px; stroke-width: 1.6; }
+.rejilla-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-bottom: 10px; }
+.hoja-filtro h3 { text-align: center; margin: 10px 0 6px; font-size: .95rem; }
+
+/* El muñeco recortado: un cuadrado con el trozo del cuerpo que toca. */
+.recorte-musculo { position: relative; display: block; width: 100%; aspect-ratio: 1; overflow: hidden; border-radius: 12px; }
+.recorte-musculo .cuerpo { position: absolute; left: 0; top: 0; width: 100%; max-width: none; opacity: 0; transition: opacity .2s; }
+.recorte-musculo.encuadrado .cuerpo { opacity: 1; }
+.capa-musculo.principal, .leyenda-color.principal { background: var(--mapa-rojo); }
+.capa-musculo.secundario, .leyenda-color.secundario { background: var(--mapa-azul); }
+/* La ficha: el muñeco grande con los músculos que trabaja. */
+.musculos-trabajados .cuerpos-grandes .cuerpo { width: 49%; max-width: 260px; }
+.leyenda-musculos { display: grid; gap: 6px; justify-items: center; text-align: center; }
+.leyenda-musculos .leyenda-item { align-items: flex-start; }
+.leyenda-musculos .leyenda-color { margin-top: 3px; flex: 0 0 auto; }
+.fila-buscador .boton-nuevo { margin: 0; flex: 0 0 auto; min-width: 0; padding-inline: 16px; }
+
+/* Medidas: una fila por medida con su trozo de muñeco. */
+.lista-medidas { display: grid; gap: 4px; }
+.fila-medida { display: flex; align-items: center; gap: 12px; width: 100%; padding: 8px 4px; border: 0; border-bottom: 1px solid var(--borde);
+  background: transparent; color: var(--texto); font: inherit; text-align: left; cursor: pointer; }
+.fila-medida:last-of-type { border-bottom: 0; }
+.dibujo-medida { flex: 0 0 56px; width: 56px; display: grid; place-items: center; }
+.dibujo-medida.grande { width: 140px; margin: 0 auto 10px; }
+.icono-medida { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 12px; background: var(--superficie-2); }
+.icono-medida svg { width: 30px; height: 30px; }
+.dibujo-medida.grande .icono-medida { width: 140px; height: 140px; }
+.dibujo-medida.grande .icono-medida svg { width: 70px; height: 70px; }
+.valor-medida { font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.detalle-medida .fila-peso { margin-bottom: 8px; }
+.detalle-medida > .boton { width: 100%; margin-bottom: 10px; }
+
+/* Fotos de progreso. */
+.rejilla-fotos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.miniatura-foto { position: relative; padding: 0; border: 2px solid transparent; border-radius: 12px; overflow: hidden; background: var(--superficie-2);
+  aspect-ratio: 3 / 4; cursor: pointer; }
+.miniatura-foto.elegida { border-color: var(--acento); }
+.miniatura-foto .foto { width: 100%; height: 100%; object-fit: cover; display: block; }
+.fecha-foto { position: absolute; left: 0; right: 0; bottom: 0; padding: 2px 4px; font-size: .72rem; font-weight: 700; color: #fff;
+  background: linear-gradient(transparent, rgb(0 0 0 / 60%)); text-align: center; }
+.pendiente-foto { position: absolute; top: 4px; right: 4px; width: 20px; height: 20px; border-radius: 50%; background: rgb(0 0 0 / 55%); color: #fff;
+  font-size: .75rem; display: grid; place-items: center; }
+.sin-foto { display: grid; place-items: center; height: 100%; padding: 8px; font-size: .75rem; color: var(--texto-suave); text-align: center; }
+.detalle-foto { display: grid; gap: 10px; }
+.detalle-foto .boton-imagen { padding: 0; border: 0; background: none; cursor: zoom-in; }
+.foto-grande { width: 100%; max-height: 60vh; object-fit: contain; border-radius: 12px; display: block; margin: 0 auto; }
+.comparar-fotos { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; width: 100%; }
+.comparar-fotos figure { margin: 0; text-align: center; }
+.comparar-fotos .foto-grande { max-height: 75vh; }
+
+/* Récords. */
+.records-hoy h2, .retos h2 { justify-content: center; }
+.fila-record { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--borde); color: var(--texto); text-decoration: none; }
+.fila-record:last-of-type { border-bottom: 0; }
+.fila-record .miniatura, .cabecera-record .miniatura { width: 48px; height: 48px; flex: 0 0 48px; border-radius: 10px; object-fit: contain; background: #fff; }
+.valor-record { font-weight: 800; font-size: 1.05rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.bloque-record { display: block; padding: 10px 0; border-bottom: 1px solid var(--borde); color: var(--texto); text-decoration: none; }
+.bloque-record:last-child { border-bottom: 0; }
+.cabecera-record { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.fila-elegir-record { padding: 8px 0; border-bottom: 1px solid var(--borde); text-align: center; }
+.fila-elegir-record strong { display: block; margin-bottom: 6px; }
+
+/* Cifras de 12 semanas: tarjetas que se deslizan. */
+.cifras-semanas { margin-bottom: 14px; width: 100%; min-width: 0; }
+.carril-cifras { display: grid; grid-auto-flow: column; grid-auto-columns: 86%; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory;
+  scrollbar-width: none; padding: 2px 2px 6px; }
+.carril-cifras::-webkit-scrollbar { display: none; }
+.tarjeta-cifra { scroll-snap-align: start; display: grid; gap: 2px; padding: 14px 16px; border-radius: var(--radio, 18px); background: var(--superficie);
+  box-shadow: var(--sombra, 0 1px 3px rgb(0 0 0 / 10%)); }
+.cifra-grande { font-size: 1.7rem; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.diferencia.sube { color: var(--mapa-verde); }
+.diferencia.baja { color: var(--texto-suave); }
+.barras-cifra { width: 100%; height: auto; margin-top: 8px; color: var(--texto-suave); }
+.barras-cifra .barra { fill: color-mix(in srgb, var(--acento) 35%, transparent); }
+.barras-cifra .barra-actual { fill: var(--acento); }
+.puntos-cifras { display: flex; justify-content: center; gap: 6px; }
+.puntos-cifras span { width: 7px; height: 7px; border-radius: 50%; background: var(--borde); }
+.puntos-cifras span.activo { background: var(--texto); }
+
+/* Retos del mes. */
+.reto { margin: 10px 0; }
+.reto-texto { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 4px; font-size: .92rem; }
+.reto .carril { display: block; height: 10px; border-radius: 999px; background: var(--superficie-2); overflow: hidden; }
+.reto .relleno { display: block; height: 100%; border-radius: 999px; background: var(--acento); }
+.reto.cumplido .relleno { background: var(--mapa-verde); }
+.reto.cumplido strong { color: var(--mapa-verde); }
+
+/* Calendario del historial. */
+.cifras-calendario { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.cifra-calendario { display: grid; justify-items: center; text-align: center; gap: 2px; padding: 12px; margin: 0; }
+.cifra-calendario strong { font-size: 1.8rem; font-weight: 800; }
+.cifra-calendario span { font-size: .82rem; color: var(--texto-suave); }
+.cabecera-calendario { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.cabecera-calendario h2 { margin: 0; }
+.cabecera-calendario .boton-icono { font-size: 1.6rem; width: 44px; height: 44px; }
+.semana-calendario { display: grid; grid-template-columns: repeat(7, 1fr) 30px; align-items: center; justify-items: center; gap: 2px; margin: 2px 0; }
+.semana-calendario.cabecera span { font-size: .78rem; font-weight: 700; color: var(--texto-suave); }
+.dia-calendario { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; font-variant-numeric: tabular-nums;
+  color: var(--texto); text-decoration: none; font-size: .95rem; }
+.dia-calendario.fuera { color: color-mix(in srgb, var(--texto-suave) 50%, transparent); }
+.dia-calendario.entrenado { background: var(--acento); color: var(--acento-texto); font-weight: 700; }
+.dia-calendario.hoy { box-shadow: inset 0 0 0 2px var(--texto); }
+.racha-semana { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--borde); font-size: .8rem; }
+.racha-semana.si { border-color: var(--mapa-verde); background: var(--mapa-verde); color: #fff; }
+/* El equilibrio con los trozos de muñeco alrededor. */
+.arana-con-dibujos { position: relative; width: 100%; max-width: 420px; margin: 0 auto; }
+.arana-con-dibujos .arana { display: block; width: 100%; }
+.arana-dibujo { position: absolute; width: 14%; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 1px; pointer-events: none; }
+.arana-dibujo small { font-size: .62rem; line-height: 1.1; color: var(--texto-suave); text-align: center; }

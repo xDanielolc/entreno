@@ -1,7 +1,6 @@
 // Mapa de recuperación: qué músculos están listos y cuáles siguen tocados,
 // más el volumen de la semana con sus avisos.
 
-import { icono } from '../iconos.js';
 import { formatearNumero } from '../calculos.js';
 import * as estado from '../estado.js';
 import { cuentaParaFatiga } from '../catalogo.js';
@@ -10,11 +9,15 @@ import {
   FACTORES, claseDeRecuperacion, detalleDeRecuperacion, esAutomatico, factorAutomatico, factorPersonal, recuperacionPorMusculo,
   seriesEnDias, seriesSemanales, sugerenciasDeAjuste, textoDeRecuperacion, durezaSemanal,
 } from '../recuperacion.js';
-import { abrirAlLlegar, ampliar, anadir, aviso, ayudaEsquina, fechaCorta, h, hoyISO, leerNumero, modal, plegable, selector } from '../ui.js';
-import { apuntarPeso, quitarPeso } from '../peso.js';
+import { abrirAlLlegar, ampliar, anadir, aviso, ayudaEsquina, h, hoyISO, modal, plegable, selector } from '../ui.js';
 import { conGlosario } from './glosario.js';
 import { pista } from './tutorial.js';
 import { tarjetaEquilibrio } from './equilibrio.js';
+import { tiraInferior } from './tira.js';
+import { vistaRecords } from './records.js';
+import { vistaMedidas } from './medidas.js';
+import { vistaFotos } from './fotos-progreso.js';
+import { tarjetaCifras } from './cifras.js';
 
 // Referencias de volumen semanal por músculo (ver Ajustes → De dónde sale cada cosa).
 const SERIES_MINIMAS = 10;
@@ -159,69 +162,31 @@ export function claseSeries(n, objetivo, recuperado = 100) {
   return 'pasado';
 }
 
-export function vistaCuerpo(contenedor) {
-  const d = estado.datos();
-  anadir(contenedor,
-    h('h1', {}, 'Tu cuerpo'),
-    tarjetaMapa(d),
-    tarjetaEquilibrio(d),
-    tarjetaSeries(d),
-    tarjetaPeso(d),
-    tarjetaAjustePersonal(d));
-}
+// Cuatro apartados con la tira de abajo (idea de «Tú» en Lyfta; Dan la quiere
+// abajo, 27-10-2026). El peso y las demás medidas van en «Medidas».
+const APARTADOS = [
+  ['resumen', 'Resumen', 'resumen'],
+  ['records', 'Récords', 'trofeo'],
+  ['medidas', 'Medidas', 'cinta'],
+  ['fotos', 'Fotos', 'camara'],
+];
 
-// Tu peso con fecha: apuntar, ver la tendencia y borrar un día mal puesto.
-function tarjetaPeso(d) {
-  const pesos = d.perfil.pesos ?? [];
-  const caja = h('input', { type: 'text', inputmode: 'decimal', class: 'numero-peso', placeholder: 'kg', 'aria-label': 'Tu peso hoy en kilos',
-    value: '' });
-  const apuntar = () => {
-    const kg = leerNumero(caja.value);
-    if (!(kg > 20 && kg < 400)) { aviso('Pon tu peso en kilos', { tipo: 'error' }); return; }
-    estado.cambiar((x) => { apuntarPeso(x, kg); });
-    aviso(`Apuntado: ${formatearNumero(kg)} kg hoy.`);
-  };
-  const ultimos = pesos.slice(-60);
-  let grafica = null;
-  const s = (tag, attrs = {}, ...hijos) => {
-    const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
-    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
-    for (const x of hijos.flat()) if (x) e.append(x);
-    return e;
-  };
-  if (ultimos.length >= 2) {
-    const ancho = 300, alto = 120, kgs = ultimos.map((p) => p.kg);
-    const min = Math.min(...kgs) - 0.5, max = Math.max(...kgs) + 0.5;
-    const t0 = new Date(ultimos[0].fecha), t1 = new Date(ultimos.at(-1).fecha);
-    const x = (f) => ((new Date(f) - t0) / Math.max(1, t1 - t0)) * (ancho - 60) + 30;
-    const y = (kg) => alto - 28 - ((kg - min) / (max - min)) * (alto - 56);
-    // Kilos encima y fecha debajo del primer punto y del último: así se lee como una gráfica.
-    const rotulo = (p, ancla) => [
-      s('text', { x: x(p.fecha), y: y(p.kg) - 10, 'text-anchor': ancla, 'font-size': 12, fill: 'currentColor' }, document.createTextNode(`${formatearNumero(p.kg)} kg`)),
-      s('text', { x: x(p.fecha), y: alto - 6, 'text-anchor': ancla, 'font-size': 11, fill: 'currentColor', opacity: 0.7 }, document.createTextNode(fechaCorta(p.fecha).slice(0, 5)))];
-    grafica = s('svg', { viewBox: `0 0 ${ancho} ${alto}`, class: 'grafica-peso', role: 'img',
-      'aria-label': `Tu peso: de ${formatearNumero(kgs[0])} a ${formatearNumero(kgs.at(-1))} kg` },
-    s('polyline', { points: ultimos.map((p) => `${x(p.fecha)},${y(p.kg)}`).join(' '), fill: 'none', stroke: 'currentColor', 'stroke-width': 2 }),
-    ultimos.map((p) => s('circle', { cx: x(p.fecha), cy: y(p.kg), r: 3, fill: 'currentColor' })),
-    rotulo(ultimos[0], 'start'), rotulo(ultimos.at(-1), 'end'));
+export function vistaCuerpo(contenedor, { apartado } = {}) {
+  const d = estado.datos();
+  const actual = APARTADOS.some(([k]) => k === apartado) ? apartado : 'resumen';
+  if (actual === 'records') vistaRecords(contenedor);
+  else if (actual === 'medidas') vistaMedidas(contenedor);
+  else if (actual === 'fotos') vistaFotos(contenedor);
+  else {
+    anadir(contenedor,
+      tarjetaCifras(d),
+      tarjetaMapa(d),
+      tarjetaEquilibrio(d),
+      tarjetaSeries(d),
+      tarjetaAjustePersonal(d));
   }
-  const cambio = pesos.length >= 2 ? pesos.at(-1).kg - pesos.at(-2).kg : null;
-  return h('section', { class: 'tarjeta tarjeta-peso' },
-    h('h2', {}, 'Tu peso'),
-    pesos.length
-      ? h('p', { class: 'centrado' }, h('strong', {}, `${formatearNumero(pesos.at(-1).kg)} kg`),
-        ` el ${fechaCorta(pesos.at(-1).fecha)}`,
-        cambio != null && cambio !== 0 && h('span', { class: 'suave' }, ` (${cambio > 0 ? '+' : ''}${formatearNumero(Math.round(cambio * 10) / 10)} kg)`))
-      : h('p', { class: 'nota centrado' }, 'Apúntalo de vez en cuando: tus flexiones, dominadas y fondos se calculan con él.'),
-    h('div', { class: 'fila-peso' }, caja, h('button', { type: 'button', class: 'boton', onclick: apuntar }, 'Apuntar hoy')),
-    // La línea es tu peso a lo largo del tiempo: se dice, que si no no se entiende.
-    grafica && h('p', { class: 'nota centrado' }, 'Gráfica de tu peso: cada punto es un día que lo apuntaste. Si no cambia, la línea sale plana.'),
-    grafica,
-    pesos.length > 0 && plegable('peso-historial', 'Todas las veces', {}, h('table', { class: 'tabla-musculos' },
-      h('tbody', {}, [...pesos].reverse().map((p) => h('tr', {},
-        h('td', {}, fechaCorta(p.fecha)), h('td', {}, `${formatearNumero(p.kg)} kg`),
-        h('td', {}, h('button', { type: 'button', class: 'boton-icono', 'aria-label': `Borrar el peso del ${fechaCorta(p.fecha)}`,
-          onclick: () => estado.cambiar((x) => { quitarPeso(x, p.fecha); }) }, icono('cerrar')))))))));
+  contenedor.append(tiraInferior(APARTADOS.map(([k, texto, ic]) => ({
+    texto, icono: ic, href: k === 'resumen' ? '#/cuerpo' : `#/cuerpo/${k}`, activo: k === actual })), { etiqueta: 'Apartados de Cuerpo' }));
 }
 
 function tarjetaMapa(d) {

@@ -15,7 +15,7 @@ import { FRACCION_CORPORAL_POR_NOMBRE, PROGRAMAS, fraccionSinDato } from '../esq
 import { MODOS_INICIO, MODOS_REINICIO, PRESETS_CICLO, inicioDe, alargarCiclo, aplicarPreset, completarCiclo, describirCiclo, empezarCicloNuevo, escaleraDe } from '../ciclos.js';
 import { abrirAlLlegar, ampliar, ayuda, hoyISO, confirmarEscribiendo, idApartado } from '../ui.js';
 import { CATALOGO, esMaquinaDePlacas, normalizar, tipoDeEjercicio } from '../catalogo.js';
-import { ORDEN_MUSCULOS, nombreMusculo } from '../musculos.js';
+import { ORDEN_MUSCULOS, nombreMusculo, siluetaCuerpo } from '../musculos.js';
 import { entradaDeEjercicio, planesPorDefecto } from '../series.js';
 import { nombreSede, sedesActivas, separarPorSede } from '../sedes.js';
 import { seccionProgreso } from './graficas.js';
@@ -45,12 +45,14 @@ export function vistaEjercicios(contenedor) {
   const zona = h('div', { id: 'lista-ejercicios' });
 
   anadir(contenedor,
-    h('div', { class: 'cabecera-vista' },
-      h('h1', {}, 'Ejercicios'),
+    // Sin título: la pestaña de abajo ya dice «Ejercicios» (Dan, 27-10-2026).
+    // «+ Nuevo» va junto al buscador.
+    !d.ejercicios.length && h('div', { class: 'cabecera-vista sin-titulo' },
       h('a', { class: 'boton', href: '#/ejercicio/nuevo' }, '+ Nuevo')),
 
-    pista('ejercicios-lista', 'Toca un ejercicio para cambiar sus series y músculos. «+ Nuevo» para añadir de la lista o crear uno.'),
-    d.ejercicios.length > 0 && barraFiltros(() => pintarLista()),
+    pista('ejercicios-lista', 'Toca un ejercicio para cambiar sus series y músculos. Abajo, los filtros por músculo, equipo y función.'),
+    d.ejercicios.length > 0 && barraFiltros(() => pintarLista(), { tira: true,
+      junto: h('a', { class: 'boton boton-nuevo', href: '#/ejercicio/nuevo' }, '+ Nuevo') }),
 
     zona,
 
@@ -280,6 +282,7 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
       onclick: () => ampliar(existente.nombre, () => h('img', { class: 'imagen-grande', src: imagenFicha.archivo, alt: `Ilustración de ${existente.nombre}` })) },
     h('img', { src: imagenFicha.archivo, alt: `Ilustración de ${existente.nombre}`, loading: 'lazy' })),
     imagenFicha && pista('ampliar-dibujo', 'Toca el dibujo para verlo en grande.'),
+    existente && musculosTrabajados(existente),
     cabecera,
     zona);
 
@@ -1795,4 +1798,27 @@ export function explicaciones1RM() {
   return h('div', { class: 'explicaciones' }, EXPLICACIONES_1RM.map((x) => h('details', { class: 'explicacion' },
     h('summary', {}, x.titulo),
     h('p', {}, x.texto))));
+}
+
+// Músculos que trabaja, en el muñeco grande de frente y de espaldas: en rojo
+// los principales y en azul los secundarios (como en Lyfta, con nuestro
+// muñeco; Dan, 27-10-2026). Tocarlo lo abre en grande.
+function musculosTrabajados(ej) {
+  const principales = ej.musculos?.principales ?? [];
+  const secundarios = (ej.musculos?.secundarios ?? []).filter((m) => !principales.includes(m));
+  if (!principales.length && !secundarios.length) return null;
+  const estados = Object.fromEntries([
+    ...secundarios.map((m) => [m, { clase: 'secundario', titulo: `${nombreMusculo(m)} (secundario)` }]),
+    ...principales.map((m) => [m, { clase: 'principal', titulo: `${nombreMusculo(m)} (principal)` }])]);
+  const cuerpos = () => [siluetaCuerpo({ vista: 'delante', estadoPorMusculo: estados }), siluetaCuerpo({ vista: 'detras', estadoPorMusculo: estados })];
+  const nombres = (lista) => lista.map((m) => nombreMusculo(m, { corto: true })).join(', ');
+  return h('section', { class: 'tarjeta musculos-trabajados' },
+    h('h2', {}, 'Músculos que trabaja'),
+    h('button', { type: 'button', class: 'cuerpos cuerpos-boton cuerpos-grandes', 'aria-label': 'Ver los músculos en grande',
+      onclick: () => ampliar(ej.nombre, () => h('div', { class: 'cuerpos ampliado' }, cuerpos())) }, cuerpos()),
+    h('div', { class: 'leyenda leyenda-musculos' },
+      principales.length > 0 && h('span', { class: 'leyenda-item' }, h('span', { class: 'leyenda-color principal' }),
+        h('span', {}, h('strong', {}, 'Principal: '), nombres(principales))),
+      secundarios.length > 0 && h('span', { class: 'leyenda-item' }, h('span', { class: 'leyenda-color secundario' }),
+        h('span', {}, h('strong', {}, 'Secundario: '), nombres(secundarios)))));
 }

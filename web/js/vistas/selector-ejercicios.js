@@ -9,8 +9,10 @@ import { CATALOGO, TIPOS_EJERCICIO, esMaquinaDePlacas, normalizar, tipoDeEjercic
 import * as estado from '../estado.js';
 import { planesPorDefecto } from '../series.js';
 import { imagenDeEjercicio } from '../imagenes.js';
-import { MUSCULOS, ORDEN_MUSCULOS, TREN_INFERIOR, TREN_SUPERIOR, nombreMusculo } from '../musculos.js';
-import { anadir, h, modal, nuevoId, selector } from '../ui.js';
+import { MUSCULOS, ORDEN_MUSCULOS, TREN_INFERIOR, TREN_SUPERIOR, musculoRecortado, nombreMusculo } from '../musculos.js';
+import { materialDe } from '../calculos.js';
+import { icono } from '../iconos.js';
+import { anadir, h, modal, nuevoId } from '../ui.js';
 
 export const MODOS_VISTA = {
   lista: 'Solo nombre',
@@ -30,7 +32,7 @@ const DIVISIONES = {
 
 // El filtro se recuerda mientras la app esté abierta; la forma de ver la
 // lista, también entre visitas (solo en este móvil).
-const filtro = { texto: '', musculo: '', division: '', tipo: '', orden: 'alfabetico' };
+const filtro = { texto: '', musculo: '', equipo: '', division: '', tipo: '', orden: 'alfabetico' };
 
 // Cómo se ordena la lista: por defecto, alfabético; o agrupada.
 export const ORDENES = { alfabetico: 'Alfabético', grupo: 'Por grupo (empuje, tirón…)', musculo: 'Por músculo principal' };
@@ -47,8 +49,6 @@ function guardarModo(nuevo) {
   try { localStorage.setItem('entreno-modo-vista', nuevo); } catch { /* sin almacenamiento, da igual */ }
 }
 
-// Si dejaste los filtros abiertos, siguen abiertos al volver a pintar.
-let filtrosAbiertos = false;
 
 export function filtrar(items) {
   const texto = normalizar(filtro.texto);
@@ -61,6 +61,7 @@ export function filtrar(items) {
     if (texto && !normalizar(x.nombre).includes(texto)) return false;
     if (filtro.musculo && !todos.includes(filtro.musculo)) return false;
     if (filtro.tipo && tipoDeEjercicio(x) !== filtro.tipo) return false;
+    if (filtro.equipo && equipoDe(x) !== filtro.equipo) return false;
     if (filtro.division === 'superior' && !principales.some((m) => TREN_SUPERIOR.includes(m))) return false;
     if (filtro.division === 'inferior' && !principales.some((m) => TREN_INFERIOR.includes(m))) return false;
     if (['empuje', 'tirón', 'pierna', 'core'].includes(filtro.division) && x.grupo !== filtro.division) return false;
@@ -69,51 +70,99 @@ export function filtrar(items) {
 }
 
 export function hayFiltro() {
-  return Boolean(filtro.texto || filtro.musculo || filtro.division || filtro.tipo);
+  return Boolean(filtro.texto || filtro.musculo || filtro.equipo || filtro.division || filtro.tipo);
 }
 
-// Buscador y, plegados debajo, los filtros y la forma de ver la lista.
-// alCambiar() vuelve a pintar.
-export function barraFiltros(alCambiar, { placeholder = 'Buscar ejercicio' } = {}) {
-  // El buscador y, a su derecha, el botón de filtros; los filtros se abren
-  // debajo. Se repintan solos al elegir; el buscador no, para no perder el teclado.
-  const panel = h('div', { class: 'panel-filtros', hidden: !filtrosAbiertos });
-  const boton = h('button', { type: 'button', class: 'boton-filtros', 'aria-expanded': String(filtrosAbiertos),
-    onclick: () => { filtrosAbiertos = !filtrosAbiertos; panel.hidden = !filtrosAbiertos; boton.setAttribute('aria-expanded', String(filtrosAbiertos)); } });
+// Material de cada ejercicio, juntado en «equipos» para el filtro visual (como
+// Lyfta: barra, mancuerna, polea…). Sale del catálogo si el ejercicio no lo guarda.
+export const EQUIPOS = {
+  barra: 'Barra', mancuernas: 'Mancuernas', kettlebell: 'Kettlebell', discos: 'Discos', polea: 'Polea',
+  maquina: 'Máquina', corporal: 'Tu peso', fija: 'Barra fija y paralelas', gomas: 'Gomas',
+  accesorios: 'Balón, rueda, cajón…', esterilla: 'Esterilla', cardio: 'Bici, piscina, monte…', otro: 'Sin indicar',
+};
+const MATERIAL_A_EQUIPO = {
+  barra: 'barra', landmine: 'barra', mancuernas: 'mancuernas', mancuerna: 'mancuernas', kettlebell: 'kettlebell',
+  disco: 'discos', 'disco o goma': 'discos', polea: 'polea', 'máquina': 'maquina', multipower: 'maquina', trineo: 'maquina',
+  'peso corporal': 'corporal', suelo: 'corporal', pared: 'corporal', banco: 'corporal', mano: 'corporal', libre: 'corporal',
+  'barra fija': 'fija', paralelas: 'fija', 'barra baja': 'fija', 'arnés': 'fija', 'mano o goma': 'gomas', goma: 'gomas',
+  'balón medicinal': 'accesorios', rueda: 'accesorios', 'cajón': 'accesorios', comba: 'accesorios', cuerdas: 'accesorios',
+  'saco o sombra': 'accesorios', esterilla: 'esterilla', bici: 'cardio', 'bici de sala': 'cardio', piscina: 'cardio',
+  patines: 'cardio', 'montaña': 'cardio',
+};
+export function equipoDe(x) {
+  const material = materialDe(x);
+  if (material) return MATERIAL_A_EQUIPO[material] ?? 'otro';
+  if (x?.grupo === 'yoga') return 'esterilla';
+  return x?.carga?.tipo === 'pesoCorporal' || x?.carga === 'pesoCorporal' ? 'corporal' : 'otro';
+}
+
+// Buscador y forma de ver la lista arriba; los filtros (músculo, equipo,
+// función y orden) en botones que abren una hoja con dibujos. En la pestaña
+// Ejercicios van en la tira de abajo (`tira: true`, lo pidió Dan el
+// 27-10-2026); dentro de una ventana, en una fila bajo el buscador.
+// alCambiar() vuelve a pintar la lista.
+export function barraFiltros(alCambiar, { placeholder = 'Buscar ejercicio', tira = false, junto = null } = {}) {
+  const botones = h('div', { class: tira ? 'tira-inferior tira-filtros' : 'fila-filtros-visual' });
+  const vistas = h('div', { class: 'modos-vista', role: 'radiogroup', 'aria-label': 'Cómo ver la lista' });
+  const quitar = h('div');
   const cambio = () => { pintarFiltros(); alCambiar(); };
-  const desplegable = (clave, opciones, etiqueta) => selector(Object.entries(opciones), filtro[clave],
-    (v) => { filtro[clave] = v; cambio(); }, { titulo: etiqueta, lista: true });
+  if (tira) document.body.classList.add('hay-tira');
+
+  const elegir = (titulo, construir) => {
+    const cerrar = modal(titulo, h('div', { class: 'hoja-filtro' }, construir((clave, valor) => {
+      filtro[clave] = valor; cerrar(); cambio();
+    })));
+  };
+  const opcionVisual = (activo, dibujo, texto, alPulsar) => h('button', { type: 'button',
+    class: `opcion-visual${activo ? ' activo' : ''}`, 'aria-pressed': String(activo), onclick: alPulsar }, dibujo, h('span', {}, texto));
+  const chips = (clave, opciones) => h('div', { class: 'rejilla-chips' }, opciones.map(([k, texto]) => h('button', { type: 'button',
+    class: `chip seleccionable${filtro[clave] === k ? ' activo' : ''}`, 'aria-pressed': String(filtro[clave] === k),
+    onclick: () => { filtro[clave] = k; document.querySelector('.hoja-filtro')?.closest('.modal-fondo')?.remove(); cambio(); } }, texto)));
+
+  const abrirMusculos = () => elegir('Músculo', (poner) => h('div', { class: 'rejilla-visual' },
+    opcionVisual(!filtro.musculo, musculoRecortado(['pecho', 'abdomen', 'cuadriceps', 'hombro', 'biceps'], { vista: 'delante' }),
+      'Todos', () => poner('musculo', '')),
+    ORDEN_MUSCULOS.map((m) => opcionVisual(filtro.musculo === m, musculoRecortado([m]), nombreMusculo(m, { corto: true }),
+      () => poner('musculo', m)))));
+  const abrirEquipos = () => elegir('Equipo', (poner) => h('div', { class: 'rejilla-visual' },
+    opcionVisual(!filtro.equipo, icono('ejercicios', { clase: 'icono icono-grande' }), 'Todos', () => poner('equipo', '')),
+    Object.entries(EQUIPOS).map(([k, texto]) => opcionVisual(filtro.equipo === k, icono(k, { clase: 'icono icono-grande' }), texto,
+      () => poner('equipo', k)))));
+  const abrirFuncion = () => elegir('Función', () => h('div', {},
+    h('h3', {}, 'Qué movimiento'),
+    chips('division', Object.entries(DIVISIONES)),
+    h('h3', {}, 'Qué tipo'),
+    chips('tipo', [['', 'Cualquier tipo'], ...Object.entries(TIPOS_EJERCICIO)])));
+  const abrirOrden = () => elegir('Orden', () => chips('orden', Object.entries(ORDENES)));
 
   function pintarFiltros() {
-    const activos = ['musculo', 'division', 'tipo'].filter((k) => filtro[k]).length;
-    boton.textContent = activos ? `Filtros (${activos})` : 'Filtros';
-    boton.classList.toggle('activo', activos > 0);
-    panel.replaceChildren();
-    anadir(panel,
-      h('div', { class: 'fila-filtros' },
-        desplegable('musculo', { '': 'Cualquier músculo',
-          ...Object.fromEntries(ORDEN_MUSCULOS.map((m) => [m, MUSCULOS[m].nombre])) }, 'Músculo'),
-        desplegable('division', DIVISIONES, 'Parte del cuerpo'),
-        desplegable('tipo', { '': 'Cualquier tipo', ...TIPOS_EJERCICIO }, 'Tipo'),
-        desplegable('orden', ORDENES, 'Orden')),
-      activos > 0 && h('button', { type: 'button', class: 'boton enlace', onclick: () => {
-        filtro.musculo = ''; filtro.division = ''; filtro.tipo = ''; cambio();
-      } }, 'Quitar filtros'),
-      h('div', { class: 'modos-vista', role: 'radiogroup', 'aria-label': 'Cómo ver la lista' },
-        Object.entries(MODOS_VISTA).map(([clave, texto]) => h('button', {
-          type: 'button', role: 'radio', 'aria-checked': String(clave === modo),
-          class: `chip seleccionable ${clave === modo ? 'activo' : ''}`,
-          onclick: () => { guardarModo(clave); cambio(); },
-        }, texto))));
+    const funcion = [filtro.division && DIVISIONES[filtro.division], filtro.tipo && TIPOS_EJERCICIO[filtro.tipo]].filter(Boolean).join(' · ');
+    const boton = (texto, icon, activo, alPulsar) => h('button', { type: 'button', class: `tira-boton${activo ? ' activo' : ''}`,
+      'aria-pressed': String(activo), onclick: alPulsar }, icono(icon), h('span', { class: 'tira-texto' }, texto));
+    botones.replaceChildren(
+      boton(filtro.musculo ? nombreMusculo(filtro.musculo, { corto: true }) : 'Músculo', 'musculo', Boolean(filtro.musculo), abrirMusculos),
+      boton(filtro.equipo ? EQUIPOS[filtro.equipo] : 'Equipo', 'mancuernas', Boolean(filtro.equipo), abrirEquipos),
+      boton(funcion || 'Función', 'funcion', Boolean(funcion), abrirFuncion),
+      boton(filtro.orden === 'alfabetico' ? 'Orden' : ORDENES[filtro.orden].split(' (')[0], 'orden', filtro.orden !== 'alfabetico', abrirOrden));
+    vistas.replaceChildren(...Object.entries(MODOS_VISTA).map(([clave, texto]) => h('button', {
+      type: 'button', role: 'radio', 'aria-checked': String(clave === modo),
+      class: `chip seleccionable ${clave === modo ? 'activo' : ''}`,
+      onclick: () => { guardarModo(clave); cambio(); },
+    }, texto)));
+    const hay = ['musculo', 'equipo', 'division', 'tipo'].some((k) => filtro[k]);
+    quitar.replaceChildren(...(hay ? [h('button', { type: 'button', class: 'boton secundario quitar-filtros', onclick: () => {
+      Object.assign(filtro, { musculo: '', equipo: '', division: '', tipo: '' }); cambio();
+    } }, 'Quitar filtros')] : []));
   }
   pintarFiltros();
 
   return h('div', { class: 'filtros-ejercicios' },
     h('div', { class: 'fila-buscador' },
       h('input', { type: 'search', class: 'buscador', placeholder, value: filtro.texto,
-        oninput: (e) => { filtro.texto = e.target.value; alCambiar(); } }),
-      boton),
-    panel);
+        oninput: (e) => { filtro.texto = e.target.value; alCambiar(); } }), junto),
+    vistas,
+    quitar,
+    botones);
 }
 
 // Contenedor de la lista, con la clase que toca según el modo.

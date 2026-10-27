@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 27;
+export const VERSION_ACTUAL = 28;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -230,6 +230,8 @@ export function archivoNuevo({ nombre = '', correo = null } = {}) {
     rutinas: [],
     sesiones: [],
     diario: [],
+    medidas: [],
+    fotos: [],
   };
 }
 
@@ -614,6 +616,20 @@ const MIGRACIONES = {
   // convertir: lo de antes no tiene lado ni medida elegida.
   26: (datos) => {
     datos.version = 27;
+    return datos;
+  },
+  // v27 → v28: medidas del cuerpo y fotos de progreso (ideas de Lyfta, Dan,
+  // 27-10-2026). `medidas[]`: { id, fecha, clave, valor } (clave: 'grasa',
+  // 'kcal', 'cuello', 'biceps-izq'… o la de una medida tuya); el peso sigue
+  // en `perfil.pesos`. `fotos[]`: { id, fecha, nota, driveId, borrada } (la
+  // imagen va aparte, en el móvil y en Drive). En el perfil, opcionales:
+  // `medidasPropias` [{ clave, nombre, unidad }], `recordsHoy` [{ ejercicioId,
+  // tipo }] (los récords que salen en Hoy; sin él, los básicos) y `retos`
+  // (false los quita de Hoy). Nada que convertir.
+  27: (datos) => {
+    datos.medidas ??= [];
+    datos.fotos ??= [];
+    datos.version = 28;
     return datos;
   },
 };

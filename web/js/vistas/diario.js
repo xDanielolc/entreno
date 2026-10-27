@@ -82,7 +82,7 @@ export function vistaDiario(contenedor) {
   const tituloDia = fecha === hoy ? 'Hoy' : fecha === ayer ? `Ayer, ${fechaCorta(fecha)}` : fechaCorta(fecha);
 
   anadir(contenedor,
-    h('h1', {}, 'Diario'),
+    // Sin título: la pestaña de abajo ya lo dice (Dan, 27-10-2026).
     h('section', { class: 'tarjeta diario-peso' },
       h('div', { class: 'cabecera-tarjeta' }, h('h2', { class: 'crece' }, tituloDia)),
       h('div', { class: 'diario-navegar' },

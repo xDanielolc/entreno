@@ -1493,3 +1493,36 @@ Encargo de la conversación de flexibilidad tras la prueba de Dan (notas en su T
   hacia el brazo y lejos de él: la de una figura se pasó a espejo centrada en el cuello) e isométrico de flexión plantar.
   Gemini no supo 90/90, rotación torácica a cuatro patas ni sentarse sobre los talones (dedos del pie): siguen los muñecos;
   apuntado en `imagenes-ia/pendientes.md`. Almacén `entreno-imagenes-47`.
+
+## Ronda 0.69.0 (27-10-2026): ideas de Lyfta y presentación
+
+Esquema v28 (`medidas[]`, `fotos[]`, y en el perfil `medidasPropias`, `recordsHoy`, `retos`; `fusion.js` funde
+`medidas` y `fotos` como las demás colecciones).
+- **Tira de abajo** (`vistas/tira.js`, `tiraInferior`, clase `hay-tira` en body, que app.js quita al cambiar de
+  pantalla): Cuerpo (Resumen, Récords, Medidas, Fotos; rutas `#/cuerpo/<apartado>`), Historial (Lista, Calendario con
+  racha de semanas, `#/historial/calendario`) y los filtros de Ejercicios. Dan eligió «tira en varias pestañas».
+- **Filtros de ejercicios** (`barraFiltros(…, { tira, junto })` en selector-ejercicios.js): arriba solo el buscador,
+  «+ Nuevo» y cómo ver la lista; abajo Músculo, Equipo, Función y Orden, cada uno abre una hoja con dibujos. Equipo sale
+  del material (`EQUIPOS`, `equipoDe`, iconos nuevos en iconos.js). En las ventanas (elegir ejercicio) van en una fila.
+- **Muñeco recortado** (`musculoRecortado(claves, { vista, lado })` en musculos.js): busca dónde está el músculo en su
+  capa y encuadra un cuadrado alrededor. `siluetaCuerpo({ lado: 'izq' | 'der' })` colorea solo un lado (el de la
+  persona). Clases `principal` (rojo) y `secundario` (azul).
+- Ficha del ejercicio: «Músculos que trabaja», el muñeco grande con principales y secundarios. Equilibrio en «Músculos»:
+  el trozo de muñeco de cada zona alrededor de la araña.
+- Resumen de Cuerpo: tarjetas que se deslizan con entrenamientos, volumen y duración de 12 semanas frente a las 12
+  anteriores (`cifrasPorSemanas` en records.js; sin horas apuntadas, la de duración no sale).
+- **Récords** (`web/js/records.js`: `recordsDe`, `tiposDe`, `TIPOS_RECORD`: 1RM, más peso, más repeticiones, volumen en
+  una serie y en un día, tiempo, distancia). Página en Cuerpo y tarjeta en Hoy con los básicos por defecto o los que
+  elijas («Elegir cuáles» → `perfil.recordsHoy`). **Retos del mes** a tu medida en Hoy (`retosDelMes`: tu media de los
+  tres meses anteriores + 10 %, redondeado), se quitan con ✕ o en Ajustes → Personalización.
+- **Medidas** (`vistas/medidas.js`): peso (sigue en `perfil.pesos`), grasa, kcal, perímetros con lado y altura, más las
+  tuyas; masa magra calculada. **Fotos de progreso** (`web/js/fotos.js` + `vistas/fotos-progreso.js`): reducidas a
+  1280 px, en IndexedDB `entreno-fotos` y en la carpeta de la app de Drive (`drive.descargarBinario`, `subirPendientes`
+  tras cada sincronización); comparar dos (mantener pulsada o «Comparar»). «Borrar todos mis datos» y «Eliminar mi
+  cuenta» borran también las fotos.
+- Fuera los títulos que repiten la pestaña (Ejercicios, Historial, Cuerpo, Ajustes, Aprender y Diario).
+- Mancuernas y un solo lado: la casilla del peso dice «kg ×2» o «kg/lado» con su «?» (`etiquetaPeso` en sesion.js);
+  fuera la línea aparte.
+- Presentación: la pesa entra botando desde la izquierda, ya a su tamaño (fuera el salto hacia atrás encogiendo), y caja
+  y pesa más grandes. El vídeo salía a un tercio de tamaño: a `video_presentacion.py` le faltaba la etiqueta viewport y
+  Chrome pintaba a 980 px de ancho. Vídeos rehechos. Almacén `entreno-imagenes-48`.
