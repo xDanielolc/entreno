@@ -199,3 +199,23 @@ Con bultitos de oreja a los lados (de frente o de espaldas):
 - sentadilla-en-multipower-quieta.webp: Sentadilla en multipower
 - sentadilla-quieta.webp: Sentadilla
 Sin mirar de cerca (cabeza pequeña o tumbados): el resto se ve liso en las láminas a 300 px.
+
+## Muñecos que faltan (27-10-2026)
+Auditoría: los 341 ejercicios del catálogo tienen imagen; 37 siguen con el muñeco vectorial (`fuente: propia`).
+Fuerza: Press Arnold, Flexiones con lastre, Curl de muñeca (y su alias Curl de muñeca con barra), Extensión de muñeca,
+Colgarse de la barra (alias: Sujeción de barra en rack), Sentadilla a una pierna, Hip thrust (alias: Hip thrust en
+máquina), Elevación de tibiales, Tibial con disco, Plancha Copenhague, Posición hueca, Giros rusos (alias: Giros en
+landmine), Press pallof, Bandera del dragón, Lanzamiento de balón medicinal.
+Cardio: Rodillas al pecho, Escaleras; HIIT y Tabata se quedan con su muñeco (son conceptos, no una postura).
+Estiramientos y movilidad: Estiramiento de lumbares con rodillas al pecho (Apanasana), Rotación torácica en libro
+abierto, Movilidad de muñeca, Rotación 90/90, Deslizamiento neural (nerve floss), Rotación tibial con rodilla
+flexionada, Rotación torácica en cuadrupedia, Extensión torácica sobre rodillo, Flexión y extensión de dedos del pie,
+Estiramiento del empeine, Estiramiento de los dedos del pie, Liberación con rodillo.
+Yoga: Tortuga tumbada (Supta Kurmasana), Báculo sobre cuatro miembros (Chaturanga Dandasana).
+Fuera del catálogo: «Dislocaciones con pica» (nombre viejo, renombrado a «Rotaciones de hombro con palo» en la v23).
+Resultado (27-10, noche): 35 dibujos nuevos (Gemini y ChatGPT; originales en gemini/ y chatgpt/). Siguen con muñeco: HIIT y Tabata
+(conceptos), Tortuga tumbada (Supta Kurmasana) y el nombre viejo «Dislocaciones con pica». Lo que no salió bien, en pendientes.md.
+Cabezas lisas rehechas: extensión torácica sobre rodillo, press pallof, chaturanga, dedos del pie, rotación interna con toalla,
+tobillo a la pared, deslizamiento ciático, flexión plantar. Orejas quitadas: air squat, bicicleta estática, boxeo, burpees, peso
+muerto con mancuernas, plancha, sentadilla búlgara, sentadilla frontal, sentadilla, fondos asistidos. Quedan con oreja: dominadas
+negativas, elevaciones laterales (y en polea), encogimientos, sentadilla en multipower y remo de cardio. Lo de antes, en antes-27-10/.

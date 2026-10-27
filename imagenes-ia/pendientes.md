@@ -83,3 +83,16 @@ Pendiente de lo que pidió:
 - estiramiento-de-los-dedos-del-pie: otra vez de rodillas en zancada, no sentado sobre los talones. Sigue el muñeco.
 - Sin intentar (misma familia, previsiblemente igual): estiramiento-del-empeine, flexion-y-extension-de-dedos-del-pie, rotacion-tibial-con-rodilla-flexionada. Probar con ChatGPT o con una foto de modelo.
 - Truco que sí funcionó: si la IA inclina las dos cabezas al mismo lado, espejo de una figura entera (flexión lateral de cuello) o solo de la cabeza, centrada en el cuello (deslizamiento neural cervical).
+
+## 27-10-2026 (noche): muñecos que faltaban
+- tortuga-tumbada (Supta Kurmasana): Gemini dibuja la tortuga normal (Kurmasana) o posturas imposibles. Sigue el muñeco.
+- tibial-con-disco: Gemini estira la rodilla en la segunda figura (no es solo el tobillo): se usa solo la primera, quieta.
+- giros-rusos y giros-en-landmine: Gemini pinta la segunda figura en espejo entera (piernas y ancla incluidas): solo la primera, quieta.
+- liberacion-con-rodillo: las dos figuras salieron iguales: quieta.
+- press-pallof: la polea cambiaba de altura entre figuras: se usa solo la segunda (brazos estirados), quieta.
+- press-arnold: el inicio es más un press de hombros (codos abiertos) que el de Arnold (codos delante de la cara).
+- movilidad-de-muneca (ChatGPT): los dedos apuntan hacia delante, no hacia las rodillas.
+- rotacion-tibial-con-rodilla-flexionada (ChatGPT): lleva dos flechitas junto al pie.
+- Orejas: sentadilla-en-multipower y encogimientos-de-trapecio salieron con el trazo fino y gris al quitarlas (descartes/orejas-*): se quedan como estaban.
+  deslizamiento-neural-cervical: al alisar las cabezas Gemini enderezaba la inclinación: se queda el de antes (las cabezas ya eran lisas).
+- ChatGPT agotado hasta el 28-10 a las 22:44; Gemini (cuenta 1) hasta las 23:38 del 27-10.

@@ -1526,3 +1526,9 @@ Esquema v28 (`medidas[]`, `fotos[]`, y en el perfil `medidasPropias`, `recordsHo
 - Presentación: la pesa entra botando desde la izquierda, ya a su tamaño (fuera el salto hacia atrás encogiendo), y caja
   y pesa más grandes. El vídeo salía a un tercio de tamaño: a `video_presentacion.py` le faltaba la etiqueta viewport y
   Chrome pintaba a 980 px de ancho. Vídeos rehechos. Almacén `entreno-imagenes-48`.
+- 0.69.1: dibujos de IA para 35 de los 37 ejercicios que seguían con muñeco en vector (auditoría en `imagenes-ia/cola.md`,
+  «Muñecos que faltan»; HIIT y Tabata se quedan con muñeco, son conceptos, y la tortuga tumbada no salió), cara lisa
+  en 8 más y orejas fuera en 10 (sentadillas, boxeo, burpees, plancha, bici…). Hip thrust pasa al dibujo de ChatGPT
+  (`usar: ia`). Flojos, para su revisión: press Arnold (codos abiertos), movilidad de muñeca (dedos hacia delante),
+  rotación tibial (flechitas), libro abierto (esterilla torcida). Lo de antes, en `imagenes-ia/antes-27-10/`.
+  Almacén `entreno-imagenes-49`.

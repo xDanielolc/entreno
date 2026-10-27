@@ -435,7 +435,8 @@
   "ejercicio": "Curl de muñeca",
   "vista": "sentado en un banco con los antebrazos apoyados en los muslos y una barra en las manos, palmas hacia arriba, visto de lado",
   "inicio": "muñecas dobladas hacia abajo",
-  "final": "muñecas dobladas hacia arriba"
+  "final": "muñecas dobladas hacia arriba",
+  "ancla": "encajar"
  },
  {
   "slug": "sentadilla-frontal",
@@ -494,8 +495,7 @@
   "inicio": "cadera abajo casi tocando el suelo",
   "final": "cadera arriba, cuerpo recto de los hombros a las rodillas",
   "ancla": "encajar",
-  "usar": "antes",
-  "invertir": true
+  "usar": "ia"
  },
  {
   "slug": "puente-de-gluteo",
@@ -633,14 +633,16 @@
   "ejercicio": "Elevación de tibiales",
   "vista": "de pie con la espalda apoyada en una pared y los talones un paso por delante, visto de lado",
   "inicio": "las plantas de los pies apoyadas en el suelo",
-  "final": "las puntas de los pies levantadas hacia las espinillas, apoyado en los talones"
+  "final": "las puntas de los pies levantadas hacia las espinillas, apoyado en los talones",
+  "ancla": "encajar"
  },
  {
   "slug": "tibial-con-disco",
   "ejercicio": "Tibial con disco",
   "vista": "sentado en el borde de un banco alto con un disco colgado de una correa sobre el empeine, visto de lado",
   "inicio": "la punta del pie bajada",
-  "final": "la punta del pie levantada hacia la espinilla"
+  "final": "la punta del pie levantada hacia la espinilla",
+  "solo": true
  },
  {
   "slug": "abductores-en-maquina",
@@ -786,13 +788,15 @@
   "ejercicio": "Extensión de muñeca",
   "vista": "sentado con los antebrazos apoyados en los muslos y una barra en las manos, palmas hacia abajo, visto de lado",
   "inicio": "muñecas dobladas hacia abajo",
-  "final": "muñecas dobladas hacia arriba"
+  "final": "muñecas dobladas hacia arriba",
+  "ancla": "encajar"
  },
  {
   "slug": "colgarse-de-la-barra",
   "ejercicio": "Colgarse de la barra",
   "vista": "visto de frente",
-  "postura": "colgado de una barra fija con los brazos estirados, agarre a la anchura de los hombros, cuerpo relajado"
+  "postura": "colgado de una barra fija con los brazos estirados, agarre a la anchura de los hombros, cuerpo relajado",
+  "sinAlias": true
  },
  {
   "slug": "paseo-del-granjero",
@@ -831,7 +835,8 @@
   "ejercicio": "Press Arnold",
   "vista": "sentado en un banco con respaldo vertical, visto de frente",
   "inicio": "mancuernas delante de la cara con las palmas mirando hacia ti, codos abajo",
-  "final": "brazos estirados con las mancuernas por encima de la cabeza, palmas hacia delante"
+  "final": "brazos estirados con las mancuernas por encima de la cabeza, palmas hacia delante",
+  "ancla": "encajar"
  },
  {
   "slug": "extension-de-triceps-en-maquina",
@@ -974,7 +979,9 @@
   "ejercicio": "Giros rusos",
   "vista": "sentado en el suelo con las rodillas dobladas y los pies levantados, tronco inclinado hacia atrás, con un disco en las manos, visto de frente",
   "inicio": "tronco girado a un lado, el disco junto a la cadera",
-  "final": "tronco girado al otro lado, el disco junto a la otra cadera"
+  "final": "tronco girado al otro lado, el disco junto a la otra cadera",
+  "solo": true,
+  "sinAlias": true
  },
  {
   "slug": "press-pallof",
@@ -1012,7 +1019,8 @@
   "ejercicio": "Bandera del dragón",
   "vista": "tumbado boca arriba en un banco plano agarrado al banco por detrás de la cabeza, visto de lado",
   "inicio": "cuerpo recto y levantado en vertical apoyado solo en los hombros",
-  "final": "cuerpo recto bajado casi horizontal por encima del banco"
+  "final": "cuerpo recto bajado casi horizontal por encima del banco",
+  "ancla": "encajar"
  },
  {
   "slug": "flexion-de-cuello-con-disco",
@@ -1475,7 +1483,8 @@
   "ejercicio": "Rotación torácica en libro abierto",
   "vista": "tumbado de lado en el suelo con las rodillas dobladas, visto desde arriba",
   "inicio": "los dos brazos estirados juntos delante del pecho",
-  "final": "el brazo de arriba abierto hacia el otro lado, el pecho mirando al techo"
+  "final": "el brazo de arriba abierto hacia el otro lado, el pecho mirando al techo",
+  "ancla": "encajar"
  },
  {
   "slug": "sentadilla-profunda-mantenida",
@@ -1504,7 +1513,7 @@
   "usar": "ia",
   "inicio": "las dos piernas dobladas a 90 grados y tumbadas hacia la izquierda: la de delante con el muslo hacia delante y la de atrás con el muslo hacia el lado, como una Z",
   "final": "las dos rodillas giradas hacia la derecha: ahora la pierna de delante y la de atrás forman la misma Z hacia el otro lado",
-  "ancla": "pies"
+  "ancla": "encajar"
  },
  {
   "slug": "gato-camello",
@@ -1520,7 +1529,8 @@
   "ejercicio": "Deslizamiento neural (nerve floss)",
   "vista": "sentado en una silla, visto de lado",
   "inicio": "la pierna estirada delante con la punta del pie hacia arriba y la cabeza hacia atrás",
-  "final": "la rodilla doblada, el pie hacia abajo y la barbilla hacia el pecho"
+  "final": "la rodilla doblada, el pie hacia abajo y la barbilla hacia el pecho",
+  "ancla": "encajar"
  },
  {
   "slug": "deslizamiento-neural-ciatico",
@@ -1547,7 +1557,7 @@
   "usar": "ia",
   "inicio": "la punta de un pie girada hacia dentro, el talón en el mismo sitio",
   "final": "la punta de ese pie girada hacia fuera, el talón en el mismo sitio; la rodilla no se mueve",
-  "ancla": "pies"
+  "ancla": "encajar"
  },
  {
   "slug": "rotacion-toracica-en-cuadrupedia",
@@ -1632,7 +1642,7 @@
   "usar": "ia",
   "inicio": "los dedos de un pie levantados hacia arriba, la planta y el talón en el suelo",
   "final": "los dedos de ese pie encogidos hacia abajo agarrando el suelo",
-  "ancla": "pies"
+  "ancla": "encajar"
  },
  {
   "slug": "isometrico-de-flexion-plantar",
@@ -1646,7 +1656,8 @@
   "ejercicio": "Liberación con rodillo",
   "vista": "tumbado de lado con un rodillo de espuma bajo el muslo, apoyado en el antebrazo, visto de lado",
   "inicio": "el rodillo cerca de la cadera",
-  "final": "el rodillo cerca de la rodilla"
+  "final": "el rodillo cerca de la rodilla",
+  "solo": true
  },
  {
   "slug": "yoga-guerrero-i",
@@ -2081,5 +2092,18 @@
   "vista": "de frente, solo desde la cintura hacia arriba",
   "postura": "una mano con la palma en la frente empujando la cabeza hacia atrás mientras la cabeza empuja hacia delante, sin moverse; el otro brazo relajado",
   "usar": "ia"
+ },
+ {
+  "slug": "giros-en-landmine",
+  "ejercicio": "Giros en landmine",
+  "vista": "de pie, visto de frente, barra anclada en el suelo",
+  "postura": "la punta de la barra junto a la cadera",
+  "solo": true
+ },
+ {
+  "slug": "sujecion-de-barra-en-rack",
+  "ejercicio": "Sujeción de barra en rack",
+  "vista": "de pie en un rack, visto de frente",
+  "postura": "barra cargada sujeta a la altura de los muslos"
  }
 ]
