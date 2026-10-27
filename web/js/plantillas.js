@@ -28,6 +28,8 @@ const series = (n, min, max) => Array.from({ length: n }, () => ({ tipo: 'libre'
 const programa = (cual, inicial = null) => ({ tipo: 'libre', progresion: 'programa', programa: cual, inicial });
 // Estiramiento o ejercicio de movilidad medido en segundos (o repeticiones).
 const t = (seg) => ({ tipo: 'libre', progresion: 'libre', objetivo: [seg, seg] });
+// N series de repeticiones sin peso, solo para apuntar (sin «sube el peso»).
+const reps = (n, min, max = min) => Array.from({ length: n }, () => ({ tipo: 'libre', progresion: 'libre', objetivo: [min, max] }));
 
 const e = (nombre, series, extra = {}) => ({ nombre, series, ...extra });
 
@@ -344,37 +346,40 @@ Elevación de piernas colgado: 2 × 8-12 (piernas estiradas; 60-90 s)`),
   {
     id: 'movilidad-para-meditar',
     tipo: 'flexibilidad',
+    version: 2,
     nombre: 'Movilidad para sentarse a meditar',
     autor: 'Propuesta de la app, basada en una rutina personal',
     resumen: 'Dos rutinas de 15 minutos (cuello y espalda; piernas y caderas) y una progresión de tobillos para poder sentarse sobre los talones sin dolor.',
     porQue: 'Sentarse a meditar pide cuello y espalda libres, caderas que rotan y tobillos que se doblan. Cada rutina va en tres pasos: movilidad '
       + 'activa para calentar, fuerza en el final del recorrido para que el rango se quede, y estiramientos pasivos al final. La progresión de '
       + 'tobillos usa un ladrillo bajo los glúteos: alto hasta aguantar 10 minutos sin molestias, luego medio, luego bajo.',
-    comoSeHace: 'A y B en días alternos, y la de tobillos 3-4 veces por semana (5 minutos). Nunca con dolor por encima de 3 sobre 10. Mide cada '
+    comoSeHace: 'En casa. A y B en días alternos, y la de tobillos 3-4 veces por semana (5 minutos). Lo que va por lado lleva una serie por lado. Nunca con dolor por encima de 3 sobre 10. Mide cada '
       + 'dos semanas: minutos sentado sin dolor, distancia pie-pared en el tobillo, y con qué apoyo (alto, medio, bajo, sin ladrillo).',
     dias: [
       { nombre: 'A: cuello, espalda y caderas', ejercicios: [
-        e('Retracción cervical (chin tuck)', series(2, 10, 10)),
-        e('Flexión lateral de cuello activa', series(2, 8, 8), { nota: 'Por lado' }),
-        e('Extensión torácica sobre rodillo', series(2, 8, 8)),
-        e('Gato-camello (Marjaryasana-Bitilasana)', [t(60)]),
-        e('Isométricos de cuello', [t(30)], { nota: '3 × 10 s por lado' }),
-        e('Elevaciones Y-T-W', series(2, 8, 8), { nota: 'Cada letra' }),
+        e('Retracción cervical (chin tuck)', reps(2, 10)),
+        e('Flexión lateral de cuello activa', reps(2, 8), { nota: 'Serie 1 hacia la izquierda, serie 2 hacia la derecha. Oreja al hombro sin subir el hombro' }),
+        e('Extensión torácica en silla', reps(2, 8), { nota: 'Sentado, manos detrás de la cabeza: arquea la parte alta de la espalda sobre el borde del respaldo y vuelve' }),
+        e('Gato-camello (Marjaryasana-Bitilasana)', [t(60)], { nota: 'Manos y rodillas quietas: solo se mueve la espalda, redonda arriba y hundida abajo, todo lo que dé cómodo' }),
+        e('Isométrico de cuello hacia delante', [t(30)], { nota: '3 × 10 s: mano en la frente, empuja sin mover la cabeza' }),
+        e('Isométrico de cuello hacia atrás', [t(30)], { nota: '3 × 10 s: manos en la nuca, empuja sin mover la cabeza' }),
+        e('Isométricos de cuello', [t(30), t(30)], { nota: 'Hacia el lado: serie 1 izquierda, serie 2 derecha; 3 × 10 s con la mano en la sien' }),
+        e('Elevaciones Y-T-W', reps(2, 8), { nota: 'De pie, inclinado hacia delante con la espalda recta (bisagra de cadera), para que los brazos suban contra la gravedad. 8 de cada letra' }),
         e('Cobra en el suelo (Bhujangasana)', [t(30)]),
-        e('Estiramiento de trapecio superior', [t(30)], { nota: 'Por lado' }),
-        e('Estiramiento del elevador de la escápula', [t(30)], { nota: 'Por lado' }),
+        e('Estiramiento de trapecio superior', [t(30), t(30)], { nota: 'Serie 1 un lado, serie 2 el otro' }),
+        e('Estiramiento del elevador de la escápula', [t(30), t(30)], { nota: 'Serie 1 un lado, serie 2 el otro' }),
         e('Niño o embrión (Balasana)', [t(45)]),
       ] },
       { nombre: 'B: piernas para sentarse', ejercicios: [
-        e('CARs de cadera', series(1, 5, 5), { nota: 'Por lado' }),
-        e('Rotación 90/90', series(1, 6, 8), { nota: 'Transiciones, por lado' }),
-        e('Tobillo con rodilla a la pared', series(1, 10, 10), { nota: 'Por lado' }),
-        e('Sentadilla cosaca', series(2, 6, 6), { nota: 'Por lado' }),
-        e('Sentadilla búlgara', series(2, 6, 6), { nota: 'Profunda, sin peso' }),
-        e('Elevación de gemelos', series(2, 10, 10), { nota: 'Pausa de 2 s abajo' }),
+        e('CARs de cadera', reps(2, 5), { nota: 'Serie 1 pierna izquierda, serie 2 derecha. A cuatro patas: círculo grande y lento con la rodilla' }),
+        e('Rotación 90/90', reps(2, 6, 8), { nota: 'Transiciones: serie 1 empezando hacia la izquierda, serie 2 hacia la derecha' }),
+        e('Tobillo con rodilla a la pared', reps(2, 10), { nota: 'Serie 1 un tobillo, serie 2 el otro' }),
+        e('Sentadilla cosaca', reps(2, 6), { nota: 'Alternando lados: 6 por lado en cada serie' }),
+        e('Sentadilla búlgara', reps(4, 6), { nota: 'Profunda, sin peso. Series 1-2 una pierna, 3-4 la otra' }),
+        e('Elevación de gemelos', reps(2, 10), { nota: 'Pausa de 2 s abajo' }),
         e('Estiramiento de aductores en mariposa (Baddha Konasana)', [t(40)]),
-        e('Estiramiento del sofá (couch stretch)', [t(40)], { nota: 'Por lado' }),
-        e('Estiramiento de glúteo en paloma (Eka Pada Rajakapotasana)', [t(40)], { nota: 'Por lado' }),
+        e('Estiramiento del sofá (couch stretch)', [t(40), t(40)], { nota: 'Serie 1 un lado, serie 2 el otro. Cojín bajo la rodilla' }),
+        e('Estiramiento de glúteo en paloma (Eka Pada Rajakapotasana)', [t(40), t(40)], { nota: 'Serie 1 un lado, serie 2 el otro' }),
       ] },
       { nombre: 'Tobillos (5 min)', ejercicios: [
         e('Flexión y extensión de dedos del pie', series(1, 10, 15)),
@@ -388,7 +393,7 @@ Elevación de piernas colgado: 2 × 8-12 (piernas estiradas; 60-90 s)`),
   {
     id: 'flexibilidad-spagat-y-hombro',
     tipo: 'flexibilidad',
-    version: 1,
+    version: 2,
     nombre: 'Flexibilidad: spagat y hombro',
     autor: 'Dan (investigación «Elasticidad», 10-2026)',
     resumen: 'Una sesión de unos 20 minutos para casa, cuatro veces por semana: primero el spagat frontal (isquios y psoas), '
@@ -402,25 +407,32 @@ Elevación de piernas colgado: 2 × 8-12 (piernas estiradas; 60-90 s)`),
       + 'menos (Sullivan 1992). El frontal va primero porque es la meta principal; el lateral puede toparse con el hueso en las '
       + 'caderas con choque femoroacetabular (Tannast 2007). Decisiones prácticas sin estudio propio: el orden, el reparto de series '
       + 'y los 10 segundos entre series.',
-    comoSeHace: 'Cuatro veces por semana, por la tarde (nunca en la primera hora tras levantarte), mejor tras moverte un poco. '
-      + 'Intensidad 6-7 sobre 10, en la panza del músculo, nunca en la articulación. En Ajustes, pon 10 s de descanso entre '
-      + 'estiramientos. Si un día vas justo, recorta el final, no el principio. Para y consúltalo si notas un pinchazo profundo en la '
+    comoSeHace: 'En casa, cuatro veces por semana, por la tarde (nunca en la primera hora tras levantarte), mejor tras moverte un poco. '
+      + 'Intensidad 6-7 sobre 10, en la panza del músculo, nunca en la articulación. El descanso entre series solo sirve para cambiar de '
+      + 'lado o de postura: déjalo en 0-10 s o sáltatelo. Bastan series de 30-45 s; no hace falta llegar a 2 minutos. Si un día vas justo, recorta el final, no el principio. Para y consúltalo si notas un pinchazo profundo en la '
       + 'ingle, dolor junto al hueso de la nalga, hormigueo por la pierna o un chasquido. La prueba del final es opcional: hazla una '
-      + 'vez al mes, a la misma hora, y apunta los centímetros de la ingle al suelo.',
+      + 'vez al mes, a la misma hora, una vez con cada pierna, y apunta los centímetros de la ingle al suelo.',
     dias: [
       { nombre: 'Spagat y hombro', ejercicios: [
         e('CARs de cadera', [t(60)], { nota: 'Calentar: círculos grandes y lentos, 3 por lado' }),
         e('Estiramiento de isquios (Janu Sirsasana)', [t(45), t(45), t(45), t(45), t(45), t(45)],
-          { nota: 'Series 1-3 una pierna, 4-6 la otra. Pecho hacia la rodilla con la espalda recta, sin redondear' }),
+          { nota: '3 por lado: series 1-3 pierna izquierda, 4-6 derecha. Pecho hacia la rodilla con la espalda recta, sin redondear' }),
         e('Estiramiento de psoas en zancada (Anjaneyasana)', [t(45), t(45), t(45), t(45), t(45), t(45)],
-          { nota: 'Series 1-3 un lado, 4-6 el otro. Rodilla de atrás en el suelo; mete la cola y aprieta el glúteo antes de avanzar' }),
+          { nota: '3 por lado: series 1-3 un lado, 4-6 el otro. Rodilla de atrás apoyada en el suelo sobre un cojín doblado, empeine '
+            + 'apoyado; tronco erguido, manos en la rodilla de delante o en una silla. Mete la cola, aprieta el glúteo y avanza la cadera '
+            + 'solo un poco. Que tire del cuádriceps es normal; dolor en la rodilla no: más cojín o menos avance' }),
         e('Postura del sastre, apertura lateral (Upavistha Konasana)', [t(60), t(60)],
-          { nota: 'Tronco hacia delante desde la cadera con la espalda recta; ladrillo bajo las manos si hace falta' }),
+          { nota: 'Sentado en el suelo, nunca de pie. Sobre un cojín o una toalla doblada, piernas abiertas solo hasta donde den sin '
+            + 'forzar: menos de 90° entre las piernas es normal al empezar. Rodillas al techo, manos detrás o delante; inclina el tronco '
+            + 'desde la cadera solo si mantienes la espalda recta' }),
         e('Estiramiento de pectoral en el marco de la puerta', [t(45), t(45), t(45), t(45), t(45), t(45)],
-          { nota: 'Series 1-3 un lado, 4-6 el otro. Brazo a 90°; sin dolor de hombro' }),
-        e('Estiramiento de dorsal', [t(60), t(60)], { nota: 'De rodillas, codos en una silla, pecho hacia el suelo' }),
-        e('Zancada hacia el split frontal (Hanumanasana)', [t(30)],
-          { opcional: true, nota: 'Prueba, una vez al mes: centímetros de la ingle al suelo, cada pierna' }),
+          { nota: '3 por lado: series 1-3 un lado, 4-6 el otro. Brazo a 90°; sin dolor de hombro' }),
+        e('Estiramiento de dorsal', [t(60), t(60)], { nota: 'Es el de hombro por encima de la cabeza. De rodillas, cadera encima de las '
+          + 'rodillas (no sentado en los talones: eso sería Balasana), brazos estirados al frente o codos en una silla; deja caer el pecho' }),
+        e('Zancada hacia el split frontal (Hanumanasana)', [t(30), t(30)],
+          { opcional: true, nota: 'Prueba, una vez al mes: serie 1 pierna izquierda delante, serie 2 la derecha. No es hacer el spagat: '
+            + 'zancada lo más baja que puedas, manos en dos sillas o ladrillos, el pie de delante desliza. Mide con cinta métrica de la '
+            + 'ingle al suelo; vale cualquier altura' }),
       ] },
     ],
   },

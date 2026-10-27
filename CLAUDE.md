@@ -1434,3 +1434,20 @@ mudo. El tema se guarda también en localStorage (`entreno-tema`, `aplicarTema`)
   lo «ya ofrecido» va en localStorage). Hecho por la conversación del sueño (vistas/pvt.js y vistas/diario.js).
 - 0.67.3: textos de la línea base del test de atención aclarados (Dan no entendía «primeros 21 días… hacen falta 5»):
   la base son los primeros 5 tests y 21 días es el plazo para hacerlos. Hecho por la conversación del sueño.
+
+## 0.67.4 (27-10-2026): correcciones de contenido de las dos rutinas de flexibilidad
+
+Hecha desde la conversación «Investigación flexibilidad», tras las notas de Dan del 26-27/10 al probarlas. Solo
+contenido: plantillas.js (las dos suben a version 2), catalogo.js, version.js, sw.js y este archivo. Lo que es de la app
+(series por lado, pedir la medida, imágenes, casa/gimnasio, actualizar las copias de Dan) va como encargo aparte.
+- Nuevo ayudante `reps(n, min, max)` en plantillas.js: repeticiones sin peso con progresión libre («Solo apuntar»).
+  La meditación usaba `series()`, que ponía «Sube el peso al completarlas» en ejercicios sin peso.
+- `movilidad-para-meditar`: una serie por lado en todo lo unilateral (flexión lateral de cuello, trapecio, elevador,
+  CARs, 90/90, tobillo, sofá, paloma; búlgara 4 series, 2 por lado); isométricos de cuello separados en hacia delante,
+  hacia atrás y lateral (2 series); la extensión torácica sobre rodillo pasa a «Extensión torácica en silla» (Dan no
+  tiene rodillo); Y-T-W de pie en bisagra de cadera; gato-camello con manos y rodillas quietas; «En casa».
+- `flexibilidad-spagat-y-hombro`: notas por lado; psoas con la rodilla apoyada en un cojín; apertura lateral sentado
+  sobre cojín (menos de 90° es normal); dorsal = hombro por encima de la cabeza, no Balasana; prueba del split 2 × 30 s,
+  una por pierna, medida con cinta desde cualquier altura; el descanso entre series solo para cambiar de lado (0-10 s).
+- catalogo.js: «Isométrico de cuello hacia delante», «Isométrico de cuello hacia atrás», «Extensión torácica en silla»
+  (las tres sin imagen todavía); Y-T-W pasa de material «suelo» a «libre».

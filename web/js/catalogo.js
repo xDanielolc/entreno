@@ -251,6 +251,8 @@ export const CATALOGO = [
   ej('Extensión de cuello con arnés', 'core', 'arnés', ['cuello'], ['trapecio']),
   ej('Flexión lateral de cuello', 'core', 'disco o goma', ['cuello'], []),
   ej('Isométricos de cuello', 'core', 'mano o goma', ['cuello'], [], sinCarga),
+  ej('Isométrico de cuello hacia delante', 'core', 'mano', ['cuello'], [], sinCarga),
+  ej('Isométrico de cuello hacia atrás', 'core', 'mano', ['cuello'], ['trapecio'], sinCarga),
 
   // --- Cardio -------------------------------------------------------------
   ej('Cardio', 'cardio', 'libre', [], [], { ...sinCarga, distancia: true }),
@@ -341,7 +343,8 @@ export const CATALOGO = [
   movilidad('Retracción cervical (chin tuck)', ['cuello'], [], 'libre', { esfuerzo: 'repeticiones' }),
   movilidad('Flexión lateral de cuello activa', ['cuello'], ['trapecio'], 'libre', { esfuerzo: 'repeticiones' }),
   movilidad('Extensión torácica sobre rodillo', ['dorsal'], ['pecho'], 'rodillo', { esfuerzo: 'repeticiones' }),
-  movilidad('Elevaciones Y-T-W', ['hombroPosterior'], ['trapecio'], 'suelo', { esfuerzo: 'repeticiones' }),
+  movilidad('Elevaciones Y-T-W', ['hombroPosterior'], ['trapecio'], 'libre', { esfuerzo: 'repeticiones' }),
+  movilidad('Extensión torácica en silla', ['dorsal'], ['pecho'], 'silla', { esfuerzo: 'repeticiones' }),
   movilidad('Cobra en el suelo (Bhujangasana)', ['lumbar'], ['hombroPosterior', 'gluteo'], 'suelo'),
   estiramiento('Estiramiento del sofá (couch stretch)', ['cuadriceps'], ['gluteo'], 'pared'),
   estiramiento('Estiramiento de glúteo en paloma (Eka Pada Rajakapotasana)', ['gluteo'], ['cuadriceps']),
