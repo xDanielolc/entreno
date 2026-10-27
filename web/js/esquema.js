@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 26;
+export const VERSION_ACTUAL = 27;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -604,6 +604,16 @@ const MIGRACIONES = {
     datos.perfil.avisarPvt ??= null;
     datos.perfil.avisarPvtHora ??= null;
     datos.version = 26;
+    return datos;
+  },
+  // v26 → v27: lados y medidas de los estiramientos (Dan, 27-10-2026). Una
+  // serie de un ejercicio de un solo lado puede llevar `plan.lado`
+  // ('izquierda' | 'derecha'): la app lo dice y cada lado guarda lo suyo. Y
+  // `ej.estiramiento.medida` ('ninguna' | 'mano' | 'cm') manda sobre cómo se
+  // mide un estiramiento (si no, lo dice medidas-estiramiento.js). Nada que
+  // convertir: lo de antes no tiene lado ni medida elegida.
+  26: (datos) => {
+    datos.version = 27;
     return datos;
   },
 };

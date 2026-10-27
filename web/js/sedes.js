@@ -33,10 +33,19 @@ export function nuevaSede(nombre, tipo = 'gimnasio') {
 // el del último entrenamiento.
 export function sedeInicial(datos, rutina) {
   if (rutina?.sedeId) return rutina.sedeId;
+  // Las rutinas de estirar, movilidad y yoga, en casa (si tienes ese sitio).
+  const casa = sedesActivas(datos).find((s) => s.tipo === 'casa');
+  if (casa && rutina && esDeEstirar(datos, rutina)) return casa.id;
   if (datos.perfil.sedePorDefecto) return datos.perfil.sedePorDefecto;
   const ultima = [...datos.sesiones].filter((s) => !s.borrada && s.sedeId)
     .sort((a, b) => (a.fecha + (a.inicio || '')).localeCompare(b.fecha + (b.inicio || ''))).at(-1);
   return ultima?.sedeId ?? null;
+}
+
+// ¿Es una rutina de estirar, movilidad o yoga? (más de la mitad de sus ejercicios)
+export function esDeEstirar(datos, rutina) {
+  const grupos = rutina.dias.flatMap((d) => d.ejercicios.map((x) => datos.ejercicios.find((e) => e.id === x.ejercicioId)?.grupo));
+  return grupos.length > 0 && grupos.filter((g) => ['estiramiento', 'movilidad', 'yoga'].includes(g)).length > grupos.length / 2;
 }
 
 // ¿Se puede hacer este ejercicio en este sitio?

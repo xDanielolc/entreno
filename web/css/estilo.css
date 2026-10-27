@@ -2202,3 +2202,13 @@ html, body { overflow-x: clip; }
 .rango-fechas { display: grid; justify-items: center; gap: 8px; margin: 6px 0 10px; }
 .rango-fechas .fila-marcas { justify-content: center; }
 .rango-fechas input[type="date"] { max-width: 12em; text-align: center; }
+
+/* Lado de la serie (ejercicios de un solo lado) y medida de los estiramientos (0.68). */
+.insignia-lado { display: inline-flex; align-items: center; min-height: 32px; padding: 2px 12px; border-radius: 999px;
+  background: var(--acento-suave); color: var(--texto); font-weight: 700; font-size: 0.95rem; flex-basis: 100%; justify-content: center; }
+.serie-estiramiento { flex-direction: column; align-items: stretch; }
+.serie-estiramiento .como-medir { margin: 0; text-align: center; }
+.fila-estiramiento { display: flex; flex-wrap: wrap; gap: 6px; }
+.fila-estiramiento > * { flex: 1 1 140px; min-width: 0; }
+.pregunta-sede .fila-botones { flex-wrap: wrap; margin-top: 8px; }
+.pregunta-sede .fila-botones > * { min-width: 0; }

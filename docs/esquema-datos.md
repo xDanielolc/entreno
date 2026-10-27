@@ -625,3 +625,11 @@ la vez, a veces sin cobertura):
   `avisarPvtHora` («HH:MM»; sin ella, media hora después de
   `levantarseObjetivo`). Nada que convertir: los archivos de antes llegan sin
   tests y sin aviso.
+- **v27 (lados y medidas de los estiramientos, 27-10-2026).** Una serie de un
+  ejercicio de un solo lado puede llevar `plan.lado` (`"izquierda"` o
+  `"derecha"`): la app lo dice en la serie y cada lado guarda lo suyo («la
+  última vez» va por serie). En el ejercicio, `estiramiento.medida`
+  (`"ninguna"`, `"mano"` o `"cm"`) manda sobre cómo se mide un estiramiento;
+  sin ella, lo dice `web/js/medidas-estiramiento.js`. La medida de cada serie
+  sigue en `serie.estiramiento.cm` o `serie.estiramiento.nivel`. Nada que
+  convertir.

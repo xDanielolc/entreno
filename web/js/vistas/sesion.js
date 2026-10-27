@@ -26,9 +26,10 @@ import {
   serieSuelta,
 } from '../series.js';
 import { anadir, aviso, nuevoId, confirmar, deslizarParaConfirmar, fechaLarga, h, formatearTiempo, horario, leerNumero, leerTiempo } from '../ui.js';
-import { DESCANSO_ESTIRAMIENTOS_POR_DEFECTO, arrancarDescanso, arrancarRespiracion, barraDescanso, descansoDeTramo, preguntaAvisos } from './descanso.js';
+import { DESCANSO_ESTIRAMIENTOS_POR_DEFECTO, arrancarDescanso, arrancarRespiracion, barraDescanso, descansoDeTramo, preguntaAvisos, saltarDescanso } from './descanso.js';
 import { cuentaParaFatiga, tipoDeEjercicio } from '../catalogo.js';
-import { ASISTENCIAS, ESCALA_MANO, PROGRAMAS, TECNICAS_ESTIRAMIENTO, extraDeSerie, medidasDe, unidadMedida } from '../esquema.js';
+import { ESCALA_MANO, PROGRAMAS, TECNICAS_ESTIRAMIENTO, extraDeSerie, medidasDe, unidadMedida } from '../esquema.js';
+import { MEDIDAS, medidaApuntada, medidaDe } from '../medidas-estiramiento.js';
 import { ORDEN_MUSCULOS, nombreMusculo } from '../musculos.js';
 import { ESCALA_RECUPERACION, factorPersonal, puntuacionSentida, recuperacionPorMusculo } from '../recuperacion.js';
 import { fechaCorta } from '../ui.js';
@@ -49,6 +50,11 @@ const vistaPreguntada = new Set();    // sesiones a las que ya se les preguntó:
 const editando = new Set();
 // Serie que espera a que montes su ciclo en la ficha: al volver se rehace.
 let cicloPendiente = null;
+// Entrenamientos en los que ya contestaste dónde estás.
+const sedePreguntada = new Set();
+// La serie tras la que corre el descanso: si empiezas a apuntar otra, el
+// descanso cuenta como saltado (Dan, 27-10-2026).
+let descansoTrasSerie = null;
 
 export const MODOS_ENTRENO = {
   serie: { etiqueta: 'Solo la serie que toca', descripcion: 'Una serie en pantalla: deslizas para pasar a la siguiente. Lo más limpio.' },
@@ -159,6 +165,7 @@ export function vistaSesion(contenedor, { id }) {
         title: 'Cómo verlo', onclick: () => elegirVista() }, icono('ojo'))),
 
     sesion.diaRutinaId && h('p', { class: 'suave' }, nombreDelDia(d, sesion)),
+    enCurso && preguntaSede(),
 
     enCurso && (posicion == null || posicion === 0) && tarjetaComoLlegas(),
 
@@ -585,6 +592,20 @@ export function vistaSesion(contenedor, { id }) {
     return grande && enCurso && movil ? deslizable(tarjeta) : tarjeta;
   }
 
+  // Al empezar, dónde estás: Dan hizo en casa dos rutinas que se quedaron
+  // como del gimnasio. La que ya viene puesta (la de la rutina, la de por
+  // defecto o la última) va primero y marcada.
+  function preguntaSede() {
+    const sedes = sedesActivas(d);
+    if (sedes.length < 2 || sedePreguntada.has(id) || sesion.ejercicios.some((e) => e.series.some((x) => x.hecha))) return null;
+    const ordenadas = [...sedes].sort((a, b) => (b.id === sesion.sedeId) - (a.id === sesion.sedeId));
+    return h('div', { class: 'tarjeta pregunta-sede' },
+      h('p', { class: 'centrado' }, h('strong', {}, '¿Dónde entrenas hoy?')),
+      h('div', { class: 'fila-botones' }, ordenadas.map((x) => h('button', { type: 'button',
+        class: `boton${x.id === sesion.sedeId ? '' : ' secundario'}`,
+        onclick: () => { sedePreguntada.add(id); cambiarSesion((y) => { y.sedeId = x.id; }); } }, x.nombre))));
+  }
+
   function fotoViva(archivo) {
     let img = fotosVivas.get(archivo);
     if (!img) { img = h('img', { src: archivo, alt: '' }); fotosVivas.set(archivo, img); }
@@ -594,11 +615,13 @@ export function vistaSesion(contenedor, { id }) {
   // Modo «serie»: «Calentamiento 2 de 4» o «Serie 1 de 5», y un puntito por
   // serie (los de calentar, más pequeños; se pueden tocar).
   function puntosSeries(entrada, k, trabajo) {
+    const lado = planDe(ejercicioDe(entrada.ejercicioId) ?? {}, entrada.series[trabajo[k]] ?? {})?.lado;
+    const ladoTexto = () => (lado ? ` · ${lado}` : '');
     const esCal = (j) => entrada.series[j].tipo === 'calentamiento';
     const grupo = trabajo.filter((j) => esCal(j) === esCal(trabajo[k]));
     const n = grupo.indexOf(trabajo[k]) + 1;
     return h('div', { class: 'contador-series' },
-      h('span', { class: 'suave' }, `${esCal(trabajo[k]) ? 'Calentamiento' : 'Serie'} ${n} de ${grupo.length}`),
+      h('span', { class: 'suave' }, `${esCal(trabajo[k]) ? 'Calentamiento' : 'Serie'} ${n} de ${grupo.length}${ladoTexto(entrada.series[trabajo[k]])}`),
       h('div', { class: 'puntos-ejercicios puntos-series' }, trabajo.map((j, n) => h('button', { type: 'button',
         'aria-label': `${esCal(j) ? 'Calentamiento' : 'Serie'} ${n + 1}`, class: `${n === k ? 'activo' : ''}${entrada.series[j].hecha ? ' hecho' : ''}${esCal(j) ? ' cal' : ''}`,
         onclick: () => { guardarVista('serie', posicion, n); estado.emitir('vista'); } }))));
@@ -771,6 +794,12 @@ export function vistaSesion(contenedor, { id }) {
     const uCarga = unidadCarga(ej);
     const uEsf = unidadEsfuerzo(ej);
     const textoRango = (r) => (r ? (r[0] === r[1] ? String(r[0]) : `${r[0]}-${r[1]}`) : '');
+    // El rango con su unidad: «8-12 reps», o «30 s» / «1:00-1:30» si es tiempo
+    // (antes salía «30 min:s»).
+    const conUnidad = (v) => (esTiempo(ej) ? textoEsfuerzo(ej, v) : `${conUnidad(v)}`);
+    const rangoConUnidad = (r) => (!r ? '' : esTiempo(ej)
+      ? (r[0] === r[1] ? textoEsfuerzo(ej, r[0]) : `${textoEsfuerzo(ej, r[0])}-${textoEsfuerzo(ej, r[1])}`)
+      : `${textoRango(r)} ${uEsf}`);
 
     // Calentamiento: el peso (si sale de tu 1RM) y ningún objetivo.
     if (serie.tipo === 'calentamiento') {
@@ -853,16 +882,16 @@ export function vistaSesion(contenedor, { id }) {
           // El primer día de un ciclo el peso es otro: se supera el 1RM de la
           // última vez, no sus repeticiones (Dan veía a la vez «bajado» y «superado»).
           lineas.push(h('span', { class: 'compara' }, s.ultimaDelCiclo ? '↑ Para superar la última vez' : '↑ Para superar el 1RM de la última vez', ` (${textoSerie(ej, ult.serie)})`, ': ',
-            h('strong', {}, serie.objetivo != null ? `${formatearNumero(serie.objetivo)} ${uEsf}` : '—')));
+            h('strong', {}, serie.objetivo != null ? `${conUnidad(serie.objetivo)}` : '—')));
         } else if (serie.objetivo != null) {
           const rmObj = serie.rmObjetivo ?? s.rmObjetivo;
-          lineas.push(h('span', { class: 'compara' }, '↑ Objetivo: ', h('strong', {}, `${formatearNumero(serie.objetivo)} ${uEsf}`),
+          lineas.push(h('span', { class: 'compara' }, '↑ Objetivo: ', h('strong', {}, `${conUnidad(serie.objetivo)}`),
             rmObj ? ` (las que superan tu 1RM de ${formatearNumero(Math.round(rmObj))} kg)` : ''));
         }
         if (s.cicloPrevio) {
           const p = s.cicloPrevio;
           lineas.push(h('span', { class: 'compara' }, `↑ Ciclo ${p.cicloN} ${p.mismoPeso ? `con ${formatearNumero(p.carga)} ${uCarga}` : `en la sesión ${p.dia} (${formatearNumero(p.carga)} ${uCarga})`}: `,
-            h('strong', {}, `${formatearNumero(p.esfuerzo)} ${uEsf}`), p.mismoPeso ? ' · para superarlo, una más' : ''));
+            h('strong', {}, `${conUnidad(p.esfuerzo)}`), p.mismoPeso ? ' · para superarlo, una más' : ''));
         }
       }
     } else if (s.modo === 'programa') {
@@ -877,14 +906,14 @@ export function vistaSesion(contenedor, { id }) {
       if (s.pocosDatos && !s.carga) partes.push('Máximo trabajo: aún faltan datos, entrena con el peso que quieras');
       else {
         partes.push(`Máximo trabajo: ${formatearNumero(s.carga)} ${uCarga}`);
-        if (s.esfuerzoObjetivo) partes.push(`unas ${formatearNumero(s.esfuerzoObjetivo)} ${uEsf}`);
+        if (s.esfuerzoObjetivo) partes.push(`unas ${conUnidad(s.esfuerzoObjetivo)}`);
         if (s.aviso) partes.push(s.aviso.toLowerCase());
         if (s.mejorReal) partes.push(`tu récord: ${formatearNumero(s.mejorReal.trabajo)} (${formatearNumero(s.mejorReal.carga)} ${uCarga} × ${formatearNumero(s.mejorReal.esfuerzo)})`);
       }
     } else if (s.porRM && serie.carga != null) {
       const base = serie.rmUsado?.valor ?? s.rmUsado;
       partes.push(`Hoy ${formatearNumero(serie.carga)} ${uCarga}` + (s.esfuerzoObjetivo ? ` × ${s.esfuerzoObjetivo}` : ''));
-      if (s.objetivoSuperar) lineas.push(h('span', { class: 'compara' }, '↑ Para superar la última vez: ', h('strong', {}, `${s.objetivoSuperar} ${uEsf}`)));
+      if (s.objetivoSuperar) lineas.push(h('span', { class: 'compara' }, '↑ Para superar la última vez: ', h('strong', {}, `${conUnidad(s.objetivoSuperar)}`)));
     } else if (s.modo === 'carga' && !s.ultima) {
       // Serie nueva: el peso sale de tu 1RM (el de la cabecera).
       const rango = textoRango(s.rango);
@@ -892,23 +921,23 @@ export function vistaSesion(contenedor, { id }) {
       if (serie.carga != null && ej.carga?.tipo !== 'pesoCorporal') {
         const base = serie.rmUsado?.valor ?? s.rmUsado;
         partes.push(`Hoy: ${formatearNumero(serie.carga)} ${uCarga}${rango ? ` × ${rango}` : ''}${rec}`);
-      } else partes.push(`Hoy: ${rango ? `${rango} ${uEsf}` : 'apunta lo que hagas'}${rec}`);
+      } else partes.push(`Hoy: ${rango ? rangoConUnidad(s.rango) : 'apunta lo que hagas'}${rec}`);
     } else if (!s.ultima && !s.referencia) {
       // Solo apuntar, sin nada de antes: el rango y, si hay 1RM, un peso orientativo.
       const r = s.rango ?? plan.objetivoEsfuerzo;
       const conPesoYReps = !['ninguna', 'altura', 'pesoCorporal'].includes(ej.carga?.tipo) && ej.esfuerzo?.tipo === 'repeticiones';
       const orientativo = conPesoYReps && r && rmAntes ? pesoDePlan(d, ej, { progresion: { objetivoEsfuerzo: r } }, rmAntes.valor) : null;
-      partes.push(r ? `Hoy: ${textoRango(r)} ${uEsf}` : 'Apunta lo que hagas');
+      partes.push(r ? `Hoy: ${rangoConUnidad(r)}` : 'Apunta lo que hagas');
       if (orientativo) partes.push(`con tu 1RM, unos ${formatearNumero(orientativo)} ${uCarga}`);
     } else {
       const u = (s.ultima ?? s.referencia).serie;
       partes.push(`${s.ultima ? 'Última vez' : 'Última vez (en otra serie)'}: ${textoSerie(ej, u)}`);
       if (s.modo === 'carga' && s.sube) partes.push(`hoy sube a ${formatearNumero(s.carga)} ${uCarga}`
         + (s.rango ? ` × ${textoRango(s.rango)}` : ''));
-      if (s.modo === 'carga' && !s.sube && s.rango) partes.push(`objetivo ${s.rango[1]} ${uEsf}`
+      if (s.modo === 'carga' && !s.sube && s.rango) partes.push(`objetivo ${conUnidad(s.rango[1])}`
         + (s.recamaraMin ? ` con ${s.recamaraMin} en recámara` : '') + ': al llegar, sube el peso'
         + (s.faltaRecamara ? ' (la última vez llegaste, pero apurando)' : ''));
-      if (s.modo === 'esfuerzo') partes.push(`hoy intenta ${formatearNumero(s.esfuerzoObjetivo)} ${uEsf}`);
+      if (s.modo === 'esfuerzo') partes.push(`hoy intenta ${conUnidad(s.esfuerzoObjetivo)}`);
     }
     if (!partes.length && !lineas.length) return null;
     if (!lineas.length) return h('p', { class: 'sugerencia' }, partes.join(' · '));
@@ -1050,7 +1079,8 @@ export function vistaSesion(contenedor, { id }) {
     serie.detalle ??= {};
     const tramos = tramosDe(serie.tecnicas);
     const toca = enCurso && entrada && !serie.hecha && (unaSerie || entrada.series.findIndex((x) => !x.hecha) === j);
-    return h('div', { class: `serie ${serie.hecha ? 'hecha' : ''}`, 'data-serie': j },
+    return h('div', { class: `serie ${serie.hecha ? 'hecha' : ''}`, 'data-serie': j,
+      oninput: () => { if (enCurso && !serie.hecha && serie.id !== descansoTrasSerie) saltarDescanso(); } },
       toca && olvidoRecamara(ej, entrada, i, j),
       enCurso && entrada && otraSola(ej, entrada, i, j, serie),
       toca && propuestaPorRMDeHoy(ej, entrada, i, j, serie),
@@ -1274,7 +1304,9 @@ export function vistaSesion(contenedor, { id }) {
       despues: () => {
         const x = estado.datos().sesiones.find((s) => s.id === id)?.ejercicios[i]?.series.find((y) => y.id === serie.id);
         if (x) descansoEntreSeries(ej, x);
-        pasarTrasHecha(i, j);
+        // Si el estiramiento se mide, la medida se pide antes de pasar de postura.
+        if (x && esEstirar(ej) && x.tipo !== 'calentamiento' && !medidaApuntada(ej, x)) pedirMedida(ej, i, j, () => pasarTrasHecha(i, j));
+        else pasarTrasHecha(i, j);
       } });
   }
 
@@ -1378,11 +1410,12 @@ export function vistaSesion(contenedor, { id }) {
           }) }))));
   }
 
-  // Estiramientos, movilidad y yoga: con qué técnica, con qué ayuda y, si
-  // te apoyas con la mano, en qué punto de la escala (del puño a sin mano).
+  // Estiramientos, movilidad y yoga: cómo se mide (una línea, de
+  // medidas-estiramiento.js), la medida de esta serie y la técnica. Los que
+  // no tienen medida no piden nada: basta con hacerlos.
   function camposEstiramiento(ej, i, j, serie) {
-    // Un calentamiento (la movilidad dinámica del principio) no lleva ayudas ni escala.
-    if (!['estiramiento', 'movilidad', 'yoga'].includes(tipoDeEjercicio(ej)) || serie.tipo === 'calentamiento') return null;
+    // Un calentamiento (la movilidad dinámica del principio) no lleva medida.
+    if (!esEstirar(ej) || serie.tipo === 'calentamiento') return null;
     const actual = { ...ej.estiramiento, ...serie.estiramiento };
     const guardar = (clave, valor) => cambiarSesion((s) => {
       const x = s.ejercicios[i].series[j];
@@ -1390,30 +1423,49 @@ export function vistaSesion(contenedor, { id }) {
     });
     const desplegable = (clave, catalogo, vacio) => selector([['', vacio], ...Object.entries(catalogo).map(([k, v]) => [k, v.etiqueta ?? v])],
       actual[clave] ?? '', (v) => guardar(clave, v), { titulo: vacio, lista: true });
-    // Las ayudas se pueden combinar (cinta y pared, por ejemplo) y se puede
-    // medir por varios sitios a la vez: la escala de la mano y centímetros.
-    const ayudas = actual.asistencias ?? (actual.asistencia ? [actual.asistencia] : []);
-    const cambiarAyuda = (clave, marcada) => {
-      const nuevas = ayudas.filter((x) => x !== clave && x !== 'ninguna');
-      if (marcada && clave !== 'ninguna') nuevas.push(clave);
-      cambiarSesion((s) => {
+    const med = medidaDe(ej);
+    return h('div', { class: 'serie-estiramiento' },
+      med.mide && h('p', { class: 'nota bloque como-medir' }, `Mide ${med.como}.`),
+      med.mide === 'mano' && desplegable('nivel', ESCALA_MANO, 'Escala de la mano'),
+      med.mide === 'cm' && campoCm(actual.cm, (v) => guardar('cm', v)),
+      h('div', { class: 'fila-estiramiento' },
+        desplegable('tecnica', TECNICAS_ESTIRAMIENTO, 'Técnica'),
+        selector(Object.entries(MEDIDAS), med.mide ?? 'ninguna', (v) => estado.cambiar((datos) => {
+          const e = datos.ejercicios.find((x) => x.id === ej.id);
+          if (e) e.estiramiento = { ...e.estiramiento, medida: v };
+        }), { titulo: 'Cómo se mide', lista: true })),
+      actual.tecnica && h('small', { class: 'nota bloque' }, TECNICAS_ESTIRAMIENTO[actual.tecnica]?.descripcion));
+  }
+
+  function campoCm(valor, alCambiar) {
+    return h('label', { class: 'valor' },
+      h('span', { class: 'et' }, 'Centímetros'),
+      h('input', { type: 'text', inputmode: 'decimal', value: valor ?? '', 'aria-label': 'Centímetros',
+        oninput: (e) => alCambiar(leerNumero(e.target.value)) }));
+  }
+
+  // Al acabar el tiempo de un estiramiento que se mide: la medida antes de
+  // seguir. «Luego» la deja para después (la casilla sigue en la serie).
+  function pedirMedida(ej, i, j, seguir) {
+    const med = medidaDe(ej);
+    let valor = null;
+    const guardar = () => {
+      if (valor != null && valor !== '') cambiarSesion((s) => {
         const x = s.ejercicios[i].series[j];
-        x.estiramiento = { ...ej.estiramiento, ...x.estiramiento, asistencias: nuevas, asistencia: nuevas[0] ?? null };
+        x.estiramiento = { ...ej.estiramiento, ...x.estiramiento, [med.mide === 'cm' ? 'cm' : 'nivel']: valor };
       });
     };
-    return h('div', { class: 'serie-estiramiento' },
-      desplegable('tecnica', TECNICAS_ESTIRAMIENTO, 'Técnica'),
-      h('div', { class: 'chips' }, Object.entries(ASISTENCIAS).filter(([k]) => k !== 'ninguna').map(([k, v]) => h('button', {
-        type: 'button', class: `chip seleccionable ${ayudas.includes(k) ? 'activo' : ''}`,
-        'aria-pressed': String(ayudas.includes(k)),
-        onclick: () => cambiarAyuda(k, !ayudas.includes(k)),
-      }, v.etiqueta ?? v))),
-      ayudas.includes('mano') && desplegable('nivel', ESCALA_MANO, 'Apoyo de la mano'),
-      h('label', { class: 'valor' },
-        h('span', { class: 'et' }, 'Hasta dónde llegas (cm)'),
-        h('input', { type: 'text', inputmode: 'decimal', value: actual.cm ?? '', 'aria-label': 'Centímetros que te faltan o que llegas',
-          oninput: (e) => guardar('cm', leerNumero(e.target.value)) })),
-      actual.tecnica && h('small', { class: 'nota bloque' }, TECNICAS_ESTIRAMIENTO[actual.tecnica]?.descripcion));
+    const campo = med.mide === 'cm'
+      ? campoCm(null, (v) => { valor = v; })
+      : h('div', { class: 'lista-eleccion' }, Object.entries(ESCALA_MANO).map(([k, v]) => h('button', { type: 'button', class: 'boton secundario',
+        onclick: () => { valor = k; guardar(); cerrar(); seguir(); } }, v)));
+    const cerrar = modal('¿Hasta dónde has llegado?', h('div', {},
+      h('p', { class: 'centrado' }, `Mide ${med.como}.`),
+      campo,
+      h('div', { class: 'fila-botones' },
+        h('button', { type: 'button', class: 'boton secundario', onclick: () => { cerrar(); seguir(); } }, 'Luego'),
+        med.mide === 'cm' && h('button', { type: 'button', class: 'boton', onclick: () => { guardar(); cerrar(); seguir(); } }, 'Guardar'))));
+    if (med.mide === 'cm') setTimeout(() => document.querySelector('.modal-fondo input')?.focus(), 50);
   }
 
   // ¿Es esta la serie de prueba del 1RM? La primera de trabajo de un
@@ -1437,6 +1489,7 @@ export function vistaSesion(contenedor, { id }) {
     const plan = planDe(ej, serie);
     const nombreLibre = plan && !plan.calentamiento ? `Programación: ${nombreRegla(plan).split(':')[0]}` : 'Sin objetivo';
     return h('div', { class: 'serie-cabecera' },
+      plan?.lado && h('span', { class: `insignia-lado ${plan.lado}` }, plan.lado === 'izquierda' ? 'Lado izquierdo' : 'Lado derecho'),
       selector(Object.entries(TIPOS_SERIE).map(([k, t]) => [k, k === 'libre' ? nombreLibre : t,
         k === 'libre' && plan && !plan.calentamiento ? nombreRegla(plan) : EXPLICA_TIPO[k]]), serie.tipo, (v) => {
         // «Ciclo» en un ejercicio que aún no tiene ninguno: la app pregunta cuál.
@@ -1860,6 +1913,14 @@ export function vistaSesion(contenedor, { id }) {
       arrancarDescanso(DESCANSO_ANTES_DE_PESADA, { texto: 'antes de la primera serie' });
       return;
     }
+    descansoTrasSerie = serie?.id ?? null;
+    // Del lado izquierdo al derecho del mismo ejercicio, sin descanso.
+    const enCursoSeries = estado.datos().sesiones.find((s) => s.id === id)?.ejercicios[i]?.series ?? [];
+    const otroLado = serie && enCursoSeries[enCursoSeries.findIndex((x) => x.id === serie.id) + 1];
+    if (planDe(ej, serie ?? {})?.lado === 'izquierda' && otroLado && planDe(ej, otroLado)?.lado === 'derecha') {
+      aviso('Ahora el lado derecho, sin descanso.');
+      return;
+    }
     const siguiente = sesion.ejercicios[i + 1];
     if (itemDeRutina(ej.id)?.superserie && siguiente) {
       const otro = ejercicioDe(siguiente.ejercicioId);
@@ -2203,6 +2264,7 @@ export function unidadEsfuerzo(ej) {
 }
 
 const esTiempo = (ej) => ej.esfuerzo?.tipo === 'tiempo';
+const esEstirar = (ej) => ['estiramiento', 'movilidad', 'yoga'].includes(tipoDeEjercicio(ej));
 // El cronómetro vale en cuanto el ejercicio apunte tiempo, aunque no sea su
 // medida principal (flexiones con repeticiones, tiempo y distancia).
 const mideTiempo = (ej) => medidasDe(ej).includes('tiempo');

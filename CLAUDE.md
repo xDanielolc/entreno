@@ -1451,3 +1451,30 @@ contenido: plantillas.js (las dos suben a version 2), catalogo.js, version.js, s
   una por pierna, medida con cinta desde cualquier altura; el descanso entre series solo para cambiar de lado (0-10 s).
 - catalogo.js: «Isométrico de cuello hacia delante», «Isométrico de cuello hacia atrás», «Extensión torácica en silla»
   (las tres sin imagen todavía); Y-T-W pasa de material «suelo» a «libre».
+
+## Ronda 0.68.0 (27-10-2026): estiramientos por lado y con su medida
+
+Encargo de la conversación de flexibilidad tras la prueba de Dan (notas en su To Do). Esquema v27 (todo opcional).
+- **Prehechas de lista que se actualizan**: `plantillaNueva` ya no exige `texto`; `diasDePlantilla()` (plantillas.js)
+  monta los días con las series de cada ejercicio (propias si el ejercicio no tenía, si no «solo de esta rutina») y
+  `actualizarDesdePlantilla` la usa igual que el texto, con `reutilizarPlanes` (que ahora casa una serie sin lado con
+  una nueva con lado y le pone el lado). `anadirPlantilla` guarda `versionPlantilla` también en las de lista.
+- **Lados** (`plan.lado` 'izquierda' | 'derecha'): `porLado([...])` (todas las de un lado y luego las del otro) y
+  `alternos([...])` en plantillas.js; «por lado / por brazo / por pierna» en el texto de una rutina (`forma.porLado`,
+  `crearPlanesRapidos` duplica cada serie). La serie enseña «Lado izquierdo» (`.insignia-lado`) y el contador «Serie
+  1 de 6 · izquierda»; `resumenPlanes` dice «3 × 45 s por lado». De izquierda a derecha del mismo ejercicio no hay
+  descanso. Prehechas con lados: las dos de flexibilidad (versión 3), «Flexibilidad: tres sesiones» (2), PPL Heavy
+  Duty de 3 días (2), 5/3/1 (2), calistenia (2) y «Fuerza sin máquinas» (9: el pájaro, «2 × 12-15 por brazo»).
+- **Medidas de estiramientos** (`web/js/medidas-estiramiento.js`, `medidaDe`, `medidaApuntada`): una línea por
+  estiramiento con qué medir y cómo (cm o escala de la mano); los que no tienen medida sencilla no piden nada.
+  `ej.estiramiento.medida` (elegible en la serie, «Cómo se mide») manda. Fuera las ayudas en chips de la serie.
+  Al acabar el reloj de un estiramiento con medida, `pedirMedida` la pide antes de pasar de postura («Luego» la
+  deja para la casilla de la serie).
+- Empezar otra serie (escribir en ella o arrancar su reloj) con el descanso en marcha cuenta como saltarlo
+  (`saltarDescanso` en descanso.js). Descanso entre estiramientos por defecto 10 s (antes 20).
+- **Dónde**: al empezar sale «¿Dónde entrenas hoy?» si tienes dos sitios o más (la propuesta, primero);
+  `sedeInicial` propone «Casa» en las rutinas de estirar, movilidad o yoga, y las prehechas de flexibilidad nuevas
+  van con la sede de casa.
+- «Hoy: 30 min:s» → «Hoy: 30 s» (`conUnidad`/`rangoConUnidad` en `lineaSugerenciaBase`).
+- OJO al editar con `python - <<'EOF'` desde la herramienta: «\b» y «\n» llegan como «\b» y «\n» (un retroceso o un
+  salto de línea de verdad). Para reemplazos con barras, script en el scratchpad con Write.

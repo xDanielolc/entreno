@@ -16,7 +16,8 @@
 //
 // Palabras que entiende en las series: Bilbo, máxima, fuerza (2 en
 // recámara), descendente o drop (en la última), ascendente, calentamiento, min / s (tiempo),
-// opcional y superserie.
+// opcional, superserie y «por lado» (o por brazo, por pierna: una serie con
+// cada lado).
 
 import { CATALOGO, normalizar } from './catalogo.js';
 import { crearPlanesRapidos, textoForma } from './rapidas.js';
@@ -56,6 +57,7 @@ function analizarPieza(texto, tipoTexto = '', comoTexto = '') {
     forma.de = Number(soloReps[1]);
     forma.a = soloReps[2] != null ? Number(soloReps[2]) : forma.de;
   }
+  if (/\bpor (lado|brazo|pierna)\b/.test(normalizar(texto))) forma.porLado = true;
   if (/bilbo/.test(t)) forma.tipo = 'bilbo';
   else if (/maxim/.test(t)) { forma.tipo = 'maxima'; forma.de ??= 1; forma.a ??= 2; }
   else if (/drop|descend/.test(t)) forma.tipo = 'ultima-drop';

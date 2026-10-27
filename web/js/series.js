@@ -83,7 +83,19 @@ export function nombreRegla(plan) {
   return 'Doble progresión: al llegar arriba, sube el peso';
 }
 
+// Con lados: «3 × 45 s por lado» si los dos lados llevan lo mismo.
 export function resumenPlanes(planes, ej = null) {
+  const izq = planes.filter((p) => p.lado === 'izquierda');
+  const der = planes.filter((p) => p.lado === 'derecha');
+  if (izq.length && izq.length === der.length && izq.length + der.length === planes.length) {
+    const a = resumenSinLado(izq, ej);
+    if (a === resumenSinLado(der, ej)) return `${a} por lado`;
+  }
+  if (planes.length === 1 && planes[0].lado) return `${resumenSinLado(planes, ej)} (lado ${planes[0].lado === 'izquierda' ? 'izquierdo' : 'derecho'})`;
+  return resumenSinLado(planes, ej);
+}
+
+function resumenSinLado(planes, ej) {
   const grupos = [];
   for (const p of planes) {
     const t = textoPlan(p, ej);

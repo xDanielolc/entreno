@@ -57,7 +57,16 @@ export function repsAscendentes(de, a, n) {
 }
 
 // Planes de una forma (no los guarda: quien llama los mete en `ej.series`).
+// «por lado» (o por brazo, por pierna): cada serie se hace con un lado y con
+// el otro, seguidas, y cada lado guarda lo suyo (`plan.lado`).
 export function crearPlanesRapidos(datos, ej, forma) {
+  const planes = planesRapidos(datos, ej, forma);
+  if (!forma.porLado) return planes;
+  return planes.flatMap((p) => [{ ...p, lado: 'izquierda' },
+    { ...structuredClone(p), id: `pl_${Math.random().toString(36).slice(2, 9)}`, lado: 'derecha' }]);
+}
+
+function planesRapidos(datos, ej, forma) {
   const f = completarForma(forma, ej);
   const n = Math.max(1, Math.min(20, Math.round(f.n ?? 1)));
   if (f.tipo === 'bilbo' || (f.modo === 'ciclo' && f.ciclo === 'bilbo')) return [planPorDefecto({ perfil: { cuestionario: { objetivo: 'fuerza' } } }, ej)];

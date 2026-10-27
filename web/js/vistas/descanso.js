@@ -39,8 +39,9 @@ export function arrancarRespiracion(perfil) {
 
 // Descanso que toca dentro de una serie, según su técnica.
 export const DESCANSO_TRAMOS_POR_DEFECTO = { 'drop-set': 30, 'rest-pause': 20, miorepeticiones: 20 };
-// Segundos entre estiramientos (perfil.descansoEstiramientos si se cambia).
-export const DESCANSO_ESTIRAMIENTOS_POR_DEFECTO = 20;
+// Segundos entre estiramientos (perfil.descansoEstiramientos si se cambia):
+// solo para cambiar de postura (antes 20; Dan preguntó por qué tanto).
+export const DESCANSO_ESTIRAMIENTOS_POR_DEFECTO = 10;
 
 export function descansoDeTramo(perfil, tecnica) {
   return perfil.descansoTramos?.[tecnica] ?? DESCANSO_TRAMOS_POR_DEFECTO[tecnica] ?? 20;
@@ -278,6 +279,12 @@ function saltar() {
   if (usado >= 10 && quedaban >= 10 && propuesto !== totalSeg) {
     proponer(propuesto, `Has descansado ${formatear(usado)} de ${formatear(totalSeg)}. ¿Dejar el descanso entre series en ${formatear(propuesto)}?`);
   } else if (Math.abs(alargadoSeg) >= 15) ofrecerCambiado(totalSeg + alargadoSeg);
+}
+
+// Empezar la serie siguiente con el descanso en marcha cuenta como saltarlo
+// (con la misma propuesta de cambiar el descanso).
+export function saltarDescanso() {
+  if (finMs && restante() > 0) saltar();
 }
 
 // −30 s y +30 s a los lados del tiempo (estilo A, elegido por Dan el 22-10-2026).

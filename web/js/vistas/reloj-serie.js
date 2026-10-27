@@ -11,6 +11,7 @@ import * as estado from '../estado.js';
 import { h } from '../ui.js';
 import { icono } from '../iconos.js';
 import { PRESETS_HIIT, abrirIntervalos, duracionTexto, pitar } from './intervalos.js';
+import { saltarDescanso } from './descanso.js';
 
 const relojes = new Map();   // serieId → reloj en marcha
 const elegidos = new Map();  // serieId → { modo, hiit } elegido antes de empezar
@@ -151,6 +152,7 @@ export function relojSerie({ sesionId, serieId, objetivo = null, despues = null 
   const etiqueta = h('div', { class: 'reloj-etiqueta' });
 
   const empezar = () => {
+    saltarDescanso(); // empezar la serie siguiente corta el descanso
     const r = { modo, sesionId, serieId, objetivo, despues, inicio: Date.now(), pausadoEn: null, restado: 0, avisados: new Set() };
     if (modo === 'hiit') {
       r.hiit = hiit; r.fases = fasesDe(hiit); r.faseAntes = null;

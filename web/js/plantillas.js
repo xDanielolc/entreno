@@ -21,7 +21,15 @@ const alFallo = (min = 6, max = 10) => ({ tipo: 'libre', progresion: 'carga', ob
 const sinFallo = (min = 15, max = 20) => ({ tipo: 'libre', progresion: 'carga', objetivo: [min, max] });
 const libre = { tipo: 'libre' };
 const restPause = (min, max) => ({ tipo: 'intensidad', tecnicas: ['rest-pause'], objetivo: [min, max] });
-const unilateral = (forma) => ({ ...forma, tecnicas: [...forma.tecnicas, 'unilateral'] });
+// Ejercicios de un solo lado: cada serie con su lado (`plan.lado`), para que
+// la app diga «izquierda» o «derecha» y guarde lo de cada lado aparte.
+// `porLado([f, f])` hace las de la izquierda y después las de la derecha
+// (estiramientos: 1-2 un lado, 3-4 el otro); `alternos([f, f])` va alternando
+// (fuerza: izquierda, derecha, descanso, izquierda, derecha).
+const conLado = (forma, lado) => ({ ...forma, lado });
+const porLado = (formas) => [...formas.map((f) => conLado(f, 'izquierda')), ...formas.map((f) => conLado(f, 'derecha'))];
+const alternos = (formas) => formas.flatMap((f) => [conLado(f, 'izquierda'), conLado(f, 'derecha')]);
+const veces = (n, forma) => Array.from({ length: n }, () => forma);
 // Varias series iguales con doble progresión en un rango de repeticiones.
 const series = (n, min, max) => Array.from({ length: n }, () => ({ tipo: 'libre', progresion: 'carga', objetivo: [min, max] }));
 
@@ -43,7 +51,7 @@ export const PLANTILLAS = [
     id: 'fuerza-sin-maquinas',
     // Sube este número cada vez que cambie la rutina: las rutinas hechas con
     // una versión anterior ofrecen actualizarse.
-    version: 8,
+    version: 9,
     nombre: 'Fuerza sin máquinas: cuatro días',
     autor: 'Dan (su rutina de 10-2026)',
     resumen: 'Dos días de torso y dos de pierna, solo con barra, mancuernas y tu peso. Cada básico tiene un día pesado '
@@ -81,7 +89,7 @@ Dominadas negativas: 3 × 3-5 (bajada de 3-5 s; sube con salto o desde un banco;
 Curl martillo: 2 × 8-12 con 1 en recámara, serie descendente en la última (alterno, con mancuernas: kilos por mancuerna y repeticiones por brazo; la descendente, hasta 0-1 en recámara; 90 s)
 Extensión de tríceps sobre la cabeza: 2 × 8-12 con 1 en recámara, serie descendente en la última (con mancuerna; la descendente, hasta 0-1 en recámara; 90 s)
 Elevaciones laterales: 2 × 12-15 con 1 en recámara (60-90 s)
-Pájaro a una mano: 2 × 12-15 con 1 en recámara (con el brazo estirado; por brazo; 60 s)
+Pájaro a una mano: 2 × 12-15 por brazo con 1 en recámara (con el brazo estirado; 60 s)
 
 Día 2: Pierna, sentadilla pesada · 70-75 min
 Cardio: calentamiento 10 min (suave: bici, cinta o andar rápido, a ritmo de poder hablar; es el calentamiento general y el cardio de la semana a la vez)
@@ -101,7 +109,7 @@ Press militar: calentamiento 1 × 1 al 70 % + máxima 1-2 según tu 1RM + 2 × 3
 Dominadas: 4 × 1-2 (en racimo: 45-60 s entre series, sin llegar al fallo; cuando salgan 3 seguidas, 3 × 3)
 Curl martillo: 2 × 8-12 con 1 en recámara, serie descendente en la última (alterno, con mancuernas: kilos por mancuerna y repeticiones por brazo; la descendente, hasta 0-1 en recámara; 90 s)
 Fondos en paralelas negativos: 2 × 3-5 (bajada de 3-5 s; subes con los pies en un banco o de un salto; cuando hagas 5 con 5 s de bajada, prueba fondos normales; 2 min)
-Pájaro a una mano: 2 × 12-15 con 1 en recámara (con el brazo estirado desde el 25-10: pide menos peso; por brazo; 60 s)
+Pájaro a una mano: 2 × 12-15 por brazo con 1 en recámara (con el brazo estirado desde el 25-10: pide menos peso; 60 s)
 
 Día 4: Pierna, peso muerto pesado · 75 min
 Cardio: calentamiento 10 min (como el día 2)
@@ -266,6 +274,7 @@ Elevación de piernas colgado: 2 × 8-12 (piernas estiradas; 60-90 s)`),
   },
   {
     id: 'ppl-bilbo-heavy-duty-3',
+    version: 2,
     nombre: 'PPL Bilbo + Heavy Duty (3 días)',
     autor: 'Dan (versión anterior, noviembre de 2025)',
     resumen: 'Tres días: empuje, tirón y pierna. Cada ejercicio con una serie Bilbo y una de intensidad; unos 30-40 minutos por día.',
@@ -288,7 +297,7 @@ Elevación de piernas colgado: 2 × 8-12 (piernas estiradas; 60-90 s)`),
         e('Peso muerto', [bilbo, alFallo(6, 8)], { nota: 'Bilbo de 15-20; fallo técnico' }),
         e('Hiperextensiones', [bilbo, isometrico(10, 12)]),
         e('Jalón al pecho', [bilbo, dropSet(6, 8)]),
-        e('Remo en máquina', [bilbo, unilateral(dropSet(6, 8))]),
+        e('Remo en máquina', [bilbo, ...alternos([dropSet(6, 8)])]),
         e('Curl de bíceps en máquina', [bilbo, isometrico(8, 12)]),
         e('Pájaros con mancuernas', [bilbo, isometrico(10, 12)]),
         e('Carrera', [libre], { opcional: true }),
@@ -297,10 +306,10 @@ Elevación de piernas colgado: 2 × 8-12 (piernas estiradas; 60-90 s)`),
         e('Saltos al cajón', [libre], { opcional: true, nota: 'Calentamiento' }),
         e('Sentadilla', [bilbo, alFallo(6, 8)], { nota: 'Fallo técnico' }),
         e('Extensión de cuádriceps', [alFallo(12, 20)], { nota: 'A una pierna y luego a dos, peso medio' }),
-        e('Curl femoral tumbado', [bilbo, unilateral(dropSet(8, 10))]),
+        e('Curl femoral tumbado', [bilbo, ...alternos([dropSet(8, 10)])]),
         e('Abductores en máquina', [bilbo, excentricas(8, 10)]),
         e('Aductores en máquina', [bilbo, dropSet(8, 10)]),
-        e('Elevación de gemelos', [bilbo, unilateral(isometrico(10, 12))]),
+        e('Elevación de gemelos', [bilbo, ...alternos([isometrico(10, 12)])]),
         e('Carrera', [libre], { opcional: true }),
       ] },
     ],
@@ -308,6 +317,7 @@ Elevación de piernas colgado: 2 × 8-12 (piernas estiradas; 60-90 s)`),
   {
     id: 'flexibilidad-tres-sesiones',
     tipo: 'flexibilidad',
+    version: 2,
     nombre: 'Flexibilidad: tres sesiones',
     autor: 'Propuesta de la app, basada en una rutina personal de fisioterapia',
     resumen: 'Tres sesiones cortas (10-12 minutos) de estiramientos y movilidad: cadera y pierna, cuello y espalda, y aperturas de cadera y hombro. Cada una con una prueba para medir el progreso.',
@@ -319,34 +329,34 @@ Elevación de piernas colgado: 2 × 8-12 (piernas estiradas; 60-90 s)`),
       + 'a qué distancia llegas con la escala de la mano. Si algo duele de verdad, para y consúltalo.',
     dias: [
       { nombre: 'A: cadera y pierna', ejercicios: [
-        e('Deslizamiento neural ciático', [t(60)]),
-        e('Estiramiento de glúteo en figura de 4 (Supta Kapotasana)', [t(90)], { nota: 'Con PIR: empuja 5 s, relaja 5 s' }),
+        e('Deslizamiento neural ciático', porLado([t(30)])),
+        e('Estiramiento de glúteo en figura de 4 (Supta Kapotasana)', porLado([t(45)]), { nota: 'Con PIR: empuja 5 s, relaja 5 s' }),
         e('Rotación 90/90', [t(120)], { nota: 'Prueba: cuenta las rotaciones limpias sin manos' }),
-        e('Rotación tibial con rodilla flexionada', [t(60)]),
-        e('Estiramiento de gemelo en pared', [t(30)]),
-        e('Estiramiento de sóleo en pared', [t(30)]),
+        e('Rotación tibial con rodilla flexionada', porLado([t(30)])),
+        e('Estiramiento de gemelo en pared', porLado([t(30)])),
+        e('Estiramiento de sóleo en pared', porLado([t(30)])),
       ] },
       { nombre: 'B: cuello y espalda', ejercicios: [
-        e('Rotación torácica en cuadrupedia', [t(60)]),
-        e('Estiramiento de trapecio superior', [t(90)], { nota: 'Con PIR: empuja la cabeza contra la mano 5 s, relaja 5 s' }),
-        e('Deslizamiento neural cervical', [t(60)], { nota: 'Para si notas hormigueo' }),
+        e('Rotación torácica en cuadrupedia', porLado([t(30)])),
+        e('Estiramiento de trapecio superior', porLado([t(45)]), { nota: 'Con PIR: empuja la cabeza contra la mano 5 s, relaja 5 s' }),
+        e('Deslizamiento neural cervical', porLado([t(30)]), { nota: 'Para si notas hormigueo' }),
         e('Gato-camello (Marjaryasana-Bitilasana)', [t(90)]),
         e('Puente por fases', [t(90)], { nota: 'Prueba: apunta la fase (1 a 4) y el tiempo' }),
       ] },
       { nombre: 'C: aperturas de cadera y hombro', ejercicios: [
         e('Estiramiento de aductores en mariposa (Baddha Konasana)', [t(90)], { nota: 'Con PIR' }),
         e('Postura del sastre, apertura lateral (Upavistha Konasana)', [t(60)], { nota: 'Prueba: distancia rodilla-suelo con la escala de la mano' }),
-        e('Estiramiento de psoas en zancada (Anjaneyasana)', [t(90)], { nota: 'Mete la cola antes de avanzar la cadera' }),
-        e('Zancada hacia el split frontal (Hanumanasana)', [t(60)], { nota: 'Prueba: distancia ingle-suelo' }),
-        e('Rotación externa de hombro con banda', [t(60)]),
-        e('Rotación interna de hombro con toalla', [t(60)]),
+        e('Estiramiento de psoas en zancada (Anjaneyasana)', porLado([t(45)]), { nota: 'Mete la cola antes de avanzar la cadera' }),
+        e('Zancada hacia el split frontal (Hanumanasana)', porLado([t(30)]), { nota: 'Prueba: distancia de la ingle al suelo, con cada pierna delante' }),
+        e('Rotación externa de hombro con banda', porLado([t(30)])),
+        e('Rotación interna de hombro con toalla', porLado([t(30)])),
       ] },
     ],
   },
   {
     id: 'movilidad-para-meditar',
     tipo: 'flexibilidad',
-    version: 2,
+    version: 3,
     nombre: 'Movilidad para sentarse a meditar',
     autor: 'Propuesta de la app, basada en una rutina personal',
     resumen: 'Dos rutinas de 15 minutos (cuello y espalda; piernas y caderas) y una progresión de tobillos para poder sentarse sobre los talones sin dolor.',
@@ -358,28 +368,28 @@ Elevación de piernas colgado: 2 × 8-12 (piernas estiradas; 60-90 s)`),
     dias: [
       { nombre: 'A: cuello, espalda y caderas', ejercicios: [
         e('Retracción cervical (chin tuck)', reps(2, 10)),
-        e('Flexión lateral de cuello activa', reps(2, 8), { nota: 'Serie 1 hacia la izquierda, serie 2 hacia la derecha. Oreja al hombro sin subir el hombro' }),
+        e('Flexión lateral de cuello activa', porLado(reps(1, 8)), { nota: 'Oreja al hombro sin subir el hombro' }),
         e('Extensión torácica en silla', reps(2, 8), { nota: 'Sentado, manos detrás de la cabeza: arquea la parte alta de la espalda sobre el borde del respaldo y vuelve' }),
         e('Gato-camello (Marjaryasana-Bitilasana)', [t(60)], { nota: 'Manos y rodillas quietas: solo se mueve la espalda, redonda arriba y hundida abajo, todo lo que dé cómodo' }),
         e('Isométrico de cuello hacia delante', [t(30)], { nota: '3 × 10 s: mano en la frente, empuja sin mover la cabeza' }),
         e('Isométrico de cuello hacia atrás', [t(30)], { nota: '3 × 10 s: manos en la nuca, empuja sin mover la cabeza' }),
-        e('Isométricos de cuello', [t(30), t(30)], { nota: 'Hacia el lado: serie 1 izquierda, serie 2 derecha; 3 × 10 s con la mano en la sien' }),
+        e('Isométricos de cuello', porLado([t(30)]), { nota: 'Hacia el lado: 3 × 10 s con la mano en la sien, empuja sin mover la cabeza' }),
         e('Elevaciones Y-T-W', reps(2, 8), { nota: 'De pie, inclinado hacia delante con la espalda recta (bisagra de cadera), para que los brazos suban contra la gravedad. 8 de cada letra' }),
         e('Cobra en el suelo (Bhujangasana)', [t(30)]),
-        e('Estiramiento de trapecio superior', [t(30), t(30)], { nota: 'Serie 1 un lado, serie 2 el otro' }),
-        e('Estiramiento del elevador de la escápula', [t(30), t(30)], { nota: 'Serie 1 un lado, serie 2 el otro' }),
+        e('Estiramiento de trapecio superior', porLado([t(30)])),
+        e('Estiramiento del elevador de la escápula', porLado([t(30)])),
         e('Niño o embrión (Balasana)', [t(45)]),
       ] },
       { nombre: 'B: piernas para sentarse', ejercicios: [
-        e('CARs de cadera', reps(2, 5), { nota: 'Serie 1 pierna izquierda, serie 2 derecha. A cuatro patas: círculo grande y lento con la rodilla' }),
-        e('Rotación 90/90', reps(2, 6, 8), { nota: 'Transiciones: serie 1 empezando hacia la izquierda, serie 2 hacia la derecha' }),
-        e('Tobillo con rodilla a la pared', reps(2, 10), { nota: 'Serie 1 un tobillo, serie 2 el otro' }),
+        e('CARs de cadera', porLado([t(30)]), { nota: 'A cuatro patas: 5 círculos grandes y lentos con la rodilla' }),
+        e('Rotación 90/90', porLado(reps(1, 6, 8)), { nota: 'Transiciones; el lado es hacia el que empiezas' }),
+        e('Tobillo con rodilla a la pared', porLado(reps(1, 10))),
         e('Sentadilla cosaca', reps(2, 6), { nota: 'Alternando lados: 6 por lado en cada serie' }),
-        e('Sentadilla búlgara', reps(4, 6), { nota: 'Profunda, sin peso. Series 1-2 una pierna, 3-4 la otra' }),
+        e('Sentadilla búlgara', porLado(reps(2, 6)), { nota: 'Profunda, sin peso' }),
         e('Elevación de gemelos', reps(2, 10), { nota: 'Pausa de 2 s abajo' }),
         e('Estiramiento de aductores en mariposa (Baddha Konasana)', [t(40)]),
-        e('Estiramiento del sofá (couch stretch)', [t(40), t(40)], { nota: 'Serie 1 un lado, serie 2 el otro. Cojín bajo la rodilla' }),
-        e('Estiramiento de glúteo en paloma (Eka Pada Rajakapotasana)', [t(40), t(40)], { nota: 'Serie 1 un lado, serie 2 el otro' }),
+        e('Estiramiento del sofá (couch stretch)', porLado([t(40)]), { nota: 'Cojín bajo la rodilla' }),
+        e('Estiramiento de glúteo en paloma (Eka Pada Rajakapotasana)', porLado([t(40)])),
       ] },
       { nombre: 'Tobillos (5 min)', ejercicios: [
         e('Flexión y extensión de dedos del pie', series(1, 10, 15)),
@@ -393,7 +403,7 @@ Elevación de piernas colgado: 2 × 8-12 (piernas estiradas; 60-90 s)`),
   {
     id: 'flexibilidad-spagat-y-hombro',
     tipo: 'flexibilidad',
-    version: 2,
+    version: 3,
     nombre: 'Flexibilidad: spagat y hombro',
     autor: 'Dan (investigación «Elasticidad», 10-2026)',
     resumen: 'Una sesión de unos 20 minutos para casa, cuatro veces por semana: primero el spagat frontal (isquios y psoas), '
@@ -414,23 +424,23 @@ Elevación de piernas colgado: 2 × 8-12 (piernas estiradas; 60-90 s)`),
       + 'vez al mes, a la misma hora, una vez con cada pierna, y apunta los centímetros de la ingle al suelo.',
     dias: [
       { nombre: 'Spagat y hombro', ejercicios: [
-        e('CARs de cadera', [t(60)], { nota: 'Calentar: círculos grandes y lentos, 3 por lado' }),
-        e('Estiramiento de isquios (Janu Sirsasana)', [t(45), t(45), t(45), t(45), t(45), t(45)],
-          { nota: '3 por lado: series 1-3 pierna izquierda, 4-6 derecha. Pecho hacia la rodilla con la espalda recta, sin redondear' }),
-        e('Estiramiento de psoas en zancada (Anjaneyasana)', [t(45), t(45), t(45), t(45), t(45), t(45)],
-          { nota: '3 por lado: series 1-3 un lado, 4-6 el otro. Rodilla de atrás apoyada en el suelo sobre un cojín doblado, empeine '
+        e('CARs de cadera', porLado([t(30)]), { nota: 'Calentar: 3 círculos grandes y lentos' }),
+        e('Estiramiento de isquios (Janu Sirsasana)', porLado(veces(3, t(45))),
+          { nota: 'Pecho hacia la rodilla con la espalda recta, sin redondear' }),
+        e('Estiramiento de psoas en zancada (Anjaneyasana)', porLado(veces(3, t(45))),
+          { nota: 'Rodilla de atrás apoyada en el suelo sobre un cojín doblado, empeine '
             + 'apoyado; tronco erguido, manos en la rodilla de delante o en una silla. Mete la cola, aprieta el glúteo y avanza la cadera '
             + 'solo un poco. Que tire del cuádriceps es normal; dolor en la rodilla no: más cojín o menos avance' }),
         e('Postura del sastre, apertura lateral (Upavistha Konasana)', [t(60), t(60)],
           { nota: 'Sentado en el suelo, nunca de pie. Sobre un cojín o una toalla doblada, piernas abiertas solo hasta donde den sin '
             + 'forzar: menos de 90° entre las piernas es normal al empezar. Rodillas al techo, manos detrás o delante; inclina el tronco '
             + 'desde la cadera solo si mantienes la espalda recta' }),
-        e('Estiramiento de pectoral en el marco de la puerta', [t(45), t(45), t(45), t(45), t(45), t(45)],
-          { nota: '3 por lado: series 1-3 un lado, 4-6 el otro. Brazo a 90°; sin dolor de hombro' }),
+        e('Estiramiento de pectoral en el marco de la puerta', porLado(veces(3, t(45))),
+          { nota: 'Brazo a 90°; sin dolor de hombro' }),
         e('Estiramiento de dorsal', [t(60), t(60)], { nota: 'Es el de hombro por encima de la cabeza. De rodillas, cadera encima de las '
           + 'rodillas (no sentado en los talones: eso sería Balasana), brazos estirados al frente o codos en una silla; deja caer el pecho' }),
-        e('Zancada hacia el split frontal (Hanumanasana)', [t(30), t(30)],
-          { opcional: true, nota: 'Prueba, una vez al mes: serie 1 pierna izquierda delante, serie 2 la derecha. No es hacer el spagat: '
+        e('Zancada hacia el split frontal (Hanumanasana)', porLado([t(30)]),
+          { opcional: true, nota: 'Prueba, una vez al mes, con cada pierna delante. No es hacer el spagat: '
             + 'zancada lo más baja que puedas, manos en dos sillas o ladrillos, el pie de delante desliza. Mide con cinta métrica de la '
             + 'ingle al suelo; vale cualquier altura' }),
       ] },
@@ -482,6 +492,7 @@ Elevación de piernas colgado: 2 × 8-12 (piernas estiradas; 60-90 s)`),
   },
   {
     id: 'cinco-tres-uno',
+    version: 2,
     nombre: '5/3/1 (Wendler)',
     autor: 'Jim Wendler, resumido con palabras propias',
     resumen: 'Cuatro días por semana, uno por básico: sentadilla, press de banca, peso muerto y press militar. Ciclos de cuatro semanas.',
@@ -501,7 +512,7 @@ Elevación de piernas colgado: 2 × 8-12 (piernas estiradas; 60-90 s)`),
         e('Peso muerto', [programa('531')]), e('Zancadas', series(3, 8, 12)), e('Elevaciones de piernas', series(3, 10, 15)),
       ] },
       { nombre: 'Press de banca', ejercicios: [
-        e('Press de banca', [programa('531')]), e('Remo con mancuerna', series(3, 8, 12)), e('Press inclinado con mancuernas', series(3, 8, 12)),
+        e('Press de banca', [programa('531')]), e('Remo con mancuerna', alternos(series(3, 8, 12))), e('Press inclinado con mancuernas', series(3, 8, 12)),
       ] },
       { nombre: 'Sentadilla', ejercicios: [
         e('Sentadilla', [programa('531')]), e('Curl femoral tumbado', series(3, 10, 12)), e('Plancha', series(3, 30, 60)),
@@ -550,6 +561,7 @@ Elevación de piernas colgado: 2 × 8-12 (piernas estiradas; 60-90 s)`),
   },
   {
     id: 'calistenia-cuerpo-entero',
+    version: 2,
     nombre: 'Calistenia: cuerpo entero',
     autor: 'Propuesta de la app',
     resumen: 'Solo con tu peso, una barra y unas paralelas (o un parque). Tres días por semana.',
@@ -561,7 +573,7 @@ Elevación de piernas colgado: 2 × 8-12 (piernas estiradas; 60-90 s)`),
       { nombre: 'Cuerpo entero', ejercicios: [
         e('Flexiones', series(3, 5, 15), { nota: 'Con rodillas si no llegas a 5' }),
         e('Dominadas', series(3, 3, 10), { nota: 'O remo invertido si aún no salen' }),
-        e('Sentadilla a una pierna', series(3, 5, 12), { nota: 'Empieza con sentadilla normal o con apoyo' }),
+        e('Sentadilla a una pierna', alternos(series(3, 5, 12)), { nota: 'Empieza con sentadilla normal o con apoyo' }),
         e('Fondos de tríceps', series(3, 5, 12), { nota: 'En paralelas o en banco' }),
         e('Remo invertido', series(3, 8, 15)),
         e('Puente de glúteo', series(3, 10, 20)),
@@ -574,6 +586,12 @@ Elevación de piernas colgado: 2 × 8-12 (piernas estiradas; 60-90 s)`),
 
 // Plantilla de serie para un ejercicio a partir de la forma de la plantilla.
 function planDesde(ej, forma) {
+  const plan = planDesdeSinLado(ej, forma);
+  if (forma.lado) plan.lado = forma.lado;
+  return plan;
+}
+
+function planDesdeSinLado(ej, forma) {
   if (forma.tipo === 'bilbo') {
     const plan = serieNuevaPlantilla(ej, { tipo: 'bilbo', progresion: 'bilbo' });
     const generador = { inicial: ej.carga.tipo === 'ninguna' ? 10 : 20, incremento: ej.carga.tipo === 'ninguna' ? 1 : 2.5, cada: 1 };
@@ -615,6 +633,36 @@ export function ejerciciosNuevos(datos, plantilla) {
   return nombres.filter((n) => !tuyos.has(normalizar(n)));
 }
 
+// Los días de una prehecha escrita como lista (no como texto), con las series
+// de cada ejercicio tal como las pide. Si el ejercicio es nuevo o no tenía
+// series, pasan a ser las suyas; si ya las tenía, son «solo de esta rutina»
+// (y reutilizarPlanes cambia después las que ya tenías iguales por las tuyas,
+// para no perder «la última vez»). Cambia `datos`.
+function diasDePlantilla(datos, plantilla, rutinaId) {
+  const porNombre = new Map(datos.ejercicios.filter((x) => !x.archivado && !x.borrado).map((x) => [normalizar(x.nombre), x]));
+  const ejercicioPara = (nombre) => {
+    const clave = normalizar(nombre);
+    if (porNombre.has(clave)) return porNombre.get(clave);
+    const base = CATALOGO.find((c) => normalizar(c.nombre) === clave) ?? { nombre, grupo: '', material: '' };
+    const nuevo = ejercicioDesdeCatalogo(base);
+    nuevo.series = [];
+    datos.ejercicios.push(nuevo);
+    porNombre.set(clave, nuevo);
+    return nuevo;
+  };
+  return plantilla.dias.map((dia) => ({ id: nuevoId('dia'), nombre: dia.nombre, ejercicios: dia.ejercicios.map((item) => {
+    const ej = ejercicioPara(item.nombre);
+    ej.series ??= [];
+    const propias = !ej.series.some((p) => !p.soloRutina);
+    const planes = item.series.map((forma) => ({ ...planDesde(ej, forma), soloRutina: propias ? null : rutinaId }));
+    ej.series.push(...planes);
+    return { ejercicioId: ej.id, opcional: Boolean(item.opcional), series: propias ? null : planes.map((p) => p.id), nota: item.nota ?? null };
+  }) }));
+}
+
+// Las rutinas de estirar, movilidad y yoga se hacen en casa: la de casa si la tienes.
+const sedeDeCasa = (datos) => (datos.sedes ?? []).find((x) => !x.archivado && x.tipo === 'casa')?.id ?? null;
+
 // Añade la rutina y los ejercicios que falten. Cambia `datos` (dentro de
 // estado.cambiar) y devuelve el id de la rutina nueva.
 export function anadirPlantilla(datos, plantilla) {
@@ -624,28 +672,17 @@ export function anadirPlantilla(datos, plantilla) {
     rutina.plantilla = plantilla.id;
     rutina.versionPlantilla = plantilla.version ?? 1;
     rutina.descripcion = `${plantilla.porQue}\n\n${plantilla.comoSeHace}`;
+    if (tipoDePlantilla(plantilla) === 'flexibilidad') rutina.sedeId = sedeDeCasa(datos);
     return id;
   }
-  const porNombre = new Map(datos.ejercicios.filter((x) => !x.archivado).map((x) => [normalizar(x.nombre), x]));
-  const idDe = (item) => {
-    const clave = normalizar(item.nombre);
-    if (porNombre.has(clave)) return porNombre.get(clave).id;
-    const base = CATALOGO.find((c) => normalizar(c.nombre) === clave) ?? { nombre: item.nombre, grupo: '', material: '' };
-    const nuevo = ejercicioDesdeCatalogo(base);
-    nuevo.series = item.series.map((forma) => planDesde(nuevo, forma));
-    datos.ejercicios.push(nuevo);
-    porNombre.set(clave, nuevo);
-    return nuevo.id;
-  };
   const rutina = {
     id: nuevoId('rut'), nombre: plantilla.nombre, activa: true, diasSemana: null,
-    sedeId: null, plantilla: plantilla.id,
+    sedeId: tipoDePlantilla(plantilla) === 'flexibilidad' ? sedeDeCasa(datos) : null, plantilla: plantilla.id,
+    versionPlantilla: plantilla.version ?? 1,
     descripcion: `${plantilla.porQue}\n\n${plantilla.comoSeHace}`,
-    dias: plantilla.dias.map((dia) => ({
-      id: nuevoId('dia'), nombre: dia.nombre,
-      ejercicios: dia.ejercicios.map((item) => ({ ejercicioId: idDe(item), opcional: Boolean(item.opcional), series: null, nota: item.nota ?? null })),
-    })),
   };
+  rutina.dias = diasDePlantilla(datos, plantilla, rutina.id);
+  reutilizarPlanes(datos, rutina);
   datos.rutinas.push(rutina);
   return rutina.id;
 }
@@ -653,7 +690,7 @@ export function anadirPlantilla(datos, plantilla) {
 // ¿Hay una versión más nueva de la prehecha de la que salió esta rutina?
 export function plantillaNueva(rutina) {
   const p = PLANTILLAS.find((x) => x.id === rutina?.plantilla);
-  return p?.texto && (rutina.versionPlantilla ?? 1) < (p.version ?? 1) ? p : null;
+  return p && (rutina.versionPlantilla ?? 1) < (p.version ?? 1) ? p : null;
 }
 
 // Rehace los días de la rutina con la última versión de su prehecha. Los
@@ -676,10 +713,13 @@ function reutilizarPlanes(datos, rutina) {
       item.series = item.series.map((pid) => {
         const nuevo = ej.series.find((p) => p.id === pid);
         if (!nuevo || nuevo.soloRutina !== rutina.id) return pid;
-        const viejo = ej.series.find((q) => q !== nuevo && !usados.has(q.id) && (q.soloRutina === 'retirada' || !q.soloRutina)
-          && firmaPlan(q) === firmaPlan(nuevo));
+        // Vale una del mismo lado o, si no, una sin lado (que pasa a tenerlo).
+        const sirve = (q, lado) => q !== nuevo && !usados.has(q.id) && (q.soloRutina === 'retirada' || !q.soloRutina)
+          && firmaPlan(q) === firmaPlan(nuevo) && (q.lado ?? null) === lado;
+        const viejo = ej.series.find((q) => sirve(q, nuevo.lado ?? null)) ?? (nuevo.lado ? ej.series.find((q) => sirve(q, null)) : null);
         if (!viejo) return pid;
         usados.add(viejo.id);
+        if (nuevo.lado) viejo.lado = nuevo.lado;
         if (viejo.soloRutina === 'retirada') viejo.soloRutina = rutina.id;
         ej.series = ej.series.filter((p) => p.id !== nuevo.id);
         return viejo.id;
@@ -691,21 +731,25 @@ function reutilizarPlanes(datos, rutina) {
 export function actualizarDesdePlantilla(datos, rutinaId) {
   const rutina = datos.rutinas.find((r) => r.id === rutinaId);
   const plantilla = PLANTILLAS.find((x) => x.id === rutina?.plantilla);
-  if (!rutina || !plantilla?.texto) return false;
+  if (!rutina || !plantilla) return false;
   const conHistorial = new Set(datos.sesiones.flatMap((s) => s.ejercicios.flatMap((x) => x.series.map((y) => y.planId))));
   for (const ej of datos.ejercicios) {
     ej.series = (ej.series ?? []).filter((p) => p.soloRutina !== rutina.id || conHistorial.has(p.id));
     for (const p of ej.series) if (p.soloRutina === rutina.id) p.soloRutina = 'retirada';
   }
-  const idTemporal = crearRutinaDesdeTexto(datos, analizarRutina(plantilla.texto), { nombre: rutina.nombre });
-  const nueva = datos.rutinas.find((r) => r.id === idTemporal);
-  for (const ej of datos.ejercicios) for (const p of ej.series ?? []) if (p.soloRutina === idTemporal) p.soloRutina = rutina.id;
+  let dias;
+  if (plantilla.texto) {
+    const idTemporal = crearRutinaDesdeTexto(datos, analizarRutina(plantilla.texto), { nombre: rutina.nombre });
+    dias = datos.rutinas.find((r) => r.id === idTemporal).dias;
+    for (const ej of datos.ejercicios) for (const p of ej.series ?? []) if (p.soloRutina === idTemporal) p.soloRutina = rutina.id;
+    datos.rutinas = datos.rutinas.filter((r) => r.id !== idTemporal);
+  } else dias = diasDePlantilla(datos, plantilla, rutina.id);
   // Cada día conserva su id (por orden): así la app sabe por qué día vas.
-  nueva.dias.forEach((dia, k) => { if (rutina.dias[k]) dia.id = rutina.dias[k].id; });
-  rutina.dias = nueva.dias;
+  dias.forEach((dia, k) => { if (rutina.dias[k]) dia.id = rutina.dias[k].id; });
+  rutina.dias = dias;
   reutilizarPlanes(datos, rutina);
   rutina.descripcion = `${plantilla.porQue}\n\n${plantilla.comoSeHace}`;
   rutina.versionPlantilla = plantilla.version ?? 1;
-  datos.rutinas = datos.rutinas.filter((r) => r.id !== idTemporal);
+  if (tipoDePlantilla(plantilla) === 'flexibilidad' && !rutina.sedeId) rutina.sedeId = sedeDeCasa(datos);
   return true;
 }
