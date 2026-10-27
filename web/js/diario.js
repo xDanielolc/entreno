@@ -120,6 +120,7 @@ export function apuntarEnDiario(datos, fecha, campo, valor) {
 
 const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 const masDias = (fechaISO, n) => { const d = new Date(`${fechaISO}T12:00:00`); d.setDate(d.getDate() + n); return iso(d); };
+const diasEntre = (a, b) => Math.round((new Date(`${b}T12:00:00`) - new Date(`${a}T12:00:00`)) / 86_400_000);
 const diaSemana = (fechaISO) => new Date(`${fechaISO}T12:00:00`).getDay();
 
 const media = (xs) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null);
@@ -285,10 +286,11 @@ export function horaAcostarse(datos, hoy = hoyISO()) {
 //   · **Se decide sobre medias de 7 tests, no sobre un día suelto**, y solo se
 //     llama cambio a lo que pasa del 11-12 % respecto a la base (2,77 × el
 //     error típico de Thompson 2022, el cambio mínimo detectable).
-//   · **La línea base son los días 1 al 21** (decisión de Dan, 26-10-2026). El
-//     PVT no tiene curva de aprendizaje (Langner 2023; Graw 2004), pero los
-//     primeros días hay ruido de familiarización y no hay nada publicado
-//     sobre cuántos hacen falta.
+//   · **La línea base son los primeros 5 tests**, sin plazo (decisión de Dan,
+//     26 y 27-10-2026). El PVT no tiene curva de aprendizaje (Langner 2023;
+//     Graw 2004), así que no hay por qué tirar los primeros días, y no hay
+//     nada publicado sobre cuántos tests hacen falta: 5 es una decisión de la
+//     app, no una cifra de la literatura.
 export const MODOS_PVT = {
   min3: { etiqueta: '3 min', corto: '3 min', minutos: 3, duracionMs: 3 * 60 * 1000, isiMinMs: 1000, isiMaxMs: 4000, lapsoMs: 355, esperaMaxMs: 10_000 },
   min5: { etiqueta: '5 min', corto: '5 min', minutos: 5, duracionMs: 5 * 60 * 1000, isiMinMs: 2000, isiMaxMs: 10_000, lapsoMs: 500, esperaMaxMs: 30_000 },
@@ -300,11 +302,16 @@ export const ANTICIPACION_PVT_MS = 100;
 // Cambio mínimo detectable: 2,77 × el error típico del 4,1-4,4 % de Thompson
 // 2022. Por debajo, es la variación normal de uno mismo.
 export const CAMBIO_REAL_PVT = 0.115;
-// Sobre cuántos tests se decide, y qué días forman la línea base.
+// Sobre cuántos tests se decide y cuáles forman la línea base.
 export const TESTS_MEDIA_MOVIL = 7;
-export const DIA_INICIO_BASE = 1;
-export const DIA_FIN_BASE = 21;
 export const TESTS_MINIMOS_BASE = 5;
+// La base no tiene plazo: son los primeros 5 tests, lleguen cuando lleguen
+// (decisión de Dan, 27-10-2026). Antes había una ventana de 21 días y, si no
+// se llegaba a 5 dentro de ella, la base no se calculaba nunca: un punto
+// muerto. Lo que queda del número es solo un aviso: si esos 5 tests acaban
+// repartidos en más de 21 días, la base retrata dos épocas en vez de una y la
+// app lo dice al compararte.
+export const DIAS_BASE_SEGUIDA = 21;
 // El aviso de la mañana, si no se pone otra hora: media hora después de la
 // hora de levantarse que ya está en el perfil.
 export const AVISO_PVT_TRAS_LEVANTARSE_MIN = 30;
@@ -369,23 +376,25 @@ export function mediaMovilPVT(datos, modo) {
   return suyos.length ? { ...resumirTests(suyos), desde: suyos[0].fecha, hasta: suyos.at(-1).fecha } : null;
 }
 
-// Tu línea base de una duración: los tests de los días 1 al 21 contando desde
-// el primero que hiciste de esa duración. Dan eligió el 26-10-2026 contar desde
-// el primer día en vez de tirar la primera semana, para tener base antes; el
-// test no tiene curva de aprendizaje (Langner 2023; Graw 2004), así que el
-// riesgo es solo el ruido de los primeros días. Devuelve
-// { falta: 'dias' | 'tests', … } mientras no se pueda calcular: antes que un
-// número flojo, ninguno.
+// Tu línea base de una duración: tus primeros 5 tests de esa duración, sin
+// plazo. Dan eligió el 26-10-2026 contar desde el primer test en vez de tirar
+// la primera semana (el test no tiene curva de aprendizaje: Langner 2023;
+// Graw 2004) y el 27-10-2026 quitar la ventana de 21 días, que podía dejar la
+// base sin calcular para siempre. Si los 5 acaban repartidos en más de
+// DIAS_BASE_SEGUIDA días, se marca `repartida` para avisar al compararse.
+// Devuelve { falta: 'dias' | 'tests', … } mientras no se pueda calcular:
+// antes que un número flojo, ninguno.
 export function baseDePVT(datos, modo) {
-  const todos = testsPVT(datos, modo);
+  const todos = testsPVT(datos, modo).filter((t) => t.velocidad > 0);
   if (!todos.length) return { falta: 'dias', tests: 0, dias: 0 };
   const primero = todos[0].fecha;
-  const desde = masDias(primero, DIA_INICIO_BASE - 1);
-  const hasta = masDias(primero, DIA_FIN_BASE - 1);
-  const dentro = todos.filter((t) => t.fecha >= desde && t.fecha <= hasta && t.velocidad > 0);
-  if (dentro.length < TESTS_MINIMOS_BASE) {
-    return { falta: 'tests', desde, hasta, primero, tests: dentro.length };
+  if (todos.length < TESTS_MINIMOS_BASE) {
+    return { falta: 'tests', primero, tests: todos.length, faltan: TESTS_MINIMOS_BASE - todos.length };
   }
+  const dentro = todos.slice(0, TESTS_MINIMOS_BASE);
+  const desde = dentro[0].fecha;
+  const hasta = dentro.at(-1).fecha;
+  const abarca = diasEntre(desde, hasta) + 1;
   // Primero se promedia cada día (puede tener dos tests) y luego los días.
   const porDia = new Map();
   for (const t of dentro) {
@@ -400,6 +409,8 @@ export function baseDePVT(datos, modo) {
     desde,
     hasta,
     primero,
+    abarca,
+    repartida: abarca > DIAS_BASE_SEGUIDA,
     velocidad: media(dias.map((ts) => media(ts.map((t) => t.velocidad)))),
     mediaMs: media(dias.map((ts) => media(ts.map((t) => t.mediaMs).filter((v) => v > 0))).filter((v) => v != null)),
     lapsos: media(dias.map((ts) => media(ts.map((t) => t.lapsos ?? 0)))),
@@ -429,4 +440,151 @@ export function horaAvisoPvt(datos) {
 // es para no olvidarse, no para exigir una en concreto.
 export function faltaPvtHoy(datos, fecha = hoyISO()) {
   return pvtDelDia(datos, fecha).length === 0;
+}
+
+// ---------------------------------------------------------------------------
+// Cribado del sueño: ¿hay algo que arreglar antes de tocar las horas?
+// ---------------------------------------------------------------------------
+//
+// Sale de la investigación del 27-10-2026 (informe 07 de «Investigación
+// sueño»). Lo que este cribado NO es: un diagnóstico. La guía de la American
+// Academy of Sleep Medicine es explícita y con recomendación fuerte en que los
+// cuestionarios no deben usarse para diagnosticar apnea sin una prueba del
+// sueño (Kapur 2017, J Clin Sleep Med, PMID 28162150). Esto solo decide si
+// merece la pena pedir cita.
+//
+// Lo segundo que conviene tener claro antes de contestarlo: corregir lo que
+// salga aquí no va a quitarte horas de sueño. El único estudio que ha medido
+// la duración habitual antes y después de tratar un trastorno del sueño (57
+// pacientes con apnea, actigrafía 7 días, 3 meses de CPAP) no encontró cambio
+// de grupo: 354,0 min antes y 353,0 min después, p = 0,87, y eso con la
+// eficiencia y la fragmentación ya mejoradas (Tachikawa 2017, Ann Am Thorac
+// Soc, PMID 28326793). Lo que se gana es el día siguiente.
+//
+// Los ocho primeros son el STOP-BANG (Chung 2008, Anesthesiology, PMID
+// 18431116): ronquido, cansancio, apneas observadas y tensión, más índice de
+// masa corporal, edad, cuello y sexo. Aviso importante para quien lo conteste
+// siendo joven, delgado y hombre: por ser hombre ya se suma un punto y cuatro
+// de los ocho son inalcanzables, así que el cuestionario funciona peor justo
+// en ese perfil. Su especificidad agrupada es de 0,40 (Li 2024, Sleep Breath,
+// PMID 39601864): un resultado positivo es un «no descartado», no un
+// «probable».
+//
+// Los de las piernas son los cuatro criterios esenciales del síndrome de
+// piernas inquietas, más una pregunta sobre patadas observadas, que es el
+// único indicio casero de los movimientos periódicos de las piernas: el
+// hallazgo que mejor encaja con «duermo mucho y no descanso» (índice > 15/h:
+// 7,1 h de sueño frente a 6,9 h, sueño profundo del 17,6 % frente al 20,6 %,
+// microdespertares 26,5/h frente a 19,2/h, y sin somnolencia que lo delate;
+// Haba-Rubio 2018, Sleep Med, PMID 29425577).
+
+export const CRIBADO_SUENO = [
+  { clave: 'apnea', titulo: 'Respiración por la noche', nota: 'Las ocho primeras son el cuestionario STOP-BANG.', preguntas: [
+    { clave: 'ronca', texto: '¿Roncas fuerte?', ayuda: 'Fuerte quiere decir que se oye a través de una puerta cerrada, o que alguien te lo ha dicho.' },
+    { clave: 'cansancio', texto: '¿Estás cansado o con sueño durante el día casi todos los días?' },
+    { clave: 'apneas', texto: '¿Alguien te ha visto dejar de respirar mientras duermes?', ayuda: 'Es la pregunta de más peso de todas. Si duermes solo y no puedes saberlo, contesta que no.' },
+    { clave: 'tension', texto: '¿Tienes la tensión alta o tomas algo para ella?' },
+    { clave: 'imc', texto: '¿Tu índice de masa corporal pasa de 35?', ayuda: 'Es tu peso en kilos dividido entre tu altura en metros al cuadrado. Con 1,80 m de altura, 35 son unos 113 kg.' },
+    { clave: 'edad', texto: '¿Tienes más de 50 años?' },
+    { clave: 'cuello', texto: '¿Tu cuello mide más de 40 cm de contorno?', ayuda: 'Con una cinta métrica, a la altura de la nuez.' },
+    { clave: 'varon', texto: '¿Eres hombre?' },
+    { clave: 'atragantado', texto: '¿Te despiertas de noche atragantado o con sensación de ahogo?', ayuda: 'Esta y las dos siguientes no puntúan en el STOP-BANG, pero son las que más dicen en alguien joven y delgado.' },
+    { clave: 'bocaSeca', texto: '¿Te despiertas con la boca muy seca?' },
+    { clave: 'cabeza', texto: '¿Te despiertas con dolor de cabeza?' },
+  ] },
+  { clave: 'piernas', titulo: 'Las piernas', preguntas: [
+    { clave: 'urgencia', texto: '¿Sientes una necesidad imperiosa de mover las piernas, normalmente con una sensación desagradable?' },
+    { clave: 'reposo', texto: '¿Esa necesidad aparece o empeora cuando estás quieto o en reposo?' },
+    { clave: 'alivio', texto: '¿Se alivia, al menos en parte, si te mueves o andas?' },
+    { clave: 'noche', texto: '¿Es peor por la tarde o por la noche que por la mañana?' },
+    { clave: 'patadas', texto: '¿Te han dicho que das patadas mientras duermes, o amaneces con las sábanas revueltas por los pies?', ayuda: 'Es el único indicio casero de los movimientos periódicos de las piernas, que no se detectan con un reloj.' },
+  ] },
+  { clave: 'nariz', titulo: 'La nariz', preguntas: [
+    { clave: 'tapada', texto: '¿Se te tapa la nariz por la noche?' },
+    { clave: 'boca', texto: '¿Duermes o te despiertas respirando por la boca?' },
+  ] },
+  { clave: 'sustancias', titulo: 'Lo que tomas', preguntas: [
+    { clave: 'alcohol', texto: '¿Bebes alcohol tres noches o más por semana?' },
+    { clave: 'cannabis', texto: '¿Fumas cannabis casi a diario?' },
+    { clave: 'antihistaminicos', texto: '¿Tomas antihistamínicos para dormir?' },
+    { clave: 'antidepresivos', texto: '¿Tomas antidepresivos?', ayuda: 'No para que los dejes, que eso no se hace por una app. Es que son un predictor independiente de los movimientos periódicos de las piernas.' },
+  ] },
+];
+
+export const PREGUNTAS_CRIBADO = CRIBADO_SUENO.flatMap((g) => g.preguntas.map((p) => `${g.clave}.${p.clave}`));
+const ITEMS_STOP_BANG = ['ronca', 'cansancio', 'apneas', 'tension', 'imc', 'edad', 'cuello', 'varon'];
+
+export const cribadoCompleto = (datos) => {
+  const r = datos?.cribadoSueno?.respuestas;
+  return !!r && PREGUNTAS_CRIBADO.every((k) => typeof r[k] === 'boolean');
+};
+
+// El veredicto. Devuelve avisos ordenados por urgencia, cada uno con su porqué
+// y su fuente, y nunca un diagnóstico. `prioridad`: 'alta' es «pide cita»,
+// 'media' es «coméntalo», 'baja' es «esto lo arreglas tú».
+export function veredictoCribado(respuestas) {
+  const si = (k) => respuestas?.[k] === true;
+  const avisos = [];
+  const stopBang = ITEMS_STOP_BANG.filter((k) => si(`apnea.${k}`)).length;
+
+  if (si('apnea.apneas') || si('apnea.atragantado')) {
+    avisos.push({ prioridad: 'alta', titulo: 'Pide cita y una prueba del sueño',
+      texto: 'Que alguien te vea dejar de respirar, o despertarte atragantado, no es un síntoma menor: solo el 6 % de la población lo refiere, y es el ítem de más peso del cuestionario. Lo que toca es una poligrafía respiratoria en casa o una polisomnografía, no más autoevaluación.',
+      fuente: 'Durán 2001, Am J Respir Crit Care Med, PMID 11254524; Chung 2008, PMID 18431116' });
+  } else if (stopBang >= 3 && (si('apnea.ronca') || si('apnea.bocaSeca') || si('apnea.cabeza'))) {
+    avisos.push({ prioridad: 'alta', titulo: `Coméntalo con tu médico: ${stopBang} puntos de 8 y síntomas de noche`,
+      texto: 'Con 3 puntos ya se considera riesgo, aunque en alguien joven y delgado el cuestionario infla el resultado (por ser hombre ya suma 1 y cuatro ítems son inalcanzables). Y la apnea no se descarta por estar delgado: el 23,5 % de quienes la tienen está en peso normal y el 44,4 % solo en sobrepeso.',
+      fuente: 'Esmaeili 2025, EClinicalMedicine, PMID 40330547; Nagappa 2015, PLoS One, PMID 26658438' });
+  } else if (stopBang >= 3) {
+    avisos.push({ prioridad: 'media', titulo: `${stopBang} puntos de 8 en el cuestionario de apnea`,
+      texto: 'Puntúa, pero sin ningún síntoma nocturno que lo acompañe. Vale la pena mencionarlo si vas al médico por otra cosa, no pedir cita solo por esto.',
+      fuente: 'Li 2024, Sleep Breath, PMID 39601864 (especificidad de 0,40: positivo significa «no descartado»)' });
+  }
+
+  const criterios = ['urgencia', 'reposo', 'alivio', 'noche'].filter((k) => si(`piernas.${k}`)).length;
+  if (criterios === 4) {
+    avisos.push({ prioridad: 'alta', titulo: 'Cumples los cuatro criterios del síndrome de piernas inquietas',
+      texto: 'Es un diagnóstico clínico, sin prueba: se cumple o no en la entrevista. Pide cita y que te miren de paso la ferritina y el índice de saturación de transferrina. En el estudio poblacional más grande, solo el 6,2 % de quienes lo sufrían tenía el diagnóstico puesto.',
+      fuente: 'Allen 2005 (estudio REST), Sleep Med, PMID 15956009; criterios esenciales del IRLSSG' });
+  } else if (criterios === 3) {
+    avisos.push({ prioridad: 'media', titulo: 'Cumples tres de los cuatro criterios de piernas inquietas',
+      texto: 'Con tres no se cumple la definición, pero conviene volver a mirarlo dentro de unas semanas por si aparece el cuarto.',
+      fuente: 'Criterios esenciales del IRLSSG' });
+  }
+
+  if (si('piernas.patadas')) {
+    avisos.push({ prioridad: 'alta', titulo: 'Las patadas de noche piden una polisomnografía completa',
+      texto: 'Los movimientos periódicos de las piernas son el único hallazgo asociado a dormir más horas y descansar menos: más sueño superficial, menos sueño profundo, muchos más microdespertares y, lo peor para detectarlo, sin somnolencia de día que lo delate. No se miden con un reloj ni con una poligrafía respiratoria: hacen falta electrodos en las piernas.',
+      fuente: 'Haba-Rubio 2018, Sleep Med, PMID 29425577' });
+  }
+
+  if (si('sustancias.antidepresivos') && (criterios >= 3 || si('piernas.patadas'))) {
+    avisos.push({ prioridad: 'media', titulo: 'Dilo en la consulta: tomas antidepresivos',
+      texto: 'Son un predictor independiente de los movimientos periódicos de las piernas. No se tocan por tu cuenta ni por lo que diga una app, pero quien te trate tiene que saberlo.',
+      fuente: 'Haba-Rubio 2016, Ann Neurol, PMID 26703954' });
+  }
+
+  if (si('nariz.tapada') || si('nariz.boca')) {
+    avisos.push({ prioridad: 'media', titulo: 'La nariz, con expectativas realistas',
+      texto: 'Tratar una rinitis mejora la calidad del sueño de forma pequeña (d = 0,29) y no mejora nada la somnolencia de día (p = 0,907). Merece la pena por lo primero; no esperes lo segundo.',
+      fuente: 'Tabata 2025, Int Arch Allergy Immunol, PMID 39471798' });
+  }
+
+  if (si('sustancias.alcohol')) {
+    avisos.push({ prioridad: 'baja', titulo: 'El alcohol, las noches que lo haya',
+      texto: 'Rompe el sueño REM ya a dos copas y sube el pulso nocturno. Esto no necesita médico: necesita noches sin él, y verlo en tu propio diario.',
+      fuente: 'Gardiner 2025, Sleep Med Rev, PMID 39631226' });
+  }
+  if (si('sustancias.cannabis')) {
+    avisos.push({ prioridad: 'baja', titulo: 'El cannabis a diario',
+      texto: 'El consumo diario se asocia a un 21 % más de tiempo despierto dentro de la noche.',
+      fuente: 'Velzeboer 2026, Sleep, PMID 41408729' });
+  }
+  if (si('sustancias.antihistaminicos')) {
+    avisos.push({ prioridad: 'baja', titulo: 'Los antihistamínicos para dormir no son una solución',
+      texto: 'Dejan resaca al día siguiente y a los tres días ya no sedan: el cuerpo se acostumbra. Lo que queda es el efecto de la mañana.',
+      fuente: 'Katayose 2012, PMID 22806823; Richardson 2002, PMID 12352276' });
+  }
+
+  return { stopBang, criteriosPiernas: criterios, avisos };
 }

@@ -12,6 +12,7 @@
 // cuenta como choque.
 
 const COLECCIONES = ['sedes', 'ejercicios', 'rutinas', 'sesiones', 'diario', 'medidas', 'fotos'];
+const SUELTOS = ['cribadoSueno'];
 
 const igual = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const esObjeto = (x) => x != null && typeof x === 'object' && !Array.isArray(x);
@@ -25,6 +26,11 @@ export function fusionar(base, local, remoto) {
     datos[c] = fusionarLista(base ? base[c] ?? [] : null, local[c] ?? [], remoto[c] ?? [], c, choques);
   }
   datos.perfil = fusionarObjeto(base ? base.perfil ?? {} : null, local.perfil ?? {}, remoto.perfil ?? {}, 'perfil', choques);
+  // Datos sueltos que no son listas: el cribado del sueño (v29), entero.
+  for (const k of SUELTOS) {
+    const v = elegir(base ? base[k] : undefined, local[k], remoto[k], Boolean(base), k, choques);
+    if (v === undefined) delete datos[k]; else datos[k] = v;
+  }
   datos.revision = Math.max(local.revision ?? 0, remoto.revision ?? 0) + 1;
   return { datos, choques };
 }

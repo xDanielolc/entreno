@@ -5,7 +5,8 @@
 //
 // De aquí salen también las dos tarjetas de Inicio: la hora de acostarse de
 // esta semana (`tarjetaHoraAcostarse`) y el recordatorio del test de atención
-// (`tarjetaPvtPendiente`). El test en sí está en `vistas/pvt.js`.
+// (`tarjetaPvtPendiente`). El test en sí está en `vistas/pvt.js` y el cribado
+// del sueño, que se hace una vez, en `vistas/cribado.js`.
 import * as estado from '../estado.js';
 import { formatearNumero } from '../calculos.js';
 import { apuntarPeso, quitarPeso } from '../peso.js';
@@ -16,6 +17,7 @@ import {
 } from '../diario.js';
 import { colores, graficaLineas } from './graficas.js';
 import { abrirPVT, activarAvisoPvt, avisoPvtActivo, faltaPermisoPvt, ofrecerPvtTrasDiario, programarAvisoPvt, puedeAvisarPvt } from './pvt.js';
+import { tarjetaCribado } from './cribado.js';
 import { anadir, aviso, ayuda, fechaCorta, h, hoyISO, leerNumero } from '../ui.js';
 
 // El día que se edita arriba (por defecto, hoy). Se elige tocando una fila.
@@ -128,6 +130,7 @@ export function vistaDiario(contenedor) {
       } }, 'Guardar el día')),
 
     tarjetaPVT(d, fecha, hoy),
+    tarjetaCribado(d),
     tablaDias(d, fecha),
     resumen(d, hoy),
     graficas(d, necesidad),
@@ -190,7 +193,7 @@ const AYUDA_PVT = [
   'El dato principal es la velocidad de respuesta (respuestas por segundo: la media de 1 dividido entre cada tiempo de reacción). Los lapsos, que son las reacciones tan lentas que cuentan como despiste, se apuntan pero sirven de poco en alguien descansado: con 7 h en cama la velocidad baja y los lapsos no suben (Belenky 2003), así que mirando solo los lapsos un recorte de sueño parece gratis cuando no lo es.',
   'Tres duraciones: 3, 5 y 10 minutos. Viene marcada la de 5 porque es la única con un cambio mínimo detectable publicado (Thompson 2022): por debajo de un 11-12 % de diferencia no es un cambio, es ruido. Sus números no se mezclan nunca entre sí: en gente descansada el de 3 min y el de 10 ni siquiera se parecen (r = 0,134; Antler 2022, 83 adultos).',
   'No hay baremos publicados de ninguna versión (Taillard 2024, PMID 38401239): te comparas contigo y con nadie más. Y tocar una pantalla táctil añade unos 68 ms (Arsintescu 2017), así que hazlo siempre con el mismo móvil y en la misma postura, a la misma hora, antes del té o el café.',
-  'La app decide sobre la media de tus últimos 7 tests, nunca sobre un día suelto. Y tu línea base la forman tus primeros 5 tests, con un plazo de 21 días desde el primero para hacerlos.',
+  'La app decide sobre la media de tus últimos 7 tests, nunca sobre un día suelto. Y tu línea base la forman tus primeros 5 tests, sin plazo: si acaban repartidos en más de 21 días, la app te lo dice al compararte.',
 ];
 
 // En el día de hoy: el botón para hacerlo, lo que hayas hecho ya y el aviso de

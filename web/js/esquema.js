@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 28;
+export const VERSION_ACTUAL = 29;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -232,6 +232,7 @@ export function archivoNuevo({ nombre = '', correo = null } = {}) {
     diario: [],
     medidas: [],
     fotos: [],
+    cribadoSueno: null,
   };
 }
 
@@ -630,6 +631,17 @@ const MIGRACIONES = {
     datos.medidas ??= [];
     datos.fotos ??= [];
     datos.version = 28;
+    return datos;
+  },
+  // v28 → v29: cribado del sueño (investigación del 27-10-2026, conversación
+  // del sueño). `cribadoSueno`: { fecha, version, respuestas } con una
+  // respuesta de sí o no por pregunta, en claves «grupo.pregunta»
+  // (`CRIBADO_SUENO` en `diario.js`). Se contesta una vez y se puede repetir;
+  // solo se guarda entero. Nada que convertir: quien no lo haya hecho se queda
+  // en null.
+  28: (datos) => {
+    datos.cribadoSueno ??= null;
+    datos.version = 29;
     return datos;
   },
 };

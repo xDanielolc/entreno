@@ -1542,3 +1542,12 @@ Esquema v28 (`medidas[]`, `fotos[]`, y en el perfil `medidasPropias`, `recordsHo
 - 0.69.4: tortuga tumbada (Supta Kurmasana) con dibujo de Gemini, por fin: con la lámina del libro de Kaminoff de modelo
   (`imagenes-ia/arreglos/modelo-tortuga-tumbada.png`, fuera de Git) y después la cabeza lisa en conversación nueva. Ya no
   queda ningún ejercicio con muñeco en vector. Almacén `entreno-imagenes-51`.
+
+## Ronda 0.70.0 (28-10-2026): cribado del sueño
+
+Esquema v29. Hecho por la conversación del sueño y publicado desde aquí: cribado del sueño (22 preguntas de sí o no,
+una sola vez, desde la pestaña Sueño; `vistas/cribado.js`, preguntas y veredicto en `diario.js`) para descartar apnea,
+piernas inquietas, nariz y sustancias antes de tocar las horas; da avisos con prioridad y fuente, nunca un diagnóstico.
+La línea base del test de atención deja de tener plazo: son los primeros 5 tests, lleguen cuando lleguen, con aviso si
+quedan repartidos en más de 21 días. `cribadoSueno` va en la raíz de los datos: `fusion.js` lo funde con `SUELTOS`
+(si no, al juntar el móvil con Drive se perdía el de un lado).

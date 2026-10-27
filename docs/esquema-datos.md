@@ -646,3 +646,7 @@ la vez, a veces sin cobertura):
   `recordsHoy` ([{ `ejercicioId`, `tipo` }], los récords que salen en Hoy; sin
   él, los de los básicos) y `retos` (`false` quita los retos del mes de Hoy).
   Nada que convertir.
+- **v29 (cribado del sueño, 28-10-2026).** `cribadoSueno` en la raíz de los
+  datos: { `fecha`, `version`, `respuestas` } (sí o no por pregunta, claves
+  «grupo.pregunta», `CRIBADO_SUENO` en `web/js/diario.js`), o null si no se ha
+  hecho. `fusion.js` lo funde entero (`SUELTOS`). Nada que convertir.
