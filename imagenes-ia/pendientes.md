@@ -76,3 +76,10 @@ Pendiente de lo que pidió:
   dos fases), fondos asistidos (el de antes es de paralelas).
 - Línea gruesa como la de Everkinetic en los de IA (crunch, elevaciones laterales).
 - flexiones-en-pino (22-10, con la pared): en la segunda fase el cuerpo se inclina y los pies resbalan por la pared, y la pared cambia de distancia. Descartado.
+
+## 27-10-2026 (rutinas de estirar de Dan)
+- rotacion-90-90: otra vez con las piernas cruzadas (Gemini no entiende la Z de las dos piernas). Sigue el muñeco.
+- rotacion-toracica-en-cuadrupedia: primero tres brazos; luego las dos posturas iguales. Sigue el muñeco.
+- estiramiento-de-los-dedos-del-pie: otra vez de rodillas en zancada, no sentado sobre los talones. Sigue el muñeco.
+- Sin intentar (misma familia, previsiblemente igual): estiramiento-del-empeine, flexion-y-extension-de-dedos-del-pie, rotacion-tibial-con-rodilla-flexionada. Probar con ChatGPT o con una foto de modelo.
+- Truco que sí funcionó: si la IA inclina las dos cabezas al mismo lado, espejo de una figura entera (flexión lateral de cuello) o solo de la cabeza, centrada en el cuello (deslizamiento neural cervical).

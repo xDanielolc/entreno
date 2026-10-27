@@ -1468,7 +1468,7 @@
   "usar": "ia",
   "inicio": "el pie de delante a unos centímetros de la pared, la rodilla de delante recta",
   "final": "la rodilla de delante doblada hacia delante hasta tocar la pared, el talón de ese pie sigue apoyado en el suelo",
-  "ancla": "pies"
+  "ancla": "delante"
  },
  {
   "slug": "rotacion-toracica-en-libro-abierto",
@@ -1529,7 +1529,7 @@
   "usar": "ia",
   "inicio": "una rodilla doblada con el pie en el suelo y la cabeza mirando hacia abajo",
   "final": "esa pierna estirada al frente con la punta del pie hacia arriba y la cabeza mirando hacia arriba",
-  "ancla": "pies"
+  "ancla": "encajar"
  },
  {
   "slug": "deslizamiento-neural-cervical",
@@ -1591,7 +1591,7 @@
   "usar": "ia",
   "inicio": "la cabeza adelantada, con la barbilla por delante del pecho",
   "final": "la cabeza llevada hacia atrás en horizontal, metiendo la barbilla (papada), la mirada al frente, sin inclinar la cabeza",
-  "ancla": "pies"
+  "ancla": "encajar"
  },
  {
   "slug": "flexion-lateral-de-cuello-activa",

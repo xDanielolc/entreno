@@ -1488,3 +1488,8 @@ Encargo de la conversación de flexibilidad tras la prueba de Dan (notas en su T
   «Haz un dibujo nuevo a partir de este, idéntico en todo… cambia SOLO las cabezas»; en la misma conversación se inventa otro
   dibujo. La descarga más fiable: clic en la imagen (abre el editor) y su botón de descargar arriba a la derecha.
   `creditos.json` se ajusta a mano tras procesar (el procesado deshace los cinco «-completo»). Almacén `entreno-imagenes-46`.
+- 0.68.2: más dibujos de sus rutinas de estirar que eran muñecos: retracción cervical, rotación externa (codos pegados) e
+  interna (con toalla) de hombro, tobillo con la rodilla a la pared, deslizamientos neurales ciático y cervical (cabeza
+  hacia el brazo y lejos de él: la de una figura se pasó a espejo centrada en el cuello) e isométrico de flexión plantar.
+  Gemini no supo 90/90, rotación torácica a cuatro patas ni sentarse sobre los talones (dedos del pie): siguen los muñecos;
+  apuntado en `imagenes-ia/pendientes.md`. Almacén `entreno-imagenes-47`.

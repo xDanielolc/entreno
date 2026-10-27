@@ -1129,9 +1129,11 @@
    "fuente": "propia"
   },
   "Tobillo con rodilla a la pared": {
-   "archivo": "imagenes/munecos/tobillo-con-rodilla-a-la-pared.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/tobillo-con-rodilla-a-la-pared.webp",
+   "estatica": "imagenes/ejercicios/ia/tobillo-con-rodilla-a-la-pared-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Rotación torácica en libro abierto": {
    "archivo": "imagenes/munecos/rotacion-toracica-en-libro-abierto.svg",
@@ -1688,14 +1690,18 @@
    "fuente": "propia"
   },
   "Deslizamiento neural ciático": {
-   "archivo": "imagenes/munecos/deslizamiento-neural-ciatico.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/deslizamiento-neural-ciatico.webp",
+   "estatica": "imagenes/ejercicios/ia/deslizamiento-neural-ciatico-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Deslizamiento neural cervical": {
-   "archivo": "imagenes/munecos/deslizamiento-neural-cervical.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/deslizamiento-neural-cervical.webp",
+   "estatica": "imagenes/ejercicios/ia/deslizamiento-neural-cervical-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Rotación tibial con rodilla flexionada": {
    "archivo": "imagenes/munecos/rotacion-tibial-con-rodilla-flexionada.svg",
@@ -1750,19 +1756,25 @@
    "autor": "Gemini"
   },
   "Rotación externa de hombro con banda": {
-   "archivo": "imagenes/munecos/rotacion-externa-de-hombro-con-banda.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/rotacion-externa-de-hombro-con-banda.webp",
+   "estatica": "imagenes/ejercicios/ia/rotacion-externa-de-hombro-con-banda-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Rotación interna de hombro con toalla": {
-   "archivo": "imagenes/munecos/rotacion-interna-de-hombro-con-toalla.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/rotacion-interna-de-hombro-con-toalla.webp",
+   "estatica": "imagenes/ejercicios/ia/rotacion-interna-de-hombro-con-toalla-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Retracción cervical (chin tuck)": {
-   "archivo": "imagenes/munecos/retraccion-cervical-chin-tuck.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/retraccion-cervical-chin-tuck.webp",
+   "estatica": "imagenes/ejercicios/ia/retraccion-cervical-chin-tuck-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Flexión lateral de cuello activa": {
    "archivo": "imagenes/ejercicios/ia/flexion-lateral-de-cuello-activa.webp",
@@ -1810,9 +1822,11 @@
    "fuente": "propia"
   },
   "Isométrico de flexión plantar": {
-   "archivo": "imagenes/munecos/isometrico-de-flexion-plantar.svg",
-   "autor": "dibujo propio de la app",
-   "fuente": "propia"
+   "archivo": "imagenes/ejercicios/ia/isometrico-de-flexion-plantar-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/isometrico-de-flexion-plantar-quieta.webp",
+   "animada": false,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Estiramiento del empeine": {
    "archivo": "imagenes/munecos/estiramiento-del-empeine.svg",
