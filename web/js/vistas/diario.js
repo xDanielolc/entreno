@@ -18,6 +18,7 @@ import {
 import { colores, graficaLineas } from './graficas.js';
 import { abrirPVT, activarAvisoPvt, avisoPvtActivo, faltaPermisoPvt, ofrecerPvtTrasDiario, programarAvisoPvt, puedeAvisarPvt } from './pvt.js';
 import { tarjetaCribado } from './cribado.js';
+import { abrirHistoricoPVT, modosConTests } from './historico-pvt.js';
 import { anadir, aviso, ayuda, fechaCorta, h, hoyISO, leerNumero } from '../ui.js';
 
 // El día que se edita arriba (por defecto, hoy). Se elige tocando una fila.
@@ -212,6 +213,9 @@ function tarjetaPVT(d, fecha, hoy) {
       ? h('button', { type: 'button', class: 'boton grande', onclick: () => abrirPVT({ alCerrar: () => estado.emitir('vista') }) },
         hechos.length ? 'Hacer otro test' : 'Hacer el test')
       : h('p', { class: 'nota' }, 'El test se apunta en el día en que se hace.'),
+    modosConTests(d).length
+      ? h('button', { type: 'button', class: 'boton secundario', onclick: () => abrirHistoricoPVT() }, 'Ver el histórico')
+      : null,
     esHoy && filaAvisoPVT(d));
 }
 

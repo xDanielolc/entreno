@@ -1564,3 +1564,8 @@ Esquema v30 (`sedesBasicas` en esquema.js: Gimnasio, Casa y Calle de serie, el q
   la línea «Mide…» y vale para el ejercicio. La escala de la mano, en rejilla de dos columnas.
 - Descanso entre estiramientos: la barra dice «suelta, respira y colócate» y, la primera vez de cada entreno, un aviso
   explica qué hacer en ese rato.
+- 0.71.1: histórico del test de atención (`vistas/historico-pvt.js`, hecho por la conversación del sueño), en un cartel
+  con «Ver el histórico» desde la tarjeta del test en Sueño. Cada duración por separado (la de 3 min no correlaciona con
+  la de 10: Antler 2022), la velocidad de respuesta como medida principal en vez de los lapsos (Belenky 2003) y el límite
+  del 11,5 % dibujado, que es el cambio mínimo detectable (Thompson 2022). `graficaLineas` admite `decimalesY` (por
+  defecto 0, así que las gráficas de ejercicio no cambian).

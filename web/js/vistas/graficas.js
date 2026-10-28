@@ -54,9 +54,14 @@ function texto(contenido, props) {
 // Gráfica de líneas
 // ---------------------------------------------------------------------------
 
+// Las marcas del eje Y se escriben con tantos decimales como pida quien
+// llama: en kilos sobran, pero la velocidad del test va de 2,9 a 3,6 resp/s
+// y sin decimales el eje sale «3, 3, 4» (histórico del PVT, 28-10-2026).
+const redondear = (v, decimales) => Math.round(v * 10 ** decimales) / 10 ** decimales;
+
 // `textoX`: cómo se escribe cada valor del eje X (por defecto, el número; en
 // el historial, la fecha).
-export function graficaLineas({ titulo, series, unidad, etiquetaX = 'Día del ciclo', textoX = (x) => x }) {
+export function graficaLineas({ titulo, series, unidad, etiquetaX = 'Día del ciclo', textoX = (x) => x, decimalesY = 0 }) {
   const conDatos = series.filter((s) => s.puntos.length);
   if (!conDatos.length) return null;
 
@@ -84,7 +89,7 @@ export function graficaLineas({ titulo, series, unidad, etiquetaX = 'Día del ci
   },
   // Rejilla, discreta
   marcasY.map((v) => nodo('line', { x1: MARGEN.izquierda, x2: ANCHO - MARGEN.derecha, y1: py(v), y2: py(v), class: 'rejilla' })),
-  marcasY.map((v) => texto(formatearNumero(Math.round(v)), { x: MARGEN.izquierda - 6, y: py(v) + 3, class: 'eje', 'text-anchor': 'end' })),
+  marcasY.map((v) => texto(formatearNumero(redondear(v, decimalesY)), { x: MARGEN.izquierda - 6, y: py(v) + 3, class: 'eje', 'text-anchor': 'end' })),
   marcasX.map((v) => texto(textoX(v), { x: px(v), y: ALTO - 8, class: 'eje', 'text-anchor': anclaX(v) })),
 
   // Una línea por ciclo, con sus puntos y su etiqueta al final
