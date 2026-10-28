@@ -28,7 +28,7 @@ import {
 import { anadir, aviso, nuevoId, confirmar, deslizarParaConfirmar, fechaLarga, h, formatearTiempo, horario, leerNumero, leerTiempo } from '../ui.js';
 import { DESCANSO_ESTIRAMIENTOS_POR_DEFECTO, arrancarDescanso, arrancarRespiracion, barraDescanso, descansoDeTramo, preguntaAvisos, saltarDescanso } from './descanso.js';
 import { cuentaParaFatiga, tipoDeEjercicio } from '../catalogo.js';
-import { ESCALA_MANO, PROGRAMAS, TECNICAS_ESTIRAMIENTO, extraDeSerie, medidasDe, unidadMedida } from '../esquema.js';
+import { ASISTENCIAS, ESCALA_MANO, PROGRAMAS, TECNICAS_ESTIRAMIENTO, extraDeSerie, medidasDe, unidadMedida } from '../esquema.js';
 import { MEDIDAS, medidaApuntada, medidaDe } from '../medidas-estiramiento.js';
 import { ORDEN_MUSCULOS, nombreMusculo } from '../musculos.js';
 import { ESCALA_RECUPERACION, factorPersonal, puntuacionSentida, recuperacionPorMusculo } from '../recuperacion.js';
@@ -54,6 +54,8 @@ let cicloPendiente = null;
 const sedePreguntada = new Set();
 // La serie tras la que corre el descanso: si empiezas a apuntar otra, el
 // descanso cuenta como saltado (Dan, 27-10-2026).
+// Entrenos en los que ya se ha dicho qué hacer entre estiramientos.
+const explicadoEntreEstiramientos = new Set();
 let descansoTrasSerie = null;
 
 export const MODOS_ENTRENO = {
@@ -594,15 +596,29 @@ export function vistaSesion(contenedor, { id }) {
   // Al empezar, dónde estás: Dan hizo en casa dos rutinas que se quedaron
   // como del gimnasio. La que ya viene puesta (la de la rutina, la de por
   // defecto o la última) va primero y marcada.
+  // Solo la primera vez que haces una rutina (Dan, 28-10-2026: «con que me
+  // pregunte una vez me vale»): lo que contestes se queda en la rutina y las
+  // siguientes veces empieza ahí. Se cambia tocando el sitio de arriba.
   function preguntaSede() {
     const sedes = sedesActivas(d);
+    const rutina = d.rutinas.find((r) => r.id === sesion.rutinaId);
+    if (!rutina || rutina.sedeId || sesion.tutorial) return null;
     if (sedes.length < 2 || sedePreguntada.has(id) || sesion.ejercicios.some((e) => e.series.some((x) => x.hecha))) return null;
     const ordenadas = [...sedes].sort((a, b) => (b.id === sesion.sedeId) - (a.id === sesion.sedeId));
     return h('div', { class: 'tarjeta pregunta-sede' },
       h('p', { class: 'centrado' }, h('strong', {}, '¿Dónde entrenas hoy?')),
       h('div', { class: 'fila-botones' }, ordenadas.map((x) => h('button', { type: 'button',
         class: `boton${x.id === sesion.sedeId ? '' : ' secundario'}`,
-        onclick: () => { sedePreguntada.add(id); cambiarSesion((y) => { y.sedeId = x.id; }); } }, x.nombre))));
+        onclick: () => {
+          sedePreguntada.add(id);
+          estado.cambiar((datos) => {
+            const y = datos.sesiones.find((s) => s.id === id);
+            if (y) y.sedeId = x.id;
+            const r = datos.rutinas.find((z) => z.id === rutina.id);
+            if (r) r.sedeId = x.id;
+          });
+        } }, x.nombre)),
+      h('p', { class: 'nota centrado' }, `Solo te lo pregunto esta vez: la próxima, «${rutina.nombre}» empieza en el sitio que elijas.`)));
   }
 
   function fotoViva(archivo) {
@@ -1419,33 +1435,89 @@ export function vistaSesion(contenedor, { id }) {
   // Estiramientos, movilidad y yoga: cómo se mide (una línea, de
   // medidas-estiramiento.js), la medida de esta serie y la técnica. Los que
   // no tienen medida no piden nada: basta con hacerlos.
+  // Lo que se apunta en un estiramiento, en casillas como las demás (Dan,
+  // 28-10-2026: «no me convence cómo se anotan; que no tenga que decir cada vez
+  // cómo se apunta»): la medida (centímetros o la escala de la mano), la ayuda
+  // que has usado (ladrillo, pared, cinta…) y, debajo, la técnica con su «?».
+  // Cómo se mide se elige una vez, en el «?» de la línea «Mide…».
   function camposEstiramiento(ej, i, j, serie) {
     // Un calentamiento (la movilidad dinámica del principio) no lleva medida.
     if (!esEstirar(ej) || serie.tipo === 'calentamiento') return null;
     const actual = { ...ej.estiramiento, ...serie.estiramiento };
-    const guardar = (clave, valor) => cambiarSesion((s) => {
-      const x = s.ejercicios[i].series[j];
-      x.estiramiento = { ...ej.estiramiento, ...x.estiramiento, [clave]: valor === '' || valor == null ? null : valor };
+    const guardar = (clave, valor) => cambiarSesion((x) => {
+      const y = x.ejercicios[i].series[j];
+      y.estiramiento = { ...ej.estiramiento, ...y.estiramiento, [clave]: valor === '' || valor == null ? null : valor };
     });
-    const desplegable = (clave, catalogo, vacio) => selector([['', vacio], ...Object.entries(catalogo).map(([k, v]) => [k, v.etiqueta ?? v])],
-      actual[clave] ?? '', (v) => guardar(clave, v), { titulo: vacio, lista: true });
     const med = medidaDe(ej);
+    const ayudas = (actual.asistencias ?? (actual.asistencia ? [actual.asistencia] : [])).filter((a) => a !== 'mano' && a !== 'ninguna');
+    const casillaBoton = (etiqueta, texto, alPulsar, vacio) => h('div', { class: 'valor' },
+      h('span', { class: 'et' }, etiqueta),
+      h('button', { type: 'button', class: `casilla-boton${vacio ? ' vacia' : ''}`, onclick: alPulsar }, texto));
     return h('div', { class: 'serie-estiramiento' },
-      med.mide && h('p', { class: 'nota bloque como-medir' }, `Mide ${med.como}.`),
-      med.mide === 'mano' && desplegable('nivel', ESCALA_MANO, 'Escala de la mano'),
-      med.mide === 'cm' && campoCm(actual.cm, (v) => guardar('cm', v)),
-      h('div', { class: 'fila-estiramiento' },
-        desplegable('tecnica', TECNICAS_ESTIRAMIENTO, 'Técnica'),
-        selector(Object.entries(MEDIDAS), med.mide ?? 'ninguna', (v) => estado.cambiar((datos) => {
+      med.mide && h('p', { class: 'nota bloque como-medir' }, `Mide ${med.como}.`,
+        h('button', { type: 'button', class: 'que-es ayuda', 'aria-label': 'Cómo se mide',
+          onclick: (e) => { e.preventDefault(); modal('Cómo se mide', h('div', { class: 'ayuda-texto' }, cambiarComoSeMide(ej))); } }, '?')),
+      h('div', { class: 'serie-valores casillas-estiramiento' },
+        med.mide === 'cm' && campoCm(actual.cm, (v) => guardar('cm', v)),
+        med.mide === 'mano' && casillaBoton('Mano', actual.nivel ? ESCALA_MANO[actual.nivel] : '—',
+          () => elegirMano(actual.nivel, (v) => guardar('nivel', v)), !actual.nivel),
+        casillaBoton('Ayuda', ayudas.length ? ayudas.map((a) => ASISTENCIAS[a]).join(', ') : 'Sin ayuda',
+          () => elegirAyudas(ayudas, (lista) => guardar('asistencias', lista.length ? lista : ['ninguna'])), !ayudas.length)),
+      h('button', { type: 'button', class: 'boton-tecnica', onclick: () => elegirTecnica(actual.tecnica, (v) => guardar('tecnica', v)) },
+        'Técnica: ', h('strong', {}, TECNICAS_ESTIRAMIENTO[actual.tecnica]?.etiqueta ?? 'sin indicar'), ' ', h('span', { class: 'que-es' }, '?')));
+  }
+
+  // La escala de la mano en un cartel: los ocho dibujos, de más ayuda a ninguna.
+  function elegirMano(actual, alElegir) {
+    const cerrar = modal('¿Qué cabe en el hueco?', h('div', {},
+      h('p', { class: 'nota centrado' }, 'Mete la mano en el hueco que te queda: la forma que quepa justa es tu medida (del 1, el hueco más grande, al 8, sin hueco).'),
+      h('div', { class: 'rejilla-mano' }, Object.entries(ESCALA_MANO).map(([k, v]) => h('button', { type: 'button',
+        class: `opcion-visual${k === actual ? ' activo' : ''}`, onclick: () => { cerrar(); alElegir(k); } }, v)))));
+  }
+
+  // Las ayudas, varias a la vez (ladrillo bajo la rodilla y pared, por ejemplo).
+  function elegirAyudas(actuales, alElegir) {
+    const elegidas = new Set(actuales);
+    const caja = h('div', { class: 'rejilla-chips' });
+    const pintar = () => caja.replaceChildren(...Object.entries(ASISTENCIAS).filter(([k]) => !['ninguna', 'mano'].includes(k))
+      .map(([k, v]) => h('button', { type: 'button', class: `chip seleccionable${elegidas.has(k) ? ' activo' : ''}`, 'aria-pressed': String(elegidas.has(k)),
+        onclick: () => { if (elegidas.has(k)) elegidas.delete(k); else elegidas.add(k); pintar(); } }, v)));
+    pintar();
+    const cerrar = modal('¿Con qué ayuda?', h('div', {},
+      h('p', { class: 'nota centrado' }, 'Marca lo que has usado en esta serie. Con ayuda, la medida no se compara igual que sin ella.'),
+      caja,
+      h('div', { class: 'fila-botones' },
+        h('button', { type: 'button', class: 'boton secundario', onclick: () => { cerrar(); alElegir([]); } }, 'Sin ayuda'),
+        h('button', { type: 'button', class: 'boton', onclick: () => { cerrar(); alElegir([...elegidas]); } }, 'Listo'))));
+  }
+
+  // Las técnicas, cada una con lo que es: así se elige sabiendo qué se hace.
+  function elegirTecnica(actual, alElegir) {
+    const cerrar = modal('Técnica de estiramiento', h('div', { class: 'lista-tecnicas' },
+      h('p', { class: 'nota centrado' }, 'Cómo haces el estiramiento. Si no sabes cuál, «Estático pasivo»: llegar y aguantar relajado.'),
+      Object.entries(TECNICAS_ESTIRAMIENTO).map(([k, v]) => h('button', { type: 'button',
+        class: `boton-marca${k === actual ? ' activo' : ''}`, onclick: () => { cerrar(); alElegir(k); } },
+      h('strong', {}, v.etiqueta), h('small', { class: 'bloque suave' }, v.descripcion))),
+      h('button', { type: 'button', class: 'boton secundario', onclick: () => { cerrar(); alElegir(null); } }, 'Sin indicar')));
+  }
+
+  // Cómo se mide este estiramiento (para siempre, en el ejercicio).
+  function cambiarComoSeMide(ej) {
+    const med = medidaDe(ej);
+    return h('div', {},
+      h('p', {}, 'Cada estiramiento se mide siempre igual, para poder comparar un día con otro. Si quieres medirlo de otra forma, cámbialo aquí: vale para todas las series de este ejercicio.'),
+      selector(Object.entries(MEDIDAS), med.mide ?? 'ninguna', (v) => {
+        estado.cambiar((datos) => {
           const e = datos.ejercicios.find((x) => x.id === ej.id);
           if (e) e.estiramiento = { ...e.estiramiento, medida: v };
-        }), { titulo: 'Cómo se mide', lista: true })),
-      actual.tecnica && h('small', { class: 'nota bloque' }, TECNICAS_ESTIRAMIENTO[actual.tecnica]?.descripcion));
+        });
+        document.querySelectorAll('.modal-fondo').forEach((m) => m.remove());
+      }, { titulo: 'Cómo se mide', botones: true }));
   }
 
   function campoCm(valor, alCambiar) {
     return h('label', { class: 'valor' },
-      h('span', { class: 'et' }, 'Centímetros'),
+      h('span', { class: 'et' }, 'cm'),
       h('input', { type: 'text', inputmode: 'decimal', value: valor ?? '', 'aria-label': 'Centímetros',
         oninput: (e) => alCambiar(leerNumero(e.target.value)) }));
   }
@@ -1463,7 +1535,7 @@ export function vistaSesion(contenedor, { id }) {
     };
     const campo = med.mide === 'cm'
       ? campoCm(null, (v) => { valor = v; })
-      : h('div', { class: 'lista-eleccion' }, Object.entries(ESCALA_MANO).map(([k, v]) => h('button', { type: 'button', class: 'boton secundario',
+      : h('div', { class: 'rejilla-mano' }, Object.entries(ESCALA_MANO).map(([k, v]) => h('button', { type: 'button', class: 'opcion-visual',
         onclick: () => { valor = k; guardar(); cerrar(); seguir(); } }, v)));
     const cerrar = modal('¿Hasta dónde has llegado?', h('div', {},
       h('p', { class: 'centrado' }, `Mide ${med.como}.`),
@@ -1939,7 +2011,16 @@ export function vistaSesion(contenedor, { id }) {
     if (vuelta && posicion != null) aviso(`Descansa y vuelve a ${ejercicioDe(anterior.ejercicioId)?.nombre ?? 'la superserie'}.`, { accion: vuelta });
     if (['estiramiento', 'movilidad', 'yoga'].includes(tipoDeEjercicio(ej))) {
       const seg = d.perfil.descansoEstiramientos ?? DESCANSO_ESTIRAMIENTOS_POR_DEFECTO;
-      if (seg) arrancarDescanso(seg, { texto: 'entre estiramientos' });
+      // Qué hacer en ese rato (Dan, 28-10-2026: «¿qué se supone que tengo que
+      // hacer entre descansos estirando?»): se dice en la barra y, la primera
+      // vez de cada entreno, con un aviso.
+      if (seg) {
+        arrancarDescanso(seg, { texto: 'suelta, respira y colócate' });
+        if (!explicadoEntreEstiramientos.has(id)) {
+          explicadoEntreEstiramientos.add(id);
+          aviso('Entre estiramientos: sal de la postura despacio, mueve un poco la zona, respira hondo y ponte en la siguiente. No hace falta más.', { ms: 7000 });
+        }
+      }
       return;
     }
     // Manda el descanso que hayas guardado para ese tipo de serie (al cambiarlo

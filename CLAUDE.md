@@ -1551,3 +1551,16 @@ piernas inquietas, nariz y sustancias antes de tocar las horas; da avisos con pr
 La línea base del test de atención deja de tener plazo: son los primeros 5 tests, lleguen cuando lleguen, con aviso si
 quedan repartidos en más de 21 días. `cribadoSueno` va en la raíz de los datos: `fusion.js` lo funde con `SUELTOS`
 (si no, al juntar el móvil con Drive se perdía el de un lado).
+
+## Ronda 0.71.0 (28-10-2026): sus notas de la sesión de yoga
+
+Esquema v30 (`sedesBasicas` en esquema.js: Gimnasio, Casa y Calle de serie, el que falte por tipo).
+- «¿Dónde entrenas hoy?» solo la primera vez que haces una rutina: la respuesta se guarda en `rutina.sedeId` y las
+  siguientes empieza ahí (se cambia con el sitio de arriba del entreno). Sin rutina, no pregunta. El cuestionario usa
+  el sitio de ese tipo en vez de crear otro.
+- Estiramientos en el entreno (`camposEstiramiento` en sesion.js): la medida (cm o mano) y la **ayuda** (ladrillo,
+  pared, cinta, silla, goma…; varias a la vez, `elegirAyudas`) en casillas como las demás; la técnica debajo, en una
+  línea que abre todas con su explicación (`elegirTecnica`); «Cómo se mide» ya no sale en cada serie: está en el «?» de
+  la línea «Mide…» y vale para el ejercicio. La escala de la mano, en rejilla de dos columnas.
+- Descanso entre estiramientos: la barra dice «suelta, respira y colócate» y, la primera vez de cada entreno, un aviso
+  explica qué hacer en ese rato.

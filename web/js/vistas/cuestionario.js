@@ -128,9 +128,13 @@ export function hacerCuestionario({ alTerminar } = {}) {
       // recupera antes mientras coge técnica.
       if (respuestas.experiencia === 'novato') x.perfil.recamaraPorDefecto ??= 2;
       // El sitio donde entrenas queda creado, y es el que sale al entrenar.
-      if (respuestas.donde && !(x.sedes || []).length) {
-        const sede = nuevaSede(TIPOS_SEDE[respuestas.donde]?.etiqueta ?? 'Mi sitio', respuestas.donde);
-        x.sedes = [...(x.sedes || []), sede];
+      // Desde la v30 ya vienen Gimnasio, Casa y Calle: se usa el de ese tipo.
+      if (respuestas.donde) {
+        let sede = (x.sedes || []).find((s) => s.tipo === respuestas.donde && !s.archivado);
+        if (!sede) {
+          sede = nuevaSede(TIPOS_SEDE[respuestas.donde]?.etiqueta ?? 'Mi sitio', respuestas.donde);
+          x.sedes = [...(x.sedes || []), sede];
+        }
         x.perfil.sedePorDefecto = sede.id;
       }
     });
@@ -147,7 +151,7 @@ export function hacerCuestionario({ alTerminar } = {}) {
       : r.experiencia === 'novato'
         ? 'Te lo explico todo, con notas en cada pantalla, y dejo puesta una recámara de 2 (más lejos del fallo mientras coges técnica).'
         : 'Te lo explico todo, con notas cortas en cada pantalla.');
-    if (r.donde) lineas.push(`He creado tu sitio: ${TIPOS_SEDE[r.donde]?.etiqueta}. Cada entrenamiento se guardará ahí.`);
+    if (r.donde) lineas.push(`Tu sitio de siempre: ${TIPOS_SEDE[r.donde]?.etiqueta}. Cada entrenamiento se guardará ahí (Gimnasio, Casa y Calle vienen hechos; cámbialos en Ajustes).`);
     lineas.push(`La rutina que te recomiendo en «Entrenar» va con lo que buscas (${PREGUNTAS[1].opciones[r.objetivo]?.etiqueta.toLowerCase() ?? 'tu objetivo'}).`);
     lineas.push('Todo esto se cambia luego en Ajustes y en Aprender; nada queda fijo.');
     const cerrarR = modal('Listo, queda así', h('div', {},

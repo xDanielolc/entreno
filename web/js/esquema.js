@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 29;
+export const VERSION_ACTUAL = 30;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -225,7 +225,7 @@ export function archivoNuevo({ nombre = '', correo = null } = {}) {
       avisarPvt: null,
       avisarPvtHora: null,
     },
-    sedes: [],
+    sedes: sedesBasicas([]),
     ejercicios: [],
     rutinas: [],
     sesiones: [],
@@ -644,7 +644,26 @@ const MIGRACIONES = {
     datos.version = 29;
     return datos;
   },
+  // v29 → v30: tres sitios de serie, Gimnasio, Casa y Calle (Dan, 28-10-2026:
+  // «tres escenarios prefijados y que cada uno quite o añada»). Solo se crea
+  // el que falte (por su tipo); los que ya tengas se quedan como están.
+  29: (datos) => {
+    datos.sedes = sedesBasicas(datos.sedes ?? []);
+    datos.version = 30;
+    return datos;
+  },
 };
+
+// Los tres sitios de serie que falten (por tipo), detrás de los que haya. No
+// cambiar: lo usa una migración publicada.
+function sedesBasicas(sedes) {
+  const salida = [...sedes];
+  for (const [tipo, nombre] of [['gimnasio', 'Gimnasio'], ['casa', 'Casa'], ['calle', 'Calle o parque']]) {
+    if (salida.some((s) => s.tipo === tipo && !s.archivado)) continue;
+    salida.push({ id: `sede_${tipo}_${Math.random().toString(36).slice(2, 8)}`, nombre, tipo, archivado: false });
+  }
+  return salida;
+}
 
 // Nombres de antes → nombres de la v23 (no cambiar: lo usa una migración publicada).
 const RENOMBRADOS_V23 = {

@@ -650,3 +650,9 @@ la vez, a veces sin cobertura):
   datos: { `fecha`, `version`, `respuestas` } (sí o no por pregunta, claves
   «grupo.pregunta», `CRIBADO_SUENO` en `web/js/diario.js`), o null si no se ha
   hecho. `fusion.js` lo funde entero (`SUELTOS`). Nada que convertir.
+- **v30 (sitios de serie, 28-10-2026).** Todos los archivos tienen un sitio de
+  cada tipo `gimnasio`, `casa` y `calle` (se crea el que falte, con el nombre
+  «Gimnasio», «Casa» o «Calle o parque»); se pueden renombrar, archivar o
+  añadir más en Ajustes. `rutina.sedeId` guarda dónde se hace cada rutina: la
+  app lo pregunta solo la primera vez. Las ayudas de un estiramiento van en
+  `serie.estiramiento.asistencias` (lista; `['ninguna']` = sin ayuda).

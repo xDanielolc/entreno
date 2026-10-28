@@ -2359,3 +2359,16 @@ body.entreno-a-pantalla .tira-inferior { display: none; }
 .arana-con-dibujos .arana { display: block; width: 100%; }
 .arana-dibujo { position: absolute; width: 14%; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 1px; pointer-events: none; }
 .arana-dibujo small { font-size: .62rem; line-height: 1.1; color: var(--texto-suave); text-align: center; }
+/* Estiramientos (0.71): medida y ayuda en casillas como las demás; la técnica, debajo con su «?». */
+.casillas-estiramiento { margin-top: 6px; }
+.casilla-boton { min-height: 56px; width: 100%; border-radius: var(--radio-pequeno, 12px); border: 1.5px solid var(--borde); background: var(--superficie-2);
+  color: var(--texto); font: inherit; font-weight: 700; font-size: .95rem; line-height: 1.15; padding: 4px 6px; cursor: pointer; }
+.casilla-boton.vacia { color: var(--texto-suave); font-weight: 500; }
+.serie.hecha .casilla-boton { border-color: var(--acento); }
+.boton-tecnica { display: block; margin: 8px auto 0; border: 0; background: none; color: var(--texto-suave); font: inherit; font-size: .9rem; cursor: pointer; }
+.boton-tecnica strong { color: var(--texto); }
+.boton-tecnica .que-es { margin-left: 2px; }
+.rejilla-mano { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.rejilla-mano .opcion-visual { font-size: 1rem; padding: 12px 6px; }
+.lista-tecnicas { display: grid; gap: 6px; }
+.lista-tecnicas .boton-marca { text-align: left; }
