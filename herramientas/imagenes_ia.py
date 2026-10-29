@@ -362,7 +362,14 @@ CONGELADOS = {"cruces-en-polea-completo",
               "pajaro-a-una-mano",  # el banco de la segunda postura copiado de la primera (26-10)
               "fondos-de-triceps",  # nuevo (26-10): las patas, la base y la punta de las barras copiadas de la primera
               "dominadas-neutras",  # el asa de la segunda postura alargada como la de la primera (26-10)
-              "curl-nordico"}  # la colchoneta de la segunda postura copiada de la primera (26-10)
+              "curl-nordico",  # la colchoneta de la segunda postura copiada de la primera (26-10)
+              "fondos-asistidos",  # 29-10: sobre la máquina de las dominadas asistidas; borrada a mano una raya del borde
+              "encogimientos-de-trapecio",  # 29-10: borrado a mano el trozo de pesa que dejaba fijo_desde bajo las manos
+              "dominada", "dominadas-negativas",  # 29-10: la barra de la segunda postura, la de la primera; orejas borradas
+              "dominadas-supinas",  # 29-10: la segunda figura estrechada (mismo agarre) y la barra de la primera
+              "remo-de-cardio",  # 29-10: orejas borradas a mano
+              "elevaciones-laterales-en-polea",  # 29-10: orejas borradas a mano y el contorno de la cara cerrado
+              "elevaciones-laterales"}  # 29-10: pies apoyados (Gemini) y orejas borradas a mano
 
 QUIETOS = {"Plancha lateral": "imagenes/ejercicios/anim/plancha-lateral-quieta.webp"}
 

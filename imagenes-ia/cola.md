@@ -219,3 +219,20 @@ Cabezas lisas rehechas: extensión torácica sobre rodillo, press pallof, chatur
 tobillo a la pared, deslizamiento ciático, flexión plantar. Orejas quitadas: air squat, bicicleta estática, boxeo, burpees, peso
 muerto con mancuernas, plancha, sentadilla búlgara, sentadilla frontal, sentadilla, fondos asistidos. Quedan con oreja: dominadas
 negativas, elevaciones laterales (y en polea), encogimientos, sentadilla en multipower y remo de cardio. Lo de antes, en antes-27-10/.
+
+# Repaso del 29-10-2026 (séptima revisión y todas las notas anteriores)
+Hecho: los ~45 mini teletransportes (buscar_saltos.py), superman y puente de glúteo con el dibujo nuevo, fondos asistidos
+(máquina de las dominadas asistidas), fondos con lastre, agarres de las dominadas asistidas, pies de las elevaciones
+laterales, agarre de las supinas, barra y orejas de las dominadas, caras de montaña, vela y triángulo, orejas de
+multipower, encogimientos, polea lateral, remo de cardio y elevaciones laterales.
+Pendiente (no salió o necesita foto de ejemplo):
+- [ ] Press de hombro a una mano: Gemini no estira el brazo arriba (3 intentos, en descartes/). Probar ChatGPT.
+- [ ] Extensión de tríceps en máquina: agarre y placas (necesita foto de la máquina de verdad).
+- [ ] Remo en máquina y máquina de glúteo: Dan prefiere el de antes con la máquina corregida.
+- [ ] Sentadilla hack: el de antes viene cortado y con otra escala; rehacer con foto de ejemplo.
+- [ ] Antebrazo (flexores): la postura no es esa; buscar ejemplos reales.
+- [ ] Peso muerto rumano con mancuernas: el de Everkinetic viene cortado por las piernas (completar).
+- [ ] Cabeza a la rodilla: animar metiendo la cabeza (falta la segunda postura).
+- [ ] CARs de cadera y flexiones en pica: las manos/pies no quedan fijos porque la IA dibuja otra postura; rehacer.
+- [ ] Mountain climbers: falta animar la otra pierna. Elíptica: pendiente (no sale con ninguna IA).
+- [ ] Supinas: conservar también el dibujo de antes como segunda perspectiva (hace falta que la app enseñe dos).

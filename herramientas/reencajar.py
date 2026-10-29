@@ -33,6 +33,49 @@ REENCAJAR = {
     # Medido sobre la rejilla: (62, -55); el (68, -72) de antes dejaba 17 píxeles de salto.
     "prensa-de-piernas": {"mover": (62, -55), "zona": (70, 195, 250, 300)},
     "remo-en-polea": {"zona": (0.05, 0.62, 0.8, 0.8)},                 # 23-10: el banco (la variante «al pecho»)
+    # 29-10, Dan: «mini teletransporte… comprueba en todos que el pie y el soporte de la máquina no se mueven».
+    # El banco y las piernas, clavados; por debajo de `fijo_desde`, la segunda postura lleva lo mismo que la primera.
+    "press-de-banca": {"zona": (0.0, 0.6, 1.0, 1.0), "fijo_desde": 0.62},
+    "press-de-banca-con-mancuernas": {"zona": (0.0, 0.6, 1.0, 1.0), "fijo_desde": 0.6},
+    "press-inclinado": {"zona": (0.0, 0.6, 1.0, 1.0), "fijo_desde": 0.6},
+    "press-inclinado-con-mancuernas": {"zona": (0.0, 0.6, 1.0, 1.0), "fijo_desde": 0.6},
+    "press-declinado": {"zona": (0.0, 0.25, 0.4, 1.0)},              # las piernas enganchadas y la pata del banco
+    # 29-10: repaso de todos con la superposición rojo/azul (lo quieto que saltaba 1-3 píxeles).
+    "curl-femoral-sentado": {"zona": (0.55, 0.0, 1.0, 0.6)},           # el respaldo
+    "curl-predicador": {"zona": (0.0, 0.75, 1.0, 1.0), "fijo_desde": 0.8},   # las piernas
+    "jalon-con-agarre-estrecho": {"zona": (0.0, 0.75, 1.0, 1.0), "fijo_desde": 0.8},   # el asiento y las piernas
+    "jalon-al-pecho-ek": {"zona": (0.0, 0.8, 1.0, 1.0), "fijo_desde": 0.82},
+    "aperturas-con-mancuernas": {"zona": (0.0, 0.55, 1.0, 1.0), "fijo_desde": 0.62},   # el banco y las piernas
+    "curl-de-biceps-en-maquina": {"zona": (0.0, 0.0, 0.25, 1.0)},      # el bastidor de la máquina
+    "press-frances": {"zona": (0.0, 0.55, 1.0, 1.0), "fijo_desde": 0.66},
+    "press-cerrado": {"zona": (0.0, 0.6, 1.0, 1.0), "fijo_desde": 0.66},
+    "remo-con-mancuerna": {"zona": (0.0, 0.5, 1.0, 0.62)},              # el banco y la rodilla apoyada
+    "flexion-lateral-de-cuello": {"zona": (0.0, 0.7, 1.0, 1.0), "fijo_desde": 0.75},   # el tronco
+    "extension-de-cuello-con-arnes": {"zona": (0.0, 0.7, 1.0, 1.0), "fijo_desde": 0.75},
+    "flexion-de-cuello-con-disco": {"zona": (0.0, 0.7, 1.0, 1.0), "fijo_desde": 0.75},
+    "isometricos-de-cuello": {"zona": (0.0, 0.7, 1.0, 1.0), "fijo_desde": 0.75},
+    # Dibujos de la IA repasados el 29-10 (lo apoyado, clavado).
+    "fondos-en-paralelas-con-lastre": {"ia": True, "zona": (0.0, 0.43, 0.32, 0.56), "mover": (0, 100)},  # la mano y la barra (29-10)
+    "dominadas-asistidas": {"ia": True, "mover": (0, 0), "zona": (0.0, 0.0, 0.45, 1.0)},  # el poste y la base          # la base de la máquina
+    "maquina-de-gluteo": {"ia": True, "zona": (0.0, 0.85, 1.0, 1.0)},
+    "elevaciones-frontales-completo": {"ia": True, "zona": (0.0, 0.9, 1.0, 1.0), "fijo_desde": 0.68},
+    "curl-de-muneca": {"ia": True, "zona": (0.0, 0.55, 0.5, 1.0)},              # el banco
+    "rotaciones-de-hombro-con-palo": {"ia": True, "zona": (0.0, 0.9, 1.0, 1.0)},  # los pies y el suelo
+    "rotacion-interna-de-hombro-con-toalla": {"ia": True, "zona": (0.0, 0.85, 1.0, 1.0), "fijo_desde": 0.76},
+    "cobra-en-el-suelo": {"ia": True, "zona": (0.0, 0.7, 0.45, 1.0)},           # las piernas en el suelo
+    "dominadas-con-lastre": {"ia": True, "zona": (0.0, 0.0, 1.0, 0.08)},        # la barra
+    "press-arnold": {"ia": True, "zona": (0.0, 0.6, 1.0, 1.0), "fijo_desde": 0.64},
+    "rotacion-toracica-en-cuadrupedia": {"ia": True, "zona": (0.0, 0.8, 1.0, 1.0), "fijo_desde": 0.82},
+    "elevaciones-y-t-w": {"ia": True, "zona": (0.0, 0.9, 1.0, 1.0)},
+    "cardio": {"ia": True, "zona": (0.0, 0.85, 1.0, 1.0)},                      # la bici
+    "elevacion-de-piernas-colgado": {"ia": True, "zona": (0.0, 0.0, 1.0, 0.06)},  # la barra
+    "elevacion-de-rodillas-colgado": {"ia": True, "zona": (0.0, 0.0, 1.0, 0.06)},
+    "elevacion-de-gemelos-sentado": {"ia": True, "mover": (0, 0), "zona": (0.0, 0.85, 1.0, 1.0)},
+    "flexion-y-extension-de-dedos-del-pie": {"ia": True, "zona": (0.0, 0.0, 0.4, 1.0)},  # la silla
+    "peso-muerto-con-mancuernas": {"ia": True, "zona": (0.0, 0.92, 1.0, 1.0)},  # los pies
+    "extension-toracica-sobre-rodillo": {"ia": True, "zona": (0.0, 0.85, 0.3, 1.0)},  # los pies
+    "gato-camello": {"ia": True, "zona": (0.0, 0.85, 1.0, 1.0), "fijo_desde": 0.84},  # manos y rodillas
+    "deslizamiento-neural-ciatico": {"ia": True, "zona": (0.0, 0.0, 0.3, 1.0)},  # la silla
     # Dibujos de la IA («ia»: los reencaja imagenes_ia.py al hacerlos). 23-10, Dan: «un pequeño desplazamiento
     # lateral»: lo apoyado (pies, manos, rodillas) tiene que quedar clavado.
     "curl-invertido-completo": {"ia": True, "zona": (0.0, 0.9, 1.0, 1.0), "fijo_desde": 0.62},     # los pies
@@ -178,4 +221,4 @@ if __name__ == "__main__":
     for nombre, op in REENCAJAR.items():
         if not filtro or filtro == nombre:
             if not op.get("ia"):
-                reencajar(nombre, op.get("zona"), mover=op.get("mover"))
+                reencajar(nombre, op.get("zona"), mover=op.get("mover"), fijo_desde=op.get("fijo_desde"))

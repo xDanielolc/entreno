@@ -450,12 +450,11 @@
    "autor": "ChatGPT"
   },
   "Puente de glúteo": {
-   "archivo": "imagenes/ejercicios/anim/puente-de-gluteo.webp",
-   "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/puente-de-gluteo.png",
+   "archivo": "imagenes/ejercicios/ia/puente-de-gluteo.webp",
+   "estatica": "imagenes/ejercicios/ia/puente-de-gluteo-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "bridging"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Extensión de cuádriceps": {
    "archivo": "imagenes/ejercicios/anim/extension-de-cuadriceps.webp",
@@ -796,12 +795,11 @@
    "animada": false
   },
   "Superman": {
-   "archivo": "imagenes/ejercicios/anim/superman.webp",
-   "autor": "Everkinetic",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "supermans",
-   "estatica": "imagenes/ejercicios/superman.png",
-   "animada": true
+   "archivo": "imagenes/ejercicios/ia/superman.webp",
+   "estatica": "imagenes/ejercicios/ia/superman-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Flexión de cuello con disco": {
    "archivo": "imagenes/ejercicios/anim/flexion-de-cuello-con-disco.webp",
@@ -2337,15 +2335,11 @@
    "animada": true
   },
   "Fondos en paralelas con lastre": {
-   "archivo": "imagenes/ejercicios/ia/fondos-de-triceps-ek-completo.webp",
-   "autor": "Everkinetic",
-   "nombreEnWger": "Fondos",
-   "aliasDe": "Fondos de tríceps",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "chest-dips",
-   "estatica": "imagenes/ejercicios/ia/fondos-de-triceps-ek-completo-quieta.webp",
+   "archivo": "imagenes/ejercicios/ia/fondos-en-paralelas-con-lastre.webp",
+   "estatica": "imagenes/ejercicios/ia/fondos-en-paralelas-con-lastre-quieta.webp",
    "animada": true,
-   "completadoCon": "Gemini"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Fondos en paralelas negativos": {
    "archivo": "imagenes/ejercicios/ia/fondos-en-paralelas-negativos-completo.webp",

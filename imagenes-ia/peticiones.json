@@ -205,6 +205,16 @@
   "usar": "antes"
  },
  {
+  "slug": "fondos-en-paralelas-con-lastre",
+  "ejercicio": "Fondos en paralelas con lastre",
+  "vista": "de frente en las paralelas, con cinturón de lastre, cadena y disco colgando (sobre el completado de los fondos negativos)",
+  "inicio": "arriba con los brazos estirados",
+  "final": "abajo con los codos doblados",
+  "ancla": "encajar",
+  "usar": "ia",
+  "sinAlias": true
+ },
+ {
   "slug": "fondos-asistidos",
   "ejercicio": "Fondos asistidos",
   "vista": "de rodillas sobre el apoyo de una máquina de fondos asistidos, visto de lado",
@@ -503,7 +513,8 @@
   "vista": "tumbado boca arriba en el suelo con las rodillas dobladas, visto de lado",
   "inicio": "cadera apoyada en el suelo",
   "final": "cadera subida, cuerpo recto de los hombros a las rodillas",
-  "ancla": "atras"
+  "ancla": "atras",
+  "usar": "ia"
  },
  {
   "slug": "sentadilla-goblet",
@@ -949,7 +960,8 @@
   "vista": "tumbado boca abajo en el suelo, visto de lado",
   "inicio": "brazos estirados por delante, todo el cuerpo apoyado",
   "final": "brazos, pecho y piernas levantados del suelo a la vez",
-  "ancla": "encajar"
+  "ancla": "encajar",
+  "usar": "ia"
  },
  {
   "slug": "lenador-en-polea",

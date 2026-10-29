@@ -1569,3 +1569,17 @@ Esquema v30 (`sedesBasicas` en esquema.js: Gimnasio, Casa y Calle de serie, el q
   la de 10: Antler 2022), la velocidad de respuesta como medida principal en vez de los lapsos (Belenky 2003) y el límite
   del 11,5 % dibujado, que es el cambio mínimo detectable (Thompson 2022). `graficaLineas` admite `decimalesY` (por
   defecto 0, así que las gráficas de ejercicio no cambian).
+- 0.71.2 (29/30-10-2026): repaso de dibujos tras su séptima revisión. Todas sus notas de todas las rondas (colecciones
+  `comparar` y `revision`) cruzadas una a una con lo publicado; las que seguían sin hacer, en `imagenes-ia/cola.md`
+  («Repaso del 29-10»). Mini teletransportes: `herramientas/buscar_saltos.py` mide en todas las animaciones si lo quieto
+  coincide mejor desplazado 1-6 px; ~45 reencajados (los press, curls, jalones, cuello, máquinas…: entradas del 29-10 en
+  `REENCAJAR`, con `fijo_desde` también para los de Everkinetic) y `herramientas/escalar_encajar.py` para los que además
+  cambian de tamaño (press de hombro en máquina, escalera, face pull, elevación de piernas). Superman y puente de glúteo
+  enseñaban el de Everkinetic aunque Dan eligió el nuevo (`usar: ia`). Con Gemini: fondos asistidos sobre la máquina de
+  las dominadas asistidas, fondos con lastre (cinturón y disco sobre el completado de los negativos; nueva petición),
+  dominadas asistidas sin los dos agarres, elevaciones laterales con los pies apoyados, supinas con el mismo agarre
+  (segunda figura estrechada a mano), cara lisa en montaña, vela, triángulo y multipower. A mano: barra quieta y sin
+  orejas en dominadas y negativas, trozo de pesa en encogimientos, orejas (`herramientas/quitar_orejas.py`, cabezas de
+  frente) en elevaciones laterales, encogimientos, polea lateral y remo de cardio. Todo lo retocado a mano, en
+  `CONGELADOS`. OJO: Pillow no da la duración de un fotograma WebP sin `load()`; las duraciones se leen con seek + load
+  (mountain climbers va a 450/300 ms). Almacén `entreno-imagenes-52`.
