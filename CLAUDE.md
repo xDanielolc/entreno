@@ -1583,3 +1583,23 @@ Esquema v30 (`sedesBasicas` en esquema.js: Gimnasio, Casa y Calle de serie, el q
   frente) en elevaciones laterales, encogimientos, polea lateral y remo de cardio. Todo lo retocado a mano, en
   `CONGELADOS`. OJO: Pillow no da la duración de un fotograma WebP sin `load()`; las duraciones se leen con seek + load
   (mountain climbers va a 450/300 ms). Almacén `entreno-imagenes-52`.
+
+## Ronda 0.72.0 (30-10-2026): sus notas de la página de pruebas 0.71
+
+- Entrenar sin «Últimos entrenamientos» (ya están el historial y lo que toca hoy). Medidas sin «Ingesta calórica»
+  (Dan: «para eso ya está MyFitnessPal»).
+- Músculos secundarios en amarillo (`--mapa-ambar`), como en el mapa, no en azul.
+- `musculoRecortado(…, { encuadre: 'cerca' | 'normal' | 'entero', ambosLados })`: los filtros de músculo, de cerca;
+  «Todos», el cuerpo entero en rojo; muslos y pantorrillas de Medidas, centrados entre las dos piernas. Equilibrio:
+  los trozos de muñeco más grandes y sin nombre.
+- Filtro de equipo rehecho: balón, rueda, cajón, comba, cuerdas y saco por separado; nadar y el monte van a «Sin
+  material»; dibujos nuevos de polea y esterilla; «Todos» con tres dibujos; solo salen los equipos que tiene algún
+  ejercicio.
+- Atrás del móvil cierra el cartel de arriba (`modal()` deja una entrada en el historial; `cerrarCarteles()` en ui.js
+  para cerrarlos por código sin dejar entradas sueltas). Ver en grande sin bailar de lado (100 % en vez de 100vw).
+- Ajustes: «Dónde entrenas» y «Ejercicios borrados» ya no se cierran al añadir o recuperar (el título llevaba el número
+  y el apartado se recuerda por su título).
+- Descanso: empezar la serie siguiente lo quita en silencio, sin proponer cambiar el ajuste (`saltarDescanso`).
+- Calendario: el ✓ de la derecha, explicado (semanas con algún entreno, las de la racha).
+- «Por lado» no le salía porque su rutina de flexibilidad es anterior a los lados y no la había actualizado: con
+  «Actualizar mi rutina» las series salen por lado (comprobado sobre una copia de sus datos).

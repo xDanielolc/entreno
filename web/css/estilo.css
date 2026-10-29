@@ -1850,12 +1850,12 @@ body.entreno-a-pantalla .contenido.con-barra-entreno { padding-bottom: calc(var(
 .con-ayuda-esquina { position: relative; padding-bottom: 46px; }
 .ayuda-esquina { position: absolute; right: 12px; bottom: 12px; }
 /* Ver en grande: a toda la pantalla y, con el móvil de lado, girado. */
-.modal.modal-ampliado { width: 100vw; max-width: 100vw; height: 100dvh; max-height: 100dvh; border-radius: 0; display: grid; grid-template-rows: auto 1fr; }
+.modal.modal-ampliado { width: 100%; max-width: 100%; overflow-x: hidden; height: 100dvh; max-height: 100dvh; border-radius: 0; display: grid; grid-template-rows: auto 1fr; }
 .ampliado-lienzo { display: grid; place-items: center; overflow: hidden; min-height: 0; }
 /* En vertical, lo que no cabe (el cuerpo de espaldas, debajo del de frente) se ve deslizando
    DENTRO del cartel; lo de detrás no se mueve (Dan, 28-10-2026). */
 .modal-ampliado:not(.tumbado) .ampliado-lienzo { overflow-y: auto; overscroll-behavior: contain; place-items: start center;
-  -webkit-overflow-scrolling: touch; padding-bottom: 24px; }
+  -webkit-overflow-scrolling: touch; padding-bottom: 24px;  overflow-x: hidden; touch-action: pan-y;  /* sin bailar de lado (Dan, 29-10) */ }
 .modal-ampliado:not(.tumbado) .ampliado-lienzo > * { max-height: none; }
 html:has(.modal-fondo), body:has(.modal-fondo) { overflow: hidden; }
 .ampliado-lienzo > * { max-width: 100%; max-height: 100%; }
@@ -2259,7 +2259,7 @@ body.entreno-a-pantalla .tira-inferior { display: none; }
 .recorte-musculo .cuerpo { position: absolute; left: 0; top: 0; width: 100%; max-width: none; opacity: 0; transition: opacity .2s; }
 .recorte-musculo.encuadrado .cuerpo { opacity: 1; }
 .capa-musculo.principal, .leyenda-color.principal { background: var(--mapa-rojo); }
-.capa-musculo.secundario, .leyenda-color.secundario { background: var(--mapa-azul); }
+.capa-musculo.secundario, .leyenda-color.secundario { background: var(--mapa-ambar); }  /* amarillo, como en el mapa (Dan, 29-10) */
 /* La ficha: el muñeco grande con los músculos que trabaja. */
 .musculos-trabajados .cuerpos-grandes .cuerpo { width: 49%; max-width: 260px; }
 .leyenda-musculos { display: grid; gap: 6px; justify-items: center; text-align: center; }
@@ -2355,9 +2355,9 @@ body.entreno-a-pantalla .tira-inferior { display: none; }
 .racha-semana { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--borde); font-size: .8rem; }
 .racha-semana.si { border-color: var(--mapa-verde); background: var(--mapa-verde); color: #fff; }
 /* El equilibrio con los trozos de muñeco alrededor. */
-.arana-con-dibujos { position: relative; width: 100%; max-width: 420px; margin: 0 auto; }
+.arana-con-dibujos { position: relative; width: 100%; max-width: 480px; margin: 0 auto; }
 .arana-con-dibujos .arana { display: block; width: 100%; }
-.arana-dibujo { position: absolute; width: 14%; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 1px; pointer-events: none; }
+.arana-dibujo { position: absolute; width: 21%; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 1px; pointer-events: none; }
 .arana-dibujo small { font-size: .62rem; line-height: 1.1; color: var(--texto-suave); text-align: center; }
 /* Estiramientos (0.71): medida y ayuda en casillas como las demás; la técnica, debajo con su «?». */
 .casillas-estiramiento { margin-top: 6px; }
@@ -2372,3 +2372,7 @@ body.entreno-a-pantalla .tira-inferior { display: none; }
 .rejilla-mano .opcion-visual { font-size: 1rem; padding: 12px 6px; }
 .lista-tecnicas { display: grid; gap: 6px; }
 .lista-tecnicas .boton-marca { text-align: left; }
+
+/* «Todos» en el filtro de equipo: tres dibujos juntos (Dan, 29-10-2026). */
+.iconos-todos { display: inline-flex; gap: 2px; align-items: center; justify-content: center; }
+.iconos-todos .icono { width: 26px; height: 26px; }

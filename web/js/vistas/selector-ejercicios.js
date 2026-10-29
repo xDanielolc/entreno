@@ -12,7 +12,7 @@ import { imagenDeEjercicio } from '../imagenes.js';
 import { MUSCULOS, ORDEN_MUSCULOS, TREN_INFERIOR, TREN_SUPERIOR, musculoRecortado, nombreMusculo } from '../musculos.js';
 import { materialDe } from '../calculos.js';
 import { icono } from '../iconos.js';
-import { anadir, h, modal, nuevoId } from '../ui.js';
+import { anadir, cerrarCarteles, h, modal, nuevoId } from '../ui.js';
 
 export const MODOS_VISTA = {
   lista: 'Solo nombre',
@@ -75,19 +75,21 @@ export function hayFiltro() {
 
 // Material de cada ejercicio, juntado en «equipos» para el filtro visual (como
 // Lyfta: barra, mancuerna, polea…). Sale del catálogo si el ejercicio no lo guarda.
+// 29-10, Dan: balón, rueda y cajón por separado; nadar o andar por el monte no son equipo (van con «sin material»).
 export const EQUIPOS = {
-  barra: 'Barra', mancuernas: 'Mancuernas', kettlebell: 'Kettlebell', discos: 'Discos', polea: 'Polea',
-  maquina: 'Máquina', corporal: 'Tu peso', fija: 'Barra fija y paralelas', gomas: 'Gomas',
-  accesorios: 'Balón, rueda, cajón…', esterilla: 'Esterilla', cardio: 'Bici, piscina, monte…', otro: 'Sin indicar',
+  barra: 'Barra', mancuernas: 'Mancuernas', kettlebell: 'Kettlebell', discos: 'Disco suelto (sin barra)', polea: 'Polea',
+  maquina: 'Máquina', fija: 'Barra fija y paralelas', gomas: 'Gomas', balon: 'Balón medicinal', rueda: 'Rueda abdominal',
+  cajon: 'Cajón', comba: 'Comba', cuerdas: 'Cuerdas', saco: 'Saco de boxeo', bici: 'Bici', esterilla: 'Esterilla',
+  corporal: 'Sin material (tu peso)', otro: 'Otros',
 };
 const MATERIAL_A_EQUIPO = {
   barra: 'barra', landmine: 'barra', mancuernas: 'mancuernas', mancuerna: 'mancuernas', kettlebell: 'kettlebell',
   disco: 'discos', 'disco o goma': 'discos', polea: 'polea', 'máquina': 'maquina', multipower: 'maquina', trineo: 'maquina',
   'peso corporal': 'corporal', suelo: 'corporal', pared: 'corporal', banco: 'corporal', mano: 'corporal', libre: 'corporal',
   'barra fija': 'fija', paralelas: 'fija', 'barra baja': 'fija', 'arnés': 'fija', 'mano o goma': 'gomas', goma: 'gomas',
-  'balón medicinal': 'accesorios', rueda: 'accesorios', 'cajón': 'accesorios', comba: 'accesorios', cuerdas: 'accesorios',
-  'saco o sombra': 'accesorios', esterilla: 'esterilla', bici: 'cardio', 'bici de sala': 'cardio', piscina: 'cardio',
-  patines: 'cardio', 'montaña': 'cardio',
+  'balón medicinal': 'balon', rueda: 'rueda', 'cajón': 'cajon', comba: 'comba', cuerdas: 'cuerdas',
+  'saco o sombra': 'saco', esterilla: 'esterilla', bici: 'bici', 'bici de sala': 'bici', piscina: 'corporal',
+  patines: 'otro', 'montaña': 'corporal',
 };
 export function equipoDe(x) {
   const material = materialDe(x);
@@ -117,16 +119,19 @@ export function barraFiltros(alCambiar, { placeholder = 'Buscar ejercicio', tira
     class: `opcion-visual${activo ? ' activo' : ''}`, 'aria-pressed': String(activo), onclick: alPulsar }, dibujo, h('span', {}, texto));
   const chips = (clave, opciones) => h('div', { class: 'rejilla-chips' }, opciones.map(([k, texto]) => h('button', { type: 'button',
     class: `chip seleccionable${filtro[clave] === k ? ' activo' : ''}`, 'aria-pressed': String(filtro[clave] === k),
-    onclick: () => { filtro[clave] = k; document.querySelector('.hoja-filtro')?.closest('.modal-fondo')?.remove(); cambio(); } }, texto)));
+    onclick: () => { filtro[clave] = k; cerrarCarteles(document.querySelector('.hoja-filtro')); cambio(); } }, texto)));
 
   const abrirMusculos = () => elegir('Músculo', (poner) => h('div', { class: 'rejilla-visual' },
-    opcionVisual(!filtro.musculo, musculoRecortado(['pecho', 'abdomen', 'cuadriceps', 'hombro', 'biceps'], { vista: 'delante' }),
+    opcionVisual(!filtro.musculo, musculoRecortado(Object.keys(MUSCULOS).filter((m) => MUSCULOS[m].vistas.includes('delante')), { vista: 'delante', encuadre: 'entero' }),
       'Todos', () => poner('musculo', '')),
-    ORDEN_MUSCULOS.map((m) => opcionVisual(filtro.musculo === m, musculoRecortado([m]), nombreMusculo(m, { corto: true }),
+    ORDEN_MUSCULOS.map((m) => opcionVisual(filtro.musculo === m, musculoRecortado([m], { encuadre: 'cerca' }), nombreMusculo(m, { corto: true }),
       () => poner('musculo', m)))));
+  // Solo los equipos que tiene algún ejercicio (tuyo o del catálogo).
+  const hayEquipo = new Set([...CATALOGO, ...estado.datos().ejercicios].map(equipoDe));
   const abrirEquipos = () => elegir('Equipo', (poner) => h('div', { class: 'rejilla-visual' },
-    opcionVisual(!filtro.equipo, icono('ejercicios', { clase: 'icono icono-grande' }), 'Todos', () => poner('equipo', '')),
-    Object.entries(EQUIPOS).map(([k, texto]) => opcionVisual(filtro.equipo === k, icono(k, { clase: 'icono icono-grande' }), texto,
+    opcionVisual(!filtro.equipo, h('span', { class: 'iconos-todos' }, ['barra', 'mancuernas', 'maquina'].map((k) => icono(k, { clase: 'icono' }))),
+      'Todos', () => poner('equipo', '')),
+    Object.entries(EQUIPOS).filter(([k]) => hayEquipo.has(k)).map(([k, texto]) => opcionVisual(filtro.equipo === k, icono(k, { clase: 'icono icono-grande' }), texto,
       () => poner('equipo', k)))));
   const abrirFuncion = () => elegir('Función', () => h('div', {},
     h('h3', {}, 'Qué movimiento'),
@@ -141,7 +146,7 @@ export function barraFiltros(alCambiar, { placeholder = 'Buscar ejercicio', tira
       'aria-pressed': String(activo), onclick: alPulsar }, icono(icon), h('span', { class: 'tira-texto' }, texto));
     botones.replaceChildren(
       boton(filtro.musculo ? nombreMusculo(filtro.musculo, { corto: true }) : 'Músculo', 'musculo', Boolean(filtro.musculo), abrirMusculos),
-      boton(filtro.equipo ? EQUIPOS[filtro.equipo] : 'Equipo', 'mancuernas', Boolean(filtro.equipo), abrirEquipos),
+      boton(EQUIPOS[filtro.equipo] ?? 'Equipo', 'mancuernas', Boolean(EQUIPOS[filtro.equipo]), abrirEquipos),
       boton(funcion || 'Función', 'funcion', Boolean(funcion), abrirFuncion),
       boton(filtro.orden === 'alfabetico' ? 'Orden' : ORDENES[filtro.orden].split(' (')[0], 'orden', filtro.orden !== 'alfabetico', abrirOrden));
     vistas.replaceChildren(...Object.entries(MODOS_VISTA).map(([clave, texto]) => h('button', {

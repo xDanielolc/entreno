@@ -13,7 +13,7 @@ import { guiaTrasPrueba, marcarVista, pintarGuia, pista } from './tutorial.js';
 import { queEs } from './glosario.js';
 import { relojEnMarcha, relojSerie } from './reloj-serie.js';
 import { duracionTexto } from './intervalos.js';
-import { ayuda, modal, selector } from '../ui.js';
+import { ayuda, cerrarCarteles, modal, selector } from '../ui.js';
 import { aplicarPreset } from '../ciclos.js';
 import { renovarAlTocar } from '../sincronizacion.js';
 import * as estado from '../estado.js';
@@ -1511,7 +1511,7 @@ export function vistaSesion(contenedor, { id }) {
           const e = datos.ejercicios.find((x) => x.id === ej.id);
           if (e) e.estiramiento = { ...e.estiramiento, medida: v };
         });
-        document.querySelectorAll('.modal-fondo').forEach((m) => m.remove());
+        cerrarCarteles();
       }, { titulo: 'Cómo se mide', botones: true }));
   }
 

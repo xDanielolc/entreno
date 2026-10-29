@@ -13,7 +13,6 @@ import { aviso, fechaCorta, h, hoyISO, leerNumero, modal, nuevoId } from '../ui.
 export const MEDIDAS_CUERPO = [
   { clave: 'peso', nombre: 'Peso corporal', unidad: 'kg', icono: 'corporal', min: 20, max: 400 },
   { clave: 'grasa', nombre: 'Grasa corporal', unidad: '%', icono: 'cinta', min: 2, max: 70 },
-  { clave: 'kcal', nombre: 'Ingesta calórica', unidad: 'kcal', icono: 'kcal', min: 300, max: 10000 },
   { clave: 'cuello', nombre: 'Cuello', musculos: ['cuello'] },
   { clave: 'hombros', nombre: 'Hombros', musculos: ['hombro'] },
   { clave: 'pecho', nombre: 'Pecho', musculos: ['pecho'] },
@@ -58,7 +57,7 @@ const unidadDe = (m) => m.unidad ?? 'cm';
 const conUnidad = (m, v) => `${formatearNumero(v)} ${unidadDe(m)}`;
 
 function dibujo(m) {
-  if (m.musculos) return musculoRecortado(m.musculos, { vista: m.vista ?? null, lado: m.lado ?? null });
+  if (m.musculos) return musculoRecortado(m.musculos, { vista: m.vista ?? null, lado: m.lado ?? null, ambosLados: /^(muslo|pantorrilla)/.test(m.clave) });
   return h('span', { class: 'icono-medida' }, icono(m.icono ?? 'cinta'));
 }
 

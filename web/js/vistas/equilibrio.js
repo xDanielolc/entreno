@@ -149,14 +149,14 @@ function arana(valores, anilloObjetivo, { dibujos = false, sinEtiquetas = false 
   // Márgenes anchos a los lados para que las etiquetas quepan en el móvil.
   if (dibujos) {
     // Más margen alrededor: los dibujos van fuera de la red.
-    const [x0, y0, ancho, alto] = [-120, -120, T + 240, T + 240];
+    const [x0, y0, ancho, alto] = [-175, -175, T + 350, T + 350];   // 29-10, Dan: dibujos más grandes y sin nombre
     const grafico = arana(valores, anilloObjetivo, { sinEtiquetas: true });
     grafico.setAttribute('viewBox', `${x0} ${y0} ${ancho} ${alto}`);
     return h('div', { class: 'arana-con-dibujos' }, grafico, valores.map((v, i) => {
-      const [x, y] = punto(i, 1.48);
-      return h('span', { class: 'arana-dibujo', title: v.nombre,
+      const [x, y] = punto(i, 1.62);
+      return h('span', { class: 'arana-dibujo', title: v.nombre, 'aria-label': v.nombre,
         style: `left:${((x - x0) / ancho) * 100}%;top:${((y - y0) / alto) * 100}%` },
-      musculoRecortado(v.musculos), h('small', {}, v.nombre));
+      musculoRecortado(v.musculos, { encuadre: 'cerca' }));
     }));
   }
   return nodo('svg', { viewBox: `-78 -34 ${T + 156} ${T + 68}`, class: 'arana', role: 'img',

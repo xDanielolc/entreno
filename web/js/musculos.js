@@ -270,7 +270,11 @@ export function vistaDe(claves) {
   return detras > delante ? 'detras' : 'delante';
 }
 
-export function musculoRecortado(claves, { vista = null, lado = null, clase = 'principal', secundarios = [], titulo = '' } = {}) {
+// `encuadre`: 'cerca' (el músculo grande, para los filtros), 'normal' o 'entero' (todo el cuerpo). `ambosLados`:
+// el lado marcado se colorea solo, pero el encuadre coge los dos (Dan, 29-10: «las pantorrillas y los muslos,
+// centrados entre las dos piernas, no en la roja»).
+export function musculoRecortado(claves, { vista = null, lado = null, clase = 'principal', secundarios = [], titulo = '',
+  encuadre = 'normal', ambosLados = false } = {}) {
   const lista = [].concat(claves).filter((m) => MUSCULOS[m]);
   const cara = vista ?? vistaDe(lista);
   const estados = Object.fromEntries([
@@ -288,21 +292,29 @@ export function musculoRecortado(claves, { vista = null, lado = null, clase = 'p
     if (validas.length) {
       x0 = Math.min(...validas.map((c) => c.x0)); x1 = Math.max(...validas.map((c) => c.x1));
       y0 = Math.min(...validas.map((c) => c.y0)); y1 = Math.max(...validas.map((c) => c.y1));
-      if (lado) {
+      if (lado && !ambosLados) {
         // Solo la mitad del lado marcado.
         const derecha = (lado === 'izq') === (cara === 'delante');
         if (derecha) x0 = Math.max(x0, 0.49); else x1 = Math.min(x1, 0.51);
       }
     }
     // Un cuadrado con el músculo en medio y algo de cuerpo alrededor.
-    const ancho = Math.min(1, Math.max(0.42, (x1 - x0) * 1.5, (y1 - y0) * PROPORCION * 1.35));
+    const [minimo, margen] = encuadre === 'cerca' ? [0.26, 1.15] : [0.42, 1.5];
+    const ancho = Math.min(1, Math.max(minimo, (x1 - x0) * margen, (y1 - y0) * PROPORCION * margen * 0.9));
     const alto = ancho / PROPORCION;
     const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
     const izq = Math.min(Math.max(cx - ancho / 2, 0), 1 - ancho);
     const arriba = Math.min(Math.max(cy - alto / 2, 0), 1 - alto);
-    cuerpo.style.width = `${100 / ancho}%`;
-    cuerpo.style.left = `${(-izq / ancho) * 100}%`;
-    cuerpo.style.top = `${(-arriba * PROPORCION / ancho) * 100}%`;
+    if (encuadre === 'entero') {
+      // Todo el cuerpo, de pies a cabeza, centrado en el cuadrado.
+      cuerpo.style.width = `${100 / PROPORCION}%`;
+      cuerpo.style.left = `${(100 - 100 / PROPORCION) / 2}%`;
+      cuerpo.style.top = '0';
+    } else {
+      cuerpo.style.width = `${100 / ancho}%`;
+      cuerpo.style.left = `${(-izq / ancho) * 100}%`;
+      cuerpo.style.top = `${(-arriba * PROPORCION / ancho) * 100}%`;
+    }
     marco.classList.add('encuadrado');
   });
   return marco;

@@ -1801,7 +1801,7 @@ export function explicaciones1RM() {
 }
 
 // Músculos que trabaja, en el muñeco grande de frente y de espaldas: en rojo
-// los principales y en azul los secundarios (como en Lyfta, con nuestro
+// los principales y en amarillo los secundarios (como en Lyfta, con nuestro
 // muñeco; Dan, 27-10-2026). Tocarlo lo abre en grande.
 function musculosTrabajados(ej) {
   const principales = ej.musculos?.principales ?? [];

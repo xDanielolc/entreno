@@ -268,12 +268,12 @@ function ofrecerCambiado(segundos) {
   proponer(seg, `Has dejado el descanso en ${formatear(seg)} en vez de ${formatear(totalSeg)}. ¿Quedártelo así para el descanso entre series?`);
 }
 
-function saltar() {
+function saltar({ proponerCambio = true } = {}) {
   const quedaban = restante();
   const usado = Math.max(0, totalSeg + alargadoSeg - quedaban);
   const era = entreSeries();
   pararDescanso();
-  if (!era || !totalSeg) return;
+  if (!era || !totalSeg || !proponerCambio) return;
   const propuesto = Math.max(15, Math.round(usado / 15) * 15);
   // Se ofrece siempre que lo cortes con margen (10 s o más antes de acabar).
   if (usado >= 10 && quedaban >= 10 && propuesto !== totalSeg) {
@@ -281,10 +281,11 @@ function saltar() {
   } else if (Math.abs(alargadoSeg) >= 15) ofrecerCambiado(totalSeg + alargadoSeg);
 }
 
-// Empezar la serie siguiente con el descanso en marcha cuenta como saltarlo
-// (con la misma propuesta de cambiar el descanso).
+// Empezar la serie siguiente con el descanso en marcha cuenta como saltarlo, pero
+// en silencio: sin proponer cambiar el ajuste (Dan, 29-10-2026: «que el descanso
+// no me persiga, es molesto»). La propuesta solo sale con el botón «Saltar».
 export function saltarDescanso() {
-  if (finMs && restante() > 0) saltar();
+  if (finMs && restante() > 0) saltar({ proponerCambio: false });
 }
 
 // −30 s y +30 s a los lados del tiempo (estilo A, elegido por Dan el 22-10-2026).

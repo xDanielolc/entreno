@@ -157,6 +157,23 @@ export function aviso(texto, { tipo = 'info', ms, accion } = {}) {
 }
 
 // Ventana modal sencilla. Devuelve una función para cerrarla.
+// Cada cartel deja una entrada en el historial del navegador: así el botón de
+// atrás del móvil lo cierra en vez de salir de la pantalla (Dan, 29-10-2026:
+// «dando atrás que se salga, no quiero tener que subir hasta la X»).
+let popsPropios = 0;
+let navegoAlCerrar = false;   // se cerró un cartel y enseguida se cambió de pantalla
+addEventListener('hashchange', () => { if (popsPropios > 0) navegoAlCerrar = true; });
+addEventListener('popstate', () => {
+  if (popsPropios > 0) {
+    popsPropios -= 1;
+    // El atrás de cerrar llegó después de un cambio de pantalla: lo deshace.
+    if (navegoAlCerrar) { navegoAlCerrar = false; history.forward(); }
+    return;
+  }
+  const abiertos = document.querySelectorAll('.modal-fondo');
+  abiertos[abiertos.length - 1]?.remove();
+});
+
 export function modal(titulo, contenido) {
   const fondo = h('div', { class: 'modal-fondo', onclick: (e) => { if (e.target === fondo) cerrar(); } });
   const caja = h('div', { class: 'modal', role: 'dialog', 'aria-modal': 'true', 'aria-label': titulo },
@@ -166,8 +183,20 @@ export function modal(titulo, contenido) {
     contenido);
   fondo.append(caja);
   document.body.append(fondo);
-  function cerrar() { fondo.remove(); }
+  try { history.pushState({ cartel: true }, ''); } catch { /* sin historial */ }
+  function cerrar() {
+    if (!fondo.isConnected) return;
+    fondo.remove();
+    if (history.state?.cartel) { popsPropios += 1; history.back(); }
+  }
+  fondo.cerrar = cerrar;
   return cerrar;
+}
+
+// Cierra los carteles abiertos (o el que contiene `dentro`) quitando también su entrada del historial.
+export function cerrarCarteles(dentro = null) {
+  const fondos = dentro ? [dentro.closest('.modal-fondo')].filter(Boolean) : [...document.querySelectorAll('.modal-fondo')].reverse();
+  for (const f of fondos) (f.cerrar ?? (() => f.remove()))();
 }
 
 // Ver algo en grande (el mapa del cuerpo, el equilibrio, el dibujo de un

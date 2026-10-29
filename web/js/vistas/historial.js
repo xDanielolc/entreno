@@ -199,9 +199,9 @@ function vistaCalendario(d) {
           h('button', { type: 'button', class: 'boton-icono', 'aria-label': 'Mes anterior', onclick: () => mover(-1) }, '‹'),
           h('h2', {}, `${MESES[m - 1].charAt(0).toUpperCase()}${MESES[m - 1].slice(1)} de ${a}`),
           h('button', { type: 'button', class: 'boton-icono', 'aria-label': 'Mes siguiente', disabled: am >= iso(hoy).slice(0, 7), onclick: () => mover(1) }, '›')),
-        h('div', { class: 'semana-calendario cabecera' }, DIAS_SEMANA.map((x) => h('span', {}, x)), h('span', { 'aria-hidden': 'true' }, '')),
+        h('div', { class: 'semana-calendario cabecera' }, DIAS_SEMANA.map((x) => h('span', {}, x)), h('span', { title: 'Semana entrenada' }, '✓')),
         filas,
-        h('p', { class: 'nota centrado' }, 'Toca un día marcado para abrir ese entrenamiento. A la derecha, las semanas en las que entrenaste.')));
+        h('p', { class: 'nota centrado' }, 'Toca un día marcado para abrir ese entrenamiento. El ✓ de la derecha marca las semanas en las que entrenaste al menos un día: son las que cuentan para las «semanas seguidas entrenando» de arriba.')));
   };
   pintar();
   return caja;

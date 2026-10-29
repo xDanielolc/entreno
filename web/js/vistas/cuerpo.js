@@ -9,7 +9,7 @@ import {
   FACTORES, claseDeRecuperacion, detalleDeRecuperacion, esAutomatico, factorAutomatico, factorPersonal, recuperacionPorMusculo,
   seriesEnDias, seriesSemanales, sugerenciasDeAjuste, textoDeRecuperacion, durezaSemanal,
 } from '../recuperacion.js';
-import { abrirAlLlegar, ampliar, anadir, aviso, ayudaEsquina, h, hoyISO, modal, plegable, selector } from '../ui.js';
+import { abrirAlLlegar, ampliar, anadir, aviso, ayudaEsquina, cerrarCarteles, h, hoyISO, modal, plegable, selector } from '../ui.js';
 import { conGlosario } from './glosario.js';
 import { pista } from './tutorial.js';
 import { tarjetaEquilibrio } from './equilibrio.js';
@@ -301,7 +301,7 @@ function tarjetaSeries(d) {
         h('li', {}, 'Un músculo secundario cuenta media serie. Una serie descendente, según lo que elijas en Ajustes.'),
         h('li', {}, 'Estiramientos, movilidad y yoga no cuentan.')),
       h('a', { class: 'boton secundario', href: '#/aprender', onclick: () => {
-        document.querySelectorAll('.modal-fondo').forEach((m) => m.remove());
+        cerrarCarteles();
         abrirAlLlegar('ap-de-donde-sale-cada-cosa', 'ap-series-por-musculo-y-semana');
       } }, 'De dónde salen estos números')]));
 }

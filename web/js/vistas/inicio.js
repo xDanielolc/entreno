@@ -38,7 +38,6 @@ function avisosDeHoy(d) {
 }
 
 let preguntandoTutorial = false;
-import { masRecienteAntes, resumenSesion } from './historial.js';
 import { avisoPlantillaNueva, empezarDia, enPuntos, queToca, rutinasActivas } from './rutinas.js';
 
 // ¿Toca de verdad entrenar hoy? Mira los músculos del día que toca y, si
@@ -153,8 +152,6 @@ export function vistaInicio(contenedor) {
   const d = estado.datos();
   const enCurso = d.sesiones.find((s) => s.estado === 'en-curso' && !s.borrada);
   const activos = d.ejercicios.filter((e) => !e.archivado);
-  const recientes = d.sesiones.filter((s) => s.estado === 'terminada' && !s.borrada)
-    .sort(masRecienteAntes).slice(0, 2);
   const necesitaPeso = d.perfil.pesoCorporalKg == null
     && activos.some((e) => ['asistida', 'pesoCorporal'].includes(e.carga.tipo));
   const toca = queToca(d, recuperacionPorMusculo(d));
@@ -292,32 +289,6 @@ export function vistaInicio(contenedor) {
     activos.length > 0 && tarjetaRetos(d),
 
     tarjetaHoraAcostarse(d),
-    tarjetaPvtPendiente(d),
-
-    recientes.length > 0 && seccionRecientes(d, recientes));
+    tarjetaPvtPendiente(d));
 }
 
-// Los últimos entrenamientos, en breve (fecha y día de la rutina) o con
-// detalle (los ejercicios), como se prefiera; se recuerda en este aparato.
-function seccionRecientes(d, recientes) {
-  const CLAVE = 'entreno-ultimos-detalle';
-  let detalle = false;
-  try { detalle = localStorage.getItem(CLAVE) === 'si'; } catch { /* sin almacenamiento */ }
-  const lista = h('div', { class: 'lista-recientes' });
-  const boton = h('button', { type: 'button', class: 'boton enlace boton-detalle' });
-  const pintar = () => {
-    lista.replaceChildren(...recientes.map((s) => resumenSesion(d, s, { breve: !detalle })));
-    boton.textContent = detalle ? 'En breve' : 'Con detalle';
-    boton.setAttribute('aria-pressed', String(detalle));
-  };
-  boton.onclick = () => {
-    detalle = !detalle;
-    try { localStorage.setItem(CLAVE, detalle ? 'si' : 'no'); } catch { /* sin almacenamiento */ }
-    pintar();
-  };
-  pintar();
-  return h('section', {},
-    h('div', { class: 'cabecera-seccion' }, h('h2', {}, 'Últimos entrenamientos'), boton),
-    lista,
-    h('a', { class: 'boton enlace', href: '#/historial' }, 'Ver todo el historial'));
-}

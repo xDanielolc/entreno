@@ -295,7 +295,7 @@ export function vistaAjustes(contenedor) {
 
     seccionSedes(d, apartado),
 
-    d.ejercicios.some((e) => e.borrado) && apartado(`Ejercicios borrados (${d.ejercicios.filter((e) => e.borrado).length})`,
+    d.ejercicios.some((e) => e.borrado) && apartado('Ejercicios borrados',
       h('p', { class: 'nota' }, 'Conservan su historial. Recupéralos si borraste alguno sin querer.'),
       h('ul', { class: 'lista-enlaces' }, d.ejercicios.filter((e) => e.borrado).map((e) => h('li', { class: 'fila-ejercicio' },
         h('span', {}, e.nombre, h('small', { class: 'suave' }, ` · borrado el ${e.borrado}`)),
@@ -375,7 +375,9 @@ function seccionSedes(d, apartado) {
     const s = x.sedes.find((y) => y.id === id);
     if (s) fn(s, x);
   }, opcionesCambio);
-  return apartado(sedes.length ? `Dónde entrenas (${sedes.length})` : 'Dónde entrenas',
+  // El título no lleva el número de sitios: el apartado se recuerda abierto por su título y, al añadir uno, se
+  // cerraba (Dan, 29-10-2026).
+  return apartado('Dónde entrenas',
     h('p', { class: 'nota' }, 'Gimnasios, casa, la calle… Cada entrenamiento apunta dónde se hizo, y cada ejercicio puede ser '
       + 'igual en todos los sitios o de uno solo (en su ficha).'),
     sedes.map((s) => h('div', { class: 'fila-sede' },
