@@ -1643,3 +1643,6 @@ version.js, sw.js y este archivo. La de spagat no cambia (sigue en versión 3).
   test de hoy (informativa, no tiñe nada) y la de la media móvil, que es la que manda y lleva el umbral de
   `CAMBIO_REAL_PVT`. Las horas del diario se escriben en dos casillas h/min separadas por dos puntos, nunca con
   `input type="time"`: su selector corta el botón «Establecer» en el móvil.
+- 0.73.3: solo sube la versión. La rutina de meditar (conversación de flexibilidad) y lo del sueño salieron los dos como
+  0.73.2, y un móvil que ya tuviera la primera no habría cogido la segunda. Antes de publicar, mirar `git log` por si
+  otra conversación ya ha usado ese número.
