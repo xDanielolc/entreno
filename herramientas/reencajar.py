@@ -46,7 +46,8 @@ REENCAJAR = {
     "jalon-con-agarre-estrecho": {"zona": (0.0, 0.75, 1.0, 1.0), "fijo_desde": 0.8},   # el asiento y las piernas
     "jalon-al-pecho-ek": {"zona": (0.0, 0.8, 1.0, 1.0), "fijo_desde": 0.82},
     "aperturas-con-mancuernas": {"zona": (0.0, 0.55, 1.0, 1.0), "fijo_desde": 0.62},   # el banco y las piernas
-    "curl-de-biceps-en-maquina": {"zona": (0.0, 0.0, 0.25, 1.0)},      # el bastidor de la máquina
+    "curl-de-biceps-en-maquina": {"zona": (0.0, 0.0, 0.25, 1.0), "escalado": True},
+    "curl-femoral-tumbado-ek": {"zona": (0.0, 0.3, 0.6, 1.0), "escalado": True},  # 02-11: el banco      # el bastidor de la máquina
     "press-frances": {"zona": (0.0, 0.55, 1.0, 1.0), "fijo_desde": 0.66},
     "press-cerrado": {"zona": (0.0, 0.6, 1.0, 1.0), "fijo_desde": 0.66},
     "remo-con-mancuerna": {"zona": (0.0, 0.5, 1.0, 0.62)},              # el banco y la rodilla apoyada
@@ -220,5 +221,5 @@ if __name__ == "__main__":
     filtro = sys.argv[1] if len(sys.argv) > 1 else None
     for nombre, op in REENCAJAR.items():
         if not filtro or filtro == nombre:
-            if not op.get("ia"):
+            if not op.get("ia") and not op.get("escalado"):  # escalado: hecho con escalar_encajar.py, no se repite
                 reencajar(nombre, op.get("zona"), mover=op.get("mover"), fijo_desde=op.get("fijo_desde"))

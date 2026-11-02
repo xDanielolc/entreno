@@ -704,27 +704,41 @@ export function plantillaNueva(rutina) {
 const firmaPlan = (p) => JSON.stringify([p.tipo, Boolean(p.calentamiento), p.progresion?.tipo ?? null, p.progresion?.preset ?? null,
   p.progresion?.objetivoEsfuerzo ?? p.objetivoEsfuerzo ?? null, p.progresion?.recamaraMin ?? null, p.progresion?.porRM ?? null,
   [...(p.tecnicas ?? [])].sort()]);
+// Más suelta: la misma serie aunque cambie un detalle (la recámara, el prehecho, las semanas del 1RM). Sin esto,
+// pasar de «10-15» a «10-15 con 1 en recámara» creaba series nuevas sin «la última vez» (Dan, 30-10: gemelo y
+// sentadilla salían como si nunca las hubiera hecho).
+const firmaSuelta = (p) => JSON.stringify([p.tipo, Boolean(p.calentamiento), p.progresion?.tipo ?? null,
+  p.progresion?.objetivoEsfuerzo ?? p.objetivoEsfuerzo ?? null, p.progresion?.porRM ? [p.progresion.porRM.fija ?? null, p.progresion.porRM.valor ?? null] : null,
+  [...(p.tecnicas ?? [])].sort()]);
 function reutilizarPlanes(datos, rutina) {
   const usados = new Set();
+  for (const firma of [firmaPlan, firmaSuelta]) {
   for (const dia of rutina.dias) {
     for (const item of dia.ejercicios) {
       const ej = datos.ejercicios.find((e) => e.id === item.ejercicioId);
       if (!ej || !Array.isArray(item.series)) continue;
       item.series = item.series.map((pid) => {
         const nuevo = ej.series.find((p) => p.id === pid);
-        if (!nuevo || nuevo.soloRutina !== rutina.id) return pid;
+        if (!nuevo || nuevo.soloRutina !== rutina.id || usados.has(nuevo.id)) return pid;
         // Vale una del mismo lado o, si no, una sin lado (que pasa a tenerlo).
-        const sirve = (q, lado) => q !== nuevo && !usados.has(q.id) && (q.soloRutina === 'retirada' || !q.soloRutina)
-          && firmaPlan(q) === firmaPlan(nuevo) && (q.lado ?? null) === lado;
+        // En la pasada suelta, solo las que eran de esta rutina: las propias del ejercicio no cambian de regla.
+        const sirve = (q, lado) => q !== nuevo && !usados.has(q.id)
+          && (q.soloRutina === 'retirada' || (!q.soloRutina && firma === firmaPlan))
+          && firma(q) === firma(nuevo) && (q.lado ?? null) === lado;
         const viejo = ej.series.find((q) => sirve(q, nuevo.lado ?? null)) ?? (nuevo.lado ? ej.series.find((q) => sirve(q, null)) : null);
         if (!viejo) return pid;
         usados.add(viejo.id);
+        // Si solo se parecen, la de antes toma la regla nueva (y conserva su id y su historial).
+        if (firma === firmaSuelta) {
+          for (const [k, v] of Object.entries(nuevo)) if (!['id', 'soloRutina', 'lado'].includes(k)) viejo[k] = v;
+        }
         if (nuevo.lado) viejo.lado = nuevo.lado;
         if (viejo.soloRutina === 'retirada') viejo.soloRutina = rutina.id;
         ej.series = ej.series.filter((p) => p.id !== nuevo.id);
         return viejo.id;
       });
     }
+  }
   }
 }
 

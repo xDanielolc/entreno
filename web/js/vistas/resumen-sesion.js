@@ -48,8 +48,14 @@ export function comparacionSerie(datos, ej, serie, { excluirSesion } = {}) {
   const historial = seriesDeEjercicio(datos, ej.id, { excluirSesion, planId: serie.planId || undefined })
     .filter((x) => Boolean(x.serie.tramos?.length) === Boolean(serie.tramos?.length))
     // Una serie suelta (sin plantilla) solo se compara con otras sueltas del mismo tipo.
-    .filter((x) => serie.planId || (!x.serie.planId && x.serie.tipo === serie.tipo));
+    .filter((x) => serie.planId || (!x.serie.planId && x.serie.tipo === serie.tipo))
+    // Un calentamiento apuntado con el plan de esta serie no es «esta serie la última vez» (salía «▲ 217 %»
+    // frente a una barra de 20 kg × 14).
+    .filter((x) => x.serie.tipo !== 'calentamiento');
   const anterior = historial.at(-1);
+  // Sin la recámara apuntada todavía, la estimación sale baja y la flecha engaña (Dan vio «superado» y «▼ 3 %» a
+  // la vez mientras escribía): se espera a tenerla si la de la última vez la tenía.
+  if (serie.recamara == null && anterior?.serie.recamara != null && !serie.tramos?.length) return '';
   const delCicloAnterior = serie.cicloN > 1 && serie.diaCiclo
     ? historial.filter((x) => x.entrada.cicloN === serie.cicloN - 1 && x.entrada.diaCiclo === serie.diaCiclo).at(-1)
     : null;
@@ -95,8 +101,9 @@ export function mostrarResumen(datos, sesionId) {
       h('small', {}, `${r.que} · antes ${formatearNumero(r.antes)}`)))),
     comparacion.length > 0 && h('div', { class: 'como-vas' },
       h('h3', {}, 'Frente a la última vez'),
+      h('p', { class: 'nota' }, 'Tu mejor 1RM estimado de hoy en cada ejercicio frente al de la última vez que hiciste este mismo día de la rutina (sin calentamientos).'),
       comparacion.map((c) => h('div', { class: `fila-como-vas ${c.clase}` },
-        h('span', { class: 'nombre' }, c.nombre),
+        h('span', { class: 'nombre' }, c.nombre, c.fecha ? h('small', { class: 'suave' }, ` · ${c.fecha}`) : null),
         h('span', { class: `insignia ${c.clase}` }, c.insignia)))),
     cambios.length > 0 && seccionCambios(cambios),
     h('div', { class: 'fila-botones' },
@@ -139,12 +146,16 @@ function comparacionPorEjercicio(datos, sesion) {
     // Se compara lo mismo con lo mismo: el 1RM si lo hay; si no (solo drop
     // sets, o sin peso), el trabajo o lo que midas, sin colores.
     const medidas = (series) => series.map((s) => medida(datos, ej, s)).filter(Boolean);
-    const hoyTodas = medidas(entrada.series.filter((s) => s.hecha));
+    const hoyTodas = medidas(entrada.series.filter((s) => s.hecha && s.tipo !== 'calentamiento'));
     if (!hoyTodas.length) continue;
     const nombre = hoyTodas.some((m) => m.nombre === '1RM') ? '1RM' : hoyTodas[0].nombre;
     const hoy = hoyTodas.filter((m) => m.nombre === nombre);
-    const antes = seriesDeEjercicio(datos, ej.id, { excluirSesion: sesion.id })
-      .filter((x) => x.sesion.fecha <= sesion.fecha);
+    const todasAntes = seriesDeEjercicio(datos, ej.id, { excluirSesion: sesion.id })
+      .filter((x) => x.sesion.fecha <= sesion.fecha && x.serie.tipo !== 'calentamiento');
+    // Frente a la última vez que hiciste ESE día de la rutina, si lo hay: el mismo ejercicio en segundo lugar y
+    // con otras series rinde menos que el día que va primero (Dan, 30-10, sentadilla «−9 %»).
+    const mismoDia = sesion.diaRutinaId ? todasAntes.filter((x) => x.sesion.diaRutinaId === sesion.diaRutinaId) : [];
+    const antes = mismoDia.length ? mismoDia : todasAntes;
     const ultimaFecha = antes.at(-1)?.sesion.id;
     const deEseDia = medidas(antes.filter((x) => x.sesion.id === ultimaFecha).map((x) => x.serie)).filter((m) => m.nombre === nombre);
     const mejorHoy = Math.max(...hoy.map((m) => m.valor));
@@ -155,7 +166,8 @@ function comparacionPorEjercicio(datos, sesion) {
     const mejora = nombre === '1RM' ? 'más fuerte'
       : ej.esfuerzo?.tipo === 'tiempo' ? (tipoDeEjercicio(ej) === 'estiramiento' ? 'más elástico' : 'más aguante')
         : ej.esfuerzo?.tipo === 'distancia' ? 'más lejos' : 'más repeticiones';
-    filas.push({ nombre: ej.nombre, que: nombre, valor,
+    const f = antes.at(-1).sesion.fecha;
+    filas.push({ nombre: ej.nombre, que: nombre, valor, fecha: `${valor} frente a ${formatearNumero(redondear(mejorAntes, 1))}${nombre === '1RM' ? ' kg' : ''} del ${f.slice(8, 10)}/${f.slice(5, 7)}`,
       insignia: pct > 0 ? `▲ ${mejora} (+${pct} %)` : pct < 0 ? `▼ algo menos (${pct} %)` : '= igual',
       clase: pct > 0 ? 'sube' : pct < 0 ? 'baja' : '' });
   }

@@ -1603,3 +1603,23 @@ Esquema v30 (`sedesBasicas` en esquema.js: Gimnasio, Casa y Calle de serie, el q
 - Calendario: el ✓ de la derecha, explicado (semanas con algún entreno, las de la racha).
 - «Por lado» no le salía porque su rutina de flexibilidad es anterior a los lados y no la había actualizado: con
   «Actualizar mi rutina» las series salen por lado (comprobado sobre una copia de sus datos).
+
+## Ronda 0.73.0 (02-11-2026): su entreno del 30-10 (pierna, día 4)
+
+- **Actualizar una rutina ya no crea series nuevas sin historial** por un detalle: `reutilizarPlanes` (plantillas.js)
+  hace una segunda pasada con `firmaSuelta` (sin recámara, prehecho ni semanas del 1RM) y la serie de antes toma la
+  regla nueva conservando su id. Con «10-15» → «10-15 con 1 en recámara» el gemelo y la sentadilla salían sin «la
+  última vez». Si aun así una serie no tiene historial propio, la línea dice «La última vez (fecha), en esta serie: …»
+  con la serie del mismo puesto del último día (mejor el mismo día de la rutina; `ultimaEquivalente` en sesion.js).
+- Debajo de lo que toca: «Con tu 1RM de X kg, con P kg te salen unas N al fallo; N+1 lo superan» (`repsQueSalen`).
+- **1RM**: un 1RM puesto a mano hoy lo sube una serie apuntada después que dé más (`masFuerteDespues` en
+  `rmDelEjercicio`); la cabecera dice «Hoy vas más fuerte: pasa de A a B» con «Volver a A» en vez de «Cambiar»
+  (`guardarRM`). El récord de 1RM prefiere series de 12 o menos sin Bilbo (una Bilbo de 30 daba 184 kg en sentadilla).
+- Cambiar tú el peso de una serie lo pasa a las de debajo con la misma regla cuyo peso puso la app.
+- Tras la prueba de 1RM, las series de la misma regla con la casilla de peso vacía se rellenan (curl femoral).
+- Comparaciones: «frente a esta serie la última vez» sin calentamientos (salía ▲ 217 % frente a 20 × 14) y esperando a
+  la recámara; el resumen al terminar compara con el mismo día de la rutina y dice con qué fecha y cifra; el consejo
+  «lleva 3 sesiones sin superar tu 1RM» solo cuenta sesiones del mismo día de la rutina.
+- Dibujos: 11 reencajados con `escalar_encajar.py` (ahora resta la tinta que no coincide y no deja salir nada del
+  lienzo; `--salida` para probar), rotaciones de hombro con palo sin suelo ni orejas, isométricos de cuello quietos.
+  Almacén `entreno-imagenes-53`.

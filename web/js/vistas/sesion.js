@@ -700,6 +700,7 @@ export function vistaSesion(contenedor, { id }) {
         : rm.origen === 'manual' ? ['Ahora es ', resaltado('el que pusiste a mano'), '.']
           : ['Ahora sale de ', resaltado(rm.serie ? `tu entrenamiento del ${fechaCorta(rm.fecha)}: ${textoSerie(ej, rm.serie)}` : 'tu mejor serie de siempre'), '.'];
     // Al lado, tu mejor de siempre, para comparar (Dan, 26-10: «también quiero comparación con el absoluto»).
+    const subidoHoy = enCurso && rm?.origen === 'hoy' && rm.antes > 0 && Math.round(rm.valor) > Math.round(rm.antes);
     const absoluto = records(d, ej.id).mejor1RM;
     const conAbsoluto = rm && absoluto && Math.round(absoluto.valor) > Math.round(rm.valor);
     return h('div', { class: 'linea-1rm' },
@@ -713,8 +714,13 @@ export function vistaSesion(contenedor, { id }) {
         'El récord es tu mejor 1RM estimado de siempre, solo para comparar: no cambia los pesos.',
         'Si hoy estás cansado, «Cambiar» pone otro 1RM y las series que te quedan se rehacen con él.',
         'No cuentan los calentamientos ni las series con más de 5 en recámara: lejos del fallo, la estimación se equivoca mucho.']),
-      ej.carga?.tipo !== 'pesoCorporal'
-        && h('button', { type: 'button', class: 'boton enlace', onclick: () => ponerRMaMano(ej, null) }, rm ? 'Cambiar' : 'Lo sé'));
+      // Si una serie de hoy lo ha subido, se dice y se puede volver al de antes (Dan, 30-10: «en vez de "Cambiar",
+      // "hoy has sido más fuerte, te he puesto el 1RM nuevo; si quieres volver al anterior, pulsa aquí"»).
+      subidoHoy
+        ? h('div', { class: 'subido-hoy' }, h('p', { class: 'nota' }, `Hoy vas más fuerte: pasa de ${formatearNumero(Math.round(rm.antes))} a ${formatearNumero(Math.round(rm.valor))} kg con tu serie de hoy.`),
+          h('button', { type: 'button', class: 'boton enlace', onclick: () => guardarRM(ej, rm.antes, null) }, `Volver a ${formatearNumero(Math.round(rm.antes))} kg`))
+        : ej.carga?.tipo !== 'pesoCorporal'
+          && h('button', { type: 'button', class: 'boton enlace', onclick: () => ponerRMaMano(ej, null) }, rm ? 'Cambiar' : 'Lo sé'));
   }
 
   // La línea de qué toca, con un «?» en la esquina que cuenta por qué.
@@ -941,9 +947,11 @@ export function vistaSesion(contenedor, { id }) {
       const rango = textoRango(s.rango);
       const rec = s.recamaraMin ? ` dejando ${s.recamaraMin} en recámara` : '';
       if (serie.carga != null && ej.carga?.tipo !== 'pesoCorporal') {
-        const base = serie.rmUsado?.valor ?? s.rmUsado;
         partes.push(`Hoy: ${formatearNumero(serie.carga)} ${uCarga}${rango ? ` × ${rango}` : ''}${rec}`);
       } else partes.push(`Hoy: ${rango ? rangoConUnidad(s.rango) : 'apunta lo que hagas'}${rec}`);
+      // Aunque la regla sea nueva (cambió al actualizar la rutina), lo que hiciste en este puesto el último día.
+      const eq = entrada && ultimaEquivalente(ej, entrada, j);
+      if (eq) lineas.push(h('span', { class: 'compara' }, `La última vez (${fechaCorta(eq.sesion.fecha)}), en esta serie: `, h('strong', {}, textoSerie(ej, eq.serie))));
     } else if (!s.ultima && !s.referencia) {
       // Solo apuntar, sin nada de antes: el rango y, si hay 1RM, un peso orientativo.
       const r = s.rango ?? plan.objetivoEsfuerzo;
@@ -961,9 +969,35 @@ export function vistaSesion(contenedor, { id }) {
         + (s.faltaRecamara ? ' (la última vez llegaste, pero apurando)' : ''));
       if (s.modo === 'esfuerzo') partes.push(`hoy intenta ${conUnidad(s.esfuerzoObjetivo)}`);
     }
+    // Cuántas te salen con ese peso según tu 1RM de ahora, y cuántas lo superan (Dan, 30-10: «no me dice cuál es
+    // mi 1RM hoy ni qué debería hacer para superarme»).
+    const salen = s.modo === 'carga' && !serie.hecha && !serie.tramos?.length && !esMaxima(plan) ? repsQueSalen(ej, serie.carga, rmAntes) : null;
+    if (salen) lineas.push(h('span', { class: 'compara' }, `Con tu 1RM de ${formatearNumero(Math.round(rmAntes.valor))} kg, con ${formatearNumero(serie.carga)} ${uCarga} te salen unas `,
+      h('strong', {}, `${salen}`), ` al fallo; ${salen + 1} lo superan`));
     if (!partes.length && !lineas.length) return null;
     if (!lineas.length) return h('p', { class: 'sugerencia' }, partes.join(' · '));
     return h('div', { class: 'sugerencia' }, partes.length ? h('span', {}, partes.join(' · ')) : null, h('span', { class: 'comparativas' }, lineas));
+  }
+
+  // Repeticiones al fallo con ese peso según el 1RM (solo con peso de verdad y repeticiones).
+  function repsQueSalen(ej, peso, rm) {
+    if (!rm || !(peso > 0) || ['pesoCorporal', 'asistida', 'ninguna', 'altura'].includes(ej.carga?.tipo) || ej.esfuerzo?.tipo !== 'repeticiones') return null;
+    const n = Math.floor(repsParaIgualar(modeloDe(d, ej), rm.valor, peso, 0) + 1e-6);
+    return n >= 1 && n <= 40 ? n : null;
+  }
+
+  // La serie del mismo puesto (la 1.ª, 2.ª… de trabajo) la última vez que hiciste el ejercicio, mejor el mismo
+  // día de la rutina: para cuando la regla de la serie es nueva y no tiene «última vez» propia.
+  function ultimaEquivalente(ej, entrada, j) {
+    const k = entrada.series.slice(0, j).filter((x) => x.tipo !== 'calentamiento').length;
+    const antes = seriesDeEjercicio(d, ej.id, { excluirSesion: id })
+      .filter((x) => x.serie.tipo !== 'calentamiento' && x.serie.hecha !== false && x.sesion.origen !== 'importado-excel'
+        && (x.serie.esfuerzo != null || x.serie.tramos?.length));
+    const mismoDia = sesion.diaRutinaId ? antes.filter((x) => x.sesion.diaRutinaId === sesion.diaRutinaId) : [];
+    const lista = mismoDia.length ? mismoDia : antes;
+    const ultima = lista.at(-1)?.sesion.id;
+    const deEsa = lista.filter((x) => x.sesion.id === ultima);
+    return deEsa.length ? deEsa[Math.min(k, deEsa.length - 1)] : null;
   }
 
   // Al apuntar una serie (al salir de la casilla) o al pintar, las de debajo
@@ -1011,7 +1045,9 @@ export function vistaSesion(contenedor, { id }) {
       // A mitad del ejercicio el peso no se toca solo (borrador 14): en cuanto
       // hay una serie hecha con esta misma regla, las demás se quedan como
       // están. Bajarlo lo propone la app y lo decides tú.
-      if (entrada.series.some((x, k) => k !== j && x.hecha && mismaReglaEn(e, x, serie))) return;
+      // Una casilla de peso vacía sí se rellena: tras la prueba de 1RM, las demás series de la misma regla se
+      // quedaban sin peso (Dan, curl femoral del 30-10: «para qué la prueba si luego no me hace caso»).
+      if (serie.carga != null && entrada.series.some((x, k) => k !== j && x.hecha && mismaReglaEn(e, x, serie))) return;
       if (serie.carga != null && serie.rmUsado?.valor && Math.abs(serie.rmUsado.valor - rm.valor) < 0.5) return;
       const peso = pesoDePlan(datos, e, plan, rm.valor, { excluirSesion: id });
       if (!(peso > 0) || (peso === serie.carga && serie.rmUsado?.valor === rm.valor)) return;
@@ -1071,29 +1107,34 @@ export function vistaSesion(contenedor, { id }) {
         const rm = leerNumero(caja.value);
         if (!(rm > 0)) { aviso('Pon un número', { tipo: 'error' }); return; }
         cerrar();
-        estado.cambiar((datos) => {
-          const e = datos.ejercicios.find((x) => x.id === ej.id);
-          if (!e) return;
-          e.rmManual = rm;
-          e.rmManualEn = new Date().toISOString();
-          for (const plan of e.series || []) {
-            if (plan.progresion?.tipo === 'bilbo' && plan.progresion.inicio?.modo === 'prueba') plan.progresion.inicio.modo = 'porcentaje';
-          }
-          const s = datos.sesiones.find((x) => x.id === id);
-          for (const entrada of s?.ejercicios ?? []) {
-            if (entrada.ejercicioId !== ej.id) continue;
-            entrada.series = entrada.series.map((x) => {
-              const plan = (e.series || []).find((p) => p.id === x.planId);
-              const rehacer = plan && !x.hecha && !x.tramos?.length && (!x.cargaAMano || x.id === serie?.id) && x.tipo !== 'calentamiento';
-              return rehacer ? { ...crearSerieDesdePlan(datos, e, plan, { excluirSesion: id, rmHoy: rm }), id: x.id } : x;
-            });
-            const conCiclo = entrada.series.find((x) => x.cicloN != null);
-            if (conCiclo) { entrada.cicloN = conCiclo.cicloN; entrada.diaCiclo = conCiclo.diaCiclo; }
-          }
-        });
-        aviso(`Guardado: 1RM de ${formatearNumero(rm)} kg. Las series que te quedan ya llevan su peso.`);
+        guardarRM(ej, rm, serie);
       } }, 'Guardar')));
     setTimeout(() => caja.focus(), 50);
+  }
+
+  // Guarda un 1RM puesto a mano (o «Volver a…») y rehace las series que quedan.
+  function guardarRM(ej, rm, serie) {
+    estado.cambiar((datos) => {
+      const e = datos.ejercicios.find((x) => x.id === ej.id);
+      if (!e) return;
+      e.rmManual = rm;
+      e.rmManualEn = new Date().toISOString();
+      for (const plan of e.series || []) {
+        if (plan.progresion?.tipo === 'bilbo' && plan.progresion.inicio?.modo === 'prueba') plan.progresion.inicio.modo = 'porcentaje';
+      }
+      const s = datos.sesiones.find((x) => x.id === id);
+      for (const entrada of s?.ejercicios ?? []) {
+        if (entrada.ejercicioId !== ej.id) continue;
+        entrada.series = entrada.series.map((x) => {
+          const plan = (e.series || []).find((p) => p.id === x.planId);
+          const rehacer = plan && !x.hecha && !x.tramos?.length && (!x.cargaAMano || x.id === serie?.id) && x.tipo !== 'calentamiento';
+          return rehacer ? { ...crearSerieDesdePlan(datos, e, plan, { excluirSesion: id, rmHoy: rm }), id: x.id } : x;
+        });
+        const conCiclo = entrada.series.find((x) => x.cicloN != null);
+        if (conCiclo) { entrada.cicloN = conCiclo.cicloN; entrada.diaCiclo = conCiclo.diaCiclo; }
+      }
+    });
+    aviso(`Guardado: 1RM de ${formatearNumero(rm)} kg. Las series que te quedan ya llevan su peso.`);
   }
 
   function bloqueSerie(ej, entrada, i, j, serie) {
@@ -1773,7 +1814,23 @@ export function vistaSesion(contenedor, { id }) {
         if (!antes && serieCompleta(ej, serie)) descansoEntreSeries(ej, serie);
       }
     });
-    kilos.addEventListener('change', () => { if (tramo == null) reajustarDebajo(ej, i); });
+    kilos.addEventListener('change', () => {
+      if (tramo != null) return;
+      // Si cambias tú el peso, las series de debajo con la misma regla (y cuyo peso puso la app) siguen con el tuyo:
+      // Dan subió el gemelo a 90 porque iba fuerte y la serie siguiente volvía a 80 (30-10).
+      const v = leerNumero(kilos.value);
+      const siguen = v > 0 && sesion.ejercicios[i]?.series.some((x, k) => k > j && !x.hecha && x.cargaAuto && x.tipo !== 'calentamiento'
+        && !x.tramos?.length && x.carga !== v && mismaReglaEn(ej, x, serie));
+      if (siguen) {
+        cambiarSesion((s) => s.ejercicios[i].series.forEach((x, k) => {
+          if (k > j && !x.hecha && x.cargaAuto && x.tipo !== 'calentamiento' && !x.tramos?.length && mismaReglaEn(ej, x, serie)) {
+            x.carga = v; x.cargaAMano = true; delete x.cargaAuto;
+          }
+        }));
+        aviso('Las series que quedan de este ejercicio siguen con tu peso.');
+      }
+      reajustarDebajo(ej, i);
+    });
     porcentaje.addEventListener('input', () => {
       const p = leerNumero(porcentaje.value);
       const r = rmActual();

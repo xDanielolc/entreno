@@ -236,3 +236,30 @@ Pendiente (no salió o necesita foto de ejemplo):
 - [ ] CARs de cadera y flexiones en pica: las manos/pies no quedan fijos porque la IA dibuja otra postura; rehacer.
 - [ ] Mountain climbers: falta animar la otra pierna. Elíptica: pendiente (no sale con ninguna IA).
 - [ ] Supinas: conservar también el dibujo de antes como segunda perspectiva (hace falta que la app enseñe dos).
+
+# Octava revisión (02-11-2026, página de revisión, colección `revision`)
+Con código (02-11): CARs de cadera (la mano de la izquierda clavada), cobra, curl en máquina, curl femoral tumbado (tamaño),
+dominadas con lastre, elevación de piernas y de rodillas colgado (manos), escalera y face pull (tamaño), dedos del pie,
+flexiones (normales, diamante y con lastre: pies y manos), hip thrust (pies), búlgara (pierna de delante), multipower
+(pies), hack (la línea de la izquierda), rotaciones con palo (suelo), isométricos de cuello quietos.
+Con IA, dibujo propio que falta (ahora llevan el de otro ejercicio por alias y no corresponde):
+- [ ] Curl de muñeca con barra (y el de mancuerna: no alternar prono y supino; extensión de muñeca, igual).
+- [ ] Curl predicador con barra Z (no en polea). Jalón con barra en polea (no cuerda). Jalón tras nuca, jalón unilateral.
+- [ ] Dominadas neutras en la máquina de dominadas (asas paralelas) o con dos barras. Dominadas tras nuca.
+- [ ] Elevaciones laterales en máquina. Press convergente en máquina, press de banca en multipower, JM press en multipower.
+- [ ] Y-T-W (otra vez), extensión de cuello con arnés, flexión de cuello con disco, flexión lateral de cuello.
+- [ ] Extensión de tríceps en máquina (con foto). Movilidad dinámica de torso. Pull apart en polea. Tibial con disco.
+- [ ] Flexiones en pino (es de wger: hacerla nuestra). Giros rusos (animar). Press de hombro a una mano desde cero.
+- [ ] Mountain climbers: pedir la rodilla IZQUIERDA (la de detrás) al pecho para tener la tercera postura. Escalador, igual.
+- [ ] Elevaciones frontales alternas (que suba el otro brazo). Variante «Encogimientos con barra». «Pájaro con el brazo estirado».
+- [ ] Zancadas (hacia delante): usar el dibujo de las de hacia atrás con las posturas al revés.
+- [ ] Subida al cajón: que acabe de pie arriba. Dominadas pronas y supinas: alternar vista de frente y de espaldas.
+- [ ] Orejas/cara: dominadas asistidas (al bajar), fondos asistidos (orejas al bajar y la pesa al revés, como balancín),
+      press Arnold, patada de glúteo en polea, rotaciones con palo, abducción en polea (además máquina y músculo).
+- [ ] «Cabeza huevo» (preguntar qué significa): jalón al pecho, goblet, zancadas, rotación interna con toalla.
+- [ ] Remo de cardio: líneas borrosas. Extensión torácica sobre rodillo: el cuello gira 180°. Rotación torácica en
+      cuadrupedia: alucinación al girar hacia dentro. Pájaro a una mano: la muñeca apoyada se parte.
+- [ ] Rotación interna con toalla: las dos manos se mueven (la de abajo tira). Sobre la cabeza: la toalla no gira.
+- [ ] Peso muerto con mancuernas: más cachas. Remo en máquina, máquina de glúteo, elíptica, antebrazo flexores,
+      flexiones en pica, peso muerto rumano con mancuernas: pendientes de antes.
+- [ ] Nombre: «Remo en polea» → «Remo en polea a la cintura».

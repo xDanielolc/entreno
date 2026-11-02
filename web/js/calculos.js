@@ -274,6 +274,17 @@ export function rmDelEjercicio(datos, ejercicio, { sesion = null, antesDe = null
   // Si hoy has puesto otro 1RM a mano («Cambiar», por ejemplo porque llegas
   // cansado), manda ese durante el entreno, salvo una máxima apuntada después.
   const manualHoy = sesion && ejercicio.rmManual > 0 && String(ejercicio.rmManualEn ?? '').slice(0, 10) === sesion.fecha;
+  // Pero una serie apuntada después que dé más lo sube: si hoy vas más fuerte de lo que dijiste, manda lo de hoy
+  // (Dan, 30-10: récord de 120 kg en el gemelo y la cabecera seguía en los 115 que había puesto).
+  const masFuerteDespues = (sesion?.ejercicios ?? []).flatMap((entrada, i) => (entrada.ejercicioId !== ejercicio.id ? []
+    : entrada.series.filter((s, j) => s.hecha && !(antesDe && (i > antesDe.i || (i === antesDe.i && j >= antesDe.j)))
+      && String(s.hechaA ?? '') > String(ejercicio.rmManualEn ?? '') && valeParaRM(s))
+      .map((s) => ({ valor: redondear(rmSinTramos(datos, ejercicio, s) ?? 0, 1), serie: s }))))
+    .filter((x) => x.valor > ejercicio.rmManual);
+  if (manualHoy && masFuerteDespues.length) {
+    const gana = mejorDe(masFuerteDespues);
+    return { valor: gana.valor, origen: 'hoy', serie: gana.serie, corta: valeParaReferencia(ejercicio, gana.serie), antes: ejercicio.rmManual };
+  }
   if (manualHoy && !(hoyMaxima && String(hoyMaxima.serie.hechaA ?? '') > ejercicio.rmManualEn)) {
     return { valor: ejercicio.rmManual, origen: 'manual', corta: true };
   }
@@ -292,7 +303,7 @@ export function rmDelEjercicio(datos, ejercicio, { sesion = null, antesDe = null
   // El puesto a mano después de esas series de hoy manda (lo acabas de decir tú).
   const manualDespues = base?.manual && ejercicio.rmManualEn && hoy?.serie?.hechaA && ejercicio.rmManualEn > hoy.serie.hechaA;
   if (hoy && !manualDespues && (!base || base.manual || ganaSiempre || hoy.valor > base.valor)) {
-    return { valor: hoy.valor, origen: 'hoy', serie: hoy.serie, corta: valeParaReferencia(ejercicio, hoy.serie) };
+    return { valor: hoy.valor, origen: 'hoy', serie: hoy.serie, corta: valeParaReferencia(ejercicio, hoy.serie), antes: base?.valor ?? null };
   }
   if (!base) return null;
   return { valor: base.valor, origen: base.manual ? 'manual' : 'historial', fecha: base.fecha, serie: base.serie ?? null, corta: Boolean(base.corta) };
@@ -959,6 +970,7 @@ export function records(datos, ejercicioId) {
   const series = seriesDeEjercicio(datos, ejercicioId);
   let mejorTrabajo = null;
   let mejor1RM = null;
+  let mejorCorto = null;
   for (const x of series) {
     const trabajo = trabajoSerie(x.serie);
     if (trabajo != null && (!mejorTrabajo || trabajo > mejorTrabajo.valor)) {
@@ -968,8 +980,13 @@ export function records(datos, ejercicioId) {
     if (rm != null && (!mejor1RM || rm > mejor1RM.valor)) {
       mejor1RM = { valor: redondear(rm, 1), fecha: x.sesion.fecha, serie: x.serie };
     }
+    if (rm != null && valeParaReferencia(ejercicio, x.serie) && (!mejorCorto || rm > mejorCorto.valor)) {
+      mejorCorto = { valor: redondear(rm, 1), fecha: x.sesion.fecha, serie: x.serie };
+    }
   }
-  return { mejorTrabajo, mejor1RM };
+  // El récord de 1RM, como el de la cabecera: de series de 12 o menos sin Bilbo si las hay. Una Bilbo de 30
+  // repeticiones de 2025 daba a la sentadilla un «récord» de 184 kg (Dan, 30-10: «no sé de dónde saca el RM»).
+  return { mejorTrabajo, mejor1RM: mejorCorto ?? mejor1RM };
 }
 
 export function formatearNumero(n) {

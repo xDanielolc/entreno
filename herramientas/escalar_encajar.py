@@ -1,16 +1,30 @@
 """Encaja la segunda postura en tamaño y sitio sobre la primera por una zona quieta (fracciones de la caja de la
 primera postura). Prueba escalas y desplazamientos y se queda con el que más tinta hace coincidir.
-Uso: python escalar_encajar.py <webp> x0 y0 x1 y1 [escala_min escala_max]"""
+Uso: python escalar_encajar.py <webp> x0 y0 x1 y1 [escala_min escala_max] [--salida otro.webp]
+La tinta de la segunda postura que cae en la zona sin coincidir resta (si no, siempre gana la escala más grande) y
+no vale ninguna colocación que deje tinta fuera del lienzo."""
 import sys
 import numpy as np
 from PIL import Image, ImageSequence
 
+args = sys.argv[1:]
+salida = None
+if '--salida' in args:
+    i = args.index('--salida')
+    salida = args[i + 1]
+    del args[i:i + 2]
+sys.argv[1:] = args
 ruta = sys.argv[1]
 zona = tuple(float(v) for v in sys.argv[2:6])
 emin, emax = (float(sys.argv[6]), float(sys.argv[7])) if len(sys.argv) > 7 else (0.8, 1.3)
 im = Image.open(ruta)
 fr = [f.convert('RGB').copy() for f in ImageSequence.Iterator(im)]
-dur = [f.info.get('duration', 900) for f in ImageSequence.Iterator(Image.open(ruta))]
+dur = []
+_im = Image.open(ruta)
+for i in range(_im.n_frames):
+    _im.seek(i)
+    _im.load()  # sin load() Pillow no da la duración del fotograma
+    dur.append(_im.info.get('duration', 900))
 a, b = fr[0], fr[1]
 ta = np.array(a.convert('L')) < 150
 ys, xs = np.nonzero(ta)
@@ -31,12 +45,18 @@ def pegar(esc, dx, dy):
     return lienzo
 
 
+tinta_b = (np.array(b.convert('L')) < 150).sum()
+
+
 def puntua(esc, dx, dy):
     t = np.array(pegar(esc, dx, dy).convert('L')) < 150
-    return (pa & t[z[1]:z[3], z[0]:z[2]]).sum()
+    if t.sum() < 0.97 * tinta_b * esc * esc:  # se sale del lienzo
+        return -1
+    tz = t[z[1]:z[3], z[0]:z[2]]
+    return (pa & tz).sum() - 0.5 * (tz & ~pa).sum()
 
 
-mejor = (-1, 1.0, 0, 0)
+mejor = (-1e9, 1.0, 0, 0)
 for esc in np.arange(emin, emax + 1e-9, 0.02):
     for dx in range(-60, 61, 6):
         for dy in range(-60, 61, 6):
@@ -52,5 +72,5 @@ for esc in np.arange(e0 - 0.02, e0 + 0.021, 0.005):
                 mejor = (p, esc, dx, dy)
 _, esc, dx, dy = mejor
 nb = pegar(esc, dx, dy)
-a.save(ruta, 'WEBP', save_all=True, append_images=[nb], duration=dur[:2], loop=0, quality=82, method=6)
+a.save(salida or ruta, 'WEBP', save_all=True, append_images=[nb], duration=dur[:2], loop=0, quality=82, method=6)
 print(f'{ruta}: escala {esc:.3f}, desplazada {dx}, {dy}')

@@ -369,7 +369,12 @@ CONGELADOS = {"cruces-en-polea-completo",
               "dominadas-supinas",  # 29-10: la segunda figura estrechada (mismo agarre) y la barra de la primera
               "remo-de-cardio",  # 29-10: orejas borradas a mano
               "elevaciones-laterales-en-polea",  # 29-10: orejas borradas a mano y el contorno de la cara cerrado
-              "elevaciones-laterales"}  # 29-10: pies apoyados (Gemini) y orejas borradas a mano
+              "elevaciones-laterales",  # 29-10: pies apoyados (Gemini) y orejas borradas a mano
+              "rotaciones-de-hombro-con-palo",  # 02-11: línea del suelo y orejas borradas a mano
+              # 02-11: la segunda postura cambiaba de tamaño; ajustada con escalar_encajar.py
+              "cars-de-cadera", "cobra-en-el-suelo", "dominadas-con-lastre", "elevacion-de-piernas-colgado",
+              "escalera-sin-fin", "flexion-y-extension-de-dedos-del-pie", "sentadilla-bulgara",
+              "sentadilla-en-multipower"}
 
 QUIETOS = {"Plancha lateral": "imagenes/ejercicios/anim/plancha-lateral-quieta.webp"}
 

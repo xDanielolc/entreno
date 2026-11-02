@@ -826,13 +826,14 @@
    "animada": true
   },
   "Isométricos de cuello": {
-   "archivo": "imagenes/ejercicios/anim/flexion-lateral-de-cuello.webp",
+   "archivo": "imagenes/ejercicios/anim/flexion-lateral-de-cuello-quieta.webp",
    "autor": "Everkinetic",
    "fuente": "everkinetic",
    "nombreEnFuente": "static-neck-side-flexion",
-   "estatica": "imagenes/ejercicios/flexion-lateral-de-cuello.png",
-   "animada": true,
-   "aliasDe": "Flexión lateral de cuello"
+   "estatica": "imagenes/ejercicios/anim/flexion-lateral-de-cuello-quieta.webp",
+   "animada": false,
+   "aliasDe": "Flexión lateral de cuello",
+   "nota": "Isométrico: dibujo quieto (Dan, 02-11-2026)"
   },
   "Bicicleta de aire": {
    "archivo": "imagenes/ejercicios/anim/bicicleta-de-aire.webp",
@@ -2631,12 +2632,13 @@
    "autor": "Gemini"
   },
   "Isométrico de cuello hacia atrás": {
-   "archivo": "imagenes/ejercicios/anim/isometricos-de-cuello.webp",
+   "archivo": "imagenes/ejercicios/anim/isometricos-de-cuello-quieta.webp",
    "autor": "Everkinetic",
    "fuente": "everkinetic",
    "nombreEnFuente": "static-neck-flexion-extension",
-   "estatica": "imagenes/ejercicios/isometricos-de-cuello.png",
-   "animada": true
+   "estatica": "imagenes/ejercicios/anim/isometricos-de-cuello-quieta.webp",
+   "animada": false,
+   "nota": "Isométrico: dibujo quieto (Dan, 02-11-2026)"
   }
  }
 }

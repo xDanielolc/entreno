@@ -214,7 +214,11 @@ function progresoPorEjercicio(datos, sesiones, ahora, semana, dureza) {
           .flatMap((e) => e.series.filter((x) => x.hecha && !x.tramos?.length && x.tipo !== 'calentamiento'));
         const rms = hechas.map((x) => rmDeSerie(datos, ej, x, esfuerzoTotal(x))).filter(Boolean);
         return rms.length ? { s, rm: Math.max(...rms), hechas } : null;
-      }).filter(Boolean);
+      }).filter(Boolean)
+      // Se compara lo mismo con lo mismo: si el ejercicio va en varios días de la rutina (pesado el día 2, segundo
+      // y más ligero el día 4), solo las sesiones de ese mismo día. Si no, el día ligero parece un estancamiento
+      // (Dan, 30-10: «si lo hago en segundo lugar, obviamente voy a ser menos fuerte»).
+      .filter((x, _, todos) => !todos.at(-1).s.diaRutinaId || x.s.diaRutinaId === todos.at(-1).s.diaRutinaId);
     if (puntos.length < 4) continue;
     const [a, b, c] = puntos.slice(-3).map((x) => x.rm);
     const antes = Math.max(...puntos.slice(0, -3).map((x) => x.rm));
