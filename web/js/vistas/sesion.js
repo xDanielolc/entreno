@@ -757,6 +757,7 @@ export function vistaSesion(contenedor, { id }) {
     if ((plan.tecnicas ?? []).includes('drop-set')) {
       lista.push('Serie descendente: haces todas las que puedas, bajas el peso sin descansar y sigues. Cada parte va al fallo (o a 1 de él), y por eso no se apunta recámara: lo que la hace eficaz es llegar al límite varias veces en poco tiempo.');
       lista.push('La primera parte va como mucho al 80 % de tu 1RM (se cambia en Ajustes) y nunca tan pesada que no llegues al máximo de su rango.');
+      if (plan.progresion?.tipo === 'carga') lista.push('Para subir el peso solo cuenta la primera parte (la serie normal); las repeticiones de las bajadas no.');
     }
     if (serie.tipo === 'calentamiento') {
       lista.push(s.pct > 0 && rm ? `Calentamiento al ${s.pct} % de tu 1RM de ${n(Math.round(rm.valor))} kg${deDonde}.`
@@ -803,6 +804,8 @@ export function vistaSesion(contenedor, { id }) {
           : 'Es la primera vez con esta serie y la app aún no sabe tu 1RM: por eso pide una prueba.');
       } else if (s.sube) {
         lista.push(`La última vez hiciste ${textoSerie(ej, s.ultima.serie)}: llegaste arriba del rango, así que hoy sube a ${n(s.carga)} ${uC}.`);
+      } else if (s.baja) {
+        lista.push(`Las dos últimas veces te quedaste por debajo de ${rango?.[0] ?? '?'} ${uE} con este peso, así que hoy baja un salto, a ${n(s.carga)} ${uC}.`);
       } else {
         lista.push(`La última vez hiciste ${textoSerie(ej, s.ultima.serie)}. Hasta llegar a ${rango?.[1] ?? '?'} ${uE}${rec ? ` con ${rec} en recámara` : ''}, el peso se queda igual.`
           + (s.faltaRecamara ? ' Llegaste, pero apurando más de la cuenta: por eso no sube todavía.' : ''));
@@ -964,7 +967,8 @@ export function vistaSesion(contenedor, { id }) {
       partes.push(`${s.ultima ? 'Última vez' : 'Última vez (en otra serie)'}: ${textoSerie(ej, u)}`);
       if (s.modo === 'carga' && s.sube) partes.push(`hoy sube a ${formatearNumero(s.carga)} ${uCarga}`
         + (s.rango ? ` × ${textoRango(s.rango)}` : ''));
-      if (s.modo === 'carga' && !s.sube && s.rango) partes.push(`objetivo ${conUnidad(s.rango[1])}`
+      if (s.modo === 'carga' && s.baja) partes.push(`hoy baja a ${formatearNumero(s.carga)} ${uCarga}: dos veces seguidas sin llegar a ${conUnidad(s.rango?.[0])}`);
+      if (s.modo === 'carga' && !s.sube && !s.baja && s.rango) partes.push(`objetivo ${conUnidad(s.rango[1])}`
         + (s.recamaraMin ? ` con ${s.recamaraMin} en recámara` : '') + ': al llegar, sube el peso'
         + (s.faltaRecamara ? ' (la última vez llegaste, pero apurando)' : ''));
       if (s.modo === 'esfuerzo') partes.push(`hoy intenta ${conUnidad(s.esfuerzoObjetivo)}`);

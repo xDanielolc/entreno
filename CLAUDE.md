@@ -1646,3 +1646,17 @@ version.js, sw.js y este archivo. La de spagat no cambia (sigue en versión 3).
 - 0.73.3: solo sube la versión. La rutina de meditar (conversación de flexibilidad) y lo del sueño salieron los dos como
   0.73.2, y un móvil que ya tuviera la primera no habría cogido la segunda. Antes de publicar, mirar `git log` por si
   otra conversación ya ha usado ese número.
+
+## Ronda 0.74.0 (02-11-2026): su borrador 15
+
+`datos-privados/rutina-dan-borrador-15.md` sustituye al 14 (hecho por la conversación de hipertrofia tras el entreno
+de 90 min del 30-10). Prehecha «Fuerza sin máquinas» versión 10: básicos pesados con máxima + 2 bajadas (banca, la 2.ª
+con serie descendente; militar del día 3, máxima + 1 con descendente), Bilbo + 1 normal (con descendente en militar día 1
+y banca día 3), accesorios 1 serie + descendente, fuera el pájaro del día 1, negativas 2 × 3-5, rumano 2 × 6-8, 2 en
+recámara en todo lo normal, elevación de piernas colgado 2 × 5-8, «Carrera» de calentamiento.
+- Doble progresión: en una serie descendente solo cuenta la parte normal (el primer tramo) para subir (`parteNormal` en
+  `sugerenciaSerie`), y dos sesiones seguidas por debajo del mínimo del rango con el mismo peso bajan un salto (`baja`).
+- La regla 7 del borrador («los kilos de la sentadilla del día 4, la normal tras la Bilbo y el rumano salen de la
+  última vez de ese mismo día») ya la cumple la doble progresión: cada día de la rutina tiene sus propias series, con su
+  historial. La primera vez, el peso sale del 1RM (el que da el máximo del rango con 2 en recámara, ~70-75 %).
+- El paso de 2 × 5-8 a 2 × 8-12 en las elevaciones no es automático: lo dice la nota.

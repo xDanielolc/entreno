@@ -151,15 +151,25 @@ export function sugerenciaSerie(datos, ejercicio, plan, { excluirSesion, rmHoy =
       return { ...base, rango: prog.objetivoEsfuerzo ?? plan.objetivoEsfuerzo, recamaraMin: prog.recamaraMin ?? null, carga, porFormula,
         rmUsado: rm?.valor ?? null, sinRM: conPeso && !rm };
     }
-    const valorUltimo = sobre === 'carga' ? ultima.serie.carga : esfuerzoTotal(ultima.serie);
+    // En una serie descendente, solo cuenta la parte normal (el primer tramo): las repeticiones de las bajadas no
+    // suben el peso (borrador 15: «el drop set no cuenta para la doble progresión»).
+    const parteNormal = (x) => (x.tramos?.length ? { carga: x.tramos[0].carga, esfuerzo: x.tramos[0].esfuerzo, recamara: x.recamara } : x);
+    const u = parteNormal(ultima.serie);
+    const valorUltimo = sobre === 'carga' ? u.carga : esfuerzoTotal(u);
     // Sube al llegar al máximo del rango. Si la regla pide recámara (fuerza:
     // «5 con 2 en recámara»), llegar al máximo apurando no cuenta.
-    const recamaraOk = prog.recamaraMin == null || ultima.serie.recamara == null || ultima.serie.recamara >= prog.recamaraMin;
-    const sube = max != null && esfuerzoTotal(ultima.serie) >= max && recamaraOk;
-    const faltaRecamara = max != null && esfuerzoTotal(ultima.serie) >= max && !recamaraOk;
+    const recamaraOk = prog.recamaraMin == null || u.recamara == null || u.recamara >= prog.recamaraMin;
+    const sube = max != null && esfuerzoTotal(u) >= max && recamaraOk;
+    const faltaRecamara = max != null && esfuerzoTotal(u) >= max && !recamaraOk;
+    // Dos sesiones seguidas por debajo del mínimo del rango: un salto menos (borrador 15).
+    const [min] = prog.objetivoEsfuerzo || plan.objetivoEsfuerzo || [];
+    const ultimasDos = [...new Map(historial.map((x) => [x.sesion.id, x])).values()].slice(-2);
+    const baja = !sube && sobre === 'carga' && min != null && ultimasDos.length === 2 && valorUltimo > 0
+      && ultimasDos.every((x) => (esfuerzoTotal(parteNormal(x.serie)) ?? min) < min && parteNormal(x.serie).carga === valorUltimo);
     // En una máquina con sus pesos, subir es pasar al siguiente peso que hay;
     // si no, se suma el incremento y se deja en un peso que exista (disco).
-    const siguiente = !sube ? valorUltimo
+    const siguiente = baja ? aPesoDisponible(ejercicio, valorUltimo, { hacia: 'abajo' })
+      : !sube ? valorUltimo
       : sobre === 'carga' && ejercicio.pesosMaquina?.length ? aPesoDisponible(ejercicio, valorUltimo ?? 0, { hacia: 'arriba' })
         : sobre === 'carga' ? Math.max(aPesoDisponible(ejercicio, (valorUltimo ?? 0) + (prog.incremento || 0)),
           aPesoDisponible(ejercicio, valorUltimo ?? 0, { hacia: 'arriba' }))
@@ -169,6 +179,7 @@ export function sugerenciaSerie(datos, ejercicio, plan, { excluirSesion, rmHoy =
       rango: prog.objetivoEsfuerzo,
       recamaraMin: prog.recamaraMin ?? null,
       sube,
+      baja,
       faltaRecamara,
       carga: sobre === 'carga' ? siguiente : ultima.serie.carga,
       esfuerzoObjetivo: sobre === 'carga' ? (sube ? prog.objetivoEsfuerzo?.[0] : null) : siguiente,
