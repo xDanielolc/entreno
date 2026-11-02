@@ -35,6 +35,15 @@ const TABLA = {
   'Sentadilla profunda mantenida (Malasana)': mano('el hueco entre el talón y el suelo (sin mano si los dos talones apoyan)'),
   'Estiramiento del sofá (couch stretch)': mano('el hueco entre el talón y el glúteo con el tronco erguido'),
   'Rey de los bailarines (Natarajasana)': mano('el hueco entre el talón y el glúteo'),
+  // 02-11 (Dan: «muchos siguen sin medición, como Eka Pada»).
+  'Estiramiento de glúteo en paloma (Eka Pada Rajakapotasana)': cm('del glúteo de la pierna doblada al suelo, con la cadera mirando al frente (0 si apoya)'),
+  'Eka Pada Rajakapotasana': cm('del glúteo de la pierna doblada al suelo, con la cadera mirando al frente (0 si apoya)'),
+  'Estiramiento de psoas en zancada (Anjaneyasana)': cm('de la ingle de la pierna de atrás al suelo, con el tronco erguido (menos es mejor)'),
+  'Estiramiento de dorsal': cm('tumbado boca arriba, rodillas dobladas y la zona lumbar pegada, con los brazos estirados por encima de la cabeza: del dorso de la muñeca al suelo (0 si toca)'),
+  'Rotación 90/90': mano('el hueco entre la rodilla de la pierna de atrás y el suelo'),
+  'Héroe tendido (Supta Virasana)': mano('el hueco entre los omóplatos y el suelo (sin mano si apoyas la espalda)'),
+  'Supta Virasana': mano('el hueco entre los omóplatos y el suelo (sin mano si apoyas la espalda)'),
+  'Sentadilla cosaca': mano('el hueco entre el glúteo y el talón de la pierna doblada'),
 };
 
 const porClave = new Map(Object.entries(TABLA).map(([k, v]) => [normalizar(k), v]));

@@ -1623,3 +1623,7 @@ Esquema v30 (`sedesBasicas` en esquema.js: Gimnasio, Casa y Calle de serie, el q
 - Dibujos: 11 reencajados con `escalar_encajar.py` (ahora resta la tinta que no coincide y no deja salir nada del
   lienzo; `--salida` para probar), rotaciones de hombro con palo sin suelo ni orejas, isométricos de cuello quietos.
   Almacén `entreno-imagenes-53`.
+- 0.73.1: los pesos de una máquina se pueden escribir todos de golpe separados por espacios (su curl femoral va en
+  libras: 4,5 9 14 18 23 29 36 43…, sin paso fijo); medida para paloma, psoas en zancada, dorsal, 90/90, héroe tendido y
+  sentadilla cosaca (`medidas-estiramiento.js`, de su To Do: «muchos siguen sin medición, como Eka Pada»). En sus datos:
+  el 16-10 de «Elevaciones de piernas» pasado a «Elevación de piernas colgado» (con su fracción del peso, 29,8 kg).

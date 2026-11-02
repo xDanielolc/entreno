@@ -546,7 +546,7 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
     const pesos = borrador.pesosMaquina ?? [];
     const gen = { desde: pesos[0] ?? 5, hasta: pesos.at(-1) ?? 100, paso: pesos.length > 1 ? pesos[1] - pesos[0] : 5 };
     const otros = d.ejercicios.filter((e) => e.id !== borrador.id && !e.archivado && e.pesosMaquina?.length);
-    const nuevo = h('input', { type: 'text', inputmode: 'decimal', placeholder: 'Añadir un peso (kg)', 'aria-label': 'Añadir un peso' });
+    const nuevo = h('input', { type: 'text', inputmode: 'decimal', placeholder: 'Pesos (kg), separados por espacios', 'aria-label': 'Añadir pesos' });
     function generar() {
       const lista = pesosDeMaquina(gen.desde, gen.hasta, gen.paso);
       if (!lista.length) { aviso('Revisa los tres números', { tipo: 'error' }); return; }
@@ -564,13 +564,14 @@ export function vistaFormularioEjercicio(contenedor, { id, paraSesion = null }) 
         campo('Del primero', numeroInput(gen.desde, (v) => { gen.desde = v; }, { onchange: generar })),
         campo('Al último', numeroInput(gen.hasta, (v) => { gen.hasta = v; }, { onchange: generar })),
         campo('De … en …', numeroInput(gen.paso, (v) => { gen.paso = v; }, { onchange: generar }))),
-      h('small', { class: 'nota' }, 'La lista se hace sola con estos tres números. Luego puedes quitar pesos (✕) o añadir sueltos.'),
+      h('small', { class: 'nota' }, 'La lista se hace sola con estos tres números. Luego puedes quitar pesos (✕) o añadir sueltos. Si la máquina no va de un paso fijo, escríbelos todos abajo separados por espacios: 4,5 9 14 18…'),
       h('div', { class: 'fila-botones' },
         h('label', { class: 'campo crece' }, nuevo,
           h('button', { type: 'button', class: 'boton enlace', onclick: () => {
-            const v = leerNumero(nuevo.value);
-            if (v == null) return;
-            borrador.pesosMaquina = [...new Set([...pesos, v])].sort((a, b) => a - b);
+            // Varios de golpe («4,5 9 14 18…»): las máquinas en libras tienen pesos en kilos sin un paso fijo.
+            const v = nuevo.value.split(/[\s;/]+/).map((x) => leerNumero(x)).filter((x) => x > 0);
+            if (!v.length) return;
+            borrador.pesosMaquina = [...new Set([...pesos, ...v])].sort((a, b) => a - b);
             repintar();
           } }, '+ Añadir'))),
       otros.length > 0 && selector(otros.map((o, i) => [i, `${o.nombre}: ${o.pesosMaquina.length} pesos (${formatearNumero(o.pesosMaquina[0])} a ${formatearNumero(o.pesosMaquina.at(-1))} kg)`]),
