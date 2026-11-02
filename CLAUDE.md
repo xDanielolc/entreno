@@ -1627,3 +1627,15 @@ Esquema v30 (`sedesBasicas` en esquema.js: Gimnasio, Casa y Calle de serie, el q
   libras: 4,5 9 14 18 23 29 36 43…, sin paso fijo); medida para paloma, psoas en zancada, dorsal, 90/90, héroe tendido y
   sentadilla cosaca (`medidas-estiramiento.js`, de su To Do: «muchos siguen sin medición, como Eka Pada»). En sus datos:
   el 16-10 de «Elevaciones de piernas» pasado a «Elevación de piernas colgado» (con su fracción del peso, 29,8 kg).
+
+## 0.73.2 (02-11-2026): «Movilidad para sentarse a meditar» versión 4
+
+Desde la conversación «Investigación flexibilidad», tras el repaso de Dan del 28-10 al 01-11. Solo plantillas.js,
+version.js, sw.js y este archivo. La de spagat no cambia (sigue en versión 3).
+- Día B sin fuerza: fuera sentadilla búlgara, elevación de gemelos y tobillo con rodilla a la pared (le era fácil).
+  La cosaca se queda sin peso, lenta y sin cansarse. Entran sentadilla profunda mantenida (Malasana, 2 × 60 s, el tobillo
+  con carga) y figura de 4 (por lado, 45 s); mariposa a 2 × 45 s. El día era corto: ahora unos 15 min.
+- Día A: hombro por encima de la cabeza con «Rotaciones de hombro con palo» (2 × 10, ya tiene medida). El pasivo va
+  en la rutina del spagat (dorsal).
+- Tobillos: «Flexión y extensión de dedos del pie» pasa de series() a reps(): ya no queda ningún series() en las dos
+  rutinas de estirar, así que nada dice «sube el peso».

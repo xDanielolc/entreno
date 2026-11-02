@@ -356,15 +356,17 @@ Elevación de piernas colgado: 2 × 8-12 (piernas estiradas; 60-90 s)`),
   {
     id: 'movilidad-para-meditar',
     tipo: 'flexibilidad',
-    version: 3,
+    version: 4,
     nombre: 'Movilidad para sentarse a meditar',
     autor: 'Propuesta de la app, basada en una rutina personal',
     resumen: 'Dos rutinas de 15 minutos (cuello y espalda; piernas y caderas) y una progresión de tobillos para poder sentarse sobre los talones sin dolor.',
     porQue: 'Sentarse a meditar pide cuello y espalda libres, caderas que rotan y tobillos que se doblan. Cada rutina va en tres pasos: movilidad '
-      + 'activa para calentar, fuerza en el final del recorrido para que el rango se quede, y estiramientos pasivos al final. La progresión de '
+      + 'activa para calentar, posturas activas y mantenidas al final del recorrido, sin peso ni fatiga, y estiramientos pasivos al final. La progresión de '
       + 'tobillos usa un ladrillo bajo los glúteos: alto hasta aguantar 10 minutos sin molestias, luego medio, luego bajo.',
-    comoSeHace: 'En casa. A y B en días alternos, y la de tobillos 3-4 veces por semana (5 minutos). Lo que va por lado lleva una serie por lado. Nunca con dolor por encima de 3 sobre 10. Mide cada '
-      + 'dos semanas: minutos sentado sin dolor, distancia pie-pared en el tobillo, y con qué apoyo (alto, medio, bajo, sin ladrillo).',
+    comoSeHace: 'En casa. A y B en días alternos, y la de tobillos 3-4 veces por semana (5 minutos). Lo que va por lado lleva una serie por lado. Nunca con dolor por encima de 3 sobre 10. Nada de esta rutina '
+      + 'sube de peso ni se hace hasta cansarse. Mide cada dos semanas: minutos sentado sin dolor, el hueco del talón en la sentadilla '
+      + 'profunda, y con qué apoyo te sientas sobre los talones (alto, medio, bajo, sin ladrillo). El hombro por encima de la cabeza, '
+      + 'en pasivo, ya lo estira la rutina del spagat (dorsal).',
     dias: [
       { nombre: 'A: cuello, espalda y caderas', ejercicios: [
         e('Retracción cervical (chin tuck)', reps(2, 10)),
@@ -375,6 +377,7 @@ Elevación de piernas colgado: 2 × 8-12 (piernas estiradas; 60-90 s)`),
         e('Isométrico de cuello hacia atrás', [t(30)], { nota: '3 × 10 s: manos en la nuca, empuja sin mover la cabeza' }),
         e('Isométricos de cuello', porLado([t(30)]), { nota: 'Hacia el lado: 3 × 10 s con la mano en la sien, empuja sin mover la cabeza' }),
         e('Elevaciones Y-T-W', reps(2, 8), { nota: 'De pie, inclinado hacia delante con la espalda recta (bisagra de cadera), para que los brazos suban contra la gravedad. 8 de cada letra' }),
+        e('Rotaciones de hombro con palo', reps(2, 10), { nota: 'Hombro por encima de la cabeza: palo o toalla con agarre ancho, brazos estirados, de delante a atrás y vuelta, sin dolor. Con las semanas, estrecha el agarre' }),
         e('Cobra en el suelo (Bhujangasana)', [t(30)]),
         e('Estiramiento de trapecio superior', porLado([t(30)])),
         e('Estiramiento del elevador de la escápula', porLado([t(30)])),
@@ -383,16 +386,15 @@ Elevación de piernas colgado: 2 × 8-12 (piernas estiradas; 60-90 s)`),
       { nombre: 'B: piernas para sentarse', ejercicios: [
         e('CARs de cadera', porLado([t(30)]), { nota: 'A cuatro patas: 5 círculos grandes y lentos con la rodilla' }),
         e('Rotación 90/90', porLado(reps(1, 6, 8)), { nota: 'Transiciones; el lado es hacia el que empiezas' }),
-        e('Tobillo con rodilla a la pared', porLado(reps(1, 10))),
-        e('Sentadilla cosaca', reps(2, 6), { nota: 'Alternando lados: 6 por lado en cada serie' }),
-        e('Sentadilla búlgara', porLado(reps(2, 6)), { nota: 'Profunda, sin peso' }),
-        e('Elevación de gemelos', reps(2, 10), { nota: 'Pausa de 2 s abajo' }),
-        e('Estiramiento de aductores en mariposa (Baddha Konasana)', [t(40)]),
+        e('Sentadilla cosaca', reps(2, 6), { nota: 'Sin peso y sin cansarte: lenta, 2-3 s abajo en cada lado. 6 por lado en cada serie, alternando' }),
+        e('Sentadilla profunda mantenida (Malasana)', [t(60), t(60)], { nota: 'Talones en el suelo (si se levantan, un libro debajo y lo quitas con las semanas), codos empujando las rodillas hacia fuera, espalda larga. Es el tobillo con carga: sustituye al de la pared' }),
+        e('Estiramiento de aductores en mariposa (Baddha Konasana)', [t(45), t(45)]),
+        e('Estiramiento de glúteo en figura de 4 (Supta Kapotasana)', porLado([t(45)]), { nota: 'Tumbado: tobillo sobre la rodilla contraria y tira del muslo hacia el pecho' }),
         e('Estiramiento del sofá (couch stretch)', porLado([t(40)]), { nota: 'Cojín bajo la rodilla' }),
         e('Estiramiento de glúteo en paloma (Eka Pada Rajakapotasana)', porLado([t(40)])),
       ] },
       { nombre: 'Tobillos (5 min)', ejercicios: [
-        e('Flexión y extensión de dedos del pie', series(1, 10, 15)),
+        e('Flexión y extensión de dedos del pie', reps(1, 10, 15)),
         e('Isométrico de flexión plantar', [t(30)], { nota: '3 × 10 s' }),
         e('Estiramiento del empeine', [t(30)]),
         e('Héroe tendido (Supta Virasana)', [t(45)], { nota: 'Con ladrillo: alto, luego medio, luego bajo' }),
