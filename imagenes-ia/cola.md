@@ -263,3 +263,6 @@ Con IA, dibujo propio que falta (ahora llevan el de otro ejercicio por alias y n
 - [ ] Peso muerto con mancuernas: más cachas. Remo en máquina, máquina de glúteo, elíptica, antebrazo flexores,
       flexiones en pica, peso muerto rumano con mancuernas: pendientes de antes.
 - [ ] Nombre: «Remo en polea» → «Remo en polea a la cintura».
+
+- «Cabeza huevo» (Dan, 02-11): la cabeza sale ovalada y lisa, sin forma de cráneo ni mandíbula. Al rehacer jalón al
+  pecho, goblet, zancadas y rotación interna con toalla, pedir cabeza con forma de cráneo de verdad (aunque lisa).

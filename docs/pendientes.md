@@ -430,3 +430,5 @@ Pasado a `pendientes-design.md`. Se deja aquí lo que ya había, como historia.
 - [ ] **Elíptica animada** (Dan): pedir a la IA que anime el brazo que falta y alternar las imágenes con la central;
   antes, comprobar que las palancas cuadran con el brazo que toca. Si no sale, se queda quieta.
 - [ ] Muñeco del cuerpo y dibujos de cada tema (cables en Terminal, como Axiom Verge): con Design, al final.
+
+- Copiar una idea de la app de entrenamiento «Heavy» (To Do de Dan, 28-10): falta que Dan pase capturas de qué función.
