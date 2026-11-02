@@ -11,6 +11,44 @@ y al final lo que es decoración o depende de terceros.
 
 ---
 
+## 0. Lo que queda ahora (repaso del 02-11-2026)
+
+Resumen vivo de lo pendiente. El detalle de cada punto está más abajo o en el
+archivo que se cita; lo ya hecho se ha marcado con [x].
+
+- [ ] **Auditoría de experiencia de uso con Fable** (Dan, 02-11-2026; anotada
+      también en la carpeta «Quemador de tokens»): repasar la app pantalla por
+      pantalla para hacerla más intuitiva y quitar todo el texto posible. Es la
+      continuación de «Más visual, más intuitivo, menos texto» (25-09) y de
+      «Programar a mano sigue sin ser intuitivo» (21-10), más abajo. Entrega:
+      lista priorizada con captura y propuesta por pantalla, para que Dan elija
+      antes de tocar código.
+- [ ] **Copiar una idea de la app «Heavy»** (está en su To Do desde el 28-10;
+      probablemente es Hevy). Falta que Dan pase capturas de la función. Junto
+      con «Mirar las apps Lyfta y Hevy» (25-09) y las fotos de Lyfta que iba a
+      pasar.
+- [ ] **Dibujos**: octava revisión en `imagenes-ia/cola.md` (flexiones, hip
+      thrust, búlgara, pies del multipower, elevación de rodillas, face pull,
+      línea del hack, «cabeza huevo» en jalón, goblet, zancadas y rotación con
+      toalla, alias que no cuadran, press a una mano con ChatGPT). Seis
+      reencajes de prueba sin aplicar en el scratchpad de la sesión del 02-11.
+- [ ] **«Remo en polea» → «Remo en polea a la cintura»**: renombrar con
+      migración de esquema (como `RENOMBRADOS_V23`).
+- [ ] **Nombres con el material** («Elevaciones laterales con mancuernas»…),
+      del repaso de dibujos del 21-10.
+- [ ] **Elevación de piernas colgado**: el paso de 2 × 5-8 a 2 × 8-12 es a mano
+      (la nota del ejercicio lo recuerda). Si Dan quiere, que la app lo proponga.
+- [ ] **Etiqueta «multiarticular»** en el catálogo (ronda 0.66).
+- [ ] **App a la medida** (activar o quitar apartados enteros), Diario fases B y
+      C (lo lleva la conversación del sueño) y revisar cómo se apuntan las
+      técnicas de alta intensidad.
+- [ ] **Decoración**: nombre e icono de la app, muñeco del cuerpo por tema,
+      elíptica animada (Gemini y ChatGPT no la sacan).
+- [ ] **Cosas de Dan**: publicar la app en la consola de Google; pulsar
+      «Actualizar mi rutina» en «Fuerza sin máquinas» (versión 10) y en las dos
+      de estirar.
+
+
 ## 0. Encargo de la investigación «Fuerza e hipertrofia» (9-10-2026)
 
 - [x] Aplicado `docs/encargo-bibliografia.md` (0.42.0): bibliografía de 27
@@ -406,7 +444,7 @@ Pasado a `pendientes-design.md`. Se deja aquí lo que ya había, como historia.
 - [ ] **Programar a mano sigue sin ser intuitivo** (Dan, 21-10-2026: «es en
       mi opinión el apartado más flojo de la app»). Pendiente que él meta una
       rutina a mano entera para ver dónde se atasca y rehacerlo con eso.
-- [ ] Sonidos de la caja de la presentación con su grabación de Freesound
+- [x] (Hecho en la 0.59.1, licencia CC0) Sonidos de la caja de la presentación con su grabación de Freesound
       («box impact.wav», en la carpeta del proyecto): primer golpe al caer,
       segundo «paf». Falta saber su licencia antes de subirla al repositorio.
 - [ ] Empezar por el día de la rutina que uno quiera: ya existe «Otro día de
@@ -425,7 +463,7 @@ Pasado a `pendientes-design.md`. Se deja aquí lo que ya había, como historia.
 - [ ] **Etiqueta «multiarticular» en el catálogo** (idea de Dan vía la conversación del sueño): contar los
   ejercicios multiarticulares y no solo los cinco básicos; el resumen del sueño (`esBasico` en diario.js) podría
   usarla cuando exista.
-- [ ] **1RM de referencia y días malos** (Dan, revisión de la noche): ¿la última máxima manda aunque ese día
+- [x] **1RM de referencia y días malos** (hecho en la 0.67.0: manda la mejor de las 3 últimas máximas): ¿la última máxima manda aunque ese día
   estuvieras cansado? Él propone la media de las 3 últimas. Pendiente de que elija.
 - [ ] **Elíptica animada** (Dan): pedir a la IA que anime el brazo que falta y alternar las imágenes con la central;
   antes, comprobar que las palancas cuadran con el brazo que toca. Si no sale, se queda quieta.
