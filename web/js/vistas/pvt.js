@@ -358,6 +358,12 @@ export function abrirPVT({ modo = MODO_PVT_POR_DEFECTO, directo = false, alCerra
     const movil = mediaMovilPVT(d, test.modo);
     const base = baseDePVT(d, test.modo);
     const frente = compararConBase(movil?.velocidad, base);
+    // El test de hoy frente a la base, aparte. No decide nada (el veredicto
+    // sigue saliendo de la media), pero se enseña: Dan, 02-11-2026, leyó «2 %
+    // frente a tu base» creyendo que hablaba del test que acababa de hacer,
+    // cuando ese estaba un 14 % por debajo. Las dos cifras, cada una con su
+    // nombre.
+    const frenteHoy = compararConBase(test.velocidad, base);
     // Con `anadir` y no con `replaceChildren`: aquí hay hijos condicionales y
     // el navegador escribiría «false» tal cual (ya pasó una vez).
     cuerpo.replaceChildren();
@@ -376,7 +382,8 @@ export function abrirPVT({ modo = MODO_PVT_POR_DEFECTO, directo = false, alCerra
         `Media de tus últimos ${movil.tests} tests de ${cual.corto}: `,
         h('strong', {}, `${velocidadTexto(movil.velocidad)} resp/s`),
         movil.mediaMs ? ` (${Math.round(movil.mediaMs)} ms)` : ''),
-      h('p', { style: `${LINEA} font-size: .95rem;` }, lineaBase(frente, base, cual)),
+      frenteHoy && movil && movil.tests > 1 && h('p', { style: `${LINEA} font-size: .95rem;` }, lineaHoy(frenteHoy)),
+      h('p', { style: `${LINEA} font-size: .95rem;` }, lineaBase(frente, base, cual, movil)),
       h('div', { style: 'display: flex; align-items: center; justify-content: center; gap: 4px; flex-wrap: wrap;' },
         h('span', { style: `${LINEA} font-size: .85rem; opacity: .75;` }, 'No hay baremos publicados: te comparas contigo'),
         ayudaClara('Cómo se lee este test', POR_QUE_ASI)),
@@ -386,7 +393,16 @@ export function abrirPVT({ modo = MODO_PVT_POR_DEFECTO, directo = false, alCerra
 
   // La línea del veredicto: siempre sobre la media de los últimos tests, nunca
   // sobre el día suelto, y sin alarmas.
-  function lineaBase(frente, base, cual) {
+  // La cifra del test de hoy, dicha con todas las letras y desactivada: no
+  // tiñe nada ni cambia el veredicto. Un test suelto se mueve mucho más que el
+  // 11-12 % de margen, así que por sí solo no distingue un bajón del ruido.
+  function lineaHoy(frenteHoy) {
+    const pct = Math.round(Math.abs(frenteHoy.cambio) * 100);
+    if (pct === 0) return 'Hoy: igual que tu base. Un test suelto varía mucho: no decide nada.';
+    return `Hoy: ${pct} % ${frenteHoy.masLento ? 'más lento' : 'más rápido'} que tu base. Un test suelto varía mucho: no decide nada.`;
+  }
+
+  function lineaBase(frente, base, cual, movil) {
     if (!frente) {
       if (base?.falta === 'tests') {
         const faltan = base.faltan ?? (TESTS_MINIMOS_BASE - base.tests);
@@ -397,10 +413,13 @@ export function abrirPVT({ modo = MODO_PVT_POR_DEFECTO, directo = false, alCerra
     const pct = Math.round(Math.abs(frente.cambio) * 100);
     const repartida = frente.base.repartida ? `, hechos a lo largo de ${frente.base.abarca} días, así que compara con cuidado` : '';
     const base5 = `tu base de ${cual.corto} son ${velocidadTexto(frente.base.velocidad)} resp/s (${frente.base.dias} días)${repartida}`;
-    if (!frente.real) return `Dentro de tu variación normal: ${pct} % frente a tu base, por debajo del ${UMBRAL_TEXTO} de margen que haría falta para llamarlo cambio. Para el dato, ${base5}.`;
+    // De quién es el porcentaje, delante del todo: es lo que faltaba para que
+    // no se confundiera con el del test de hoy.
+    const deQuien = movil && movil.tests > 1 ? `Media de tus últimos ${movil.tests} tests: ` : 'Este test: ';
+    if (!frente.real) return `${deQuien}dentro de tu variación normal, ${pct} % frente a tu base, por debajo del ${UMBRAL_TEXTO} de margen que haría falta para llamarlo cambio. Para el dato, ${base5}.`;
     return frente.masLento
-      ? `Más lento que tu base: un ${pct} % por debajo, que ya pasa del ${UMBRAL_TEXTO} de margen. Es un dato, no una alarma: ${base5}.`
-      : `Más rápido que tu base: un ${pct} % por encima, que ya pasa del ${UMBRAL_TEXTO} de margen. Para el dato, ${base5}.`;
+      ? `${deQuien}más lento que tu base, un ${pct} % por debajo, que ya pasa del ${UMBRAL_TEXTO} de margen. Es un dato, no una alarma: ${base5}.`
+      : `${deQuien}más rápido que tu base, un ${pct} % por encima, que ya pasa del ${UMBRAL_TEXTO} de margen. Para el dato, ${base5}.`;
   }
 
   function cifra(nombre, valor) {

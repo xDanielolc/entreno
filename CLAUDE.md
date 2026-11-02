@@ -1639,3 +1639,7 @@ version.js, sw.js y este archivo. La de spagat no cambia (sigue en versión 3).
   en la rutina del spagat (dorsal).
 - Tobillos: «Flexión y extensión de dedos del pie» pasa de series() a reps(): ya no queda ningún series() en las dos
   rutinas de estirar, así que nada dice «sube el peso».
+- 0.73.2 (hecho por la conversación del sueño): el cartel del test de atención da dos cifras con su nombre: la del
+  test de hoy (informativa, no tiñe nada) y la de la media móvil, que es la que manda y lleva el umbral de
+  `CAMBIO_REAL_PVT`. Las horas del diario se escriben en dos casillas h/min separadas por dos puntos, nunca con
+  `input type="time"`: su selector corta el botón «Establecer» en el móvil.

@@ -55,9 +55,43 @@ export function vistaDiario(contenedor) {
       h('input', { type: 'text', inputmode: 'numeric', id: `diario-${campo}`, value: e[campo] ?? '', ...extra,
         oninput: (ev) => guardar(campo, leerNumero(ev.target.value)) }),
       h('small', { class: 'suave' }, unidad)));
-  const hora = (campo, etiqueta) => h('label', { class: 'campo' },
-    h('span', { class: 'etiqueta-campo' }, etiqueta),
-    h('input', { type: 'time', id: `diario-${campo}`, value: e[campo] ?? '', oninput: (ev) => guardar(campo, ev.target.value || null) }));
+  // La hora, en dos casillas propias. Era un `input type="time"` y el selector
+  // del navegador le cortaba el botón «Establecer» abajo a la derecha en el
+  // móvil con tema oscuro (Dan, 02-11-2026). Mismo patrón que el tiempo de las
+  // series en `sesion.js`: teclado numérico, sin dos puntos que el teclado del
+  // móvil no tiene, y sin desplegables. Se sigue guardando «HH:MM».
+  // Va en un div y no en un label porque son dos casillas: un label solo puede
+  // apuntar a una, y cada casilla lleva ya su propio `aria-label`.
+  const hora = (campo, etiqueta) => {
+    const partes = /^(\d{1,2}):(\d{2})$/.exec(e[campo] ?? '');
+    const cajas = {};
+    const leerTodo = () => {
+      if (Object.values(cajas).every((x) => x.value.trim() === '')) return guardar(campo, null);
+      const n = (clave, tope) => Math.min(tope, Math.max(0, Math.round(leerNumero(cajas[clave].value) ?? 0)));
+      guardar(campo, `${String(n('h', 23)).padStart(2, '0')}:${String(n('m', 59)).padStart(2, '0')}`);
+    };
+    const hueco = (clave, nombre, valor, id) => {
+      // Sin el relleno lateral de las demás casillas: aquí van dos cifras en
+      // huecos estrechos (los de la fila de tres campos se quedan en 26 px) y
+      // con los 12 px de cada lado los minutos salían cortados.
+      const caja = h('input', { type: 'text', inputmode: 'numeric', maxlength: '2', id,
+        style: 'flex: 1 1 0; min-width: 0; padding-left: 2px; padding-right: 2px; font-size: 1.1rem; text-align: center;',
+        'aria-label': `${etiqueta}, ${nombre}`, value: valor, oninput: leerTodo });
+      cajas[clave] = caja;
+      return caja;
+    };
+    return h('div', { class: 'campo' },
+      h('span', { class: 'etiqueta-campo' }, etiqueta),
+      // Sin las etiquetas «h» y «min» al lado de cada casilla, como las tiene
+      // el tiempo de las series: aquí hay huecos de 19 px (la fila de tres
+      // campos) y el «min» acababa chocando con el campo siguiente. Dos puntos
+      // en medio: ocupan 6 px, se entiende solo y cada casilla conserva su
+      // `aria-label` entero para quien use lector de pantalla.
+      h('div', { class: 'trozos-tiempo', style: 'align-items: center;' },
+        hueco('h', 'h', partes ? partes[1] : '', `diario-${campo}`),
+        h('span', { style: 'flex: 0 0 auto; opacity: .6;' }, ':'),
+        hueco('m', 'min', partes ? partes[2] : '', `diario-${campo}-min`)));
+  };
 
   const calculo = h('p', { class: 'calculo-sueno' });
   function pintarCalculo() {
