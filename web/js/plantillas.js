@@ -51,7 +51,7 @@ export const PLANTILLAS = [
     id: 'fuerza-sin-maquinas',
     // Sube este número cada vez que cambie la rutina: las rutinas hechas con
     // una versión anterior ofrecen actualizarse.
-    version: 10,
+    version: 11,
     nombre: 'Fuerza sin máquinas: cuatro días',
     autor: 'Dan (su rutina de 10-2026)',
     resumen: 'Dos días de torso y dos de pierna, solo con barra, mancuernas y tu peso. Cada básico tiene un día pesado '
@@ -88,8 +88,8 @@ export const PLANTILLAS = [
 Carrera: calentamiento 5 min (suave, a ritmo de poder hablar y en llano)
 Movilidad dinámica de torso: calentamiento 3 min (de pie y sin pausas: círculos de brazos, 10 en cada sentido; palo, barra vacía o toalla por encima de la cabeza de delante a atrás, 10; giros de tronco con el palo en los hombros, 10 por lado. Nunca estires 60 s o más seguidos un músculo antes de un básico pesado)
 Press de banca: calentamiento 1 × 5 al 30 % + calentamiento 1 × 3 al 60 % + calentamiento 1 × 1 al 80 % + máxima 1-2 según tu 1RM + 2 × 3-5 al 80 % con 2 en recámara, serie descendente en la última (aproximaciones seguidas; 2 min antes de la máxima; máxima a un 90 %: 1-2 repeticiones que acaben a 1-2 del fallo; si te sobran 3 o más, deja la barra, sube un 5-10 % y haz otra sola, que cuenta como aproximación: vale la última; 2 min; bajada al 80 % con 2 en recámara; en la segunda, sin descanso, quita un 20-25 % del peso y sigue hasta 1 en recámara, nunca al fallo sin ayudante; 2 min)
-Remo con barra: Bilbo + 1 × 8-10 con 2 en recámara (la Bilbo hace de aproximación: de 23-25 a 15 repeticiones con 2 en recámara, superando la anterior; la normal sin serie descendente porque carga la espalda baja; sus kilos salen de la última vez de este día; 2 min)
-Press militar: Bilbo + 1 × 8-10 con 2 en recámara, serie descendente en la última (como el remo; la descendente, hasta 1 en recámara)
+Remo con barra: Bilbo + 1 × 6-8 con 2 en recámara (la Bilbo hace de aproximación: de 23-25 a 15 repeticiones con 2 en recámara, superando la anterior; la normal sin serie descendente porque carga la espalda baja; sus kilos salen de la última vez de este día; 2 min)
+Press militar: Bilbo + 1 × 6-8 con 2 en recámara, serie descendente en la última (como el remo; la descendente, hasta 1 en recámara)
 Dominadas negativas: 2 × 3-5 (bajada de 3-5 s; sube con salto o desde un banco; 2 min)
 Curl martillo: 1 × 8-12 con 2 en recámara, serie descendente en la última (alterno, con mancuernas: kilos por mancuerna y repeticiones por brazo; la descendente, coge las mancuernas de 2-4 kg menos y sigue hasta 0-1 en recámara; 60-90 s)
 Extensión de tríceps sobre la cabeza: 1 × 8-12 con 2 en recámara, serie descendente en la última (con mancuerna; la descendente, hasta 0-1 en recámara; 60-90 s)

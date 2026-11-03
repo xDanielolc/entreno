@@ -1037,8 +1037,9 @@ export function vistaSesion(contenedor, { id }) {
     const antes = seriesDeEjercicio(d, ej.id, { excluirSesion: id })
       .filter((x) => x.serie.tipo !== 'calentamiento' && x.serie.hecha !== false && x.sesion.origen !== 'importado-excel'
         && (x.serie.esfuerzo != null || x.serie.tramos?.length));
-    const mismoDia = sesion.diaRutinaId ? antes.filter((x) => x.sesion.diaRutinaId === sesion.diaRutinaId) : [];
-    const lista = mismoDia.length ? mismoDia : antes;
+    // Solo el mismo día de la rutina: otro día puede ser el pesado (Dan, 03-11-2026: en el remo moderado le salía
+    // «67,5 × 6», que era una bajada del día de remo pesado).
+    const lista = sesion.diaRutinaId ? antes.filter((x) => x.sesion.diaRutinaId === sesion.diaRutinaId) : antes;
     const ultima = lista.at(-1)?.sesion.id;
     const deEsa = lista.filter((x) => x.sesion.id === ultima);
     return deEsa.length ? deEsa[Math.min(k, deEsa.length - 1)] : null;

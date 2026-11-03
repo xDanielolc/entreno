@@ -1677,3 +1677,8 @@ recámara en todo lo normal, elevación de piernas colgado 2 × 5-8, «Carrera»
 - Saludo sin frases motivacionales: solo «Hola, Daniel.».
 - «¿Cómo llegas?» pregunta también por los músculos del último entreno terminado de la semana, aunque la app los dé
   por recuperados.
+- 0.75.1: el «67,5 × 6» que le salía en el remo moderado era una bajada del día de remo pesado: `ultimaEquivalente`
+  (sesion.js) ya solo mira el mismo día de la rutina. El 60 kg era el peso correcto del 1RM para 8-10 con 2 en
+  recámara. Rutina versión 11: la normal del remo y del militar del día 1 pasan a 6-8 (Dan: «6-8 o menos, para ir
+  por fuerza»). En sus datos: esos planes a 6-8 y las dos series de remo del 03-11 sueltas de su plan
+  (`planIdAntes`), así la próxima vez el peso sale del 1RM para 8 (65 kg); siguen contando para el 1RM.

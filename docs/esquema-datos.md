@@ -566,7 +566,8 @@ la vez, a veces sin cobertura):
   `cargaAuto` (el peso lo puso la app con tu 1RM y se ajusta si el 1RM de hoy
   cambia), `cargaAMano` (lo cambiaste tú: no se toca), `objetivoDe: 'rm'`
   (primera vez en un ciclo: el objetivo iguala tu 1RM, no «la última vez»),
-  `rmObjetivo`, y `planIdAntes` / `objetivoAntes` (una serie pasada a
+  `rmObjetivo`, `sigueA` en un plan (v31: el id del plan del mismo puesto cuyo historial sigue mientras este
+  no tenga ninguno), y `planIdAntes` / `objetivoAntes` (una serie pasada a
   calentamiento deja su regla y la recupera si vuelve). `sesion.vista.serie`:
   qué serie se ve en el modo «una serie». `progresion.porRM` con
   `fija: 'pct'` también en planes de calentamiento («50 % × 8»; 0 % = la
