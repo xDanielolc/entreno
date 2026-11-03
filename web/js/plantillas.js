@@ -7,7 +7,7 @@
 
 import { generarEscalera } from './calculos.js';
 import { CATALOGO, normalizar } from './catalogo.js';
-import { DIAS_CICLO_POR_DEFECTO, serieNuevaPlantilla } from './esquema.js';
+import { DIAS_CICLO_POR_DEFECTO, enlazarPorPuesto, serieNuevaPlantilla } from './esquema.js';
 import { ejercicioDesdeCatalogo } from './vistas/selector-ejercicios.js';
 import { nuevoId } from './ui.js';
 import { analizarRutina, crearRutinaDesdeTexto } from './rutina-texto.js';
@@ -768,6 +768,8 @@ export function actualizarDesdePlantilla(datos, rutinaId) {
   dias.forEach((dia, k) => { if (rutina.dias[k]) dia.id = rutina.dias[k].id; });
   rutina.dias = dias;
   reutilizarPlanes(datos, rutina);
+  // Las series nuevas que no casan con ninguna de antes siguen el historial de la del mismo puesto.
+  enlazarPorPuesto(datos, rutina);
   rutina.descripcion = `${plantilla.porQue}\n\n${plantilla.comoSeHace}`;
   rutina.versionPlantilla = plantilla.version ?? 1;
   if (tipoDePlantilla(plantilla) === 'flexibilidad' && !rutina.sedeId) rutina.sedeId = sedeDeCasa(datos);

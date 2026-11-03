@@ -14,7 +14,7 @@ import { queEs } from './glosario.js';
 import { relojEnMarcha, relojSerie } from './reloj-serie.js';
 import { duracionTexto } from './intervalos.js';
 import { ayuda, cerrarCarteles, modal, selector } from '../ui.js';
-import { aplicarPreset } from '../ciclos.js';
+import { PRESETS_CICLO, aplicarPreset } from '../ciclos.js';
 import { renovarAlTocar } from '../sincronizacion.js';
 import * as estado from '../estado.js';
 import {
@@ -65,6 +65,15 @@ export const MODOS_ENTRENO = {
 };
 
 // Qué es cada tipo de serie, en una línea (sale al elegirlo).
+// El nombre del ciclo de una serie («Bilbo», «Lineal hasta atascarse»…): Dan, 03-11-2026, «que me diga en qué tipo
+// de ciclo estoy».
+function nombreCiclo(plan) {
+  const preset = plan?.progresion?.preset;
+  if (!preset || preset === 'bilbo') return 'Bilbo';
+  if (preset === 'personalizado') return 'a tu manera';
+  return PRESETS_CICLO[preset]?.etiqueta ?? 'Bilbo';
+}
+
 const EXPLICA_TIPO = {
   bilbo: 'Sobrecarga progresiva: la app te dice el peso y el objetivo, según la progresión de cargas.',
   intensidad: 'Con una técnica: serie descendente, rest-pause, miorrepeticiones…',
@@ -427,7 +436,16 @@ export function vistaSesion(contenedor, { id }) {
     // También los que aún se están recuperando de entrenos recientes (Dan:
     // «me pregunta por los de ese día pero no por los de otros, y así nunca
     // vamos a estimar bien si me recupero rápido»). Son opcionales.
-    const recientes = ORDEN_MUSCULOS.filter((m) => !musculos.has(m) && previsto[m] && previsto[m].porcentaje < 95);
+    // Y siempre los del último entreno de la semana, aunque la app los dé por recuperados (Dan, 03-11-2026: «no me ha
+    // preguntado por los músculos que entrené el último día, solo los de hoy»).
+    const hace7 = new Date(Date.now() - 7 * 86_400_000).toISOString().slice(0, 10);
+    const anterior = d.sesiones.filter((x) => x.id !== sesion.id && !x.borrada && x.estado === 'terminada' && x.fecha >= hace7
+      && x.origen !== 'importado-excel').sort((a, b) => (a.fecha + (a.inicio || '')).localeCompare(b.fecha + (b.inicio || ''))).at(-1);
+    const delAnterior = new Set((anterior?.ejercicios ?? []).flatMap((x) => {
+      const e = ejercicioDe(x.ejercicioId);
+      return e && cuentaParaFatiga(e) && x.series.some((y) => y.hecha && y.tipo !== 'calentamiento') ? e.musculos?.principales ?? [] : [];
+    }));
+    const recientes = ORDEN_MUSCULOS.filter((m) => !musculos.has(m) && previsto[m] && (delAnterior.has(m) || previsto[m].porcentaje < 95));
     const todas = [...lista, ...recientes].every((m) => respuestas[m]);
     if (todas) {
       const quedan = Math.ceil(10 - (Date.now() - (sesion.sensacionesListas ?? 0)) / 1000);
@@ -901,7 +919,7 @@ export function vistaSesion(contenedor, { id }) {
         } else partes.push(serie.hecha ? 'Hecha: con ella se monta el ciclo' : 'Montando el ciclo con tu 1RM de hoy…');
       } else if (s.cicloTerminado) partes.push(`Ciclo ${s.cicloN} terminado: prepara el siguiente en la ficha (o pon el reinicio en automático)`);
       else {
-        partes.push(`Ciclo ${s.cicloN} · sesión ${serie.diaCiclo ?? s.dia}`);
+        partes.push(`${nombreCiclo(plan)} · ciclo ${s.cicloN} · sesión ${serie.diaCiclo ?? s.dia}`);
         if (s.fase) partes.push(`fase ${s.fase.n} de ${s.fase.deN}`);
         if (s.pesoBajo) partes.push('peso muy bajo para tu 1RM: revisa el ciclo en la ficha');
         if (s.cicloAgotado) partes.push('el ciclo se acaba aquí: la próxima vez empieza el siguiente, más ligero');
@@ -942,15 +960,25 @@ export function vistaSesion(contenedor, { id }) {
         if (s.mejorReal) partes.push(`tu récord: ${formatearNumero(s.mejorReal.trabajo)} (${formatearNumero(s.mejorReal.carga)} ${uCarga} × ${formatearNumero(s.mejorReal.esfuerzo)})`);
       }
     } else if (s.porRM && serie.carga != null) {
-      const base = serie.rmUsado?.valor ?? s.rmUsado;
-      partes.push(`Hoy ${formatearNumero(serie.carga)} ${uCarga}` + (s.esfuerzoObjetivo ? ` × ${s.esfuerzoObjetivo}` : ''));
-      if (s.objetivoSuperar) lineas.push(h('span', { class: 'compara' }, '↑ Para superar la última vez: ', h('strong', {}, `${conUnidad(s.objetivoSuperar)}`)));
+      const kilos = `${formatearNumero(serie.carga)} ${uCarga}`;
+      if (esMaxima(plan)) {
+        partes.push(`Objetivo de hoy: ${kilos} × 1-2 dejando 1-2 en recámara`);
+        if (s.ultima) lineas.push(h('span', { class: 'compara' }, `Tu máxima anterior (${fechaCorta(s.ultima.sesion.fecha)}): `, h('strong', {}, textoSerie(ej, s.ultima.serie))));
+      } else if (esBajada(plan)) {
+        const r = s.rango ?? plan.progresion?.objetivoEsfuerzo;
+        partes.push(`Objetivo de hoy: ${kilos} × ${r ? textoRango(r) : ''} dejando ${plan.progresion?.recamaraMin ?? 2} en recámara, las que salgan`);
+        if (s.ultima) lineas.push(h('span', { class: 'compara' }, `La última vez (${fechaCorta(s.ultima.sesion.fecha)}): `, h('strong', {}, textoSerie(ej, s.ultima.serie))));
+        if (r) lineas.push(h('span', { class: 'compara' }, `Para a ${plan.progresion?.recamaraMin ?? 2} del fallo o al llegar a ${r[1]}, lo que llegue antes; apunta la recámara real`));
+      } else {
+        partes.push(`Hoy ${kilos}` + (s.esfuerzoObjetivo ? ` × ${s.esfuerzoObjetivo}` : ''));
+        if (s.objetivoSuperar) lineas.push(h('span', { class: 'compara' }, '↑ Para superar la última vez: ', h('strong', {}, `${conUnidad(s.objetivoSuperar)}`)));
+      }
     } else if (s.modo === 'carga' && !s.ultima) {
       // Serie nueva: el peso sale de tu 1RM (el de la cabecera).
       const rango = textoRango(s.rango);
       const rec = s.recamaraMin ? ` dejando ${s.recamaraMin} en recámara` : '';
       if (serie.carga != null && ej.carga?.tipo !== 'pesoCorporal') {
-        partes.push(`Hoy: ${formatearNumero(serie.carga)} ${uCarga}${rango ? ` × ${rango}` : ''}${rec}`);
+        partes.push(`Objetivo de hoy: ${formatearNumero(serie.carga)} ${uCarga}${s.esfuerzoObjetivo ? ` × ${s.esfuerzoObjetivo}` : rango ? ` × ${rango}` : ''}${rec}`);
       } else partes.push(`Hoy: ${rango ? rangoConUnidad(s.rango) : 'apunta lo que hagas'}${rec}`);
       // Aunque la regla sea nueva (cambió al actualizar la rutina), lo que hiciste en este puesto el último día.
       const eq = entrada && ultimaEquivalente(ej, entrada, j);
@@ -964,13 +992,25 @@ export function vistaSesion(contenedor, { id }) {
       if (orientativo) partes.push(`con tu 1RM, unos ${formatearNumero(orientativo)} ${uCarga}`);
     } else {
       const u = (s.ultima ?? s.referencia).serie;
-      partes.push(`${s.ultima ? 'Última vez' : 'Última vez (en otra serie)'}: ${textoSerie(ej, u)}`);
-      if (s.modo === 'carga' && s.sube) partes.push(`hoy sube a ${formatearNumero(s.carga)} ${uCarga}`
-        + (s.rango ? ` × ${textoRango(s.rango)}` : ''));
-      if (s.modo === 'carga' && s.baja) partes.push(`hoy baja a ${formatearNumero(s.carga)} ${uCarga}: dos veces seguidas sin llegar a ${conUnidad(s.rango?.[0])}`);
-      if (s.modo === 'carga' && !s.sube && !s.baja && s.rango) partes.push(`objetivo ${conUnidad(s.rango[1])}`
-        + (s.recamaraMin ? ` con ${s.recamaraMin} en recámara` : '') + ': al llegar, sube el peso'
-        + (s.faltaRecamara ? ' (la última vez llegaste, pero apurando)' : ''));
+      const fecha = (s.ultima ?? s.referencia).sesion?.fecha;
+      if (s.modo === 'carga' && s.ultima && s.sobre === 'carga' && s.esfuerzoObjetivo != null) {
+        // Borrador 15, ampliación 2: los kilos de la última vez en este puesto y una repetición más; al llegar al
+        // tope, sube el peso y vuelve al mínimo.
+        const kilos = serie.carga ?? s.carga;
+        partes.push(`Objetivo de hoy: ${kilos != null ? `${formatearNumero(kilos)} ${uCarga} × ` : ''}${conUnidad(s.esfuerzoObjetivo)}`
+          + (s.recamaraMin ? ` dejando ${s.recamaraMin} en recámara` : ''));
+        lineas.push(h('span', { class: 'compara' }, `La última vez${fecha ? ` (${fechaCorta(fecha)})` : ''}: `, h('strong', {}, textoSerie(ej, u)),
+          s.sube ? ': llegaste arriba, sube el peso' : s.baja ? `: dos veces sin llegar a ${s.rango?.[0]}, baja un salto`
+            : s.faltaRecamara ? ': llegaste arriba, pero apurando' : ''));
+        if (s.rango) lineas.push(h('span', { class: 'compara' }, `Para a ${s.recamaraMin ?? 2} del fallo o al llegar a ${s.rango[1]}, lo que llegue antes; apunta la recámara real`));
+      } else {
+        partes.push(`${s.ultima ? 'Última vez' : 'Última vez (en otra serie)'}: ${textoSerie(ej, u)}`);
+        if (s.modo === 'carga' && s.sube) partes.push(`hoy sube a ${formatearNumero(s.carga)} ${uCarga}`
+          + (s.rango ? ` × ${textoRango(s.rango)}` : ''));
+        if (s.modo === 'carga' && s.baja) partes.push(`hoy baja a ${formatearNumero(s.carga)} ${uCarga}: dos veces seguidas sin llegar a ${conUnidad(s.rango?.[0])}`);
+        if (s.modo === 'carga' && !s.sube && !s.baja && s.rango) partes.push(`objetivo ${conUnidad(s.rango[1])}`
+          + (s.recamaraMin ? ` con ${s.recamaraMin} en recámara` : '') + ': al llegar, sube el peso');
+      }
       if (s.modo === 'esfuerzo') partes.push(`hoy intenta ${conUnidad(s.esfuerzoObjetivo)}`);
     }
     // Cuántas te salen con ese peso según tu 1RM de ahora, y cuántas lo superan (Dan, 30-10: «no me dice cuál es
@@ -1064,6 +1104,14 @@ export function vistaSesion(contenedor, { id }) {
       }
     });
     return cambio;
+  }
+  // Las repeticiones del objetivo de hoy (para el gris de las casillas vacías).
+  function objetivoHoyDe(ej, serie) {
+    const plan = planDe(ej, serie);
+    if (!plan || serie.tipo === 'calentamiento') return null;
+    const s = sugerenciaSerie(d, ej, plan, { excluirSesion: id });
+    const v = s.objetivoSuperar ?? s.esfuerzoObjetivo;
+    return v != null ? formatearNumero(v) : null;
   }
   // Lo que hiciste la última vez en esta serie (para el gris de las casillas vacías).
   function ultimaDe(ej, serie) {
@@ -1613,7 +1661,10 @@ export function vistaSesion(contenedor, { id }) {
     const nombreLibre = plan && !plan.calentamiento ? `Programación: ${nombreRegla(plan).split(':')[0]}` : 'Sin objetivo';
     return h('div', { class: 'serie-cabecera' },
       plan?.lado && h('span', { class: `insignia-lado ${plan.lado}` }, plan.lado === 'izquierda' ? 'Lado izquierdo' : 'Lado derecho'),
-      selector(Object.entries(TIPOS_SERIE).map(([k, t]) => [k, k === 'libre' ? nombreLibre : t,
+      // Con un ciclo, «Libre» sería «Programación: Ciclo» y salía dos veces (Dan, 03-11-2026).
+      selector(Object.entries(TIPOS_SERIE).filter(([k]) => !(k === 'libre' && plan?.progresion?.tipo === 'bilbo'))
+        .map(([k, t]) => [k, k === 'libre' ? nombreLibre
+          : k === 'bilbo' && plan?.progresion?.tipo === 'bilbo' ? `Ciclo ${nombreCiclo(plan)}` : t,
         k === 'libre' && plan && !plan.calentamiento ? nombreRegla(plan) : EXPLICA_TIPO[k]]), serie.tipo, (v) => {
         // «Ciclo» en un ejercicio que aún no tiene ninguno: la app pregunta cuál.
         if (v === 'bilbo' && !(ej.series || []).some((p) => p.progresion?.tipo === 'bilbo')) { elegirCiclo(ej, i, j); return; }
@@ -1735,7 +1786,8 @@ export function vistaSesion(contenedor, { id }) {
           h('span', { class: 'et' }, unidadEsfuerzo(ej)),
           h('input', { type: 'text', inputmode: 'decimal', 'aria-label': TIPOS_ESFUERZO[ej.esfuerzo.tipo].etiqueta,
             value: serie.esfuerzo ?? '',
-            placeholder: serie.esfuerzo == null ? (serie.objetivo != null ? formatearNumero(serie.objetivo) : ultimaDe(ej, serie)?.esfuerzo ?? '') : '',
+            placeholder: serie.esfuerzo == null ? (serie.objetivo != null ? formatearNumero(serie.objetivo)
+              : objetivoHoyDe(ej, serie) ?? ultimaDe(ej, serie)?.esfuerzo ?? '') : '',
             oninput: (e) => {
               actualizar((x) => {
                 const antes = serieCompleta(ej, x);
@@ -1755,7 +1807,8 @@ export function vistaSesion(contenedor, { id }) {
         return h('label', { class: 'valor recamara' },
           h('span', { class: 'et' }, 'Recámara', queEs('recamara', '?')),
           h('input', { type: 'text', inputmode: 'decimal', value: serie.recamara ?? '', 'aria-label': 'Repeticiones en recámara',
-            placeholder: serie.recamara == null ? String(ultimaDe(ej, serie)?.recamara ?? recamaraPorDefectoDe(d, ej, planDe(ej, serie))) : '',
+            placeholder: serie.recamara == null ? String(planDe(ej, serie)?.progresion?.recamaraMin ?? ultimaDe(ej, serie)?.recamara
+              ?? recamaraPorDefectoDe(d, ej, planDe(ej, serie))) : '',
             oninput: (e) => {
               const v = leerNumero(e.target.value);
               cercania.textContent = v != null ? (tipoDeFallo(v) || '') : '';

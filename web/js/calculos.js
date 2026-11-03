@@ -109,8 +109,12 @@ export function sugerenciaSerie(datos, ejercicio, plan, { excluirSesion, rmHoy =
   const sobre = prog.sobre || (ejercicio.carga?.tipo === 'ninguna' ? 'esfuerzo' : 'carga');
   // Un calentamiento apuntado con el plan de una serie de trabajo (pasaba al
   // cambiarle el tipo) no es «la última vez» de esa serie: daba 20 kg × 14.
-  const historial = seriesDeEjercicio(datos, ejercicio.id, { excluirSesion, planId: plan.id })
+  const deUnPlan = (pid) => seriesDeEjercicio(datos, ejercicio.id, { excluirSesion, planId: pid })
     .filter((x) => plan.calentamiento || x.serie.tipo !== 'calentamiento');
+  // Una serie que sustituye a otra del mismo puesto al actualizar la rutina (`sigueA`) sigue con su historial: a Dan
+  // el remo pasó de 6-8 a 8-10 y la app, sin «última vez», bajó de 67,5 a 60 kg (03-11-2026).
+  let historial = deUnPlan(plan.id);
+  if (!historial.length && plan.sigueA) historial = deUnPlan(plan.sigueA);
   const ultima = historial.at(-1) ?? null;
   // Si esta serie es nueva pero el ejercicio ya se ha hecho, se parte de la
   // última carga conocida: así una serie descendente recién creada no sale vacía.
@@ -149,7 +153,7 @@ export function sugerenciaSerie(datos, ejercicio, plan, { excluirSesion, rmHoy =
         if (peso > 0) { carga = aPesoDisponible(ejercicio, peso, { rm: rm.valor }); porFormula = true; }
       }
       return { ...base, rango: prog.objetivoEsfuerzo ?? plan.objetivoEsfuerzo, recamaraMin: prog.recamaraMin ?? null, carga, porFormula,
-        rmUsado: rm?.valor ?? null, sinRM: conPeso && !rm };
+        rmUsado: rm?.valor ?? null, sinRM: conPeso && !rm, esfuerzoObjetivo: porFormula && sobre === 'carga' ? max : null };
     }
     // En una serie descendente, solo cuenta la parte normal (el primer tramo): las repeticiones de las bajadas no
     // suben el peso (borrador 15: «el drop set no cuenta para la doble progresión»).
@@ -182,7 +186,11 @@ export function sugerenciaSerie(datos, ejercicio, plan, { excluirSesion, rmHoy =
       baja,
       faltaRecamara,
       carga: sobre === 'carga' ? siguiente : ultima.serie.carga,
-      esfuerzoObjetivo: sobre === 'carga' ? (sube ? prog.objetivoEsfuerzo?.[0] : null) : siguiente,
+      // Objetivo de hoy (borrador 15, ampliación 2): una repetición más que la última vez sin pasar del tope; al
+      // subir o bajar el peso, el mínimo del rango.
+      esfuerzoObjetivo: sobre !== 'carga' ? siguiente
+        : sube || baja ? (min ?? null)
+          : max != null && esfuerzoTotal(u) != null ? Math.min(max, Math.round(esfuerzoTotal(u)) + 1) : null,
     };
   }
 

@@ -1660,3 +1660,20 @@ recámara en todo lo normal, elevación de piernas colgado 2 × 5-8, «Carrera»
   última vez de ese mismo día») ya la cumple la doble progresión: cada día de la rutina tiene sus propias series, con su
   historial. La primera vez, el peso sale del 1RM (el que da el máximo del rango con 2 en recámara, ~70-75 %).
 - El paso de 2 × 5-8 a 2 × 8-12 en las elevaciones no es automático: lo dice la nota.
+
+## Ronda 0.75.0 (03-11-2026): objetivo de hoy y su remo de 60 kg
+
+- Esquema v31: `plan.sigueA` (opcional). Una serie de rutina que nunca se ha hecho sigue el historial de la del mismo
+  puesto el último día terminado de ese día de la rutina (`enlazarPorPuesto` en esquema.js, lo usan la migración y
+  `actualizarDesdePlantilla`). A Dan, la serie normal del remo cambió de regla, se quedó sin «última vez» y la app le
+  puso el peso del 1RM para 10 (60 kg) en vez de los 67,5 de la última vez.
+- Borrador 15, ampliación 2: «Objetivo de hoy» con kilos, repeticiones y recámara. Doble progresión: los kilos de la
+  última vez y una repetición más sin pasar del tope (`esfuerzoObjetivo` siempre); al subir o bajar, el mínimo. Máxima:
+  1-2 dejando 1-2 y «Tu máxima anterior». Bajadas: «3-5 dejando 2, las que salgan». Debajo, «Para a 2 del fallo o al
+  llegar a N, lo que llegue antes; apunta la recámara real». Los grises de las casillas son el objetivo de hoy
+  (`objetivoHoyDe`) y la recámara de la regla.
+- Tipo de serie: «Ciclo Bilbo» (o el nombre de su ciclo, `nombreCiclo`) y sin la opción «Programación: Ciclo», que
+  salía repetida. La línea del ciclo dice «Bilbo · ciclo 1 · sesión 3».
+- Saludo sin frases motivacionales: solo «Hola, Daniel.».
+- «¿Cómo llegas?» pregunta también por los músculos del último entreno terminado de la semana, aunque la app los dé
+  por recuperados.

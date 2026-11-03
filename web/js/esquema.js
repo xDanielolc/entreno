@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 30;
+export const VERSION_ACTUAL = 31;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -652,7 +652,45 @@ const MIGRACIONES = {
     datos.version = 30;
     return datos;
   },
+  // v30 → v31: `plan.sigueA` (opcional). Una serie de rutina que nunca se ha hecho sigue el historial de la del mismo
+  // puesto la última vez que hiciste ese día (Dan, 03-11-2026: el remo pasó de 6-8 a 8-10 al actualizar la rutina y
+  // la app, sin «última vez», le bajó de 67,5 a 60 kg).
+  30: (datos) => {
+    for (const rutina of datos.rutinas ?? []) enlazarPorPuesto(datos, rutina);
+    datos.version = 31;
+    return datos;
+  },
 };
+
+// Las series de trabajo de cada día de `rutina` que aún no se han hecho nunca se enlazan (`sigueA`) con la serie del
+// mismo puesto (1.ª, 2.ª… de trabajo de ese ejercicio) el último día terminado de ese día de la rutina, si llevaba la
+// misma clase de progresión y otra regla. No cambiar: lo usa una migración publicada.
+export function enlazarPorPuesto(datos, rutina) {
+  const hechas = new Set((datos.sesiones ?? []).flatMap((s) => (s.ejercicios ?? []).flatMap((x) => (x.series ?? [])
+    .filter((y) => y.hecha).map((y) => y.planId))));
+  for (const dia of rutina.dias ?? []) {
+    const sesiones = (datos.sesiones ?? []).filter((s) => s.diaRutinaId === dia.id && !s.borrada && s.estado !== 'en-curso')
+      .sort((a, b) => (a.fecha + (a.inicio || '')).localeCompare(b.fecha + (b.inicio || '')));
+    for (const item of dia.ejercicios ?? []) {
+      const ej = (datos.ejercicios ?? []).find((e) => e.id === item.ejercicioId);
+      if (!ej || !Array.isArray(item.series)) continue;
+      const delItem = item.series.map((pid) => (ej.series ?? []).find((p) => p.id === pid))
+        .filter((p) => p && !p.calentamiento && p.tipo !== 'calentamiento');
+      const ultima = [...sesiones].reverse().find((s) => s.ejercicios.some((x) => x.ejercicioId === ej.id
+        && x.series.some((y) => y.hecha && y.tipo !== 'calentamiento')));
+      if (!ultima) continue;
+      const antes = ultima.ejercicios.filter((x) => x.ejercicioId === ej.id)
+        .flatMap((x) => x.series.filter((y) => y.hecha && y.tipo !== 'calentamiento'));
+      delItem.forEach((plan, k) => {
+        const vieja = antes[k];
+        const planViejo = vieja && (ej.series ?? []).find((p) => p.id === vieja.planId);
+        if (plan.sigueA || hechas.has(plan.id) || !planViejo || planViejo.id === plan.id) return;
+        if ((planViejo.progresion?.tipo ?? 'libre') !== (plan.progresion?.tipo ?? 'libre')) return;
+        plan.sigueA = planViejo.id;
+      });
+    }
+  }
+}
 
 // Los tres sitios de serie que falten (por tipo), detrás de los que haya. No
 // cambiar: lo usa una migración publicada.

@@ -85,31 +85,9 @@ function cuandoTexto(fecha, ahora) {
   return `el ${fecha.toLocaleDateString('es-ES', { weekday: 'long' })} ${tramo}`;
 }
 
-// Un saludo distinto cada vez (cambia cada hora, no en cada toque).
-const SALUDOS = [
-  'Hola, {n}. La barra no se va a levantar sola.',
-  '{n}, hoy también cuenta.',
-  'Buenas, {n}. Un día más es un día más fuerte.',
-  '{n}, el mejor entrenamiento es el que se hace.',
-  'Hola, {n}. Poco a poco y sin parar.',
-  '{n}, lo difícil ya lo has hecho: abrir la app.',
-  'Hola, {n}. Hoy, una repetición más que ayer.',
-  '{n}, tu yo de dentro de un año te lo agradecerá.',
-  'Buenas, {n}. Calienta bien, que luego nos quejamos.',
-  '{n}, si dudas, empieza por la primera serie.',
-  'Hola, {n}. Descansar también es entrenar.',
-  '{n}, la constancia gana a la motivación.',
-  'Hola, {n}. Hoy toca lo que toca, y ya está.',
-  '{n}, apunta las series: lo que no se mide no mejora.',
-  'Buenas, {n}. Cada serie, con intención.',
-  '{n}, sin prisa: el peso subirá.',
-];
-
+// Solo «Hola, Daniel.»: sin frases motivacionales (Dan, 03-11-2026: «me parece horroroso»).
 function saludo(nombre) {
-  const base = SALUDOS[Math.floor(Date.now() / 3_600_000) % SALUDOS.length];
-  // Sin nombre, la frase se queda sin el hueco: «Buenas. Un día más…».
-  const texto = nombre ? base.replace('{n}', nombre) : base.replace(', {n}.', '.').replace('{n}, ', '');
-  return texto.replace(/\s{2,}/g, ' ').replace(/^(\p{L})/u, (m) => m.toUpperCase());
+  return nombre ? `Hola, ${nombre}.` : 'Hola.';
 }
 
 // La fecha de hoy debajo del saludo: «Jueves, 22 de octubre».
