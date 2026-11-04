@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 31;
+export const VERSION_ACTUAL = 32;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -658,6 +658,35 @@ const MIGRACIONES = {
   30: (datos) => {
     for (const rutina of datos.rutinas ?? []) enlazarPorPuesto(datos, rutina);
     datos.version = 31;
+    return datos;
+  },
+  // v31 → v32: el hombro, en dos (Dan, 04-11-2026: la banca le pintaba el hombro lateral). `hombro` pasa a ser el
+  // delantero y entra `hombroLateral`: las elevaciones laterales y los pájaros de pie van solo al lateral; el remo al
+  // mentón, también al lateral; los press por encima de la cabeza llevan además el lateral de secundario. Objetivos,
+  // ritmo de recuperación y sensaciones del hombro se copian al lateral.
+  31: (datos) => {
+    for (const ej of datos.ejercicios ?? []) {
+      const m = ej.musculos;
+      if (!m) continue;
+      const n = (ej.nombre || '').toLowerCase();
+      const p = m.principales ?? [], s = m.secundarios ?? [];
+      const tiene = p.includes('hombro') || s.includes('hombro');
+      if (/elevaci[oó]n(es)? lateral|laterales/.test(n) && tiene) {
+        m.principales = p.map((x) => (x === 'hombro' ? 'hombroLateral' : x));
+        m.secundarios = s.map((x) => (x === 'hombro' ? 'hombroLateral' : x));
+      } else if (/rem(o|os) al ment[oó]n/.test(n)) {
+        if (!p.includes('hombroLateral')) m.principales = [...p, 'hombroLateral'];
+        m.secundarios = s.filter((x) => x !== 'hombroLateral');
+      } else if (/press militar|press de hombro|press arnold|press tras nuca|flexiones en (pica|pino)/.test(n) && tiene
+        && !p.includes('hombroLateral') && !s.includes('hombroLateral')) {
+        m.secundarios = ['hombroLateral', ...s];
+      }
+    }
+    const copiar = (obj) => { if (obj && 'hombro' in obj && !('hombroLateral' in obj)) obj.hombroLateral = obj.hombro; };
+    copiar(datos.perfil?.objetivoSeries);
+    copiar(datos.perfil?.recuperacion?.factores);
+    for (const s of datos.sesiones ?? []) copiar(s.sensaciones);
+    datos.version = 32;
     return datos;
   },
 };

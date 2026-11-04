@@ -419,7 +419,7 @@ El paso 3 no es opcional. Es la red de seguridad.
   fallo). Cada plantilla de serie gana `tramoSalto` (kilos por bajada).
 - **v5.** `perfil.dropSet = { bajadas, salto, inicioPorcentaje }`.
 - **v6.** Cada ejercicio gana `musculos = { principales: [], secundarios: [] }`
-  con claves de `web/js/musculos.js` (cuello, trapecio, hombro,
+  con claves de `web/js/musculos.js` (cuello, trapecio, hombro (el delantero), hombroLateral,
   hombroPosterior, pecho, biceps, triceps, antebrazo, abdomen, oblicuos,
   dorsal, lumbar, gluteo, abductores, cuadriceps, aductores, isquios, gemelo,
   tibial).
@@ -657,3 +657,8 @@ la vez, a veces sin cobertura):
   añadir más en Ajustes. `rutina.sedeId` guarda dónde se hace cada rutina: la
   app lo pregunta solo la primera vez. Las ayudas de un estiramiento van en
   `serie.estiramiento.asistencias` (lista; `['ninguna']` = sin ayuda).
+- **v32 (hombro en dos, 04-11-2026).** `hombro` pasa a ser el hombro
+  delantero y entra `hombroLateral`. La migración pone las elevaciones
+  laterales solo en el lateral, añade el lateral como principal al remo al
+  mentón y como secundario a los press por encima de la cabeza, y copia al
+  lateral los objetivos, el ritmo de recuperación y las sensaciones del hombro.

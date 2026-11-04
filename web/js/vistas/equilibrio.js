@@ -13,7 +13,7 @@ import { objetivoSeries } from './cuerpo.js';
 // Zonas del cuerpo: los 20 músculos juntados en 12, como hace Lyfta.
 const ZONAS = [
   ['Pecho', ['pecho']],
-  ['Hombros', ['hombro', 'hombroPosterior']],
+  ['Hombros', ['hombro', 'hombroLateral', 'hombroPosterior']],
   ['Bíceps', ['biceps']],
   ['Tríceps', ['triceps']],
   ['Antebrazo', ['antebrazoFlexor', 'antebrazoExtensor']],
@@ -26,7 +26,7 @@ const ZONAS = [
   ['Gemelos', ['gemelo', 'soleo', 'tibial']],
 ];
 
-const DELANTE = ['pecho', 'hombro', 'biceps', 'antebrazoFlexor', 'abdomen', 'oblicuos', 'cuadriceps', 'aductores', 'tibial', 'cuello'];
+const DELANTE = ['pecho', 'hombro', 'hombroLateral', 'biceps', 'antebrazoFlexor', 'abdomen', 'oblicuos', 'cuadriceps', 'aductores', 'tibial', 'cuello'];
 const deGrupo = (g) => Object.keys(MUSCULOS).filter((m) => MUSCULOS[m].grupo === g);
 const CORE = deGrupo('core');
 

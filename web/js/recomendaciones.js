@@ -103,7 +103,7 @@ export function recomendacionesGenerales(datos, ahora = new Date()) {
 
   // 13 y 14. Desequilibrios.
   const suma = (ms) => ms.reduce((t, m) => t + (semana[m] ?? 0), 0);
-  const empuje = suma(['pecho', 'hombro']);
+  const empuje = suma(['pecho', 'hombro', 'hombroLateral']);
   const tiron = suma(['dorsal', 'hombroPosterior']);
   if (empuje >= 8 && empuje > tiron * 1.5) {
     lista.push(r('empuje-tiron', 'consejo', `Esta semana empujas bastante más de lo que tiras (${formatearNumero(Math.round(empuje))} series `

@@ -2,7 +2,7 @@
 //
 // El cuerpo y la mayoría de capas vienen de wger (licencia Creative Commons
 // BY-SA, atribución en Ajustes). Las capas que wger no trae (antebrazo, hombro
-// posterior, lumbares, aductores, abductores, cuello, tibial, gemelo y sóleo)
+// delantero, lateral y posterior, lumbares, aductores, abductores, cuello, tibial, gemelo y sóleo)
 // son dibujos propios, hechos con herramientas/dibujar_capas_extra.py.
 //
 // Cada capa se pinta del color que toque usando una máscara, así que sigue
@@ -12,7 +12,10 @@
 export const MUSCULOS = {
   cuello:          { nombre: 'Cuello',           grupo: 'core',   tamano: 'pequeno', vistas: ['delante', 'detras'], propia: true },
   trapecio:        { nombre: 'Trapecio',         grupo: 'tirón',  tamano: 'medio',   vistas: ['detras'] },
-  hombro:          { nombre: 'Hombro anterior y lateral', corto: 'Hombros', grupo: 'empuje', tamano: 'pequeno', vistas: ['delante'], propia: true },
+  // El hombro, en dos desde el 04-11-2026: la banca y los press de pecho cansan
+  // el delantero; las elevaciones laterales, el lateral; el militar, los dos.
+  hombro:          { nombre: 'Hombro delantero', grupo: 'empuje', tamano: 'pequeno', vistas: ['delante'], propia: true },
+  hombroLateral:   { nombre: 'Hombro lateral',   grupo: 'empuje', tamano: 'pequeno', vistas: ['delante'], propia: true },
   hombroPosterior: { nombre: 'Hombro posterior', grupo: 'tirón',  tamano: 'pequeno', vistas: ['detras'], propia: true },
   pecho:           { nombre: 'Pecho',            grupo: 'empuje', tamano: 'grande',  vistas: ['delante'], propia: true },
   biceps:          { nombre: 'Bíceps',           grupo: 'tirón',  tamano: 'pequeno', vistas: ['delante'] },
@@ -41,7 +44,7 @@ export const MUSCULOS = {
 export const ORDEN_MUSCULOS = Object.keys(MUSCULOS);
 
 // Músculos del tren superior e inferior, para los filtros del catálogo.
-export const TREN_SUPERIOR = ['cuello', 'trapecio', 'hombro', 'hombroPosterior', 'pecho', 'biceps', 'triceps', 'antebrazoFlexor', 'antebrazoExtensor', 'dorsal'];
+export const TREN_SUPERIOR = ['cuello', 'trapecio', 'hombro', 'hombroLateral', 'hombroPosterior', 'pecho', 'biceps', 'triceps', 'antebrazoFlexor', 'antebrazoExtensor', 'dorsal'];
 export const TREN_INFERIOR = ['gluteo', 'abductores', 'cuadriceps', 'aductores', 'isquios', 'gemelo', 'soleo', 'tibial'];
 
 export function nombreMusculo(clave, { corto = false } = {}) {

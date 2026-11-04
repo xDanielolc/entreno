@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 r"""
-Capas de músculo que wger no trae (antebrazo, hombro posterior, lumbares,
+Capas de músculo que wger no trae (antebrazo, hombro delantero, lateral y posterior, lumbares,
 aductores, abductores, cuello, tibial y sóleo, más el gemelo partido del
 sóleo), dibujadas encima de su silueta.
 
@@ -58,11 +58,17 @@ CAPAS = {
                      (64.6, 93.4), (70, 96.8), (78.5, 98.5), (87, 98.5), (93, 98), (95.4, 97.2), (94, 94), (93.4, 86),
                      (92.2, 80), (90.6, 75)]],
     },
-    # Hombro anterior y lateral: la cabeza del hombro, hasta la misma línea
-    # que el pecho.
+    # Hombro, en dos desde el 04-11-2026 (Dan: la banca le pintaba el hombro
+    # lateral). De frente, la cabeza delantera llega hasta la misma línea que
+    # el pecho y la lateral es el borde de fuera, por la línea oscura que
+    # baja del acromion.
     "hombro": {
-        "delante": [[(62, 66), (57.5, 65.8), (53, 67.6), (50, 71), (48.4, 77), (48.2, 84), (48.9, 91), (51, 96), (53.5, 99),
-                     (56.5, 95), (59.3, 90.5), (60.6, 87.4), (64.4, 80.6), (68.2, 73.6), (67, 69)]],
+        "delante": [[(58.3, 65.8), (62, 66), (67, 69), (68.2, 73.6), (64.4, 80.6), (60.6, 87.4), (59.3, 90.5), (56.5, 95),
+                     (54.3, 98), (54.4, 92), (54.8, 85), (55.6, 78), (56.8, 71)]],
+    },
+    "hombroLateral": {
+        "delante": [[(56.7, 65.9), (53, 67.6), (50, 71), (48.4, 77), (48.2, 84), (48.9, 91), (51, 96), (52.8, 98.2),
+                     (52.8, 92), (53.2, 85), (54, 78), (55.2, 71)]],
     },
     "hombroPosterior": {
         "detras": [[(47, 76), (55, 70), (64, 71), (70, 77), (64, 86.5), (55, 95), (46.5, 99.5),

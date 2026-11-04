@@ -1682,3 +1682,13 @@ recámara en todo lo normal, elevación de piernas colgado 2 × 5-8, «Carrera»
   recámara. Rutina versión 11: la normal del remo y del militar del día 1 pasan a 6-8 (Dan: «6-8 o menos, para ir
   por fuerza»). En sus datos: esos planes a 6-8 y las dos series de remo del 03-11 sueltas de su plan
   (`planIdAntes`), así la próxima vez el peso sale del 1RM para 8 (65 kg); siguen contando para el 1RM.
+
+## Ronda 0.76.0 (04-11-2026): el hombro, en dos
+
+Dan: «el hombro está en amarillo y no he hecho nada de hombro, especialmente hombro medio». Era la banca, que lleva
+el hombro de secundario, y el muñeco pintaba delantero y lateral juntos. Esquema v32: `hombro` es ahora el hombro
+delantero y entra `hombroLateral` (capa propia en `dibujar_capas_extra.py`, el borde de fuera de la cabeza del hombro
+visto de frente). Catálogo y migración: elevaciones laterales solo al lateral, remo al mentón y jumping jacks al
+lateral, los press por encima de la cabeza (militar, de hombro, Arnold, tras nuca, pica, pino) con el lateral de
+secundario; objetivos, ritmo de recuperación y sensaciones del hombro copiados al lateral. Equilibrio, medidas y el
+consejo de empuje/tirón cuentan los dos. Almacén `entreno-imagenes-54`.

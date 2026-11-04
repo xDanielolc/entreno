@@ -14,7 +14,7 @@ export const MEDIDAS_CUERPO = [
   { clave: 'peso', nombre: 'Peso corporal', unidad: 'kg', icono: 'corporal', min: 20, max: 400 },
   { clave: 'grasa', nombre: 'Grasa corporal', unidad: '%', icono: 'cinta', min: 2, max: 70 },
   { clave: 'cuello', nombre: 'Cuello', musculos: ['cuello'] },
-  { clave: 'hombros', nombre: 'Hombros', musculos: ['hombro'] },
+  { clave: 'hombros', nombre: 'Hombros', musculos: ['hombro', 'hombroLateral'] },
   { clave: 'pecho', nombre: 'Pecho', musculos: ['pecho'] },
   { clave: 'biceps-izq', nombre: 'Bíceps izquierdo', musculos: ['biceps'], lado: 'izq' },
   { clave: 'biceps-der', nombre: 'Bíceps derecho', musculos: ['biceps'], lado: 'der' },
