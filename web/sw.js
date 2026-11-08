@@ -7,12 +7,17 @@
 // Solo se ocupa del CÓDIGO de la app. Los datos del usuario nunca pasan por
 // aquí: viven en el dispositivo (IndexedDB) y en su Google Drive.
 
-const VERSION = '0.80.0';
+const VERSION = '0.81.0';
 const CACHE = `entreno-${VERSION}`;
 // Las imágenes van en un almacén aparte que NO se borra al actualizar la app:
 // así se ven sin conexión aunque haya salido una versión nueva.
 // Si cambian las imágenes, se sube el número y los móviles bajan las nuevas.
 const CACHE_IMAGENES = 'entreno-imagenes-54';  // el mismo nombre en app.js (guardarImagenesParaSinConexion)
+// Los audios de hipnosis, igual: almacén aparte que NO se borra al actualizar
+// la app. Pesan varios megas cada uno y no cambian nunca, así que se guardan
+// la primera vez que suenan y a partir de ahí se oyen sin conexión. Si algún
+// día se cambia un audio sin cambiarle el nombre, se sube este número.
+const CACHE_AUDIOS = 'entreno-audios-1';
 
 const ARCHIVOS = [
   './',
@@ -39,6 +44,8 @@ const ARCHIVOS = [
   './js/records.js',
   './js/fotos.js',
   './js/diario.js',
+  './js/audios.js',
+  './js/vistas/audios.js',
   './js/presentacion.js',
   './js/vistas/diario.js',
   './js/vistas/importar.js',
@@ -110,7 +117,7 @@ self.addEventListener('install', (evento) => {
 self.addEventListener('activate', (evento) => {
   evento.waitUntil(
     caches.keys()
-      .then((claves) => Promise.all(claves.filter((c) => c !== CACHE && c !== CACHE_IMAGENES).map((c) => caches.delete(c))))
+      .then((claves) => Promise.all(claves.filter((c) => ![CACHE, CACHE_IMAGENES, CACHE_AUDIOS].includes(c)).map((c) => caches.delete(c))))
       .then(() => self.clients.claim()));
 });
 
@@ -129,6 +136,21 @@ self.addEventListener('fetch', (evento) => {
       if (guardada) return guardada;
       const respuesta = await fetch(peticion);
       if (respuesta.ok) cache.put(peticion, respuesta.clone());
+      return respuesta;
+    })());
+    return;
+  }
+
+  // Audios: igual que las imágenes, pero sin el tope de 4 s de la red, porque
+  // son de varios megas. La pantalla los pide con fetch() entero (nunca por
+  // tramos), que es justo lo que se puede guardar.
+  if (url.pathname.includes('/audios/')) {
+    evento.respondWith((async () => {
+      const cache = await caches.open(CACHE_AUDIOS);
+      const guardada = await cache.match(peticion, { ignoreSearch: true });
+      if (guardada) return guardada;
+      const respuesta = await fetch(peticion);
+      if (respuesta.ok && respuesta.status === 200) cache.put(peticion, respuesta.clone());
       return respuesta;
     })());
     return;

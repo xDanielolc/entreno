@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 35;
+export const VERSION_ACTUAL = 36;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -733,6 +733,15 @@ const MIGRACIONES = {
   // si no estaba apuntada). Opcional y sin valor para los tests de antes: solo sube el número.
   34: (datos) => {
     datos.version = 35;
+    return datos;
+  },
+  // v36: en la entrada del día, `audioSonoHasta` (segundos). Lo apunta sola la
+  // pantalla de audios cuando reproduce uno de dormir: es lo único que la app
+  // SABE (qué versión sonó y hasta qué segundo llegó a sonar). Hasta dónde
+  // llegó él despierto sigue siendo cosa suya, en el campo de siempre.
+  // Opcional y sin valor por defecto, así que no hay nada que rellenar.
+  35: (datos) => {
+    datos.version = 36;
     return datos;
   },
 };

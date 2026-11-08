@@ -17,6 +17,7 @@ import {
   horaAcostarse, horaAvisoPvt, horaAvisoPvtTarde, listoParaPvt, modoPVT, pvtDelDia, resumenUltimos7, testsPVT, textoHoras,
   totalIlusiones,
 } from '../diario.js';
+import { audioPorId, reloj } from '../audios.js';
 import { colores, graficaLineas } from './graficas.js';
 import { abrirPVT, activarAvisoPvt, avisoPvtActivo, faltaPermisoPvt, ofrecerPvtTrasDiario, programarAvisoPvt, puedeAvisarPvt } from './pvt.js';
 import { tarjetaCribado } from './cribado.js';
@@ -173,6 +174,15 @@ export function vistaDiario(contenedor) {
         onclick: () => guardar('audio', e.audio === k ? null : k, { repintar: true }) }, t))),
       // Cuál de los dos. Solo aparece si esa noche hubo audio: preguntarlo en
       // las noches sin audio sería una casilla que siempre se queda vacía.
+      // El botón de poner el audio va aquí, que es donde lo busca: en la
+      // tarjeta de la noche, al lado de donde luego lo apunta.
+      h('a', { class: 'boton secundario', href: '#/audios' }, 'Escuchar un audio'),
+      // Lo que la app sabe de cierto porque lo reprodujo ella: qué versión
+      // sonó y hasta qué segundo. No sustituye a lo de arriba, que es hasta
+      // dónde llegó ÉL despierto, y eso solo lo sabe él.
+      e.audioSonoHasta != null && h('p', { class: 'nota' },
+        `La app puso el audio ${e.audioVersion ?? ''} y sonó hasta el ${reloj(e.audioSonoHasta)}`
+        + (audioPorId(`dormir-${e.audioVersion}`)?.duracion <= e.audioSonoHasta + 2 ? ', o sea entero.' : '.')),
       e.audio && e.audio !== 'no' && h('span', { class: 'etiqueta-campo suave' }, 'Cuál'),
       e.audio && e.audio !== 'no' && h('div', { class: 'fila-marcas compacta' }, Object.entries(VERSIONES_AUDIO).map(([k, t]) => h('button', { type: 'button',
         class: `boton-marca${String(e.audioVersion) === k ? ' activo' : ''}`, 'aria-pressed': String(String(e.audioVersion) === k),

@@ -701,6 +701,19 @@ la vez, a veces sin cobertura):
     autonómica arrastra la duración; el mínimo no.
   - Nada que convertir en los datos ya guardados: la migración solo añade los
     dos campos del perfil.
+- **v36 (la app apunta sola qué audio sonó, 09-11-2026).** Un campo más en la
+  entrada del día, opcional y sin valor por defecto, así que la migración solo
+  sube el número.
+  - `audioSonoHasta` (segundos): hasta qué segundo llegó a sonar el audio de
+    hipnosis que puso la propia app desde la pantalla `#/audios`. Se guarda
+    junto con `audioVersion`, cada 30 segundos mientras suena y al terminar, y
+    solo si pasó de 30 segundos (un toque sin querer no es una noche con
+    audio). La noche se apunta en el día en que se LEVANTA: a partir de las
+    17:00 el audio cuenta para el día siguiente (`fechaDeLaNoche()` en
+    `js/audios.js`).
+  - Lo que la app NO apunta sola es hasta dónde llegó él despierto: eso solo lo
+    sabe él y sigue en `audio`. Los dos datos conviven a propósito.
+
 - **v35 (test de atención a los 45 min de levantarse, 09-11-2026).** Cada test
   de `diario[].pvt[]` guarda `minTrasLevantarse`: los minutos desde la hora de
   `levantado` de ese día cuando se hizo, o null si no estaba apuntada (null es

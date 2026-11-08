@@ -2383,3 +2383,28 @@ body.entreno-a-pantalla .tira-inferior { display: none; }
 /* Final de la serie en los accesorios: descendente o miorrepeticiones (borrador 16). */
 .final-serie { display: flex; align-items: center; justify-content: center; gap: .4rem; flex-wrap: wrap; }
 .final-serie > .fila-marcas { width: auto; margin: 0; }
+
+/* Reproductor de los audios de hipnosis (pantalla #/audios). */
+.audio-ficha {
+  border-top: 1px solid var(--borde);
+  padding-top: 1rem;
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.audio-ficha:first-of-type { border-top: 0; padding-top: 0; margin-top: 0; }
+.audio-barra {
+  width: 100%;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--fondo-hundido, rgba(127, 127, 127, 0.25));
+  overflow: hidden;
+}
+.audio-barra-llena {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--acento);
+  transition: width 0.4s linear;
+}
+

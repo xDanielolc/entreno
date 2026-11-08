@@ -14,6 +14,7 @@ import { vistaHistorial } from './vistas/historial.js';
 import { vistaInicio } from './vistas/inicio.js';
 import { vistaCuerpo } from './vistas/cuerpo.js';
 import { vistaDiario } from './vistas/diario.js';
+import { vistaAudios } from './vistas/audios.js';
 import { vistaFormularioRutina, vistaRutinas } from './vistas/rutinas.js';
 import { vistaSesion } from './vistas/sesion.js';
 import { pintarGuia } from './vistas/tutorial.js';
@@ -46,6 +47,7 @@ const RUTAS = [
   { patron: /^#\/sesion\/([\w-]+)$/, vista: vistaSesion, pestana: 'inicio', params: ['id'] },
   { patron: /^#\/cuerpo(?:\/(\w+))?$/, vista: vistaCuerpo, pestana: 'cuerpo', params: ['apartado'] },
   { patron: /^#\/diario$/, vista: vistaDiario, pestana: 'diario' },
+  { patron: /^#\/audios$/, vista: vistaAudios, pestana: 'diario' },
   { patron: /^#\/rutinas$/, vista: vistaRutinas, pestana: 'inicio' },
   { patron: /^#\/rutina\/([\w-]+)$/, vista: vistaFormularioRutina, pestana: 'inicio', params: ['id'] },
   { patron: /^#\/historial(?:\/(\w+))?$/, vista: vistaHistorial, pestana: 'historial', params: ['apartado'] },
