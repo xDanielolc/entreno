@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 32;
+export const VERSION_ACTUAL = 33;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -224,6 +224,8 @@ export function archivoNuevo({ nombre = '', correo = null } = {}) {
       inicioPlanSueno: null,
       avisarPvt: null,
       avisarPvtHora: null,
+      avisarPvtTarde: null,
+      avisarPvtTardeHora: null,
     },
     sedes: sedesBasicas([]),
     ejercicios: [],
@@ -687,6 +689,33 @@ const MIGRACIONES = {
     copiar(datos.perfil?.recuperacion?.factores);
     for (const s of datos.sesiones ?? []) copiar(s.sensaciones);
     datos.version = 32;
+    return datos;
+  },
+  // v32 → v33: el segundo test de atención del día y dos datos nuevos de la
+  // noche. Sale de mirar los 12 primeros tests de Dan el 08-11-2026.
+  //
+  // En el perfil: `avisarPvtTarde` (el recordatorio de la tarde, igual que
+  // `avisarPvt` pero para el segundo test) y `avisarPvtTardeHora` («HH:MM»;
+  // sin ella, las 18:00). Mientras `avisarPvtTarde` esté vacío, la app se
+  // comporta como hasta ahora: un test y un aviso.
+  //
+  // En cada test de `pvt[]`, dos campos opcionales: `momento` ('manana' o
+  // 'tarde') y `cafeina` (true/false, si había tomado café o té antes). Los
+  // tests de antes no los llevan y no hace falta convertirlos: el momento se
+  // deduce de la hora (corte a las 14:00) y la cafeína se queda sin saber,
+  // que es la verdad.
+  //
+  // En cada día del diario, dos campos opcionales más: `audio` (cuál de las
+  // opciones de AUDIO_HIPNOSIS: 'no', 'entero', 'sugestion', 'antes') y
+  // `pulsoMinimo` (el pulso más bajo de la noche, en lpm). Lo del pulso mínimo
+  // es porque el pulso MEDIO de la noche depende de cuánto duerma esa noche
+  // (en sus 19 noches, r = +0,45 entre horas de sueño y pulso medio), así que
+  // como medida de carga autonómica va contaminado por la duración; el mínimo
+  // no lo está.
+  32: (datos) => {
+    datos.perfil.avisarPvtTarde ??= null;
+    datos.perfil.avisarPvtTardeHora ??= null;
+    datos.version = 33;
     return datos;
   },
 };

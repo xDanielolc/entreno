@@ -36,9 +36,10 @@
 import * as estado from '../estado.js';
 import { formatearNumero } from '../calculos.js';
 import {
-  ANTICIPACION_PVT_MS, DIAS_BASE_SEGUIDA, MODOS_PVT, MODO_PVT_POR_DEFECTO,
-  TESTS_MEDIA_MOVIL, TESTS_MINIMOS_BASE, apuntarPVT, baseDePVT, calcularSueno, compararConBase, datosModoPVT, entradaDe,
-  faltaPvtHoy, horaAvisoPvt, mediaMovilPVT, velocidadDeTiempos,
+  ANTICIPACION_PVT_MS, CORTE_MOMENTO_PVT_MIN, DIAS_BASE_SEGUIDA, MODOS_PVT, MODO_PVT_POR_DEFECTO,
+  TESTS_MEDIA_MOVIL, TESTS_MINIMOS_BASE, apuntarPVT, baseDePVT, calcularSueno, compararConBase, datosModoPVT,
+  dosTestsAlDia, entradaDe, faltaPvtHoy, faltaPvtMomento, horaAvisoPvt, horaAvisoPvtTarde, marcarCafeinaUltimoPVT,
+  mediaMovilPVT, velocidadDeTiempos,
 } from '../diario.js';
 import { anadir, aviso, ayuda, confirmar, h, hoyISO, modal } from '../ui.js';
 
@@ -336,13 +337,21 @@ export function abrirPVT({ modo = MODO_PVT_POR_DEFECTO, directo = false, alCerra
     fase = 'fin';
     barra.style.width = '100%';
     const velocidad = velocidadDeTiempos(rts);
+    const ahora = new Date();
     const test = {
-      hora: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+      hora: ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+      // El momento se guarda en el propio test en vez de deducirlo luego de la
+      // hora: si algún día se mueve el corte de las 14:00, los tests ya hechos
+      // siguen diciendo cuál era cuál.
+      momento: ahora.getHours() * 60 + ahora.getMinutes() < CORTE_MOMENTO_PVT_MIN ? 'manana' : 'tarde',
       modo: elegido,
       velocidad: velocidad == null ? null : Math.round(velocidad * 1000) / 1000,
       mediaMs: rts.length ? Math.round(rts.reduce((a, b) => a + b, 0) / rts.length) : null,
       lapsos: rts.filter((x) => x >= ajustes().lapsoMs).length + sinRespuesta,
       falsos,
+      // Se rellena en la pantalla de resultados, de un toque. Queda en null si
+      // no contesta: null es «no se sabe», no «no había tomado».
+      cafeina: null,
     };
     const fecha = hoyISO();
     // Con `tecleo: true` la pantalla de debajo no se repinta mientras el test
@@ -387,6 +396,7 @@ export function abrirPVT({ modo = MODO_PVT_POR_DEFECTO, directo = false, alCerra
       h('div', { style: 'display: flex; align-items: center; justify-content: center; gap: 4px; flex-wrap: wrap;' },
         h('span', { style: `${LINEA} font-size: .85rem; opacity: .75;` }, 'No hay baremos publicados: te comparas contigo'),
         ayudaClara('Cómo se lee este test', POR_QUE_ASI)),
+      preguntaCafeina(test),
       h('p', { style: `${LINEA} font-size: .85rem; opacity: .7;` }, `Guardado en el diario de hoy, a las ${test.hora}.`),
       claro('Cerrar', cerrar, { grande: true }));
   }
@@ -426,6 +436,26 @@ export function abrirPVT({ modo = MODO_PVT_POR_DEFECTO, directo = false, alCerra
     return h('div', { style: 'display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding-bottom: 6px; border-bottom: 1px solid color-mix(in srgb, currentColor 22%, transparent);' },
       h('span', { style: 'font-size: .9rem; text-align: left; opacity: .85;' }, nombre),
       h('strong', { style: 'font-size: 1.2rem; font-variant-numeric: tabular-nums; white-space: nowrap;' }, valor));
+  }
+
+  // ¿Café o té antes de este test? Dos botones y a otra cosa. Se pregunta aquí
+  // y no antes de empezar para no meterle la idea en la cabeza justo cuando va
+  // a medirse. Sin contestar se queda en null, que es «no se sabe»: eso es
+  // mejor que un «no» inventado.
+  function preguntaCafeina(test) {
+    const caja = h('div', { style: 'display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%;' });
+    const pintar = (valor) => {
+      caja.replaceChildren(
+        h('span', { style: `${LINEA} font-size: .85rem;` }, '¿Café, té o bebida con cafeína antes de este test?'),
+        h('div', { style: 'display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;' },
+          [[false, 'No'], [true, 'Sí']].map(([v, t]) => claro(t, () => {
+            const nuevo = valor === v ? null : v;
+            estado.cambiar((x) => marcarCafeinaUltimoPVT(x, test.fecha, nuevo), { tecleo: true });
+            pintar(nuevo);
+          }, { pequeno: true, secundario: valor !== v }))));
+    };
+    pintar(test.cafeina ?? null);
+    return caja;
   }
 
   if (directo) empezar(); else pintarIntro();
@@ -535,7 +565,10 @@ export const faltaPermisoPvt = () => puedeAvisarPvt() && estado.datos()?.perfil?
   && Notification.permission !== 'granted';
 
 let temporizadorManana = null;
-let avisadoEn = null;   // el día que ya se avisó en esta sesión de la app
+let temporizadorTarde = null;
+// El día que ya se avisó en esta sesión de la app, uno por momento: el aviso
+// de la tarde tiene que poder saltar aunque el de la mañana ya haya saltado.
+let avisadoEn = { manana: null, tarde: null };
 
 // Pide el permiso (hay que llamarlo desde un toque) y deja el aviso puesto.
 export async function activarAvisoPvt() {
@@ -557,28 +590,59 @@ export async function activarAvisoPvt() {
 export function quitarAvisoPvt() {
   estado.cambiar((x) => { x.perfil.avisarPvt = false; });
   clearTimeout(temporizadorManana);
+  clearTimeout(temporizadorTarde);
   temporizadorManana = null;
+  temporizadorTarde = null;
+}
+
+// El segundo test del día: se enciende y se apaga aparte del de la mañana,
+// pero cuelga del mismo permiso de avisos.
+export async function activarAvisoPvtTarde() {
+  if (!estado.datos().perfil.avisarPvt) { await activarAvisoPvt(); }
+  if (!estado.datos().perfil.avisarPvt) return;
+  estado.cambiar((x) => { x.perfil.avisarPvtTarde = true; });
+  programarAvisoPvt();
+}
+
+export function quitarAvisoPvtTarde() {
+  estado.cambiar((x) => { x.perfil.avisarPvtTarde = false; });
+  clearTimeout(temporizadorTarde);
+  temporizadorTarde = null;
 }
 
 // Se llama al pintar Hoy y el Diario: si el aviso está activado, hay hora y
 // hoy falta el test, se programa para esa hora. No molesta si ya pasó.
 export function programarAvisoPvt() {
   clearTimeout(temporizadorManana);
+  clearTimeout(temporizadorTarde);
   temporizadorManana = null;
+  temporizadorTarde = null;
   if (!avisoPvtActivo()) return;
   registrarAvisoPeriodico();
   const d = estado.datos();
-  const hora = horaAvisoPvt(d);
   const hoy = hoyISO();
-  if (!hora || avisadoEn === hoy || !faltaPvtHoy(d, hoy)) return;
+  temporizadorManana = programarUno(horaAvisoPvt(d), 'manana', hoy);
+  // El de la tarde solo si está activado, y con su propio control de «ya
+  // avisado»: haber hecho el de la mañana no debe callarlo, porque el de la
+  // tarde es justo el que aporta el dato que falta.
+  if (dosTestsAlDia(d)) temporizadorTarde = programarUno(horaAvisoPvtTarde(d), 'tarde', hoy);
+}
+
+// Programa uno de los dos avisos. Devuelve el temporizador, o null si no hay
+// nada que programar (sin hora, ya avisado hoy, el test ya hecho o la hora ya
+// pasada: de eso último se encarga la tarjeta de la pantalla).
+function programarUno(hora, momento, hoy) {
+  const d = estado.datos();
+  if (!hora || avisadoEn[momento] === hoy || !faltaPvtMomento(d, hoy, momento)) return null;
   const [hh, mm] = hora.split(':').map(Number);
   const cuando = new Date();
   cuando.setHours(hh, mm, 0, 0);
   const falta = cuando.getTime() - Date.now();
-  if (falta <= 0) return;   // la hora ya pasó: de eso se encarga la tarjeta
-  temporizadorManana = setTimeout(() => {
-    avisadoEn = hoyISO();
-    if (faltaPvtHoy(estado.datos(), avisadoEn)) notificarPvt();
+  if (falta <= 0) return null;
+  return setTimeout(() => {
+    const dia = hoyISO();
+    avisadoEn[momento] = dia;
+    if (faltaPvtMomento(estado.datos(), dia, momento)) notificarPvt(momento);
   }, falta);
 }
 
@@ -596,14 +660,18 @@ async function registrarAvisoPeriodico() {
   } catch { /* el navegador no lo admite: queda la tarjeta de la app */ }
 }
 
-async function notificarPvt() {
+async function notificarPvt(momento = 'manana') {
   if (!avisoPvtActivo()) return;
+  const tarde = momento === 'tarde';
   try {
     const reg = await navigator.serviceWorker.ready;
-    for (const n of await reg.getNotifications({ tag: 'pvt' })) n.close();
-    await reg.showNotification('Test de atención', {
-      body: 'Hoy aún no lo has hecho. Son 5 minutos, antes del té o el café.',
-      tag: 'pvt', renotify: true, icon: './iconos/icono-v2-192.png', badge: './iconos/icono-v2-192.png',
+    const tag = tarde ? 'pvt-tarde' : 'pvt';
+    for (const n of await reg.getNotifications({ tag })) n.close();
+    await reg.showNotification(tarde ? 'Test de atención de la tarde' : 'Test de atención', {
+      body: tarde
+        ? 'El segundo del día. Son 5 minutos, y es el que recoge el cansancio acumulado.'
+        : 'Hoy aún no lo has hecho. Son 5 minutos, antes del té o el café.',
+      tag, renotify: true, icon: './iconos/icono-v2-192.png', badge: './iconos/icono-v2-192.png',
       vibrate: [400, 200, 400], data: { url: `${location.origin}${location.pathname}#/diario` },
     });
   } catch { /* sin service worker: queda la tarjeta de la app */ }

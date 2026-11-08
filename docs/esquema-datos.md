@@ -662,3 +662,25 @@ la vez, a veces sin cobertura):
   laterales solo en el lateral, añade el lateral como principal al remo al
   mentón y como secundario a los press por encima de la cabeza, y copia al
   lateral los objetivos, el ritmo de recuperación y las sensaciones del hombro.
+- **v33 (segundo test del día y dos datos de la noche, 08-11-2026).** Sale de
+  mirar los 12 primeros tests del registro: se hicieron todos entre 8 y 28 minutos
+  después de levantarse (media 13), o sea dentro de la inercia del sueño, y su
+  velocidad no correlaciona con lo que durmió esa noche (r = +0,08).
+  - En el **perfil**, dos campos opcionales: `avisarPvtTarde` (true, false o
+    null) y `avisarPvtTardeHora` («HH:MM»; sin ella, las 18:00). Mientras
+    `avisarPvtTarde` esté vacío la app se comporta como antes: un test y un
+    aviso. El aviso de la mañana pasa de 30 a **45 minutos** después de
+    `levantarseObjetivo` (`AVISO_PVT_TRAS_LEVANTARSE_MIN`).
+  - En cada test de `pvt[]`, dos campos opcionales: `momento` (`"manana"` o
+    `"tarde"`) y `cafeina` (true, false o null si no se contestó). Los tests
+    de antes no los llevan: el momento se deduce de la hora, con el corte a
+    las 14:00 (`CORTE_MOMENTO_PVT_MIN`), y la cafeína se queda sin saber.
+  - En cada día del **diario**, dos campos opcionales: `audio` (`"no"`,
+    `"entero"`, `"sugestion"` o `"antes"`, `AUDIO_HIPNOSIS`), para marcar las
+    noches con el audio de hipnosis y hasta dónde se llegó despierto, y
+    `pulsoMinimo` (lpm). Lo del pulso mínimo es porque el pulso **medio** de la
+    noche depende de cuánto se duerma esa noche (en un registro propio de 19 noches,
+    r = +0,45 entre horas de sueño y pulso medio), así que como medida de carga
+    autonómica arrastra la duración; el mínimo no.
+  - Nada que convertir en los datos ya guardados: la migración solo añade los
+    dos campos del perfil.

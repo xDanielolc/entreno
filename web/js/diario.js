@@ -23,6 +23,21 @@ export const ADELANTO_SEMANAL_MIN = 15;
 export const ALCOHOL = { no: 'No', poco: '1-2 bebidas', mucho: '3 o más' };
 export const SENSACIONES = ['', 'Fatal', 'Mal', 'Regular', 'Bien', 'Genial'];
 
+// El audio de hipnosis antes de dormir, para poder comparar las noches con
+// audio y las noches sin él. Sin este registro la prueba no se puede leer: lo
+// único que descuenta la expectativa es alternar y comparar.
+//
+// Qué se apunta y por qué «hasta dónde llegaste despierto»: la sugestión
+// central del audio va del minuto 6:44 al 9:47, después de la inducción. Una
+// noche en la que te duermas en el minuto cuatro no es una noche con
+// sugestión, y contarla como tal diluye el efecto que se busca.
+export const AUDIO_HIPNOSIS = {
+  no: 'No',
+  entero: 'Sí, entero',
+  sugestion: 'Sí, pasada la sugestión',
+  antes: 'Sí, me dormí antes',
+};
+
 // Los básicos con los que se mira si el sueño te está costando: el volumen
 // tolerado cae antes que el 1RM (Cook 2012; Knowles 2022). Se reconocen por el
 // nombre del catálogo tolerando variantes («press de banca inclinado», «peso
@@ -312,9 +327,30 @@ export const TESTS_MINIMOS_BASE = 5;
 // repartidos en más de 21 días, la base retrata dos épocas en vez de una y la
 // app lo dice al compararte.
 export const DIAS_BASE_SEGUIDA = 21;
-// El aviso de la mañana, si no se pone otra hora: media hora después de la
-// hora de levantarse que ya está en el perfil.
-export const AVISO_PVT_TRAS_LEVANTARSE_MIN = 30;
+// El aviso de la mañana, si no se pone otra hora: tres cuartos de hora después
+// de la hora de levantarse que ya está en el perfil.
+//
+// Eran 30 minutos y subió a 45 el 08-11-2026, al mirar los 12 primeros tests
+// de Dan: los hizo todos entre 8 y 28 minutos después de levantarse (media
+// 13), o sea dentro de la inercia del sueño, que es la franja del día con peor
+// rendimiento y más variable. El resultado es que su velocidad no correlaciona
+// con lo que durmió esa noche (r = +0,08 sobre 12 tests). A los 45 minutos ya
+// se ha salido de la parte empinada de la inercia y el dato sigue siendo
+// comparable de un día a otro, que es lo que importa aquí.
+export const AVISO_PVT_TRAS_LEVANTARSE_MIN = 45;
+
+// El segundo test del día, por la tarde. Es el que recoge el cansancio
+// acumulado sin la inercia del sueño encima: la inercia se mide en minutos
+// desde que te levantas y a media tarde ya no queda nada de ella, mientras que
+// el efecto de dormir poco se acumula a lo largo de semanas (Van Dongen 2003,
+// Sleep 26(2):117-126, PMID 12683469). Con un solo test por la mañana los dos
+// efectos van mezclados y no se pueden separar.
+export const AVISO_PVT_TARDE_POR_DEFECTO = '18:00';
+
+// Los dos momentos del día en que se hace el test. El corte está a las 14:00:
+// por debajo cuenta como el de la mañana y por encima como el de la tarde.
+export const MOMENTOS_PVT = { manana: 'Mañana', tarde: 'Tarde' };
+export const CORTE_MOMENTO_PVT_MIN = 14 * 60;
 
 export const modoPVT = (test) => (MODOS_PVT[test?.modo] ? test.modo : MODO_PVT_POR_DEFECTO);
 export const datosModoPVT = (modo) => MODOS_PVT[modo] ?? MODOS_PVT[MODO_PVT_POR_DEFECTO];
@@ -332,6 +368,14 @@ export function velocidadDeTiempos(ms) {
 export function apuntarPVT(datos, fecha, test) {
   const e = entradaOCrear(datos, fecha);
   (e.pvt ??= []).push(test);
+}
+
+// Apunta si había tomado cafeína antes del último test de ese día. Se pregunta
+// en la pantalla de resultados, no antes, para no meterle la idea en la cabeza
+// justo cuando va a hacer el test.
+export function marcarCafeinaUltimoPVT(datos, fecha, valor) {
+  const lista = entradaDe(datos, fecha)?.pvt;
+  if (lista?.length) lista.at(-1).cafeina = valor;
 }
 
 // Todos los tests apuntados, del más antiguo al más reciente, cada uno con su
@@ -436,11 +480,43 @@ export function horaAvisoPvt(datos) {
   return arriba == null ? null : textoHora(arriba + AVISO_PVT_TRAS_LEVANTARSE_MIN);
 }
 
+// La hora del aviso de la tarde: la que se haya puesto o, si no, las 18:00.
+export function horaAvisoPvtTarde(datos) {
+  const p = datos?.perfil ?? {};
+  return /^\d{1,2}:\d{2}$/.test(p.avisarPvtTardeHora ?? '') ? p.avisarPvtTardeHora : AVISO_PVT_TARDE_POR_DEFECTO;
+}
+
+// A qué momento del día pertenece un test. Si se guardó con `momento`, ese; si
+// no (los tests de antes del 08-11-2026), se deduce de la hora.
+export function momentoPVT(test) {
+  if (MOMENTOS_PVT[test?.momento]) return test.momento;
+  const m = minutos(test?.hora);
+  return m == null || m < CORTE_MOMENTO_PVT_MIN ? 'manana' : 'tarde';
+}
+
+// Los tests de un día repartidos por momento: { manana: [...], tarde: [...] }.
+export function pvtDelDiaPorMomento(datos, fecha) {
+  const salida = { manana: [], tarde: [] };
+  for (const t of pvtDelDia(datos, fecha)) salida[momentoPVT(t)].push(t);
+  return salida;
+}
+
 // ¿Falta el test de hoy? Cuenta cualquiera de las duraciones: el recordatorio
 // es para no olvidarse, no para exigir una en concreto.
 export function faltaPvtHoy(datos, fecha = hoyISO()) {
   return pvtDelDia(datos, fecha).length === 0;
 }
+
+// ¿Falta el de la mañana o el de la tarde? El aviso de cada momento solo salta
+// si ese momento está sin hacer: haber hecho el de la mañana no calla el de la
+// tarde, que es justo el que aporta el dato nuevo.
+export function faltaPvtMomento(datos, fecha = hoyISO(), momento = 'manana') {
+  return pvtDelDiaPorMomento(datos, fecha)[momento]?.length === 0;
+}
+
+// ¿Está activado el segundo test del día? Mientras no lo esté, la app se
+// comporta como antes: un solo test y un solo aviso.
+export const dosTestsAlDia = (datos) => Boolean(datos?.perfil?.avisarPvtTarde);
 
 // ---------------------------------------------------------------------------
 // Cribado del sueño: ¿hay algo que arreglar antes de tocar las horas?

@@ -11,9 +11,9 @@ import * as estado from '../estado.js';
 import { formatearNumero } from '../calculos.js';
 import { apuntarPeso, quitarPeso } from '../peso.js';
 import {
-  ADELANTO_SEMANAL_MIN, ALCOHOL, MODOS_PVT, MODO_PVT_POR_DEFECTO, NECESIDAD_SUENO_POR_DEFECTO, SENSACIONES, SUENO_MINIMO_H,
-  apuntarEnDiario, calcularSueno, datosModoPVT, entradaDe, faltaPvtHoy, horaAcostarse, horaAvisoPvt, modoPVT, pvtDelDia,
-  resumenUltimos7, testsPVT, textoHoras,
+  ADELANTO_SEMANAL_MIN, ALCOHOL, AUDIO_HIPNOSIS, MODOS_PVT, MODO_PVT_POR_DEFECTO, NECESIDAD_SUENO_POR_DEFECTO, SENSACIONES,
+  SUENO_MINIMO_H, apuntarEnDiario, calcularSueno, datosModoPVT, dosTestsAlDia, entradaDe, faltaPvtHoy, faltaPvtMomento,
+  horaAcostarse, horaAvisoPvt, horaAvisoPvtTarde, modoPVT, pvtDelDia, resumenUltimos7, testsPVT, textoHoras,
 } from '../diario.js';
 import { colores, graficaLineas } from './graficas.js';
 import { abrirPVT, activarAvisoPvt, avisoPvtActivo, faltaPermisoPvt, ofrecerPvtTrasDiario, programarAvisoPvt, puedeAvisarPvt } from './pvt.js';
@@ -152,7 +152,23 @@ export function vistaDiario(contenedor) {
         class: `boton-marca${e.alcohol === k ? ' activo' : ''}`, 'aria-pressed': String(e.alcohol === k),
         onclick: () => guardar('alcohol', e.alcohol === k ? null : k, { repintar: true }) }, t))),
       fila(hora('cafeinaHora', 'Último café o té'), numero('pulsoNocturno', 'Pulso nocturno', 'lpm'), numero('siestaMin', 'Siesta', 'min')),
-      h('p', { class: 'nota' }, 'Lo del reloj, a mano y solo esto: horas, pulso medio de la noche. Sus fases y puntuaciones no son fiables.'),
+      fila(numero('pulsoMinimo', 'Pulso mínimo de la noche', 'lpm')),
+      h('div', { class: 'titulo-con-ayuda' }, h('span', { class: 'etiqueta-campo suave' }, 'Por qué también el mínimo'),
+        ayuda('Pulso medio y pulso mínimo', 'El pulso MEDIO de la noche depende de cuánto duermas esa noche: cuanto más larga es la noche, '
+          + 'más peso tienen las últimas horas, que son las de más REM y pulso más alto. En un registro propio de 19 noches, horas de sueño y pulso medio '
+          + 'van juntos (r = +0,45). Eso hace que el pulso medio sea una mala medida de «cuánto ha trabajado el corazón esta noche», porque '
+          + 'arrastra la duración. El mínimo no arrastra nada: es el suelo al que llegó el corazón, dure lo que dure la noche. Si tu reloj te '
+          + 'lo da, apunta los dos.')),
+      h('p', { class: 'nota' }, 'Lo del reloj, a mano y solo esto: horas, pulso medio y pulso mínimo de la noche. Sus fases y puntuaciones no son fiables.'),
+
+      h('div', { class: 'titulo-con-ayuda' }, h('span', { class: 'etiqueta-campo' }, 'Audio de hipnosis'),
+        ayuda('Audio de hipnosis', 'Apunta si anoche escuchaste el audio y hasta dónde llegaste despierto. La sugestión central va del minuto '
+          + '6:44 al 9:47: si te dormiste antes, esa noche no cuenta como noche con sugestión. Sin este registro no se pueden comparar las '
+          + 'noches con audio y las noches sin él, y comparar es lo único que descuenta la expectativa: tú sabes si esa noche hubo audio, así '
+          + 'que todo lo que sea sensación va contaminado.')),
+      h('div', { class: 'fila-marcas compacta' }, Object.entries(AUDIO_HIPNOSIS).map(([k, t]) => h('button', { type: 'button',
+        class: `boton-marca${e.audio === k ? ' activo' : ''}`, 'aria-pressed': String(e.audio === k),
+        onclick: () => guardar('audio', e.audio === k ? null : k, { repintar: true }) }, t))),
       // Se guarda solo, pero un botón da tranquilidad: confirma y lleva a la tabla.
       h('button', { type: 'button', class: 'boton grande', onclick: () => {
         document.activeElement?.blur?.();
@@ -243,6 +259,12 @@ function tarjetaPVT(d, fecha, hoy) {
     hechos.length ? tablaPVT(hechos) : h('p', { class: 'nota' }, esHoy
       ? `Hoy todavía no lo has hecho. Son ${porDefecto.minutos} minutos (o 3, o 10: lo eliges al empezar).`
       : 'Ese día no hiciste ninguno.'),
+    // Con los dos tests al día activados, la tarjeta dice cuál falta en vez de
+    // callarse en cuanto hay uno hecho.
+    esHoy && dosTestsAlDia(d) && hechos.length > 0 && h('p', { class: 'nota' },
+      faltaPvtMomento(d, fecha, 'tarde') ? `Falta el de la tarde: te aviso a las ${horaAvisoPvtTarde(d)}.`
+        : faltaPvtMomento(d, fecha, 'manana') ? 'Falta el de la mañana.'
+          : 'Hoy ya tienes los dos.'),
     esHoy
       ? h('button', { type: 'button', class: 'boton grande', onclick: () => abrirPVT({ alCerrar: () => estado.emitir('vista') }) },
         hechos.length ? 'Hacer otro test' : 'Hacer el test')

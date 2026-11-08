@@ -5,8 +5,8 @@ import { BILBO_RECAMARA_POR_DEFECTO, BILBO_REPS_MAX_POR_DEFECTO, REDONDEO_MANCUE
 import * as estado from '../estado.js';
 import { apartarCopia, copiasAparte, desconectar, eliminarCuenta, juntarCopia, rehacerCopiasLegibles, sincronizar, situacionActual } from '../sincronizacion.js';
 import { apartadoPlegable, ayuda, modal, selector } from '../ui.js';
-import { ADELANTO_SEMANAL_MIN, NECESIDAD_SUENO_POR_DEFECTO, SUENO_MINIMO_H, horaAvisoPvt } from '../diario.js';
-import { activarAvisoPvt, programarAvisoPvt, quitarAvisoPvt } from './pvt.js';
+import { ADELANTO_SEMANAL_MIN, NECESIDAD_SUENO_POR_DEFECTO, SUENO_MINIMO_H, horaAvisoPvt, horaAvisoPvtTarde } from '../diario.js';
+import { activarAvisoPvt, activarAvisoPvtTarde, programarAvisoPvt, quitarAvisoPvt, quitarAvisoPvtTarde } from './pvt.js';
 import { VERSION_APP } from '../version.js';
 import { anadir, aviso, confirmar, h, hoyISO, leerNumero } from '../ui.js';
 import { DESCANSO_ESTIRAMIENTOS_POR_DEFECTO, DESCANSO_TRAMOS_POR_DEFECTO, RESPIRACION_POR_DEFECTO, activarNotificaciones, probarAviso, puedeNotificar } from './descanso.js';
@@ -44,9 +44,35 @@ function avisoTestAtencion(d) {
       h('input', { type: 'time', value: hora ?? '',
         onchange: (ev) => { estado.cambiar((x) => { x.perfil.avisarPvtHora = ev.target.value || null; }); programarAvisoPvt(); } })),
     h('small', { class: 'nota' }, !hora
-      ? 'Sin hora: pon en Perfil la hora a la que quieres levantarte y el aviso saldrá media hora después.'
-      : 'Media hora después de tu hora de levantarte, salvo que pongas otra. Solo avisa si ese día aún no has hecho el test. '
+      ? 'Sin hora: pon en Perfil la hora a la que quieres levantarte y el aviso saldrá tres cuartos de hora después.'
+      : 'Tres cuartos de hora después de tu hora de levantarte, salvo que pongas otra. Solo avisa si ese día aún no has hecho el test. '
         + 'Con el navegador cerrado puede no llegar; entonces lo verás en Entrenar y en Sueño al abrir la app.'),
+    ...avisoTestTarde(d, activo),
+  ];
+}
+
+// El segundo test del día. Cuelga del aviso de la mañana (mismo permiso), y
+// por eso solo se ofrece cuando aquel está activo.
+function avisoTestTarde(d, avisoMananaActivo) {
+  if (!avisoMananaActivo) return [];
+  const activo = Boolean(d.perfil.avisarPvtTarde);
+  const hora = horaAvisoPvtTarde(d);
+  return [
+    h('h3', {}, 'Segundo test, por la tarde'),
+    h('div', { class: 'fila-marcas compacta' },
+      h('button', { type: 'button', class: `boton-marca${activo ? ' activo' : ''}`, 'aria-pressed': String(activo),
+        onclick: async () => { if (activo) { quitarAvisoPvtTarde(); } else { await activarAvisoPvtTarde(); } estado.emitir('vista'); } },
+      activo ? `¡Te aviso también a las ${hora} para el segundo test!` : 'Sin segundo test: tocar para activarlo')),
+    activo && h('label', { class: 'campo' },
+      h('span', { class: 'etiqueta-campo' }, 'Hora del aviso de la tarde'),
+      h('input', { type: 'time', value: hora,
+        onchange: (ev) => { estado.cambiar((x) => { x.perfil.avisarPvtTardeHora = ev.target.value || null; }); programarAvisoPvt(); } })),
+    h('small', { class: 'nota' },
+      'El de la mañana sale a los 45 minutos de levantarte, cuando ya has salido de la inercia del sueño. El de la tarde '
+      + 'es el que recoge el cansancio acumulado, que es lo que se acumula a lo largo de semanas y no se nota de un día '
+      + 'para otro (Van Dongen 2003). Con los dos se pueden separar las dos cosas; con uno solo, no.'),
+    activo && h('small', { class: 'nota' },
+      'Los dos tests de un día se promedian entre ellos antes de entrar en tu línea base, así que tener dos no la mueve por sí solo.'),
   ];
 }
 
