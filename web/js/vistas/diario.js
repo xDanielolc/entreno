@@ -14,7 +14,7 @@ import {
   ADELANTO_SEMANAL_MIN, ALCOHOL, AUDIO_HIPNOSIS, ITEMS_ILUSIONES, MODOS_PVT, MODO_PVT_POR_DEFECTO,
   NECESIDAD_SUENO_POR_DEFECTO, NIVELES_ILUSIONES, NOTAS_ILUSIONES, SENSACIONES, SUENO_MINIMO_H, VERSIONES_AUDIO,
   apuntarEnDiario, calcularSueno, datosModoPVT, dosTestsAlDia, entradaDe, faltaPvtHoy, faltaPvtMomento,
-  horaAcostarse, horaAvisoPvt, horaAvisoPvtTarde, modoPVT, pvtDelDia, resumenUltimos7, testsPVT, textoHoras,
+  horaAcostarse, horaAvisoPvt, horaAvisoPvtTarde, listoParaPvt, modoPVT, pvtDelDia, resumenUltimos7, testsPVT, textoHoras,
   totalIlusiones,
 } from '../diario.js';
 import { colores, graficaLineas } from './graficas.js';
@@ -352,7 +352,13 @@ export function tarjetaPvtPendiente(d, hoy = hoyISO()) {
   if (!testsPVT(d).length || !faltaPvtHoy(d, hoy)) return null;
   return h('section', { class: 'tarjeta aviso-tarjeta', style: 'text-align: center' },
     h('div', { class: 'antetitulo' }, 'Test de atención'),
-    h('p', {}, `Hoy no lo has hecho todavía. Son ${datosModoPVT(MODO_PVT_POR_DEFECTO).minutos} minutos, antes del té o el café.`),
+    h('p', {}, (() => {
+      const { listo, hora, pasado } = listoParaPvt(d, hoy);
+      const base = `Son ${datosModoPVT(MODO_PVT_POR_DEFECTO).minutos} minutos, antes del té o el café.`;
+      if (pasado) return `El de la mañana ya no toca hoy: se hace entre 45 min y casi 3 h después de levantarte. ${base}`;
+      return !listo && hora ? `Hoy no lo has hecho todavía: a partir de las ${hora}, 45 min después de levantarte. ${base}`
+        : `Hoy no lo has hecho todavía. ${base}`;
+    })()),
     h('button', { type: 'button', class: 'boton', onclick: () => abrirPVT({ alCerrar: () => estado.emitir('vista') }) }, 'Hacer el test'));
 }
 

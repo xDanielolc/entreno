@@ -1712,3 +1712,19 @@ vistas/pvt.js, diario.js y su parte de ajustes.js: la conversación del sueño.
 - Presentación a 1,75 veces (`VELOCIDAD` en presentacion.js: 2,5 s en vez de 4,4; vídeo con `playbackRate`, la
   animación CSS con el `playbackRate` de cada animación y los sonidos divididos), la escena oculta hasta que arranca
   (se veía quieta un momento y luego empezaba: «sale a medias y luego entera») y sin repetir si ya hay una en marcha.
+
+## 0.79.0 (08-11-2026, conversación del sueño)
+
+Qué audio de hipnosis se puso cada noche (`audioVersion`) y la tarjeta «Ilusiones» (nivel 1-6 y cuatro notas de 0 a
+3) en el diario. Esquema v34.
+
+## Ronda 0.80.0 (09-11-2026): el test de atención, a los 45 min de levantarse de verdad
+
+Pedido por la conversación del sueño y encargado aquí por Dan. Esquema v35.
+- `horaAvisoPvt(datos, fecha)` (diario.js): hora fija de Ajustes si la hay; si no, la hora de «levantado» del diario
+  de ese día + 45 min (`AVISO_PVT_TRAS_LEVANTARSE_MIN`); si aún no la ha apuntado, la hora objetivo del perfil + 45.
+- `listoParaPvt()` y `VENTANA_PVT_MANANA_MIN` (120): el test de la mañana toca entre 45 min y 2 h 45 min después de
+  levantarse. El cartel con cuenta atrás de la 0.67.2 (`ofrecerPvtTrasDiario`) ya no arranca el test antes de los
+  45 min: dice a qué hora toca y deja el aviso puesto; pasada la ventana, hoy ya no lo ofrece. La tarjeta de Hoy dice
+  «a partir de las HH:MM».
+- Cada test guarda `minTrasLevantarse` (`minutosTrasLevantarse()`, null si no hay hora apuntada).

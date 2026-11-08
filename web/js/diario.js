@@ -503,14 +503,53 @@ export function compararConBase(velocidad, base) {
   return { base, cambio, real: Math.abs(cambio) >= CAMBIO_REAL_PVT, masLento: cambio < 0 };
 }
 
-// La hora del aviso de la mañana: la que se haya puesto o, si no, media hora
-// después de la hora de levantarse objetivo del perfil. null si no hay ninguna
-// de las dos (entonces no se puede avisar y la app no lo promete).
-export function horaAvisoPvt(datos) {
+// La hora del aviso de la mañana: la que se haya puesto a mano o, si no, 45
+// minutos después de la hora a la que te has levantado HOY (la de «levantado»
+// del diario). Si aún no la has apuntado, 45 minutos después de la hora de
+// levantarse objetivo del perfil. null si no hay ninguna (entonces no se puede
+// avisar y la app no lo promete). Desde el 09-11-2026: Dan hace días sin
+// despertador y se levanta a horas distintas; con una hora fija, la inercia
+// del sueño en el momento del test cambiaba de un día a otro.
+export function horaAvisoPvt(datos, fecha = hoyISO()) {
   const p = datos?.perfil ?? {};
   if (/^\d{1,2}:\d{2}$/.test(p.avisarPvtHora ?? '')) return p.avisarPvtHora;
-  const arriba = minutos(p.levantarseObjetivo);
+  const arriba = minutos(entradaDe(datos ?? {}, fecha)?.levantado) ?? minutos(p.levantarseObjetivo);
   return arriba == null ? null : textoHora(arriba + AVISO_PVT_TRAS_LEVANTARSE_MIN);
+}
+
+// Minutos desde que te levantaste hoy hasta `ahora`, según la hora de
+// «levantado» del diario. null si no está apuntada.
+export function minutosTrasLevantarse(datos, fecha = hoyISO(), ahora = new Date()) {
+  const arriba = minutos(entradaDe(datos ?? {}, fecha)?.levantado);
+  if (arriba == null) return null;
+  const dif = ahora.getHours() * 60 + ahora.getMinutes() - arriba;
+  return dif < 0 ? dif + 1440 : dif;
+}
+
+// Cuánto dura la ventana del test de la mañana a partir de esos 45 minutos.
+// Pasada, el de la mañana ya no toca ese día: un test a las 13:00 de alguien
+// que se levantó a las 8:00 entraría en los datos como «de la mañana» sin
+// serlo (conversación del sueño, 09-11-2026).
+export const VENTANA_PVT_MANANA_MIN = 120;
+
+// ¿Toca ya el test de la mañana? Hace falta que hayan pasado
+// AVISO_PVT_TRAS_LEVANTARSE_MIN desde la hora de «levantado» de hoy, y no más
+// de esa ventana. Sin esa hora no se sabe, y no se frena a nadie.
+// Devuelve { listo, hora, pasado }: `hora` es a partir de cuándo toca y
+// `pasado`, que hoy la ventana ya se cerró.
+//
+// OJO al comparar: los 12 primeros tests de Dan (hasta el 08-11-2026) se
+// hicieron entre 8 y 28 minutos después de levantarse; desde el 09-11-2026 van
+// a los 45 o más. Los nuevos son comparables entre sí, no con aquellos. Cada
+// test guarda `minTrasLevantarse` (null si no había hora apuntada) para poder
+// separarlos o corregirlos en el análisis.
+export function listoParaPvt(datos, fecha = hoyISO(), ahora = new Date()) {
+  const tras = minutosTrasLevantarse(datos, fecha, ahora);
+  if (tras == null) return { listo: true, hora: null, pasado: false };
+  const arriba = minutos(entradaDe(datos ?? {}, fecha)?.levantado);
+  const pasado = tras > AVISO_PVT_TRAS_LEVANTARSE_MIN + VENTANA_PVT_MANANA_MIN;
+  return { listo: tras >= AVISO_PVT_TRAS_LEVANTARSE_MIN && !pasado, pasado,
+    hora: textoHora(arriba + AVISO_PVT_TRAS_LEVANTARSE_MIN) };
 }
 
 // La hora del aviso de la tarde: la que se haya puesto o, si no, las 18:00.

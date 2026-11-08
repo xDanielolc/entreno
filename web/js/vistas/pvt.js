@@ -38,7 +38,7 @@ import { formatearNumero } from '../calculos.js';
 import {
   ANTICIPACION_PVT_MS, CORTE_MOMENTO_PVT_MIN, DIAS_BASE_SEGUIDA, MODOS_PVT, MODO_PVT_POR_DEFECTO,
   TESTS_MEDIA_MOVIL, TESTS_MINIMOS_BASE, apuntarPVT, baseDePVT, calcularSueno, compararConBase, datosModoPVT,
-  dosTestsAlDia, entradaDe, faltaPvtHoy, faltaPvtMomento, horaAvisoPvt, horaAvisoPvtTarde, marcarCafeinaUltimoPVT,
+  dosTestsAlDia, entradaDe, faltaPvtHoy, faltaPvtMomento, horaAvisoPvt, horaAvisoPvtTarde, listoParaPvt, marcarCafeinaUltimoPVT, minutosTrasLevantarse,
   mediaMovilPVT, velocidadDeTiempos,
 } from '../diario.js';
 import { anadir, aviso, ayuda, confirmar, h, hoyISO, modal } from '../ui.js';
@@ -352,6 +352,10 @@ export function abrirPVT({ modo = MODO_PVT_POR_DEFECTO, directo = false, alCerra
       // Se rellena en la pantalla de resultados, de un toque. Queda en null si
       // no contesta: null es «no se sabe», no «no había tomado».
       cafeina: null,
+      // Minutos desde la hora de «levantado» de hoy (null si no está apuntada):
+      // con menos de 45, el test cae en la inercia del sueño y se puede apartar
+      // en el análisis.
+      minTrasLevantarse: minutosTrasLevantarse(estado.datos(), hoyISO(), ahora),
     };
     const fecha = hoyISO();
     // Con `tecleo: true` la pantalla de debajo no se repinta mientras el test
@@ -505,6 +509,22 @@ export function ofrecerPvtTrasDiario({ alCerrar } = {}) {
   // Si ya hay otro cartel o el propio test delante, ni se ofrece ni se gasta
   // el turno del día: se volverá a mirar la próxima vez.
   if (document.querySelector('.modal-fondo, .pvt-capa')) return false;
+  // Antes de 45 minutos desde que te levantaste no se arranca: es la inercia del
+  // sueño. Se dice a qué hora toca y se deja el aviso puesto; el turno del día
+  // no se gasta, así que el cartel saldrá si vuelves al diario a partir de esa hora.
+  const { listo, hora, pasado } = listoParaPvt(d, hoy);
+  if (pasado) {
+    // La ventana de la mañana ya se cerró: hoy no se ofrece (se gasta el turno).
+    apuntarOfrecido(hoy);
+    return false;
+  }
+  if (!listo) {
+    programarAvisoPvt();
+    aviso(avisoPvtActivo()
+      ? `El test de atención, a partir de las ${hora} (45 min después de levantarte). Te aviso entonces.`
+      : `El test de atención, a partir de las ${hora}: 45 min después de levantarte, para que no lo pille la modorra de recién despierto.`);
+    return false;
+  }
   apuntarOfrecido(hoy);
 
   const cual = datosModoPVT(MODO_PVT_POR_DEFECTO);

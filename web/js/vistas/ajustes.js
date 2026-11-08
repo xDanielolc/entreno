@@ -45,7 +45,7 @@ function avisoTestAtencion(d) {
         onchange: (ev) => { estado.cambiar((x) => { x.perfil.avisarPvtHora = ev.target.value || null; }); programarAvisoPvt(); } })),
     h('small', { class: 'nota' }, !hora
       ? 'Sin hora: pon en Perfil la hora a la que quieres levantarte y el aviso saldrá tres cuartos de hora después.'
-      : 'Tres cuartos de hora después de tu hora de levantarte, salvo que pongas otra. Solo avisa si ese día aún no has hecho el test. '
+      : 'Tres cuartos de hora después de la hora a la que te levantes ese día (la que apuntes en Sueño; si aún no la has apuntado, la de Perfil), salvo que pongas una hora fija aquí. Solo avisa si ese día aún no has hecho el test. '
         + 'Con el navegador cerrado puede no llegar; entonces lo verás en Entrenar y en Sueño al abrir la app.'),
     ...avisoTestTarde(d, activo),
   ];

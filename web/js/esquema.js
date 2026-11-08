@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 34;
+export const VERSION_ACTUAL = 35;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -727,6 +727,12 @@ const MIGRACIONES = {
   //     y `ilusionVista` (0 a 3): la sesión de entrenamiento de ilusiones.
   33: (datos) => {
     datos.version = 34;
+    return datos;
+  },
+  // v34 → v35: cada test de atención guarda `minTrasLevantarse` (minutos desde la hora de «levantado» de ese día; null
+  // si no estaba apuntada). Opcional y sin valor para los tests de antes: solo sube el número.
+  34: (datos) => {
+    datos.version = 35;
     return datos;
   },
 };

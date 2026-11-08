@@ -701,3 +701,9 @@ la vez, a veces sin cobertura):
     autonómica arrastra la duración; el mínimo no.
   - Nada que convertir en los datos ya guardados: la migración solo añade los
     dos campos del perfil.
+- **v35 (test de atención a los 45 min de levantarse, 09-11-2026).** Cada test
+  de `diario[].pvt[]` guarda `minTrasLevantarse`: los minutos desde la hora de
+  `levantado` de ese día cuando se hizo, o null si no estaba apuntada (null es
+  «no se sabe», no cero). Los tests de antes no lo llevan. Los 12 primeros de
+  Dan (hasta el 08-11-2026) se hicieron entre 8 y 28 min después de levantarse;
+  desde el 09-11 van a los 45 o más: no son comparables entre sí sin separarlos.
