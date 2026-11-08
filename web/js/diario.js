@@ -38,6 +38,39 @@ export const AUDIO_HIPNOSIS = {
   antes: 'Sí, me dormí antes',
 };
 
+// Cuál de los audios. Los bloques de la sugestión del audio 2 no se volvieron a
+// generar: son los MISMOS archivos de voz del audio 1, así que entre una
+// versión y otra solo cambia la inducción y la profundización. Eso es lo que
+// permite preguntarse si el envoltorio influye, con la sugestión constante.
+// En el audio 1 la sugestión va de 6:44 a 9:47; en el 2, de 6:26 a 9:29.
+export const VERSIONES_AUDIO = {
+  1: 'El 1 (cuerpo y escalera)',
+  2: 'El 2 (párpados y ojo de la mente)',
+};
+
+// El entrenamiento de ilusiones: cuatro ítems por sesión, siempre en el mismo
+// orden y de menos a más difícil para él (el oído y la vista son los que le
+// cuestan). Se puntúan de 0 a 3 y van en el día en que se hace la sesión.
+//
+// Por qué se mide en vez de darlo por hecho: dos semanas escuchando hipnosis
+// no subieron la sugestionabilidad en el único experimento que lo probó
+// (Rasch y Cordi 2023, Front Psychol 14:1293070), y el programa clásico para
+// entrenarla sube el autoinforme pero no la respuesta observada, con el efecto
+// explicado entero por la expectativa (Gearan y Kirsch 1993, PMID 8468105).
+export const ITEMS_ILUSIONES = { Motor: 'Cuerpo', Tacto: 'Tacto', Oido: 'Oído', Vista: 'Vista' };
+export const NIVELES_ILUSIONES = [1, 2, 3, 4, 5, 6];
+export const NOTAS_ILUSIONES = [0, 1, 2, 3];
+
+// El total de la sesión, de 0 a 12. Devuelve null si falta algún ítem: media
+// sesión no es comparable con una entera.
+export function totalIlusiones(entrada) {
+  const notas = Object.keys(ITEMS_ILUSIONES).map((k) => entrada?.['ilusion' + k]);
+  return notas.every((n) => typeof n === 'number') ? notas.reduce((a, b) => a + b, 0) : null;
+}
+
+// Si ese día hubo sesión de ilusiones (hay nivel apuntado, con notas o sin ellas).
+export const huboIlusiones = (entrada) => entrada?.ilusionNivel != null;
+
 // Los básicos con los que se mira si el sueño te está costando: el volumen
 // tolerado cae antes que el 1RM (Cook 2012; Knowles 2022). Se reconocen por el
 // nombre del catálogo tolerando variantes («press de banca inclinado», «peso

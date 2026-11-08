@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 33;
+export const VERSION_ACTUAL = 34;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -716,6 +716,17 @@ const MIGRACIONES = {
     datos.perfil.avisarPvtTarde ??= null;
     datos.perfil.avisarPvtTardeHora ??= null;
     datos.version = 33;
+    return datos;
+  },
+  // v34: en la entrada del día caben dos cosas nuevas, las dos opcionales y
+  // ninguna con valor por defecto, así que no hay nada que rellenar:
+  //   · `audioVersion` (1 o 2): cuál de los dos audios de hipnosis se escuchó
+  //     esa noche. Las noches anteriores al 08-11-2026 son todas del audio 1,
+  //     pero no se marcan aquí: inventar el dato sería peor que no tenerlo.
+  //   · `ilusionNivel` (1 a 6) y `ilusionMotor`, `ilusionTacto`, `ilusionOido`
+  //     y `ilusionVista` (0 a 3): la sesión de entrenamiento de ilusiones.
+  33: (datos) => {
+    datos.version = 34;
     return datos;
   },
 };

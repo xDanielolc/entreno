@@ -662,6 +662,23 @@ la vez, a veces sin cobertura):
   laterales solo en el lateral, añade el lateral como principal al remo al
   mentón y como secundario a los press por encima de la cabeza, y copia al
   lateral los objetivos, el ritmo de recuperación y las sensaciones del hombro.
+- **v34 (qué audio y entrenamiento de ilusiones, 08-11-2026).** Dos añadidos a
+  la entrada del día, los dos opcionales y sin valor por defecto, así que la
+  migración solo sube el número de versión.
+  - `audioVersion` (1 o 2): cuál de los dos audios de hipnosis se escuchó esa
+    noche. Los bloques de la sugestión del audio 2 son los MISMOS archivos de
+    voz que los del audio 1, así que entre una versión y otra solo cambia la
+    inducción y la profundización: con esto se puede preguntar si el envoltorio
+    influye, con la sugestión constante. Las noches anteriores al 08-11-2026
+    son todas del audio 1, pero no se rellenan en la migración: inventar el
+    dato sería peor que no tenerlo.
+  - `ilusionNivel` (1 a 6) y `ilusionMotor`, `ilusionTacto`, `ilusionOido` y
+    `ilusionVista` (0 a 3 cada uno): la sesión semanal de entrenamiento de
+    ilusiones, que se hace despierto y por la tarde, después del test de las
+    18:00. El total de la sesión (0 a 12) se calcula con `totalIlusiones()` y
+    devuelve null si falta algún ítem, porque media sesión no es comparable con
+    una entera.
+
 - **v33 (segundo test del día y dos datos de la noche, 08-11-2026).** Sale de
   mirar los 12 primeros tests del registro: se hicieron todos entre 8 y 28 minutos
   después de levantarse (media 13), o sea dentro de la inercia del sueño, y su

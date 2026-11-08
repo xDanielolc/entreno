@@ -11,9 +11,11 @@ import * as estado from '../estado.js';
 import { formatearNumero } from '../calculos.js';
 import { apuntarPeso, quitarPeso } from '../peso.js';
 import {
-  ADELANTO_SEMANAL_MIN, ALCOHOL, AUDIO_HIPNOSIS, MODOS_PVT, MODO_PVT_POR_DEFECTO, NECESIDAD_SUENO_POR_DEFECTO, SENSACIONES,
-  SUENO_MINIMO_H, apuntarEnDiario, calcularSueno, datosModoPVT, dosTestsAlDia, entradaDe, faltaPvtHoy, faltaPvtMomento,
+  ADELANTO_SEMANAL_MIN, ALCOHOL, AUDIO_HIPNOSIS, ITEMS_ILUSIONES, MODOS_PVT, MODO_PVT_POR_DEFECTO,
+  NECESIDAD_SUENO_POR_DEFECTO, NIVELES_ILUSIONES, NOTAS_ILUSIONES, SENSACIONES, SUENO_MINIMO_H, VERSIONES_AUDIO,
+  apuntarEnDiario, calcularSueno, datosModoPVT, dosTestsAlDia, entradaDe, faltaPvtHoy, faltaPvtMomento,
   horaAcostarse, horaAvisoPvt, horaAvisoPvtTarde, modoPVT, pvtDelDia, resumenUltimos7, testsPVT, textoHoras,
+  totalIlusiones,
 } from '../diario.js';
 import { colores, graficaLineas } from './graficas.js';
 import { abrirPVT, activarAvisoPvt, avisoPvtActivo, faltaPermisoPvt, ofrecerPvtTrasDiario, programarAvisoPvt, puedeAvisarPvt } from './pvt.js';
@@ -169,6 +171,12 @@ export function vistaDiario(contenedor) {
       h('div', { class: 'fila-marcas compacta' }, Object.entries(AUDIO_HIPNOSIS).map(([k, t]) => h('button', { type: 'button',
         class: `boton-marca${e.audio === k ? ' activo' : ''}`, 'aria-pressed': String(e.audio === k),
         onclick: () => guardar('audio', e.audio === k ? null : k, { repintar: true }) }, t))),
+      // Cuál de los dos. Solo aparece si esa noche hubo audio: preguntarlo en
+      // las noches sin audio sería una casilla que siempre se queda vacía.
+      e.audio && e.audio !== 'no' && h('span', { class: 'etiqueta-campo suave' }, 'Cuál'),
+      e.audio && e.audio !== 'no' && h('div', { class: 'fila-marcas compacta' }, Object.entries(VERSIONES_AUDIO).map(([k, t]) => h('button', { type: 'button',
+        class: `boton-marca${String(e.audioVersion) === k ? ' activo' : ''}`, 'aria-pressed': String(String(e.audioVersion) === k),
+        onclick: () => guardar('audioVersion', String(e.audioVersion) === k ? null : Number(k), { repintar: true }) }, t))),
       // Se guarda solo, pero un botón da tranquilidad: confirma y lleva a la tabla.
       h('button', { type: 'button', class: 'boton grande', onclick: () => {
         document.activeElement?.blur?.();
@@ -180,6 +188,7 @@ export function vistaDiario(contenedor) {
         document.querySelector('.tabla-diario')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } }, 'Guardar el día')),
 
+    tarjetaIlusiones(e, guardar),
     tarjetaPVT(d, fecha, hoy),
     tarjetaCribado(d),
     tablaDias(d, fecha),
@@ -249,6 +258,30 @@ const AYUDA_PVT = [
 
 // En el día de hoy: el botón para hacerlo, lo que hayas hecho ya y el aviso de
 // la mañana. En un día pasado, solo lo que hubo (el test se hace en directo).
+// El entrenamiento de ilusiones. Va en el diario del día en que se hace, que
+// es por la tarde y DESPUÉS del test de las 18:00 para no contaminarlo. La
+// tarjeta se abre al elegir nivel: sin nivel no hay nada que puntuar.
+function tarjetaIlusiones(e, guardar) {
+  const total = totalIlusiones(e);
+  const marca = (campo, valor, texto) => h('button', { type: 'button',
+    class: `boton-marca${e[campo] === valor ? ' activo' : ''}`, 'aria-pressed': String(e[campo] === valor),
+    onclick: () => guardar(campo, e[campo] === valor ? null : valor, { repintar: true }) }, texto);
+  return h('section', { class: 'tarjeta' },
+    h('div', { class: 'titulo-con-ayuda' }, h('h2', { class: 'crece' }, 'Ilusiones'),
+      ayuda('Entrenamiento de ilusiones', 'Una sesión por semana, sentado y despierto, por la tarde y después del test de las 18:00. '
+        + 'Cuatro ítems en el mismo orden, de menos a más difícil: cuerpo, tacto, oído y vista. Se puntúa 0 si no pasó nada, 1 si hubo '
+        + 'un asomo, 2 si pasó claramente pero sabías que lo imaginabas, y 3 si pasó como si fuera de verdad. No se sube de nivel hasta '
+        + 'sacar 2 o más en un ítem dos sesiones seguidas. Un cero es un dato tan bueno como un tres: puntuar de cortesía estropea la '
+        + 'escalera entera.')),
+    h('span', { class: 'etiqueta-campo suave' }, 'Nivel de hoy'),
+    h('div', { class: 'fila-marcas compacta' }, NIVELES_ILUSIONES.map((n) => marca('ilusionNivel', n, String(n)))),
+    e.ilusionNivel != null && h('div', {},
+      Object.entries(ITEMS_ILUSIONES).map(([clave, etiqueta]) => h('div', {},
+        h('span', { class: 'etiqueta-campo suave' }, etiqueta),
+        h('div', { class: 'fila-marcas compacta' }, NOTAS_ILUSIONES.map((n) => marca('ilusion' + clave, n, String(n)))))),
+      h('p', { class: 'nota centrado' }, total == null ? 'Faltan ítems por puntuar.' : `Total: ${total} de 12.`)));
+}
+
 function tarjetaPVT(d, fecha, hoy) {
   const hechos = pvtDelDia(d, fecha);
   const esHoy = fecha === hoy;
