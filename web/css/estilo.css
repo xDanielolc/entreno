@@ -1643,6 +1643,9 @@ div.sugerencia > span { display: block; }
    arranca, tapa la animación de debajo. */
 #presentacion .video-presentacion { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 #presentacion.con-video .escena { visibility: hidden; }
+/* Hasta que arranca (el vídeo o la animación), la escena no se ve: si no, se veía
+   quieta un momento y luego empezaba de nuevo. */
+#presentacion:not(.en-marcha) .escena { visibility: hidden; }
 #presentacion .caja {
   position: absolute; left: 50%; top: 50%; width: 92px; height: 92px; margin: -46px 0 0 -46px;
   border-radius: 26px; background: var(--acento); box-shadow: 0 10px 28px -8px color-mix(in srgb, var(--acento) 70%, transparent);
@@ -2376,3 +2379,7 @@ body.entreno-a-pantalla .tira-inferior { display: none; }
 /* «Todos» en el filtro de equipo: tres dibujos juntos (Dan, 29-10-2026). */
 .iconos-todos { display: inline-flex; gap: 2px; align-items: center; justify-content: center; }
 .iconos-todos .icono { width: 26px; height: 26px; }
+
+/* Final de la serie en los accesorios: descendente o miorrepeticiones (borrador 16). */
+.final-serie { display: flex; align-items: center; justify-content: center; gap: .4rem; flex-wrap: wrap; }
+.final-serie > .fila-marcas { width: auto; margin: 0; }

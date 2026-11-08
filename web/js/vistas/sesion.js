@@ -1683,12 +1683,13 @@ export function vistaSesion(contenedor, { id }) {
         });
       }, { titulo: 'Tipo de serie', lista: true }),
 
-      serie.tipo === 'intensidad' && desplegableTecnicas(serie.tecnicas, (nuevas) => cambiarSesion((s) => {
-        const x = s.ejercicios[i].series[j];
-        x.tecnicas = nuevas;
-        x.recamara = recamaraDe(nuevas, x.recamara ?? null);
-        x.tramos = tramosDe(nuevas) ? (x.tramos ?? tramosPropuestos(x, planDe(ej, x), null, d.perfil)) : null;
-      })),
+      descendenteOMio(ej, serie) ? finalDeLaSerie(ej, i, j, serie)
+        : serie.tipo === 'intensidad' && desplegableTecnicas(serie.tecnicas, (nuevas) => cambiarSesion((s) => {
+          const x = s.ejercicios[i].series[j];
+          x.tecnicas = nuevas;
+          x.recamara = recamaraDe(nuevas, x.recamara ?? null);
+          x.tramos = tramosDe(nuevas) ? (x.tramos ?? tramosPropuestos(x, planDe(ej, x), null, d.perfil)) : null;
+        })),
 
       marcaObjetivo(ej, serie),
 
@@ -1700,6 +1701,41 @@ export function vistaSesion(contenedor, { id }) {
           if (!caja.hidden) caja.focus();
         } }, icono('bocadillo')),
       h('button', { class: 'boton-icono borrar-serie', 'aria-label': 'Borrar serie', onclick: () => borrarSerie(i, j) }, icono('papelera')));
+  }
+
+  // Borrador 16: en los accesorios (sin Bilbo ni series según el 1RM), el final de la serie es una serie
+  // descendente o miorrepeticiones, a elegir cada día. Las dos cuentan igual y ninguna cuenta para subir el peso.
+  function descendenteOMio(ej, serie) {
+    if (serie.tipo !== 'intensidad' || serie.tecnicas?.length !== 1 || !['drop-set', 'miorepeticiones'].includes(serie.tecnicas[0])) return false;
+    if (!(planDe(ej, serie)?.tecnicas ?? []).includes('drop-set')) return false;
+    return !(ej.series ?? []).some((p) => p.progresion?.tipo === 'bilbo' || p.progresion?.porRM);
+  }
+
+  function finalDeLaSerie(ej, i, j, serie) {
+    const elegir = (v) => cambiarSesion((s) => {
+      const x = s.ejercicios[i].series[j];
+      if (x.tecnicas?.[0] === v) return;
+      const primera = x.tramos?.[0] ?? null;
+      const carga = primera?.carga ?? x.carga ?? null;
+      // Las bajadas que ponía la app se guardan por si se vuelve a la descendente.
+      if (x.tecnicas?.[0] === 'drop-set') x.tramosDescendente = x.tramos;
+      x.tecnicas = [v];
+      x.recamara = recamaraDe(x.tecnicas, x.recamara ?? null);
+      // Miorrepeticiones: la serie normal y hasta 3 miniseries de 3-5 con el mismo peso.
+      x.tramos = v === 'miorepeticiones'
+        ? [{ carga, esfuerzo: primera?.esfuerzo ?? null, objetivo: null },
+          ...[1, 2, 3].map(() => ({ carga, esfuerzo: null, objetivo: 5 }))]
+        : (x.tramosDescendente?.length ? structuredClone(x.tramosDescendente) : tramosPropuestos({ ...x, carga }, planDe(ej, x), null, d.perfil));
+      if (v !== 'miorepeticiones') delete x.tramosDescendente;
+      if (v !== 'miorepeticiones' && primera && x.tramos?.[0]) Object.assign(x.tramos[0], { carga, esfuerzo: primera.esfuerzo ?? null });
+    });
+    return h('div', { class: 'final-serie' },
+      selector([['drop-set', 'Descendente'], ['miorepeticiones', 'Miorrepeticiones']], serie.tecnicas[0], elegir,
+        { titulo: 'Al final de la serie', compacto: true }),
+      ayuda('Descendente o miorrepeticiones', 'Elige cada día cómo acabas la serie. Descendente: sin descanso, quita un 20-25 % '
+        + 'del peso y sigue hasta 0-1 en recámara. Miorrepeticiones: descansa 15-20 s (3-5 respiraciones hondas) y haz miniseries '
+        + 'de 3-5 con el mismo peso, hasta 3 miniseries o hasta que una salga de menos de 3. Cuentan igual para el volumen y '
+        + 'ninguna cuenta para subir el peso: solo la serie normal.'));
   }
 
   function marcaObjetivo(ej, serie) {

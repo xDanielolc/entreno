@@ -6,7 +6,12 @@
 // segundo plano, abrirla desde el icono no la arrancaba de nuevo).
 
 const CLAVE = 'entreno-presentacion';
-export const DURACION_MS = 4400;
+// La animación y los vídeos están hechos a 4,4 s; se ponen a 1,75 veces (2,5 s): era muy larga (08-11-2026).
+// El vídeo va con playbackRate y la animación CSS con la de cada animación (getAnimations).
+const VELOCIDAD = 1.75;
+export const DURACION_MS = Math.round(4400 / VELOCIDAD);
+// Una presentación en marcha o recién acabada no se repite (salía a medias y luego entera).
+let ultimaVez = 0;
 // Fuera más de esto, al volver se repite la presentación.
 const AUSENCIA_PARA_REPETIR_MS = 20 * 60 * 1000;
 // Segundos que se adelantan los sonidos sobre lo que dice el navegador.
@@ -55,6 +60,8 @@ async function conVideo(p, arrancar) {
   ]);
   if (!datos || !p.isConnected) return false;
   const video = Object.assign(document.createElement('video'), { playsInline: true, preload: 'auto', src: URL.createObjectURL(datos) });
+  video.defaultPlaybackRate = VELOCIDAD;
+  video.playbackRate = VELOCIDAD;
   video.className = 'video-presentacion';
   video.addEventListener('playing', () => { p.classList.add('con-video'); arrancar(null); }, { once: true });
   p.append(video);
@@ -79,11 +86,16 @@ export function mostrarPresentacion(variante = variantePresentacion(), { nueva =
   }
   const p = document.getElementById('presentacion');
   if (!p) return;
+  if (p.classList.contains('en-marcha') || p.dataset.preparando) return;
+  p.dataset.preparando = '1';
+  ultimaVez = Date.now();
   const quitar = () => p.remove();
   p.addEventListener('click', quitar, { once: true });
   const quieto = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const arrancar = (sonidos) => {
+    if (p.classList.contains('en-marcha')) return;
     p.classList.add('en-marcha');
+    try { for (const a of p.getAnimations({ subtree: true })) a.playbackRate = VELOCIDAD; } catch { /* navegador viejo: a su ritmo */ }
     sonidos?.();
     setTimeout(quitar, quieto ? 1300 : DURACION_MS);
   };
@@ -101,7 +113,8 @@ export function repetirAlVolver() {
   let fuera = null;
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) { fuera = Date.now(); return; }
-    if (fuera && Date.now() - fuera > AUSENCIA_PARA_REPETIR_MS) mostrarPresentacion(undefined, { nueva: true });
+    if (fuera && Date.now() - fuera > AUSENCIA_PARA_REPETIR_MS && Date.now() - ultimaVez > 10000
+      && !document.getElementById('presentacion')) mostrarPresentacion(undefined, { nueva: true });
     fuera = null;
   });
 }
@@ -172,7 +185,7 @@ function preparar(variante) {
     // Cada golpe se programa medio segundo antes de sonar: así, si la grabación
     // ya está lista, suena ella (los golpes de la caja llegan pasados 2 s).
     for (const [tipo, momento, x] of SONIDOS[variante] ?? SONIDOS.cae) {
-      const t = ahora + momento - retraso;
+      const t = ahora + momento / VELOCIDAD - retraso;
       if (t <= ahora) continue;
       const espera = Math.max(0, (t - audio.currentTime - 0.5) * 1000);
       setTimeout(() => { if (audio.state === 'running' && t > audio.currentTime) sonidos[tipo](t, x); }, espera);

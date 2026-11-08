@@ -1692,3 +1692,23 @@ visto de frente). Catálogo y migración: elevaciones laterales solo al lateral,
 lateral, los press por encima de la cabeza (militar, de hombro, Arnold, tras nuca, pica, pino) con el lateral de
 secundario; objetivos, ritmo de recuperación y sensaciones del hombro copiados al lateral. Equilibrio, medidas y el
 consejo de empuje/tirón cuentan los dos. Almacén `entreno-imagenes-54`.
+
+## 0.77.0 (08-11-2026, conversación del sueño)
+
+Dos tests de atención al día (mañana, a los 45 min de la hora objetivo de levantarse, y tarde, aviso propio a las
+18:00), cafeína antes del test, pulso mínimo de la noche y audio de hipnosis en el diario. Esquema v33. Dueña de
+vistas/pvt.js, diario.js y su parte de ajustes.js: la conversación del sueño.
+
+## Ronda 0.78.0 (08-11-2026): borrador 16 y presentación más corta
+
+- `datos-privados/rutina-dan-borrador-16.md` sustituye al 15. Prehecha «Fuerza sin máquinas» versión 12: 2
+  aproximaciones en el primer básico de cada día (barra × 5 = 30 % y 70 % × 2), dominadas en racimo 4 × 1-2 también el
+  día 1 (fuera las negativas), fuera los fondos negativos del día 3, días de 65-70 min, y en los accesorios el final de
+  la serie a elegir cada día. Aprender («Cómo calentar», «Cómo progresa esta rutina») al día con el borrador 16.
+- Entreno: en los accesorios (series con descendente de un ejercicio sin Bilbo ni series según el 1RM,
+  `descendenteOMio`), la cabecera de la serie lleva «Descendente / Miorrepeticiones» con su «?» (`finalDeLaSerie`).
+  Miorrepeticiones = la serie normal y 3 miniseries de 5 como objetivo con el mismo peso; las bajadas de antes se
+  guardan en `serie.tramosDescendente` mientras tanto. Solo la parte normal (tramo 0) cuenta para subir el peso.
+- Presentación a 1,75 veces (`VELOCIDAD` en presentacion.js: 2,5 s en vez de 4,4; vídeo con `playbackRate`, la
+  animación CSS con el `playbackRate` de cada animación y los sonidos divididos), la escena oculta hasta que arranca
+  (se veía quieta un momento y luego empezaba: «sale a medias y luego entera») y sin repetir si ya hay una en marcha.
