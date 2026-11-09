@@ -87,7 +87,7 @@ export function vistaAudios(contenedor) {
         h('p', { class: 'nota' }, 'La primera vez que pones uno se descarga entero y se guarda. A partir de ahí suena sin conexión.')),
       h('section', { class: 'tarjeta' },
         h('h2', {}, 'Para dormir'),
-        h('p', { class: 'nota' }, 'La sugestión es la misma grabación en los dos: solo cambia cómo se llega hasta ella. Alterna 1 y 2 por noches.'),
+        h('p', { class: 'nota' }, 'La sugestión es la misma grabación en todos: solo cambia cómo se llega hasta ella. Ve rotándolos por noches, sin repetir el de la noche anterior.'),
         ...audiosDe('dormir').map((a) => fichaAudio(a, pintar))),
       h('section', { class: 'tarjeta' },
         h('h2', {}, 'Ilusiones'),
