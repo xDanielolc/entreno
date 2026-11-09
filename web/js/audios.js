@@ -41,6 +41,16 @@ export const AUDIOS = [
     sugestion: [285, 467],
   },
   {
+    id: 'dormir-4',
+    tipo: 'dormir',
+    version: 4,
+    nombre: 'Dormir 4 · el tren de noche',
+    descripcion: 'Tumbado en la litera de un tren de noche: el balanceo, las ruedas, las luces que pasan y un túnel. No te pide nada.',
+    archivo: 'audios/dormir-4.mp3',
+    duracion: 588,
+    sugestion: [305, 487],
+  },
+  {
     id: 'ilusiones-1',
     tipo: 'ilusiones',
     nivel: 1,

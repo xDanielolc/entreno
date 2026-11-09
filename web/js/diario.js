@@ -45,7 +45,8 @@ export const AUDIO_HIPNOSIS = {
 // En el audio 1 la sugestión va de 6:44 a 9:47; en el 2, de 6:26 a 9:29.
 export const VERSIONES_AUDIO = {
   1: 'El 1 (cuerpo y escalera)',
-  2: 'El 2 (párpados y ojo de la mente)',
+  2: 'El 2 (cuenta lenta y manta)',
+  4: 'El 4 (el tren)',
 };
 
 // El entrenamiento de ilusiones: cuatro ítems por sesión, siempre en el mismo
