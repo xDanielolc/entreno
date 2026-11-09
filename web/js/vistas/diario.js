@@ -199,7 +199,7 @@ export function vistaDiario(contenedor) {
         document.querySelector('.tabla-diario')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } }, 'Guardar el día')),
 
-    tarjetaIlusiones(e, guardar),
+    tarjetaIlusiones(e, guardar, fecha),
     tarjetaPVT(d, fecha, hoy),
     tarjetaCribado(d),
     tablaDias(d, fecha),
@@ -272,8 +272,22 @@ const AYUDA_PVT = [
 // El entrenamiento de ilusiones. Va en el diario del día en que se hace, que
 // es por la tarde y DESPUÉS del test de las 18:00 para no contaminarlo. La
 // tarjeta se abre al elegir nivel: sin nivel no hay nada que puntuar.
-function tarjetaIlusiones(e, guardar) {
+//
+// Cerrada por defecto: con los niveles a la vista todos los días, se confundía
+// con el audio de dormir (09-11-2026, apuntó dos sesiones que no había hecho
+// creyendo que le preguntaba qué hipnosis de dormir había puesto). Se abre
+// solo si él dice que ha hecho una sesión, o si ya hay nivel apuntado.
+const ilusionesAbiertas = new Set();
+function tarjetaIlusiones(e, guardar, fecha) {
   const total = totalIlusiones(e);
+  if (e.ilusionNivel == null && !ilusionesAbiertas.has(fecha)) {
+    return h('section', { class: 'tarjeta' },
+      h('h2', {}, 'Ilusiones'),
+      h('p', { class: 'nota' }, 'Solo si hoy has hecho una sesión con el audio de ilusiones, el de día, sentado y despierto. '
+        + 'El audio de dormir no va aquí: se apunta arriba, en «Audio de hipnosis».'),
+      h('button', { type: 'button', class: 'boton secundario',
+        onclick: () => { ilusionesAbiertas.add(fecha); estado.emitir('vista'); } }, 'Hoy hice una sesión de ilusiones'));
+  }
   const marca = (campo, valor, texto) => h('button', { type: 'button',
     class: `boton-marca${e[campo] === valor ? ' activo' : ''}`, 'aria-pressed': String(e[campo] === valor),
     onclick: () => guardar(campo, e[campo] === valor ? null : valor, { repintar: true }) }, texto);
@@ -284,6 +298,7 @@ function tarjetaIlusiones(e, guardar) {
         + 'un asomo, 2 si pasó claramente pero sabías que lo imaginabas, y 3 si pasó como si fuera de verdad. No se sube de nivel hasta '
         + 'sacar 2 o más en un ítem dos sesiones seguidas. Un cero es un dato tan bueno como un tres: puntuar de cortesía estropea la '
         + 'escalera entera.')),
+    h('p', { class: 'nota' }, 'La sesión de ilusiones de hoy, la de día. El audio de dormir va arriba, en «Audio de hipnosis».'),
     h('span', { class: 'etiqueta-campo suave' }, 'Nivel de hoy'),
     h('div', { class: 'fila-marcas compacta' }, NIVELES_ILUSIONES.map((n) => marca('ilusionNivel', n, String(n)))),
     e.ilusionNivel != null && h('div', {},
