@@ -46,6 +46,7 @@ export const AUDIO_HIPNOSIS = {
 export const VERSIONES_AUDIO = {
   1: 'El 1 (cuerpo y escalera)',
   2: 'El 2 (cuenta lenta y manta)',
+  3: 'El 3 (la cabaña)',
   4: 'El 4 (el tren)',
 };
 
@@ -58,7 +59,7 @@ export const VERSIONES_AUDIO = {
 // (Rasch y Cordi 2023, Front Psychol 14:1293070), y el programa clásico para
 // entrenarla sube el autoinforme pero no la respuesta observada, con el efecto
 // explicado entero por la expectativa (Gearan y Kirsch 1993, PMID 8468105).
-export const ITEMS_ILUSIONES = { Motor: 'Cuerpo', Tacto: 'Tacto', Oido: 'Oído', Vista: 'Vista' };
+export const ITEMS_ILUSIONES = { Motor: 'Cuerpo', Tacto: 'Tacto, gusto u olfato', Oido: 'Oído', Vista: 'Vista' };
 export const NIVELES_ILUSIONES = [1, 2, 3, 4, 5, 6];
 export const NOTAS_ILUSIONES = [0, 1, 2, 3];
 

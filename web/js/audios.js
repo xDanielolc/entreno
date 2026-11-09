@@ -41,6 +41,16 @@ export const AUDIOS = [
     sugestion: [285, 467],
   },
   {
+    id: 'dormir-3',
+    tipo: 'dormir',
+    version: 3,
+    nombre: 'Dormir 3 · la cabaña con nieve',
+    descripcion: 'Una cabaña de madera en lo alto de un monte, de noche, con la estufa encendida y la nieve cayendo fuera. No te pide nada.',
+    archivo: 'audios/dormir-3.mp3',
+    duracion: 558,
+    sugestion: [274, 457],
+  },
+  {
     id: 'dormir-4',
     tipo: 'dormir',
     version: 4,
@@ -67,6 +77,24 @@ export const AUDIOS = [
     descripcion: 'El brazo que pesa tanto que no se levanta, frío en una mano, una radio al otro lado de la pared y un círculo quieto en lo oscuro.',
     archivo: 'audios/ilusiones-2.mp3',
     duracion: 448,
+  },
+  {
+    id: 'ilusiones-3',
+    tipo: 'ilusiones',
+    nivel: 3,
+    nombre: 'Ilusiones · nivel 3',
+    descripcion: 'El brazo rígido como una barra de hierro, el sabor de un limón, una canción que conoces y tu habitación vista desde la puerta.',
+    archivo: 'audios/ilusiones-3.mp3',
+    duracion: 445,
+  },
+  {
+    id: 'ilusiones-4',
+    tipo: 'ilusiones',
+    nivel: 4,
+    nombre: 'Ilusiones · nivel 4',
+    descripcion: 'El brazo que sube solo, olor a café, alguien que dice tu nombre en otra habitación y, ya con los ojos abiertos, un tono de color en el cuarto.',
+    archivo: 'audios/ilusiones-4.mp3',
+    duracion: 457,
   },
 ];
 
