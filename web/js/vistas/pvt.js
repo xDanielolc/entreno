@@ -94,6 +94,14 @@ function ayudaClara(titulo, texto) {
 }
 
 const velocidadTexto = (v) => (v > 0 ? formatearNumero(Math.round(v * 100) / 100) : '—');
+
+// Desviación típica muestral (n − 1), redondeada al milisegundo. Con menos de
+// dos tiempos no tiene sentido y devuelve null.
+function desviacionTipica(xs) {
+  if (!xs || xs.length < 2) return null;
+  const m = xs.reduce((a, b) => a + b, 0) / xs.length;
+  return Math.round(Math.sqrt(xs.reduce((a, x) => a + (x - m) ** 2, 0) / (xs.length - 1)));
+}
 // El umbral, dicho como lo dice la fuente: el error típico de Thompson 2022 da
 // un cambio mínimo detectable de entre el 11 % y el 12 %.
 const UMBRAL_TEXTO = '11-12 %';
@@ -101,6 +109,7 @@ const UMBRAL_TEXTO = '11-12 %';
 const POR_QUE_ASI = [
   'No hay baremos publicados de ninguna versión de este test (Taillard 2024, Neurophysiol Clin, PMID 38401239): no existe un «esto es lo normal». La comparación es siempre contigo mismo.',
   `Tocar una pantalla táctil añade unos ${RETRASO_TACTIL_MS} ms frente a pulsar un botón de verdad (Arsintescu 2017). Para que tus números se puedan comparar entre sí, hazlo siempre con el mismo móvil, en la misma postura y con el mismo dedo, y no los compares con los de ningún estudio.`,
+  'La desviación típica dice cuánto se dispersan tus tiempos dentro de un mismo test. Con falta de sueño no solo sube la media: también sube la dispersión, porque aparecen respuestas normales mezcladas con otras muy lentas (Doran, Van Dongen y Dinges 2001). Se compara contigo mismo, como todo lo demás.',
   'El dato principal es la velocidad de respuesta: la media de 1 dividido entre cada tiempo de reacción en segundos. Con 7 h en cama la velocidad baja pero los lapsos no suben (Belenky 2003), así que mirando solo los lapsos un recorte de sueño parece gratis cuando no lo es.',
   `Las tres duraciones no se mezclan nunca: en gente descansada el de 3 min y el de 10 ni siquiera se parecen (r = 0,134; Antler 2022). El de 5 min viene marcado porque es el único con un cambio mínimo detectable publicado (Thompson 2022): por debajo de un ${UMBRAL_TEXTO} de diferencia es ruido, no un cambio.`,
   `Por eso la app decide sobre la media de tus últimos ${TESTS_MEDIA_MOVIL} tests, nunca sobre un día suelto. Y tu línea base la forman tus primeros ${TESTS_MINIMOS_BASE} tests, sin plazo: si acaban repartidos en más de ${DIAS_BASE_SEGUIDA} días, la app te lo dice al compararte, porque entonces la base retrata dos épocas en vez de una.`,
@@ -347,6 +356,17 @@ export function abrirPVT({ modo = MODO_PVT_POR_DEFECTO, directo = false, alCerra
       modo: elegido,
       velocidad: velocidad == null ? null : Math.round(velocidad * 1000) / 1000,
       mediaMs: rts.length ? Math.round(rts.reduce((a, b) => a + b, 0) / rts.length) : null,
+      // La desviación típica de SUS tiempos en este test: cuánto se dispersan.
+      // Con falta de sueño no solo sube la media, también la dispersión dentro
+      // de cada persona («inestabilidad de estado»: Doran, Van Dongen y Dinges
+      // 2001, Arch Ital Biol 139(3):253-267, PMID 11330205). Sale de los tiempos
+      // válidos, los mismos que la media.
+      dtMs: desviacionTipica(rts),
+      // Los tiempos uno a uno, en ms. Pesan poco y permiten calcular después
+      // cualquier otra medida sin depender de lo que se guardó en su día (la DT,
+      // por ejemplo, no se puede sacar de los tests anteriores al 09-11-2026
+      // porque solo guardaban la media).
+      tiempos: rts.map((x) => Math.round(x)),
       lapsos: rts.filter((x) => x >= ajustes().lapsoMs).length + sinRespuesta,
       falsos,
       // Se rellena en la pantalla de resultados, de un toque. Queda en null si
@@ -389,6 +409,7 @@ export function abrirPVT({ modo = MODO_PVT_POR_DEFECTO, directo = false, alCerra
         h('span', { style: `${LINEA} font-size: .9rem;` }, 'respuestas por segundo (velocidad)')),
       h('div', { style: 'display: grid; gap: 8px; width: 100%;' },
         cifra('Tiempo de reacción medio', test.mediaMs == null ? '—' : `${test.mediaMs} ms`),
+        cifra('Desviación típica', test.dtMs == null ? '—' : `${test.dtMs} ms`),
         cifra('Lapsos', String(test.lapsos)),
         cifra('Falsos toques', String(test.falsos))),
       movil && movil.tests > 1 && h('p', { style: `${LINEA} font-size: .95rem;` },

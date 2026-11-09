@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 36;
+export const VERSION_ACTUAL = 37;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -742,6 +742,14 @@ const MIGRACIONES = {
   // Opcional y sin valor por defecto, así que no hay nada que rellenar.
   35: (datos) => {
     datos.version = 36;
+    return datos;
+  },
+  // v37: cada test de atención guarda además `dtMs` (la desviación típica de
+  // sus tiempos, en ms) y `tiempos` (los tiempos uno a uno, en ms). Opcionales:
+  // los tests anteriores no los tienen y NO se pueden reconstruir, porque solo
+  // guardaban la media. Nada que rellenar.
+  36: (datos) => {
+    datos.version = 37;
     return datos;
   },
 };

@@ -701,6 +701,15 @@ la vez, a veces sin cobertura):
     autonómica arrastra la duración; el mínimo no.
   - Nada que convertir en los datos ya guardados: la migración solo añade los
     dos campos del perfil.
+- **v37 (la dispersión del test de atención, 09-11-2026).** Cada test de la
+  lista `pvt` de la entrada del día guarda dos campos más, opcionales:
+  - `dtMs`: la desviación típica muestral (n − 1) de los tiempos válidos del
+    test, en ms. Con falta de sueño sube la dispersión dentro de cada persona,
+    no solo la media (Doran, Van Dongen y Dinges 2001, PMID 11330205).
+  - `tiempos`: los tiempos válidos uno a uno, en ms redondeados. Sirven para
+    calcular después cualquier otra medida. Los tests anteriores no los tienen y
+    no se pueden reconstruir.
+
 - **v36 (la app apunta sola qué audio sonó, 09-11-2026).** Un campo más en la
   entrada del día, opcional y sin valor por defecto, así que la migración solo
   sube el número.
