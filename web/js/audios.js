@@ -23,15 +23,22 @@ export const AUDIOS = [
     duracion: 688,
     sugestion: [404, 587],
   },
+  // El 2 se rehízo el 09-11-2026 porque no le gustó: la cuenta iba muy rápida y
+  // sin silencios, y el «ojo de la mente» le resultó confuso. Ahora cuenta de
+  // diez a uno con un número por trozo y unos ocho segundos entre ellos, y en
+  // lugar del ojo de la mente hay una manta pesada. La sugestión sigue siendo la
+  // misma grabación. El archivo cambia de nombre (dormir-2b) para que los
+  // móviles que guardaron el viejo bajen el nuevo. OJO AL ANALIZAR: la noche del
+  // 08 al 09-11-2026 sonó la versión vieja del 2, fuera de la app.
   {
     id: 'dormir-2',
     tipo: 'dormir',
     version: 2,
-    nombre: 'Dormir 2 · los párpados y el ojo de la mente',
-    descripcion: 'Párpados pesados y una cuenta atrás desde veinte atada a tu respiración; luego un párpado de dentro que se cierra.',
-    archivo: 'audios/dormir-2.mp3',
-    duracion: 669,
-    sugestion: [386, 569],
+    nombre: 'Dormir 2 · la cuenta lenta y la manta',
+    descripcion: 'Una cuenta de diez a uno, muy despacio, con silencio entre número y número; luego una habitación oscura y una manta pesada.',
+    archivo: 'audios/dormir-2b.mp3',
+    duracion: 568,
+    sugestion: [285, 467],
   },
   {
     id: 'ilusiones-1',
@@ -41,6 +48,15 @@ export const AUDIOS = [
     descripcion: 'Manos imantadas, calor en una mano, un grifo que gotea lejos y un resplandor de color. Sentado y despierto.',
     archivo: 'audios/ilusiones-1.mp3',
     duracion: 488,
+  },
+  {
+    id: 'ilusiones-2',
+    tipo: 'ilusiones',
+    nivel: 2,
+    nombre: 'Ilusiones · nivel 2',
+    descripcion: 'El brazo que pesa tanto que no se levanta, frío en una mano, una radio al otro lado de la pared y un círculo quieto en lo oscuro.',
+    archivo: 'audios/ilusiones-2.mp3',
+    duracion: 448,
   },
 ];
 
