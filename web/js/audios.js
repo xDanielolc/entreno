@@ -96,6 +96,24 @@ export const AUDIOS = [
     archivo: 'audios/ilusiones-4.mp3',
     duracion: 457,
   },
+  {
+    id: 'ilusiones-5',
+    tipo: 'ilusiones',
+    nivel: 5,
+    nombre: 'Ilusiones · nivel 5',
+    descripcion: 'Las manos que se pegan, una mano que se duerme y apenas nota un pellizco, y ya con los ojos abiertos un grifo que gotea y un objeto que respira.',
+    archivo: 'audios/ilusiones-5.mp3',
+    duracion: 445,
+  },
+  {
+    id: 'ilusiones-6',
+    tipo: 'ilusiones',
+    nivel: 6,
+    nombre: 'Ilusiones · nivel 6',
+    descripcion: 'El último. Una palabra que se queda para después, un insecto que anda por el brazo y, con los ojos abiertos, una mosca que se mueve y una luz en la pared.',
+    archivo: 'audios/ilusiones-6.mp3',
+    duracion: 443,
+  },
 ];
 
 export const audioPorId = (id) => AUDIOS.find((a) => a.id === id) ?? null;
