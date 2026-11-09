@@ -2360,7 +2360,8 @@ body.entreno-a-pantalla .tira-inferior { display: none; }
 /* El equilibrio con los trozos de muñeco alrededor. */
 .arana-con-dibujos { position: relative; width: 100%; max-width: 480px; margin: 0 auto; }
 .arana-con-dibujos .arana { display: block; width: 100%; }
-.arana-dibujo { position: absolute; width: 21%; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 1px; pointer-events: none; }
+.arana-dibujo { position: absolute; width: 18%; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 1px; pointer-events: none; }
+.arana-dibujo .recorte-musculo { border-radius: 50%; box-shadow: 0 0 0 2px var(--superficie, var(--fondo)); }
 .arana-dibujo small { font-size: .62rem; line-height: 1.1; color: var(--texto-suave); text-align: center; }
 /* Estiramientos (0.71): medida y ayuda en casillas como las demás; la técnica, debajo con su «?». */
 .casillas-estiramiento { margin-top: 6px; }

@@ -148,14 +148,23 @@ function arana(valores, anilloObjetivo, { dibujos = false, sinEtiquetas = false 
   const poligono = (r) => valores.map((_, i) => punto(i, typeof r === 'function' ? r(i) : r).map((x) => x.toFixed(1)).join(',')).join(' ');
   // Márgenes anchos a los lados para que las etiquetas quepan en el móvil.
   if (dibujos) {
-    // Más margen alrededor: los dibujos van fuera de la red.
-    const [x0, y0, ancho, alto] = [-175, -175, T + 350, T + 350];   // 29-10, Dan: dibujos más grandes y sin nombre
+    // Los dibujos van en círculo fuera de la red, cada uno en un redondel. El
+    // tamaño y la distancia salen del número de zonas para que dos vecinos no
+    // se monten nunca (09-11-2026, Dan: «se ven así de juntas»): la distancia
+    // entre centros vecinos (cuerda) es 2·r·sen(π/k) y el redondel ocupa el
+    // 92 % de ella; además el redondel no puede tocar la red (R + 12).
+    const cuerda = 2 * Math.sin(Math.PI / k);
+    const proporcion = 0.92 * cuerda;                          // diámetro / radio del círculo de dibujos
+    const radioDibujos = (R + 12) / (1 - proporcion / 2);
+    const diametro = proporcion * radioDibujos;
+    const mitad = radioDibujos + diametro / 2 + 4;
+    const [x0, y0, ancho, alto] = [C - mitad, C - mitad, 2 * mitad, 2 * mitad];
     const grafico = arana(valores, anilloObjetivo, { sinEtiquetas: true });
     grafico.setAttribute('viewBox', `${x0} ${y0} ${ancho} ${alto}`);
     return h('div', { class: 'arana-con-dibujos' }, grafico, valores.map((v, i) => {
-      const [x, y] = punto(i, 1.62);
+      const [x, y] = punto(i, radioDibujos / R);
       return h('span', { class: 'arana-dibujo', title: v.nombre, 'aria-label': v.nombre,
-        style: `left:${((x - x0) / ancho) * 100}%;top:${((y - y0) / alto) * 100}%` },
+        style: `left:${((x - x0) / ancho) * 100}%;top:${((y - y0) / alto) * 100}%;width:${(diametro / ancho) * 100}%` },
       musculoRecortado(v.musculos, { encuadre: 'cerca' }));
     }));
   }

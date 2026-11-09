@@ -1728,3 +1728,9 @@ Pedido por la conversación del sueño y encargado aquí por Dan. Esquema v35.
   45 min: dice a qué hora toca y deja el aviso puesto; pasada la ventana, hoy ya no lo ofrece. La tarjeta de Hoy dice
   «a partir de las HH:MM».
 - Cada test guarda `minTrasLevantarse` (`minutosTrasLevantarse()`, null si no hay hora apuntada).
+
+## 0.86.2 (09-11-2026): equilibrio sin dibujos montados
+
+Los trozos de muñeco alrededor de la araña de «Equilibrio» se montaban unos encima de otros (en el ordenador y peor en
+el móvil). Ahora van en redondeles cuyo tamaño y distancia salen del número de zonas (`arana()` en vistas/equilibrio.js:
+diámetro = 92 % de la distancia entre vecinos, sin tocar la red); comprobado a 375 px, 12 zonas, ninguno se toca.
