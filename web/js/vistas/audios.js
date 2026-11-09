@@ -82,8 +82,8 @@ export function vistaAudios(contenedor) {
       h('section', { class: 'tarjeta' },
         h('div', { class: 'titulo-con-ayuda' }, h('h2', { class: 'crece' }, 'Audios'),
           ayuda('Los audios', 'Los de dormir se ponen ya en la cama, con la luz apagada y el volumen bajo: tiene que oírse sin esfuerzo, no llenar '
-            + 'la habitación. No pasa nada si te duermes antes del final, y puedes apagar la pantalla, que sigue sonando. Alterna el 1 y el 2 por '
-            + 'noches. El de ilusiones NO es para dormir: se hace sentado y despierto, una vez por semana, por la tarde y después del test de las 18:00.')),
+            + 'la habitación. No pasa nada si te duermes antes del final, y puedes apagar la pantalla, que sigue sonando. Rótalos por noches, '
+            + 'sin repetir el de la noche anterior. El de ilusiones NO es para dormir: se hace sentado y despierto, una vez por semana, por la tarde y después del test de las 18:00.')),
         h('p', { class: 'nota' }, 'La primera vez que pones uno se descarga entero y se guarda. A partir de ahí suena sin conexión.')),
       h('section', { class: 'tarjeta' },
         h('h2', {}, 'Para dormir'),

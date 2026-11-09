@@ -17,7 +17,7 @@ import {
   horaAcostarse, horaAvisoPvt, horaAvisoPvtTarde, listoParaPvt, modoPVT, pvtDelDia, resumenUltimos7, testsPVT, textoHoras,
   totalIlusiones,
 } from '../diario.js';
-import { audioPorId, reloj } from '../audios.js';
+import { audioPorId, audiosDe, reloj } from '../audios.js';
 import { colores, graficaLineas } from './graficas.js';
 import { abrirPVT, activarAvisoPvt, avisoPvtActivo, faltaPermisoPvt, ofrecerPvtTrasDiario, programarAvisoPvt, puedeAvisarPvt } from './pvt.js';
 import { tarjetaCribado } from './cribado.js';
@@ -165,8 +165,9 @@ export function vistaDiario(contenedor) {
       h('p', { class: 'nota' }, 'Lo del reloj, a mano y solo esto: horas, pulso medio y pulso mínimo de la noche. Sus fases y puntuaciones no son fiables.'),
 
       h('div', { class: 'titulo-con-ayuda' }, h('span', { class: 'etiqueta-campo' }, 'Audio de hipnosis'),
-        ayuda('Audio de hipnosis', 'Apunta si anoche escuchaste el audio y hasta dónde llegaste despierto. La sugestión central va del minuto '
-          + '6:44 al 9:47: si te dormiste antes, esa noche no cuenta como noche con sugestión. Sin este registro no se pueden comparar las '
+        ayuda('Audio de hipnosis', 'Apunta si anoche escuchaste el audio y hasta dónde llegaste despierto. La sugestión central va '
+          + audiosDe('dormir').map((a) => `del ${reloj(a.sugestion[0])} al ${reloj(a.sugestion[1])} en el ${a.version}`).join(', ')
+          + ': si te dormiste antes, esa noche no cuenta como noche con sugestión. Sin este registro no se pueden comparar las '
           + 'noches con audio y las noches sin él, y comparar es lo único que descuenta la expectativa: tú sabes si esa noche hubo audio, así '
           + 'que todo lo que sea sensación va contaminado.')),
       h('div', { class: 'fila-marcas compacta' }, Object.entries(AUDIO_HIPNOSIS).map(([k, t]) => h('button', { type: 'button',
