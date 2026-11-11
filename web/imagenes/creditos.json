@@ -240,14 +240,14 @@
    "nombreEnWger": "Flexiones en pino"
   },
   "Dominadas": {
-   "archivo": "imagenes/ejercicios/ia/dominada.webp",
+   "archivo": "imagenes/ejercicios/ia/dominadas-dos-vistas.webp",
    "estatica": "imagenes/ejercicios/ia/dominada-quieta.webp",
    "animada": true,
    "fuente": "ia",
    "autor": "Gemini"
   },
   "Dominadas supinas": {
-   "archivo": "imagenes/ejercicios/ia/dominadas-supinas.webp",
+   "archivo": "imagenes/ejercicios/ia/dominadas-dos-vistas.webp",
    "estatica": "imagenes/ejercicios/ia/dominadas-supinas-quieta.webp",
    "animada": true,
    "fuente": "ia",
@@ -436,8 +436,8 @@
    "autor": "Gemini"
   },
   "Zancadas": {
-   "archivo": "imagenes/ejercicios/ia/zancadas.webp",
-   "estatica": "imagenes/ejercicios/ia/zancadas-quieta.webp",
+   "archivo": "imagenes/ejercicios/ia/zancadas-adelante.webp",
+   "estatica": "imagenes/ejercicios/ia/zancadas-adelante-quieta.webp",
    "animada": true,
    "fuente": "ia",
    "autor": "ChatGPT"
@@ -866,8 +866,8 @@
    "autor": "ChatGPT"
   },
   "Colgarse de la barra": {
-   "archivo": "imagenes/ejercicios/ia/colgarse-de-la-barra-quieta.webp",
-   "estatica": "imagenes/ejercicios/ia/colgarse-de-la-barra-quieta.webp",
+   "archivo": "imagenes/ejercicios/ia/colgarse-de-la-barra-de-frente-quieta.webp",
+   "estatica": "imagenes/ejercicios/ia/colgarse-de-la-barra-de-frente-quieta.webp",
    "animada": false,
    "fuente": "ia",
    "autor": "Gemini"
@@ -2295,8 +2295,8 @@
    "aliasDe": "Sentadilla"
   },
   "Zancadas con salto": {
-   "archivo": "imagenes/ejercicios/ia/zancadas.webp",
-   "estatica": "imagenes/ejercicios/ia/zancadas-quieta.webp",
+   "archivo": "imagenes/ejercicios/ia/zancadas-adelante.webp",
+   "estatica": "imagenes/ejercicios/ia/zancadas-adelante-quieta.webp",
    "animada": true,
    "fuente": "ia",
    "autor": "ChatGPT",

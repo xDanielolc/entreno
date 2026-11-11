@@ -374,7 +374,11 @@ CONGELADOS = {"cruces-en-polea-completo",
               # 02-11: la segunda postura cambiaba de tamaño; ajustada con escalar_encajar.py
               "cars-de-cadera", "cobra-en-el-suelo", "dominadas-con-lastre", "elevacion-de-piernas-colgado",
               "escalera-sin-fin", "flexion-y-extension-de-dedos-del-pie", "sentadilla-bulgara",
-              "sentadilla-en-multipower"}
+              "sentadilla-en-multipower",
+              # 11-11: pies, manos o apoyos fijados con fijar_zona.py (octava revisión de Dan)
+              "hip-thrust", "flexiones-con-lastre", "puente-de-gluteo", "elevacion-de-rodillas-colgado",
+              # 11-11: montados con dibujos que ya había (zancadas hacia delante, dominadas con dos vistas)
+              "zancadas-adelante", "dominadas-dos-vistas", "colgarse-de-la-barra-de-frente"}
 
 QUIETOS = {"Plancha lateral": "imagenes/ejercicios/anim/plancha-lateral-quieta.webp"}
 

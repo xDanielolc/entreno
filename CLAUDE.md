@@ -1934,3 +1934,17 @@ funciona» no hace falta que lo marque. Hecho en esta ronda (esquema v40, `perfi
   apunta el mínimo y no propone pesos.
 - Con mancuernas, la casilla del peso dice «kg cada una» (antes «kg ×2», que no se entendía), también en la tabla de
   las bajadas. En los estiramientos por lado, el reloj va justo debajo de «Lado izquierdo» (el tipo de serie, abajo).
+
+### 0.90.2 (11-11-2026): dibujos, lo de la octava revisión que no necesitaba IA
+
+- `herramientas/fijar_zona.py` (nuevo): `ver` (posturas superpuestas en rojo y azul), `medir`/`fijar` (clava una zona:
+  los pies, las manos), `dos` (mueve dos puntos a la vez, pies y manos, deformando lo de en medio; `--soporte` deja el
+  banco o el suelo en su sitio; `--primera` mueve la primera postura), `congelar` (deja idéntico entre posturas todo lo
+  que no se mueve) y `todo` (el congelado a todas las animaciones). **Tras reprocesar dibujos con las otras
+  herramientas, pasar `python herramientas/fijar_zona.py todo`**: si no, vuelven los mini teletransportes.
+- Aplicado: hip thrust, las tres flexiones, hack, elevaciones colgado, cobra, puente de glúteo y el congelado en las
+  221 animaciones. Montados con dibujos que ya había: «Zancadas» (hacia delante), «Dominadas» y «Dominadas supinas»
+  (dos vistas alternas, `dominadas-dos-vistas.webp`) y «Colgarse de la barra» de frente. Los de `ia/` tocados a mano
+  están en `CONGELADOS` (imagenes_ia.py). Almacén `entreno-imagenes-55`.
+- Lo que sigue pidiendo IA (dibujos propios para los alias que no corresponden, caras, búlgara, laterales…) está en
+  `imagenes-ia/cola.md`, «Octava revisión» y «Novena pasada». Copia de los dibujos de antes: `imagenes-ia/antes-11-11/`.
