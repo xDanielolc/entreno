@@ -1818,3 +1818,14 @@ lista con el resultado está en el informe. Funcionaba todo lo comprobado. Fallo
   publica.
 - Barrido a 375 px con todos los plegables abiertos: 19 pantallas sin nada que se salga ni botones cortados. Con el
   oscurecido forzado de Chrome, Inicio y el entreno se leen bien.
+
+### 0.88.0 (experimento, ronda aparte): las series que no tocan, en una fila
+
+En las vistas «un ejercicio cada vez» y «todos los ejercicios», cada serie ocupaba un bloque entero (objetivo, tipo,
+casillas…): un ejercicio de cinco series eran tres pantallas. Ahora solo quedan enteras **la serie que toca y la
+anterior** (para ponerle la recámara o corregirla); las demás salen en una fila corta, como la tabla de Hevy
+(«C · 20 kg × 5 ✓», «2 · 47,5 kg × 3-5», «3 · Serie descendente»), y se abren al tocarlas (`resumida()`,
+`filaResumida()` y `seriesAbiertas` en sesion.js; estilos `.serie-resumida`). No cambia nada en la vista «una serie»
+(la de Dan), ni en ejercicios de una o dos series, ni en el entreno de prueba del tutorial. El «✓ Hecho» de un toque
+tampoco sale ya en las series de bajada («las que salgan»). Para deshacer solo esto: `git revert` del commit de la
+0.88.0.

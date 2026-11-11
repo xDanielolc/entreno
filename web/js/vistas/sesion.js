@@ -91,6 +91,8 @@ let serieEntra = null;
 const saltosCerrados = new Set();
 // Series medidas en tiempo con las casillas abiertas («Escribir el tiempo a mano»).
 const tiempoAbierto = new Set();
+// Series que has abierto a mano tocando su fila resumida (se quedan abiertas mientras la app esté abierta).
+const seriesAbiertas = new Set();
 // Cómo se hace la serie de prueba del 1RM: cerca del fallo, pero sin llegar.
 const PARA_EN_PRUEBA = 'para cuando te quede 1 en recámara (una más y fallarías); apunta las que hagas y esa recámara';
 
@@ -615,6 +617,7 @@ export function vistaSesion(contenedor, { id }) {
       unaSerie && trabajo.length > 1 && puntosSeries(entrada, k, trabajo),
       entrada.series.map((serie, j) => {
         if (visible != null && j !== visible) return null;
+        if (resumida(entrada, j, serie)) return filaResumida(ej, entrada, j, serie);
         const bloque = bloqueSerie(ej, entrada, indice, j, serie);
         if (visible != null && serieEntra) { bloque.classList.add(`entra-${serieEntra}`); serieEntra = null; }
         return bloque;
@@ -627,6 +630,44 @@ export function vistaSesion(contenedor, { id }) {
         enCurso && h('button', { class: `boton ${vacia ? '' : 'secundario'}`, onclick: () => asistenteEnEntreno(indice, ej) }, 'Programar series')));
     if (enCurso) setTimeout(() => reajustarDebajo(ej, indice), 0);
     return grande && enCurso && movil ? deslizable(tarjeta) : tarjeta;
+  }
+
+  // Las series que no tocan, en una fila corta (como la tabla de Hevy): «2 · 60 kg × 8 ✓» o «3 · 60 kg × 6-10».
+  // A la vista enteras quedan la que toca y la anterior (para ponerle la recámara o corregirla); cualquier otra se abre
+  // tocándola. No se aplica en el modo «una serie» (ya se ve una sola), ni con una o dos series, ni fuera del entreno
+  // en curso. Experimento de la auditoría del 11-11-2026 (ronda 0.88.0).
+  function resumida(entrada, j, serie) {
+    if (!enCurso || unaSerie || sesion.tutorial || seriesAbiertas.has(serie.id) || entrada.series.length <= 2) return false;
+    const primeraSinHacer = entrada.series.findIndex((x) => !x.hecha);
+    const abierta = primeraSinHacer < 0 ? entrada.series.length - 1 : primeraSinHacer;
+    return j !== abierta && j !== abierta - 1;
+  }
+
+  function filaResumida(ej, entrada, j, serie) {
+    const esCal = serie.tipo === 'calentamiento';
+    const numero = esCal ? 'C' : String(entrada.series.slice(0, j + 1).filter((x) => x.tipo !== 'calentamiento').length);
+    const plan = planDe(ej, serie);
+    let texto;
+    if (serie.hecha) texto = textoSerie(ej, serie) || 'Hecha';
+    else {
+      const conPeso = !['ninguna', 'pesoCorporal', 'altura'].includes(ej.carga?.tipo);
+      const peso = conPeso && serie.carga != null && !serie.tramos?.length ? `${formatearNumero(serie.carga)} ${unidadCarga(ej)}` : '';
+      const rango = plan?.progresion?.objetivoEsfuerzo ?? plan?.objetivoEsfuerzo ?? null;
+      // Máximas y bajadas se piden por rango («1-2», «3-5»), no por una cifra.
+      const objetivo = esMaxima(plan) || esBajada(plan) ? null : serie.objetivo ?? objetivoHoyDe(ej, serie);
+      const cuanto = esTiempo(ej)
+        ? ((serie.objetivo ?? rango?.[1]) != null ? textoEsfuerzo(ej, serie.objetivo ?? rango[1]) : '')
+        : objetivo != null ? String(objetivo) : rango ? (rango[0] === rango[1] ? String(rango[0]) : `${rango[0]}-${rango[1]}`) : '';
+      const tecnica = textoTecnicas(serie.tecnicas);
+      texto = serie.tramos?.length ? (tecnica || 'Serie con bajadas')
+        : ([peso, cuanto].filter(Boolean).join(' × ') || (esCal ? 'Calentamiento' : 'Por hacer')) + (tecnica ? ` · ${tecnica}` : '');
+    }
+    return h('button', { type: 'button', class: `serie-resumida${serie.hecha ? ' hecha' : ''}${esCal ? ' cal' : ''}`, 'data-serie': j,
+      'aria-label': `${esCal ? 'Calentamiento' : `Serie ${numero}`}: ${texto}. Tocar para abrirla`,
+      onclick: () => { seriesAbiertas.add(serie.id); estado.emitir('vista'); } },
+    h('span', { class: 'serie-n' }, numero),
+    h('span', { class: 'serie-texto' }, texto),
+    h('span', { class: 'serie-estado', 'aria-hidden': 'true' }, serie.hecha ? '✓' : '▾'));
   }
 
   // Al empezar, dónde estás: Dan hizo en casa dos rutinas que se quedaron
@@ -1501,9 +1542,9 @@ export function vistaSesion(contenedor, { id }) {
   function hechoComoPrevisto(ej, entrada, i, j, serie) {
     if (!entrada || serie.tramos?.length || ej.esfuerzo?.tipo !== 'repeticiones' || esPrueba(ej, entrada, j, i)) return null;
     if (!unaSerie && entrada.series.findIndex((x) => !x.hecha) !== j) return null;
-    // En las series de «todas las que puedas» (ciclos, máximas) lo que cuenta es lo que salga: se escribe.
+    // En las series de «todas las que puedas» (ciclos, máximas, bajadas «las que salgan») lo que cuenta es lo que salga: se escribe.
     const plan = planDe(ej, serie);
-    if (plan?.progresion?.tipo === 'bilbo' || esMaxima(plan) || serie.amrap) return null;
+    if (plan?.progresion?.tipo === 'bilbo' || esMaxima(plan) || esBajada(plan) || serie.amrap) return null;
     const ultima = ultimaDe(ej, serie);
     const sinPeso = ['ninguna', 'pesoCorporal'].includes(ej.carga?.tipo);
     const carga = serie.carga ?? (sinPeso || ej.carga?.tipo === 'asistida' ? null : ultima?.carga ?? null);
