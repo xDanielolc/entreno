@@ -266,3 +266,15 @@ Con IA, dibujo propio que falta (ahora llevan el de otro ejercicio por alias y n
 
 - «Cabeza huevo» (Dan, 02-11): la cabeza sale ovalada y lisa, sin forma de cráneo ni mandíbula. Al rehacer jalón al
   pecho, goblet, zancadas y rotación interna con toalla, pedir cabeza con forma de cráneo de verdad (aunque lisa).
+
+# Novena pasada (11-11-2026): lo de la octava revisión que no necesitaba IA
+Hecho con `herramientas/fijar_zona.py` (nuevo): hip thrust (pies y banco), flexiones (pies), flexiones diamante y con
+lastre (pies y manos), hack (línea de la izquierda), elevación de rodillas y de piernas colgado (manos), cobra (piernas),
+puente de glúteo (pies). «Congelado» en las 221 animaciones: todo lo que no se mueve queda idéntico entre posturas
+(los mini teletransportes de los press y de las máquinas). Montados con dibujos que ya había: zancadas hacia delante
+(el de las de hacia atrás, con el hombre de pie donde queda el pie de atrás), dominadas y dominadas supinas con las dos
+vistas (de espaldas y de frente, alternando) y colgarse de la barra de frente.
+No salió con código: sentadilla búlgara (para clavar el pie de delante hay que deformar demasiado la segunda postura:
+rehacer con IA, las dos posturas en una imagen). Elevaciones laterales («los pies siguen elevados»): es el dibujo de los
+pies, hay que redibujarlos. Elevaciones frontales alternas: la vista es de tres cuartos, no vale el espejo.
+Página de revisión de esta pasada (antes y después): ver `docs/pendientes.md`, sección 0.

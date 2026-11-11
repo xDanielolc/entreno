@@ -40,11 +40,10 @@ archivo que se cita; lo ya hecho se ha marcado con [x].
       (`campoHora`), fuera `huboIlusiones`, `estaSonando`, `faltaCribado` y la importación `modoPVT`. La conversación
       del sueño no estaba en marcha: cuando vuelva, que lea esto y lo de `pvt.js` (0.89.0: tres líneas de importación y
       un bloque al final de `programarAvisoPvt()` y en `quitarAvisoPvt()` para el servidor de avisos).
-- [ ] **Dibujos**: octava revisión en `imagenes-ia/cola.md` (flexiones, hip
-      thrust, búlgara, pies del multipower, elevación de rodillas, face pull,
-      línea del hack, «cabeza huevo» en jalón, goblet, zancadas y rotación con
-      toalla, alias que no cuadran, press a una mano con ChatGPT). Seis
-      reencajes de prueba sin aplicar en el scratchpad de la sesión del 02-11.
+- [ ] **Dibujos**: de la octava revisión, lo que no necesitaba IA está hecho (0.90.2, `herramientas/fijar_zona.py`) y
+      a la espera de que Dan lo marque en https://claude.ai/artifact/XgcLvhLqNji2DioHGBHiJA (colección `dibujos9`,
+      antes y después; fuente en `datos-privados/revision-dibujos-9/`, se rehace con su `montar.py`). Lo que pide
+      redibujar con IA sigue en `imagenes-ia/cola.md` («Octava revisión» y «Novena pasada»).
 - [x] **«Remo en polea» → «Remo en polea a la cintura»** (0.88.2, esquema v39, `RENOMBRADOS_V39`).
 - [ ] **Nombres con el material** («Elevaciones laterales con mancuernas»…),
       del repaso de dibujos del 21-10.
