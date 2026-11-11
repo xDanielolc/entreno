@@ -18,3 +18,5 @@ Necesitan Python con `websocket-client` y `Pillow`, Chrome instalado y la app se
 - `css_muerto.py` (desde `web/`): reglas de `estilo.css` de clases que ya no aparecen en ningún JS (`--aplicar`).
 
 Probar siempre en modo prueba («Probar sin cuenta»), nunca con una cuenta real.
+- `prueba_worker.py`: ejecuta el Worker de avisos (`herramientas/cloudflare/avisos.js`) dentro de Chrome con un almacén y un servicio de avisos de mentira, y comprueba la firma.
+- `prueba_push.py`: entrega un push vacío al service worker de la app local y enseña la notificación que saca.
