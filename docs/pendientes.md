@@ -16,17 +16,17 @@ y al final lo que es decoración o depende de terceros.
 Resumen vivo de lo pendiente. El detalle de cada punto está más abajo o en el
 archivo que se cita; lo ya hecho se ha marcado con [x].
 
-- [ ] **Auditoría de experiencia de uso con Fable** (Dan, 02-11-2026; anotada
-      también en la carpeta «Quemador de tokens»): repasar la app pantalla por
-      pantalla para hacerla más intuitiva y quitar todo el texto posible. Es la
-      continuación de «Más visual, más intuitivo, menos texto» (25-09) y de
-      «Programar a mano sigue sin ser intuitivo» (21-10), más abajo. Entrega:
-      lista priorizada con captura y propuesta por pantalla, para que Dan elija
-      antes de tocar código.
-- [ ] **Copiar una idea de la app «Heavy»** (está en su To Do desde el 28-10;
-      probablemente es Hevy). Falta que Dan pase capturas de la función. Junto
-      con «Mirar las apps Lyfta y Hevy» (25-09) y las fotos de Lyfta que iba a
-      pasar.
+- [x] **Auditoría de experiencia de uso con Fable y Hevy** (hecha la noche del 11 al 12-11-2026, rondas 0.87.0 a
+      0.88.1; ver `CLAUDE.md`, «Auditoría con Fable»). Informe con capturas y «Vale / Repetir»:
+      https://claude.ai/artifact/6WHq2fAbLuBEo6x4CdT21K. Para volver: etiqueta `v0.86.3-antes-auditoria`.
+- [ ] **Lo que dejó la auditoría sin hacer** (propuestas; Dan decide en el informe):
+      quitar la pestaña Sueño por defecto a quien instala la app de nuevas; dibujo del ejercicio más pequeño al
+      entrenar; que la serie de prueba de 1RM tenga papelera y tipo; acortar el aviso «Te has saltado…»; que «+ Añadir
+      sitio» pida el nombre (ahora crea otro «Gimnasio»); el «% 1RM» de una casilla no se refresca hasta repintar;
+      teclado propio con calculadora de discos (idea de Hevy).
+- [ ] **Avisar a la conversación del sueño** (no estaba en marcha esa noche): casilla `type="time"` en Ajustes →
+      Perfil; `huboIlusiones`, `estaSonando` y `faltaCribado` sin uso; importación `modoPVT` sobrante en
+      historico-pvt.js.
 - [ ] **Dibujos**: octava revisión en `imagenes-ia/cola.md` (flexiones, hip
       thrust, búlgara, pies del multipower, elevación de rodillas, face pull,
       línea del hack, «cabeza huevo» en jalón, goblet, zancadas y rotación con
@@ -39,7 +39,8 @@ archivo que se cita; lo ya hecho se ha marcado con [x].
 - [ ] **Elevación de piernas colgado**: el paso de 2 × 5-8 a 2 × 8-12 es a mano
       (la nota del ejercicio lo recuerda). Si Dan quiere, que la app lo proponga.
 - [ ] **Etiqueta «multiarticular»** en el catálogo (ronda 0.66).
-- [ ] **App a la medida** (activar o quitar apartados enteros), Diario fases B y
+- [ ] **App a la medida**: hecho lo de quitar pestañas de la barra (0.87.2, Ajustes → Personalización); falta
+      activar o quitar apartados enteros dentro de cada pantalla. Diario fases B y
       C (lo lleva la conversación del sueño) y revisar cómo se apuntan las
       técnicas de alta intensidad.
 - [ ] **Decoración**: nombre e icono de la app, muñeco del cuerpo por tema,

@@ -1746,7 +1746,7 @@ la carga de todos los módulos se comprueba importándolos en ese Chrome antes d
 ### 0.87.0: el primer entreno, sin carteles ni párrafos
 
 Recorrido de alguien nuevo (modo prueba): antes había 7 tarjetas y 9 botones en «Entrenar», dos carteles tras elegir el
-primer ejercicio y 2100 px de cosas por encima de las casillas de la primera serie. Ahora:
+primer ejercicio y 1800 px de cosas por encima de las casillas de la primera serie (ahora, unos 700). Ahora:
 - Bienvenida: «Entreno», una frase y una línea sobre Drive. Modo prueba: cartel corto y, en Inicio, una línea con
   «Guardar en Google».
 - Inicio (`inicio.js`): saludo, lo que toca (o «Empezar entrenamiento») y debajo lo demás. Sin rutinas, «Rutina
@@ -1829,3 +1829,18 @@ anterior** (para ponerle la recámara o corregirla); las demás salen en una fil
 (la de Dan), ni en ejercicios de una o dos series, ni en el entreno de prueba del tutorial. El «✓ Hecho» de un toque
 tampoco sale ya en las series de bajada («las que salgan»). Para deshacer solo esto: `git revert` del commit de la
 0.88.0.
+
+### 0.88.1: el peso que cambias lo siguen las series de debajo
+
+Al comprobar la corrección del 30-10 («si subo el peso, las de debajo siguen»): solo seguían las series cuyo peso salía
+del 1RM (`cargaAuto`), no las que lo traían de la última vez, que es lo normal en doble progresión. Ahora siguen también
+las que iban con el mismo peso que tenía la casilla antes de tocarla (`cargaAlEntrar`, al entrar en la casilla) y que tú
+no has tocado. Pendientes al día en `docs/pendientes.md` (sección 0: lo que la auditoría dejó como propuesta y lo que
+hay que decirle a la conversación del sueño).
+
+Cómo se probó todo esto (por si hace falta repetirlo): Chrome sin ventana por el puerto de depuración con un perfil
+propio, a 375 × 812 y densidad 2, manejado desde Python con `websocket-client` (el mismo método que
+`herramientas/video_presentacion.py`): evaluar JavaScript en la página (los módulos de la app se importan y se llaman
+con datos montados a mano), toques y deslizamientos reales con `Input.dispatchTouchEvent`, capturas a página completa,
+«sin conexión» con `Network.emulateNetworkConditions` y oscuro forzado con `--blink-settings=forceDarkModeEnabled=true`.
+Los scripts eran de usar y tirar (carpeta temporal de la sesión); si se quieren conservar, van a `herramientas/`.

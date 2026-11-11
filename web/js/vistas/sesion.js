@@ -2029,16 +2029,23 @@ export function vistaSesion(contenedor, { id }) {
         if (!antes && serieCompleta(ej, serie)) descansoEntreSeries(ej, serie);
       }
     });
+    // El peso que tenía la casilla al entrar en ella (para saber qué series de debajo iban igual).
+    let cargaAlEntrar = null;
+    kilos.addEventListener('focus', () => { cargaAlEntrar = leerNumero(kilos.value); });
     kilos.addEventListener('change', () => {
       if (tramo != null) return;
       // Si cambias tú el peso, las series de debajo con la misma regla (y cuyo peso puso la app) siguen con el tuyo:
       // Dan subió el gemelo a 90 porque iba fuerte y la serie siguiente volvía a 80 (30-10).
       const v = leerNumero(kilos.value);
-      const siguen = v > 0 && sesion.ejercicios[i]?.series.some((x, k) => k > j && !x.hecha && x.cargaAuto && x.tipo !== 'calentamiento'
-        && !x.tramos?.length && x.carga !== v && mismaReglaEn(ej, x, serie));
+      // «Puesto por la app» es también el peso que viene de la última vez: si las de debajo iban con el mismo peso
+      // que tenía esta antes de tocarla (y tú no las has tocado), siguen a la nueva. Antes solo seguían las que
+      // salían del 1RM (auditoría del 11-11-2026).
+      const sigue = (x, k) => k > j && !x.hecha && !x.cargaAMano && x.tipo !== 'calentamiento' && !x.tramos?.length && x.carga !== v
+        && (x.cargaAuto || (cargaAlEntrar != null && x.carga === cargaAlEntrar)) && mismaReglaEn(ej, x, serie);
+      const siguen = v > 0 && sesion.ejercicios[i]?.series.some(sigue);
       if (siguen) {
         cambiarSesion((s) => s.ejercicios[i].series.forEach((x, k) => {
-          if (k > j && !x.hecha && x.cargaAuto && x.tipo !== 'calentamiento' && !x.tramos?.length && mismaReglaEn(ej, x, serie)) {
+          if (sigue(x, k)) {
             x.carga = v; x.cargaAMano = true; delete x.cargaAuto;
           }
         }));
