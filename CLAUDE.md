@@ -1948,3 +1948,11 @@ funciona» no hace falta que lo marque. Hecho en esta ronda (esquema v40, `perfi
   están en `CONGELADOS` (imagenes_ia.py). Almacén `entreno-imagenes-55`.
 - Lo que sigue pidiendo IA (dibujos propios para los alias que no corresponden, caras, búlgara, laterales…) está en
   `imagenes-ia/cola.md`, «Octava revisión» y «Novena pasada». Copia de los dibujos de antes: `imagenes-ia/antes-11-11/`.
+
+### 0.90.3 (11-11-2026): primera tanda de dibujos con Gemini
+
+Goblet, press Arnold, patada de glúteo y abducción en polea rehechos (cabezas y orejas; la abducción, entera); oreja de
+las dominadas asistidas borrada a mano; jalón al pecho con la cabeza corregida (`jalon-al-pecho-ek-completo`) y dibujos
+propios de «Jalón con cuerda», «Jalón tras nuca» y «Jalón unilateral en polea» (antes llevaban el del jalón al pecho).
+`herramientas/procesar_uno.py`: procesa un original suelto sin tocar creditos.json y le pasa el congelado. Almacén
+`entreno-imagenes-56`. El método con Gemini y lo que queda, en `imagenes-ia/cola.md` («Novena pasada»).

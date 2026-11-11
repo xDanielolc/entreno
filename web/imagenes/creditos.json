@@ -268,12 +268,13 @@
    "autor": "Gemini"
   },
   "Jalón al pecho": {
-   "archivo": "imagenes/ejercicios/anim/jalon-al-pecho-ek.webp",
+   "archivo": "imagenes/ejercicios/ia/jalon-al-pecho-ek-completo.webp",
    "autor": "Everkinetic",
-   "estatica": "imagenes/ejercicios/jalon-al-pecho.png",
+   "estatica": "imagenes/ejercicios/ia/jalon-al-pecho-ek-completo-quieta.webp",
    "animada": true,
    "fuente": "everkinetic",
-   "nombreEnFuente": "underhand-pull-downs"
+   "nombreEnFuente": "underhand-pull-downs",
+   "completadoCon": "Gemini"
   },
   "Jalón con agarre estrecho": {
    "archivo": "imagenes/ejercicios/anim/jalon-con-agarre-estrecho.webp",
@@ -1921,13 +1922,11 @@
    "autor": "Gemini"
   },
   "Jalón con cuerda": {
-   "archivo": "imagenes/ejercicios/anim/jalon-al-pecho-ek.webp",
-   "autor": "Everkinetic",
-   "nombreEnWger": "Jalón al pecho con agarre neutro",
-   "aliasDe": "Jalón al pecho",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "underhand-pull-downs",
-   "animada": true
+   "archivo": "imagenes/ejercicios/ia/jalon-con-cuerda.webp",
+   "estatica": "imagenes/ejercicios/ia/jalon-con-cuerda-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Curl bayesian en polea": {
    "archivo": "imagenes/ejercicios/ia/curl-en-polea-completo.webp",
@@ -1959,13 +1958,15 @@
    "animada": true
   },
   "Jalón supino": {
-   "archivo": "imagenes/ejercicios/anim/jalon-al-pecho-ek.webp",
+   "archivo": "imagenes/ejercicios/ia/jalon-al-pecho-ek-completo.webp",
    "autor": "Everkinetic",
    "nombreEnWger": "Jalón al pecho con agarre neutro",
    "aliasDe": "Jalón al pecho",
    "fuente": "everkinetic",
    "nombreEnFuente": "underhand-pull-downs",
-   "animada": true
+   "animada": true,
+   "estatica": "imagenes/ejercicios/ia/jalon-al-pecho-ek-completo-quieta.webp",
+   "completadoCon": "Gemini"
   },
   "JM press en multipower": {
    "archivo": "imagenes/ejercicios/anim/press-frances.webp",
@@ -2057,22 +2058,18 @@
    "aliasDe": "Remo en polea a la cintura"
   },
   "Jalón unilateral en polea": {
-   "archivo": "imagenes/ejercicios/anim/jalon-al-pecho-ek.webp",
-   "autor": "Everkinetic",
-   "nombreEnWger": "Jalón al pecho con agarre neutro",
-   "aliasDe": "Jalón al pecho",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "underhand-pull-downs",
-   "animada": true
+   "archivo": "imagenes/ejercicios/ia/jalon-unilateral-en-polea.webp",
+   "estatica": "imagenes/ejercicios/ia/jalon-unilateral-en-polea-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Jalón tras nuca": {
-   "archivo": "imagenes/ejercicios/anim/jalon-al-pecho-ek.webp",
-   "autor": "Everkinetic",
-   "nombreEnWger": "Jalón al pecho con agarre neutro",
-   "aliasDe": "Jalón al pecho",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "underhand-pull-downs",
-   "animada": true
+   "archivo": "imagenes/ejercicios/ia/jalon-tras-nuca.webp",
+   "estatica": "imagenes/ejercicios/ia/jalon-tras-nuca-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Dominadas tras nuca": {
    "archivo": "imagenes/ejercicios/ia/dominada.webp",

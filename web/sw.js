@@ -7,12 +7,12 @@
 // Solo se ocupa del CÓDIGO de la app. Los datos del usuario nunca pasan por
 // aquí: viven en el dispositivo (IndexedDB) y en su Google Drive.
 
-const VERSION = '0.90.2';
+const VERSION = '0.90.3';
 const CACHE = `entreno-${VERSION}`;
 // Las imágenes van en un almacén aparte que NO se borra al actualizar la app:
 // así se ven sin conexión aunque haya salido una versión nueva.
 // Si cambian las imágenes, se sube el número y los móviles bajan las nuevas.
-const CACHE_IMAGENES = 'entreno-imagenes-55';  // el mismo nombre en app.js (guardarImagenesParaSinConexion)
+const CACHE_IMAGENES = 'entreno-imagenes-56';  // el mismo nombre en app.js (guardarImagenesParaSinConexion)
 // Los audios de hipnosis, igual: almacén aparte que NO se borra al actualizar
 // la app. Pesan varios megas cada uno y no cambian nunca, así que se guardan
 // la primera vez que suenan y a partir de ahí se oyen sin conexión. Si algún

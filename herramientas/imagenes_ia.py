@@ -378,7 +378,8 @@ CONGELADOS = {"cruces-en-polea-completo",
               # 11-11: pies, manos o apoyos fijados con fijar_zona.py (octava revisión de Dan)
               "hip-thrust", "flexiones-con-lastre", "puente-de-gluteo", "elevacion-de-rodillas-colgado",
               # 11-11: montados con dibujos que ya había (zancadas hacia delante, dominadas con dos vistas)
-              "zancadas-adelante", "dominadas-dos-vistas", "colgarse-de-la-barra-de-frente"}
+              "zancadas-adelante", "dominadas-dos-vistas", "colgarse-de-la-barra-de-frente",
+              "dominadas-asistidas"}  # 11-11: la oreja de la primera postura, borrada a mano
 
 QUIETOS = {"Plancha lateral": "imagenes/ejercicios/anim/plancha-lateral-quieta.webp"}
 

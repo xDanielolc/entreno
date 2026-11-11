@@ -278,3 +278,13 @@ No salió con código: sentadilla búlgara (para clavar el pie de delante hay qu
 rehacer con IA, las dos posturas en una imagen). Elevaciones laterales («los pies siguen elevados»): es el dibujo de los
 pies, hay que redibujarlos. Elevaciones frontales alternas: la vista es de tres cuartos, no vale el espejo.
 Página de revisión de esta pasada (antes y después): ver `docs/pendientes.md`, sección 0.
+
+Con Gemini (11-11, tarde; cortado al agotarse el uso de Claude): cabeza de la goblet, orejas del press Arnold y de la patada
+de glúteo, abducción en polea rehecha (misma columna, más músculo, cabeza lisa), jalón al pecho con la cabeza de abajo
+normal (`completo-jalon-al-pecho-ek`), y dibujos propios de jalón con cuerda, tras nuca y unilateral hechos adjuntando el
+jalón al pecho nuevo como base («a partir de este, mismo asiento y mismo cable, cambia el ejercicio a…»: sale a la primera).
+Dominadas asistidas: oreja borrada a mano. Descartados (en `descartes/`, con `-11-11`): dominadas asistidas (cambiaba la
+máquina) y cabeza a la rodilla (cambió la postura). Método para subir el dibujo de base sin abrir el selector de archivos:
+abrir el menú «+» de Gemini (los `input[type=file]` solo existen con el menú abierto), subir el archivo al que acepta
+`image/*` con file_upload y cerrar el menú con Escape. Un original nuevo se procesa con `herramientas/procesar_uno.py`
+(no toca creditos.json). Sigue pendiente todo lo demás de la lista «Con IA» de la octava revisión.
