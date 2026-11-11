@@ -19,3 +19,9 @@ imagenes-ia/chatgpt/
 imagenes-ia/descartes/
 imagenes-ia/arreglos/
 imagenes-ia/antes-*/
+
+# Pruebas en Chrome sin ventana: perfil, capturas y restos
+herramientas/pruebas/perfil-chrome/
+herramientas/pruebas/capturas/
+herramientas/pruebas/tema.txt
+herramientas/pruebas/consola.txt

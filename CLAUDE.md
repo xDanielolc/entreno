@@ -1843,4 +1843,5 @@ propio, a 375 × 812 y densidad 2, manejado desde Python con `websocket-client` 
 `herramientas/video_presentacion.py`): evaluar JavaScript en la página (los módulos de la app se importan y se llaman
 con datos montados a mano), toques y deslizamientos reales con `Input.dispatchTouchEvent`, capturas a página completa,
 «sin conexión» con `Network.emulateNetworkConditions` y oscuro forzado con `--blink-settings=forceDarkModeEnabled=true`.
-Los scripts eran de usar y tirar (carpeta temporal de la sesión); si se quieren conservar, van a `herramientas/`.
+Los scripts están en `herramientas/pruebas/` (con su `LEEME.md`); `comprobar.sh` hay que pasarlo antes de cada
+publicación, porque sin Node un nombre repetido o una importación rota solo se ve al cargar la app.
