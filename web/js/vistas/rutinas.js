@@ -7,7 +7,7 @@
 import { icono } from '../iconos.js';
 import * as estado from '../estado.js';
 import { nombreSede, sedeInicial, sedesActivas } from '../sedes.js';
-import { anadir, aviso, confirmar, h, hoyISO, modal, nuevoId, selector } from '../ui.js';
+import { anadir, aviso, confirmar, h, hoyISO, modal, nuevoId, plegable, selector } from '../ui.js';
 import { imagenDeEjercicio } from '../imagenes.js';
 import { planesDeItem, resumenPlanes, serieSuelta, textoPlan } from '../series.js';
 import { crearPlanesRapidos } from '../rapidas.js';
@@ -321,7 +321,8 @@ export function vistaFormularioRutina(contenedor, { id }) {
     return;
   }
   const borrador = existente ? structuredClone(existente) : (rutinaNueva ??= {
-    id: nuevoId('rut'), nombre: '', activa: true, dias: [], diasSemana: null,
+    // Ya con su primer día: se le pone nombre y se añaden ejercicios, sin pasos previos (auditoría del 11-11-2026).
+    id: nuevoId('rut'), nombre: '', activa: true, dias: [{ id: nuevoId('dia'), nombre: 'Día 1', ejercicios: [] }], diasSemana: null,
   });
   const nombreEj = (ejId) => d.ejercicios.find((e) => e.id === ejId)?.nombre ?? 'Ejercicio borrado';
   // Cómo estaba todo al entrar, para «Deshacer los cambios de ahora».
@@ -362,39 +363,42 @@ export function vistaFormularioRutina(contenedor, { id }) {
   function formulario() {
     return h('form', { class: 'formulario', onsubmit: (e) => { e.preventDefault(); guardar(); } },
       campo('Nombre', h('input', { type: 'text', required: true, value: borrador.nombre,
-        placeholder: 'PLPL Bilbo + Heavy Duty', oninput: (e) => { borrador.nombre = e.target.value; } })),
+        placeholder: 'Torso y pierna, Casa…', oninput: (e) => { borrador.nombre = e.target.value; } })),
 
-      h('label', { class: 'casilla' },
-        h('input', { type: 'checkbox', checked: borrador.activa,
-          onchange: (e) => { borrador.activa = e.target.checked; persistir(); } }),
-        'Rutina activa: Hoy te la propone (puedes tener varias activas)'),
-
-      borrador.activa && h('div', { class: 'campo' },
-        h('span', { class: 'etiqueta-campo' }, 'Días fijos de la semana (opcional)'),
-        h('div', { class: 'tecnicas' }, DIAS_SEMANA.map((letra, i) => h('button', {
-          type: 'button', class: `chip seleccionable ${borrador.diasSemana?.includes(i) ? 'activo' : ''}`,
-          'aria-pressed': String(Boolean(borrador.diasSemana?.includes(i))), 'aria-label': NOMBRES_DIAS[i],
-          onclick: () => {
-            const dias = new Set(borrador.diasSemana ?? []);
-            if (dias.has(i)) dias.delete(i); else dias.add(i);
-            borrador.diasSemana = dias.size ? [...dias].sort() : null;
-            repintar();
-          } }, letra))),
-        h('small', { class: 'nota' }, 'Sin días fijos, la app propone esta rutina cuando sus músculos están recuperados. '
-          + 'Con días fijos, solo esos días. Sirve para combinar dos rutinas activas: una con días fijos y otra libre, por ejemplo.')),
-
-      sedesActivas(d).length > 0 && campo('Dónde se hace', selector([['', 'En cualquier sitio'],
-        ...sedesActivas(d).map((s) => [s.id, nombreSede(d, s.id)])], borrador.sedeId ?? '',
-      (v) => { borrador.sedeId = v || null; repintar(); }, { titulo: 'Dónde se hace' })),
 
       avisoChoques(),
 
       borrador.dias.map((dia, i) => tarjetaDia(dia, i)),
 
-      h('button', { type: 'button', class: 'boton secundario', onclick: () => {
+      h('button', { type: 'button', class: 'boton secundario anadir-dia', onclick: () => {
         borrador.dias.push({ id: nuevoId('dia'), nombre: `Día ${borrador.dias.length + 1}`, ejercicios: [] });
         repintar();
       } }, '+ Añadir día'),
+
+      // Lo que casi nunca se toca, plegado y con lo elegido a la vista (antes iba por delante de los días).
+      plegable(`rutina-opciones-${borrador.id}`, `Opciones: ${resumenOpciones()}`, { class: 'explicacion opciones-rutina' },
+        h('label', { class: 'casilla' },
+          h('input', { type: 'checkbox', checked: borrador.activa,
+            onchange: (e) => { borrador.activa = e.target.checked; repintar(); } }),
+          'Rutina activa: Hoy te la propone (puedes tener varias activas)'),
+
+        borrador.activa && h('div', { class: 'campo' },
+          h('span', { class: 'etiqueta-campo' }, 'Días fijos de la semana (opcional)'),
+          h('div', { class: 'tecnicas' }, DIAS_SEMANA.map((letra, i) => h('button', {
+            type: 'button', class: `chip seleccionable ${borrador.diasSemana?.includes(i) ? 'activo' : ''}`,
+            'aria-pressed': String(Boolean(borrador.diasSemana?.includes(i))), 'aria-label': NOMBRES_DIAS[i],
+            onclick: () => {
+              const dias = new Set(borrador.diasSemana ?? []);
+              if (dias.has(i)) dias.delete(i); else dias.add(i);
+              borrador.diasSemana = dias.size ? [...dias].sort() : null;
+              repintar();
+            } }, letra))),
+          h('small', { class: 'nota' }, 'Sin días fijos, la app propone esta rutina cuando sus músculos están recuperados. '
+            + 'Con días fijos, solo esos días. Sirve para combinar dos rutinas activas: una con días fijos y otra libre, por ejemplo.')),
+
+        sedesActivas(d).length > 0 && campo('Dónde se hace', selector([['', 'En cualquier sitio'],
+          ...sedesActivas(d).map((s) => [s.id, nombreSede(d, s.id)])], borrador.sedeId ?? '',
+        (v) => { borrador.sedeId = v || null; repintar(); }, { titulo: 'Dónde se hace' }))),
 
       h('p', { class: 'nota centrado' }, existente || creada ? 'Los cambios se guardan solos.' : 'En cuanto le pongas nombre, se guarda sola.'),
       h('div', { class: 'fila-botones' },
@@ -402,6 +406,13 @@ export function vistaFormularioRutina(contenedor, { id }) {
         h('button', { class: 'boton', type: 'submit' }, 'Listo')),
 
       existente && h('button', { type: 'button', class: 'boton enlace peligro-texto', onclick: borrar }, 'Borrar rutina'));
+  }
+
+  // «activa · cualquier día · en cualquier sitio»: lo elegido en las opciones, en una línea.
+  function resumenOpciones() {
+    const dias = borrador.diasSemana?.length ? borrador.diasSemana.map((i) => DIAS_SEMANA[i]).join(' ') : 'cualquier día';
+    return [borrador.activa ? 'activa' : 'sin usar', borrador.activa && dias,
+      borrador.sedeId ? nombreSede(d, borrador.sedeId) : null].filter(Boolean).join(' · ');
   }
 
   // Dos días seguidos que cargan los mismos músculos no se pueden hacer en
@@ -471,7 +482,8 @@ export function vistaFormularioRutina(contenedor, { id }) {
         h('span', { class: 'ej-rutina-texto' },
           h('strong', {}, nombre),
           h('small', { class: 'suave' }, [resumen || 'Aún sin series', item.opcional && 'opcional',
-            item.superserie && 'superserie con el siguiente', item.nota].filter(Boolean).join(' · '))),
+            // La nota, recortada: entera está al abrir el ejercicio (las de las rutinas prehechas ocupaban media pantalla).
+            item.superserie && 'superserie con el siguiente', item.nota && (item.nota.length > 46 ? `${item.nota.slice(0, 44).trimEnd()}…` : item.nota)].filter(Boolean).join(' · '))),
         h('span', { class: 'ej-rutina-flecha', 'aria-hidden': 'true' }, abierto ? '▴' : '▾')),
       abierto && detalleEjercicio(dia, item, j, ej, clave));
   }
@@ -498,8 +510,12 @@ export function vistaFormularioRutina(contenedor, { id }) {
           h('span', {}, g.texto, g.planes[0].soloRutina ? '' : h('small', { class: 'suave' }, ' · del ejercicio')),
           h('button', { type: 'button', class: 'boton-icono', 'aria-label': `Quitar ${g.texto} de este día`,
             onclick: () => quitarDelDia(item, ej, g.planes) }, icono('cerrar')))))
-        : h('p', { class: 'suave centrado' }, 'Aún sin series: añade las de este día.'),
-      h('button', { type: 'button', class: 'boton', onclick: () => abrirAnadir(item, ej) }, '+ Añadir series'),
+        : [h('p', { class: 'suave centrado' }, 'Aún sin series. Con un toque:'),
+          // Lo normal, de un toque (como «Agregar serie» de Hevy, pero ya con su progresión); lo demás, en «Otras series».
+          h('div', { class: 'chips series-de-un-toque' }, seriesDeUnToque(ej).map(([texto, forma]) => h('button', { type: 'button', class: 'chip seleccionable',
+            // Elegidas las series, el ejercicio se pliega: el día queda como una lista y «+ Ejercicio» a mano.
+            onclick: () => { abiertosRutina.delete(clave); crearRapidas(item, ej, { ...forma, donde: (ej.series || []).some((p) => !p.soloRutina) ? 'rutina' : 'ejercicio' }); } }, texto)))],
+      h('button', { type: 'button', class: usadas.length ? 'boton' : 'boton secundario', onclick: () => abrirAnadir(item, ej) }, usadas.length ? '+ Añadir series' : 'Otras series (ciclos, 1RM, descendentes…)'),
       sinUsar.length > 0 && h('div', { class: 'sin-usar' },
         h('small', { class: 'nota' }, 'Series de este ejercicio que hoy no hace este día. Toca una para ponerla:'),
         h('div', { class: 'fila-marcas compacta' }, agrupar(sinUsar, ej).map((g) => h('button', { type: 'button', class: 'boton-marca',
@@ -521,6 +537,13 @@ export function vistaFormularioRutina(contenedor, { id }) {
       h('div', { class: 'fila-botones' },
         h('a', { class: 'boton secundario', href: `#/ejercicio/${ej.id}` }, 'Abrir el ejercicio'),
         quitar));
+  }
+
+  // Las series más corrientes según lo que mide el ejercicio.
+  function seriesDeUnToque(ej) {
+    if (ej.esfuerzo?.tipo === 'tiempo') return [['3 × 30 s', { n: 3, rango: [30, 30] }], ['3 × 1 min', { n: 3, rango: [60, 60] }], ['1 × 10 min', { n: 1, rango: [600, 600] }]];
+    if (ej.esfuerzo?.tipo !== 'repeticiones') return [];
+    return [['3 × 8-12', { n: 3, rango: [8, 12] }], ['3 × 6-10', { n: 3, rango: [6, 10] }], ['4 × 4-6', { n: 4, rango: [4, 6], recamara: 2 }]];
   }
 
   // Series iguales seguidas, en una línea: «4 × 4 (2 en recámara)».

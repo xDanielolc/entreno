@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 37;
+export const VERSION_ACTUAL = 38;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -752,6 +752,12 @@ const MIGRACIONES = {
     datos.version = 37;
     return datos;
   },
+  // v38: `perfil.pestanasOcultas` (lista de pestañas quitadas de la barra de abajo: 'cuerpo', 'diario', 'historial',
+  // 'aprender'). Opcional; sin ella se ven todas, como hasta ahora. Nada que rellenar.
+  37: (datos) => {
+    datos.version = 38;
+    return datos;
+  },
 };
 
 // Las series de trabajo de cada día de `rutina` que aún no se han hecho nunca se enlazan (`sigueA`) con la serie del
@@ -898,3 +904,6 @@ export function validar(datos) {
   if (!ok) throw new Error('El archivo de datos no tiene un formato reconocible');
   return datos;
 }
+
+// Las pestañas que se pueden quitar de la barra de abajo (`perfil.pestanasOcultas`, desde la v38).
+export const PESTANAS_OPCIONALES = { cuerpo: 'Cuerpo', diario: 'Sueño', historial: 'Historial', aprender: 'Aprender' };

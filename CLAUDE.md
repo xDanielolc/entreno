@@ -1793,3 +1793,15 @@ lista con el resultado está en el informe. Funcionaba todo lo comprobado. Fallo
   pantallas). Quedan sin tocar por ser de la conversación del sueño: `huboIlusiones`, `estaSonando`, `faltaCribado`,
   la importación `modoPVT` de historico-pvt.js y un `input type="time"` en Ajustes → Perfil (ella evita ese tipo de
   casilla en el diario porque su selector se corta en el móvil).
+
+### 0.87.2: montar una rutina en tres toques y pestañas a tu medida (esquema v38)
+
+- Editor de rutinas (`rutinas.js`): una rutina nueva ya trae su «Día 1»; las opciones (activa, días fijos, dónde) van
+  plegadas debajo de los días con lo elegido a la vista («Opciones: activa · cualquier día»). Un ejercicio recién añadido
+  al día ofrece sus series de un toque (`seriesDeUnToque`: 3 × 8-12, 3 × 6-10, 4 × 4-6; en tiempo, 3 × 30 s…) y se
+  pliega al elegirlas, así el día queda como una lista; todo lo demás (ciclos, 1RM, descendentes) sigue en «Otras
+  series», que abre el asistente de siempre. La nota de cada ejercicio sale recortada en la fila (entera al abrirlo).
+- `perfil.pestanasOcultas` (v38, opcional): Ajustes → Personalización → «Pestañas de la barra de abajo» quita Cuerpo,
+  Sueño, Historial o Aprender de la barra (`PESTANAS_OPCIONALES` en esquema.js; `pintarNavegacion` en app.js). Por
+  defecto se ven todas; la pantalla quitada se abre desde ese mismo sitio y, si estás en ella, su pestaña se ve.
+- Avisos de abajo: el texto y la ✕ en la misma fila.

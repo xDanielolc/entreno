@@ -2450,3 +2450,13 @@ details.como-llegas:not([open]) > summary { font-weight: 500; font-size: .92rem;
 .serie-cabecera > .selector-abrir { flex: 1 1 0; min-width: 0; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: .88rem; text-align: left; }
 .serie-cabecera > .marca:empty { display: none; }
 .serie-cabecera > .boton-bocadillo, .serie-cabecera > .borrar-serie { flex: 0 0 auto; }
+
+/* Editor de rutinas (0.87.2): opciones plegadas y series de un toque. */
+.opciones-rutina { margin-top: 12px; }
+.series-de-un-toque { justify-content: center; margin: 4px 0 10px; }
+.series-de-un-toque .chip { min-height: 44px; padding: 8px 16px; font-weight: 700; }
+.formulario > .anadir-dia { display: flex; margin-inline: auto; }
+/* Avisos de abajo: el texto y la ✕ en la misma fila (antes la ✕ ocupaba una fila entera). */
+.aviso-texto-caja { flex: 1 1 0; min-width: min(100%, 12em); }
+/* Con cinco pestañas o menos, la letra de la barra vuelve a su tamaño. */
+.navegacion.pocas a { font-size: .74rem; }

@@ -19,6 +19,7 @@ import { pista } from './tutorial.js';
 import { botonImportar } from './importar.js';
 import { MODOS_ENTRENO } from './sesion.js';
 import { TEMAS, aplicarTema } from './cuestionario.js';
+import { PESTANAS_OPCIONALES } from '../esquema.js';
 
 // Aviso de la mañana para hacer el test de atención del Diario. Una web no se
 // despierta sola con el navegador cerrado, así que el texto no promete más de
@@ -131,6 +132,22 @@ export function vistaAjustes(contenedor) {
           (t) => { estado.cambiar((x) => { x.perfil.tema = t; }); aplicarTema(t); }, { compacto: true }),
         h('small', { class: 'nota' }, 'Claro, oscuro o como el móvil, y seis con más carácter. Los de fantasía son un primer intento: '
           + 'si alguno se lee mal en tu móvil, dímelo con una captura.')),
+      // La app a tu medida (pendiente desde octubre): quitar de la barra lo que no uses.
+      h('div', { class: 'campo' },
+        h('span', { class: 'etiqueta-campo' }, 'Pestañas de la barra de abajo'),
+        h('div', { class: 'fila-marcas compacta' }, Object.entries(PESTANAS_OPCIONALES).map(([id, nombre]) => {
+          const oculta = (d.perfil.pestanasOcultas ?? []).includes(id);
+          return h('button', { type: 'button', class: `boton-marca${oculta ? '' : ' activo'}`, 'aria-pressed': String(!oculta),
+            onclick: () => estado.cambiar((x) => {
+              const lista = new Set(x.perfil.pestanasOcultas ?? []);
+              if (lista.has(id)) lista.delete(id); else lista.add(id);
+              if (lista.size) x.perfil.pestanasOcultas = [...lista]; else delete x.perfil.pestanasOcultas;
+            }) }, nombre);
+        })),
+        h('small', { class: 'nota' }, 'Las marcadas se ven. Entrenar, Ejercicios y Ajustes están siempre.'),
+        (d.perfil.pestanasOcultas ?? []).length > 0 && h('div', { class: 'fila-marcas compacta' },
+          (d.perfil.pestanasOcultas ?? []).filter((id) => PESTANAS_OPCIONALES[id]).map((id) => h('a', { class: 'boton secundario',
+            href: { cuerpo: '#/cuerpo', diario: '#/diario', historial: '#/historial', aprender: '#/aprender' }[id] }, `Abrir ${PESTANAS_OPCIONALES[id]}`)))),
       h('div', { class: 'campo' },
         h('span', { class: 'etiqueta-campo' }, 'Retos del mes en Entrenar'),
         opciones({ si: 'Sí', no: 'No' }, d.perfil.retos === false ? 'no' : 'si',

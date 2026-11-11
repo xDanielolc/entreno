@@ -3,6 +3,7 @@
 import { icono } from './iconos.js';
 import * as local from './almacen-local.js';
 import * as estado from './estado.js';
+import { PESTANAS_OPCIONALES } from './esquema.js';
 import { cargarCreditos, imagenDeEjercicio } from './imagenes.js';
 import { MUSCULOS, archivoCapa } from './musculos.js';
 import { sincronizar, situacionActual } from './sincronizacion.js';
@@ -148,9 +149,16 @@ function recordarEnPestana(pestana, hash) {
   try { localStorage.setItem(CLAVE_PESTANAS, JSON.stringify({ ...ultimasPorPestana(), [pestana]: hash })); } catch { /* nada */ }
 }
 
+// Las pestañas que se pueden quitar de la barra (Ajustes → Personalización): la pantalla sigue existiendo y se
+// llega a ella desde Ajustes. Entrenar, Ejercicios y Ajustes están siempre. La pestaña en la que estás se ve aunque
+// esté quitada, para no perderte.
 function pintarNavegacion(activa) {
   const ultimas = ultimasPorPestana();
-  navegacion.replaceChildren(...PESTANAS.map((p) => h('a', {
+  const ocultas = new Set((estado.datos()?.perfil?.pestanasOcultas ?? []).filter((id) => PESTANAS_OPCIONALES[id]));
+  const visibles = PESTANAS.filter((p) => !ocultas.has(p.id) || p.id === activa);
+  navegacion.style.gridTemplateColumns = `repeat(${visibles.length}, 1fr)`;
+  navegacion.classList.toggle('pocas', visibles.length <= 5);
+  navegacion.replaceChildren(...visibles.map((p) => h('a', {
     href: p.id === activa ? p.href : (ultimas[p.id] || p.href),
     class: p.id === activa ? 'activa' : '', 'aria-current': p.id === activa ? 'page' : null,
   }, icono(p.id), h('span', {}, p.texto))));
