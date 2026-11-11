@@ -142,4 +142,3 @@ export function tarjetaCribado(d) {
 
 // Por si alguna vez hace falta avisar desde fuera (hoy no se usa, pero deja
 // claro qué cuenta como «hecho»).
-export const faltaCribado = (d) => !cribadoCompleto(d);

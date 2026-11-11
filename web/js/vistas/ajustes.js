@@ -3,7 +3,7 @@ import { apuntarPeso } from '../peso.js';
 import { BILBO_RECAMARA_POR_DEFECTO, BILBO_REPS_MAX_POR_DEFECTO, REDONDEO_MANCUERNAS_POR_DEFECTO, REDONDEO_POR_DEFECTO, formatearNumero } from '../calculos.js';
 import * as estado from '../estado.js';
 import { apartarCopia, copiasAparte, desconectar, eliminarCuenta, juntarCopia, rehacerCopiasLegibles, sincronizar, situacionActual } from '../sincronizacion.js';
-import { apartadoPlegable, ayuda, modal, selector } from '../ui.js';
+import { apartadoPlegable, ayuda, campoHora, modal, selector } from '../ui.js';
 import { ADELANTO_SEMANAL_MIN, NECESIDAD_SUENO_POR_DEFECTO, SUENO_MINIMO_H, horaAvisoPvt, horaAvisoPvtTarde } from '../diario.js';
 import { activarAvisoPvt, activarAvisoPvtTarde, programarAvisoPvt, quitarAvisoPvt, quitarAvisoPvtTarde } from './pvt.js';
 import { VERSION_APP } from '../version.js';
@@ -38,10 +38,7 @@ function avisoTestAtencion(d) {
     h('div', { class: 'fila-marcas compacta' },
       h('button', { type: 'button', class: `boton-marca${activo ? ' activo' : ''}`, 'aria-pressed': String(activo),
         onclick: async () => { if (activo) { quitarAvisoPvt(); return; } await activarAvisoPvt(); } }, texto)),
-    activo && h('label', { class: 'campo' },
-      h('span', { class: 'etiqueta-campo' }, 'Hora del aviso'),
-      h('input', { type: 'time', value: hora ?? '',
-        onchange: (ev) => { estado.cambiar((x) => { x.perfil.avisarPvtHora = ev.target.value || null; }); programarAvisoPvt(); } })),
+    activo && campoHora('Hora del aviso', hora, (v) => { estado.cambiar((x) => { x.perfil.avisarPvtHora = v; }); programarAvisoPvt(); }),
     h('small', { class: 'nota' }, !hora
       ? 'Sin hora: pon en Perfil la hora a la que quieres levantarte y el aviso saldrá tres cuartos de hora después.'
       : 'Tres cuartos de hora después de la hora a la que te levantes ese día (la que apuntes en Sueño; si aún no la has apuntado, la de Perfil), salvo que pongas una hora fija aquí. Solo avisa si ese día aún no has hecho el test. '
@@ -62,10 +59,7 @@ function avisoTestTarde(d, avisoMananaActivo) {
       h('button', { type: 'button', class: `boton-marca${activo ? ' activo' : ''}`, 'aria-pressed': String(activo),
         onclick: async () => { if (activo) { quitarAvisoPvtTarde(); } else { await activarAvisoPvtTarde(); } estado.emitir('vista'); } },
       activo ? `¡Te aviso también a las ${hora} para el segundo test!` : 'Sin segundo test: tocar para activarlo')),
-    activo && h('label', { class: 'campo' },
-      h('span', { class: 'etiqueta-campo' }, 'Hora del aviso de la tarde'),
-      h('input', { type: 'time', value: hora,
-        onchange: (ev) => { estado.cambiar((x) => { x.perfil.avisarPvtTardeHora = ev.target.value || null; }); programarAvisoPvt(); } })),
+    activo && campoHora('Hora del aviso de la tarde', hora, (v) => { estado.cambiar((x) => { x.perfil.avisarPvtTardeHora = v; }); programarAvisoPvt(); }),
     h('small', { class: 'nota' },
       'El de la mañana sale a los 45 minutos de levantarte, cuando ya has salido de la inercia del sueño. El de la tarde '
       + 'es el que recoge el cansancio acumulado, que es lo que se acumula a lo largo de semanas y no se nota de un día '
@@ -251,7 +245,7 @@ export function vistaAjustes(contenedor) {
     apartado('Entrenamiento y series',
       h('div', { class: 'campo' },
         h('span', { class: 'etiqueta-campo' }, 'Cómo ir por el entrenamiento'),
-        opciones(MODOS_ENTRENO, d.perfil.modoEntreno ?? 'ejercicio', (m) => estado.cambiar((x) => { x.perfil.modoEntreno = m; }), { compacto: true }),
+        opciones(MODOS_ENTRENO, d.perfil.modoEntreno ?? 'serie', (m) => estado.cambiar((x) => { x.perfil.modoEntreno = m; }), { compacto: true }),
         h('small', { class: 'nota' }, 'Es lo que sale marcado al empezar cada entrenamiento; allí puedes elegir otra cosa.')),
       numeroAjuste('Repeticiones en recámara por defecto', d.perfil.recamaraPorDefecto, (x, v) => { x.perfil.recamaraPorDefecto = v; }),
       h('small', { class: 'nota' }, 'Las que sueles dejarte sin hacer al acabar una serie. Viene puesto 1 porque es lo que recomendamos '
@@ -438,9 +432,27 @@ function seccionSedes(d, apartado) {
             if (x.perfil.sedePorDefecto === y.id) x.perfil.sedePorDefecto = null;
           });
         } }, icono('papelera')))),
-    h('button', { class: 'boton secundario', onclick: () => estado.cambiar((x) => {
-      x.sedes.push(nuevaSede(sedes.length ? `Sitio ${sedes.length + 1}` : 'Mi gimnasio'));
-    }) }, '+ Añadir sitio'));
+    h('button', { class: 'boton secundario', onclick: () => {
+      let tipo = 'gimnasio';
+      const nombre = h('input', { type: 'text', placeholder: 'Gimnasio del barrio, casa de mis padres…', 'aria-label': 'Nombre del sitio' });
+      const crear = () => {
+        const texto = nombre.value.trim();
+        if (!texto) { nombre.focus(); return; }
+        cerrar();
+        estado.cambiar((x) => { x.sedes.push(nuevaSede(texto, tipo)); });
+      };
+      nombre.addEventListener('keydown', (e) => { if (e.key === 'Enter') crear(); });
+      const cerrar = modal('Sitio nuevo', h('div', { class: 'formulario' },
+        h('label', { class: 'campo' }, h('span', { class: 'etiqueta-campo' }, '¿Cómo se llama?'), nombre),
+        h('span', { class: 'etiqueta-campo' }, '¿Qué es?'),
+        h('div', { class: 'chips tipos-sitio' }, Object.entries(TIPOS_SEDE).map(([k, v]) => h('button', { type: 'button', class: `chip seleccionable${k === tipo ? ' activo' : ''}`,
+          'aria-pressed': String(k === tipo), onclick: (e) => {
+            tipo = k;
+            for (const c of e.currentTarget.parentElement.children) { c.classList.toggle('activo', c === e.currentTarget); c.setAttribute('aria-pressed', String(c === e.currentTarget)); }
+          } }, v.etiqueta))),
+        h('button', { class: 'boton', onclick: crear }, 'Añadir')));
+      setTimeout(() => nombre.focus(), 50);
+    } }, '+ Añadir sitio'));
 }
 
 // El plan de sueño: a qué hora quieres levantarte, cuándo empieza el plan y
@@ -461,10 +473,7 @@ function camposSueno(d) {
         + 'adelantaron unas 2 h la fase de 22 personas en 3 semanas, sin que perdieran sueño (Facer-Childs 2019).',
         `Nunca se propone una hora que deje menos de ${SUENO_MINIMO_H} h de sueño real (Watson 2015).`,
       ])),
-    h('label', { class: 'campo' },
-      h('span', { class: 'etiqueta-campo' }, 'Hora de levantarse objetivo'),
-      h('input', { type: 'time', value: d.perfil.levantarseObjetivo ?? '',
-        onchange: (e) => estado.cambiar((x) => { x.perfil.levantarseObjetivo = e.target.value || null; }) })),
+    campoHora('Hora de levantarse objetivo', d.perfil.levantarseObjetivo, (v) => estado.cambiar((x) => { x.perfil.levantarseObjetivo = v; })),
     h('label', { class: 'campo' },
       h('span', { class: 'etiqueta-campo' }, 'Fecha de inicio del plan'),
       h('input', { type: 'date', value: d.perfil.inicioPlanSueno ?? '',

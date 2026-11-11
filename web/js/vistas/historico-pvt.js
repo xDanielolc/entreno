@@ -21,7 +21,7 @@ import * as estado from '../estado.js';
 import { formatearNumero } from '../calculos.js';
 import {
   CAMBIO_REAL_PVT, MODOS_PVT, MODO_PVT_POR_DEFECTO, TESTS_MEDIA_MOVIL,
-  baseDePVT, compararConBase, datosModoPVT, mediaMovilPVT, modoPVT, testsPVT,
+  baseDePVT, compararConBase, datosModoPVT, mediaMovilPVT, testsPVT,
 } from '../diario.js';
 import { fechaCorta, h, modal, selector } from '../ui.js';
 import { colores, graficaLineas } from './graficas.js';

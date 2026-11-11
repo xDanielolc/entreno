@@ -2450,3 +2450,45 @@ details.como-llegas:not([open]) > summary { font-weight: 500; font-size: .92rem;
 .series-escritas-fila input { flex: 1 1 auto; min-width: 0; }
 .series-escritas-fila .boton { flex: 0 0 auto; width: auto; margin: 0; padding-inline: 16px; }
 .entiendo-series:empty { display: none; }
+
+/* 0.90.0: la serie, a la vista sin bajar (móvil, entreno en curso). */
+.hecho-varias { display: grid; gap: 8px; justify-items: center; padding: 10px 8px; border-radius: var(--radio-pequeno); background: var(--superficie-2); }
+.hecho-varias .hecho-titulo { font-weight: 700; }
+.hecho-varias .chips { justify-content: center; gap: 8px; flex-wrap: nowrap; width: 100%; }
+.hecho-varias .hecho-reps { display: inline-grid; place-items: center; border: 1px solid var(--texto-suave); border-radius: 999px; background: var(--superficie); flex: 1 1 0; min-width: 0; max-width: 72px; min-height: 48px; padding: 0; font-size: 1.15rem; font-weight: 700; font-variant-numeric: tabular-nums; justify-content: center; }
+.hecho-varias .hecho-reps.objetivo { background: var(--acento); color: var(--acento-texto, var(--fondo)); border-color: var(--acento); }
+.sugerencia .comparativas { display: block; }
+.sugerencia .compara { display: inline; }
+.sugerencia .compara + .compara::before { content: ' · '; }
+.aviso-saltos { display: flex; align-items: center; gap: 8px; padding: 8px 44px 8px 12px; text-align: left; }
+.aviso-saltos p { margin: 0; flex: 1; }
+.aviso-saltos .boton.pequeno { flex: 0 0 auto; width: auto; min-width: 0; min-height: 36px; margin: 0; padding: 4px 14px; }
+.aviso-saltos .cerrar-aviso { top: 50%; transform: translateY(-50%); }
+.lista-saltados { list-style: none; margin: 0 0 10px; padding: 0; display: grid; gap: 4px; font-weight: 600; }
+.foto-en-cartel { display: block; width: 100%; max-height: 240px; object-fit: contain; background: #fff; border-radius: var(--radio-pequeno); margin-bottom: 12px; }
+.serie.cabecera-abajo .serie-cabecera { margin-top: 10px; }
+@media (max-width: 699px) {
+  body.entreno-a-pantalla .fila-cabecera-entreno { gap: 6px; margin-bottom: 4px; }
+  body.entreno-a-pantalla .fila-cabecera-entreno .fecha, body.entreno-a-pantalla .fila-cabecera-entreno > .selector-abrir { min-height: 36px; padding-block: 4px; font-size: .9rem; }
+  body.entreno-a-pantalla .fila-cabecera-entreno + p.suave { margin: 0 0 6px; font-size: .85rem; text-align: center; }
+  body.entreno-a-pantalla .ejercicio-sesion.una .cabecera-tarjeta .miniatura { width: 64px; height: 64px; flex: 0 0 64px; object-fit: contain; background: #fff; border-radius: 12px; }
+  body.entreno-a-pantalla .ejercicio-sesion.una .linea-1rm { margin-bottom: 6px; font-size: .95rem; }
+}
+.sugerencia .comparativas::first-letter { text-transform: uppercase; }
+@media (max-width: 699px) {
+  body.entreno-a-pantalla .fila-cabecera-entreno > .selector-abrir { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+  body.entreno-a-pantalla .fila-cabecera-entreno + p.suave { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+}
+
+/* 0.90.0: la hora en dos casillas, el calendario con objetivo y la serie de prueba con sus botones. */
+.trozos-hora { align-items: center; justify-content: center; }
+.trozos-hora .hueco-hora { flex: 0 1 4.2em; min-width: 0; padding-inline: 4px; text-align: center; font-size: 1.1rem; font-variant-numeric: tabular-nums; }
+.trozos-hora .dos-puntos { flex: 0 0 auto; opacity: .6; font-weight: 700; }
+.objetivo-semana { display: grid; gap: 8px; justify-items: center; text-align: center; margin-bottom: 10px; }
+.objetivo-semana .titulo-con-ayuda { justify-content: center; }
+.objetivo-dias { justify-content: center; flex-wrap: nowrap; gap: 6px; width: 100%; }
+.objetivo-dias .chip { flex: 1 1 0; min-width: 0; max-width: 48px; min-height: 40px; padding: 0; display: inline-grid; place-items: center; font-weight: 700; }
+.objetivo-dias .chip.activo { background: var(--acento); color: var(--acento-texto, var(--fondo)); border-color: var(--acento); }
+.serie-cabecera.de-prueba .insignia-prueba { flex: 1 1 100%; text-align: center; }
+.tipos-sitio { justify-content: center; margin-bottom: 12px; }
+.tipos-sitio .chip.activo { background: var(--acento); color: var(--acento-texto, var(--fondo)); border-color: var(--acento); }

@@ -240,6 +240,11 @@ export function vistaInicio(contenedor) {
     !rutina && ((!d.rutinas.length && cuestionarioHecho(d) && tarjetaRecomendacion(d))
       || h('a', { class: 'boton secundario', href: '#/rutinas' }, d.rutinas.length ? 'Elegir una rutina' : 'Ver rutinas ya hechas')),
 
+    // La recuperación, justo debajo de lo que toca, en cuanto hay algún entrenamiento del que recuperarse: es de lo
+    // mejor de la app (Dan, 11-11-2026). Solo se esconde a quien aún no ha entrenado nunca.
+    haEntrenado && tarjetaRecuperacion(d, { compacta: true,
+      extra: h('button', { class: 'boton secundario', onclick: () => voyHoy(d, dia) }, '¿Voy hoy? ¿Cansancio o pereza?') }),
+
     // Tu peso, aquí mismo: sin mandarte a Ajustes.
     necesitaPeso && h('div', { class: 'tarjeta aviso-tarjeta fila-aviso' },
       h('span', {}, 'Tus ejercicios con tu peso o con máquina asistida necesitan saber cuánto pesas.'),
@@ -250,10 +255,6 @@ export function vistaInicio(contenedor) {
 
     tarjetaSugerenciasAjuste(d),
     avisosDeHoy(d, { sinPeso: necesitaPeso }),
-    // La recuperación, cuando ya hay algún entrenamiento del que recuperarse.
-    haEntrenado && tarjetaRecuperacion(d, { compacta: true,
-      extra: h('button', { class: 'boton secundario', onclick: () => voyHoy(d, dia) }, '¿Voy hoy? ¿Cansancio o pereza?') }),
-
     // Récords y retos a la vista: motivan (ideas de Lyfta, Dan, 27-10-2026).
     activos.length > 0 && tarjetaRecordsHoy(d),
     activos.length > 0 && tarjetaRetos(d),

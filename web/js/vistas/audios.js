@@ -32,7 +32,6 @@ let sonando = null;          // { id, tipo, version, audio, url, maximo, fecha }
 let latido = null;           // el intervalo de cada segundo
 let repintar = null;
 
-export const estaSonando = (id) => sonando?.id === id;
 
 // El contador se refresca solo él, sin repintar la pantalla entera: repintar
 // cada segundo haría saltar el desplazamiento y perder el foco. Los nodos se

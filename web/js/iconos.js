@@ -48,7 +48,8 @@ const SVG = {
   camara: '<path d="M4 8h3l1.5-2.5h7L17 8h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.6"/>',
   lista: '<path d="M8 6h13M8 12h13M8 18h13M3.5 6h.5M3.5 12h.5M3.5 18h.5"/>',
   calendario: '<rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8.5 3v4M15.5 3v4"/>',
-  musculo: '<path d="M5 19c3-1 6-1 9 0 2.5-.5 4.5-2.5 5-5.5.4-3-1.5-5-4-5-1.2-2.3-3.5-4-6-3.5L8 8.5c1.3.7 2.5.6 3.5 0M5 19c-1-3-.5-6.5 1.5-9"/>',
+  // Brazo sacando bíceps: trazado del icono «biceps-flexed» de Lucide (licencia ISC, https://lucide.dev).
+  musculo: '<path d="M12.409 13.017A5 5 0 0 1 22 15c0 3.866-4 7-9 7-4.077 0-8.153-.82-10.371-2.462-.426-.316-.631-.832-.62-1.362C2.118 12.723 2.627 2 10 2a3 3 0 0 1 3 3 2 2 0 0 1-2 2c-1.105 0-1.64-.444-2-1"/><path d="M15 14a5 5 0 0 0-7.584 2"/><path d="M9.964 6.825C8.019 7.977 9.5 13 8 15"/>',
   funcion: '<path d="M4 12h9M10 8l4 4-4 4M20 4v16"/>',
   orden: '<path d="M7 4v16M4 17l3 3 3-3M14 6h7M14 12h5M14 18h3"/>',
 };

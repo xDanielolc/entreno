@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 39;
+export const VERSION_ACTUAL = 40;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -216,7 +216,11 @@ export function archivoNuevo({ nombre = '', correo = null } = {}) {
       respiracion: { veces: 3, inspirar: 4, espirar: 4 },
       recuperacion: { factores: {}, desde: {} },
       tutoriales: { nivel: null, vistos: {} },
-      modoEntreno: 'ejercicio',
+      // Quien empieza de cero ve la serie que toca y nada más, y cuatro pestañas (Entrenar, Cuerpo, Ejercicios y
+      // Ajustes); las demás se ponen en Ajustes → Personalización (Dan, 11-11-2026). A quien ya usaba la app no le
+      // cambia nada: las migraciones no tocan ni la vista ni las pestañas.
+      modoEntreno: 'serie',
+      pestanasOcultas: ['diario', 'historial', 'aprender'],
       redondeoKg: 2.5,
       prehechos: [],
       necesidadSuenoH: 8.5,
@@ -776,6 +780,13 @@ const MIGRACIONES = {
     datos.version = 39;
     return datos;
   },
+
+  // v40: `perfil.objetivoDiasSemana` (opcional, entero de 1 a 7): los días de entreno que hacen que una semana cuente
+  // en el calendario del historial. Sin él, 1. No hay nada que convertir.
+  39: (datos) => {
+    datos.version = 40;
+    return datos;
+  },
 };
 
 // Las series de trabajo de cada día de `rutina` que aún no se han hecho nunca se enlazan (`sigueA`) con la serie del
@@ -927,6 +938,9 @@ export function validar(datos) {
   if (!ok) throw new Error('El archivo de datos no tiene un formato reconocible');
   return datos;
 }
+
+// Cuántos días por semana cuentan como «semana cumplida» en el calendario si no has puesto otro objetivo.
+export const DIAS_SEMANA_OBJETIVO_POR_DEFECTO = 1;
 
 // Las pestañas que se pueden quitar de la barra de abajo (`perfil.pestanasOcultas`, desde la v38).
 export const PESTANAS_OPCIONALES = { cuerpo: 'Cuerpo', diario: 'Sueño', historial: 'Historial', aprender: 'Aprender' };

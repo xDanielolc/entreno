@@ -297,6 +297,37 @@ export function horario(sesion) {
   return `${hora(sesion.inicio)} a ${hora(sesion.fin)} · ${min} min`;
 }
 
+// Una hora en dos casillas (horas y minutos) con teclado numérico, sin el selector del navegador: en el móvil con
+// tema oscuro le cortaba el botón «Establecer» (Dan, 02-11-2026; primero se hizo en Sueño, vistas/diario.js).
+// `alCambiar` recibe «HH:MM» o null al salir de las dos casillas, no a cada tecla: quien llama suele repintar.
+// `leer()` da el valor de ahora (para un cartel con su botón).
+export function campoHora(etiqueta, valor, alCambiar = null) {
+  const partes = /^(\d{1,2}):(\d{2})$/.exec(valor ?? '');
+  const cajas = {};
+  const leer = () => {
+    if (Object.values(cajas).every((x) => x.value.trim() === '')) return null;
+    const n = (clave, tope) => Math.min(tope, Math.max(0, Math.round(leerNumero(cajas[clave].value) ?? 0)));
+    return `${String(n('h', 23)).padStart(2, '0')}:${String(n('m', 59)).padStart(2, '0')}`;
+  };
+  const hueco = (clave, nombre, texto) => {
+    cajas[clave] = h('input', { type: 'text', inputmode: 'numeric', maxlength: '2', class: 'hueco-hora', 'aria-label': `${etiqueta}, ${nombre}`, value: texto });
+    return cajas[clave];
+  };
+  const fila = h('div', { class: 'trozos-tiempo trozos-hora' },
+    hueco('h', 'horas', partes ? partes[1] : ''), h('span', { class: 'dos-puntos', 'aria-hidden': 'true' }, ':'), hueco('m', 'minutos', partes ? partes[2] : ''));
+  let antes = leer();
+  fila.addEventListener('focusout', (e) => {
+    if (fila.contains(e.relatedTarget)) return;
+    const ahora = leer();
+    if (ahora === antes) return;
+    antes = ahora;
+    alCambiar?.(ahora);
+  });
+  const campo = h('div', { class: 'campo campo-hora' }, h('span', { class: 'etiqueta-campo' }, etiqueta), fila);
+  campo.leer = leer;
+  return campo;
+}
+
 // Un «?» pequeño en la esquina de abajo a la derecha de una tarjeta, para los
 // curiosos: abre la explicación en un cartel (`construir` devuelve lo que va
 // dentro). La tarjeta necesita la clase `con-ayuda-esquina`.

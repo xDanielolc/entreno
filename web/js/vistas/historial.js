@@ -1,6 +1,7 @@
 import * as estado from '../estado.js';
 import { sedeInicial } from '../sedes.js';
-import { anadir, fechaLarga, h, hoyISO, modal, nuevoId, selector, horario } from '../ui.js';
+import { anadir, ayuda, campoHora, fechaLarga, h, hoyISO, modal, nuevoId, selector, horario } from '../ui.js';
+import { DIAS_SEMANA_OBJETIVO_POR_DEFECTO } from '../esquema.js';
 import { TIPOS_EJERCICIO, normalizar, tipoDeEjercicio } from '../catalogo.js';
 import { MUSCULOS, ORDEN_MUSCULOS } from '../musculos.js';
 import { tiraInferior } from './tira.js';
@@ -65,15 +66,15 @@ export function vistaHistorial(contenedor, { apartado } = {}) {
   // ejemplo): se crea en esa fecha y se rellena como uno normal.
   function anadirPasado() {
     const fecha = h('input', { type: 'date', value: hoyISO(), max: hoyISO() });
-    const hora = h('input', { type: 'time', value: '19:00' });
+    const hora = campoHora('Hora de inicio', '19:00');
     const cerrar = modal('Entrenamiento de otro día', h('div', { class: 'formulario' },
       h('label', { class: 'campo' }, h('span', { class: 'etiqueta-campo' }, 'Día'), fecha),
-      h('label', { class: 'campo' }, h('span', { class: 'etiqueta-campo' }, 'Hora de inicio'), hora),
+      hora,
       h('button', { class: 'boton', onclick: () => {
         if (!fecha.value) return;
         const id = nuevoId('ses');
         const [a, m, dd] = fecha.value.split('-').map(Number);
-        const [hh, mm] = (hora.value || '19:00').split(':').map(Number);
+        const [hh, mm] = (hora.leer() || '19:00').split(':').map(Number);
         estado.cambiar((datos) => {
           datos.sesiones.push({
             id, fecha: fecha.value, sedeId: sedeInicial(datos, null), rutinaId: null, diaRutinaId: null,
@@ -148,15 +149,50 @@ const DIAS_SEMANA = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
 const iso = (f) => `${f.getFullYear()}-${String(f.getMonth() + 1).padStart(2, '0')}-${String(f.getDate()).padStart(2, '0')}`;
 const lunesDe = (f) => new Date(f.getFullYear(), f.getMonth(), f.getDate() - ((f.getDay() + 6) % 7));
 
-// Semanas seguidas con al menos un entrenamiento, contando esta (si ya has
-// entrenado) o la anterior.
-export function rachaDeSemanas(fechas) {
-  const semanas = new Set([...fechas].map((x) => iso(lunesDe(new Date(`${x}T12:00:00`)))));
+// Los días entrenados de cada semana (clave: su lunes).
+function diasPorSemana(fechas) {
+  const semanas = new Map();
+  for (const x of new Set(fechas)) { const l = iso(lunesDe(new Date(`${x}T12:00:00`))); semanas.set(l, (semanas.get(l) ?? 0) + 1); }
+  return semanas;
+}
+
+// Semanas seguidas cumpliendo el objetivo (días de entreno por semana), contando esta si ya lo has cumplido o, si
+// no, desde la anterior: una semana a medias no rompe la racha.
+export function rachaDeSemanas(fechas, objetivo = 1) {
+  const semanas = diasPorSemana(fechas);
+  const cumple = (l) => (semanas.get(iso(l)) ?? 0) >= objetivo;
+  const atras = (l) => new Date(l.getFullYear(), l.getMonth(), l.getDate() - 7);
   let lunes = lunesDe(new Date());
-  if (!semanas.has(iso(lunes))) lunes = new Date(lunes.getFullYear(), lunes.getMonth(), lunes.getDate() - 7);
+  if (!cumple(lunes)) lunes = atras(lunes);
   let n = 0;
-  while (semanas.has(iso(lunes))) { n += 1; lunes = new Date(lunes.getFullYear(), lunes.getMonth(), lunes.getDate() - 7); }
+  while (cumple(lunes)) { n += 1; lunes = atras(lunes); }
   return n;
+}
+
+// Días seguidos entrenando, hasta hoy (o hasta ayer, si hoy aún no has entrenado).
+export function rachaDeDias(fechas) {
+  const dias = new Set(fechas);
+  const atras = (f) => new Date(f.getFullYear(), f.getMonth(), f.getDate() - 1);
+  let dia = new Date();
+  if (!dias.has(iso(dia))) dia = atras(dia);
+  let n = 0;
+  while (dias.has(iso(dia))) { n += 1; dia = atras(dia); }
+  return n;
+}
+
+// De las últimas `cuantas` semanas ya terminadas (más esta, si ya está cumplida), en cuántas se cumplió el objetivo.
+export function semanasCumplidas(fechas, objetivo = 1, cuantas = 12) {
+  const semanas = diasPorSemana(fechas);
+  let lunes = lunesDe(new Date());
+  let n = 0;
+  let miradas = 0;
+  if ((semanas.get(iso(lunes)) ?? 0) >= objetivo) { n += 1; miradas += 1; }
+  while (miradas < cuantas) {
+    lunes = new Date(lunes.getFullYear(), lunes.getMonth(), lunes.getDate() - 7);
+    if ((semanas.get(iso(lunes)) ?? 0) >= objetivo) n += 1;
+    miradas += 1;
+  }
+  return { cumplidas: n, de: cuantas };
 }
 
 function vistaCalendario(d) {
@@ -164,8 +200,11 @@ function vistaCalendario(d) {
   const sesiones = d.sesiones.filter((s) => !s.borrada && !s.tutorial && s.ejercicios.some((e) => e.series.some((x) => x.hecha)));
   const porDia = new Map();
   for (const s of sesiones) porDia.set(s.fecha, [...(porDia.get(s.fecha) ?? []), s]);
-  const racha = rachaDeSemanas(porDia.keys());
   const pintar = () => {
+    const objetivo = Math.min(7, Math.max(1, estado.datos().perfil.objetivoDiasSemana ?? DIAS_SEMANA_OBJETIVO_POR_DEFECTO));
+    const racha = rachaDeSemanas(porDia.keys(), objetivo);
+    const seguidos = rachaDeDias(porDia.keys());
+    const cumplidas = semanasCumplidas(porDia.keys(), objetivo);
     const hoy = new Date();
     const [a, m] = (mesCalendario ?? iso(hoy).slice(0, 7)).split('-').map(Number);
     const primero = new Date(a, m - 1, 1);
@@ -175,7 +214,7 @@ function vistaCalendario(d) {
     const filas = [];
     for (let lunes = inicio; lunes.getMonth() === m - 1 || lunes < primero; lunes = new Date(lunes.getFullYear(), lunes.getMonth(), lunes.getDate() + 7)) {
       const dias = [...Array(7)].map((_, k) => new Date(lunes.getFullYear(), lunes.getMonth(), lunes.getDate() + k));
-      const entrenada = dias.some((x) => porDia.has(iso(x)));
+      const entrenada = dias.filter((x) => porDia.has(iso(x))).length >= objetivo;
       filas.push(h('div', { class: 'semana-calendario' },
         dias.map((x) => {
           const clave = iso(x);
@@ -186,22 +225,35 @@ function vistaCalendario(d) {
             ? h('a', { class: clase, href: `#/sesion/${del.at(-1).id}`, 'aria-label': `${fechaLarga(clave)}: ${del.length} ${del.length === 1 ? 'entrenamiento' : 'entrenamientos'}` }, String(x.getDate()))
             : h('span', { class: clase }, String(x.getDate()));
         }),
-        h('span', { class: `racha-semana${entrenada ? ' si' : ''}`, 'aria-label': entrenada ? 'Semana entrenada' : 'Semana sin entrenar' }, entrenada ? '✓' : '')));
+        h('span', { class: `racha-semana${entrenada ? ' si' : ''}`, 'aria-label': entrenada ? 'Semana cumplida' : 'Semana sin cumplir' }, entrenada ? '✓' : '')));
       if (filas.length > 6) break;
     }
     const mover = (k) => { const f = new Date(a, m - 1 + k, 1); mesCalendario = iso(f).slice(0, 7); pintar(); };
     caja.replaceChildren(
       h('div', { class: 'cifras-calendario' },
-        h('div', { class: 'tarjeta cifra-calendario' }, h('strong', {}, String(racha)), h('span', {}, racha === 1 ? 'semana seguida entrenando' : 'semanas seguidas entrenando')),
+        h('div', { class: 'tarjeta cifra-calendario' }, h('strong', {}, String(racha)), h('span', {}, racha === 1 ? 'semana seguida cumpliendo' : 'semanas seguidas cumpliendo')),
+        h('div', { class: 'tarjeta cifra-calendario' }, h('strong', {}, `${cumplidas.cumplidas} de ${cumplidas.de}`), h('span', {}, 'últimas semanas cumplidas')),
+        h('div', { class: 'tarjeta cifra-calendario' }, h('strong', {}, String(seguidos)), h('span', {}, seguidos === 1 ? 'día seguido entrenando' : 'días seguidos entrenando')),
         h('div', { class: 'tarjeta cifra-calendario' }, h('strong', {}, String(delMes)), h('span', {}, delMes === 1 ? 'entrenamiento este mes' : 'entrenamientos este mes'))),
+      // Tu objetivo: cuántos días de entreno hacen que una semana cuente (Dan, 11-11-2026: «para mí 1 o 2 días está
+      // bien, otra gente igual necesita más»).
+      h('section', { class: 'tarjeta objetivo-semana' },
+        h('div', { class: 'titulo-con-ayuda' }, h('span', { class: 'etiqueta-campo' }, 'Tu objetivo: días por semana'),
+          ayuda('Tu objetivo de la semana', [
+            'Elige cuántos días quieres entrenar cada semana. Una semana cuenta como cumplida cuando llegas a ese número: lleva un ✓ a la derecha del calendario.',
+            '«Semanas seguidas cumpliendo» es tu racha: la semana en curso no la rompe mientras no acabe.',
+            '«Últimas semanas cumplidas» mira las doce últimas. «Días seguidos entrenando» cuenta hasta hoy, o hasta ayer si hoy aún no has entrenado.',
+            'Toca un día marcado del calendario para abrir ese entrenamiento.'])),
+        h('div', { class: 'chips objetivo-dias' }, [1, 2, 3, 4, 5, 6, 7].map((n) => h('button', { type: 'button', class: `chip seleccionable${n === objetivo ? ' activo' : ''}`,
+          'aria-pressed': String(n === objetivo), 'aria-label': `${n} ${n === 1 ? 'día' : 'días'} por semana`,
+          onclick: () => { estado.cambiar((x) => { x.perfil.objetivoDiasSemana = n; }); pintar(); } }, String(n))))),
       h('section', { class: 'tarjeta calendario' },
         h('div', { class: 'cabecera-calendario' },
           h('button', { type: 'button', class: 'boton-icono', 'aria-label': 'Mes anterior', onclick: () => mover(-1) }, '‹'),
           h('h2', {}, `${MESES[m - 1].charAt(0).toUpperCase()}${MESES[m - 1].slice(1)} de ${a}`),
           h('button', { type: 'button', class: 'boton-icono', 'aria-label': 'Mes siguiente', disabled: am >= iso(hoy).slice(0, 7), onclick: () => mover(1) }, '›')),
-        h('div', { class: 'semana-calendario cabecera' }, DIAS_SEMANA.map((x) => h('span', {}, x)), h('span', { title: 'Semana entrenada' }, '✓')),
-        filas,
-        h('p', { class: 'nota centrado' }, 'Toca un día marcado para abrir ese entrenamiento. El ✓ de la derecha marca las semanas en las que entrenaste al menos un día: son las que cuentan para las «semanas seguidas entrenando» de arriba.')));
+        h('div', { class: 'semana-calendario cabecera' }, DIAS_SEMANA.map((x) => h('span', {}, x)), h('span', { title: 'Semana cumplida' }, '✓')),
+        filas));
   };
   pintar();
   return caja;

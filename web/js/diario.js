@@ -71,7 +71,6 @@ export function totalIlusiones(entrada) {
 }
 
 // Si ese día hubo sesión de ilusiones (hay nivel apuntado, con notas o sin ellas).
-export const huboIlusiones = (entrada) => entrada?.ilusionNivel != null;
 
 // Los básicos con los que se mira si el sueño te está costando: el volumen
 // tolerado cae antes que el 1RM (Cook 2012; Knowles 2022). Se reconocen por el

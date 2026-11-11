@@ -1895,3 +1895,32 @@ de Hevy (creados por la web; apuntar entrenos allí solo se puede en el móvil, 
   («3 series + 2 de calentamiento») cuando la línea entera pasa de 60 letras.
 - Para meter las rutinas en Hevy sin cientos de clics se usó lo mismo que manda su web al guardar (se vio creando dos
   rutinas de prueba a mano); nada de eso queda en el repositorio.
+
+## Ronda 0.90.0 (11-11-2026): lo que Dan marcó en el informe de la auditoría
+
+Dan contestó el informe punto por punto (colección `respuestas` del artefacto). Regla nueva suya: los informes de cambios
+van siempre con una imagen a cada lado (antes y después), botones de test y comentario; lo que ya está «comprobado,
+funciona» no hace falta que lo marque. Hecho en esta ronda (esquema v40, `perfil.objetivoDiasSemana`, opcional):
+- **La serie, en una pantalla** (móvil, entreno en curso): el dibujo va pequeño junto al nombre (al tocarlo se abre
+  grande con las estadísticas), la línea de qué toca es una frase («Hoy: 80 kg × 3-5, dejando 2») más lo de la última
+  vez, y lo demás («para a 2 del fallo…», «con tu 1RM te salen unas N», el ciclo anterior) va al «?» de esa línea
+  (`linea.extras` en `lineaSugerenciaBase`). En el modo «una serie» las casillas y el «Hecho» van antes que el tipo de
+  serie, el comentario y la papelera (`cabeceraAbajo`). Cabecera más baja (solo el día de la rutina, en una línea).
+- **«Hecho» en todas las series de repeticiones** (`hechoComoPrevisto` + `repsDeUnToque`): un botón por cada número de
+  repeticiones del rango («✓ Hecho con 80 kg: ¿cuántas? 3 · 4 · 5»); en un ciclo, el objetivo y los de alrededor; en la
+  máxima, 1, 2 o 3. Después, la recámara de un toque (`recamaraDeUnToque`, solo en «una serie») y pasa sola a la
+  siguiente: una serie son dos toques. Sigue sin salir en la prueba de 1RM ni en las series con bajadas.
+- «Te has saltado N ejercicios» en una línea con «Ver» (la lista y «no avisarme más» van en el cartel).
+- La serie de prueba de 1RM lleva tipo, comentario y papelera como las demás.
+- Quien empieza de cero (`archivoNuevo`): vista «una serie» y cuatro pestañas (Entrenar, Cuerpo, Ejercicios, Ajustes);
+  Sueño, Historial y Aprender se ponen en Ajustes → Personalización. A quien ya usaba la app no le cambia nada.
+- Entrenar: la recuperación, justo debajo de lo que toca (Dan: «es una de las mejores características»); sigue sin
+  salir a quien no ha entrenado nunca.
+- Calendario del historial: objetivo de días por semana (1 a 7), cuatro cifras (semanas seguidas cumpliendo, últimas
+  12 semanas cumplidas, días seguidos, entrenamientos del mes) y la explicación en un «?» (`rachaDeSemanas(fechas,
+  objetivo)`, `rachaDeDias`, `semanasCumplidas`).
+- `campoHora()` en ui.js (dos casillas, sin el selector del navegador): las tres horas de Ajustes y la del
+  «entrenamiento de otro día». «+ Añadir sitio» pregunta nombre y tipo. Icono de «Músculo»: un brazo sacando bíceps
+  (trazado de Lucide, licencia ISC).
+- Con permiso de Dan («corrige todo»), lo que quedaba de la parte de sueño: fuera `huboIlusiones`, `estaSonando`,
+  `faltaCribado` y la importación `modoPVT` del histórico.
