@@ -1734,3 +1734,41 @@ Pedido por la conversación del sueño y encargado aquí por Dan. Esquema v35.
 Los trozos de muñeco alrededor de la araña de «Equilibrio» se montaban unos encima de otros (en el ordenador y peor en
 el móvil). Ahora van en redondeles cuyo tamaño y distancia salen del número de zonas (`arana()` en vistas/equilibrio.js:
 diámetro = 92 % de la distancia entre vecinos, sin tocar la red); comprobado a 375 px, 12 zonas, ninguno se toca.
+
+## Auditoría con Fable (noche del 11 al 12-11-2026, sin Dan)
+
+Encargo de Dan: que la app sea más intuitiva que Hevy sin perder lo complejo, comprobar lo que mandó corregir y limpiar.
+Para volver a como estaba antes de la auditoría: etiqueta `v0.86.3-antes-auditoria`. Cada ronda es un commit que se
+deshace solo con `git revert`. Informe con capturas: https://claude.ai/artifact/6WHq2fAbLuBEo6x4CdT21K. Para probar a
+375 px con capturas fiables se usó un Chrome sin ventana manejado por código (el panel integrado las recorta); sin Node,
+la carga de todos los módulos se comprueba importándolos en ese Chrome antes de publicar.
+
+### 0.87.0: el primer entreno, sin carteles ni párrafos
+
+Recorrido de alguien nuevo (modo prueba): antes había 7 tarjetas y 9 botones en «Entrenar», dos carteles tras elegir el
+primer ejercicio y 2100 px de cosas por encima de las casillas de la primera serie. Ahora:
+- Bienvenida: «Entreno», una frase y una línea sobre Drive. Modo prueba: cartel corto y, en Inicio, una línea con
+  «Guardar en Google».
+- Inicio (`inicio.js`): saludo, lo que toca (o «Empezar entrenamiento») y debajo lo demás. Sin rutinas, «Rutina
+  recomendada» con «Usar esta rutina», que la añade de un toque (`anadirPlantilla`). Instalar, avisos del descanso y «Poner
+  mi peso» van debajo de lo principal; la recuperación y la pregunta de avisos solo salen cuando ya has entrenado; fuera
+  la pista «hoy» y el consejo del peso repetido.
+- Entreno (`sesion.js`): un ejercicio de la lista general entra sin preguntar; el entreno vacío dice «Empieza por un
+  ejercicio»; la vista se pone sola (la de la última vez o «un ejercicio cada vez») y el cartel «¿Cómo quieres verlo?»
+  solo sale si se marca en Ajustes (`perfil.preguntarVista === true`; se cambia con el ojo o en «⋯»); «¿Cómo llegas?»
+  sale plegado en una línea para quien nunca lo ha usado; «¿Dónde entrenas hoy?» solo para quien ha entrenado en dos
+  sitios o más; la pregunta de avisos, tras la primera serie; puntitos y pista de deslizar solo con dos ejercicios o más;
+  sin línea «Tu 1RM: aún no lo sabe la app» ni casilla «% 1RM» mientras no hay 1RM; fecha, sitio y ojo en una fila;
+  cabecera de cada serie en una fila (el tipo dice solo la regla en el móvil); «para a 2 del fallo…» y «con tu 1RM te
+  salen N» solo en la serie que toca; dibujo algo más bajo en el móvil (20 % del alto).
+- **«✓ Hecho: 60 kg × 8»** (`hechoComoPrevisto`): en la serie que toca, si la app sabe el peso y las repeticiones del
+  objetivo (o las de la última vez), un toque la apunta, arranca el descanso y la siguiente pregunta la recámara con
+  chips («¿Cuántas te quedaban…?»). No sale en la prueba de 1RM, en ciclos, en máximas ni en series con bajadas: ahí
+  cuenta lo que salga y se escribe. Es el ✓ de Hevy.
+- **Fallo arreglado (ui.js), venía de la 0.72**: cerrar un cartel y cambiar de pantalla en el mismo toque («⋯ → Ir a la
+  app», «⋯ → Terminar entrenamiento», enlaces dentro de un cartel) devolvía a la pantalla de antes y el resumen no salía.
+  Chrome lanza un `popstate` al cambiar de pantalla y se contaba como el «atrás» propio del cartel. Ahora `cierres`,
+  `urlAlCerrar` y `destinoTrasCerrar` los distinguen por la dirección. Probado con toques reales.
+- Una mancuerna no es dos (`conMancuernas` en calculos.js): sentadilla goblet, pullover, «remo con mancuerna», curl
+  concentrado y leñador ya no llevan «kg ×2» ni cuentan doble en el 1RM; el salto de peso sigue siendo el de mancuernas
+  (`usaMancuernas`).

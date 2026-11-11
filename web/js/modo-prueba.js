@@ -12,9 +12,8 @@ import { sincronizar } from './sincronizacion.js';
 import { normalizar } from './catalogo.js';
 import { aviso, h, modal } from './ui.js';
 
-export const TEXTO_AVISO = 'Estás en modo prueba: nada se guarda en tu cuenta. Todo queda solo en este navegador, así que si '
-  + 'borras sus datos, desinstalas la app o se te estropea el móvil, perderás estos entrenamientos. Puedes entrar con Google '
-  + 'cuando quieras y lo que hayas hecho hasta ahora se guardará en tu Drive.';
+export const TEXTO_AVISO = 'Todo queda solo en este navegador: si borras sus datos, desinstalas la app o cambias de móvil, se pierde. '
+  + 'Puedes entrar con Google cuando quieras y lo hecho se guardará en tu Drive.';
 
 // Cartel grande al entrar en modo prueba.
 export function avisarModoPrueba() {
@@ -28,10 +27,10 @@ export function avisarModoPrueba() {
 
 // Barra fija arriba de la pantalla de inicio mientras se está en prueba.
 export function barraModoPrueba() {
-  return h('section', { class: 'tarjeta aviso-tarjeta aviso-prueba' },
-    h('p', {}, h('strong', {}, 'Modo prueba. '), 'Nada se guarda en tu cuenta: si se borra el navegador o se estropea el móvil, '
-      + 'se pierden estos entrenamientos.'),
-    h('button', { class: 'boton', onclick: guardarPruebaEnCuenta }, 'Entrar con Google y guardar lo hecho'));
+  // Una línea: el aviso largo ya salió en el cartel de entrada.
+  return h('section', { class: 'tarjeta aviso-tarjeta aviso-prueba compacta' },
+    h('p', {}, h('strong', {}, 'Modo prueba'), ': sin cuenta.'),
+    h('button', { class: 'boton secundario', onclick: guardarPruebaEnCuenta }, 'Guardar en Google'));
 }
 
 // Entra con Google y añade a la cuenta lo hecho en prueba.

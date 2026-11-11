@@ -114,10 +114,10 @@ export function preguntaAvisos() {
   const perfil = estado.datos()?.perfil;
   if (!enMovil() || preguntaDescartada || !puedeNotificar() || perfil?.avisarDescanso === false || Notification.permission !== 'default') return null;
   const caja = h('div', { class: 'tarjeta pregunta-avisos' },
-    h('p', {}, h('strong', {}, '¿Te aviso cuando acabe cada descanso?'),
-      h('small', { class: 'bloque suave' }, 'Con una notificación que vibra, aunque tengas el móvil bloqueado. Al tocar «¡Avísame!», el móvil te pide permiso: acéptalo.')),
+    h('p', {}, h('strong', {}, '¿Te aviso al acabar cada descanso?'),
+      h('small', { class: 'bloque suave' }, 'Vibra aunque el móvil esté bloqueado. Te pedirá permiso: acéptalo.')),
     h('div', { class: 'fila-botones' },
-      h('button', { type: 'button', class: 'boton secundario', onclick: () => { estado.cambiar((x) => { x.perfil.avisarDescanso = false; }); caja.remove(); } }, 'Sin avisos, gracias'),
+      h('button', { type: 'button', class: 'boton secundario', onclick: () => { estado.cambiar((x) => { x.perfil.avisarDescanso = false; }); caja.remove(); } }, 'No, gracias'),
       // Si el permiso no llega, la tarjeta se va hasta que vuelvas a abrir la app: no insiste.
       h('button', { type: 'button', class: 'boton', onclick: async () => { await activarNotificaciones(); preguntaDescartada = true; caja.remove(); } }, '¡Avísame!')));
   return caja;

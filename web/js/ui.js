@@ -160,18 +160,44 @@ export function aviso(texto, { tipo = 'info', ms, accion } = {}) {
 // Cada cartel deja una entrada en el historial del navegador: así el botón de
 // atrás del móvil lo cierra en vez de salir de la pantalla (Dan, 29-10-2026:
 // «dando atrás que se salga, no quiero tener que subir hasta la X»).
-let popsPropios = 0;
-let navegoAlCerrar = false;   // se cerró un cartel y enseguida se cambió de pantalla
-addEventListener('hashchange', () => { if (popsPropios > 0) navegoAlCerrar = true; });
+//
+// Cerrar un cartel por código da un paso atrás en el historial (para quitar su
+// entrada), y ese paso llega tarde: si en el mismo toque el código cambia de
+// pantalla («⋯ → Ir a la app», «⋯ → Terminar entrenamiento», un enlace dentro
+// de un cartel), el atrás llegaba después y devolvía a la pantalla de antes.
+// Fallo desde la 0.72, encontrado en la auditoría del 11-11-2026: Chrome
+// lanza un popstate al momento por el propio cambio de pantalla, y ese se
+// tomaba por el atrás esperado. Ahora se distinguen por la dirección: mientras
+// se espera el atrás, un popstate en otra dirección es el cambio de pantalla
+// (se apunta el destino) y, cuando llega el atrás de verdad, se vuelve a ir.
+let cierres = 0;           // pasos atrás propios que aún no han llegado
+let urlAlCerrar = null;    // dónde estaba la app al cerrar el cartel
+let destinoTrasCerrar = null;        // a dónde se quiso ir justo después de cerrarlo
+let renavegando = false;
+let relojCierres = null;
 addEventListener('popstate', () => {
-  if (popsPropios > 0) {
-    popsPropios -= 1;
-    // El atrás de cerrar llegó después de un cambio de pantalla: lo deshace.
-    if (navegoAlCerrar) { navegoAlCerrar = false; history.forward(); }
+  if (renavegando) return;
+  if (cierres > 0) {
+    if (location.href !== urlAlCerrar) { destinoTrasCerrar = location.href; return; }
+    cierres -= 1;
+    if (cierres > 0) return;
+    clearTimeout(relojCierres);
+    if (destinoTrasCerrar) {
+      const ir = destinoTrasCerrar;
+      destinoTrasCerrar = null;
+      renavegando = true;
+      try { location.href = ir; } finally { renavegando = false; }
+      // Los carteles que se abrieron entre medias (el resumen al terminar) recuperan su entrada: atrás los cierra.
+      for (let n = document.querySelectorAll('.modal-fondo').length; n > 0; n--) {
+        try { history.pushState({ cartel: true }, ''); } catch { /* sin historial */ }
+      }
+    }
     return;
   }
   const abiertos = document.querySelectorAll('.modal-fondo');
-  abiertos[abiertos.length - 1]?.remove();
+  if (abiertos.length) { abiertos[abiertos.length - 1].remove(); return; }
+  // Una entrada de cartel que quedó suelta (se cambió de pantalla con él abierto): se salta.
+  if (history.state?.cartel) history.back();
 });
 
 export function modal(titulo, contenido) {
@@ -187,7 +213,14 @@ export function modal(titulo, contenido) {
   function cerrar() {
     if (!fondo.isConnected) return;
     fondo.remove();
-    if (history.state?.cartel) { popsPropios += 1; history.back(); }
+    if (history.state?.cartel) {
+      if (cierres === 0) { urlAlCerrar = location.href; destinoTrasCerrar = null; }
+      cierres += 1;
+      // Por si el atrás no llegara nunca (historial vacío): no se queda esperando.
+      clearTimeout(relojCierres);
+      relojCierres = setTimeout(() => { cierres = 0; destinoTrasCerrar = null; }, 1500);
+      history.back();
+    }
   }
   fondo.cerrar = cerrar;
   return cerrar;

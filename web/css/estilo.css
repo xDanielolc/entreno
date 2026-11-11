@@ -2409,3 +2409,44 @@ body.entreno-a-pantalla .tira-inferior { display: none; }
   transition: width 0.4s linear;
 }
 
+
+/* ---------------------------------------------------------------------------
+   Auditoría del 11-11-2026 (0.87): menos cosas entre abrir la app y apuntar la serie.
+   --------------------------------------------------------------------------- */
+/* Modo prueba, en una línea. */
+.aviso-prueba.compacta { display: flex; align-items: center; gap: 10px; padding: 10px 14px; }
+.aviso-prueba.compacta p { margin: 0; flex: 1 1 auto; text-align: left; font-size: .92rem; }
+.aviso-prueba.compacta .boton { flex: 0 0 auto; min-height: 40px; padding: 6px 14px; font-size: .9rem; width: auto; }
+/* Entreno sin ejercicios. */
+.entreno-vacio { text-align: center; padding: 12vh 8px 24px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.entreno-vacio h2 { margin: 8px 0 0; font-size: 1.3rem; }
+.entreno-vacio p { margin: 0 0 14px; max-width: 28ch; }
+.entreno-vacio-icono { width: 64px; height: 64px; border-radius: 20px; background: var(--superficie-2); display: grid; place-items: center; color: var(--texto-suave); }
+.entreno-vacio-icono .icono { width: 34px; height: 34px; }
+/* La rutina recomendada, como la tarjeta de «Hoy te toca». */
+.tarjeta-recomendada .boton { width: 100%; margin-top: 8px; }
+.tarjeta-recomendada > p.suave { margin-bottom: 4px; }
+/* «¿Cómo llegas?» plegado: una línea, no una tarjeta. */
+details.como-llegas:not([open]) { background: none; box-shadow: none; border: 0; padding: 0; margin: 0 0 8px; }
+details.como-llegas:not([open]) > summary { font-weight: 500; font-size: .92rem; color: var(--texto-suave); min-height: 36px; }
+/* Fecha, sitio y ojo en una sola fila. */
+.fila-cabecera-entreno { flex-wrap: nowrap; }
+.fila-cabecera-entreno .fecha { flex: 0 1 9.2em; min-width: 0; padding-inline: 10px; }
+.fila-cabecera-entreno > .fila-marcas, .fila-cabecera-entreno > .selector-abrir { flex: 1 1 5em; min-width: 0; }
+.fila-cabecera-entreno .boton-vista { flex: 0 0 auto; }
+/* «+ Otra serie» y «Programar series», en una línea cada uno. */
+.fila-mas-series .boton { font-size: .95rem; padding-inline: 10px; white-space: nowrap; min-height: 48px; }
+.fila-mas-series { align-items: stretch; }
+.tarjeta .fila-botones.fila-mas-series > .boton { height: 48px; margin: 0; }
+/* «Tu 1RM: 82 kg», su «?» y «Cambiar», en la misma línea. */
+.linea-1rm { flex-wrap: nowrap; }
+.linea-1rm > span:first-child { min-width: 0; }
+.linea-1rm .boton.enlace { flex: 0 0 auto; min-height: 36px; padding: 4px 12px; font-size: .9rem; }
+.linea-1rm:has(.subido-hoy) { flex-wrap: wrap; }
+/* El dibujo del ejercicio, algo más bajo en el móvil: las casillas de la serie quedan más cerca. */
+@media (max-width: 699px) { .foto-ejercicio img { max-height: min(220px, 20vh); } }
+/* La cabecera de cada serie, en una fila: el tipo (si no cabe, se corta con puntos), el comentario y la papelera.
+   Antes eran dos filas y un hueco en blanco por serie. */
+.serie-cabecera > .selector-abrir { flex: 1 1 0; min-width: 0; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: .88rem; text-align: left; }
+.serie-cabecera > .marca:empty { display: none; }
+.serie-cabecera > .boton-bocadillo, .serie-cabecera > .borrar-serie { flex: 0 0 auto; }

@@ -262,7 +262,7 @@ export function vistaAjustes(contenedor) {
         opciones(MODOS_GLOSARIO, modoGlosario(d), (m) => estado.cambiar((x) => { x.perfil.glosario = m; }), { compacto: true }),
         h('small', { class: 'nota' }, 'Salen detrás de palabras como 1RM, recámara o serie descendente. También se quitan desde el propio cartel.')),
       h('label', { class: 'casilla' },
-        h('input', { type: 'checkbox', checked: d.perfil.preguntarVista !== false,
+        h('input', { type: 'checkbox', checked: d.perfil.preguntarVista === true,
           onchange: (e) => estado.cambiar((x) => { x.perfil.preguntarVista = e.target.checked; }) }),
         'Preguntar «¿cómo quieres verlo?» al empezar cada entrenamiento'),
       h('label', { class: 'casilla' },

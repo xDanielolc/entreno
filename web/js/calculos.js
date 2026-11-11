@@ -723,7 +723,18 @@ export function unLado(ejercicio) {
   if (typeof ejercicio?.unilateral === 'boolean') return ejercicio.unilateral;   // lo elegido en Ajustes finos
   return /(a una mano|a un brazo|a una pierna|unilateral)/i.test(ejercicio?.nombre ?? '');
 }
-export function conMancuernas(ejercicio) { return /mancuerna/i.test(materialDe(ejercicio) ?? '') || /mancuerna/i.test(ejercicio?.nombre ?? ''); }
+// ¿Se hace con mancuernas (una o dos)? Para el salto de peso: van de 2 en 2.
+function usaMancuernas(ejercicio) { return /mancuerna/i.test(materialDe(ejercicio) ?? '') || /mancuerna/i.test(ejercicio?.nombre ?? ''); }
+// ¿Con DOS mancuernas, una en cada mano? Entonces se apunta el peso de una («kg ×2») y el 1RM cuenta las dos.
+// Con una sola (sentadilla goblet, pullover, «remo con mancuerna», curl concentrado, leñador…) el peso apuntado es
+// el que se levanta: antes contaban doble y el 1RM salía inflado (auditoría del 11-11-2026).
+const UNA_MANCUERNA = /(goblet|pullover|concentrado|le[ñn]ador|inclinaciones laterales)/i;
+export function conMancuernas(ejercicio) {
+  const nombre = ejercicio?.nombre ?? '';
+  if (/mancuernas/i.test(nombre)) return true;
+  if (/mancuerna/i.test(nombre) || UNA_MANCUERNA.test(nombre)) return false;
+  return materialDe(ejercicio) === 'mancuernas';
+}
 // Calentamientos de 10 en 10 kg (decisión práctica de Dan: sin cuentas al
 // calentar). Se quita en Ajustes y entonces van con el % exacto.
 let calentamientoRedondo = true;
@@ -773,7 +784,7 @@ export function materialDe(ejercicio) {
 }
 export function pasoDe(ejercicio) {
   if (ejercicio?.redondeoKg > 0) return ejercicio.redondeoKg;
-  return conMancuernas(ejercicio) ? redondeoMancuernas : redondeoGlobal;
+  return usaMancuernas(ejercicio) ? redondeoMancuernas : redondeoGlobal;
 }
 
 // Redondea al salto de disco: en el gimnasio no hay 25,6 kg.

@@ -7,7 +7,7 @@ import { tarjetaRecuperacion, tarjetaSugerenciasAjuste } from './cuerpo.js';
 import { tarjetaInstalar } from './instalar.js';
 import { pista } from './tutorial.js';
 import { cuestionarioCerrado, cuestionarioHecho, hacerCuestionario, rutinaRecomendada } from './cuestionario.js';
-import { PLANTILLAS } from '../plantillas.js';
+import { PLANTILLAS, anadirPlantilla } from '../plantillas.js';
 import { cuentaParaFatiga } from '../catalogo.js';
 import { nombreMusculo } from '../musculos.js';
 import { recuperacionPorMusculo } from '../recuperacion.js';
@@ -23,14 +23,15 @@ import { tarjetaRetos } from './cifras.js';
 // Lo que ya enseña el muñeco de Cuerpo (series por músculo) no se repite aquí.
 const YA_SE_VE = new Set(['volumen-bajo', 'volumen-bien']);
 
-function avisosDeHoy(d) {
+function avisosDeHoy(d, { sinPeso = false } = {}) {
   const semana = (() => {
     const f = new Date(); f.setHours(0, 0, 0, 0); f.setDate(f.getDate() + 3 - ((f.getDay() + 6) % 7));
     const enero = new Date(f.getFullYear(), 0, 4);
     return `${f.getFullYear()}-${1 + Math.round(((f - enero) / 86_400_000 - 3 + ((enero.getDay() + 6) % 7)) / 7)}`;
   })();
   return recomendacionesGenerales(d)
-    .filter((r) => (r.nivel !== 'bien' || r.clave === 'vas-bien') && !YA_SE_VE.has(r.clave))
+    // Si ya sale la tarjeta «Poner mi peso», el consejo del peso sobra.
+    .filter((r) => (r.nivel !== 'bien' || r.clave === 'vas-bien') && !YA_SE_VE.has(r.clave) && !(sinPeso && r.clave === 'peso'))
     .map((r) => pista(`aviso-${r.clave}-${r.texto.split(/[:.]/)[0]}-${semana}`, r.texto,
       { siempre: true, icono: r.nivel === 'aviso' ? 'aviso' : '→', clase: 'pista-aviso' }))
     .filter(Boolean)
@@ -118,12 +119,19 @@ function listaDelDia(d, dia) {
 }
 
 // Con el cuestionario hecho y sin rutinas: la prehecha que mejor encaja.
+// Un toque la añade (con sus ejercicios) y la pantalla pasa a decir qué toca hoy.
 function tarjetaRecomendacion(d) {
   const plantilla = PLANTILLAS.find((p) => p.id === rutinaRecomendada(d.perfil));
   if (!plantilla) return null;
-  return h('section', { class: 'tarjeta aviso-tarjeta' },
-    h('p', {}, h('strong', {}, 'Para empezar te recomiendo: '), plantilla.nombre, '. ', plantilla.resumen),
-    h('a', { class: 'boton', href: '#/rutinas' }, 'Ver las rutinas prehechas'));
+  return h('section', { class: 'tarjeta tarjeta-hoy tarjeta-recomendada' },
+    h('div', { class: 'antetitulo' }, 'Rutina recomendada'),
+    h('h2', {}, plantilla.nombre),
+    h('p', { class: 'suave' }, plantilla.resumen),
+    h('button', { class: 'boton', onclick: () => {
+      estado.cambiar((datos) => { anadirPlantilla(datos, plantilla); });
+      aviso('Rutina añadida: ya tienes qué toca hoy.');
+    } }, 'Usar esta rutina'),
+    h('a', { class: 'boton secundario', href: '#/rutinas' }, 'Ver todas las rutinas'));
 }
 
 export function vistaInicio(contenedor) {
@@ -136,6 +144,7 @@ export function vistaInicio(contenedor) {
   const rutina = toca?.rutina ?? null;
   const dia = toca?.dia ?? null;
   const otras = (toca?.alternativas ?? []).filter((a) => a.rutina.id !== rutina?.id);
+  const haEntrenado = d.sesiones.some((s) => !s.borrada && s.estado === 'terminada');
 
   // Primera vez: ¿cuánto tutorial quieres? (no encima de otro cartel)
   // Primera vez: el cuestionario de bienvenida (nivel, objetivo, dónde,
@@ -187,26 +196,6 @@ export function vistaInicio(contenedor) {
     h('div', { class: 'saludo-hoy' },
       h('h1', {}, saludo(d.perfil.nombre)),
       h('p', { class: 'suave' }, fechaDeHoy())),
-    tarjetaInstalar(),
-    preguntaAvisos(),
-    pista('hoy', 'Qué toca hoy y cómo va tu recuperación. Si quieres más ayuda, en la pestaña «Aprender» están el tutorial y el glosario.'),
-
-    // Tu peso, aquí mismo: sin mandarte a Ajustes.
-    necesitaPeso && h('div', { class: 'tarjeta aviso-tarjeta fila-aviso' },
-      h('span', {}, 'Tus ejercicios con tu peso o con máquina asistida necesitan saber cuánto pesas.'),
-      h('button', { class: 'boton', onclick: () => {
-        const caja = h('input', { type: 'text', inputmode: 'decimal', 'aria-label': 'Tu peso en kilos' });
-        const cerrar = modal('Tu peso corporal', h('div', { class: 'formulario' },
-          h('label', { class: 'campo' }, h('span', { class: 'etiqueta-campo' }, 'Peso (kg)'), caja),
-          h('p', { class: 'nota' }, 'Solo para calcular la carga de flexiones, dominadas y máquinas asistidas.'),
-          h('button', { class: 'boton', onclick: () => {
-            const kg = leerNumero(caja.value);
-            if (!(kg > 0)) { aviso('Pon un número', { tipo: 'error' }); return; }
-            cerrar();
-            estado.cambiar((x) => { apuntarPeso(x, kg); });
-          } }, 'Guardar')));
-        setTimeout(() => caja.focus(), 50);
-      } }, 'Poner mi peso')),
 
     enCurso?.tutorial
       ? h('section', { class: 'tarjeta' },
@@ -246,20 +235,36 @@ export function vistaInicio(contenedor) {
       h('button', { class: 'boton secundario', onclick: empezarSuelto }, 'Entrenar sin rutina'),
       h('a', { class: 'boton secundario', href: '#/rutinas' }, 'Ver rutinas')),
 
-    !d.rutinas.length && cuestionarioHecho(d) && tarjetaRecomendacion(d),
+    // Sin rutinas: la recomendada (un toque la añade) o, sin cuestionario, el camino a las prehechas.
+    // Auditoría del 11-11-2026: antes eran dos tarjetas con párrafo y tres botones.
+    !rutina && ((!d.rutinas.length && cuestionarioHecho(d) && tarjetaRecomendacion(d))
+      || h('a', { class: 'boton secundario', href: '#/rutinas' }, d.rutinas.length ? 'Elegir una rutina' : 'Ver rutinas ya hechas')),
 
-    !activos.length && h('div', { class: 'tarjeta' },
-      h('p', {}, 'Aún no tienes ejercicios. Puedes añadir una rutina prehecha (trae sus ejercicios) o crear el primero.'),
-      h('div', { class: 'fila-botones' },
-        h('a', { class: 'boton', href: '#/rutinas' }, 'Rutinas prehechas'),
-        h('a', { class: 'boton secundario', href: '#/ejercicio/nuevo' }, 'Crear ejercicio'))),
+    // Tu peso, aquí mismo: sin mandarte a Ajustes.
+    necesitaPeso && h('div', { class: 'tarjeta aviso-tarjeta fila-aviso' },
+      h('span', {}, 'Tus ejercicios con tu peso o con máquina asistida necesitan saber cuánto pesas.'),
+      h('button', { class: 'boton', onclick: () => {
+        const caja = h('input', { type: 'text', inputmode: 'decimal', 'aria-label': 'Tu peso en kilos' });
+        const cerrar = modal('Tu peso corporal', h('div', { class: 'formulario' },
+          h('label', { class: 'campo' }, h('span', { class: 'etiqueta-campo' }, 'Peso (kg)'), caja),
+          h('p', { class: 'nota' }, 'Solo para calcular la carga de flexiones, dominadas y máquinas asistidas.'),
+          h('button', { class: 'boton', onclick: () => {
+            const kg = leerNumero(caja.value);
+            if (!(kg > 0)) { aviso('Pon un número', { tipo: 'error' }); return; }
+            cerrar();
+            estado.cambiar((x) => { apuntarPeso(x, kg); });
+          } }, 'Guardar')));
+        setTimeout(() => caja.focus(), 50);
+      } }, 'Poner mi peso')),
 
-    activos.length > 0 && !rutina && h('a', { class: 'boton secundario', href: '#/rutinas' },
-      'Elegir o crear una rutina para que te diga qué toca cada día'),
+    // Instalar y los avisos del descanso, debajo de lo principal (antes iban delante de «Empezar»).
+    tarjetaInstalar(),
+    haEntrenado && preguntaAvisos(),
 
     tarjetaSugerenciasAjuste(d),
-    avisosDeHoy(d),
-    tarjetaRecuperacion(d, { compacta: true,
+    avisosDeHoy(d, { sinPeso: necesitaPeso }),
+    // La recuperación, cuando ya hay algún entrenamiento del que recuperarse.
+    haEntrenado && tarjetaRecuperacion(d, { compacta: true,
       extra: h('button', { class: 'boton secundario', onclick: () => voyHoy(d, dia) }, '¿Voy hoy? ¿Cansancio o pereza?') }),
 
     // Récords y retos a la vista: motivan (ideas de Lyfta, Dan, 27-10-2026).
