@@ -156,7 +156,7 @@ Elevación de piernas colgado: 2 × 5-8 con 2 en recámara (piernas estiradas; c
       { nombre: 'Día 3: tirón', ejercicios: [
         e('Remo con barra', [bilbo, dropSet(6, 8)]),
         e('Dominadas', [bilbo, dropSet(6, 8)]),
-        e('Remo en polea', [bilbo, dropSet(6, 8)]),
+        e('Remo en polea a la cintura', [bilbo, dropSet(6, 8)]),
         e('Curl martillo', [bilbo, isometrico(8, 12)]),
         e('Pájaros con mancuernas', [bilbo, isometrico(10, 12)]),
         e('Cardio', [libre], { opcional: true }),
@@ -561,7 +561,7 @@ Elevación de piernas colgado: 2 × 5-8 con 2 en recámara (piernas estiradas; c
         e('Peso muerto rumano', series(2, 8, 12)), e('Press de hombro con mancuernas', series(2, 8, 12)), e('Plancha', series(2, 20, 45)),
       ] },
       { nombre: 'B', ejercicios: [
-        e('Prensa de piernas', series(3, 10, 12)), e('Flexiones', series(3, 5, 15)), e('Remo en polea', series(3, 8, 12)),
+        e('Prensa de piernas', series(3, 10, 12)), e('Flexiones', series(3, 5, 15)), e('Remo en polea a la cintura', series(3, 8, 12)),
         e('Puente de glúteo', series(2, 10, 15)), e('Curl femoral tumbado', series(2, 10, 12)), e('Bicho muerto', series(2, 8, 12)),
       ] },
     ],

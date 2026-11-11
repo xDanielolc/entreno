@@ -1845,3 +1845,14 @@ con datos montados a mano), toques y deslizamientos reales con `Input.dispatchTo
 «sin conexión» con `Network.emulateNetworkConditions` y oscuro forzado con `--blink-settings=forceDarkModeEnabled=true`.
 Los scripts están en `herramientas/pruebas/` (con su `LEEME.md`); `comprobar.sh` hay que pasarlo antes de cada
 publicación, porque sin Node un nombre repetido o una importación rota solo se ve al cargar la app.
+
+### 0.88.2 (12-11-2026, ya con Dan): «Remo en polea a la cintura» y el aviso del test
+
+- Esquema v39 (`RENOMBRADOS_V39`): «Remo en polea» pasa a «Remo en polea a la cintura» en tus ejercicios (el historial
+  va por id), el catálogo, las dos prehechas que lo llevan, lo que viene de los Excel y los créditos de los dibujos (el
+  nombre viejo queda como alias). Las herramientas de dibujos (`animar_imagenes.py`, `imagenes_ia.py`,
+  `peticiones.json`) usan ya el nombre nuevo.
+- El aviso del test de atención a los 45 min **no le llega** a Dan. La hora se calcula bien; lo que falla es el método:
+  es un temporizador de la página y el móvil congela la app al apagar la pantalla, así que nunca se dispara. Sin un
+  servidor que mande el aviso (push) no tiene arreglo dentro de la app. Las tres salidas están en `docs/pendientes.md`
+  (sección 0); no se ha tocado `pvt.js`, que es de la conversación del sueño.

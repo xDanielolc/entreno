@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 38;
+export const VERSION_ACTUAL = 39;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -758,6 +758,24 @@ const MIGRACIONES = {
     datos.version = 38;
     return datos;
   },
+  // v38 → v39: «Remo en polea» pasa a llamarse «Remo en polea a la cintura» (Dan, 12-11-2026), para distinguirlo de
+  // «Remo en polea al pecho» y «Remo abierto en polea». Cambia el nombre de tu ejercicio (su historial va por id, no
+  // por nombre) y el `fotoDe` de las variantes partidas de él.
+  38: (datos) => {
+    const n = (s) => (s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+    const nombres = new Set(datos.ejercicios.map((ej) => n(ej.nombre)));
+    const cambio = new Map(Object.entries(RENOMBRADOS_V39).map(([a, b]) => [n(a), b]));
+    for (const ej of datos.ejercicios) {
+      const nuevo = cambio.get(n(ej.nombre));
+      if (nuevo && !nombres.has(n(nuevo))) {
+        ej.nombre = nuevo;
+        nombres.add(n(nuevo));
+      }
+      if (cambio.has(n(ej.fotoDe))) ej.fotoDe = cambio.get(n(ej.fotoDe));
+    }
+    datos.version = 39;
+    return datos;
+  },
 };
 
 // Las series de trabajo de cada día de `rutina` que aún no se han hecho nunca se enlazan (`sigueA`) con la serie del
@@ -800,6 +818,11 @@ function sedesBasicas(sedes) {
   }
   return salida;
 }
+
+// Nombres de antes → nombres de la v39 (no cambiar: lo usa una migración publicada).
+const RENOMBRADOS_V39 = {
+  'Remo en polea': 'Remo en polea a la cintura',
+};
 
 // Nombres de antes → nombres de la v23 (no cambiar: lo usa una migración publicada).
 const RENOMBRADOS_V23 = {

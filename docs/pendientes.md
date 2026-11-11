@@ -24,6 +24,15 @@ archivo que se cita; lo ya hecho se ha marcado con [x].
       entrenar; que la serie de prueba de 1RM tenga papelera y tipo; acortar el aviso «Te has saltado…»; que «+ Añadir
       sitio» pida el nombre (ahora crea otro «Gimnasio»); el «% 1RM» de una casilla no se refresca hasta repintar;
       teclado propio con calculadora de discos (idea de Hevy).
+- [ ] **El aviso del test de atención no llega** (Dan, 12-11-2026: «no me llega»). No es un fallo de la cuenta (la
+      hora sale bien: levantado + 45 min), es el método: el aviso es un temporizador de la propia página
+      (`programarUno` en pvt.js) y el móvil congela la app en cuanto se apaga la pantalla o se cambia de app, así
+      que a los 45 minutos ya no hay nadie para lanzarlo. Solo saldría con la app abierta y a la vista todo ese rato.
+      Tres salidas, a elegir por Dan: (1) avisos de verdad con el Worker de Cloudflare que ya existe para renovar el
+      pase de Google (push: hay que añadirle una tarea cada minuto, un almacén y dos claves; lo prepara Claude y Dan
+      da tres pasos en Cloudflare); (2) que al apuntar «levantado» la app ofrezca el texto «Pon una alarma a las
+      HH:MM» (sin automatismo: una web no puede crear alarmas del móvil); (3) dejarlo y que el texto no prometa un
+      aviso: «al abrir la app después de las HH:MM te lo recuerdo». Los archivos son de la conversación del sueño.
 - [ ] **Avisar a la conversación del sueño** (no estaba en marcha esa noche): casilla `type="time"` en Ajustes →
       Perfil; `huboIlusiones`, `estaSonando` y `faltaCribado` sin uso; importación `modoPVT` sobrante en
       historico-pvt.js.
@@ -32,8 +41,7 @@ archivo que se cita; lo ya hecho se ha marcado con [x].
       línea del hack, «cabeza huevo» en jalón, goblet, zancadas y rotación con
       toalla, alias que no cuadran, press a una mano con ChatGPT). Seis
       reencajes de prueba sin aplicar en el scratchpad de la sesión del 02-11.
-- [ ] **«Remo en polea» → «Remo en polea a la cintura»**: renombrar con
-      migración de esquema (como `RENOMBRADOS_V23`).
+- [x] **«Remo en polea» → «Remo en polea a la cintura»** (0.88.2, esquema v39, `RENOMBRADOS_V39`).
 - [ ] **Nombres con el material** («Elevaciones laterales con mancuernas»…),
       del repaso de dibujos del 21-10.
 - [ ] **Elevación de piernas colgado**: el paso de 2 × 5-8 a 2 × 8-12 es a mano

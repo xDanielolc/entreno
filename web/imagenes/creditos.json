@@ -291,7 +291,7 @@
    "fuente": "everkinetic",
    "nombreEnFuente": "t-bar-rows"
   },
-  "Remo en polea": {
+  "Remo en polea a la cintura": {
    "archivo": "imagenes/ejercicios/ia/remo-en-polea.webp",
    "estatica": "imagenes/ejercicios/ia/remo-en-polea-quieta.webp",
    "animada": true,
@@ -2054,7 +2054,7 @@
    "animada": true,
    "fuente": "ia",
    "autor": "Gemini",
-   "aliasDe": "Remo en polea"
+   "aliasDe": "Remo en polea a la cintura"
   },
   "Jalón unilateral en polea": {
    "archivo": "imagenes/ejercicios/anim/jalon-al-pecho-ek.webp",
@@ -2088,7 +2088,7 @@
    "animada": true,
    "fuente": "ia",
    "autor": "Gemini",
-   "aliasDe": "Remo en polea"
+   "aliasDe": "Remo en polea a la cintura"
   },
   "Pullover con mancuerna": {
    "archivo": "imagenes/ejercicios/ia/pullover-en-polea-completo.webp",
@@ -2639,6 +2639,14 @@
    "estatica": "imagenes/ejercicios/anim/isometricos-de-cuello-quieta.webp",
    "animada": false,
    "nota": "Isométrico: dibujo quieto (Dan, 02-11-2026)"
+  },
+  "Remo en polea": {
+   "archivo": "imagenes/ejercicios/ia/remo-en-polea.webp",
+   "estatica": "imagenes/ejercicios/ia/remo-en-polea-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini",
+   "aliasDe": "Remo en polea a la cintura"
   }
  }
 }

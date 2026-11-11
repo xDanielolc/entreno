@@ -262,7 +262,7 @@ Con IA, dibujo propio que falta (ahora llevan el de otro ejercicio por alias y n
 - [ ] Rotación interna con toalla: las dos manos se mueven (la de abajo tira). Sobre la cabeza: la toalla no gira.
 - [ ] Peso muerto con mancuernas: más cachas. Remo en máquina, máquina de glúteo, elíptica, antebrazo flexores,
       flexiones en pica, peso muerto rumano con mancuernas: pendientes de antes.
-- [ ] Nombre: «Remo en polea» → «Remo en polea a la cintura».
+- [x] Nombre: «Remo en polea» → «Remo en polea a la cintura» (0.88.2, esquema v39).
 
 - «Cabeza huevo» (Dan, 02-11): la cabeza sale ovalada y lisa, sin forma de cráneo ni mandíbula. Al rehacer jalón al
   pecho, goblet, zancadas y rotación interna con toalla, pedir cabeza con forma de cráneo de verdad (aunque lisa).

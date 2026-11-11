@@ -87,7 +87,7 @@ export const CATALOGO = [
   ej('Remo con barra', 'tirón', 'barra', ['dorsal'], ['trapecio', 'biceps', 'lumbar', 'hombroPosterior']),
   ej('Remo con mancuerna', 'tirón', 'mancuernas', ['dorsal'], ['biceps', 'hombroPosterior']),
   ej('Remo en T', 'tirón', 'barra', ['dorsal'], ['trapecio', 'biceps', 'lumbar']),
-  ej('Remo en polea', 'tirón', 'polea', ['dorsal'], ['trapecio', 'biceps', 'hombroPosterior']),
+  ej('Remo en polea a la cintura', 'tirón', 'polea', ['dorsal'], ['trapecio', 'biceps', 'hombroPosterior']),
   ej('Remo en polea al pecho', 'tirón', 'polea', ['trapecio', 'hombroPosterior'], ['dorsal', 'biceps']),
   ej('Remo en máquina', 'tirón', 'máquina', ['dorsal'], ['trapecio', 'biceps', 'hombroPosterior']),
   ej('Remo invertido', 'tirón', 'barra baja', ['dorsal'], ['biceps', 'hombroPosterior'], corporal),

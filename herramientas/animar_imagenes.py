@@ -203,7 +203,7 @@ FORZADOS = {
     "Remo con mancuerna": ["rear-deltoid-row-dumbbell"],
     "Remo en T": ["t-bar-rows"],
     "Remo en máquina": ["seated-cable-rows"],
-    "Remo en polea": ["seated-cable-rows"],
+    "Remo en polea a la cintura": ["seated-cable-rows"],
     "Remo invertido": ["body-row"],
     "Sentadilla búlgara": ["one-leg-squat-with-barbell", "single-leg-squat-with-barbell"],
     "Sentadilla hack": ["hack-squat-machine"],

@@ -391,7 +391,7 @@ OTRO_DIBUJO = {"Fondos de pecho": "Fondos asistidos",
                "Peso muerto rumano con mancuernas": "Peso muerto con mancuernas",
                "Pájaros en polea": "Pájaros en máquina",
                "Press militar sentado": "Press militar",
-               "Remo en polea al pecho": "Remo en polea",
+               "Remo en polea al pecho": "Remo en polea a la cintura",
                "Sentadilla búlgara con barra": "Sentadilla búlgara",
                "Plancha lateral dinámica": "Plancha lateral"}
 
