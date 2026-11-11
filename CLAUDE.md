@@ -1856,3 +1856,26 @@ publicación, porque sin Node un nombre repetido o una importación rota solo se
   es un temporizador de la página y el móvil congela la app al apagar la pantalla, así que nunca se dispara. Sin un
   servidor que mande el aviso (push) no tiene arreglo dentro de la app. Las tres salidas están en `docs/pendientes.md`
   (sección 0); no se ha tocado `pvt.js`, que es de la conversación del sueño.
+
+## Ronda 0.89.0 (12-11-2026): avisos a su hora con un segundo Worker
+
+Dan eligió «avisos con Cloudflare» para el test de atención. Matiz de la decisión «sin servidor propio»: los **datos**
+siguen sin servidor (dispositivo y Drive); Cloudflare solo lleva dos ayudas que no los ven (el renovador del pase de
+Google y este servidor de avisos).
+- `herramientas/cloudflare/avisos.js` (Worker `entreno-avisos`): `GET /clave` y `POST /programar { endpoint, avisos:
+  [{ tipo, cuando }] }` (el estado completo de ese móvil; lista vacía = quitar). Guarda en un KV (`AVISOS`) la lista
+  de avisos pendientes en una sola clave y su par de claves VAPID, que crea él solo (sin secretos a mano). Un cron cada
+  minuto (`scheduled`) manda los que tocan como push **sin contenido** (solo firma ES256; nada que cifrar) y los borra;
+  los de más de 30 min de retraso se descartan y un móvil que ya no existe (404/410) se quita.
+- `web/js/avisos-push.js`: `programarPush(avisos)`. Se apunta al push con la clave pública del servidor (guardada un
+  día), no repite lo ya dicho (`entreno-push-estado` en localStorage) y, si el servidor no contesta, no insiste en diez
+  minutos. `CONFIG.urlAvisos` solo en la web publicada.
+- `pvt.js` (de la conversación del sueño, cambio mínimo): `programarAvisoPvt()` le pasa lo que queda por avisar hoy y
+  `quitarAvisoPvt()` lo vacía. El temporizador de siempre se queda como respaldo con la app abierta.
+- `sw.js`: `push` enseña «Test de atención» (o «…de la tarde» desde las 15:00) con el mismo `tag` que la app, sin volver
+  a vibrar si ya estaba. `avisos-push.js` está en la lista de archivos.
+- `privacidad.html` cuenta las dos ayudas de Cloudflare (antes decía «no tiene servidor propio»): **Dan debe leerla**.
+- Probado sin Cloudflare: el Worker dentro de Chrome con almacén y servicio de avisos simulados (orígenes, validación,
+  reparto a su hora, baja con 410, firma verificada con la clave pública) y el `push` del service worker con
+  `ServiceWorker.deliverPushMessage`. **Sin probar**: el envío real (necesita que Dan cree el Worker: cuatro pasos en
+  `docs/cloudflare.md`, «Avisos a su hora») y apuntarse desde un móvil.

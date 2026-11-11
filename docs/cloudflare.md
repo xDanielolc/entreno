@@ -77,3 +77,53 @@ indicador de arriba, Google te pedirá permiso una última vez.
 - Solo acepta peticiones desde `https://xdanielolc.github.io`.
 - Para cortarlo todo: quitar el acceso de la app en
   <https://myaccount.google.com/permissions>, o borrar el Worker.
+
+---
+
+# Avisos a su hora (segundo Worker, 12-11-2026)
+
+Para que el aviso del test de atención llegue **con la app cerrada y el móvil bloqueado**. Hasta ahora era un
+temporizador de la propia app, y el móvil la congela al apagar la pantalla: no llegaba. Este Worker guarda «avisa a
+este móvil a tal hora» y lo manda él. El código está en `herramientas/cloudflare/avisos.js`.
+
+Qué guarda: la dirección de avisos que da el navegador de cada móvil (anónima) y la hora. Nada de lo que apuntas. No
+lleva ningún secreto puesto a mano: sus claves las crea él solo y se quedan en su almacén.
+
+Tiempo: unos 10 minutos. Mientras no lo hagas, la app sigue como estaba (no falla).
+
+## 1. Crear el Worker
+
+1. <https://dash.cloudflare.com> → **Workers & Pages** → **Create** → **Create Worker**.
+2. Nombre, exactamente: `entreno-avisos` (la app ya lo busca en
+   `https://entreno-avisos.entreno-app.workers.dev`). Pulsa **Deploy**.
+3. **Edit code**, borra lo que hay, pega entero `herramientas/cloudflare/avisos.js` y pulsa **Deploy**.
+
+## 2. Su almacén
+
+1. En el menú de la izquierda: **Storage & Databases** → **KV** → **Create** (o «Create a namespace»). Nombre:
+   `entreno-avisos`. Crear.
+2. Vuelve al Worker `entreno-avisos` → **Settings** → **Bindings** → **Add** → **KV namespace**.
+   Variable name: `AVISOS` (en mayúsculas, tal cual). KV namespace: `entreno-avisos`. **Deploy**.
+
+## 3. Quién puede usarlo
+
+Worker → **Settings** → **Variables and Secrets** → **Add**: tipo **Text**, nombre `ORIGENES`, valor
+`https://xdanielolc.github.io`. **Deploy**.
+
+## 4. Que mire la hora cada minuto
+
+Worker → **Settings** → **Trigger Events** → **Add** → **Cron Triggers** → expresión `* * * * *` → **Add**.
+
+## 5. Comprobar
+
+1. Abre <https://entreno-avisos.entreno-app.workers.dev/clave> en el navegador. Tiene que salir
+   `{"error":"origen_no_permitido"}`: es lo correcto (solo contesta a la app) y quiere decir que está vivo. Si sale
+   `falta_almacen`, repasa el paso 2.
+2. En el móvil, abre la app (versión 0.89.0 o posterior) y entra en Sueño. Si el aviso del test está activado, la app
+   se apunta sola.
+3. Prueba rápida sin esperar a mañana: Ajustes → Descansos → aviso del test → pon una **hora fija** tres minutos más
+   tarde que la de ahora (si ya has hecho el test de la mañana, hazlo con el de la tarde), bloquea el móvil y espera.
+   Tiene que sonar «Test de atención». Luego quita la hora fija.
+
+Si no llega: dímelo y miro los registros contigo (Worker → **Logs**). Para apagarlo todo: borra el Worker; la app
+vuelve sola al comportamiento de antes.

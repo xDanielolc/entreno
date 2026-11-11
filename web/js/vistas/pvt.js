@@ -42,6 +42,7 @@ import {
   mediaMovilPVT, velocidadDeTiempos,
 } from '../diario.js';
 import { anadir, aviso, ayuda, confirmar, h, hoyISO, modal } from '../ui.js';
+import { programarPush } from '../avisos-push.js';
 
 const RESULTADO_MS = 500;
 const FALSO_MS = 700;
@@ -630,6 +631,7 @@ export async function activarAvisoPvt() {
 
 export function quitarAvisoPvt() {
   estado.cambiar((x) => { x.perfil.avisarPvt = false; });
+  programarPush([]);
   clearTimeout(temporizadorManana);
   clearTimeout(temporizadorTarde);
   temporizadorManana = null;
@@ -667,6 +669,18 @@ export function programarAvisoPvt() {
   // avisado»: haber hecho el de la mañana no debe callarlo, porque el de la
   // tarde es justo el que aporta el dato que falta.
   if (dosTestsAlDia(d)) temporizadorTarde = programarUno(horaAvisoPvtTarde(d), 'tarde', hoy);
+  // Además, el servidor de avisos (avisos-push.js): el temporizador de arriba solo vale con la app abierta y a la
+  // vista; con el móvil bloqueado no salta nunca (Dan, 12-11-2026: «no me llega»). Se le dice lo que queda por
+  // avisar hoy, y nada en cuanto el test está hecho o la hora ha pasado.
+  const pendientes = [];
+  for (const [momento, hora] of [['manana', horaAvisoPvt(d)], ['tarde', dosTestsAlDia(d) ? horaAvisoPvtTarde(d) : null]]) {
+    if (!hora || !faltaPvtMomento(d, hoy, momento)) continue;
+    const [hh, mm] = hora.split(':').map(Number);
+    const cuando = new Date();
+    cuando.setHours(hh, mm, 0, 0);
+    if (cuando.getTime() > Date.now()) pendientes.push({ tipo: momento, cuando: cuando.getTime() });
+  }
+  programarPush(pendientes);
 }
 
 // Programa uno de los dos avisos. Devuelve el temporizador, o null si no hay

@@ -24,16 +24,13 @@ archivo que se cita; lo ya hecho se ha marcado con [x].
       entrenar; que la serie de prueba de 1RM tenga papelera y tipo; acortar el aviso «Te has saltado…»; que «+ Añadir
       sitio» pida el nombre (ahora crea otro «Gimnasio»); el «% 1RM» de una casilla no se refresca hasta repintar;
       teclado propio con calculadora de discos (idea de Hevy).
-- [ ] **El aviso del test de atención no llega** (Dan, 12-11-2026: «no me llega»). No es un fallo de la cuenta (la
-      hora sale bien: levantado + 45 min), es el método: el aviso es un temporizador de la propia página
-      (`programarUno` en pvt.js) y el móvil congela la app en cuanto se apaga la pantalla o se cambia de app, así
-      que a los 45 minutos ya no hay nadie para lanzarlo. Solo saldría con la app abierta y a la vista todo ese rato.
-      Tres salidas, a elegir por Dan: (1) avisos de verdad con el Worker de Cloudflare que ya existe para renovar el
-      pase de Google (push: hay que añadirle una tarea cada minuto, un almacén y dos claves; lo prepara Claude y Dan
-      da tres pasos en Cloudflare); (2) que al apuntar «levantado» la app ofrezca el texto «Pon una alarma a las
-      HH:MM» (sin automatismo: una web no puede crear alarmas del móvil); (3) dejarlo y que el texto no prometa un
-      aviso: «al abrir la app después de las HH:MM te lo recuerdo». Los archivos son de la conversación del sueño.
-- [ ] **Avisar a la conversación del sueño** (no estaba en marcha esa noche): casilla `type="time"` en Ajustes →
+- [ ] **El aviso del test de atención no llegaba** (Dan, 12-11-2026). Era un temporizador de la página y el móvil
+      congela la app al apagar la pantalla. Hecho en la 0.89.0: servidor de avisos (`herramientas/cloudflare/avisos.js`,
+      `web/js/avisos-push.js`, `push` en sw.js). **Falta que Dan cree el Worker `entreno-avisos`** (cuatro pasos en
+      `docs/cloudflare.md`, «Avisos a su hora») y lo pruebe en el móvil. Mientras, la app sigue como antes.
+- [ ] **Avisar a la conversación del sueño** (no estaba en marcha esa noche): en `pvt.js` se añadieron tres
+      líneas de importación y un bloque al final de `programarAvisoPvt()` y en `quitarAvisoPvt()` para el servidor de
+      avisos (0.89.0, pedido por Dan). Además: casilla `type="time"` en Ajustes →
       Perfil; `huboIlusiones`, `estaSonando` y `faltaCribado` sin uso; importación `modoPVT` sobrante en
       historico-pvt.js.
 - [ ] **Dibujos**: octava revisión en `imagenes-ia/cola.md` (flexiones, hip

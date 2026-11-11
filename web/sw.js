@@ -7,7 +7,7 @@
 // Solo se ocupa del CÓDIGO de la app. Los datos del usuario nunca pasan por
 // aquí: viven en el dispositivo (IndexedDB) y en su Google Drive.
 
-const VERSION = '0.88.2';
+const VERSION = '0.89.0';
 const CACHE = `entreno-${VERSION}`;
 // Las imágenes van en un almacén aparte que NO se borra al actualizar la app:
 // así se ven sin conexión aunque haya salido una versión nueva.
@@ -45,6 +45,7 @@ const ARCHIVOS = [
   './js/fotos.js',
   './js/diario.js',
   './js/audios.js',
+  './js/avisos-push.js',
   './js/vistas/audios.js',
   './js/presentacion.js',
   './js/vistas/diario.js',
@@ -171,6 +172,23 @@ self.addEventListener('fetch', (evento) => {
       if (peticion.mode === 'navigate') return caches.match('./index.html');
       throw new Error('Sin conexión y sin copia guardada');
     }
+  })());
+});
+
+// El aviso que manda el servidor de avisos a su hora (`herramientas/cloudflare/avisos.js`). Llega sin contenido:
+// el texto se pone aquí. Por la mañana es el test de atención de la mañana y, desde las 15:00, el de la tarde. Si la
+// app ya enseñó el suyo (estaba abierta), se repone sin volver a vibrar.
+self.addEventListener('push', (evento) => {
+  evento.waitUntil((async () => {
+    const tarde = new Date().getHours() >= 15;
+    const tag = tarde ? 'pvt-tarde' : 'pvt';
+    const ya = await self.registration.getNotifications({ tag });
+    await self.registration.showNotification(tarde ? 'Test de atención de la tarde' : 'Test de atención', {
+      body: tarde ? 'El segundo del día. Son 5 minutos, y es el que recoge el cansancio acumulado.'
+        : 'Hoy aún no lo has hecho. Son 5 minutos, antes del té o el café.',
+      tag, renotify: ya.length === 0, icon: './iconos/icono-v2-192.png', badge: './iconos/icono-v2-192.png',
+      vibrate: [400, 200, 400], data: { url: `${self.registration.scope}#/diario` },
+    });
   })());
 });
 

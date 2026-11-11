@@ -20,4 +20,8 @@ export const CONFIG = Object.freeze({
   // Solo desde la web publicada: el renovador no acepta otras direcciones
   // (en el ordenador, localhost, se entra como antes).
   urlRenovador: location.hostname.endsWith('github.io') ? 'https://entreno-renovador.entreno-app.workers.dev' : '',
+
+  // Servidor de avisos a su hora (otro Worker, `herramientas/cloudflare/avisos.js`): manda al móvil el aviso del
+  // test de atención aunque la app esté cerrada. Mientras no exista, la app sigue como antes (sin fallar).
+  urlAvisos: location.hostname.endsWith('github.io') ? 'https://entreno-avisos.entreno-app.workers.dev' : '',
 });
