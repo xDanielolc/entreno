@@ -19,6 +19,9 @@ archivo que se cita; lo ya hecho se ha marcado con [x].
 - [x] **Auditoría de experiencia de uso con Fable y Hevy** (hecha la noche del 11 al 12-11-2026, rondas 0.87.0 a
       0.88.1; ver `CLAUDE.md`, «Auditoría con Fable»). Informe con capturas y «Vale / Repetir»:
       https://claude.ai/artifact/6WHq2fAbLuBEo6x4CdT21K. Para volver: etiqueta `v0.86.3-antes-auditoria`.
+- [ ] **Comparar un entreno real en Hevy y en Entreno** (12-11-2026): los cuatro días de «Fuerza sin máquinas» están
+      en la cuenta de Hevy de Dan. Falta que haga un día con cada app en el móvil y diga qué se apunta más rápido:
+      apuntar en Hevy no se puede probar desde la web.
 - [ ] **Lo que dejó la auditoría sin hacer** (propuestas; Dan decide en el informe):
       quitar la pestaña Sueño por defecto a quien instala la app de nuevas; dibujo del ejercicio más pequeño al
       entrenar; que la serie de prueba de 1RM tenga papelera y tipo; acortar el aviso «Te has saltado…»; que «+ Añadir
