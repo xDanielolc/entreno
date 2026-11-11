@@ -19,23 +19,27 @@ archivo que se cita; lo ya hecho se ha marcado con [x].
 - [x] **Auditoría de experiencia de uso con Fable y Hevy** (hecha la noche del 11 al 12-11-2026, rondas 0.87.0 a
       0.88.1; ver `CLAUDE.md`, «Auditoría con Fable»). Informe con capturas y «Vale / Repetir»:
       https://claude.ai/artifact/6WHq2fAbLuBEo6x4CdT21K. Para volver: etiqueta `v0.86.3-antes-auditoria`.
-- [ ] **Comparar un entreno real en Hevy y en Entreno** (12-11-2026): los cuatro días de «Fuerza sin máquinas» están
-      en la cuenta de Hevy de Dan. Falta que haga un día con cada app en el móvil y diga qué se apunta más rápido:
-      apuntar en Hevy no se puede probar desde la web.
-- [ ] **Lo que dejó la auditoría sin hacer** (propuestas; Dan decide en el informe):
-      quitar la pestaña Sueño por defecto a quien instala la app de nuevas; dibujo del ejercicio más pequeño al
-      entrenar; que la serie de prueba de 1RM tenga papelera y tipo; acortar el aviso «Te has saltado…»; que «+ Añadir
-      sitio» pida el nombre (ahora crea otro «Gimnasio»); el «% 1RM» de una casilla no se refresca hasta repintar;
-      teclado propio con calculadora de discos (idea de Hevy).
-- [ ] **El aviso del test de atención no llegaba** (Dan, 12-11-2026). Era un temporizador de la página y el móvil
-      congela la app al apagar la pantalla. Hecho en la 0.89.0: servidor de avisos (`herramientas/cloudflare/avisos.js`,
-      `web/js/avisos-push.js`, `push` en sw.js). **Falta que Dan cree el Worker `entreno-avisos`** (cuatro pasos en
-      `docs/cloudflare.md`, «Avisos a su hora») y lo pruebe en el móvil. Mientras, la app sigue como antes.
-- [ ] **Avisar a la conversación del sueño** (no estaba en marcha esa noche): en `pvt.js` se añadieron tres
-      líneas de importación y un bloque al final de `programarAvisoPvt()` y en `quitarAvisoPvt()` para el servidor de
-      avisos (0.89.0, pedido por Dan). Además: casilla `type="time"` en Ajustes →
-      Perfil; `huboIlusiones`, `estaSonando` y `faltaCribado` sin uso; importación `modoPVT` sobrante en
-      historico-pvt.js.
+- [x] **Comparar un entreno en Hevy y en Entreno** (11-11-2026): probado Hevy en el móvil de Dan por Enlace Móvil
+      (entreno de prueba descartado, nada guardado). Hevy: todas las series del ejercicio en una tabla y un ✓ por
+      fila; con un rango («3-5») el ✓ apunta el mínimo y, para poner lo real, son cuatro toques; no propone ningún
+      peso y el que escribes se copia a todas las filas, calentamientos incluidos. Entreno desde la 0.90.0: una serie
+      son dos toques (repeticiones y recámara) con el peso ya puesto.
+- [x] **Lo que Dan aceptó del informe** (0.90.0 y 0.90.1): cuatro pestañas y vista «una serie» para quien empieza,
+      dibujo pequeño al entrenar, papelera y tipo en la serie de prueba, «Te has saltado…» en una línea, «+ Añadir
+      sitio» con nombre, calendario con objetivo de días, recuperación arriba en Entrenar, «kg cada una».
+- [ ] **Lo que queda del informe** (Dan decide con fotos en el informe nuevo): mostrar el material junto al nombre
+      del ejercicio («Press de banca · barra») en vez de renombrar con una migración; teclado propio con calculadora
+      de discos (Hevy la tiene); Ajustes «más intuitivo» (pidió repensarlo, sin detalle); la serie descendente sigue
+      siendo la pantalla más cargada del entreno; el «% 1RM» de una casilla no se refresca hasta repintar; el texto
+      del paso de la recámara en la guía de bienvenida dice «viene puesta 1» y ya no viene puesta.
+- [ ] **El aviso del test de atención** (no le llegaba: era un temporizador de la página). Servidor de avisos hecho
+      en la 0.89.0 y **creado en Cloudflare el 11-11-2026** (Worker `entreno-avisos`, con su almacén `AVISOS`, la
+      variable `ORIGENES` y el cron de cada minuto; responde bien desde fuera). **Falta la prueba real en el móvil
+      de Dan**: abrir la app (0.90.0 o posterior) con el aviso activado y ver que llega con la pantalla apagada.
+- [x] **Parte del sueño, corregida desde aquí con permiso de Dan** (0.90.0): horas de Ajustes en dos casillas
+      (`campoHora`), fuera `huboIlusiones`, `estaSonando`, `faltaCribado` y la importación `modoPVT`. La conversación
+      del sueño no estaba en marcha: cuando vuelva, que lea esto y lo de `pvt.js` (0.89.0: tres líneas de importación y
+      un bloque al final de `programarAvisoPvt()` y en `quitarAvisoPvt()` para el servidor de avisos).
 - [ ] **Dibujos**: octava revisión en `imagenes-ia/cola.md` (flexiones, hip
       thrust, búlgara, pies del multipower, elevación de rodillas, face pull,
       línea del hack, «cabeza huevo» en jalón, goblet, zancadas y rotación con

@@ -1924,3 +1924,13 @@ funciona» no hace falta que lo marque. Hecho en esta ronda (esquema v40, `perfi
   (trazado de Lucide, licencia ISC).
 - Con permiso de Dan («corrige todo»), lo que quedaba de la parte de sueño: fuera `huboIlusiones`, `estaSonando`,
   `faltaCribado` y la importación `modoPVT` del histórico.
+
+### 0.90.1 (11-11-2026): Cloudflare, Hevy en el móvil y retoques
+
+- Servidor de avisos creado en Cloudflare (ver `docs/cloudflare.md`): `/clave` y `/programar` responden desde fuera.
+  Falta ver llegar un aviso al móvil de Dan con la pantalla apagada.
+- Hevy probado en el móvil de Dan con Enlace Móvil (un entreno de prueba, descartado). Lo aprendido está en
+  `docs/pendientes.md`, sección 0. Lo que Hevy hace mejor ya está copiado (tabla, ✓); lo que hace peor: con un rango
+  apunta el mínimo y no propone pesos.
+- Con mancuernas, la casilla del peso dice «kg cada una» (antes «kg ×2», que no se entendía), también en la tabla de
+  las bajadas. En los estiramientos por lado, el reloj va justo debajo de «Lado izquierdo» (el tipo de serie, abajo).

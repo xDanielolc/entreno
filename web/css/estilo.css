@@ -2489,6 +2489,9 @@ details.como-llegas:not([open]) > summary { font-weight: 500; font-size: .92rem;
 .objetivo-dias { justify-content: center; flex-wrap: nowrap; gap: 6px; width: 100%; }
 .objetivo-dias .chip { flex: 1 1 0; min-width: 0; max-width: 48px; min-height: 40px; padding: 0; display: inline-grid; place-items: center; font-weight: 700; }
 .objetivo-dias .chip.activo { background: var(--acento); color: var(--acento-texto, var(--fondo)); border-color: var(--acento); }
-.serie-cabecera.de-prueba .insignia-prueba { flex: 1 1 100%; text-align: center; }
+.serie-cabecera.de-prueba .insignia-prueba { flex: 0 0 auto; }
+.serie-cabecera.de-prueba > .selector-abrir { flex: 0 1 auto; width: auto; }
 .tipos-sitio { justify-content: center; margin-bottom: 12px; }
 .tipos-sitio .chip.activo { background: var(--acento); color: var(--acento-texto, var(--fondo)); border-color: var(--acento); }
+.lado-arriba { display: flex; margin-bottom: 8px; }
+.lado-arriba .insignia-lado { flex: 1; text-align: center; }

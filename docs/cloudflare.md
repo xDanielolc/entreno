@@ -82,6 +82,11 @@ indicador de arriba, Google te pedirá permiso una última vez.
 
 # Avisos a su hora (segundo Worker, 12-11-2026)
 
+> **Hecho el 11-11-2026.** El Worker `entreno-avisos` ya existe en la cuenta de Cloudflare de Dan (lo creó Claude
+> con su sesión abierta y su permiso): código de `herramientas/cloudflare/avisos.js`, almacén `entreno-avisos`
+> enlazado como `AVISOS`, variable `ORIGENES` y cron `* * * * *`. Los pasos de abajo quedan por si hay que rehacerlo.
+> Para subir una versión nueva del código basta repetir el paso de pegar el código.
+
 Para que el aviso del test de atención llegue **con la app cerrada y el móvil bloqueado**. Hasta ahora era un
 temporizador de la propia app, y el móvil la congela al apagar la pantalla: no llegaba. Este Worker guarda «avisa a
 este móvil a tal hora» y lo manda él. El código está en `herramientas/cloudflare/avisos.js`.

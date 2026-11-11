@@ -772,7 +772,8 @@ export function vistaSesion(contenedor, { id }) {
       return [`${unidad}/lado`, ayuda('Peso de un lado', 'Apunta el peso y las repeticiones de un solo lado; con el otro, las mismas.')];
     }
     if (ej.carga?.tipo === 'peso' && conMancuernas(ej)) {
-      return [`${unidad} ×2`, ayuda('Peso de una mancuerna', 'El peso es el de una mancuerna (lo que lleva cada mano), no la suma de las dos. Por eso «×2»: levantas dos.')];
+      // «kg ×2» no se entendía (Dan, 11-11-2026: «¿queda claro que solo se apunta lo que pesa cada mancuerna?»).
+      return [`${unidad} cada una`, ayuda('Peso de una mancuerna', 'Apunta lo que pesa una sola mancuerna (lo que lleva cada mano), no la suma de las dos. La app ya cuenta que levantas dos.')];
     }
     return unidad;
   }
@@ -1285,7 +1286,8 @@ export function vistaSesion(contenedor, { id }) {
     const toca = enCurso && entrada && !serie.hecha && (unaSerie || entrada.series.findIndex((x) => !x.hecha) === j);
     // De serie en serie y en el móvil, lo primero son las casillas y el «Hecho»; el tipo de serie, el comentario y
     // la papelera van debajo. Las series con bajadas o por lados conservan su cabecera arriba (dice qué se hace).
-    const cabeceraAbajo = unaSerie && movil && enCurso && !tramos && !planDe(ej, serie)?.lado && !esPrueba(ej, entrada, j, i);
+    const cabeceraAbajo = unaSerie && movil && enCurso && !tramos && !esPrueba(ej, entrada, j, i);
+    const lado = cabeceraAbajo ? planDe(ej, serie)?.lado : null;
     return h('div', { class: `serie ${serie.hecha ? 'hecha' : ''}${cabeceraAbajo ? ' cabecera-abajo' : ''}`, 'data-serie': j,
       oninput: () => { if (enCurso && !serie.hecha && serie.id !== descansoTrasSerie) saltarDescanso(); } },
       toca && olvidoRecamara(ej, entrada, i, j),
@@ -1293,11 +1295,12 @@ export function vistaSesion(contenedor, { id }) {
       toca && propuestaPorRMDeHoy(ej, entrada, i, j, serie),
       lineaSugerencia(ej, serie, entrada, j, i),
       !cabeceraAbajo && cabeceraSerie(ej, i, j, serie, entrada),
+      lado && h('div', { class: 'lado-arriba' }, h('span', { class: `insignia-lado ${lado}` }, lado === 'izquierda' ? 'Lado izquierdo' : 'Lado derecho')),
       relojDeSerie(ej, entrada, i, j, serie),
       tramos ? tramosSerie(ej, i, j, serie, tramos) : valoresSerie(ej, i, j, serie),
       hechoDeUnToque(ej, entrada, i, j, serie),
       recamaraDeUnToque(ej, entrada, i, j, serie),
-      cabeceraAbajo && cabeceraSerie(ej, i, j, serie, entrada),
+      cabeceraAbajo && cabeceraSerie(ej, i, j, serie, entrada, { sinLado: true }),
       camposTecnicas(ej, i, j, serie),
       camposEstiramiento(ej, i, j, serie),
       h('p', { class: 'comparacion' }, comparacionSerie(d, ej, serie, { excluirSesion: id })),
@@ -1828,7 +1831,7 @@ export function vistaSesion(contenedor, { id }) {
     return Boolean(s.sinRM) && !rmDelEjercicio(d, ej, { sesion, antesDe: { i, j } });
   }
 
-  function cabeceraSerie(ej, i, j, serie, entrada) {
+  function cabeceraSerie(ej, i, j, serie, entrada, { sinLado = false } = {}) {
     // La serie de prueba lleva su letrero y, como las demás, tipo, comentario y papelera (antes no se podía borrar).
     const prueba = esPrueba(ej, entrada, j, i);
     const plan = planDe(ej, serie);
@@ -1836,7 +1839,7 @@ export function vistaSesion(contenedor, { id }) {
     const nombreLibre = plan && !plan.calentamiento ? `${movil ? '' : 'Programación: '}${nombreRegla(plan).split(':')[0]}` : 'Sin objetivo';
     return h('div', { class: `serie-cabecera${prueba ? ' de-prueba' : ''}` },
       prueba && h('span', { class: 'insignia-prueba' }, serie.hecha ? 'Prueba de 1RM hecha' : 'Prueba de 1RM'),
-      plan?.lado && h('span', { class: `insignia-lado ${plan.lado}` }, plan.lado === 'izquierda' ? 'Lado izquierdo' : 'Lado derecho'),
+      plan?.lado && !sinLado && h('span', { class: `insignia-lado ${plan.lado}` }, plan.lado === 'izquierda' ? 'Lado izquierdo' : 'Lado derecho'),
       // Con un ciclo, «Libre» sería «Programación: Ciclo» y salía dos veces (Dan, 03-11-2026).
       selector(Object.entries(TIPOS_SERIE).filter(([k]) => !(k === 'libre' && plan?.progresion?.tipo === 'bilbo'))
         .map(([k, t]) => [k, k === 'libre' ? nombreLibre
@@ -2189,7 +2192,7 @@ export function vistaSesion(contenedor, { id }) {
       // de su columna (y un hueco encima de las ✕).
       h('div', { class: `tramo cabecera-tramos${conCarga ? '' : ' sin-carga'}${conAntes ? ' con-antes' : ''}`, 'aria-hidden': 'true' },
         conAntes && h('span', { class: 'crece' }, 'La otra vez'),
-        conCarga && h('span', { class: 'crece' }, unidadCarga(ej)),
+        conCarga && h('span', { class: 'crece' }, ej.carga?.tipo === 'peso' && !unLado(ej) && conMancuernas(ej) ? `${unidadCarga(ej)} cada una` : unLado(ej) && ['peso', 'asistida'].includes(ej.carga?.tipo) ? `${unidadCarga(ej)}/lado` : unidadCarga(ej)),
         conCarga && h('span', { class: 'crece' }, '% 1RM'),
         h('span', { class: 'crece' }, unidadEsfuerzo(ej)),
         h('span', {})),
