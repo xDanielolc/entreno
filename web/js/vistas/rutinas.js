@@ -7,7 +7,7 @@
 import { icono } from '../iconos.js';
 import * as estado from '../estado.js';
 import { nombreSede, sedeInicial, sedesActivas } from '../sedes.js';
-import { anadir, aviso, confirmar, h, hoyISO, leerNumero, modal, nuevoId, selector } from '../ui.js';
+import { anadir, aviso, confirmar, h, hoyISO, modal, nuevoId, selector } from '../ui.js';
 import { imagenDeEjercicio } from '../imagenes.js';
 import { planesDeItem, resumenPlanes, serieSuelta, textoPlan } from '../series.js';
 import { crearPlanesRapidos } from '../rapidas.js';

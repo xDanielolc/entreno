@@ -25,7 +25,7 @@ import {
   avisoPrimeraBajada, crearSerieDesdePlan, entradaDeEjercicio, modoCargaDe, origenModoCarga, recalcularTramos, saltoDeTramo,
   serieSuelta,
 } from '../series.js';
-import { anadir, aviso, nuevoId, confirmar, deslizarParaConfirmar, fechaLarga, h, formatearTiempo, horario, leerNumero, leerTiempo } from '../ui.js';
+import { anadir, aviso, nuevoId, confirmar, deslizarParaConfirmar, fechaLarga, h, formatearTiempo, horario, leerNumero } from '../ui.js';
 import { DESCANSO_ESTIRAMIENTOS_POR_DEFECTO, arrancarDescanso, arrancarRespiracion, barraDescanso, descansoDeTramo, preguntaAvisos, saltarDescanso } from './descanso.js';
 import { cuentaParaFatiga, tipoDeEjercicio } from '../catalogo.js';
 import { ASISTENCIAS, ESCALA_MANO, PROGRAMAS, TECNICAS_ESTIRAMIENTO, extraDeSerie, medidasDe, unidadMedida } from '../esquema.js';
@@ -758,7 +758,8 @@ export function vistaSesion(contenedor, { id }) {
       // Si una serie de hoy lo ha subido, se dice y se puede volver al de antes (Dan, 30-10: «en vez de "Cambiar",
       // "hoy has sido más fuerte, te he puesto el 1RM nuevo; si quieres volver al anterior, pulsa aquí"»).
       subidoHoy
-        ? h('div', { class: 'subido-hoy' }, h('p', { class: 'nota' }, `Hoy vas más fuerte: pasa de ${formatearNumero(Math.round(rm.antes))} a ${formatearNumero(Math.round(rm.valor))} kg con tu serie de hoy.`),
+        ? h('div', { class: 'subido-hoy' }, h('p', { class: 'nota' }, `Hoy vas más fuerte: pasa de ${formatearNumero(Math.round(rm.antes))} a `,
+            h('span', { 'data-rm-ejercicio': ej.id }, `${formatearNumero(Math.round(rm.valor))} kg`), ' con tu serie de hoy.'),
           h('button', { type: 'button', class: 'boton enlace', onclick: () => guardarRM(ej, rm.antes, null) }, `Volver a ${formatearNumero(Math.round(rm.antes))} kg`))
         : ej.carga?.tipo !== 'pesoCorporal'
           && h('button', { type: 'button', class: 'boton enlace', onclick: () => ponerRMaMano(ej, null) }, rm ? 'Cambiar' : 'Lo sé'));
@@ -935,14 +936,14 @@ export function vistaSesion(contenedor, { id }) {
     const partes = [];
     const lineas = [];
     if (s.prueba && !serie.hecha && !rmAntes) {
-      return tarjetaPrueba(`Aún no tienes 1RM en este ejercicio. Esta serie es la prueba: pon un peso con el que hagas de 3 a 10 y ${PARA_EN_PRUEBA}. Con ella la app calcula tu 1RM y monta el ciclo.`);
+      return tarjetaPrueba('Primera vez: pon un peso con el que hagas de 3 a 10 repeticiones y para cuando te quede 1. Con esta serie se calcula tu 1RM y se monta el ciclo.');
     }
 
     if (s.modo === 'bilbo') {
       if (s.sinCiclo) {
         if (plan.progresion?.sobre === 'esfuerzo') partes.push('Hoy: haz todas las que puedas; desde ahí el ciclo irá subiendo');
         else if (!serie.hecha && !rmAntes) {
-          return tarjetaPrueba(`Sin 1RM todavía: pon un peso con el que hagas de 3 a 10 y ${PARA_EN_PRUEBA}. De aquí sale tu 1RM y el ciclo.`);
+          return tarjetaPrueba('Primera vez: pon un peso con el que hagas de 3 a 10 repeticiones y para cuando te quede 1. De aquí salen tu 1RM y el ciclo.');
         } else partes.push(serie.hecha ? 'Hecha: con ella se monta el ciclo' : 'Montando el ciclo con tu 1RM de hoy…');
       } else if (s.cicloTerminado) partes.push(`Ciclo ${s.cicloN} terminado: prepara el siguiente en la ficha (o pon el reinicio en automático)`);
       else {
@@ -1043,7 +1044,7 @@ export function vistaSesion(contenedor, { id }) {
     // Cuántas te salen con ese peso según tu 1RM de ahora, y cuántas lo superan (Dan, 30-10: «no me dice cuál es
     // mi 1RM hoy ni qué debería hacer para superarme»).
     const salen = esLaQueToca && s.modo === 'carga' && !serie.hecha && !serie.tramos?.length && !esMaxima(plan) ? repsQueSalen(ej, serie.carga, rmAntes) : null;
-    if (salen) lineas.push(h('span', { class: 'compara' }, `Con tu 1RM de ${formatearNumero(Math.round(rmAntes.valor))} kg, con ${formatearNumero(serie.carga)} ${uCarga} te salen unas `,
+    if (salen) lineas.push(h('span', { class: 'compara' }, `Con tu 1RM de ${formatearNumero(Math.round(rmAntes.valor))} kg, con ${formatearNumero(serie.carga)} ${uCarga} ${salen === 1 ? 'te sale ' : 'te salen unas '}`,
       h('strong', {}, `${salen}`), ` al fallo; ${salen + 1} lo superan`));
     if (!partes.length && !lineas.length) return null;
     if (!lineas.length) return h('p', { class: 'sugerencia' }, partes.join(' · '));
@@ -1207,7 +1208,10 @@ export function vistaSesion(contenedor, { id }) {
         if (entrada.ejercicioId !== ej.id) continue;
         entrada.series = entrada.series.map((x) => {
           const plan = (e.series || []).find((p) => p.id === x.planId);
-          const rehacer = plan && !x.hecha && !x.tramos?.length && (!x.cargaAMano || x.id === serie?.id) && x.tipo !== 'calentamiento';
+          // También las series con bajadas que aún no has empezado: sin 1RM se quedaban con los pesos en blanco
+          // aunque lo pusieras a mano (auditoría del 11-11-2026).
+          const sinEmpezar = !x.tramos?.length || x.tramos.every((tr) => tr.esfuerzo == null);
+          const rehacer = plan && !x.hecha && sinEmpezar && (!x.cargaAMano || x.id === serie?.id) && x.tipo !== 'calentamiento';
           return rehacer ? { ...crearSerieDesdePlan(datos, e, plan, { excluirSesion: id, rmHoy: rm }), id: x.id } : x;
         });
         const conCiclo = entrada.series.find((x) => x.cicloN != null);
@@ -1610,7 +1614,8 @@ export function vistaSesion(contenedor, { id }) {
       h('span', { class: 'et' }, etiqueta),
       h('button', { type: 'button', class: `casilla-boton${vacio ? ' vacia' : ''}`, onclick: alPulsar }, texto));
     return h('div', { class: 'serie-estiramiento' },
-      med.mide && h('p', { class: 'nota bloque como-medir' }, `Mide ${med.como}.`,
+      // Cómo se mide, una vez (en la serie que toca), no repetido en todas las del ejercicio.
+      med.mide && (unaSerie || !enCurso || sesion.ejercicios[i]?.series.findIndex((x) => !x.hecha) === j) && h('p', { class: 'nota bloque como-medir' }, `Mide ${med.como}.`,
         h('button', { type: 'button', class: 'que-es ayuda', 'aria-label': 'Cómo se mide',
           onclick: (e) => { e.preventDefault(); modal('Cómo se mide', h('div', { class: 'ayuda-texto' }, cambiarComoSeMide(ej))); } }, '?')),
       h('div', { class: 'serie-valores casillas-estiramiento' },
@@ -2417,6 +2422,7 @@ export function vistaSesion(contenedor, { id }) {
     if (!await confirmar(algo ? '¿Cancelar el entrenamiento? Lo apuntado irá a la papelera del historial.'
       : '¿Cancelar el entrenamiento? No has apuntado nada.', { si: 'Cancelar entrenamiento', no: 'Seguir', peligro: true })) return;
     guiado.delete(id);
+    saltarDescanso();
     estado.cambiar((datos) => {
       if (algo) {
         const s = datos.sesiones.find((x) => x.id === id);
@@ -2431,6 +2437,8 @@ export function vistaSesion(contenedor, { id }) {
 
   function terminar() {
     renovarAlTocar();
+    // El descanso de la última serie no sigue contando (ni avisa) con el entreno ya terminado.
+    saltarDescanso();
     cambiarSesion((s) => {
       s.estado = 'terminada';
       // Un entrenamiento de otro día (pasado a mano) acaba ese día, no hoy.

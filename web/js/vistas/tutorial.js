@@ -292,13 +292,16 @@ function subpasoDePrueba(sesion) {
         + 'puedes alargarlo o saltarlo.'] };
   }
   if (subpaso < 2) {
-    return { selector: '#vista .boton.secundario.grande', boton: 'Sigo',
+    // En el móvil el botón está en la barra de abajo (desde la 0.50); en el ordenador, bajo el ejercicio.
+    return { selector: '#vista .barra-entreno .barra-anadir, #vista .boton.secundario.grande.anadir-ejercicio', boton: 'Sigo',
       texto: 'Si un día te apetece hacer algo que no estaba en la rutina, con este botón lo añades al entrenamiento, aunque '
         + 'no sea tuyo todavía: lo buscas y entra con sus músculos puestos. Hoy no hace falta.' };
   }
-  return { selector: '#vista .boton.grande.terminar-entreno',
-    texto: 'Ya está. Toca «Terminar entrenamiento» y elige si lo guardas o lo borras: al ser de prueba, no cuenta para tus récords '
-      + 'ni para la recuperación si lo borras.' };
+  // El botón de terminar cambió en la 0.50/0.51 (barra de abajo; en el móvil se desliza) y la guía seguía buscando
+  // el de antes: no parpadeaba nada (auditoría del 11-11-2026).
+  return { selector: '#vista .barra-entreno .deslizar-terminar, #vista .barra-entreno .barra-terminar',
+    texto: 'Ya está. Termina el entrenamiento con la barra de abajo (en el móvil se desliza) y elige si lo guardas o lo borras: '
+      + 'al ser de prueba, no cuenta para tus récords ni para la recuperación si lo borras.' };
 }
 
 // Se llama después de pintar cada pantalla: enseña el panel si la guía va

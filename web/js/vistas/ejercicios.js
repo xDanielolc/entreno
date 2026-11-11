@@ -5,9 +5,19 @@ import {
 } from '../calculos.js';
 import * as estado from '../estado.js';
 import {
-  ASISTENCIAS, DIAS_CICLO_POR_DEFECTO, medidasDe, TECNICAS_ESTIRAMIENTO, TIPOS_CARGA, TIPOS_ESFUERZO, TIPOS_PROGRESION, TIPOS_SERIE,
-  UNIDADES, unidadMedida,
-  progresionPorDefecto, serieNuevaPlantilla, sobrePorDefecto, tramosDe,
+  ASISTENCIAS,
+  DIAS_CICLO_POR_DEFECTO,
+  medidasDe,
+  TECNICAS_ESTIRAMIENTO,
+  TIPOS_ESFUERZO,
+  TIPOS_PROGRESION,
+  TIPOS_SERIE,
+  UNIDADES,
+  unidadMedida,
+  progresionPorDefecto,
+  serieNuevaPlantilla,
+  sobrePorDefecto,
+  tramosDe,
 } from '../esquema.js';
 import { BARRA_POR_DEFECTO, inicialDelPrograma, materialDe, tramosPorDefecto } from '../calculos.js';
 import { EXPLICACIONES_1RM, FORMULAS, calibrar, estimar1RM, modeloDe, pesoParaReps, textoCalibracion } from '../formula1rm.js';

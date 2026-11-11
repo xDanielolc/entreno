@@ -10,7 +10,6 @@ import {
   seriesEnDias, seriesSemanales, sugerenciasDeAjuste, textoDeRecuperacion, durezaSemanal,
 } from '../recuperacion.js';
 import { abrirAlLlegar, ampliar, anadir, aviso, ayudaEsquina, cerrarCarteles, h, hoyISO, modal, plegable, selector } from '../ui.js';
-import { conGlosario } from './glosario.js';
 import { pista } from './tutorial.js';
 import { tarjetaEquilibrio } from './equilibrio.js';
 import { tiraInferior } from './tira.js';

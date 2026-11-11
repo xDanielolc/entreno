@@ -18,10 +18,3 @@ export function quitarPeso(datos, fecha) {
   datos.perfil.pesos = (datos.perfil.pesos ?? []).filter((p) => p.fecha !== fecha);
   if (datos.perfil.pesos.length) datos.perfil.pesoCorporalKg = datos.perfil.pesos.at(-1).kg;
 }
-
-// Días desde la última vez que te pesaste (null si nunca).
-export function diasDesdePeso(datos, ahora = new Date()) {
-  const ultima = datos.perfil.pesos?.at(-1)?.fecha;
-  if (!ultima) return null;
-  return Math.floor((ahora - new Date(`${ultima}T12:00:00`)) / 86_400_000);
-}

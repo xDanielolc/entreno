@@ -1,6 +1,5 @@
 import { icono } from '../iconos.js';
 import { apuntarPeso } from '../peso.js';
-import { creditosCargados } from '../imagenes.js';
 import { BILBO_RECAMARA_POR_DEFECTO, BILBO_REPS_MAX_POR_DEFECTO, REDONDEO_MANCUERNAS_POR_DEFECTO, REDONDEO_POR_DEFECTO, formatearNumero } from '../calculos.js';
 import * as estado from '../estado.js';
 import { apartarCopia, copiasAparte, desconectar, eliminarCuenta, juntarCopia, rehacerCopiasLegibles, sincronizar, situacionActual } from '../sincronizacion.js';
@@ -11,16 +10,15 @@ import { VERSION_APP } from '../version.js';
 import { anadir, aviso, confirmar, h, hoyISO, leerNumero } from '../ui.js';
 import { DESCANSO_ESTIRAMIENTOS_POR_DEFECTO, DESCANSO_TRAMOS_POR_DEFECTO, RESPIRACION_POR_DEFECTO, activarNotificaciones, probarAviso, puedeNotificar } from './descanso.js';
 import { TIPOS_SEDE, nuevaSede, sedesActivas } from '../sedes.js';
-import { calibrar, textoCalibracion } from '../formula1rm.js';
 import { TEXTO_AVISO, guardarPruebaEnCuenta } from '../modo-prueba.js';
-import { explicaciones1RM, opciones } from './ejercicios.js';
+import { opciones } from './ejercicios.js';
 import { tramosPorDefecto } from '../calculos.js';
 import { FORMAS_DROP_SET, FORMA_DROP_SET_POR_DEFECTO } from '../recuperacion.js';
 import { MODOS_GLOSARIO, modoGlosario } from './glosario.js';
 import { pista } from './tutorial.js';
 import { botonImportar } from './importar.js';
 import { MODOS_ENTRENO } from './sesion.js';
-import { TEMAS, aplicarTema, hacerCuestionario } from './cuestionario.js';
+import { TEMAS, aplicarTema } from './cuestionario.js';
 
 // Aviso de la mañana para hacer el test de atención del Diario. Una web no se
 // despierta sola con el navegador cerrado, así que el texto no promete más de

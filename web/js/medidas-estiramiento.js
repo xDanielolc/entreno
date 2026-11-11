@@ -37,6 +37,8 @@ const TABLA = {
   'Rey de los bailarines (Natarajasana)': mano('el hueco entre el talón y el glúteo'),
   // 02-11 (Dan: «muchos siguen sin medición, como Eka Pada»).
   'Estiramiento de glúteo en paloma (Eka Pada Rajakapotasana)': cm('del glúteo de la pierna doblada al suelo, con la cadera mirando al frente (0 si apoya)'),
+  // La postura de yoga es la misma paloma: misma medida (Dan, To Do: «muchos siguen sin medición, como Eka Pada»).
+  'Paloma real con una pierna (Eka Pada Rajakapotasana)': cm('del glúteo de la pierna doblada al suelo, con la cadera mirando al frente (0 si apoya)'),
   'Eka Pada Rajakapotasana': cm('del glúteo de la pierna doblada al suelo, con la cadera mirando al frente (0 si apoya)'),
   'Estiramiento de psoas en zancada (Anjaneyasana)': cm('de la ingle de la pierna de atrás al suelo, con el tronco erguido (menos es mejor)'),
   'Estiramiento de dorsal': cm('tumbado boca arriba, rodillas dobladas y la zona lumbar pegada, con los brazos estirados por encima de la cabeza: del dorso de la muñeca al suelo (0 si toca)'),

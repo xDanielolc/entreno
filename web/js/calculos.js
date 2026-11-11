@@ -1,6 +1,6 @@
 // Cálculos de entrenamiento. Funciones puras: no leen ni guardan nada.
 
-import { PROGRAMAS, TECNICAS, recamaraDe, tramosDe } from './esquema.js';
+import { PROGRAMAS, recamaraDe, tramosDe } from './esquema.js';
 import { modeloDe, pesoParaReps, repsParaIgualar, rmDeSerie } from './formula1rm.js';
 import { CATALOGO, normalizar } from './catalogo.js';
 
@@ -710,7 +710,6 @@ function sugerenciaPrograma(datos, ejercicio, plan, { excluirSesion } = {}) {
 // El de Ajustes se fija aquí desde el estado para no pasar `datos` a todas
 // las cuentas.
 export const REDONDEO_POR_DEFECTO = 2.5;
-export const REDONDEOS = [0.5, 1, 1.25, 2, 2.5, 5];
 let redondeoGlobal = REDONDEO_POR_DEFECTO;
 export function fijarRedondeo(kg) { redondeoGlobal = kg > 0 ? kg : REDONDEO_POR_DEFECTO; }
 // Las mancuernas van aparte: en el gimnasio de Dan, de 2 en 2 kg (`perfil.redondeoMancuernasKg`).

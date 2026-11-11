@@ -1772,3 +1772,24 @@ primer ejercicio y 2100 px de cosas por encima de las casillas de la primera ser
 - Una mancuerna no es dos (`conMancuernas` en calculos.js): sentadilla goblet, pullover, «remo con mancuerna», curl
   concentrado y leñador ya no llevan «kg ×2» ni cuentan doble en el 1RM; el salto de peso sigue siendo el de mancuernas
   (`usaMancuernas`).
+
+### 0.87.1: lo encontrado al comprobar las rondas 0.72 a 0.86
+
+Se comprobó cada corrección en la app (modo prueba, 375 px) o llamando a sus funciones con datos montados a mano; la
+lista con el resultado está en el informe. Funcionaba todo lo comprobado. Fallos nuevos, arreglados aquí:
+- Poner el 1RM a mano en un ejercicio cuya serie es descendente dejaba las bajadas sin peso (`guardarRM` no rehacía las
+  series con tramos; ahora sí, si aún no has empezado ninguna bajada).
+- El descanso de la última serie seguía contando (y avisando) con el entreno ya terminado o cancelado: `terminar()` y
+  `cancelar()` llaman a `saltarDescanso()`.
+- La guía de bienvenida: los dos últimos pasos del entreno de prueba no señalaban nada desde la 0.50 (buscaban botones
+  que ya no existen); ahora señalan «+ Añadir ejercicio» de la barra y «Desliza para terminar».
+- «Paloma real con una pierna (Eka Pada Rajakapotasana)» (la de yoga) no tenía medida; lleva la de la paloma.
+- Cifras que se quedaban viejas hasta repintar («Prueba hecha: tu 1RM sale en 79» con la cabecera en 82; «pasa de 60 a
+  76»): llevan la marca `data-rm-ejercicio` y cambian a la vez que la cabecera. «Te sale 1» en singular.
+- Textos: las tres tarjetas de «primera vez» dicen lo mismo en dos líneas; «Mide…» sale una vez por ejercicio (en la
+  serie que toca), no en todas.
+- Limpieza: fuera `abrirCronometro` (lo sustituyó el reloj de la serie en la 0.56), `REDONDEOS`, `diasDesdePeso`,
+  `e_primeraVez` y 13 importaciones sin usar. `sw.js` lista todo lo que hace falta (comprobado sin conexión, 14
+  pantallas). Quedan sin tocar por ser de la conversación del sueño: `huboIlusiones`, `estaSonando`, `faltaCribado`,
+  la importación `modoPVT` de historico-pvt.js y un `input type="time"` en Ajustes → Perfil (ella evita ese tipo de
+  casilla en el diario porque su selector se corta en el móvil).

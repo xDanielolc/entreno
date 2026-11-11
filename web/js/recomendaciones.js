@@ -19,7 +19,10 @@ import { cuentaParaFatiga, tipoDeEjercicio } from './catalogo.js';
 import { rmDeSerie } from './formula1rm.js';
 import { ORDEN_MUSCULOS, nombreMusculo } from './musculos.js';
 import {
-  durezaSemanal, horasDesdeSesion, recuperacionPorMusculo, seriesPorMusculoDeSesion, seriesSemanales,
+  durezaSemanal,
+  horasDesdeSesion,
+  seriesPorMusculoDeSesion,
+  seriesSemanales,
 } from './recuperacion.js';
 
 const MINIMO = 10;

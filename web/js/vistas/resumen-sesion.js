@@ -241,12 +241,6 @@ function cambiosRespectoARutina(datos, sesion) {
   return cambios;
 }
 
-// True si el ejercicio no tiene ninguna serie hecha en otra sesión terminada.
-function e_primeraVez(datos, ej, sesion) {
-  return !datos.sesiones.some((s) => s.id !== sesion.id && !s.borrada && s.estado === 'terminada'
-    && s.ejercicios.some((e) => e.ejercicioId === ej.id && e.series.some((x) => x.hecha)));
-}
-
 // Los cambios, agrupados: una frase por tipo y, debajo, los ejercicios como
 // botones que se quedan marcados. Sin repetir la misma frase en cada uno.
 // Los cambios de hoy, en una frase y botones cortos: «Curl: −1 serie».

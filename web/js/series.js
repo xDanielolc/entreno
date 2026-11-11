@@ -3,14 +3,22 @@
 // serie descendente, las bajadas propuestas.
 
 import {
-  aPesoDisponible, cargaCorporal, esfuerzoTotal, pasoDe, lecturaDesdeCarga, redondear, rmDeReferencia, saltoAjustado, sugerenciaSerie,
-  tramosPropuestos, usaTramos,
-  recamaraPorDefectoDe,
+  aPesoDisponible,
+  cargaCorporal,
+  esfuerzoTotal,
+  pasoDe,
+  lecturaDesdeCarga,
+  redondear,
+  rmDeReferencia,
+  saltoAjustado,
+  sugerenciaSerie,
+  tramosPropuestos,
+  usaTramos,
 } from './calculos.js';
 import { recamaraDe, tramosDe } from './esquema.js';
 import { modeloDe, pesoParaReps, repsParaIgualar, rmDeSerie } from './formula1rm.js';
 import { nuevoId } from './ui.js';
-import { aplicarPreset, empezarCicloNuevo, prepararCiclo, renovarSiToca } from './ciclos.js';
+import { aplicarPreset, prepararCiclo, renovarSiToca } from './ciclos.js';
 import { progresionPorDefecto, serieNuevaPlantilla } from './esquema.js';
 
 // Las series de un ejercicio que aún no tiene ninguna. Con «fuerza» en el
