@@ -1879,3 +1879,19 @@ Google y este servidor de avisos).
   reparto a su hora, baja con 410, firma verificada con la clave pública) y el `push` del service worker con
   `ServiceWorker.deliverPushMessage`. **Sin probar**: el envío real (necesita que Dan cree el Worker: cuatro pasos en
   `docs/cloudflare.md`, «Avisos a su hora») y apuntarse desde un móvil.
+
+## Ronda 0.89.1 (12-11-2026): la rutina de Dan en Hevy y las series «como en papel»
+
+Dan pidió meter sus rutinas en Hevy para comparar. Hecho: los cuatro días de «Fuerza sin máquinas» están en su cuenta
+de Hevy (creados por la web; apuntar entrenos allí solo se puede en el móvil, así que eso lo tiene que probar él).
+- Lo que Hevy admite al montar una rutina: nota por ejercicio, un descanso por ejercicio, tipo de serie (calentamiento,
+  normal, al fallo, descendente) y repeticiones o rango. No tiene % del 1RM, ni recámara objetivo, ni ciclos, ni pone
+  pesos: todo eso fue a las notas. A mano son unos 25 toques por ejercicio complejo (unos 400 para los cuatro días).
+- Lo que Entreno ya hacía mejor: la prehecha entra de dos toques y la rutina pegada en texto, de tres, con sus pesos.
+- Lo copiado: en el editor de rutinas, cada ejercicio abierto tiene «O escríbelas como en papel» (`seriesEscritas` y
+  `crearEscritas` en rutinas.js): una línea como «calentamiento 1 × 5 al 30 % + máxima 1-2 + 2 × 3-5 al 80 % con 2 en
+  recámara, descendente en la última (2 min)» crea todas las series de golpe con el lector de `rutina-texto.js`
+  (`analizarRutina`), enseña antes lo que va a añadir y acepta Intro. Y el ejercicio plegado cuenta sus series
+  («3 series + 2 de calentamiento») cuando la línea entera pasa de 60 letras.
+- Para meter las rutinas en Hevy sin cientos de clics se usó lo mismo que manda su web al guardar (se vio creando dos
+  rutinas de prueba a mano); nada de eso queda en el repositorio.

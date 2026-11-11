@@ -2442,3 +2442,11 @@ details.como-llegas:not([open]) > summary { font-weight: 500; font-size: .92rem;
 .serie-resumida .serie-estado { flex: 0 0 28px; text-align: center; color: var(--texto-suave); }
 .serie-resumida.hecha .serie-estado { color: var(--bien); font-weight: 800; }
 .serie-resumida:active { transform: scale(.99); }
+
+/* Editor de rutinas (0.89.1): las series escritas como en papel. */
+.series-escritas { display: flex; flex-direction: column; gap: 6px; margin: 12px 0 4px; text-align: center; }
+.series-escritas .etiqueta-campo { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.series-escritas-fila { display: flex; gap: 8px; align-items: stretch; }
+.series-escritas-fila input { flex: 1 1 auto; min-width: 0; }
+.series-escritas-fila .boton { flex: 0 0 auto; width: auto; margin: 0; padding-inline: 16px; }
+.entiendo-series:empty { display: none; }

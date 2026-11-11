@@ -472,7 +472,14 @@ export function vistaFormularioRutina(contenedor, { id }) {
     const clave = `${dia.id}:${item.ejercicioId}`;
     const abierto = abiertosRutina.has(clave);
     const imagen = ej && imagenDeEjercicio(ej);
-    const resumen = ej ? resumenPlanes(planesDeItem(ej, item), ej) : '';
+    const planesDelDia = ej ? planesDeItem(ej, item) : [];
+    const largo = ej ? resumenPlanes(planesDelDia, ej) : '';
+    // Con muchas series distintas la línea ocupaba media tarjeta: plegado, se cuenta («5 series + 2 de calentamiento»,
+    // como hace Hevy); el detalle está al abrirlo.
+    const deCalentar = planesDelDia.filter((x) => x.calentamiento || x.tipo === 'calentamiento').length;
+    const deTrabajo = planesDelDia.length - deCalentar;
+    const resumen = largo.length <= 60 || abierto ? largo
+      : [deTrabajo && `${deTrabajo} ${deTrabajo === 1 ? 'serie' : 'series'}`, deCalentar && `${deCalentar} de calentamiento`].filter(Boolean).join(' + ');
     const nombre = ej?.nombre ?? 'Ejercicio borrado';
     return h('div', { class: `ej-rutina${abierto ? ' abierto' : ''}` },
       h('button', { type: 'button', class: 'ej-rutina-cabecera', 'aria-expanded': String(abierto),
@@ -516,6 +523,7 @@ export function vistaFormularioRutina(contenedor, { id }) {
             // Elegidas las series, el ejercicio se pliega: el día queda como una lista y «+ Ejercicio» a mano.
             onclick: () => { abiertosRutina.delete(clave); crearRapidas(item, ej, { ...forma, donde: (ej.series || []).some((p) => !p.soloRutina) ? 'rutina' : 'ejercicio' }); } }, texto)))],
       h('button', { type: 'button', class: usadas.length ? 'boton' : 'boton secundario', onclick: () => abrirAnadir(item, ej) }, usadas.length ? '+ Añadir series' : 'Otras series (ciclos, 1RM, descendentes…)'),
+      seriesEscritas(item, ej),
       sinUsar.length > 0 && h('div', { class: 'sin-usar' },
         h('small', { class: 'nota' }, 'Series de este ejercicio que hoy no hace este día. Toca una para ponerla:'),
         h('div', { class: 'fila-marcas compacta' }, agrupar(sinUsar, ej).map((g) => h('button', { type: 'button', class: 'boton-marca',
@@ -537,6 +545,58 @@ export function vistaFormularioRutina(contenedor, { id }) {
       h('div', { class: 'fila-botones' },
         h('a', { class: 'boton secundario', href: `#/ejercicio/${ej.id}` }, 'Abrir el ejercicio'),
         quitar));
+  }
+
+  // Las series, escritas como en papel («1 × 5 al 30 % + máxima 1-2 + 2 × 3-5 al 80 %, descendente en la última»):
+  // el mismo lector de «Pegar una rutina escrita», ejercicio a ejercicio. Montar a mano una programación compleja
+  // eran cuatro o cinco pasadas por el asistente; así es una línea (auditoría del 12-11-2026, tras meter la rutina de
+  // Dan en Hevy: allí son unos 25 toques por ejercicio y no calcula nada).
+  function seriesEscritas(item, ej) {
+    const caja = h('input', { type: 'text', 'aria-label': 'Series escritas', autocapitalize: 'off', spellcheck: 'false',
+      placeholder: ej.esfuerzo?.tipo === 'tiempo' ? '3 × 30 s' : '1 × 5 al 50 % + 3 × 6-8 con 2 en recámara' });
+    const entiendo = h('small', { class: 'nota entiendo-series' });
+    const boton = h('button', { type: 'button', class: 'boton secundario', disabled: true }, 'Añadir');
+    let formas = [];
+    let nota = null;
+    const leer = () => {
+      const texto = caja.value.trim();
+      const analisis = texto ? analizarRutina(`Día\nEjercicio: ${texto}`) : null;
+      const leido = analisis?.dias[0]?.ejercicios[0] ?? null;
+      formas = leido?.formas ?? [];
+      nota = leido?.nota ?? null;
+      boton.disabled = !formas.length;
+      // Lo que se va a añadir, dicho igual que luego en la lista (se montan las series sin guardarlas).
+      entiendo.textContent = !texto ? '' : formas.length
+        ? `Se añadirá: ${resumenPlanes(formas.flatMap((f) => crearPlanesRapidos(d, ej, f)), ej)}${nota ? ` · nota: ${nota}` : ''}`
+        : 'Aún no lo entiendo. Ejemplo: 3 × 8-12';
+    };
+    const anadirlas = () => { if (formas.length) crearEscritas(item, ej, formas, nota); };
+    caja.addEventListener('input', (e) => { e.stopPropagation(); leer(); });
+    caja.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); anadirlas(); } });
+    boton.addEventListener('click', anadirlas);
+    return h('div', { class: 'series-escritas' },
+      h('span', { class: 'etiqueta-campo' }, 'O escríbelas como en papel',
+        ayuda('Escribir las series', ['Sepáralas con «+». Ejemplos:',
+          '3 × 8-12', '4 × 4 con 2 en recámara', 'calentamiento 1 × 5 al 50 % + 3 × 6-8',
+          'máxima 1-2 + 2 × 3-5 al 80 %', 'Bilbo + 1 × 6-8, serie descendente en la última', '3 × 30 s por lado',
+          'Lo que pongas entre paréntesis queda como nota del ejercicio.'])),
+      h('div', { class: 'series-escritas-fila' }, caja, boton),
+      entiendo);
+  }
+
+  function crearEscritas(item, ej, formas, nota) {
+    const donde = (ej.series || []).some((p) => !p.soloRutina) ? 'rutina' : 'ejercicio';
+    const nuevos = formas.flatMap((f) => crearPlanesRapidos(d, ej, { ...f, donde }));
+    if (!nuevos.length) return;
+    const antes = planesDeItem(ej, item).map((p) => p.id);
+    if (nota && !item.nota) item.nota = nota;
+    cambiarConRutina((datos) => {
+      const propio = datos.ejercicios.find((e) => e.id === ej.id);
+      for (const p of nuevos) { p.soloRutina = donde === 'rutina' ? borrador.id : null; propio.series.push(p); }
+      if (donde === 'rutina' || item.series) item.series = [...antes, ...nuevos.map((p) => p.id)];
+    });
+    aviso(`Añadido: ${resumenPlanes(nuevos, ej)}`);
+    repintar();
   }
 
   // Las series más corrientes según lo que mide el ejercicio.
