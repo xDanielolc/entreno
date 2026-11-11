@@ -2,7 +2,7 @@ import * as estado from '../estado.js';
 import { sedeInicial } from '../sedes.js';
 import { barraModoPrueba } from '../modo-prueba.js';
 import { planesDeItem, resumenPlanes, seriesDesdePlan } from '../series.js';
-import { anadir, aviso, h, hoyISO, leerNumero, modal, nuevoId } from '../ui.js';
+import { anadir, aviso, h, hoyISO, modal, nuevoId } from '../ui.js';
 import { tarjetaRecuperacion, tarjetaSugerenciasAjuste } from './cuerpo.js';
 import { tarjetaInstalar } from './instalar.js';
 import { pista } from './tutorial.js';
@@ -15,7 +15,7 @@ import { recomendacionesGenerales } from '../recomendaciones.js';
 import { renovarAlTocar } from '../sincronizacion.js';
 import { voyHoy } from './voy-hoy.js';
 import { preguntaAvisos } from './descanso.js';
-import { apuntarPeso } from '../peso.js';
+import { pedirPesoCorporal } from '../peso.js';
 import { tarjetaHoraAcostarse, tarjetaPvtPendiente } from './diario.js';
 import { tarjetaRecordsHoy } from './records.js';
 import { tarjetaRetos } from './cifras.js';
@@ -243,20 +243,7 @@ export function vistaInicio(contenedor) {
     // Tu peso, aquí mismo: sin mandarte a Ajustes.
     necesitaPeso && h('div', { class: 'tarjeta aviso-tarjeta fila-aviso' },
       h('span', {}, 'Tus ejercicios con tu peso o con máquina asistida necesitan saber cuánto pesas.'),
-      h('button', { class: 'boton', onclick: () => {
-        const caja = h('input', { type: 'text', inputmode: 'decimal', 'aria-label': 'Tu peso en kilos' });
-        const cerrar = modal('Tu peso corporal', h('div', { class: 'formulario' },
-          h('label', { class: 'campo' }, h('span', { class: 'etiqueta-campo' }, 'Peso (kg)'), caja),
-          h('p', { class: 'nota' }, 'Solo para calcular la carga de flexiones, dominadas y máquinas asistidas.'),
-          h('button', { class: 'boton', onclick: () => {
-            const kg = leerNumero(caja.value);
-            if (!(kg > 0)) { aviso('Pon un número', { tipo: 'error' }); return; }
-            cerrar();
-            estado.cambiar((x) => { apuntarPeso(x, kg); });
-          } }, 'Guardar')));
-        setTimeout(() => caja.focus(), 50);
-      } }, 'Poner mi peso')),
-
+      h('button', { class: 'boton', onclick: () => pedirPesoCorporal() }, 'Poner mi peso')),
     // Instalar y los avisos del descanso, debajo de lo principal (antes iban delante de «Empezar»).
     tarjetaInstalar(),
     haEntrenado && preguntaAvisos(),

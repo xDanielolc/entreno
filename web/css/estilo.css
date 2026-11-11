@@ -309,15 +309,13 @@ a { color: var(--acento); text-decoration-thickness: 1.5px; text-underline-offse
 /* Series de una en una */
 .serie.oculta { display: none; }
 .como-ir .tarjeta { width: 100%; text-align: left; margin: 8px 0; }
-.cambiar-vista { text-align: left; padding-left: 0; }
+
 .que-es { font: inherit; font-size: .8rem; color: var(--acento); background: none; border: 1px solid var(--acento-suave); border-radius: 999px; padding: 1px 8px; margin-left: 4px; cursor: pointer; }
 .guia-glosario { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; }
 .puntos { padding-left: 20px; margin: 6px 0; }
 .puntos li { margin: 4px 0; }
-.tabla-comparacion { width: 100%; border-collapse: collapse; font-size: .9rem; }
-.tabla-comparacion td { padding: 6px 4px; border-bottom: 1px solid var(--borde); vertical-align: top; }
-.tabla-comparacion tr.bien td:last-child { color: var(--bien); }
-.tabla-comparacion tr.mal td:last-child { color: var(--mal); }
+
+
 .glosario .explicacion { margin-top: 4px; }
 .intervalos { text-align: center; padding: 8px 0; }
 .intervalos-fase { font-size: 1.3rem; font-weight: 700; }
@@ -419,7 +417,7 @@ a.tarjeta.fila-enlace:active, button.tarjeta.fila-enlace:active { background: va
 }
 
 .cabecera-vista h1 { margin: 0.2em 0; }
-.fecha-hoy { margin: 0; color: var(--texto-suave); }
+
 
 /* --------------------------------------------------------------------------
    Formularios
@@ -761,7 +759,6 @@ input, select, textarea { max-width: 100%; box-sizing: border-box; }
   min-height: 28px;
 }
 
-.anadir-tecnica { width: auto; min-height: 40px; padding: 6px 10px; font-size: 0.9rem; }
 
 .serie-valores.extras { margin-top: 8px; }
 .serie-valores.extras .valor input { font-size: 1rem; }
@@ -787,7 +784,7 @@ input, select, textarea { max-width: 100%; box-sizing: border-box; }
 .grafica .oculto { display: none; }
 .grafica .linea { fill: none; stroke: var(--color); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
 .grafica .punto { fill: var(--color); stroke: var(--superficie); stroke-width: 2; }
-.grafica .etiqueta-serie { fill: var(--texto-suave); font-size: 9px; font-weight: 700; }
+
 
 .leyenda { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 6px; font-size: 0.85rem; color: var(--texto-suave); }
 .leyenda-item { display: inline-flex; align-items: center; gap: 6px; }
@@ -940,8 +937,8 @@ input, select, textarea { max-width: 100%; box-sizing: border-box; }
 .resumen-sesion h3 { margin: 16px 0 6px; }
 .resumen-sesion ul { padding-left: 20px; margin: 0; }
 .resumen-sesion li { margin: 4px 0; }
-.lista-volumen li.mucho { color: var(--aviso); }
-.lista-volumen li.bien { color: var(--bien); }
+
+
 .aviso { cursor: pointer; }
 
 /* Guía de respiración entre miniseries de miorrepeticiones */
@@ -957,7 +954,7 @@ input, select, textarea { max-width: 100%; box-sizing: border-box; }
 /* ¿Cómo llegas? y ritmo de recuperación */
 .como-llegas summary { cursor: pointer; font-weight: 600; min-height: 32px; }
 .fila-sensacion { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 6px 0; border-top: 1px solid var(--borde); }
-.botones-sensacion { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+
 .ajustes-musculo { display: grid; gap: 6px; }
 .fila-ajuste { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px; }
 .fila-ajuste select { font-size: 16px; min-height: 40px; }
@@ -981,10 +978,7 @@ input, select, textarea { max-width: 100%; box-sizing: border-box; }
 .recomendaciones { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 8px; }
 .recomendaciones li { display: grid; grid-template-columns: 22px 1fr; gap: 6px; font-size: 0.92rem; line-height: 1.4; }
 .recomendaciones a { color: inherit; }
-.recomendaciones .icono-rec { font-weight: 700; text-align: center; }
-.recomendaciones .aviso .icono-rec { color: var(--peligro); }
-.recomendaciones .consejo .icono-rec { color: var(--aviso); }
-.recomendaciones .bien .icono-rec { color: var(--bien); }
+
 
 /* Elegir carga por kg o % del 1RM */
 .modo-carga { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 6px; font-size: 0.9rem; }
@@ -992,8 +986,8 @@ input, select, textarea { max-width: 100%; box-sizing: border-box; }
 /* Sitios de entrenamiento */
 .fila-sede { display: grid; grid-template-columns: 1fr auto auto auto; gap: 6px; align-items: center; margin-bottom: 6px; }
 .fila-sede input[type=text], .fila-sede select { font-size: 16px; min-height: 40px; }
-.fila-sede-sesion { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; }
-.fila-sede-sesion select { font-size: 16px; min-height: 40px; }
+
+
 @media (max-width: 480px) { .fila-sede { grid-template-columns: 1fr 1fr; } }
 
 /* Rutinas prehechas y explicaciones plegables */
@@ -1124,16 +1118,10 @@ legend .ayuda, summary .ayuda { margin-left: 6px; vertical-align: middle; }
 .ayuda-texto p { margin: 0 0 10px; }
 
 /* Volver arriba: abajo a la derecha, encima de las pestañas. */
-.volver-arriba {
-  position: fixed; right: 14px; bottom: calc(76px + env(safe-area-inset-bottom, 0px)); z-index: 25;
-  width: 48px; height: 48px; border-radius: 50%; border: 0;
-  background: var(--texto); color: var(--fondo); font-size: 1.4rem; font-weight: 800;
-  box-shadow: 0 3px 12px rgba(0,0,0,.2); cursor: pointer;
-}
-.volver-arriba[hidden] { display: none; }
+
+
 /* En el entreno, encima de la barra fija (su alto lo pone el JS). */
-body.hay-barra-entreno .volver-arriba { bottom: calc(66px + env(safe-area-inset-bottom, 0px) + var(--alto-barra-entreno, 80px) + 12px); }
-body.entreno-a-pantalla .volver-arriba { bottom: calc(var(--alto-barra-entreno, 80px) + 12px); }
+
 
 /* Selector sin desplegable: con muchas opciones, un botón que abre la lista. */
 .selector-abrir { width: 100%; justify-content: space-between; text-align: left; }
@@ -1143,11 +1131,7 @@ body.entreno-a-pantalla .volver-arriba { bottom: calc(var(--alto-barra-entreno, 
 .fila-marcas.compacta .boton-marca { flex: 0 1 auto; min-height: 38px; padding: 6px 10px; }
 
 /* Filtros del buscador, plegados. */
-.filtros-plegables > summary { cursor: pointer; color: var(--texto-suave); padding: 4px 0; min-height: 36px; display: flex; align-items: center; }
-.filtros-plegables[open] > summary { margin-bottom: 6px; }
-.filtros-plegables .fila-filtros { grid-template-columns: 1fr; }
-.filtros-plegables .selector-abrir { min-height: 40px; padding: 6px 10px; }
-.filtros-plegables .modos-vista { margin-top: 8px; }
+
 
 /* Hoy: los botones de debajo del recuadro, separados de la recuperación. */
 .acciones-hoy { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin: 12px 0 24px; }
@@ -1233,8 +1217,8 @@ body.entreno-a-pantalla .volver-arriba { bottom: calc(var(--alto-barra-entreno, 
 .records { display: grid; gap: 6px; margin-bottom: 12px; }
 .record-nuevo { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 2px 8px; border-left: 3px solid var(--acento); padding: 4px 10px; }
 .record-nuevo small { grid-column: 1 / -1; color: var(--texto-suave); }
-.cambio-sube { color: var(--bien); font-weight: 600; }
-.cambio-baja { color: var(--peligro); font-weight: 600; }
+
+
 .resumen-sesion .fila-marcas .boton-marca { flex: 1 1 100%; font-size: .9rem; }
 
 /* Tu 1RM en la ficha: una tarjeta con la pregunta. */
@@ -1259,7 +1243,7 @@ body.entreno-a-pantalla .volver-arriba { bottom: calc(var(--alto-barra-entreno, 
 .boton-otra-rutina small { font-weight: 400; color: var(--texto-suave); font-size: .78rem; }
 .pista-aviso { margin: 8px 0; }
 .fila-copia { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 0; border-top: 1px solid var(--borde); }
-.grupo-cambios { margin: 8px 0; } .grupo-cambios p { margin: 0 0 6px; }
+
 
 /* Colores del mapa del cuerpo: más vivos que los de los textos, para que se
    distingan bien sobre el dibujo. Ámbar en vez de amarillo pálido; azul y
@@ -1352,7 +1336,7 @@ body.entreno-a-pantalla .volver-arriba { bottom: calc(var(--alto-barra-entreno, 
 .tabla-musculos tbody tr:nth-child(even) td { background: rgba(127, 127, 127, .14); }
 
 /* Política de privacidad: un botón como los demás, a lo ancho. */
-.vista-ajustes > a.boton.secundario, a.boton-privacidad { display: flex; width: 100%; margin: 12px 0; }
+a.boton-privacidad { display: flex; width: 100%; margin: 12px 0; }
 
 /* Nada se sale por la derecha: los textos largos parten línea. */
 html, body { overflow-x: hidden; }
@@ -1381,14 +1365,14 @@ html, body { overflow-x: hidden; }
 /* Política de privacidad: texto a la izquierda, como los apartados. */
 a.boton-privacidad { justify-content: flex-start; padding-left: 18px; }
 /* Cancelar entrenamiento, en rojo. */
-.boton.cancelar-entreno { background: transparent; color: var(--peligro); border-color: var(--peligro); width: 100%; margin-top: 8px; }
+
 
 /* Músculos algo transparentes (se intuye el dibujo debajo) pero con el color
    claro: se ve el semáforo sin tapar el cuerpo. */
 .capa-musculo { opacity: .78; }
 
 /* Comentario de cada serie. */
-.comentario-serie .boton-comentario { padding: 2px 0; font-size: .85rem; }
+
 .comentario-serie .nota-serie { width: 100%; margin-top: 4px; }
 .comentario-serie .nota-serie[hidden] { display: none; }
 
@@ -1403,8 +1387,7 @@ a.boton-privacidad { justify-content: flex-start; padding-left: 18px; }
 .barras-musculo { gap: 0; }
 .barra-musculo { padding: 6px 8px; border-radius: 6px; }
 .barras-musculo .barra-musculo:nth-child(even),
-.tabla-datos tbody tr:nth-child(even) > *,
-.tabla-cebra tbody tr:nth-child(even) > * { background: rgba(127, 127, 127, .24); }
+.tabla-datos tbody tr:nth-child(even) > * { background: rgba(127, 127, 127, .24); }
 
 /* «Ver los números» y «Ver los entrenamientos»: botón centrado y tabla centrada. */
 .tabla-datos summary { justify-content: center; margin: 8px auto 0; width: fit-content; padding: 0 18px;
@@ -1442,8 +1425,7 @@ a.boton-privacidad { justify-content: flex-start; padding-left: 18px; }
    una imagen. En #/prueba-colores hay otras formas para comparar. */
 .tabla-musculos tbody tr:nth-child(even) td,
 .barras-musculo .barra-musculo:nth-child(even),
-.tabla-datos tbody tr:nth-child(even) > *,
-.tabla-cebra tbody tr:nth-child(even) > * {
+.tabla-datos tbody tr:nth-child(even) > * {
   background-color: transparent;
   background-image: linear-gradient(rgba(128, 128, 128, .28), rgba(128, 128, 128, .28));
 }
@@ -1499,7 +1481,7 @@ a.boton-privacidad { justify-content: flex-start; padding-left: 18px; }
 .modos-mapa .boton-marca { font-size: .8rem; padding: 6px 2px; overflow-wrap: normal; hyphens: manual; }
 /* Equilibrio: grupos de botones separados y con su título. */
 .equilibrio .grupo-botones { margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--borde); }
-.equilibrio .grupo-botones > .etiqueta-grupo { display: block; text-align: center; font-size: .8rem; color: var(--texto-suave); margin-bottom: 4px; }
+
 .equilibrio .periodo-propio { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 6px; }
 .equilibrio .periodo-propio input { width: 5em; text-align: center; }
 .arana-etiqueta { font-size: 21px; font-weight: 600; }
@@ -1520,7 +1502,7 @@ div.sugerencia > span { display: block; }
 .fila-cabecera-entreno .fecha { flex: 0 1 auto; }
 .fila-cabecera-entreno > .fila-marcas, .fila-cabecera-entreno > .selector-abrir { flex: 1 1 8em; margin: 0; }
 .boton-vista, .boton-bocadillo { font-size: 1.2rem; }
-.fila-iconos-entreno { display: flex; justify-content: center; gap: 16px; margin: 8px 0 16px; }
+
 .boton-cancelar-x { color: var(--peligro); border: 1px solid var(--peligro); font-weight: 700; }
 .notas-sesion[hidden] { display: none; }
 .boton-tecnicas { margin: 0; }
@@ -1555,11 +1537,11 @@ div.sugerencia > span { display: block; }
 .ej-rutina-flecha { color: var(--texto-suave); font-size: 1.1rem; }
 .ej-rutina-detalle { display: grid; gap: 10px; padding: 4px 10px 12px; border-top: 1px solid var(--borde); }
 .ej-rutina-detalle .etiqueta-campo { margin: 6px 0 0; text-align: center; }
-.anadir-rapido { display: grid; gap: 8px; padding: 10px; border-radius: var(--radio-pequeno); background: var(--superficie-2); }
+
 .fila-rapida { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; }
 .fila-rapida .numero-corto { width: 3.2em; text-align: center; min-height: 44px; font-size: 16px; }
 .ej-rutina-orden .boton, .ej-rutina-detalle .fila-botones .boton { flex: 1 1 0; }
-.fila-rapida .sin-cortar { white-space: nowrap; }
+
 .dia-rutina .cabecera-tarjeta { display: flex; align-items: center; gap: 8px; }
 .dia-rutina .cabecera-tarjeta input { flex: 1; min-width: 0; }
 .fila-rapida { gap: 4px; }
@@ -1577,17 +1559,15 @@ div.sugerencia > span { display: block; }
 .veredicto.descansa { border-color: var(--mapa-rojo, #b3261e); }
 
 /* Tu peso (Cuerpo) */
-.tarjeta-peso { display: grid; gap: 10px; text-align: center; }
+
 .fila-peso { display: flex; gap: 8px; justify-content: center; align-items: center; }
 .fila-peso .numero-peso { width: 6em; text-align: center; min-height: 44px; font-size: 16px; }
 .grafica-peso { width: 100%; max-width: 360px; margin: 0 auto; color: var(--acento); }
-.tarjeta-peso table { margin: 0 auto; }
+
 
 /* 0.46: Hoy en breve y «¿Voy hoy?» paso a paso */
-.cabecera-seccion { display: flex; flex-direction: column; align-items: center; gap: 2px; margin-bottom: 8px; }
-.cabecera-seccion h2 { margin: 0; }
-.cabecera-seccion .boton-detalle { padding: 4px 8px; min-height: 0; font-size: 0.85rem; }
-.lista-recientes { display: grid; gap: 8px; }
+
+
 .fila-enlace.breve { padding: 8px 12px; }
 .progreso-voy { height: 10px; border-radius: 5px; background: var(--superficie-2, var(--borde)); overflow: hidden; }
 .progreso-voy .relleno { display: block; height: 100%; border-radius: 5px; background: var(--acento); transition: width .25s; }
@@ -1609,8 +1589,8 @@ div.sugerencia > span { display: block; }
 .paso-a-paso .boton { min-width: 56px; font-size: 1.4rem; padding: 4px 0; }
 .numero-grande { font-size: 1.8rem; min-width: 2ch; text-align: center; }
 .chips.rangos { justify-content: center; margin-bottom: 4px; }
-.anadir-rapido .donde .boton-marca { flex: 1 1 0; }
-.anadir-rapido .etiqueta-campo { text-align: center; margin: 4px 0 2px; }
+
+
 .pegar-rutina textarea { width: 100%; font-size: 14px; font-family: ui-monospace, Consolas, monospace; }
 .dia-previo { text-align: left; }
 .dia-previo > strong { display: block; text-align: center; margin-bottom: 6px; }
@@ -1735,8 +1715,7 @@ div.sugerencia > span { display: block; }
 .paso-grande-fila .boton.grande { flex: 1; margin: 0; flex-direction: column; gap: 0; line-height: 1.15; }
 .paso-grande-fila .boton-siguiente small { font-weight: 500; opacity: .8; font-size: 0.8rem; overflow-wrap: anywhere; }
 .boton-paso-grande { flex: 0 0 60px; min-height: 60px; font-size: 1.6rem; padding: 0; }
-.terminar-entreno.secundario { margin-top: 20px; }
-.descanso-campana { width: auto; min-width: 44px; font-size: 1.1rem; }
+
 
 /* La serie de prueba del 1RM: un letrero claro en lugar del tipo de serie. */
 .insignia-prueba { display: inline-flex; align-items: center; min-height: 36px; padding: 4px 14px; border-radius: 999px;
@@ -1790,7 +1769,7 @@ html, body, button, .boton, .boton-marca, .opcion, .chip, td, th { hyphens: manu
    llevan una flecha a la derecha. */
 details > summary { list-style: none; }
 details > summary::-webkit-details-marker { display: none; }
-details.explicacion, details.papelera, details.fuente, details.como-llegas, details.instalar-detalle { text-align: center; }
+details.explicacion, details.papelera, details.fuente, details.como-llegas { text-align: center; }
 details.explicacion > summary, .papelera > summary, .fuente > summary, .como-llegas > summary, .instalar details > summary,
 .desplegable-musculos > summary {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px; width: auto; max-width: 100%; min-height: 40px;
@@ -1876,16 +1855,8 @@ html:has(.modal-fondo), body:has(.modal-fondo) { overflow: hidden; }
 a, button { -webkit-touch-callout: none; }
 .contador-series { scroll-margin-top: 72px; }
 /* Calentamiento: una franja con un botón por serie de aproximación. */
-.franja-calentamiento { display: grid; gap: 6px; margin: 0 0 12px; padding: 10px 12px; border-radius: var(--radio-pequeno); background: var(--superficie-2); }
-.franja-calentamiento .titulo-con-ayuda { margin: 0; }
-.franja-calentamiento .boton.enlace { justify-self: center; margin: 0; min-height: 36px; }
-.chips-calentamiento { display: grid; gap: 6px; }
-.chip-calentamiento { display: flex; width: 100%; align-items: center; gap: 10px; min-height: 44px; padding: 4px 14px 4px 8px; border-radius: 999px;
-  border: 1px solid var(--borde); background: var(--superficie); color: var(--texto); font: inherit; font-weight: 600;
-  font-variant-numeric: tabular-nums; cursor: pointer; }
-.chip-marca { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--borde); font-size: .85rem; }
-.chip-calentamiento.hecho { background: var(--acento-suave); border-color: transparent; }
-.chip-calentamiento.hecho .chip-marca { background: var(--bien); border-color: var(--bien); color: var(--superficie); }
+
+
 /* Diario */
 .fila-campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 8px; align-items: end; }
 .fila-campos .campo { margin: 0; min-width: 0; }
@@ -1966,8 +1937,7 @@ html, body { overflow-x: clip; }
 .foto-ejercicio { display: block; position: relative; width: 100%; margin: -4px 0 10px; padding: 0; border: 0; border-radius: var(--radio-pequeno);
   overflow: hidden; background: #fff; cursor: pointer; }
 .foto-ejercicio img { display: block; width: 100%; max-height: 220px; object-fit: contain; background: #fff; }
-.foto-pista { position: absolute; right: 8px; bottom: 8px; padding: 4px 10px; border-radius: 999px; font-size: .8rem; font-weight: 700;
-  background: rgb(20 22 28 / 75%); color: #fff; }
+
 .miniatura-boton { padding: 0; border: 0; background: none; cursor: pointer; border-radius: var(--radio-pequeno); }
 .fila-mas-series { margin-top: 10px; }
 .ejercicio-sesion.entra-izquierda { animation: entra-izquierda .22s ease-out; }
@@ -2217,8 +2187,8 @@ html, body { overflow-x: clip; }
   background: var(--acento-suave); color: var(--texto); font-weight: 700; font-size: 0.95rem; flex-basis: 100%; justify-content: center; }
 .serie-estiramiento { flex-direction: column; align-items: stretch; }
 .serie-estiramiento .como-medir { margin: 0; text-align: center; }
-.fila-estiramiento { display: flex; flex-wrap: wrap; gap: 6px; }
-.fila-estiramiento > * { flex: 1 1 140px; min-width: 0; }
+
+
 .pregunta-sede .fila-botones { flex-wrap: wrap; margin-top: 8px; }
 .pregunta-sede .fila-botones > * { min-width: 0; }
 
@@ -2460,3 +2430,4 @@ details.como-llegas:not([open]) > summary { font-weight: 500; font-size: .92rem;
 .aviso-texto-caja { flex: 1 1 0; min-width: min(100%, 12em); }
 /* Con cinco pestañas o menos, la letra de la barra vuelve a su tamaño. */
 .navegacion.pocas a { font-size: .74rem; }
+.valor .poner-peso { min-width: 0; min-height: 32px; padding: 2px 8px; font-size: .78rem; white-space: nowrap; }

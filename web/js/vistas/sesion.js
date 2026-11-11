@@ -36,6 +36,7 @@ import { fechaCorta } from '../ui.js';
 import { comparacionSerie, mostrarResumen } from './resumen-sesion.js';
 import { ejercicioEnSede, nombreSede, sedesActivas } from '../sedes.js';
 import { hoyISO } from '../ui.js';
+import { pedirPesoCorporal } from '../peso.js';
 import { ejercicioDesdeCatalogo, elegirEjercicio as abrirSelector } from './selector-ejercicios.js';
 import { desplegableTecnicas, textoTecnicas } from './tecnicas.js';
 
@@ -1847,8 +1848,17 @@ export function vistaSesion(contenedor, { id }) {
     const actualizar = (fn) => { cambiarSesion((s) => fn(s.ejercicios[i].series[j]), { tecleo: true }); if (sesion.tutorial) pintarGuia(); };
 
     const corporal = tipoCarga === 'pesoCorporal' && (serie.lastre != null || serie.carga == null);
-    const cargaCorporalTexto = h('small', { class: 'suave' },
-      corporal ? (serie.carga != null ? `= ${formatearNumero(serie.carga)} kg` : 'pon tu peso en Ajustes') : '');
+    // Sin tu peso, el botón para ponerlo aquí mismo (antes decía «pon tu peso en Ajustes»): las series con tu peso
+    // de este entreno se rellenan al guardarlo.
+    const cargaCorporalTexto = corporal && serie.carga == null && peso == null
+      ? h('button', { type: 'button', class: 'boton enlace poner-peso', onclick: () => pedirPesoCorporal({ alGuardar: (kg) => cambiarSesion((s, datos) => {
+        for (const entrada of s.ejercicios) {
+          const e = datos.ejercicios.find((x) => x.id === entrada.ejercicioId);
+          if (e?.carga?.tipo !== 'pesoCorporal') continue;
+          for (const x of entrada.series) if (!x.hecha && x.carga == null) x.carga = cargaCorporal(e, kg, x.lastre ?? 0);
+        }
+      }) }) }, 'Poner mi peso')
+      : h('small', { class: 'suave' }, corporal ? (serie.carga != null ? `= ${formatearNumero(serie.carga)} kg` : '') : '');
 
     return h('div', { class: 'serie-valores' },
       corporal && h('label', { class: 'valor' },
@@ -1858,7 +1868,7 @@ export function vistaSesion(contenedor, { id }) {
             actualizar((x) => {
               x.lastre = leerNumero(e.target.value) ?? 0;
               x.carga = cargaCorporal(ej, peso, x.lastre);
-              cargaCorporalTexto.textContent = x.carga != null ? `= ${formatearNumero(x.carga)} kg` : 'pon tu peso en Ajustes';
+              if (cargaCorporalTexto.tagName === 'SMALL') cargaCorporalTexto.textContent = x.carga != null ? `= ${formatearNumero(x.carga)} kg` : '';
             });
             recalcularAbajo(ej, i);
           } }),

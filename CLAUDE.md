@@ -1805,3 +1805,16 @@ lista con el resultado está en el informe. Funcionaba todo lo comprobado. Fallo
   Sueño, Historial o Aprender de la barra (`PESTANAS_OPCIONALES` en esquema.js; `pintarNavegacion` en app.js). Por
   defecto se ven todas; la pantalla quitada se abre desde ese mismo sitio y, si estás en ella, su pestaña se ve.
 - Avisos de abajo: el texto y la ✕ en la misma fila.
+
+### 0.87.3: tu peso desde la serie y hoja de estilos más ligera
+
+- `pedirPesoCorporal()` en peso.js: el cartel «Tu peso corporal» de Entrenar sale también en la serie que lo necesita
+  (botón «Poner mi peso» donde antes decía «pon tu peso en Ajustes») y rellena al guardar las series con tu peso de ese
+  entreno.
+- Fuera 57 reglas de `estilo.css` de 35 clases que ya no pinta nadie (`franja-calentamiento`, `volver-arriba`,
+  `terminar-entreno`, `fila-iconos-entreno`…): 5 KB menos. Comprobado comparando capturas de 16 pantallas antes y
+  después, píxel a píxel (solo cambian el fotograma de un dibujo animado y la barra de desplazamiento).
+- `web/zz-capas.html` (una página para trazar capas del cuerpo que se coló en la 0.49) pasa a `herramientas/`: ya no se
+  publica.
+- Barrido a 375 px con todos los plegables abiertos: 19 pantallas sin nada que se salga ni botones cortados. Con el
+  oscurecido forzado de Chrome, Inicio y el entreno se leen bien.
