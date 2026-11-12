@@ -13,6 +13,7 @@
 
 import * as estado from '../estado.js';
 import { aviso, h } from '../ui.js';
+import { programarPush } from '../avisos-push.js';
 
 let finMs = null;
 let intervalo = null;
@@ -63,6 +64,15 @@ export function arrancarDescanso(segundos, { texto = 'de descanso', ejercicio = 
   clearInterval(intervalo);
   intervalo = setInterval(pintar, 1000);
   if (texto === 'de descanso') notificar(`Descanso: ${formatear(segundos)}`, 'Te aviso cuando acabe.', { silencio: true });
+  avisoRemoto();
+}
+
+// El aviso del fin del descanso, también desde el servidor de avisos: con la pantalla apagada el móvil congela la
+// app y su cuenta atrás no llega a avisar (Dan, 12-11-2026: «solo lo muestra cuando la abro»). Se apunta la hora de
+// fin; si el descanso se salta, se alarga o se acorta, se cambia; solo entre series y con los avisos activados.
+function avisoRemoto() {
+  const fin = finMs && motivo === 'de descanso' && !respiracion && finMs - Date.now() > 4000 && notificacionesActivas() ? finMs : null;
+  programarPush(fin ? [{ tipo: 'descanso', cuando: fin }] : [], 'descanso');
 }
 
 export function pararDescanso() {
@@ -72,6 +82,7 @@ export function pararDescanso() {
   intervalo = null;
   pintar();
   cerrarNotificacion();
+  avisoRemoto();
 }
 
 // ---------------------------------------------------------------------------
@@ -127,9 +138,11 @@ async function notificar(titulo, cuerpo, { silencio = false, vibrar = null } = {
   if (!notificacionesActivas()) return;
   try {
     const reg = await navigator.serviceWorker.ready;
+    // Una notificación silenciosa no puede llevar `vibrate`, ni vacío: el navegador la rechaza entera («Silent
+    // notifications must not specify vibration patterns»). Por eso la cuenta atrás no salía nunca (visto el 12-11-2026).
     await reg.showNotification(titulo, {
       body: cuerpo, tag: 'descanso', renotify: !silencio, silent: silencio, icon: './iconos/icono-v2-192.png', badge: './iconos/icono-v2-192.png',
-      vibrate: vibrar ?? (silencio ? [] : [700, 250, 700, 250, 1000, 250, 1000]), requireInteraction: !silencio, data: { url: location.href },
+      ...(silencio ? {} : { vibrate: vibrar ?? [700, 250, 700, 250, 1000, 250, 1000] }), requireInteraction: !silencio, data: { url: location.href },
     });
   } catch { /* sin service worker (navegador de escritorio sin instalar): nada */ }
 }
@@ -296,6 +309,7 @@ function alargar(paso = 30) {
   clearInterval(intervalo);
   intervalo = setInterval(pintar, 1000);
   pintar();
+  avisoRemoto();
 }
 
 function acortar() {
@@ -304,6 +318,7 @@ function acortar() {
   finMs -= 30_000;
   alargadoSeg -= 30;
   pintar();
+  avisoRemoto();
 }
 
 export function barraDescanso() {

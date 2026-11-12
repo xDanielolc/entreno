@@ -17,6 +17,10 @@
 //             guarda su par de claves, que crea él solo la primera vez
 //   ORIGENES  (texto) webs que pueden usarlo: https://xdanielolc.github.io
 //   Un disparador «Cron» cada minuto:  * * * * *
+//
+// A qué hora llega: al segundo. El cron despierta al servidor cada minuto; él mira qué avisos tocan en ese minuto
+// y espera dormido hasta la hora exacta de cada uno (esperar no gasta tiempo de proceso). Un aviso para dentro de
+// menos de medio minuto (un descanso corto) lo manda la propia petición que lo apunta, sin pasar por el almacén.
 // No lleva ningún secreto puesto a mano.
 //
 // Rutas:
@@ -31,10 +35,12 @@ const MAXIMO_AVISOS = 500;            // en total, para que nadie llene el almac
 const MAXIMO_POR_MOVIL = 4;
 const HORIZONTE_MS = 36 * 3600_000;   // no se apunta nada a más de día y medio
 const CADUCA_MS = 30 * 60_000;        // un aviso que llega media hora tarde ya no sirve
+const VENTANA_MS = 55_000;            // cada minuto se atienden los avisos de los próximos 55 s
+const DIRECTO_MS = 25_000;            // por debajo de esto lo manda la petición que lo apunta (le quedan 30 s de vida)
 const QUIEN = 'https://xdanielolc.github.io/entreno/';   // contacto que exige el protocolo (una dirección web vale)
 
 export default {
-  async fetch(peticion, env) {
+  async fetch(peticion, env, contexto) {
     const origen = peticion.headers.get('Origin') || '';
     const permitidos = (env.ORIGENES || '').split(',').map((x) => x.trim()).filter(Boolean);
     const cors = permitidos.includes(origen)
@@ -62,9 +68,23 @@ export default {
           .filter((a) => a && typeof a.tipo === 'string' && /^[a-z-]{1,20}$/.test(a.tipo)
             && Number.isFinite(a.cuando) && a.cuando > ahora - 60_000 && a.cuando < ahora + HORIZONTE_MS)
           .map((a) => ({ e: datos.endpoint, t: a.tipo, c: Math.round(a.cuando) }));
-        const lista = (await leer(env)).filter((x) => x.e !== datos.endpoint);
-        if (lista.length + nuevos.length > MAXIMO_AVISOS) return respuesta({ error: 'lleno' }, 503);
-        await guardar(env, [...lista, ...nuevos]);
+        // Los que tocan ya mismo no dan tiempo a que el cron los vea: los manda esta petición a su hora.
+        const directos = nuevos.filter((a) => a.c - ahora <= DIRECTO_MS);
+        const alAlmacen = nuevos.filter((a) => a.c - ahora > DIRECTO_MS);
+        const antes = await leer(env);
+        const lista = antes.filter((x) => x.e !== datos.endpoint);
+        if (lista.length + alAlmacen.length > MAXIMO_AVISOS) return respuesta({ error: 'lleno' }, 503);
+        // Solo se escribe si cambia algo (el almacén gratuito tiene un tope de escrituras al día).
+        if (alAlmacen.length || lista.length !== antes.length) await guardar(env, [...lista, ...alAlmacen]);
+        if (directos.length && contexto?.waitUntil) {
+          contexto.waitUntil((async () => {
+            const k = await claves(env);
+            for (const aviso of directos.sort((a, b) => a.c - b.c)) {
+              await dormir(aviso.c - Date.now());
+              try { await mandar(k, aviso.e); } catch { /* ese aviso se pierde */ }
+            }
+          })());
+        }
         return respuesta({ ok: true, pendientes: nuevos.length });
       }
       return respuesta({ error: 'ruta' }, 404);
@@ -79,24 +99,37 @@ export default {
   },
 };
 
-async function repartir(env, ahora = Date.now()) {
+const dormir = (ms) => (ms > 0 ? new Promise((r) => setTimeout(r, ms)) : Promise.resolve());
+const igual = (a, b) => a.e === b.e && a.t === b.t && a.c === b.c;
+
+async function repartir(env) {
   const lista = await leer(env);
   if (!lista.length) return { mandados: 0, quedan: 0 };
-  const tocan = lista.filter((x) => x.c <= ahora);
+  const tocan = lista.filter((x) => x.c <= Date.now() + VENTANA_MS).sort((a, b) => a.c - b.c);
   if (!tocan.length) return { mandados: 0, quedan: lista.length };
   const k = await claves(env);
   let mandados = 0;
+  const atendidos = [];
   const caidos = new Set();   // móviles que ya no existen para su servicio de avisos
   for (const aviso of tocan) {
-    if (ahora - aviso.c > CADUCA_MS || caidos.has(aviso.e)) continue;
+    const espera = aviso.c - Date.now();
+    if (espera > 0) {
+      await dormir(espera);
+      // Mientras se esperaba, el móvil pudo quitarlo o cambiarlo (saltó el descanso): se mira otra vez.
+      if (espera > 1500 && !(await leer(env)).some((x) => igual(x, aviso))) continue;
+    }
+    atendidos.push(aviso);
+    if (Date.now() - aviso.c > CADUCA_MS || caidos.has(aviso.e)) continue;
     try {
       const r = await mandar(k, aviso.e);
       if (r.status === 404 || r.status === 410) caidos.add(aviso.e);
       else if (r.ok) mandados += 1;
     } catch { /* la red del servicio: ese aviso se pierde, no se reintenta */ }
   }
-  const quedan = lista.filter((x) => x.c > ahora && !caidos.has(x.e));
-  await guardar(env, quedan);
+  // Se quitan de la lista los atendidos, leyéndola de nuevo: en el rato de espera pudieron entrar avisos de otros.
+  const ahora = await leer(env);
+  const quedan = ahora.filter((x) => !atendidos.some((a) => igual(a, x)) && !caidos.has(x.e));
+  if (quedan.length !== ahora.length) await guardar(env, quedan);
   return { mandados, quedan: quedan.length };
 }
 

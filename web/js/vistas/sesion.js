@@ -2680,7 +2680,7 @@ export function textoSerie(ej, serie) {
   if (serie.carga != null) partes.push(`${formatearNumero(serie.carga)} ${unidadCarga(ej)}`);
   if (serie.esfuerzo != null) {
     partes.push(esTiempo(ej) ? textoEsfuerzo(ej, serie.esfuerzo)
-      : `${formatearNumero(serie.esfuerzo)} ${unidadEsfuerzo(ej)}${serie.recamara ? ` (${formatearNumero(serie.recamara)} en recámara)` : ''}`);
+      : `${formatearNumero(serie.esfuerzo)} ${unidadEsfuerzo(ej)}${serie.recamara ? `, te quedaban ${formatearNumero(serie.recamara)}` : ''}`);
   }
   for (const tipo of medidasDe(ej).slice(1)) {
     const v = extraDeSerie(serie, tipo);

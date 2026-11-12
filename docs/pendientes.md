@@ -32,6 +32,8 @@ archivo que se cita; lo ya hecho se ha marcado con [x].
       de discos (Hevy la tiene); Ajustes «más intuitivo» (pidió repensarlo, sin detalle); la serie descendente sigue
       siendo la pantalla más cargada del entreno; el «% 1RM» de una casilla no se refresca hasta repintar; el texto
       del paso de la recámara en la guía de bienvenida dice «viene puesta 1» y ya no viene puesta.
+- [ ] **El aviso del fin del descanso con la pantalla apagada** (0.91.3): va por el servidor de avisos, al segundo.
+      Probado con servidor y service worker simulados; **falta que Dan lo vea llegar en un entreno real**.
 - [ ] **El aviso del test de atención** (no le llegaba: era un temporizador de la página). Servidor de avisos hecho
       en la 0.89.0 y **creado en Cloudflare el 11-11-2026** (Worker `entreno-avisos`, con su almacén `AVISOS`, la
       variable `ORIGENES` y el cron de cada minuto; responde bien desde fuera). **Falta la prueba real en el móvil

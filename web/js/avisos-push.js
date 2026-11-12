@@ -2,19 +2,25 @@
 //
 // Un temporizador de la propia página no vale: el móvil congela la app en
 // cuanto se apaga la pantalla, y el aviso no llega (le pasó a Dan con el del
-// test de atención, 12-11-2026). Aquí la app deja apuntado en un servidor muy
-// pequeño (Cloudflare, `herramientas/cloudflare/avisos.js`) «avísame a tal
-// hora», y es él quien manda el aviso al móvil (un «push»); el texto lo pone
-// el service worker al recibirlo.
+// test de atención, 12-11-2026, y con el del fin del descanso). Aquí la app
+// deja apuntado en un servidor muy pequeño (Cloudflare,
+// `herramientas/cloudflare/avisos.js`) «avísame a tal hora», y es él quien
+// manda el aviso al móvil (un «push»). El aviso llega sin texto: qué decir lo
+// decide el service worker con lo que esta página le deja apuntado (qué avisos
+// hay pendientes y para cuándo).
 //
 // Al servidor solo va la dirección de avisos que da el navegador (anónima) y
-// la hora. Si el servidor no existe o falla, no pasa nada: queda el
-// temporizador de siempre y la tarjeta al abrir la app.
+// la hora. Si el servidor no existe o falla, no pasa nada: quedan los
+// temporizadores de siempre y las tarjetas al abrir la app.
 
 import { CONFIG } from './config.js';
 
 const CLAVE_ESTADO = 'entreno-push-estado';   // lo último que se le dijo al servidor (para no repetirlo)
 const CLAVE_PUBLICA = 'entreno-push-clave';   // la clave pública del servidor y el día que se pidió
+const CLAVE_GRUPOS = 'entreno-push-grupos';   // lo que quiere cada parte de la app: { pvt: [...], descanso: [...] }
+// Donde el service worker lee qué avisos hay pendientes (él no ve localStorage). El mismo nombre en sw.js.
+const ALMACEN_SW = 'entreno-avisos-1';
+const FICHA_SW = './__avisos-pendientes';
 
 export const hayServidorDeAvisos = () => Boolean(CONFIG.urlAvisos)
   && 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
@@ -44,16 +50,54 @@ async function clavePublica() {
   return clave;
 }
 
-let cola = Promise.resolve(false);
+// Cada parte de la app (el test de atención, el descanso) dice lo suyo; al servidor va todo junto, porque él guarda
+// el estado completo de cada móvil. Se recuerda entre aperturas: si no, el descanso borraría el aviso del test.
+function leerGrupos() {
+  try {
+    const g = JSON.parse(localStorage.getItem(CLAVE_GRUPOS) || '{}');
+    return g && typeof g === 'object' ? g : {};
+  } catch { return {}; }
+}
+function todos(grupos) {
+  const limite = Date.now() - 60_000;
+  return Object.values(grupos).flat().filter((a) => a && Number.isFinite(a.cuando) && a.cuando > limite);
+}
 
-// `avisos` es TODO lo que este móvil quiere que le avisen: [{ tipo, cuando }],
-// con `cuando` en milisegundos (como Date.now()). Sustituye a lo anterior; una
-// lista vacía lo quita todo. Devuelve una promesa con true si el servidor lo
-// tiene apuntado. Se puede llamar cuantas veces haga falta: si nada ha
-// cambiado, no se manda nada.
-export function programarPush(avisos) {
-  cola = cola.then(() => programar(avisos)).catch(() => false);
-  return cola;
+// Lo que el service worker necesita para poner el texto del aviso cuando llegue.
+async function apuntarParaElSW(grupos) {
+  try {
+    const almacen = await caches.open(ALMACEN_SW);
+    await almacen.put(FICHA_SW, new Response(JSON.stringify({ avisos: todos(grupos), apuntado: Date.now() }), { headers: { 'Content-Type': 'application/json' } }));
+  } catch { /* sin almacén (modo privado): el aviso saldrá con el texto de siempre */ }
+}
+
+let cola = Promise.resolve(false);
+let espera = null;
+let pendiente = null;
+
+// `avisos` es lo que este `grupo` quiere que le avisen: [{ tipo, cuando }], con `cuando` en milisegundos (como
+// Date.now()). Sustituye a lo anterior de ese grupo; una lista vacía lo quita. Devuelve una promesa con true si el
+// servidor lo tiene apuntado. Se puede llamar cuantas veces haga falta: si nada ha cambiado, no se manda nada, y los
+// cambios seguidos (−30 s, +30 s) se juntan en un solo envío.
+export function programarPush(avisos, grupo = 'pvt') {
+  const grupos = leerGrupos();
+  grupos[grupo] = avisos.map((a) => ({ tipo: a.tipo, cuando: Math.round(a.cuando) }));
+  for (const g of Object.keys(grupos)) {
+    grupos[g] = grupos[g].filter((a) => a.cuando > Date.now() - 60_000);
+    if (!grupos[g].length) delete grupos[g];
+  }
+  try { localStorage.setItem(CLAVE_GRUPOS, JSON.stringify(grupos)); } catch { /* sin almacén */ }
+  apuntarParaElSW(grupos);
+  clearTimeout(espera);
+  pendiente ??= {};
+  pendiente.promesa ??= new Promise((resolver) => { pendiente.resolver = resolver; });
+  const esta = pendiente;
+  espera = setTimeout(() => {
+    pendiente = null;
+    cola = cola.then(() => programar(todos(leerGrupos()))).catch(() => false);
+    cola.then(esta.resolver);
+  }, grupo === 'pvt' ? 0 : 600);
+  return esta.promesa;
 }
 
 // Si el servidor no contesta (aún no existe, o no hay red), no se insiste hasta pasados diez minutos.
@@ -75,7 +119,8 @@ async function hablarConElServidor(avisos) {
     sub = null;
   }
   if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: deB64url(clave) });
-  const deseado = JSON.stringify({ e: sub.endpoint, a: avisos.map((a) => [a.tipo, Math.round(a.cuando / 60_000)]).sort() });
+  // El descanso va al segundo; lo demás, al minuto.
+  const deseado = JSON.stringify({ e: sub.endpoint, a: avisos.map((a) => [a.tipo, Math.round(a.cuando / (a.tipo === 'descanso' ? 1000 : 60_000))]).sort() });
   try { if (localStorage.getItem(CLAVE_ESTADO) === deseado) return true; } catch { /* se manda */ }
   const r = await fetch(`${CONFIG.urlAvisos}/programar`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },

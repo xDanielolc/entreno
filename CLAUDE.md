@@ -1972,3 +1972,28 @@ Rehechos: extensión torácica sobre rodillo, rotación torácica en cuadrupedia
 fondos asistidos. Dibujos propios: «Dominadas tras nuca» y «Extensión de cuello con arnés». Almacén
 `entreno-imagenes-58`. Con esto, de la octava revisión de Dan quedan los de la lista final de la página de revisión
 (colección `dibujos9`): los que Gemini no supo hacer, los de máquina con foto y dos marcados «mal» sin nota.
+
+### 0.91.3 (12-11-2026): el fin del descanso avisa con la pantalla apagada
+
+Dan: «el crono sale como completado antes de que yo vuelva a abrir la app, pero solo lo muestra cuando la abro».
+Mismo motivo que el aviso del test: el móvil congela la página. Ahora el fin del descanso va también por el servidor
+de avisos.
+- `avisos-push.js`: `programarPush(avisos, grupo)`; cada parte de la app tiene su grupo (`pvt`, `descanso`), se
+  recuerdan en localStorage (`entreno-push-grupos`) y al servidor va la suma. Lo pendiente se deja además en el
+  almacén `entreno-avisos-1` (ficha `./__avisos-pendientes`), que es de donde el service worker saca qué texto poner:
+  el push sigue llegando sin contenido. Los cambios seguidos (−30 s, +30 s) se juntan en un envío.
+- `descanso.js`: `avisoRemoto()` al arrancar, alargar, acortar, saltar y parar; solo entre series y con los avisos
+  activados. **Fallo antiguo arreglado**: una notificación silenciosa no puede llevar `vibrate` (ni vacío): el
+  navegador la rechaza entera, así que la cuenta atrás «Descanso: 2:00» no había salido nunca.
+- `sw.js`: en `push` busca el aviso apuntado más cercano a ahora (descanso: hasta 3 min después; test: hasta 31 min);
+  si no hay ninguno que toque (el descanso se saltó), no enseña nada; sin ficha (app anterior), el test, como antes.
+  Con la app a la vista la notificación del descanso solo cambia de texto, en silencio (la app ya suena y vibra).
+- Worker (`herramientas/cloudflare/avisos.js`): avisa **al segundo**. El cron de cada minuto atiende los avisos de
+  los próximos 55 s y espera dormido hasta la hora de cada uno (esperar no gasta proceso; el plan gratuito da 15 min
+  de reloj por pasada); antes de mandar relee la lista por si el móvil lo quitó. Un aviso para dentro de 25 s o menos
+  lo manda la propia petición con `waitUntil` (30 s de vida), sin pasar por el almacén. Solo escribe en el KV si algo
+  cambia (tope gratuito: 1000 escrituras al día; un entreno son unas 75).
+- «60 kg × 10 reps, te quedaban 2» en vez de «(2 en recámara)» en `textoSerie`: Dan dudó si las 2 estaban dentro de
+  las 10. Son aparte: la fórmula suma hechas y recámara.
+- Pruebas: `herramientas/pruebas/prueba_worker_hora.py` (hora exacta y cancelación) y `prueba_push_descanso.py`
+  (qué notificación sale según lo apuntado). Sin probar: el aviso real en el móvil de Dan con la pantalla apagada.

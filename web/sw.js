@@ -7,7 +7,7 @@
 // Solo se ocupa del CÓDIGO de la app. Los datos del usuario nunca pasan por
 // aquí: viven en el dispositivo (IndexedDB) y en su Google Drive.
 
-const VERSION = '0.91.2';
+const VERSION = '0.91.3';
 const CACHE = `entreno-${VERSION}`;
 // Las imágenes van en un almacén aparte que NO se borra al actualizar la app:
 // así se ven sin conexión aunque haya salido una versión nueva.
@@ -18,6 +18,8 @@ const CACHE_IMAGENES = 'entreno-imagenes-58';  // el mismo nombre en app.js (gua
 // la primera vez que suenan y a partir de ahí se oyen sin conexión. Si algún
 // día se cambia un audio sin cambiarle el nombre, se sube este número.
 const CACHE_AUDIOS = 'entreno-audios-1';
+// Qué avisos hay pendientes y para cuándo (lo apunta la app, avisos-push.js): con eso se pone el texto del push.
+const CACHE_AVISOS = 'entreno-avisos-1';
 
 const ARCHIVOS = [
   './',
@@ -118,7 +120,7 @@ self.addEventListener('install', (evento) => {
 self.addEventListener('activate', (evento) => {
   evento.waitUntil(
     caches.keys()
-      .then((claves) => Promise.all(claves.filter((c) => ![CACHE, CACHE_IMAGENES, CACHE_AUDIOS].includes(c)).map((c) => caches.delete(c))))
+      .then((claves) => Promise.all(claves.filter((c) => ![CACHE, CACHE_IMAGENES, CACHE_AUDIOS, CACHE_AVISOS].includes(c)).map((c) => caches.delete(c))))
       .then(() => self.clients.claim()));
 });
 
@@ -180,6 +182,35 @@ self.addEventListener('fetch', (evento) => {
 // app ya enseñó el suyo (estaba abierta), se repone sin volver a vibrar.
 self.addEventListener('push', (evento) => {
   evento.waitUntil((async () => {
+    // El push llega sin texto: se mira qué aviso de los apuntados por la app toca ahora.
+    let apuntados = null;
+    try {
+      const ficha = await (await caches.open(CACHE_AVISOS)).match('./__avisos-pendientes');
+      if (ficha) apuntados = (await ficha.json()).avisos ?? [];
+    } catch { apuntados = null; }
+    const ahora = Date.now();
+    // Sin ficha (una app anterior a la 0.91.3), como siempre: es el test de atención.
+    let tipo = apuntados ? null : 'pvt';
+    if (apuntados) {
+      // El más cercano a ahora: un descanso vale si acabó hace menos de 3 minutos; un test, hasta media hora después.
+      const vale = (a) => (a.tipo === 'descanso' ? ahora - a.cuando < 3 * 60_000 : ahora - a.cuando < 31 * 60_000) && a.cuando - ahora < 15_000;
+      const toca = apuntados.filter(vale).sort((a, b) => Math.abs(a.cuando - ahora) - Math.abs(b.cuando - ahora))[0];
+      tipo = toca ? (toca.tipo === 'descanso' ? 'descanso' : 'pvt') : null;
+    }
+    if (tipo === 'descanso') {
+      // Con la app a la vista ya suena y vibra ella: la notificación solo cambia de texto, en silencio.
+      const ventanas = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+      const aLaVista = ventanas.some((v) => v.visibilityState === 'visible');
+      const ya = (await self.registration.getNotifications({ tag: 'descanso' })).some((n) => n.title.startsWith('¡Descanso terminado'));
+      await self.registration.showNotification('¡Descanso terminado!', {
+        body: 'A por la siguiente serie.', tag: 'descanso', renotify: !aLaVista && !ya, silent: aLaVista || ya,
+        icon: './iconos/icono-v2-192.png', badge: './iconos/icono-v2-192.png',
+        ...(aLaVista || ya ? {} : { vibrate: [700, 250, 700, 250, 1000, 250, 1000] }), requireInteraction: true,   // silenciosa: sin `vibrate`, o el navegador la rechaza
+        data: { url: ventanas[0]?.url ?? self.registration.scope },
+      });
+      return;
+    }
+    if (tipo !== 'pvt') return;   // un aviso que ya no toca (el descanso se saltó): nada
     const tarde = new Date().getHours() >= 15;
     const tag = tarde ? 'pvt-tarde' : 'pvt';
     const ya = await self.registration.getNotifications({ tag });
