@@ -1996,4 +1996,6 @@ de avisos.
 - «60 kg × 10 reps, te quedaban 2» en vez de «(2 en recámara)» en `textoSerie`: Dan dudó si las 2 estaban dentro de
   las 10. Son aparte: la fórmula suma hechas y recámara.
 - Pruebas: `herramientas/pruebas/prueba_worker_hora.py` (hora exacta y cancelación) y `prueba_push_descanso.py`
-  (qué notificación sale según lo apuntado). Sin probar: el aviso real en el móvil de Dan con la pantalla apagada.
+  (qué notificación sale según lo apuntado). `prueba_push_real.py [segundos]`: de punta a punta contra el servidor de
+  verdad desde el Chrome de pruebas (se apunta, programa un descanso y espera la notificación): llegó con 0,1 s de
+  desfase. Sin probar: el aviso real en el móvil de Dan con la pantalla apagada.
