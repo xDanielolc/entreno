@@ -298,3 +298,12 @@ laterales (al procesar se rompe: está en CONGELADOS con retoques a mano), rotac
 Método que más rinde: adjuntar las dos posturas del dibujo bueno en una imagen (scratchpad `dos.py`) y pedir «a partir de
 este, idéntico en todo, UN SOLO CAMBIO: …». El botón de descargar se puede pulsar por código (clic sobre el botón con
 aria-label «Descargar imagen a tamaño completo»), así cada dibujo son dos llamadas.
+
+Con Gemini, segunda cuenta (12-11, la primera llegó al tope; se entra por `gemini.google.com/u/1/app`): extensión torácica
+sobre rodillo (cabeza en su sitio), rotación torácica en cuadrupedia (postura hacia dentro), pájaro a una mano (muñeca),
+remo de cardio (trazo nítido), fondos asistidos (contrapeso al revés que el cuerpo y cabezas iguales), dominadas tras
+nuca y extensión de cuello con arnés (dibujos propios). Descartada dos veces la flexión de cuello con disco. OJO: adjuntar
+un dibujo «solo como referencia de estilo» de OTRO ejercicio contamina la postura (salió un cuerpo tumbado sobre unas
+piernas sentadas); para un ejercicio nuevo sin base, pedirlo solo con texto. Si la segunda figura sale mirando al otro
+lado, `procesar(..., espejo=True)`.
+Queda: ver la lista del final de la página de revisión (https://claude.ai/artifact/XgcLvhLqNji2DioHGBHiJA).

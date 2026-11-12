@@ -814,12 +814,11 @@
    "animada": true
   },
   "Extensión de cuello con arnés": {
-   "archivo": "imagenes/ejercicios/anim/extension-de-cuello-con-arnes.webp",
-   "autor": "Everkinetic",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "static-neck-flexion-extension",
-   "estatica": "imagenes/ejercicios/extension-de-cuello-con-arnes.png",
-   "animada": true
+   "archivo": "imagenes/ejercicios/ia/extension-de-cuello-con-arnes.webp",
+   "estatica": "imagenes/ejercicios/ia/extension-de-cuello-con-arnes-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Flexión lateral de cuello": {
    "archivo": "imagenes/ejercicios/anim/flexion-lateral-de-cuello.webp",
@@ -2073,12 +2072,11 @@
    "autor": "Gemini"
   },
   "Dominadas tras nuca": {
-   "archivo": "imagenes/ejercicios/ia/dominada.webp",
-   "estatica": "imagenes/ejercicios/ia/dominada-quieta.webp",
+   "archivo": "imagenes/ejercicios/ia/dominadas-tras-nuca.webp",
+   "estatica": "imagenes/ejercicios/ia/dominadas-tras-nuca-quieta.webp",
    "animada": true,
    "fuente": "ia",
-   "autor": "Gemini",
-   "aliasDe": "Dominadas"
+   "autor": "Gemini"
   },
   "Remo unilateral en polea": {
    "archivo": "imagenes/ejercicios/ia/remo-en-polea.webp",

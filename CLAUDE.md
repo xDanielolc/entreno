@@ -1965,3 +1965,10 @@ banca en multipower», «Press de hombro a una mano», «Encogimientos de trapec
 «Subida al cajón» con la postura de arriba (`completadoCon`); peso muerto con mancuernas más musculoso.
 `procesar_uno.py` admite el ancla como segundo argumento y `--sin-tabla`. Almacén `entreno-imagenes-57`. Lo descartado y
 lo que falta, en `imagenes-ia/cola.md` y al final de la página de revisión.
+
+### 0.91.2 (12-11-2026): tercera tanda de dibujos con Gemini
+
+Rehechos: extensión torácica sobre rodillo, rotación torácica en cuadrupedia, pájaro a una mano, remo de cardio y
+fondos asistidos. Dibujos propios: «Dominadas tras nuca» y «Extensión de cuello con arnés». Almacén
+`entreno-imagenes-58`. Con esto, de la octava revisión de Dan quedan los de la lista final de la página de revisión
+(colección `dibujos9`): los que Gemini no supo hacer, los de máquina con foto y dos marcados «mal» sin nota.
