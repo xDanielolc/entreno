@@ -30,15 +30,19 @@ export const AUDIOS = [
   // misma grabación. El archivo cambia de nombre (dormir-2b) para que los
   // móviles que guardaron el viejo bajen el nuevo. OJO AL ANALIZAR: la noche del
   // 08 al 09-11-2026 sonó la versión vieja del 2, fuera de la app.
+  // Rehecho otra vez el 12-11-2026 (dormir-2c): la cuenta a secas le pareció
+  // pobre. Ahora la manta va antes de contar y cada número lleva algo del cuerpo
+  // (peso, calor, el colchón que cede). La sugestión sigue siendo la misma
+  // grabación. Ninguna noche sonó el 2b desde la app.
   {
     id: 'dormir-2',
     tipo: 'dormir',
     version: 2,
-    nombre: 'Dormir 2 · la cuenta lenta y la manta',
-    descripcion: 'Una cuenta de diez a uno, muy despacio, con silencio entre número y número; luego una habitación oscura y una manta pesada.',
-    archivo: 'audios/dormir-2b.mp3',
-    duracion: 568,
-    sugestion: [285, 467],
+    nombre: 'Dormir 2 · la manta y la cuenta lenta',
+    descripcion: 'Una habitación oscura con una manta pesada y una cuenta de diez a uno en la que cada número trae algo: más peso, más calor, el colchón que cede.',
+    archivo: 'audios/dormir-2c.mp3',
+    duracion: 638,
+    sugestion: [355, 537],
   },
   {
     id: 'dormir-3',
@@ -60,14 +64,56 @@ export const AUDIOS = [
     duracion: 588,
     sugestion: [305, 487],
   },
+  // SEGUNDA TANDA (12-11-2026), otra fase del experimento. Sugestión larga, como
+  // la de Cordi 2014 (las capas del sueño, con peso y temperatura en vez de
+  // imágenes), cuatro sugestiones posthipnóticas y una profundización por el
+  // cuerpo. La sugestión, la profundización, las posthipnóticas y el cierre son
+  // los MISMOS archivos en los tres. El 5 y el 6 solo se diferencian en dos
+  // ciclos de fraccionamiento: compararlos dice si el fraccionamiento aporta.
+  // El rango de «sugestión» va del principio de las capas al final de las
+  // posthipnóticas.
+  {
+    id: 'dormir-5',
+    tipo: 'dormir',
+    version: 5,
+    nombre: 'Dormir 5 · la cabaña, larga',
+    descripcion: 'La cabaña con nieve, un calor que baja por el cuerpo y las capas del sueño, una encima de otra. Sin fraccionamiento.',
+    archivo: 'audios/dormir-5.mp3',
+    duracion: 1052,
+    sugestion: [411, 949],
+  },
+  {
+    id: 'dormir-6',
+    tipo: 'dormir',
+    version: 6,
+    nombre: 'Dormir 6 · la cabaña, con fraccionamiento',
+    descripcion: 'El 5, con dos veces en que los párpados se abren un instante y, al cerrarse, se baja el doble.',
+    archivo: 'audios/dormir-6.mp3',
+    duracion: 1215,
+    sugestion: [574, 1112],
+  },
+  {
+    id: 'dormir-7',
+    tipo: 'dormir',
+    version: 7,
+    nombre: 'Dormir 7 · la escalera, con fraccionamiento',
+    descripcion: 'El repaso del cuerpo y la escalera del 1, el calor que baja, el fraccionamiento y las capas del sueño.',
+    archivo: 'audios/dormir-7.mp3',
+    duracion: 1335,
+    sugestion: [694, 1232],
+  },
+  // Ilusiones alargadas el 12-11-2026 (archivos «b»): una profundización
+  // sentado después de la cuenta, en todos; dos ciclos de fraccionamiento con
+  // los ojos abiertos en los niveles 2, 4 y 6; y una posthipnótica para entrar
+  // más deprisa la próxima vez. Los ítems no cambian.
   {
     id: 'ilusiones-1',
     tipo: 'ilusiones',
     nivel: 1,
     nombre: 'Ilusiones · nivel 1',
     descripcion: 'Manos imantadas, calor en una mano, un grifo que gotea lejos y un resplandor de color. Sentado y despierto.',
-    archivo: 'audios/ilusiones-1.mp3',
-    duracion: 488,
+    archivo: 'audios/ilusiones-1b.mp3',
+    duracion: 600,
   },
   {
     id: 'ilusiones-2',
@@ -75,8 +121,8 @@ export const AUDIOS = [
     nivel: 2,
     nombre: 'Ilusiones · nivel 2',
     descripcion: 'El brazo que pesa tanto que no se levanta, frío en una mano, una radio al otro lado de la pared y un círculo quieto en lo oscuro.',
-    archivo: 'audios/ilusiones-2.mp3',
-    duracion: 448,
+    archivo: 'audios/ilusiones-2b.mp3',
+    duracion: 634,
   },
   {
     id: 'ilusiones-3',
@@ -84,8 +130,8 @@ export const AUDIOS = [
     nivel: 3,
     nombre: 'Ilusiones · nivel 3',
     descripcion: 'El brazo rígido como una barra de hierro, el sabor de un limón, una canción que conoces y tu habitación vista desde la puerta.',
-    archivo: 'audios/ilusiones-3.mp3',
-    duracion: 445,
+    archivo: 'audios/ilusiones-3b.mp3',
+    duracion: 559,
   },
   {
     id: 'ilusiones-4',
@@ -93,8 +139,8 @@ export const AUDIOS = [
     nivel: 4,
     nombre: 'Ilusiones · nivel 4',
     descripcion: 'El brazo que sube solo, olor a café, alguien que dice tu nombre en otra habitación y, ya con los ojos abiertos, un tono de color en el cuarto.',
-    archivo: 'audios/ilusiones-4.mp3',
-    duracion: 457,
+    archivo: 'audios/ilusiones-4b.mp3',
+    duracion: 643,
   },
   {
     id: 'ilusiones-5',
@@ -102,8 +148,8 @@ export const AUDIOS = [
     nivel: 5,
     nombre: 'Ilusiones · nivel 5',
     descripcion: 'Las manos que se pegan, una mano que se duerme y apenas nota un pellizco, y ya con los ojos abiertos un grifo que gotea y un objeto que respira.',
-    archivo: 'audios/ilusiones-5.mp3',
-    duracion: 445,
+    archivo: 'audios/ilusiones-5b.mp3',
+    duracion: 559,
   },
   {
     id: 'ilusiones-6',
@@ -111,8 +157,8 @@ export const AUDIOS = [
     nivel: 6,
     nombre: 'Ilusiones · nivel 6',
     descripcion: 'El último. Una palabra que se queda para después, un insecto que anda por el brazo y, con los ojos abiertos, una mosca que se mueve y una luz en la pared.',
-    archivo: 'audios/ilusiones-6.mp3',
-    duracion: 443,
+    archivo: 'audios/ilusiones-6b.mp3',
+    duracion: 629,
   },
 ];
 
