@@ -14,6 +14,9 @@ origen = Path(sys.argv[1])
 nombre = origen.stem.split('-', 1)[1]
 entrada = m.leer_tabla().get(nombre)
 op = entrada if isinstance(entrada, dict) else {}
+if '--sin-tabla' in sys.argv:   # el dibujo cambia de tipo (era quieto y ahora son dos posturas): no valen sus opciones
+    sys.argv.remove('--sin-tabla')
+    op = {}
 modo = sys.argv[2] if len(sys.argv) > 2 else op.get('ancla', 'pies')   # segundo argumento: el ancla, si el dibujo no está en peticiones.json
 if origen.stem.startswith('completo-'):
     modo = m.ANCLA_COMPLETO.get(nombre, 'encajar-suelo')

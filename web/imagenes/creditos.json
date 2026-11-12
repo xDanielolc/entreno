@@ -235,9 +235,11 @@
    "autor": "Gemini"
   },
   "Flexiones en pino": {
-   "archivo": "imagenes/ejercicios/flexiones-en-pino.png",
-   "autor": "wger",
-   "nombreEnWger": "Flexiones en pino"
+   "archivo": "imagenes/ejercicios/ia/flexiones-en-pino.webp",
+   "estatica": "imagenes/ejercicios/ia/flexiones-en-pino-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Dominadas": {
    "archivo": "imagenes/ejercicios/ia/dominadas-dos-vistas.webp",
@@ -725,7 +727,8 @@
    "fuente": "everkinetic",
    "nombreEnFuente": "step-ups-with-dumbbells",
    "estatica": "imagenes/ejercicios/subida-al-cajon.png",
-   "animada": true
+   "animada": true,
+   "completadoCon": "Gemini"
   },
   "Patada de glúteo en polea": {
    "archivo": "imagenes/ejercicios/ia/patada-de-gluteo-en-polea.webp",
@@ -944,9 +947,9 @@
    "autor": "Gemini"
   },
   "Giros rusos": {
-   "archivo": "imagenes/ejercicios/ia/giros-rusos-quieta.webp",
+   "archivo": "imagenes/ejercicios/ia/giros-rusos.webp",
    "estatica": "imagenes/ejercicios/ia/giros-rusos-quieta.webp",
-   "animada": false,
+   "animada": true,
    "fuente": "ia",
    "autor": "Gemini"
   },
@@ -1949,13 +1952,11 @@
    "animada": true
   },
   "Curl predicador en polea": {
-   "archivo": "imagenes/ejercicios/anim/curl-predicador.webp",
-   "autor": "Everkinetic",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "preacher-curl-with-barbell",
-   "aliasDe": "Curl predicador",
-   "estatica": "imagenes/ejercicios/curl-predicador.png",
-   "animada": true
+   "archivo": "imagenes/ejercicios/ia/curl-predicador-en-polea.webp",
+   "estatica": "imagenes/ejercicios/ia/curl-predicador-en-polea-quieta.webp",
+   "animada": true,
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Jalón supino": {
    "archivo": "imagenes/ejercicios/ia/jalon-al-pecho-ek-completo.webp",
@@ -2108,23 +2109,18 @@
    "completadoCon": "Gemini"
   },
   "Encogimientos de trapecio con barra": {
-   "archivo": "imagenes/ejercicios/ia/encogimientos-de-trapecio-completo.webp",
-   "autor": "Everkinetic",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "barbell-shrugs",
-   "estatica": "imagenes/ejercicios/ia/encogimientos-de-trapecio-completo-quieta.webp",
+   "archivo": "imagenes/ejercicios/ia/encogimientos-de-trapecio-con-barra.webp",
+   "estatica": "imagenes/ejercicios/ia/encogimientos-de-trapecio-con-barra-quieta.webp",
    "animada": true,
-   "completadoCon": "Gemini"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Press de banca en multipower": {
-   "archivo": "imagenes/ejercicios/anim/press-de-banca.webp",
-   "autor": "Everkinetic",
-   "nombreEnWger": "Press de Banca",
-   "aliasDe": "Press de banca",
-   "estatica": "imagenes/ejercicios/press-de-banca.png",
+   "archivo": "imagenes/ejercicios/ia/press-de-banca-en-multipower.webp",
+   "estatica": "imagenes/ejercicios/ia/press-de-banca-en-multipower-quieta.webp",
    "animada": true,
-   "fuente": "everkinetic",
-   "nombreEnFuente": "bench-press"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Press unilateral en polea": {
    "archivo": "imagenes/ejercicios/ia/cruces-en-polea-completo.webp",
@@ -2512,13 +2508,11 @@
    "autor": "Gemini"
   },
   "Press de hombro a una mano": {
-   "archivo": "imagenes/ejercicios/ia/press-de-hombro-con-mancuernas-completo.webp",
-   "autor": "Everkinetic",
-   "fuente": "everkinetic",
-   "nombreEnFuente": "one-arm-dumbbell-shoulder-press",
-   "estatica": "imagenes/ejercicios/ia/press-de-hombro-con-mancuernas-completo-quieta.webp",
+   "archivo": "imagenes/ejercicios/ia/press-de-hombro-a-una-mano.webp",
+   "estatica": "imagenes/ejercicios/ia/press-de-hombro-a-una-mano-quieta.webp",
    "animada": true,
-   "completadoCon": "Gemini"
+   "fuente": "ia",
+   "autor": "Gemini"
   },
   "Peso muerto rumano con mancuernas": {
    "archivo": "imagenes/ejercicios/anim/peso-muerto-con-mancuernas.webp",

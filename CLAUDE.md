@@ -1956,3 +1956,12 @@ las dominadas asistidas borrada a mano; jalón al pecho con la cabeza corregida 
 propios de «Jalón con cuerda», «Jalón tras nuca» y «Jalón unilateral en polea» (antes llevaban el del jalón al pecho).
 `herramientas/procesar_uno.py`: procesa un original suelto sin tocar creditos.json y le pasa el congelado. Almacén
 `entreno-imagenes-56`. El método con Gemini y lo que queda, en `imagenes-ia/cola.md` («Novena pasada»).
+
+### 0.91.1 (12-11-2026): segunda tanda de dibujos con Gemini
+
+(La 0.91.0 es de la conversación del sueño: audios nuevos.) Dibujos propios para «Curl predicador en polea», «Press de
+banca en multipower», «Press de hombro a una mano», «Encogimientos de trapecio con barra», «Dominadas neutras» y
+«Flexiones en pino» (antes de wger); «Giros rusos» animado; «Elevaciones frontales» alternas (cuatro posturas) y
+«Subida al cajón» con la postura de arriba (`completadoCon`); peso muerto con mancuernas más musculoso.
+`procesar_uno.py` admite el ancla como segundo argumento y `--sin-tabla`. Almacén `entreno-imagenes-57`. Lo descartado y
+lo que falta, en `imagenes-ia/cola.md` y al final de la página de revisión.

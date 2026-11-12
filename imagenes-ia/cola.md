@@ -288,3 +288,13 @@ máquina) y cabeza a la rodilla (cambió la postura). Método para subir el dibu
 abrir el menú «+» de Gemini (los `input[type=file]` solo existen con el menú abierto), subir el archivo al que acepta
 `image/*` con file_upload y cerrar el menú con Escape. Un original nuevo se procesa con `herramientas/procesar_uno.py`
 (no toca creditos.json). Sigue pendiente todo lo demás de la lista «Con IA» de la octava revisión.
+
+Con Gemini (12-11): dibujos propios de curl predicador en polea, press de banca en multipower, press de hombro a una mano,
+encogimientos con barra, dominadas neutras (dos asas) y flexiones en pino; giros rusos animados; elevaciones frontales
+alternas (cuatro posturas; el otro brazo, dibujo nuevo encajado por las piernas) y subida al cajón con la postura de pie
+arriba (encajada a ojo de buen cubero: revisar); peso muerto con mancuernas más musculoso. Descartados (en `descartes/`,
+`-11-11`): curl de muñeca (dos intentos: hace un curl de bíceps), sentadilla búlgara (misma geometría), elevaciones
+laterales (al procesar se rompe: está en CONGELADOS con retoques a mano), rotación interna con toalla (devuelve lo mismo).
+Método que más rinde: adjuntar las dos posturas del dibujo bueno en una imagen (scratchpad `dos.py`) y pedir «a partir de
+este, idéntico en todo, UN SOLO CAMBIO: …». El botón de descargar se puede pulsar por código (clic sobre el botón con
+aria-label «Descargar imagen a tamaño completo»), así cada dibujo son dos llamadas.
