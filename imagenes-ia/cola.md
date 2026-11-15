@@ -307,3 +307,16 @@ un dibujo «solo como referencia de estilo» de OTRO ejercicio contamina la post
 piernas sentadas); para un ejercicio nuevo sin base, pedirlo solo con texto. Si la segunda figura sale mirando al otro
 lado, `procesar(..., espejo=True)`.
 Queda: ver la lista del final de la página de revisión (https://claude.ai/artifact/XgcLvhLqNji2DioHGBHiJA).
+
+## Décima pasada (15-11-2026): tras su repaso de la página `dibujos9`
+
+El congelado viejo partía líneas: rehecho en las 222 animaciones (ver CLAUDE.md, 0.91.5). Quedan, con IA:
+- Hip thrust: pies fijos, pero el cuerpo atraviesa el banco. Redibujar la postura de arriba con los hombros en el
+  borde del banco y los pies donde están.
+- Sentadilla en multipower: los pies no son idénticos en las dos posturas (la IA los dibujó distintos).
+- Sentadilla goblet y flexiones con lastre: la cara no es la lisa de siempre.
+- Jalón al pecho: sobra la oreja (vale lo demás).
+- Zancadas hacia delante: le gustaba más el cuerpo del dibujo anterior (`ia/zancadas.webp`).
+
+Hecho el mismo 15-11 con Gemini: hip thrust, caras de goblet y flexiones con lastre. Multipower pedido (pies casi
+igual que antes: a la espera de lo que diga Dan). Siguen: oreja del jalón al pecho y las zancadas.

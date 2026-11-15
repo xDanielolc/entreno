@@ -2022,3 +2022,9 @@ trozos, brazo doble). Estaba pasado a las 221 animaciones.
 - Copia de lo de antes: `imagenes-ia/antes-15-11/` (fuera de Git). Almacén `entreno-imagenes-59`.
 - Pendiente con IA: hip thrust (el cuerpo atraviesa el banco), pies de la sentadilla en multipower, cara lisa en
   goblet y flexiones con lastre, oreja del jalón al pecho, zancadas (prefiere el cuerpo del dibujo anterior).
+- 0.91.6: con Gemini, tras el arreglo: cabezas lisas en sentadilla goblet y flexiones con lastre, hip thrust rehecho
+  (la espalda se queda en el borde del banco; los pies, clavados después con `dos`) y sentadilla en multipower pedida
+  con «pies idénticos» (Gemini los deja casi como estaban). Los cuatro pasan por `procesar_uno.py`, que ya usa el
+  congelado nuevo. Método de Gemini de esta ronda: el menú «+» tarda unos segundos en crear las casillas de archivo
+  (si no aparecen, volver a buscarlas sin recargar). Quedan: oreja del jalón al pecho y decidir las zancadas.
+  Almacén `entreno-imagenes-60`.
