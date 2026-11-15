@@ -83,10 +83,11 @@ export function vistaAudios(contenedor) {
           ayuda('Los audios', 'Los de dormir se ponen ya en la cama, con la luz apagada y el volumen bajo: tiene que oírse sin esfuerzo, no llenar '
             + 'la habitación. No pasa nada si te duermes antes del final, y puedes apagar la pantalla, que sigue sonando. Rótalos por noches, '
             + 'sin repetir el de la noche anterior. El de ilusiones NO es para dormir: se hace sentado y despierto, una vez por semana, por la tarde y después del test de las 18:00.')),
-        h('p', { class: 'nota' }, 'La primera vez que pones uno se descarga entero y se guarda. A partir de ahí suena sin conexión.')),
+        h('p', { class: 'nota' }, 'La primera vez que pones uno se descarga entero y se guarda. A partir de ahí suena sin conexión.'),
+        h('p', { class: 'nota' }, 'Puedes pausarlo y seguir por donde ibas. Si lo terminas o cierras la app, la próxima vez empieza desde el principio.')),
       h('section', { class: 'tarjeta' },
         h('h2', {}, 'Para dormir'),
-        h('p', { class: 'nota' }, 'La sugestión es la misma grabación en todos: solo cambia cómo se llega hasta ella. Ve rotándolos por noches, sin repetir el de la noche anterior.'),
+        h('p', { class: 'nota' }, 'Del 1 al 4 la sugestión es la misma grabación, y del 5 al 7 otra más larga, también igual en los tres: dentro de cada tanda solo cambia cómo se llega hasta ella. Ve rotándolos por noches, sin repetir el de la noche anterior.'),
         ...audiosDe('dormir').map((a) => fichaAudio(a, pintar))),
       h('section', { class: 'tarjeta' },
         h('h2', {}, 'Ilusiones'),
@@ -103,8 +104,15 @@ function fichaAudio(a, pintar) {
   const llena = h('div', { class: 'audio-barra-llena', id: `barra-${a.id}`, style: 'width: 0%' });
   const tiempo = h('p', { class: 'nota centrado', id: `tiempo-${a.id}` }, `0:00 de ${reloj(a.duracion)}`);
 
+  // Pausar no suelta el audio: sigue cargado y vuelve por donde iba. Lo que lo
+  // suelta es «Terminar», el final o cerrar la app (el reproductor vive en
+  // memoria, a propósito: al volver a abrirla se empieza de cero).
   const poner = async () => {
-    if (activo) { parar(); pintar(); return; }
+    if (activo) {
+      if (sonando.audio.paused) await sonando.audio.play().catch(() => {}); else sonando.audio.pause();
+      pintar();
+      return;
+    }
     parar();
     const boton = document.getElementById(`poner-${a.id}`);
     if (boton) { boton.disabled = true; boton.textContent = 'Cargando…'; }
@@ -118,7 +126,22 @@ function fichaAudio(a, pintar) {
       const audio = h('audio', { src: url, preload: 'auto', style: 'display: none' });
       document.body.append(audio);
       sonando = { id: a.id, tipo: a.tipo, version: a.version, audio, url, maximo: 0, fecha: fechaDeLaNoche() };
-      audio.addEventListener('ended', () => { parar(); pintar(); });
+      audio.addEventListener('ended', () => {
+        // Si el de dormir suena hasta el final, casi siempre lo ha oído entero
+        // (lo dijo él el 15-11-2026). Se deja marcado «Sí, entero» solo si
+        // no había nada; por la mañana lo puede cambiar en el diario.
+        if (sonando?.tipo === 'dormir') {
+          const { fecha } = sonando;
+          estado.cambiar((x) => {
+            if (!(x.diario || []).find((d) => d.fecha === fecha)?.audio) apuntarEnDiario(x, fecha, 'audio', 'entero');
+          }, { tecleo: true });
+        }
+        parar(); pintar();
+      });
+      // Los mandos de la pantalla de bloqueo también pausan: el botón tiene
+      // que decir lo que toca.
+      audio.addEventListener('pause', () => repintar?.());
+      audio.addEventListener('play', () => repintar?.());
       await audio.play();
       let desdeElUltimoGuardado = 0;
       latido = setInterval(() => {
@@ -143,7 +166,8 @@ function fichaAudio(a, pintar) {
     activo && h('div', { class: 'audio-barra', role: 'progressbar', 'aria-label': 'Lo que lleva sonando' }, llena),
     activo && tiempo,
     h('button', { type: 'button', id: `poner-${a.id}`, class: `boton grande${activo ? ' secundario' : ''}`, onclick: poner },
-      activo ? 'Parar' : 'Escuchar'),
+      !activo ? 'Escuchar' : sonando.audio.paused ? 'Seguir' : 'Pausar'),
+    activo && h('button', { type: 'button', class: 'boton secundario', onclick: () => { parar(); pintar(); } }, 'Terminar'),
     a.tipo === 'ilusiones' && h('a', { class: 'boton secundario', href: '#/diario' }, 'Apuntar las notas'));
   if (activo) refrescar();
   return ficha;
