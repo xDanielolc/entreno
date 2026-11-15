@@ -2050,3 +2050,10 @@ pesas. Los originales de Gemini procesados sin ese paso salen limpios.
   «Undécima pasada». Página de revisión rehecha solo con lo que marcó «Repetir» (claves `t-…` en `dibujos9`,
   `datos-privados/revision-dibujos-9/montar_tarde.py`). Copia de lo de antes: `imagenes-ia/antes-15-11-tarde/`.
   Almacén `entreno-imagenes-61`.
+- 0.91.9 (15-11-2026, tarde): con Gemini, sin congelado: cabezas sin orejas en los cuatro jalones (al pecho, con
+  cuerda, tras nuca y unilateral) y en los giros rusos, cabeza lisa de siempre en la sentadilla goblet (a la tercera:
+  «cabeza de maniquí de escaparate… el perfil de la cara es una sola curva, SIN nariz, SIN labios, SIN mentón marcado,
+  SIN ojo, SIN ceja y SIN oreja») y flexiones en pino nuevas con el método de Dan (darle solo la figura de la derecha
+  del dibujo de wger para que la haga nuestra; la subida «sobre esta misma imagen» no la cambia, devuelve la misma
+  postura; sí sale pidiéndole después una lámina con las dos figuras a partir de la nuestra). El jalón unilateral sigue
+  cambiando de brazo: Gemini no cambia posturas editando. Almacén `entreno-imagenes-62`.

@@ -346,3 +346,8 @@ herramientas (ver CLAUDE.md, 0.91.8). Notas de Dan de su segundo repaso de `dibu
       postura de abajo sobre la de arriba.
 Método de dos pasos (el que propone Dan y el que ya funcionó el 23-10): recortar UNA postura, pedir «edita esta imagen,
 cambia solo la postura» y guardar como `pasos-<slug>-1` y `-2`: mismo lienzo, mismo aparato, mismo muñeco.
+
+Hecho el mismo 15-11 con Gemini (0.91.9): orejas de los cuatro jalones y de los giros rusos, cara lisa de la goblet y
+flexiones en pino (método de Dan + lámina de dos figuras a partir de la nuestra). No salió: el brazo del jalón
+unilateral (pedir la lámina de dos figuras desde cero, con el mismo brazo en las dos, sin adjuntar el dibujo de ahora).
+Los originales sustituidos, en `imagenes-ia/antes-15-11-tarde/originales/`.
