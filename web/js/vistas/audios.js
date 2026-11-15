@@ -45,7 +45,12 @@ function refrescar() {
   const tiempo = document.getElementById(`tiempo-${sonando.id}`);
   if (!a || !llena || !tiempo) return;
   const s = sonando.audio.currentTime;
-  llena.style.width = `${a.duracion ? Math.min(100, (s / a.duracion) * 100) : 0}%`;
+  const pct = `${a.duracion ? Math.min(100, (s / a.duracion) * 100) : 0}%`;
+  llena.style.width = pct;
+  const bola = document.getElementById(`bola-${sonando.id}`);
+  if (bola) bola.style.left = pct;
+  const zona = document.getElementById(`zona-${sonando.id}`);
+  if (zona) { zona.setAttribute('aria-valuenow', String(Math.round(s))); zona.setAttribute('aria-valuetext', reloj(s)); }
   tiempo.textContent = `${reloj(s)} de ${reloj(a.duracion)}`
     + (a.sugestion && s > a.sugestion[1] ? ' · la sugestión ya ha pasado' : '');
 }
@@ -84,7 +89,7 @@ export function vistaAudios(contenedor) {
             + 'la habitación. No pasa nada si te duermes antes del final, y puedes apagar la pantalla, que sigue sonando. Rótalos por noches, '
             + 'sin repetir el de la noche anterior. El de ilusiones NO es para dormir: se hace sentado y despierto, una vez por semana, por la tarde y después del test de las 18:00.')),
         h('p', { class: 'nota' }, 'La primera vez que pones uno se descarga entero y se guarda. A partir de ahí suena sin conexión.'),
-        h('p', { class: 'nota' }, 'Puedes pausarlo y seguir por donde ibas. Si lo terminas o cierras la app, la próxima vez empieza desde el principio.')),
+        h('p', { class: 'nota' }, 'Puedes pausarlo y seguir por donde ibas, y tocar o arrastrar la barra para ir a otro punto. Si lo terminas o cierras la app, la próxima vez empieza desde el principio.')),
       h('section', { class: 'tarjeta' },
         h('h2', {}, 'Para dormir'),
         h('p', { class: 'nota' }, 'Del 1 al 4 la sugestión es la misma grabación, y del 5 al 7 otra más larga, también igual en los tres: dentro de cada tanda solo cambia cómo se llega hasta ella. Ve rotándolos por noches, sin repetir el de la noche anterior.'),
@@ -97,6 +102,51 @@ export function vistaAudios(contenedor) {
   };
   pintar();
   repintar = () => { if (document.body.contains(contenedor)) pintar(); };
+}
+
+// La barra se toca o se arrastra para ir a otro punto (lo pidió el 15-11-2026).
+// La zona que recoge el dedo es más alta que la raya, para que no haya que
+// apuntar. Si salta hacia delante más allá de lo que ya había sonado, se marca:
+// entonces llegar al final ya no quiere decir que lo haya oído entero.
+const SALTO_TECLADO_SEG = 15;
+
+function barraParaSaltar(a, llena) {
+  const bola = h('div', { class: 'audio-barra-bola', id: `bola-${a.id}` });
+  const zona = h('div', {
+    class: 'audio-barra-zona', id: `zona-${a.id}`, role: 'slider', tabindex: '0',
+    'aria-label': 'Ir a otro punto del audio', 'aria-valuemin': '0', 'aria-valuemax': String(a.duracion),
+  }, h('div', { class: 'audio-barra' }, llena), bola);
+
+  const irA = (segundos) => {
+    if (sonando?.id !== a.id || !Number.isFinite(segundos)) return;
+    const fin = sonando.audio.duration || a.duracion;
+    const s = Math.max(0, Math.min(fin - 0.5, segundos));
+    if (s > sonando.maximo + 2) sonando.saltado = true;
+    sonando.audio.currentTime = s;
+    refrescar();
+  };
+  const desdeElDedo = (e) => {
+    const r = zona.getBoundingClientRect();
+    return r.width > 0 ? ((e.clientX - r.left) / r.width) * a.duracion : NaN;
+  };
+
+  let arrastrando = false;
+  zona.addEventListener('pointerdown', (e) => {
+    arrastrando = true;
+    zona.classList.add('arrastrando');
+    try { zona.setPointerCapture(e.pointerId); } catch { /* nada */ }
+    irA(desdeElDedo(e));
+  });
+  zona.addEventListener('pointermove', (e) => { if (arrastrando) irA(desdeElDedo(e)); });
+  const soltar = () => { arrastrando = false; zona.classList.remove('arrastrando'); };
+  zona.addEventListener('pointerup', soltar);
+  zona.addEventListener('pointercancel', soltar);
+  zona.addEventListener('keydown', (e) => {
+    if (!sonando || sonando.id !== a.id) return;
+    if (e.key === 'ArrowRight') { e.preventDefault(); irA(sonando.audio.currentTime + SALTO_TECLADO_SEG); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); irA(sonando.audio.currentTime - SALTO_TECLADO_SEG); }
+  });
+  return zona;
 }
 
 function fichaAudio(a, pintar) {
@@ -130,7 +180,8 @@ function fichaAudio(a, pintar) {
         // Si el de dormir suena hasta el final, casi siempre lo ha oído entero
         // (lo dijo él el 15-11-2026). Se deja marcado «Sí, entero» solo si
         // no había nada; por la mañana lo puede cambiar en el diario.
-        if (sonando?.tipo === 'dormir') {
+        // Si se saltó hacia delante un trozo, no lo ha oído entero.
+        if (sonando?.tipo === 'dormir' && !sonando.saltado) {
           const { fecha } = sonando;
           estado.cambiar((x) => {
             if (!(x.diario || []).find((d) => d.fecha === fecha)?.audio) apuntarEnDiario(x, fecha, 'audio', 'entero');
@@ -163,7 +214,7 @@ function fichaAudio(a, pintar) {
     h('p', { class: 'nota' }, a.descripcion),
     h('p', { class: 'nota suave' }, `Dura ${reloj(a.duracion)}.`
       + (a.sugestion ? ` La sugestión va del ${reloj(a.sugestion[0])} al ${reloj(a.sugestion[1])}.` : '')),
-    activo && h('div', { class: 'audio-barra', role: 'progressbar', 'aria-label': 'Lo que lleva sonando' }, llena),
+    activo && barraParaSaltar(a, llena),
     activo && tiempo,
     h('button', { type: 'button', id: `poner-${a.id}`, class: `boton grande${activo ? ' secundario' : ''}`, onclick: poner },
       !activo ? 'Escuchar' : sonando.audio.paused ? 'Seguir' : 'Pausar'),
