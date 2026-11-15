@@ -121,8 +121,84 @@ def engordar(mascara, radio):
     return total > 0
 
 
-def congelar(base, im, tolerancia=3, margen=14):
-    """Deja en `im` idéntico a `base` todo lo que no se mueve. «Se mueve» la tinta de cualquiera de las dos posturas
+def campo_suave(base, im, alcance=4, radio=13, sigma=11):
+    """Cuánto hay que correr cada punto de `im` para que lo que no se mueve caiga encima de `base`: por zonas se busca
+    el desplazamiento (de hasta `alcance` píxeles) con el que mejor coinciden los trazos, y donde no coinciden de
+    ninguna manera (lo que de verdad se mueve) no se opina. Luego se suaviza, de modo que el campo cambia poco a poco:
+    al aplicarlo las líneas se doblan un pelo, pero nunca se parten."""
+    from scipy import ndimage as ndi
+    a = ndi.gaussian_filter(tinta(base).astype(np.float32), 1.2)
+    b = ndi.gaussian_filter(tinta(im).astype(np.float32), 1.2)
+    lado = 2 * radio + 1
+    ea = ndi.uniform_filter(a * a, lado)
+    mejor = np.full(a.shape, np.inf, np.float32)
+    dx = np.zeros(a.shape, np.float32)
+    dy = np.zeros(a.shape, np.float32)
+    eb = np.zeros(a.shape, np.float32)
+    for oy in range(-alcance, alcance + 1):
+        for ox in range(-alcance, alcance + 1):
+            bs = np.roll(b, (-oy, -ox), axis=(0, 1))   # bs(y, x) = b(y + oy, x + ox)
+            ssd = ndi.uniform_filter((a - bs) ** 2, lado) + 2e-4 * (ox * ox + oy * oy)
+            gana = ssd < mejor
+            mejor[gana] = ssd[gana]
+            dx[gana], dy[gana] = ox, oy
+            eb[gana] = ndi.uniform_filter(bs * bs, lado)[gana]
+    energia = ea + eb
+    calidad = 1 - mejor / (energia + 1e-6)
+    peso = np.where((calidad > 0.72) & (ea > 0.004) & (eb > 0.004), energia * (calidad - 0.72), 0).astype(np.float32)
+    u = np.zeros(a.shape, np.float32)
+    v = np.zeros(a.shape, np.float32)
+    falta = np.ones(a.shape, bool)
+    for s in (sigma, sigma * 3, sigma * 9):   # lejos de todo trazo quieto se toma lo de más lejos
+        g = ndi.gaussian_filter(peso, s)
+        hay = falta & (g > 1e-5)
+        u[hay] = (ndi.gaussian_filter(peso * dx, s) / np.maximum(g, 1e-9))[hay]
+        v[hay] = (ndi.gaussian_filter(peso * dy, s) / np.maximum(g, 1e-9))[hay]
+        falta &= ~hay
+    u = ndi.gaussian_filter(u, 4)
+    v = ndi.gaussian_filter(v, 4)
+    return u, v
+
+
+def deformar(im, u, v):
+    """Aplica el campo: el punto (x, y) del resultado sale de (x + u, y + v) de `im`."""
+    from scipy import ndimage as ndi
+    datos = np.array(im).astype(np.float32)
+    h, w = datos.shape[:2]
+    yy, xx = np.mgrid[0:h, 0:w].astype(np.float32)
+    capas = datos[..., None] if datos.ndim == 2 else datos
+    sale = np.stack([ndi.map_coordinates(capas[..., k], [yy + v, xx + u], order=3, mode='nearest') for k in range(capas.shape[-1])], -1)
+    sale = np.clip(sale, 0, 255).astype(np.uint8)
+    return Image.fromarray(sale[..., 0] if datos.ndim == 2 else sale, im.mode)
+
+
+def congelar(base, im, tolerancia=1, margen=10):
+    """Deja en `im` idéntico a `base` todo lo que no se mueve, SIN cortar líneas (15-11-2026: la versión anterior
+    copiaba trozos de la primera postura y, donde una parte se movía 2 o 3 píxeles, el trazo quedaba partido: Dan lo vio
+    como «la imagen se rompe»). Ahora primero se deforma la postura con un campo suave (`campo_suave`) para que lo
+    quieto caiga encima de la primera, y solo después se copia de la primera lo que ya coincide al píxel, con el borde
+    difuminado. Devuelve la postura corregida y la zona que se considera en movimiento."""
+    from scipy import ndimage as ndi
+    u, v = campo_suave(base, im)
+    im = deformar(im, u, v)
+    ta, tb = tinta(base), tinta(im)
+    suelta = (ta & ~engordar(tb, tolerancia)) | (tb & ~engordar(ta, tolerancia))
+    densa = engordar(suelta, 2)
+    cuenta = np.pad(suelta.astype(np.int32), 4).cumsum(0).cumsum(1)
+    cuenta = np.pad(cuenta, ((1, 0), (1, 0)))
+    h, w = suelta.shape
+    vecinos = cuenta[9:9 + h, 9:9 + w] - cuenta[:h, 9:9 + w] - cuenta[9:9 + h, :w] + cuenta[:h, :w]
+    movimiento = engordar(suelta & (vecinos >= 8) & densa, margen)
+    mezcla = ndi.gaussian_filter((~movimiento).astype(np.float32), 2.5)
+    mezcla = np.clip((mezcla - 0.5) * 2, 0, 1)   # 1 = primera postura; solo lejos del movimiento
+    a, b = np.array(base).astype(np.float32), np.array(im).astype(np.float32)
+    m = mezcla if a.ndim == 2 else mezcla[..., None]
+    datos = np.clip(a * m + b * (1 - m), 0, 255).astype(np.uint8)
+    return Image.fromarray(datos, im.mode), movimiento
+
+
+def congelar_a_cortes(base, im, tolerancia=3, margen=14):
+    """VERSIÓN ANTERIOR, que parte líneas: no usar. Deja en `im` idéntico a `base` todo lo que no se mueve. «Se mueve» la tinta de cualquiera de las dos posturas
     que no tiene tinta de la otra a `tolerancia` píxeles o menos; alrededor de ella (`margen` píxeles) se conserva la
     postura; en el resto se copia la primera. Así el banco, las piernas apoyadas o la máquina, que en los dibujos
     originales bailan uno o dos píxeles entre posturas («mini teletransporte»), quedan clavados."""

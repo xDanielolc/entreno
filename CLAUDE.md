@@ -1999,3 +1999,26 @@ de avisos.
   (qué notificación sale según lo apuntado). `prueba_push_real.py [segundos]`: de punta a punta contra el servidor de
   verdad desde el Chrome de pruebas (se apunta, programa un descanso y espera la notificación): llegó con 0,1 s de
   desfase. Sin probar: el aviso real en el móvil de Dan con la pantalla apagada.
+
+### 0.91.5 (15-11-2026): los dibujos «se partían» por el congelado
+
+Dan, al repasar la página de dibujos (colección `dibujos9`): «se rompen la mayoría de los que te he dicho repetir,
+como si la imagen se partiera». Era el `congelar` de la 0.90.2: copiaba de la primera postura todo lo que coincidía a
+3 píxeles y, donde una parte del cuerpo se movía 2 o 3 píxeles, el trazo quedaba cortado en la costura (columna a
+trozos, brazo doble). Estaba pasado a las 221 animaciones.
+- `congelar` nuevo en `herramientas/fijar_zona.py`: primero **deforma con suavidad** la postura (`campo_suave`: por
+  zonas busca el desplazamiento de hasta 4 px con el que los trazos coinciden y lo suaviza; `deformar` lo aplica) y
+  solo después copia de la primera lo que ya coincide al píxel, con el borde difuminado. Las líneas se doblan un pelo,
+  nunca se parten. El de antes queda como `congelar_a_cortes` (no usar). Necesita scipy.
+- `herramientas/rehacer_congelado.py`: rehace el congelado en todo lo que tocó la 0.90.2 o las tandas posteriores,
+  partiendo del dibujo de antes del congelado (Git, `4bdb0a9^`) cuando el de ahora es justo «aquel + congelado viejo»
+  (189) y, si no, del de ahora, que el método nuevo también cura (33). No toca los que Dan dio por buenos (`VALEN`).
+  OJO: un retoque pequeño a mano posterior puede pasar por «igual» y perderse (pasó con la oreja de las dominadas
+  asistidas, restaurada): si se vuelve a usar, comprobarlo como en esta ronda (diferencias concentradas en una zona).
+- Flexiones (Everkinetic): pies y mano de abajo en el mismo sitio (`dos --primera`).
+- Regla de Dan (15-11): los arreglos de postura o de partes del cuerpo (pies distintos, cuerpo que atraviesa el
+  banco, caras) se piden a la IA de imagen; recortar y pegar a mano «no funciona». A mano solo desplazar o deformar
+  el dibujo entero, nunca pegar trozos.
+- Copia de lo de antes: `imagenes-ia/antes-15-11/` (fuera de Git). Almacén `entreno-imagenes-59`.
+- Pendiente con IA: hip thrust (el cuerpo atraviesa el banco), pies de la sentadilla en multipower, cara lisa en
+  goblet y flexiones con lastre, oreja del jalón al pecho, zancadas (prefiere el cuerpo del dibujo anterior).
