@@ -1940,8 +1940,7 @@ funciona» no hace falta que lo marque. Hecho en esta ronda (esquema v40, `perfi
 - `herramientas/fijar_zona.py` (nuevo): `ver` (posturas superpuestas en rojo y azul), `medir`/`fijar` (clava una zona:
   los pies, las manos), `dos` (mueve dos puntos a la vez, pies y manos, deformando lo de en medio; `--soporte` deja el
   banco o el suelo en su sitio; `--primera` mueve la primera postura), `congelar` (deja idéntico entre posturas todo lo
-  que no se mueve) y `todo` (el congelado a todas las animaciones). **Tras reprocesar dibujos con las otras
-  herramientas, pasar `python herramientas/fijar_zona.py todo`**: si no, vuelven los mini teletransportes.
+  que no se mueve) y `todo` (el congelado a todas las animaciones). (`congelar` y `todo` se quitaron el 15-11-2026: rompían los dibujos; ver la 0.91.8.)
 - Aplicado: hip thrust, las tres flexiones, hack, elevaciones colgado, cobra, puente de glúteo y el congelado en las
   221 animaciones. Montados con dibujos que ya había: «Zancadas» (hacia delante), «Dominadas» y «Dominadas supinas»
   (dos vistas alternas, `dominadas-dos-vistas.webp`) y «Colgarse de la barra» de frente. Los de `ia/` tocados a mano
@@ -2028,3 +2027,26 @@ trozos, brazo doble). Estaba pasado a las 221 animaciones.
   congelado nuevo. Método de Gemini de esta ronda: el menú «+» tarda unos segundos en crear las casillas de archivo
   (si no aparecen, volver a buscarlas sin recargar). Quedan: oreja del jalón al pecho y decidir las zancadas.
   Almacén `entreno-imagenes-60`.
+
+### 0.91.8 (15-11-2026, tarde): fuera el «congelado» de los dibujos
+
+Dan, tras repasar la página otra vez: «¿por qué ahora se te rompen todos? ¿qué le estás diciendo a Gemini?». No era
+Gemini: era el paso `congelar` (0.90.2 y su «arreglo» de la 0.91.5), que copiaba de la primera postura lo que no se
+movía. Borraba líneas finas (la cuerda de una polea, un antebrazo), y la versión «suave» además doblaba máquinas y
+pesas. Los originales de Gemini procesados sin ese paso salen limpios.
+- **Quitado de todo**: 189 animaciones vuelven byte a byte a como estaban antes de la 0.90.2 (Git, `4bdb0a9^`); las
+  rehechas después con Gemini se reprocesan desde su original sin congelado (mismo encaje que tenían); las montadas a
+  mano (dominadas con dos vistas, subida al cajón, elevaciones frontales, cobra, elevaciones colgado, puente) se
+  rehacen moviendo posturas enteras. No se tocan las que Dan dio por buenas tal como estaban (los press de banca,
+  curl en máquina, flexiones, flexiones diamante, hack, dedos del pie, colgarse, jalón al pecho y jalón unilateral).
+- Herramientas: `fijar_zona.py` ya no tiene `congelar` ni `todo`; `procesar_uno.py` no congela; fuera
+  `rehacer_congelado.py`. **Regla**: a una postura solo se le hace algo entera (moverla, `fijar`, `dos`); nunca copiar
+  trozos de otra ni deformar por zonas. `--copiar` y `--soporte` también pegan: no usarlos en dibujos nuevos.
+- Vuelven al dibujo anterior, porque Dan lo prefiere: «Zancadas» (y su alias con salto) a `ia/zancadas.webp`,
+  «Encogimientos de trapecio con barra» al de Everkinetic completado y «Extensión de cuello con arnés» al de
+  Everkinetic (el de Gemini «parecía de una revista BDSM»; guardado en `imagenes-ia/para-el-recuerdo/` porque le hizo
+  mucha gracia; hay que rehacerlo en polea). Los tres dibujos retirados, en `imagenes-ia/descartes/` con `-15-11`.
+- Lo que queda es de la IA (lo que dibujó distinto entre posturas, orejas, caras): lista en `imagenes-ia/cola.md`,
+  «Undécima pasada». Página de revisión rehecha solo con lo que marcó «Repetir» (claves `t-…` en `dibujos9`,
+  `datos-privados/revision-dibujos-9/montar_tarde.py`). Copia de lo de antes: `imagenes-ia/antes-15-11-tarde/`.
+  Almacén `entreno-imagenes-61`.

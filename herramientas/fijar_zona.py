@@ -7,14 +7,17 @@ Uso:
   python fijar_zona.py fijar ruta.webp x0 y0 x1 y1 [--radio 30] [--escala] [--salida otra.webp] [--copiar]
   python fijar_zona.py dos ruta.webp ax ay dax day bx by dbx dby [--soporte x0 y0 x1 y1] [--primera] [--salida otra.webp]
       mueve dos puntos (fracciones) los píxeles que se digan y lo de en medio en proporción: pies Y manos a la vez
-  python fijar_zona.py congelar ruta.webp      deja idéntico entre posturas todo lo que no se mueve (mini teletransportes)
-  python fijar_zona.py todo                    el congelado, a todas las animaciones
 
 La zona va en fracciones del lienzo (0-1). Para cada postura que no es la primera se busca el desplazamiento (y, con
 --escala, el cambio de tamaño) con el que su tinta coincide mejor con la de la primera DENTRO de la zona, y se aplica
 a la postura entera. Con --copiar, además, lo de dentro de la zona se sustituye por lo de la primera postura (para un
 suelo o una máquina que la IA dibujó distinta cada vez). Conserva la duración de cada fotograma.
 Lo pidió Dan en la octava revisión (02-11-2026): «fija los pies, que es lo que se ve más a la derecha».
+
+OJO (15-11-2026): aquí solo se mueve o se deforma la postura ENTERA. Hubo un paso «congelar» que copiaba de la primera
+postura lo que no se movía: partía y borraba líneas (la cuerda de una polea, un antebrazo) y Dan lo rechazó. No volver
+a hacerlo: lo que la IA dibuja distinto entre posturas (los pies, la máquina, el tamaño del cuerpo) se le pide a la IA.
+`--copiar` y `--soporte` también pegan un trozo de la primera postura: no usarlos en dibujos nuevos.
 """
 import sys
 from pathlib import Path
@@ -121,140 +124,8 @@ def engordar(mascara, radio):
     return total > 0
 
 
-def campo_suave(base, im, alcance=4, radio=13, sigma=11):
-    """Cuánto hay que correr cada punto de `im` para que lo que no se mueve caiga encima de `base`: por zonas se busca
-    el desplazamiento (de hasta `alcance` píxeles) con el que mejor coinciden los trazos, y donde no coinciden de
-    ninguna manera (lo que de verdad se mueve) no se opina. Luego se suaviza, de modo que el campo cambia poco a poco:
-    al aplicarlo las líneas se doblan un pelo, pero nunca se parten."""
-    from scipy import ndimage as ndi
-    a = ndi.gaussian_filter(tinta(base).astype(np.float32), 1.2)
-    b = ndi.gaussian_filter(tinta(im).astype(np.float32), 1.2)
-    lado = 2 * radio + 1
-    ea = ndi.uniform_filter(a * a, lado)
-    mejor = np.full(a.shape, np.inf, np.float32)
-    dx = np.zeros(a.shape, np.float32)
-    dy = np.zeros(a.shape, np.float32)
-    eb = np.zeros(a.shape, np.float32)
-    for oy in range(-alcance, alcance + 1):
-        for ox in range(-alcance, alcance + 1):
-            bs = np.roll(b, (-oy, -ox), axis=(0, 1))   # bs(y, x) = b(y + oy, x + ox)
-            ssd = ndi.uniform_filter((a - bs) ** 2, lado) + 2e-4 * (ox * ox + oy * oy)
-            gana = ssd < mejor
-            mejor[gana] = ssd[gana]
-            dx[gana], dy[gana] = ox, oy
-            eb[gana] = ndi.uniform_filter(bs * bs, lado)[gana]
-    energia = ea + eb
-    calidad = 1 - mejor / (energia + 1e-6)
-    peso = np.where((calidad > 0.72) & (ea > 0.004) & (eb > 0.004), energia * (calidad - 0.72), 0).astype(np.float32)
-    u = np.zeros(a.shape, np.float32)
-    v = np.zeros(a.shape, np.float32)
-    falta = np.ones(a.shape, bool)
-    for s in (sigma, sigma * 3, sigma * 9):   # lejos de todo trazo quieto se toma lo de más lejos
-        g = ndi.gaussian_filter(peso, s)
-        hay = falta & (g > 1e-5)
-        u[hay] = (ndi.gaussian_filter(peso * dx, s) / np.maximum(g, 1e-9))[hay]
-        v[hay] = (ndi.gaussian_filter(peso * dy, s) / np.maximum(g, 1e-9))[hay]
-        falta &= ~hay
-    u = ndi.gaussian_filter(u, 4)
-    v = ndi.gaussian_filter(v, 4)
-    return u, v
-
-
-def deformar(im, u, v):
-    """Aplica el campo: el punto (x, y) del resultado sale de (x + u, y + v) de `im`."""
-    from scipy import ndimage as ndi
-    datos = np.array(im).astype(np.float32)
-    h, w = datos.shape[:2]
-    yy, xx = np.mgrid[0:h, 0:w].astype(np.float32)
-    capas = datos[..., None] if datos.ndim == 2 else datos
-    sale = np.stack([ndi.map_coordinates(capas[..., k], [yy + v, xx + u], order=3, mode='nearest') for k in range(capas.shape[-1])], -1)
-    sale = np.clip(sale, 0, 255).astype(np.uint8)
-    return Image.fromarray(sale[..., 0] if datos.ndim == 2 else sale, im.mode)
-
-
-def congelar(base, im, tolerancia=1, margen=10):
-    """Deja en `im` idéntico a `base` todo lo que no se mueve, SIN cortar líneas (15-11-2026: la versión anterior
-    copiaba trozos de la primera postura y, donde una parte se movía 2 o 3 píxeles, el trazo quedaba partido: Dan lo vio
-    como «la imagen se rompe»). Ahora primero se deforma la postura con un campo suave (`campo_suave`) para que lo
-    quieto caiga encima de la primera, y solo después se copia de la primera lo que ya coincide al píxel, con el borde
-    difuminado. Devuelve la postura corregida y la zona que se considera en movimiento."""
-    from scipy import ndimage as ndi
-    u, v = campo_suave(base, im)
-    im = deformar(im, u, v)
-    ta, tb = tinta(base), tinta(im)
-    suelta = (ta & ~engordar(tb, tolerancia)) | (tb & ~engordar(ta, tolerancia))
-    densa = engordar(suelta, 2)
-    cuenta = np.pad(suelta.astype(np.int32), 4).cumsum(0).cumsum(1)
-    cuenta = np.pad(cuenta, ((1, 0), (1, 0)))
-    h, w = suelta.shape
-    vecinos = cuenta[9:9 + h, 9:9 + w] - cuenta[:h, 9:9 + w] - cuenta[9:9 + h, :w] + cuenta[:h, :w]
-    movimiento = engordar(suelta & (vecinos >= 8) & densa, margen)
-    mezcla = ndi.gaussian_filter((~movimiento).astype(np.float32), 2.5)
-    mezcla = np.clip((mezcla - 0.5) * 2, 0, 1)   # 1 = primera postura; solo lejos del movimiento
-    a, b = np.array(base).astype(np.float32), np.array(im).astype(np.float32)
-    m = mezcla if a.ndim == 2 else mezcla[..., None]
-    datos = np.clip(a * m + b * (1 - m), 0, 255).astype(np.uint8)
-    return Image.fromarray(datos, im.mode), movimiento
-
-
-def congelar_a_cortes(base, im, tolerancia=3, margen=14):
-    """VERSIÓN ANTERIOR, que parte líneas: no usar. Deja en `im` idéntico a `base` todo lo que no se mueve. «Se mueve» la tinta de cualquiera de las dos posturas
-    que no tiene tinta de la otra a `tolerancia` píxeles o menos; alrededor de ella (`margen` píxeles) se conserva la
-    postura; en el resto se copia la primera. Así el banco, las piernas apoyadas o la máquina, que en los dibujos
-    originales bailan uno o dos píxeles entre posturas («mini teletransporte»), quedan clavados."""
-    ta, tb = tinta(base), tinta(im)
-    cerca_a, cerca_b = engordar(ta, tolerancia), engordar(tb, tolerancia)
-    suelta = (ta & ~cerca_b) | (tb & ~cerca_a)
-    # motas sueltas (un cruce de líneas, el borde de un trazo) no cuentan como movimiento
-    densa = engordar(suelta, 2)
-    cuenta = np.pad(suelta.astype(np.int32), 4).cumsum(0).cumsum(1)
-    cuenta = np.pad(cuenta, ((1, 0), (1, 0)))
-    h, w = suelta.shape
-    vecinos = cuenta[9:9 + h, 9:9 + w] - cuenta[:h, 9:9 + w] - cuenta[9:9 + h, :w] + cuenta[:h, :w]
-    movimiento = engordar(suelta & (vecinos >= 12) & densa, margen)
-    datos = np.array(im)
-    quieto = ~movimiento
-    datos[quieto] = np.array(base)[quieto]
-    return Image.fromarray(datos), movimiento
-
-
 def main():
     orden = sys.argv[1]
-    if orden == 'todo':
-        # python fijar_zona.py todo: pasa el congelado a todas las animaciones de web/imagenes/ejercicios (anim e ia).
-        # Hay que repetirlo después de reprocesar dibujos con imagenes_ia.py, animar_imagenes.py o reencajar.py.
-        raiz = Path(__file__).resolve().parent.parent / 'web' / 'imagenes' / 'ejercicios'
-        tocadas = 0
-        for ruta in sorted(list((raiz / 'anim').glob('*.webp')) + list((raiz / 'ia').glob('*.webp'))):
-            cuadros, tiempos = posturas(ruta)
-            if len(cuadros) < 2:
-                continue
-            nuevos, cambios = [cuadros[0]], 0
-            for c in cuadros[1:]:
-                m, _ = congelar(cuadros[0], c)
-                cambios += int((tinta(m) ^ tinta(c)).sum())
-                nuevos.append(m)
-            if cambios:
-                tocadas += 1
-                nuevos[0].save(ruta, 'WEBP', save_all=True, append_images=nuevos[1:], duration=tiempos, loop=0, quality=82, method=6)
-        print(tocadas, 'animaciones corregidas')
-        return
-    if orden == 'congelar':
-        # python fijar_zona.py congelar ruta.webp [--tolerancia 3] [--margen 14] [--salida otra.webp]
-        ruta = Path(sys.argv[2])
-        resto = sys.argv[3:]
-        tolerancia = int(resto[resto.index('--tolerancia') + 1]) if '--tolerancia' in resto else 3
-        margen = int(resto[resto.index('--margen') + 1]) if '--margen' in resto else 14
-        salida = Path(resto[resto.index('--salida') + 1]) if '--salida' in resto else ruta
-        cuadros, tiempos = posturas(ruta)
-        nuevos = [cuadros[0]]
-        for k, c in enumerate(cuadros[1:], 1):
-            m, movimiento = congelar(cuadros[0], c, tolerancia, margen)
-            cambiados = int((tinta(m) ^ tinta(c)).sum())
-            print(f'{ruta.name} postura {k}: se mueve el {movimiento.mean() * 100:.0f} % del lienzo; {cambiados} píxeles de tinta corregidos')
-            nuevos.append(m)
-        nuevos[0].save(salida, 'WEBP', save_all=True, append_images=nuevos[1:], duration=tiempos, loop=0, quality=82, method=6)
-        return
     if orden == 'dos':
         # python fijar_zona.py dos ruta.webp ax ay dax day bx by dbx dby [--soporte x0 y0 x1 y1] [--salida otra.webp]
         ruta = Path(sys.argv[2])

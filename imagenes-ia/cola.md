@@ -320,3 +320,29 @@ El congelado viejo partía líneas: rehecho en las 222 animaciones (ver CLAUDE.m
 
 Hecho el mismo 15-11 con Gemini: hip thrust, caras de goblet y flexiones con lastre. Multipower pedido (pies casi
 igual que antes: a la espera de lo que diga Dan). Siguen: oreja del jalón al pecho y las zancadas.
+
+## Undécima pasada (15-11-2026, tarde): fuera el congelado; lo que queda es de la IA
+
+El «congelado» (también el suave de la 0.91.5) borraba y doblaba líneas: quitado de todos los dibujos y de las
+herramientas (ver CLAUDE.md, 0.91.8). Notas de Dan de su segundo repaso de `dibujos9`, una a una, que piden IA:
+- [ ] Orejas (cara lisa) en TODOS los jalones: al pecho, con cuerda, tras nuca y unilateral. Giros rusos, también.
+- [ ] Jalón unilateral: el mismo brazo hace la extensión y la flexión (ahora empieza con uno y acaba con el otro).
+- [ ] Sentadilla goblet: sigue sin ser la cara habitual (dos intentos). Probar adjuntando una cabeza buena de muestra.
+- [ ] Dominadas neutras: el agarre no es neutro (aunque la vista es mejor) y el muñeco cambia al subir.
+- [ ] Flexiones en pino: su método: darle SOLO la figura de la derecha del dibujo anterior, que la haga nuestra, y
+      luego pedirle la subida sin enseñarle la de la izquierda («es eso lo que la está liando»).
+- [ ] Extensión de cuello con arnés: en polea (el de Gemini con disco colgando, descartado; guardado de recuerdo).
+- [ ] Press de hombro a una mano: el agarre es Arnold y la cara cambia.
+- [ ] Rotación torácica en cuadrupedia: la mano cambia de lado de la cara.
+- [ ] El cuerpo o la barra cambian entre posturas en el propio dibujo: CARs de cadera (busto y cabeza), face pull
+      (busto), escalera sin fin (busto), dominadas con lastre (barra y manos). Pedir la segunda postura sobre la
+      primera (método de dos pasos, mismo lienzo), sin enseñarle la otra.
+- [ ] Press de banca en multipower: la máquina sale un poco distinta en cada postura (si le sigue molestando).
+- [ ] Sentadilla en multipower: los pies (la app lleva ahora el dibujo de octubre; el de Gemini del 15-11, en
+      `imagenes-ia/gemini/fases-sentadilla-en-multipower.jpg`).
+- [ ] Zancadas hacia delante: ha vuelto el dibujo de antes; lo que pidió en la octava revisión sigue pendiente, con
+      el cuerpo de ese dibujo.
+- [ ] Hip thrust: los pies se clavan con `dos` (44 px), que aplasta un poco los discos; mejor pedirle a la IA la
+      postura de abajo sobre la de arriba.
+Método de dos pasos (el que propone Dan y el que ya funcionó el 23-10): recortar UNA postura, pedir «edita esta imagen,
+cambia solo la postura» y guardar como `pasos-<slug>-1` y `-2`: mismo lienzo, mismo aparato, mismo muñeco.
