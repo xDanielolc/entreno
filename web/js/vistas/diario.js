@@ -23,6 +23,21 @@ import { abrirPVT, activarAvisoPvt, avisoPvtActivo, faltaPermisoPvt, ofrecerPvtT
 import { tarjetaCribado } from './cribado.js';
 import { abrirHistoricoPVT, modosConTests } from './historico-pvt.js';
 import { anadir, aviso, ayuda, fechaCorta, h, hoyISO, leerNumero } from '../ui.js';
+import { tiraInferior } from './tira.js';
+
+// Cuatro apartados con la tira de abajo, como en Cuerpo e Historial: la
+// pantalla entera se había hecho demasiado larga (Dan, 18-11-2026). Los audios
+// tienen su propia ruta (#/audios) pero salen en la misma tira.
+const APARTADOS_SUENO = [
+  ['noche', 'Noche', 'diario', '#/diario'],
+  ['audios', 'Audios', 'auriculares', '#/audios'],
+  ['tests', 'Tests', 'reloj', '#/diario/tests'],
+  ['datos', 'Datos', 'resumen', '#/diario/datos'],
+];
+export function tiraSueno(activo) {
+  return tiraInferior(APARTADOS_SUENO.map(([k, texto, ic, href]) => ({ texto, icono: ic, href, activo: k === activo })),
+    { etiqueta: 'Apartados de Sueño' });
+}
 
 // El día que se edita arriba (por defecto, hoy). Se elige tocando una fila.
 let diaElegido = null;
@@ -37,7 +52,8 @@ window.addEventListener('hashchange', () => { acabaDeLlegar = true; });
 // hace falta esto. Va en línea porque `estilo.css` lo lleva otra tanda.
 const CENTRAR = 'justify-content: center';
 
-export function vistaDiario(contenedor) {
+export function vistaDiario(contenedor, { apartado } = {}) {
+  const actual = ['tests', 'datos'].includes(apartado) ? apartado : 'noche';
   const d = estado.datos();
   const hoy = hoyISO();
   // Con la app abierta, el aviso de la mañana se programa aquí (y en Hoy).
@@ -121,7 +137,25 @@ export function vistaDiario(contenedor) {
   const ayer = desplazarDia(hoy, -1);
   const tituloDia = fecha === hoy ? 'Hoy' : fecha === ayer ? `Ayer, ${fechaCorta(fecha)}` : fechaCorta(fecha);
 
-  anadir(contenedor,
+  if (actual === 'tests') {
+    anadir(contenedor, tarjetaPVT(d, fecha, hoy), tarjetaIlusiones(e, guardar, fecha));
+  } else if (actual === 'datos') {
+    anadir(contenedor,
+      tablaDias(d, fecha),
+      resumen(d, hoy),
+      graficas(d, necesidad),
+      tarjetaCribado(d),
+      // Dentro de su tarjeta, como lo demás (suelta al final parecía olvidada).
+      h('section', { class: 'tarjeta' }, h('label', { class: 'campo necesidad-sueno' },
+        h('span', { class: 'etiqueta-campo' }, 'Lo que necesitas dormir (horas)'),
+        h('input', { type: 'text', inputmode: 'decimal', id: 'diario-necesidad', value: String(necesidad).replace('.', ','),
+          onchange: (ev) => {
+            const v = leerNumero(ev.target.value);
+            if (v >= 4 && v <= 12) estado.cambiar((x) => { x.perfil.necesidadSuenoH = v; });
+          } }),
+        h('small', { class: 'nota' }, (d.diario ?? []).filter((x) => calcularSueno(x)).length >= 2
+          ? 'Por defecto 8,5. Es la línea discontinua de la gráfica del sueño.' : 'Por defecto 8,5.'))));
+  } else anadir(contenedor,
     // Sin título: la pestaña de abajo ya lo dice (Dan, 27-10-2026).
     h('section', { class: 'tarjeta diario-peso' },
       h('div', { class: 'cabecera-tarjeta' }, h('h2', { class: 'crece' }, tituloDia)),
@@ -197,29 +231,14 @@ export function vistaDiario(contenedor) {
         if (fecha === hoy && ofrecerPvtTrasDiario({ alCerrar: () => estado.emitir('vista') })) return;
         aviso(entradaDe(estado.datos(), fecha) ? `Guardado: ${fecha === hoy ? 'hoy' : fechaCorta(fecha)}.` : 'No hay nada que guardar todavía.');
         document.querySelector('.tabla-diario')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      } }, 'Guardar el día')),
+      } }, 'Guardar el día')));
 
-    tarjetaIlusiones(e, guardar, fecha),
-    tarjetaPVT(d, fecha, hoy),
-    tarjetaCribado(d),
-    tablaDias(d, fecha),
-    resumen(d, hoy),
-    graficas(d, necesidad),
-    // Dentro de su tarjeta, como lo demás (suelta al final parecía olvidada).
-    h('section', { class: 'tarjeta' }, h('label', { class: 'campo necesidad-sueno' },
-      h('span', { class: 'etiqueta-campo' }, 'Lo que necesitas dormir (horas)'),
-      h('input', { type: 'text', inputmode: 'decimal', id: 'diario-necesidad', value: String(necesidad).replace('.', ','),
-        onchange: (ev) => {
-          const v = leerNumero(ev.target.value);
-          if (v >= 4 && v <= 12) estado.cambiar((x) => { x.perfil.necesidadSuenoH = v; });
-        } }),
-      h('small', { class: 'nota' }, (d.diario ?? []).filter((x) => calcularSueno(x)).length >= 2
-        ? 'Por defecto 8,5. Es la línea discontinua de la gráfica del sueño.' : 'Por defecto 8,5.'))));
+  contenedor.append(tiraSueno(actual));
 
   // Si el diario de hoy ya está lleno y el test de hoy sigue sin hacer, el
   // cartel del test (con su cuenta atrás) sale al llegar aquí. Solo una vez
   // al día: de eso se encarga `ofrecerPvtTrasDiario`.
-  if (acabaDeLlegar) {
+  if (acabaDeLlegar && actual === 'noche') {
     acabaDeLlegar = false;
     ofrecerPvtTrasDiario({ alCerrar: () => estado.emitir('vista') });
   }
@@ -233,6 +252,12 @@ function desplazarDia(iso, n) {
 }
 
 // Los últimos 14 días con algo apuntado; tocar uno lo abre arriba.
+function editarDia(f) {
+  diaElegido = f;
+  window.scrollTo(0, 0);
+  if (location.hash !== '#/diario') location.hash = '#/diario'; else estado.emitir('vista');
+}
+
 function tablaDias(d, elegida) {
   const pesos = new Map((d.perfil.pesos ?? []).map((p) => [p.fecha, p.kg]));
   const fechas = [...new Set([...(d.diario ?? []).map((x) => x.fecha), ...pesos.keys()])].sort().reverse().slice(0, 14);
@@ -245,8 +270,9 @@ function tablaDias(d, elegida) {
         const e = entradaDe(d, f) ?? {};
         const s = calcularSueno(e);
         return h('tr', { class: f === elegida ? 'elegida' : '', tabindex: '0', role: 'button', 'aria-label': `Editar el ${fechaCorta(f)}`,
-          onclick: () => { diaElegido = f; window.scrollTo(0, 0); estado.emitir('vista'); },
-          onkeydown: (ev) => { if (ev.key === 'Enter') { diaElegido = f; estado.emitir('vista'); } } },
+          // La tabla vive en «Datos»; el día se edita en «Noche».
+          onclick: () => editarDia(f),
+          onkeydown: (ev) => { if (ev.key === 'Enter') editarDia(f); } },
         h('td', {}, fechaCorta(f).slice(0, 5)),
         h('td', {}, s ? textoHoras(s.real) : '—'),
         h('td', {}, s ? `${Math.round(s.eficiencia * 100)} %` : '—'),

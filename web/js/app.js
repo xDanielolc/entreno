@@ -48,7 +48,7 @@ const RUTAS = [
   { patron: /^#\/ejercicio\/([\w-]+)$/, vista: vistaFormularioEjercicio, pestana: 'ejercicios', params: ['id'] },
   { patron: /^#\/sesion\/([\w-]+)$/, vista: vistaSesion, pestana: 'inicio', params: ['id'] },
   { patron: /^#\/cuerpo(?:\/(\w+))?$/, vista: vistaCuerpo, pestana: 'cuerpo', params: ['apartado'] },
-  { patron: /^#\/diario$/, vista: vistaDiario, pestana: 'diario' },
+  { patron: /^#\/diario(?:\/(\w+))?$/, vista: vistaDiario, pestana: 'diario', params: ['apartado'] },
   { patron: /^#\/habitos$/, vista: vistaHabitos, pestana: 'habitos' },
   { patron: /^#\/audios$/, vista: vistaAudios, pestana: 'diario' },
   { patron: /^#\/rutinas$/, vista: vistaRutinas, pestana: 'inicio' },

@@ -44,6 +44,7 @@ const SVG = {
   kcal: '<circle cx="13" cy="13" r="6.5"/><circle cx="13" cy="13" r="3"/><path d="M3 3v6a2 2 0 0 0 2 2v10M5 3v5M21 3v18"/>',
   // Apartados de abajo (la tira de Cuerpo e Historial).
   resumen: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+  auriculares: '<path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/>',
   trofeo: '<path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8.5 20.5h7M10 17h4v3.5h-4z"/>',
   cinta: '<circle cx="9" cy="10" r="6"/><circle cx="9" cy="10" r="1.6"/><path d="M15 10v6h7M18 16v-2M21 16v-2"/>',
   camara: '<path d="M4 8h3l1.5-2.5h7L17 8h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.6"/>',

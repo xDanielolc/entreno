@@ -17,6 +17,7 @@ import * as estado from '../estado.js';
 import { AUDIOS, audioPorId, audiosDe, reloj, fechaDeLaNoche } from '../audios.js';
 import { apuntarEnDiario } from '../diario.js';
 import { anadir, aviso, ayuda, h } from '../ui.js';
+import { tiraSueno } from './diario.js';
 
 // Mientras suena no se apunta nada hasta pasado este rato: un toque sin querer
 // no es una noche con audio.
@@ -79,6 +80,24 @@ function guardarAvance() {
   }, { tecleo: true });
 }
 
+// Los grupos de la pantalla. «Historias» son los de la tercera tanda: cada uno
+// una historia distinta, con la misma técnica de fondo.
+const GRUPOS_AUDIOS = [
+  ['historias', 'Historias para dormir'],
+  ['anteriores', 'Primeros audios para dormir'],
+  ['ilusiones', 'Ilusiones'],
+];
+const NOTA_GRUPO = {
+  historias: 'Cada uno es una historia distinta, con la misma técnica de fondo y las mismas sugestiones para después. Ve rotándolos por noches, sin repetir el de la noche anterior.',
+  anteriores: 'Los de las dos primeras tandas. Del 1 al 4 la sugestión es la misma grabación, y del 5 al 7 otra más larga, también igual en los tres.',
+  ilusiones: 'Sentado y despierto. Al terminar, las cuatro notas van al diario.',
+};
+let grupoAudios = null;
+const grupoDe = (a) => (a?.tipo === 'ilusiones' ? 'ilusiones' : a?.historia ? 'historias' : 'anteriores');
+const audiosDelGrupo = (g) => AUDIOS.filter((a) => grupoDe(a) === g);
+const grupoVisible = () => (grupoAudios && audiosDelGrupo(grupoAudios).length ? grupoAudios
+  : GRUPOS_AUDIOS.map(([k]) => k).find((k) => audiosDelGrupo(k).length));
+
 export function vistaAudios(contenedor) {
   const pintar = () => {
     contenedor.replaceChildren();
@@ -90,15 +109,20 @@ export function vistaAudios(contenedor) {
             + 'sin repetir el de la noche anterior. El de ilusiones NO es para dormir: se hace sentado y despierto, una vez por semana, por la tarde y después del test de las 18:00.')),
         h('p', { class: 'nota' }, 'La primera vez que pones uno se descarga entero y se guarda. A partir de ahí suena sin conexión.'),
         h('p', { class: 'nota' }, 'Puedes pausarlo y seguir por donde ibas, y tocar o arrastrar la barra para ir a otro punto. Si lo terminas o cierras la app, la próxima vez empieza desde el principio.')),
+      // Tres grupos en vez de una lista larguísima (18-11-2026). Si suena uno
+      // de otro grupo, sus mandos se quedan arriba para no perderlo.
+      h('div', { class: 'fila-marcas compacta', role: 'group', 'aria-label': 'Qué audios ver' },
+        GRUPOS_AUDIOS.filter(([k]) => audiosDelGrupo(k).length).map(([k, texto]) => h('button', { type: 'button',
+          class: `boton-marca${grupoVisible() === k ? ' activo' : ''}`, 'aria-pressed': String(grupoVisible() === k),
+          onclick: () => { grupoAudios = k; pintar(); } }, texto))),
+      sonando && grupoDe(audioPorId(sonando.id)) !== grupoVisible() && h('section', { class: 'tarjeta' },
+        h('h2', {}, 'Sonando ahora'), fichaAudio(audioPorId(sonando.id), pintar)),
       h('section', { class: 'tarjeta' },
-        h('h2', {}, 'Para dormir'),
-        h('p', { class: 'nota' }, 'Del 1 al 4 la sugestión es la misma grabación, y del 5 al 7 otra más larga, también igual en los tres: dentro de cada tanda solo cambia cómo se llega hasta ella. Ve rotándolos por noches, sin repetir el de la noche anterior.'),
-        ...audiosDe('dormir').map((a) => fichaAudio(a, pintar))),
-      h('section', { class: 'tarjeta' },
-        h('h2', {}, 'Ilusiones'),
-        h('p', { class: 'nota' }, 'Sentado y despierto. Al terminar, las cuatro notas van al diario.'),
-        ...audiosDe('ilusiones').map((a) => fichaAudio(a, pintar))),
+        h('h2', {}, GRUPOS_AUDIOS.find(([k]) => k === grupoVisible())[1]),
+        h('p', { class: 'nota' }, NOTA_GRUPO[grupoVisible()]),
+        ...audiosDelGrupo(grupoVisible()).map((a) => fichaAudio(a, pintar))),
       h('p', { class: 'nota centrado' }, `${AUDIOS.length} audios.`));
+    contenedor.append(tiraSueno('audios'));
   };
   pintar();
   repintar = () => { if (document.body.contains(contenedor)) pintar(); };
