@@ -11,7 +11,7 @@
 // esté en un solo lado se conserva, y lo que esté en los dos y no coincida
 // cuenta como choque.
 
-const COLECCIONES = ['sedes', 'ejercicios', 'rutinas', 'sesiones', 'diario', 'medidas', 'fotos'];
+const COLECCIONES = ['sedes', 'ejercicios', 'rutinas', 'sesiones', 'diario', 'medidas', 'fotos', 'habitos', 'registroHabitos'];
 const SUELTOS = ['cribadoSueno'];
 
 const igual = (a, b) => JSON.stringify(a) === JSON.stringify(b);

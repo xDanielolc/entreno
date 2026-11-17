@@ -15,6 +15,7 @@ import { vistaHistorial } from './vistas/historial.js';
 import { vistaInicio } from './vistas/inicio.js';
 import { vistaCuerpo } from './vistas/cuerpo.js';
 import { vistaDiario } from './vistas/diario.js';
+import { vistaHabitos } from './vistas/habitos.js';
 import { vistaAudios } from './vistas/audios.js';
 import { vistaFormularioRutina, vistaRutinas } from './vistas/rutinas.js';
 import { vistaSesion } from './vistas/sesion.js';
@@ -48,6 +49,7 @@ const RUTAS = [
   { patron: /^#\/sesion\/([\w-]+)$/, vista: vistaSesion, pestana: 'inicio', params: ['id'] },
   { patron: /^#\/cuerpo(?:\/(\w+))?$/, vista: vistaCuerpo, pestana: 'cuerpo', params: ['apartado'] },
   { patron: /^#\/diario$/, vista: vistaDiario, pestana: 'diario' },
+  { patron: /^#\/habitos$/, vista: vistaHabitos, pestana: 'habitos' },
   { patron: /^#\/audios$/, vista: vistaAudios, pestana: 'diario' },
   { patron: /^#\/rutinas$/, vista: vistaRutinas, pestana: 'inicio' },
   { patron: /^#\/rutina\/([\w-]+)$/, vista: vistaFormularioRutina, pestana: 'inicio', params: ['id'] },
@@ -64,6 +66,7 @@ const PESTANAS = [
   { id: 'inicio', texto: 'Entrenar', href: '#/' },
   { id: 'cuerpo', texto: 'Cuerpo', href: '#/cuerpo' },
   { id: 'diario', texto: 'Sueño', href: '#/diario' },
+  { id: 'habitos', texto: 'Hábitos', href: '#/habitos' },
   { id: 'ejercicios', texto: 'Ejercicios', href: '#/ejercicios' },
   { id: 'historial', texto: 'Historial', href: '#/historial' },
   { id: 'aprender', texto: 'Aprender', href: '#/aprender' },

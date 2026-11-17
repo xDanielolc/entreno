@@ -8,6 +8,7 @@ const SVG = {
   diario: '<path d="M19.5 14.5A8 8 0 0 1 9.5 4.5a8 8 0 1 0 10 10z"/><path d="M16 4v3M14.5 5.5h3"/>',
   historial: '<rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8.5 3v4M15.5 3v4"/><path d="M8 14h3M13 14h3M8 17.5h3"/>',
   aprender: '<path d="M12 6.5c-2.2-1.8-5-2-8-2v13.5c3 0 5.8.2 8 2 2.2-1.8 5-2 8-2V4.5c-3 0-5.8.2-8 2z"/><path d="M12 6.5V20"/>',
+  habitos: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="m8.5 12.5 2.5 2.5 5-5.5"/>',
   ajustes: '<path d="M4 7h9M18.5 7H20M4 17h3M12.5 17H20"/><circle cx="15.5" cy="7" r="2.5"/><circle cx="9.5" cy="17" r="2.5"/>',
   marca: '<path d="M6.5 7.5v9M17.5 7.5v9M3.5 10v4M20.5 10v4M6.5 12h11"/>',
   papelera: '<path d="M4 7h16M10 11v6M14 11v6"/><path d="M6 7l1 12.5a1.5 1.5 0 0 0 1.5 1.5h7a1.5 1.5 0 0 0 1.5-1.5L18 7"/><path d="M9 7V4.5h6V7"/>',

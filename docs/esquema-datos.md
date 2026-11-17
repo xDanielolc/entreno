@@ -496,6 +496,12 @@ El paso 3 no es opcional. Es la red de seguridad.
   ('epley' se lee como 'personal'). Las rutinas pueden llevar `descripcion` y
   `plantilla` (id de la rutina prehecha de la que salen), y cada ejercicio de
   un día, `nota` (superseries, alternancias).
+- **v41 (0.92.0).** Hábitos. `habitos[]`: `{ id, nombre, minimo, dias: [0-6] (0 = lunes),
+  bloque: 'construccion' | 'mantenimiento', orden, desde: 'AAAA-MM-DD', borrado? }` (borrar es blando).
+  `registroHabitos[]`: `{ id: 'rh_AAAA-MM-DD', fecha, r: { [idHabito]: 'si' | 'no' } }`; el id sale de la
+  fecha para que dos dispositivos escriban en el mismo registro y la fusión junte las respuestas una a una.
+  Las dos listas están en `COLECCIONES` de `fusion.js`. El día de los hábitos cambia a las 5:00
+  (`HORA_CAMBIO_DIA` en `habitos.js`).
 
 ---
 

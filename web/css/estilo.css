@@ -2522,3 +2522,39 @@ details.como-llegas:not([open]) > summary { font-weight: 500; font-size: .92rem;
 .tipos-sitio .chip.activo { background: var(--acento); color: var(--acento-texto, var(--fondo)); border-color: var(--acento); }
 .lado-arriba { display: flex; margin-bottom: 8px; }
 .lado-arriba .insignia-lado { flex: 1; text-align: center; }
+
+/* Hábitos (0.92.0): una tarjeta con Sí, No y Luego, y el cuadrante del mes. */
+.habitos-tarjeta { text-align: center; }
+.habitos-progreso { color: var(--texto-suave); font-size: .9rem; margin: 0 0 6px; }
+.habitos-nombre { font-size: 1.6rem; margin: 6px 0; overflow-wrap: anywhere; }
+.habitos-minimo { color: var(--texto-suave); margin: 0 0 14px; }
+.habitos-resumen-dia { font-size: 1.2rem; font-weight: 700; }
+.habitos-botones { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 8px 0; }
+.habitos-botones .habitos-luego { grid-column: 1 / -1; }
+.boton.habitos-si { background: var(--bien); border-color: var(--bien); color: var(--superficie); }
+.boton.habitos-no { background: var(--mal); border-color: var(--mal); color: var(--superficie); }
+.habitos-mes { justify-content: center; align-items: center; flex-wrap: nowrap; }
+.habitos-mes h2 { margin: 0 8px; }
+.habitos-global { display: flex; justify-content: center; gap: 24px; margin: 10px 0; }
+.habitos-global > div { display: flex; flex-direction: column; align-items: center; }
+.habitos-global strong { font-size: 1.8rem; font-family: var(--fuente-numeros, inherit); }
+.habitos-cuadrante { overflow-x: auto; margin: 8px -6px; }
+.habitos-cuadrante table { border-collapse: separate; border-spacing: 2px; font-size: .75rem; }
+.habitos-cuadrante th { font-weight: 600; padding: 0 1px; }
+.habitos-cuadrante thead th span, .habitos-cuadrante thead th small { display: block; line-height: 1.1; }
+.habitos-cuadrante thead th small { color: var(--texto-suave); font-weight: 400; }
+.habitos-cuadrante thead th.hoy { color: var(--acento); }
+.habitos-cuadrante .habitos-col-nombre { position: sticky; left: 0; z-index: 1; background: var(--superficie);
+  text-align: left; min-width: 110px; max-width: 130px; padding-right: 6px; white-space: normal; overflow-wrap: anywhere; }
+.habitos-cuadrante td { width: 22px; height: 22px; min-width: 22px; border-radius: 4px; padding: 0; }
+.habitos-cuadrante td button { all: unset; display: block; width: 100%; height: 22px; cursor: pointer; }
+.habitos-cuadrante td.si, .habitos-muestra.si { background: var(--bien); }
+.habitos-cuadrante td.no, .habitos-muestra.no { background: var(--mal); }
+.habitos-cuadrante td.vacio, .habitos-muestra.vacio { background: color-mix(in srgb, var(--borde) 45%, transparent); }
+.habitos-cuadrante td.no-toca, .habitos-muestra.no-toca {
+  background: repeating-linear-gradient(45deg, transparent 0 3px, color-mix(in srgb, var(--borde) 60%, transparent) 3px 5px); }
+.habitos-cuadrante td.futuro { background: transparent; }
+.habitos-cuadrante td.habitos-pct { width: auto; padding: 0 4px; font-weight: 700; font-family: var(--fuente-numeros, inherit); }
+.habitos-muestra { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: middle; }
+.habitos-leyenda { margin-top: 6px; }
+.habitos-ficha { text-align: left; }

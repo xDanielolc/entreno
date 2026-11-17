@@ -2057,3 +2057,27 @@ pesas. Los originales de Gemini procesados sin ese paso salen limpios.
   del dibujo de wger para que la haga nuestra; la subida «sobre esta misma imagen» no la cambia, devuelve la misma
   postura; sí sale pidiéndole después una lámina con las dos figuras a partir de la nuestra). El jalón unilateral sigue
   cambiando de brazo: Gemini no cambia posturas editando. Almacén `entreno-imagenes-62`.
+
+## Ronda 0.92.0 (17-11-2026): pestaña Hábitos
+
+Hecha desde la conversación de hábitos de Dan (no la del entreno). Dan deja la hoja de hábitos en papel y los quiere
+en la app, aunque quede «totum revolutum»: rellenar es solo la tarjeta del siguiente hábito del día con Sí, No y
+Luego, y las estadísticas son un cuadrante de cuánto ha hecho y cuánto no.
+- Esquema v41: `habitos[]` y `registroHabitos[]` (ver `docs/esquema-datos.md`). Lógica en `web/js/habitos.js`,
+  pantalla en `web/js/vistas/habitos.js`, ruta `#/habitos`, pestaña «Hábitos» (opcional en Ajustes →
+  Personalización; oculta por defecto para quien empieza de cero; a quien ya usaba la app se le ve).
+- Tarjeta: Sí o No guardan y pasan a la siguiente; **Luego** la aparca y vuelve a salir después del siguiente hábito
+  contestado con Sí o No (`siguienteTarjeta`); si solo quedan aparcadas, por turnos. Lo aparcado y el «Deshacer la
+  última» viven en el dispositivo (`localStorage`), no en los datos. El día cambia a las 5:00 (lo de la 1 de la
+  madrugada es de la noche anterior).
+- Cuadrante del mes: una fila por hábito y una columna por día; verde sí, rojo no, gris sin apuntar, rayado no
+  toca, y el porcentaje global (sí ÷ días que tocaba, con lo no apuntado dentro) del mes y de la semana delante,
+  porque Dan pidió empezar siempre por el número global. Tocar una casilla la corrige (sí → no → sin apuntar). Se
+  abre con hoy a la vista.
+- «Mis hábitos»: editar nombre, mínimo, días y bloque, subir, bajar y quitar (blando), y «Pegar una lista entera»
+  (`nombre | mínimo | días | bloque`, días «todos», «L X V» o «L-V»/«V-L»). Un hábito no cuenta antes de su `desde`.
+- Probado en el navegador integrado a 375 px con la cuenta de prueba: secuencia Sí/Luego/Luego/No (vuelven las
+  aparcadas en su orden), deshacer, porcentajes y corregir casillas. **Sin probar**: Chrome con oscuro forzado
+  (Ecosia), el móvil real y la fusión entre dos dispositivos.
+- Fuera de esta versión: avisos, rachas, importar el histórico de sus hojas (Excel en su carpeta de hábitos) y
+  marcar solos el gym (por las sesiones) o la noche (por el Pomodoro).

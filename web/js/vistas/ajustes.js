@@ -141,7 +141,7 @@ export function vistaAjustes(contenedor) {
         h('small', { class: 'nota' }, 'Las marcadas se ven. Entrenar, Ejercicios y Ajustes están siempre.'),
         (d.perfil.pestanasOcultas ?? []).length > 0 && h('div', { class: 'fila-marcas compacta' },
           (d.perfil.pestanasOcultas ?? []).filter((id) => PESTANAS_OPCIONALES[id]).map((id) => h('a', { class: 'boton secundario',
-            href: { cuerpo: '#/cuerpo', diario: '#/diario', historial: '#/historial', aprender: '#/aprender' }[id] }, `Abrir ${PESTANAS_OPCIONALES[id]}`)))),
+            href: { cuerpo: '#/cuerpo', diario: '#/diario', habitos: '#/habitos', historial: '#/historial', aprender: '#/aprender' }[id] }, `Abrir ${PESTANAS_OPCIONALES[id]}`)))),
       h('div', { class: 'campo' },
         h('span', { class: 'etiqueta-campo' }, 'Retos del mes en Entrenar'),
         opciones({ si: 'Sí', no: 'No' }, d.perfil.retos === false ? 'no' : 'si',
