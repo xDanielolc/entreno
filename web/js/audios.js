@@ -102,6 +102,30 @@ export const AUDIOS = [
     duracion: 1335,
     sugestion: [694, 1232],
   },
+  // TERCERA TANDA (18-11-2026): las historias. Cada una es una historia
+  // distinta, con una idea de fondo, un narrador que acompaña y la técnica
+  // ericksoniana tejida dentro (lo pidió él: los anteriores sonaban a máquina,
+  // «sin alma»). Todas llevan la misma frase central del sueño profundo y las
+  // mismas cuatro posthipnóticas, dichas dentro de cada historia. La 8, la 11
+  // y la 17 llevan fraccionamiento. Voz Sola con estilo cálido. El rango de
+  // «sugestión» va del principio del sueño profundo al final de las
+  // posthipnóticas.
+  ...[
+    [8, 'brasas', 'Las brasas tapadas', 'Una cabaña con nieve, la mochila del día en el banco de la entrada y una estufa con las brasas tapadas, que siguen encendidas toda la noche sin que nadie las vigile.', 1291, [793, 1190]],
+    [9, 'alfarero', 'El alfarero', 'Un taller, barro tibio entre las manos y un torno que se para. La pieza a medias se tapa con un paño húmedo: mañana seguirá igual de blanda.', 1041, [601, 944]],
+    [10, 'dragon', 'El dragón que hiberna', 'Llegas volando a tu cueva mientras nieva. El repaso por tu cuerpo de dragón y el sueño largo, en el que se rehacen las escamas y se curan las alas.', 1107, [651, 1012]],
+    [11, 'catedral', 'La catedral en la roca', 'Una catedral tallada dentro de la montaña, donde unas ondas tibias suben desde la roca y devuelven la fuerza.', 1417, [955, 1320]],
+    [12, 'luz', 'El cuerpo de luz', 'La luz que de día se reparte hasta los bordes vuelve de noche al centro del pecho, y desde ahí repara, latido a latido.', 1318, [853, 1225]],
+    [13, 'laurisilva', 'La laurisilva con niebla', 'Un bosque antiguo de laureles que bebe de la niebla sin hacer nada. Recibir sin esfuerzo.', 1220, [750, 1121]],
+    [14, 'trigo', 'El campo de trigo', 'Tumbado en la linde de un campo de trigo frente a las montañas, mientras cae la tarde. El grano madura de noche, sin prisa.', 1180, [687, 1081]],
+    [15, 'nubes', 'El reino de las nubes', 'Volar sobre las nubes de día, ver caer el sol y, de noche, tumbado en una nube, las estrellas y una aurora.', 1284, [871, 1189]],
+    [16, 'arbol', 'El árbol en invierno', 'Un roble que suelta sus hojas en otoño y guarda la savia en las raíces. Soltar no es perder.', 1155, [766, 1054]],
+    [17, 'fragua', 'La fragua', 'El acero se hace fuerte al enfriarse despacio, toda la noche, en la fragua cerrada.', 1328, [914, 1229]],
+    [18, 'biblioteca', 'La biblioteca que se ordena sola', 'De noche, cuando se apaga la última lámpara, los libros vuelven solos a su sitio. Tú no tienes que ordenar nada.', 1210, [769, 1108]],
+  ].map(([version, clave, nombre, descripcion, duracion, sugestion]) => ({
+    id: `dormir-${version}`, tipo: 'dormir', version, historia: true,
+    nombre, descripcion, archivo: `audios/historia-${clave}.mp3`, duracion, sugestion,
+  })),
   // Ilusiones alargadas el 12-11-2026 (archivos «b»): una profundización
   // sentado después de la cuenta, en todos; dos ciclos de fraccionamiento con
   // los ojos abiertos en los niveles 2, 4 y 6; y una posthipnótica para entrar

@@ -51,6 +51,17 @@ export const VERSIONES_AUDIO = {
   5: 'El 5 (la cabaña, larga)',
   6: 'El 6 (la cabaña, fraccionada)',
   7: 'El 7 (la escalera, fraccionada)',
+  8: 'Las brasas',
+  9: 'El alfarero',
+  10: 'El dragón',
+  11: 'La catedral',
+  12: 'El cuerpo de luz',
+  13: 'La laurisilva',
+  14: 'El trigo',
+  15: 'Las nubes',
+  16: 'El árbol',
+  17: 'La fragua',
+  18: 'La biblioteca',
 };
 
 // El entrenamiento de ilusiones: cuatro ítems por sesión, siempre en el mismo
