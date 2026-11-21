@@ -591,14 +591,31 @@ export function pvtDelDiaPorMomento(datos, fecha) {
 // ¿Falta el test de hoy? Cuenta cualquiera de las duraciones: el recordatorio
 // es para no olvidarse, no para exigir una en concreto.
 export function faltaPvtHoy(datos, fecha = hoyISO()) {
-  return pvtDelDia(datos, fecha).length === 0;
+  return tocaPvt(datos, fecha) && pvtDelDia(datos, fecha).length === 0;
+}
+
+// Cada cuánto se pide el test (20-11-2026, Dan: «el test diario me aburre
+// mucho»). El plan lo necesita a diario solo mientras se mide (la fase 0, que
+// ya dio la línea base) y, si algún día se recortan horas, una vez por semana
+// para el semáforo del domingo. Un test suelto vale para el semáforo porque el
+// umbral del 11 % es justo el cambio mínimo detectable entre dos medidas
+// sueltas (Thompson 2022: error típico del 4,1-4,4 %; 1,96 × √2 × 4,1 ≈ 11,4).
+// Fuera de esos momentos, «en pausa»: ni aviso, ni tarjeta en Hoy, ni cartel
+// tras el diario. Hacerlo a mano sigue pudiéndose siempre.
+export const FRECUENCIAS_PVT = { diaria: 'Cada día', domingo: 'Solo los domingos', pausa: 'En pausa' };
+export const frecuenciaPVT = (datos) => (FRECUENCIAS_PVT[datos?.perfil?.pvtFrecuencia] ? datos.perfil.pvtFrecuencia : 'diaria');
+export function tocaPvt(datos, fecha = hoyISO()) {
+  const f = frecuenciaPVT(datos);
+  if (f === 'pausa') return false;
+  if (f === 'domingo') return diaSemana(fecha) === 0;
+  return true;
 }
 
 // ¿Falta el de la mañana o el de la tarde? El aviso de cada momento solo salta
 // si ese momento está sin hacer: haber hecho el de la mañana no calla el de la
 // tarde, que es justo el que aporta el dato nuevo.
 export function faltaPvtMomento(datos, fecha = hoyISO(), momento = 'manana') {
-  return pvtDelDiaPorMomento(datos, fecha)[momento]?.length === 0;
+  return tocaPvt(datos, fecha) && pvtDelDiaPorMomento(datos, fecha)[momento]?.length === 0;
 }
 
 // ¿Está activado el segundo test del día? Mientras no lo esté, la app se

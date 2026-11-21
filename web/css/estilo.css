@@ -2531,6 +2531,10 @@ details.como-llegas:not([open]) > summary { font-weight: 500; font-size: .92rem;
 .habitos-resumen-dia { font-size: 1.2rem; font-weight: 700; }
 .habitos-botones { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 8px 0; }
 .habitos-botones .habitos-luego { grid-column: 1 / -1; }
+.habitos-botones.tres { grid-template-columns: repeat(3, 1fr); }
+.habitos-botones .estrellas { grid-column: 1 / -1; justify-content: center; }
+.habitos-cuadrante td.estrellas-celda { background: color-mix(in srgb, var(--acento) 35%, transparent); text-align: center; }
+.habitos-cuadrante td.estrellas-celda button { line-height: 22px; font-weight: 700; }
 .boton.habitos-si { background: var(--bien); border-color: var(--bien); color: var(--superficie); }
 .boton.habitos-no { background: var(--mal); border-color: var(--mal); color: var(--superficie); }
 .habitos-mes { justify-content: center; align-items: center; flex-wrap: nowrap; }

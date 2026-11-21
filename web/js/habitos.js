@@ -5,6 +5,12 @@
 //   desde: 'AAAA-MM-DD' (antes de ese día no cuenta), borrado?: true }. Borrar es blando, para no perder el historial.
 // - Un día: { id: 'rh_AAAA-MM-DD', fecha, r: { [idHabito]: 'si' | 'no' } }. El id sale de la fecha, así que el móvil
 //   y el ordenador escriben en el mismo registro y la fusión junta las respuestas hábito a hábito.
+// - Un hábito puede ir enlazado al diario del sueño (`enlace: 'alcohol' | 'sensacion'`, desde el 20-11-2026): su
+//   respuesta no va a `registroHabitos`, sino al campo del diario de ese mismo día (el día en que te levantas, igual que
+//   «Noche»). Así el resumen y las gráficas del sueño siguen leyendo lo de siempre, y en Sueño solo quedan los datos
+//   del reloj. El alcohol cuenta como hecho si fue «nada»; las estrellas no son un hábito y no entran en el porcentaje.
+
+import { ALCOHOL, SENSACIONES, apuntarEnDiario, entradaDe } from './diario.js';
 
 export const DIAS_SEMANA = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
 export const TODOS_LOS_DIAS = [0, 1, 2, 3, 4, 5, 6];
@@ -39,12 +45,39 @@ export function toca(habito, fecha) {
   return (habito.dias?.length ? habito.dias : TODOS_LOS_DIAS).includes(diaSemana(fecha));
 }
 
+export const ENLACES = {
+  alcohol: { campo: 'alcohol', opciones: [['no', 'Nada'], ['poco', ALCOHOL.poco], ['mucho', ALCOHOL.mucho]] },
+  sensacion: { campo: 'sensacion', estrellas: true, nombres: SENSACIONES },
+};
+const enlaceDe = (habito) => ENLACES[habito?.enlace] ?? null;
+export const esEstrellas = (habito) => Boolean(enlaceDe(habito)?.estrellas);
+// ¿Entra en el porcentaje? Todo menos las estrellas.
+export const cuenta = (habito) => !esEstrellas(habito);
+
+// Lo guardado tal cual: 'si' / 'no' en los normales; el valor del diario en los enlazados.
+export function valorDe(datos, habito, fecha) {
+  const enlace = enlaceDe(habito);
+  if (enlace) return entradaDe(datos, fecha)?.[enlace.campo] ?? null;
+  return respuestasDe(datos, fecha)[habito.id] ?? null;
+}
+
+// 'si', 'no' o null, para el cuadrante y las cuentas. Las estrellas no son ni sí ni no.
+export function estadoDe(datos, habito, fecha) {
+  const v = valorDe(datos, habito, fecha);
+  if (v == null || esEstrellas(habito)) return null;
+  if (habito.enlace === 'alcohol') return v === 'no' ? 'si' : 'no';
+  return v === 'si' ? 'si' : v === 'no' ? 'no' : null;
+}
+
 export function respuestasDe(datos, fecha) {
   return (datos.registroHabitos ?? []).find((x) => x.fecha === fecha)?.r ?? {};
 }
 
 // valor: 'si', 'no' o null (quitar la respuesta).
+// En los enlazados, el valor del campo del diario (o null para quitarlo).
 export function responder(datos, fecha, idHabito, valor) {
+  const enlace = enlaceDe((datos.habitos ?? []).find((x) => x.id === idHabito));
+  if (enlace) { apuntarEnDiario(datos, fecha, enlace.campo, valor ?? null); return; }
   datos.registroHabitos ??= [];
   let dia = datos.registroHabitos.find((x) => x.fecha === fecha);
   if (!dia) {
@@ -60,8 +93,7 @@ export function delDia(datos, fecha) {
 }
 
 export function pendientes(datos, fecha) {
-  const r = respuestasDe(datos, fecha);
-  return delDia(datos, fecha).filter((x) => !r[x.id]);
+  return delDia(datos, fecha).filter((x) => valorDe(datos, x, fecha) == null);
 }
 
 // La tarjeta que sale ahora. «Luego» aparca un hábito: vuelve a salir después del siguiente que contestes con Sí o
@@ -87,20 +119,30 @@ export function aplazar(aplazados, id, respondidas) {
 export function cuentas(datos, desde, hasta, hoy) {
   const total = { posibles: 0, si: 0, no: 0, vacio: 0 };
   const porHabito = new Map();
-  const lista = habitosActivos(datos);
+  const lista = habitosActivos(datos).filter(cuenta);
   for (const x of lista) porHabito.set(x.id, { posibles: 0, si: 0, no: 0, vacio: 0 });
   const fin = hasta < hoy ? hasta : hoy;
   for (let f = desde; f <= fin; f = sumarDias(f, 1)) {
-    const r = respuestasDe(datos, f);
     for (const x of lista) {
       if (!toca(x, f)) continue;
       const c = porHabito.get(x.id);
-      const v = r[x.id] === 'si' ? 'si' : r[x.id] === 'no' ? 'no' : 'vacio';
+      const v = estadoDe(datos, x, f) ?? 'vacio';
       c.posibles++; c[v]++;
       total.posibles++; total[v]++;
     }
   }
   return { total, porHabito };
+}
+
+// Media de estrellas entre dos fechas (sin pasar de hoy), o null.
+export function mediaEstrellas(datos, habito, desde, hasta, hoy) {
+  const fin = hasta < hoy ? hasta : hoy;
+  const vs = [];
+  for (let f = desde; f <= fin; f = sumarDias(f, 1)) {
+    const v = valorDe(datos, habito, f);
+    if (toca(habito, f) && v > 0) vs.push(v);
+  }
+  return vs.length ? vs.reduce((a, b) => a + b, 0) / vs.length : null;
 }
 
 export const porcentaje = (c) => (c.posibles ? Math.round((100 * c.si) / c.posibles) : null);

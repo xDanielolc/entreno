@@ -4,8 +4,9 @@
 // Al final, la lista de hábitos para editarla o pegar una entera.
 import * as estado from '../estado.js';
 import {
-  BLOQUES, DIAS_SEMANA, TODOS_LOS_DIAS, aplazar, cuentas, delDia, diaDeHabitos, diaSemana, habitosActivos, leerLista,
-  pendientes, porcentaje, responder, respuestasDe, siguienteTarjeta, sumarDias, textoDias, toca,
+  BLOQUES, DIAS_SEMANA, ENLACES, TODOS_LOS_DIAS, aplazar, cuenta, cuentas, delDia, diaDeHabitos, diaSemana, esEstrellas,
+  estadoDe, habitosActivos, leerLista, mediaEstrellas, pendientes, porcentaje, responder, siguienteTarjeta, sumarDias,
+  textoDias, toca, valorDe,
 } from '../habitos.js';
 import { aviso, confirmar, fechaLarga, h, nuevoId } from '../ui.js';
 
@@ -44,12 +45,12 @@ function tarjetaDelDia(d, hoy) {
   const actual = siguienteTarjeta(lista, aplazados, hechas);
 
   if (!actual) {
-    const r = respuestasDe(d, hoy);
-    const si = delDia(d, hoy).filter((x) => r[x.id] === 'si').length;
+    const contables = delDia(d, hoy).filter(cuenta);
+    const si = contables.filter((x) => estadoDe(d, x, hoy) === 'si').length;
     return h('section', { class: 'tarjeta habitos-tarjeta centrado' },
       h('p', { class: 'habitos-progreso' }, fechaLarga(hoy)),
       h('h2', {}, total ? 'Día completo' : 'Hoy no toca ningún hábito'),
-      total ? h('p', { class: 'habitos-resumen-dia' }, `${si} de ${total} hechos`) : '',
+      contables.length ? h('p', { class: 'habitos-resumen-dia' }, `${si} de ${contables.length} hechos`) : '',
       botonDeshacer());
   }
 
@@ -63,14 +64,27 @@ function tarjetaDelDia(d, hoy) {
     guardarLuego(hoy, aplazar(leerLuego(hoy), actual.id, hechas));
     estado.emitir('vista');
   };
+  const enlace = ENLACES[actual.enlace];
+  const botonLuego = h('button', { type: 'button', class: 'boton secundario habitos-luego', onclick: luego }, 'Luego');
+  // Las enlazadas al diario llevan sus propios botones: el alcohol, sus tres respuestas de siempre (la primera es la
+  // que cuenta como hecho); cómo te levantaste, sus cinco estrellas.
+  let botones;
+  if (enlace?.estrellas) {
+    botones = [h('div', { class: 'estrellas', role: 'radiogroup', 'aria-label': `${actual.nombre}, de 1 a 5` },
+      [1, 2, 3, 4, 5].map((n) => h('button', { type: 'button', role: 'radio', 'aria-checked': 'false', class: 'estrella',
+        'aria-label': `${n}: ${enlace.nombres[n]}`, title: enlace.nombres[n], onclick: () => contestar(n) }, '★'))), botonLuego];
+  } else if (enlace) {
+    botones = [...enlace.opciones.map(([k, t], i) => h('button', { type: 'button',
+      class: `boton grande ${i ? 'habitos-no' : 'habitos-si'}`, onclick: () => contestar(k) }, t)), botonLuego];
+  } else {
+    botones = [h('button', { type: 'button', class: 'boton grande habitos-si', onclick: () => contestar('si') }, 'Sí'),
+      h('button', { type: 'button', class: 'boton grande habitos-no', onclick: () => contestar('no') }, 'No'), botonLuego];
+  }
   return h('section', { class: 'tarjeta habitos-tarjeta centrado' },
-    h('p', { class: 'habitos-progreso' }, `${hechas + 1} de ${total} · ${BLOQUES[actual.bloque] ?? ''}`),
+    h('p', { class: 'habitos-progreso' }, `${hechas + 1} de ${total}` + (esEstrellas(actual) ? '' : ` · ${BLOQUES[actual.bloque] ?? ''}`)),
     h('h2', { class: 'habitos-nombre' }, actual.nombre),
     actual.minimo ? h('p', { class: 'habitos-minimo' }, actual.minimo) : '',
-    h('div', { class: 'habitos-botones' },
-      h('button', { type: 'button', class: 'boton grande habitos-si', onclick: () => contestar('si') }, 'Sí'),
-      h('button', { type: 'button', class: 'boton grande habitos-no', onclick: () => contestar('no') }, 'No'),
-      h('button', { type: 'button', class: 'boton secundario habitos-luego', onclick: luego }, 'Luego')),
+    h('div', { class: `habitos-botones${enlace?.opciones ? ' tres' : ''}` }, ...botones),
     botonDeshacer());
 }
 
@@ -118,9 +132,15 @@ function cuadrante(d, hoy) {
     h('th', {}, '%'));
   const filas = lista.map((x) => {
     const c = porHabito.get(x.id);
+    // Las estrellas no tienen porcentaje: al final va su media del mes.
+    let pie = c?.posibles ? String(porcentaje(c)) : '—';
+    if (esEstrellas(x)) {
+      const media = mediaEstrellas(d, x, primero, ultimo, hoy);
+      pie = media ? `${String(Math.round(media * 10) / 10).replace('.', ',')}★` : '—';
+    }
     return h('tr', {}, h('th', { class: 'habitos-col-nombre' }, x.nombre),
       ...dias.map((f) => celda(d, x, f, hoy)),
-      h('td', { class: 'habitos-pct' }, c.posibles ? String(porcentaje(c)) : '—'));
+      h('td', { class: 'habitos-pct' }, pie));
   });
 
   return h('section', { class: 'tarjeta centrado' },
@@ -155,11 +175,25 @@ function desplazadoAHoy(caja) {
 function celda(d, x, f, hoy) {
   if (f > hoy) return h('td', { class: 'futuro' });
   if (!toca(x, f)) return h('td', { class: 'no-toca' });
-  const v = respuestasDe(d, f)[x.id];
-  const siguiente = v === 'si' ? 'no' : v === 'no' ? null : 'si';
+  const valor = valorDe(d, x, f);
+  // Al tocar, el valor siguiente de la vuelta: sí, no, sin apuntar; en el alcohol, sus tres respuestas; en las
+  // estrellas, de 1 a 5 y vacío.
+  const enlace = ENLACES[x.enlace];
+  let vuelta = [null, 'si', 'no'];
+  if (enlace?.estrellas) vuelta = [null, 1, 2, 3, 4, 5];
+  else if (enlace) vuelta = [null, ...enlace.opciones.map(([k]) => k)];
+  const siguiente = vuelta[(vuelta.indexOf(valor ?? null) + 1) % vuelta.length];
+  const tocar = () => estado.cambiar((y) => responder(y, f, x.id, siguiente));
+  if (enlace?.estrellas) {
+    return h('td', { class: valor ? 'estrellas-celda' : 'vacio' },
+      h('button', { type: 'button', 'aria-label': `${x.nombre}, ${f}: ${valor ? `${valor} de 5` : 'sin apuntar'}`, onclick: tocar },
+        valor ? String(valor) : ''));
+  }
+  const v = estadoDe(d, x, f);
+  let texto = v === 'si' ? 'sí' : v === 'no' ? 'no' : 'sin apuntar';
+  if (enlace && valor) texto = Object.fromEntries(enlace.opciones)[valor] ?? texto;
   return h('td', { class: v ?? 'vacio' },
-    h('button', { type: 'button', 'aria-label': `${x.nombre}, ${f}: ${v === 'si' ? 'sí' : v === 'no' ? 'no' : 'sin apuntar'}`,
-      onclick: () => estado.cambiar((y) => responder(y, f, x.id, siguiente)) }));
+    h('button', { type: 'button', 'aria-label': `${x.nombre}, ${f}: ${texto}`, onclick: tocar }));
 }
 
 // ---------------------------------------------------------------- la lista
@@ -177,6 +211,7 @@ function editor(d, hoy) {
 
   const fichas = lista.map((x, i) => h('details', { class: 'explicacion habitos-ficha' },
     h('summary', {}, x.nombre, h('small', { class: 'suave' }, ` · ${textoDias(x.dias)}`)),
+    x.enlace ? h('p', { class: 'nota' }, 'Va con el diario del sueño: se guarda en el día en que te levantas.') : '',
     h('label', { class: 'campo' }, h('span', { class: 'etiqueta-campo' }, 'Nombre'),
       h('input', { type: 'text', value: x.nombre, oninput: (e) => cambiar(x.id, (z) => { z.nombre = e.target.value; }, { tecleo: true }),
         onchange: () => estado.emitir('vista') })),

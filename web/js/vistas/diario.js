@@ -14,6 +14,7 @@ import {
   ADELANTO_SEMANAL_MIN, ALCOHOL, AUDIO_HIPNOSIS, ITEMS_ILUSIONES, MODOS_PVT, MODO_PVT_POR_DEFECTO,
   NECESIDAD_SUENO_POR_DEFECTO, NIVELES_ILUSIONES, NOTAS_ILUSIONES, SENSACIONES, SUENO_MINIMO_H, VERSIONES_AUDIO,
   apuntarEnDiario, calcularSueno, datosModoPVT, dosTestsAlDia, entradaDe, faltaPvtHoy, faltaPvtMomento,
+  FRECUENCIAS_PVT, frecuenciaPVT, tocaPvt,
   horaAcostarse, horaAvisoPvt, horaAvisoPvtTarde, listoParaPvt, modoPVT, pvtDelDia, resumenUltimos7, testsPVT, textoHoras,
   totalIlusiones,
 } from '../diario.js';
@@ -176,18 +177,11 @@ export function vistaDiario(contenedor, { apartado } = {}) {
       fila(numero('latenciaMin', 'Hasta dormirte', 'min'), numero('despiertoMin', 'Despierto de noche', 'min'), numero('remoloneoMin', 'Remoloneando', 'min')),
       calculo,
 
-      h('div', { class: 'titulo-con-ayuda' }, h('span', { class: 'etiqueta-campo' }, 'Cómo te levantaste'),
-        ayuda('Cómo te levantaste', 'Es un dato, no un criterio: la sensación de cansancio se acostumbra a dormir poco mientras el rendimiento sigue cayendo (Van Dongen 2003). Por eso la app la apunta, pero no decide nada solo con ella.')),
-      h('div', { class: 'estrellas', role: 'radiogroup', 'aria-label': 'Cómo te levantaste, de 1 a 5' },
-        [1, 2, 3, 4, 5].map((n) => h('button', { type: 'button', role: 'radio', 'aria-checked': String(e.sensacion === n),
-          class: `estrella${(e.sensacion ?? 0) >= n ? ' activa' : ''}`, 'aria-label': `${n}: ${SENSACIONES[n]}`, title: SENSACIONES[n],
-          onclick: () => guardar('sensacion', e.sensacion === n ? null : n, { repintar: true }) }, '★'))),
-      e.sensacion && h('p', { class: 'nota centrado' }, SENSACIONES[e.sensacion]),
-
-      h('span', { class: 'etiqueta-campo' }, 'Alcohol ayer'),
-      h('div', { class: 'fila-marcas compacta' }, Object.entries(ALCOHOL).map(([k, t]) => h('button', { type: 'button',
-        class: `boton-marca${e.alcohol === k ? ' activo' : ''}`, 'aria-pressed': String(e.alcohol === k),
-        onclick: () => guardar('alcohol', e.alcohol === k ? null : k, { repintar: true }) }, t))),
+      // Cómo te levantaste y el alcohol se apuntan desde el 20-11-2026 en Hábitos, con sus tarjetas (Dan: que aquí
+      // solo queden los datos del sueño, que los puede rellenar Claude con las capturas del reloj). Se siguen guardando
+      // en esta misma entrada del diario, así que el resumen y las gráficas no cambian.
+      h('p', { class: 'nota' }, 'Cómo te levantaste y el alcohol van ahora en ', h('a', { href: '#/habitos' }, 'Hábitos'),
+        (e.sensacion || e.alcohol) ? `: ${[e.sensacion ? `${'★'.repeat(e.sensacion)} ${SENSACIONES[e.sensacion]}` : '', e.alcohol ? `alcohol, ${ALCOHOL[e.alcohol].toLowerCase()}` : ''].filter(Boolean).join(' · ')}.` : '.'),
       fila(hora('cafeinaHora', 'Último café o té'), numero('pulsoNocturno', 'Pulso nocturno', 'lpm'), numero('siestaMin', 'Siesta', 'min')),
       fila(numero('pulsoMinimo', 'Pulso mínimo de la noche', 'lpm')),
       h('div', { class: 'titulo-con-ayuda' }, h('span', { class: 'etiqueta-campo suave' }, 'Por qué también el mínimo'),
@@ -290,7 +284,7 @@ const AYUDA_PVT = [
   'El dato principal es la velocidad de respuesta (respuestas por segundo: la media de 1 dividido entre cada tiempo de reacción). Los lapsos, que son las reacciones tan lentas que cuentan como despiste, se apuntan pero sirven de poco en alguien descansado: con 7 h en cama la velocidad baja y los lapsos no suben (Belenky 2003), así que mirando solo los lapsos un recorte de sueño parece gratis cuando no lo es.',
   'Tres duraciones: 3, 5 y 10 minutos. Viene marcada la de 5 porque es la única con un cambio mínimo detectable publicado (Thompson 2022): por debajo de un 11-12 % de diferencia no es un cambio, es ruido. Sus números no se mezclan nunca entre sí: en gente descansada el de 3 min y el de 10 ni siquiera se parecen (r = 0,134; Antler 2022, 83 adultos).',
   'No hay baremos publicados de ninguna versión (Taillard 2024, PMID 38401239): te comparas contigo y con nadie más. Y tocar una pantalla táctil añade unos 68 ms (Arsintescu 2017), así que hazlo siempre con el mismo móvil y en la misma postura, a la misma hora, antes del té o el café.',
-  'La app decide sobre la media de tus últimos 7 tests, nunca sobre un día suelto. Y tu línea base la forman tus primeros 5 tests, sin plazo: si acaban repartidos en más de 21 días, la app te lo dice al compararte.',
+  'Haciéndolo a diario, la app mira la media de tus últimos 7 tests. Solo los domingos (el semáforo de cuando recortas horas), cada test se compara con tu base: el 11 % ya es el cambio mínimo entre dos medidas sueltas. Y tu línea base la forman tus primeros 5 tests, sin plazo: si acaban repartidos en más de 21 días, la app te lo dice al compararte.',
 ];
 
 // En el día de hoy: el botón para hacerlo, lo que hayas hecho ya y el aviso de
@@ -341,9 +335,11 @@ function tarjetaPVT(d, fecha, hoy) {
   return h('section', { class: 'tarjeta' },
     h('div', { class: 'titulo-con-ayuda', style: CENTRAR }, h('h2', {}, 'Test de atención'),
       ayuda('Test de atención', AYUDA_PVT)),
-    hechos.length ? tablaPVT(hechos) : h('p', { class: 'nota' }, esHoy
-      ? `Hoy todavía no lo has hecho. Son ${porDefecto.minutos} minutos (o 3, o 10: lo eliges al empezar).`
-      : 'Ese día no hiciste ninguno.'),
+    hechos.length ? tablaPVT(hechos) : h('p', { class: 'nota' }, !esHoy ? 'Ese día no hiciste ninguno.'
+      : !tocaPvt(d, fecha) ? (frecuenciaPVT(d) === 'pausa'
+        ? 'Ahora no hace falta: está en pausa, sin avisos. Si quieres hacerlo igual, adelante.'
+        : 'Hoy no toca: va solo los domingos. Si quieres hacerlo igual, adelante.')
+        : `Hoy todavía no lo has hecho. Son ${porDefecto.minutos} minutos (o 3, o 10: lo eliges al empezar).`),
     // Con los dos tests al día activados, la tarjeta dice cuál falta en vez de
     // callarse en cuanto hay uno hecho.
     esHoy && dosTestsAlDia(d) && hechos.length > 0 && h('p', { class: 'nota' },
@@ -357,7 +353,14 @@ function tarjetaPVT(d, fecha, hoy) {
     modosConTests(d).length
       ? h('button', { type: 'button', class: 'boton secundario', onclick: () => abrirHistoricoPVT() }, 'Ver el histórico')
       : null,
-    esHoy && filaAvisoPVT(d));
+    esHoy && tocaPvt(d, fecha) && filaAvisoPVT(d),
+    h('span', { class: 'etiqueta-campo suave' }, 'Cada cuánto te lo pido'),
+    h('div', { class: 'fila-marcas compacta' }, Object.entries(FRECUENCIAS_PVT).map(([k, t]) => h('button', { type: 'button',
+      class: `boton-marca${frecuenciaPVT(d) === k ? ' activo' : ''}`, 'aria-pressed': String(frecuenciaPVT(d) === k),
+      onclick: () => { estado.cambiar((x) => { x.perfil.pvtFrecuencia = k; }); programarAvisoPvt(); } }, t))),
+    h('p', { class: 'nota' }, 'Cada día, solo mientras mides tu línea base. Si recortas horas, solo los domingos, '
+      + 'para el semáforo: un test suelto vale porque el umbral del 11 % es el cambio mínimo entre dos medidas sueltas (Thompson 2022). '
+      + 'El resto del tiempo, en pausa.'));
 }
 
 // Velocidad con coma decimal, que es como escribe los números la app.
