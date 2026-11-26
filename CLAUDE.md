@@ -2110,5 +2110,8 @@ Luego, y las estadísticas son un cuadrante de cuánto ha hecho y cuánto no.
   dejando 1-2 es en torno al 90 %.
 - 0.94.4 (26-11-2026): «si salgo de la app no pita». El código del aviso está bien si el push llega; para saber dónde
   falla, Ajustes → Descansos → «Probar con la app cerrada (30 s)» (`probarServidor` en avisos-push.js): comprueba
-  navegador, permiso y servidor, apunta un fin de descanso a 30 s y dice qué ha pasado. Sospechas: el navegador (Dan
-  instaló la app desde Ecosia, que puede no entregar avisos con la app cerrada) o el ahorro de batería de Samsung.
+  navegador, permiso y servidor, apunta un fin de descanso a 30 s y dice qué ha pasado. La app la tiene instalada
+  desde Chrome; tras actualizar a la 0.94.4, ya pita con la app cerrada.
+- 0.94.5 (26-11-2026): una serie descendente nueva (nunca hecha con su regla) se compara con la última serie con bajadas
+  de ese ejercicio (mejor del mismo día de la rutina) en vez de con la del mismo puesto: su descendente del día 1 salía
+  frente a un 100 × 1 del 03-11 y sin grises en las bajadas. `ultimaEquivalente` y `tramosSerie` en sesion.js.

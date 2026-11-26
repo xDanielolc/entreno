@@ -1182,6 +1182,14 @@ export function vistaSesion(contenedor, { id }) {
     // Solo el mismo día de la rutina: otro día puede ser el pesado (Dan, 03-11-2026: en el remo moderado le salía
     // «67,5 × 6», que era una bajada del día de remo pesado).
     const lista = sesion.diaRutinaId ? antes.filter((x) => x.sesion.diaRutinaId === sesion.diaRutinaId) : antes;
+    // Una serie con bajadas se compara con tu última serie con bajadas (mejor del mismo día de la rutina): la del mismo
+    // puesto puede no tener ninguna (Dan, 26-11-2026: su descendente nueva salía frente a un 100 × 1 y sin grises).
+    const conBajadas = entrada.series[j]?.tramos?.length || usaTramos(entrada.series[j]?.tecnicas ?? []);
+    if (conBajadas) {
+      const deBajadas = (l) => l.filter((x) => x.serie.tramos?.some((t) => t.esfuerzo != null)).at(-1) ?? null;
+      const encontrada = deBajadas(lista) ?? deBajadas(antes);
+      if (encontrada) return encontrada;
+    }
     const ultima = lista.at(-1)?.sesion.id;
     const deEsa = lista.filter((x) => x.sesion.id === ultima);
     return deEsa.length ? deEsa[Math.min(k, deEsa.length - 1)] : null;
@@ -2209,7 +2217,9 @@ export function vistaSesion(contenedor, { id }) {
   function tramosSerie(ej, i, j, serie, tramos) {
     serie.tramos ??= tramosPropuestos(serie, planDe(ej, serie), null, d.perfil);
     const plan = planDe(ej, serie);
-    const anterior = plan ? sugerenciaSerie(d, ej, plan, { excluirSesion: id }).ultima?.serie : null;
+    let anterior = plan ? sugerenciaSerie(d, ej, plan, { excluirSesion: id }).ultima?.serie : null;
+    // Si esta serie nunca se ha hecho con bajadas, los grises salen de tu última serie con bajadas de este ejercicio.
+    if (!anterior?.tramos?.length && sesion.ejercicios[i]) anterior = ultimaEquivalente(ej, sesion.ejercicios[i], j)?.serie ?? anterior;
     const modoCarga = modoCargaDe(d, ej, serie, sesion);
     // Lo de la otra vez va en su columna, a la izquierda; abajo, la fila de total.
     const conAntes = false;
