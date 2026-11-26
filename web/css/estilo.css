@@ -2562,3 +2562,10 @@ details.como-llegas:not([open]) > summary { font-weight: 500; font-size: .92rem;
 .habitos-muestra { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: middle; }
 .habitos-leyenda { margin-top: 6px; }
 .habitos-ficha { text-align: left; }
+
+/* Cambiar o reordenar ejercicios en el entreno (0.94.1): el nombre arriba y los botones debajo, centrados */
+.lista-ordenar { display: flex; flex-direction: column; gap: .5rem; }
+.fila-ordenar { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: .4rem; padding: .5rem; border-radius: var(--radio-pequeno); border: 1px solid var(--borde); text-align: center; }
+.fila-ordenar .crece { flex: 1 0 100%; min-width: 0; }
+.fila-ordenar .boton-paso { width: 2.75rem; height: 2.75rem; padding: 0; }
+.fila-ordenar .boton.secundario { padding: .4rem .9rem; min-width: 0; }

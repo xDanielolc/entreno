@@ -220,7 +220,12 @@ async function arrancar() {
 
 function registrarServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
-  navigator.serviceWorker.register('./sw.js').catch((e) => console.warn('Service worker no registrado', e));
+  navigator.serviceWorker.register('./sw.js').then((registro) => {
+    // El código se sirve de la copia guardada: al volver a la app, que mire si hay versión nueva (en segundo plano).
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && navigator.onLine) registro.update().catch(() => {});
+    });
+  }).catch((e) => console.warn('Service worker no registrado', e));
   // Cuando llega una versión nueva del código, se recarga una sola vez para
   // usarla, salvo que se esté a mitad de entrenamiento escribiendo.
   // En la primera visita no hay versión anterior y no hace falta recargar.

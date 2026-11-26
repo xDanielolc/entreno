@@ -1,13 +1,13 @@
 // Service worker: permite abrir la app sin conexión.
 //
-// Estrategia «primero la red»: si hay internet se descarga siempre el código
-// más reciente (así las actualizaciones llegan solas en cada visita) y se
-// guarda una copia; sin internet se usa esa copia.
+// Estrategia «primero la copia» (desde la 0.94.1): al instalar una versión se
+// guardan todos sus archivos y desde ahí se sirven sin esperar a la red. Cuando
+// se publica otra versión, el navegador la instala sola y la app avisa.
 //
 // Solo se ocupa del CÓDIGO de la app. Los datos del usuario nunca pasan por
 // aquí: viven en el dispositivo (IndexedDB) y en su Google Drive.
 
-const VERSION = '0.94.0';
+const VERSION = '0.94.1';
 const CACHE = `entreno-${VERSION}`;
 // Las imágenes van en un almacén aparte que NO se borra al actualizar la app:
 // así se ven sin conexión aunque haya salido una versión nueva.
@@ -161,10 +161,16 @@ self.addEventListener('fetch', (evento) => {
     return;
   }
 
+  // El código: primero la copia de ESTA versión, que se guardó entera al instalarla. Antes iba primero a la red y,
+  // con poca cobertura (la del gimnasio), esperaba hasta 4 s por cada archivo: la app iba a tirones (Dan, 24-11-2026).
+  // Las versiones nuevas llegan igual: el navegador mira sw.js por su cuenta, instala la nueva con todos sus archivos
+  // y la app avisa con «Actualizar».
   evento.respondWith((async () => {
+    const deEstaVersion = await (await caches.open(CACHE)).match(peticion, { ignoreSearch: true });
+    if (deEstaVersion) return deEstaVersion;
     try {
-      // Con cobertura mala no se espera eternamente: a los 4 s se usa la copia.
-      const respuesta = await fetch(peticion, { cache: 'no-cache', signal: AbortSignal.timeout(4000) });
+      // Lo que no se guardó al instalar (pocas cosas): a la red, sin esperar eternamente.
+      const respuesta = await fetch(peticion, { cache: 'no-cache', signal: AbortSignal.timeout(6000) });
       if (respuesta.ok) {
         const cache = await caches.open(CACHE);
         cache.put(peticion, respuesta.clone());

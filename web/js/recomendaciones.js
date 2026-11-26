@@ -57,7 +57,18 @@ function terminadas(datos) {
 // Generales (pestaña Cuerpo)
 // ---------------------------------------------------------------------------
 
+// Se recuerdan mientras los datos no cambien y en la misma hora: al volver a Entrenar se ahorran unos 100 ms.
+const generalesRecordadas = new WeakMap();
 export function recomendacionesGenerales(datos, ahora = new Date()) {
+  const clave = `${datos.revision}|${Math.floor(ahora.getTime() / 3_600_000)}`;
+  const memo = generalesRecordadas.get(datos);
+  if (memo?.clave === clave) return memo.lista;
+  const lista = calcularGenerales(datos, ahora);
+  generalesRecordadas.set(datos, { clave, lista });
+  return lista;
+}
+
+function calcularGenerales(datos, ahora) {
   const lista = [];
   const sesiones = terminadas(datos);
   const semana = seriesSemanales(datos, ahora);

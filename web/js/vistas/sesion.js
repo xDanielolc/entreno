@@ -409,12 +409,68 @@ export function vistaSesion(contenedor, { id }) {
       ['Comentario del entrenamiento', 'bocadillo', () => { notasSesion.hidden = false; notasSesion.scrollIntoView({ block: 'center' }); notasSesion.querySelector('textarea').focus(); }],
       movil ? ['Ir a la app (el entreno sigue)', 'inicio', () => { location.hash = '#/'; }] : null,
       movil ? null : ['+ Añadir ejercicio', null, () => elegirEjercicio()],
+      sesion.ejercicios.length > 0 ? ['Cambiar o reordenar ejercicios', 'orden', () => ordenarEjercicios()] : null,
       ['Terminar entrenamiento', 'reloj', () => terminar()],
       ['Cancelar entrenamiento', 'cerrar', () => cancelar(), true],
     ].filter(Boolean);
     const cerrar = modal('Más opciones', h('div', { class: 'lista-selector lista-con-iconos' },
       opciones.map(([texto, ic, fn, peligro]) => h('button', { type: 'button', class: `boton-marca${peligro ? ' peligro-texto' : ''}`,
         onclick: () => { cerrar(); fn(); } }, ic && icono(ic), h('span', {}, texto)))));
+  }
+
+  // Cambiar un ejercicio por otro, quitarlo o moverlo de sitio sin salir del entreno (Dan: «cambiar dominadas
+  // negativas por positivas»). Solo para hoy: la rutina sigue igual.
+  function ordenarEjercicios() {
+    const caja = h('div', { class: 'lista-ordenar' });
+    modal('Cambiar o reordenar', caja);
+    const actual = () => estado.datos().sesiones.find((x) => x.id === id);
+    const mover = (i, paso) => {
+      cambiarSesion((s) => { const [x] = s.ejercicios.splice(i, 1); s.ejercicios.splice(i + paso, 0, x); });
+      // Si estabas viendo uno de los dos, lo sigues viendo.
+      const pos = guiado.get(id)?.pos ?? posicion;
+      if (pos === i) irA(i + paso); else if (pos === i + paso) irA(i);
+      pintar();
+    };
+    const cambiarPor = (i, viejo) => {
+      abrirSelector({
+        titulo: `Cambiar ${viejo?.nombre ?? 'el ejercicio'} por…`,
+        mios: estado.datos().ejercicios.filter((e) => !e.archivado && !e.borrado).sort((a, b) => a.nombre.localeCompare(b.nombre)),
+        marcarMio: (e) => actual()?.ejercicios.some((x) => x.ejercicioId === e.id) && 'Ya está hoy',
+        alElegirMio: (nuevo) => sustituir(i, nuevo),
+        alElegirCatalogo: (x) => {
+          const nuevo = ejercicioDesdeCatalogo(x);
+          estado.cambiar((datos) => { datos.ejercicios.push(nuevo); });
+          sustituir(i, nuevo);
+        },
+      });
+    };
+    const sustituir = (i, nuevo) => {
+      let antes;
+      cambiarSesion((s, datos) => { [antes] = s.ejercicios.splice(i, 1, entradaDeEjercicio(datos, nuevo, { excluirSesion: id })); });
+      aviso(`Hoy haces ${nuevo.nombre}`, { accion: { texto: 'Deshacer', fn: () => cambiarSesion((s) => { s.ejercicios.splice(i, 1, antes); }) } });
+      pintar();
+    };
+    const pintar = () => {
+      const s = actual();
+      if (!s) return;
+      const n = s.ejercicios.length;
+      caja.replaceChildren(...[
+        h('p', { class: 'nota centrado' }, 'Solo para hoy: tu rutina sigue igual.'),
+        ...s.ejercicios.map((entrada, i) => {
+          const e = estado.datos().ejercicios.find((x) => x.id === entrada.ejercicioId);
+          const hechas = entrada.series.filter((x) => x.hecha).length;
+          return h('div', { class: 'fila-ordenar' },
+            h('div', { class: 'crece' }, h('strong', {}, e?.nombre ?? 'Ejercicio'),
+              hechas > 0 && h('small', { class: 'bloque suave' }, hechas === 1 ? '1 serie hecha' : `${hechas} series hechas`)),
+            h('button', { type: 'button', class: 'boton-paso', 'aria-label': `Subir ${e?.nombre ?? ''}`, disabled: i === 0, onclick: () => mover(i, -1) }, '↑'),
+            h('button', { type: 'button', class: 'boton-paso', 'aria-label': `Bajar ${e?.nombre ?? ''}`, disabled: i === n - 1, onclick: () => mover(i, 1) }, '↓'),
+            h('button', { type: 'button', class: 'boton secundario', onclick: () => cambiarPor(i, e) }, 'Cambiar'),
+            h('button', { type: 'button', class: 'boton-icono', 'aria-label': `Quitar ${e?.nombre ?? ''}`,
+              onclick: () => { quitarEjercicio(i, e); pintar(); } }, icono('cerrar')));
+        }),
+      ].filter(Boolean));
+    };
+    pintar();
   }
 
   function pasoEntreEjercicios({ grande = false } = {}) {

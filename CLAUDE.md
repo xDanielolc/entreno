@@ -2081,3 +2081,20 @@ Luego, y las estadísticas son un cuadrante de cuánto ha hecho y cuánto no.
   (Ecosia), el móvil real y la fusión entre dos dispositivos.
 - Fuera de esta versión: avisos, rachas, importar el histórico de sus hojas (Excel en su carpeta de hábitos) y
   marcar solos el gym (por las sesiones) o la noche (por el Pomodoro).
+
+## Ronda 0.94.1 (26-11-2026): sus notas de To Do del 21 al 24-11
+
+- «¿Por qué me sale dos veces la misma rutina?» y «llevas 63 días sin la rutina de pierna»: en sus datos seguían activas
+  una copia de septiembre de «Movilidad para sentarse a meditar» y «PLPL Bilbo + Heavy Duty» (sin usar desde el 22-09),
+  y `queToca` elige, entre las rutinas recuperadas, la que hace más tiempo que no haces: ganaba la abandonada. Con su
+  visto bueno, las dos desactivadas en su cuenta (no borradas). Cómo elegir «Hoy te toca» entre fuerza y estirar, a la
+  espera de que elija entre tres maquetas.
+- «No va muy bien sin conexión» (él: «lento o se atasca»): el service worker iba primero a la red con 4 s de espera por
+  archivo; con poca cobertura (gimnasio) cada módulo podía esperar 4 s. Ahora el código sale de la copia de su versión,
+  guardada entera al instalarla («primero la copia»); con 5 s de latencia simulada la app pinta en 0,3 s. Las versiones
+  nuevas siguen llegando por `controllerchange` y, al volver a la app, `registro.update()`. OJO al probar en local: sin
+  subir la versión, el navegador sirve la copia vieja; borrar la caché `entreno-<versión>` o subir el número.
+- `recordsDe` y `recomendacionesGenerales` se recuerdan mientras no cambie `datos.revision` (con sus 450 entrenamientos
+  costaban más de 100 ms cada una al abrir Entrenar).
+- Entreno: «⋯ → Cambiar o reordenar ejercicios» (`ordenarEjercicios` en sesion.js): subir, bajar, cambiar por otro (de
+  los tuyos o de la lista general, con Deshacer) y quitar. Solo para hoy; la rutina no cambia.

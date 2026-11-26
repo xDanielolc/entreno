@@ -26,7 +26,17 @@ export function tiposDe(ej) {
 }
 
 // Todos los récords de un ejercicio: { tipo: { valor, fecha, texto, detalle } }.
+// Se recuerdan mientras los datos no cambien (cada cambio sube `revision`): con
+// cientos de entrenamientos, recalcularlos al volver a Entrenar costaba más de 100 ms.
+const recordados = new WeakMap();
 export function recordsDe(datos, ej) {
+  let memo = recordados.get(datos);
+  if (!memo || memo.revision !== datos.revision) recordados.set(datos, memo = { revision: datos.revision, por: new Map() });
+  if (!memo.por.has(ej.id)) memo.por.set(ej.id, calcularRecords(datos, ej));
+  return memo.por.get(ej.id);
+}
+
+function calcularRecords(datos, ej) {
   const series = seriesDeEjercicio(datos, ej.id).filter((x) => x.serie.tipo !== 'calentamiento');
   if (!series.length) return {};
   const salida = {};
