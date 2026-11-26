@@ -2115,3 +2115,9 @@ Luego, y las estadísticas son un cuadrante de cuánto ha hecho y cuánto no.
 - 0.94.5 (26-11-2026): una serie descendente nueva (nunca hecha con su regla) se compara con la última serie con bajadas
   de ese ejercicio (mejor del mismo día de la rutina) en vez de con la del mismo puesto: su descendente del día 1 salía
   frente a un 100 × 1 del 03-11 y sin grises en las bajadas. `ultimaEquivalente` y `tramosSerie` en sesion.js.
+- 0.94.6 (26-11-2026): el aviso del descanso con la app cerrada NO le llega (se corrigió: no pitaba hasta entrar). El
+  servidor funciona: `prueba_push_real.py` con 15 s y con 90 s llega al segundo. Con 40 s no llegó: los avisos de entre
+  25 y ~60 s pasan por el almacén KV, que tarda en verse desde el cron (consistencia eventual); sus descansos son de 2
+  min o más, así que no es eso. La prueba de Ajustes pasa a 20 s (el servidor la manda al momento, sin el cron) y exige
+  los avisos del descanso activados: si con el móvil bloqueado no suena, es el móvil (ahorro de batería de Samsung con
+  Chrome). Pendiente: el resultado de su prueba; si los de 25-60 s importan, pasar el almacén a un Durable Object.

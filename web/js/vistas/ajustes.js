@@ -222,11 +222,17 @@ export function vistaAjustes(contenedor) {
         : 'Este navegador no admite notificaciones; en el móvil, con la app instalada, sí.'),
       h('button', { type: 'button', class: 'boton secundario', onclick: probarAviso }, 'Probar la vibración'),
       // La prueba que de verdad importa: con la app cerrada, el aviso llega del servidor.
+      // 20 s: el servidor lo manda al momento, sin pasar por su reloj de cada minuto. Si así no suena con el móvil
+      // bloqueado, el aviso no llega al móvil (permiso, ahorro de batería), no es cosa del servidor.
       h('button', { type: 'button', class: 'boton secundario', onclick: async () => {
+        if (!estado.datos().perfil.avisarDescanso) {
+          aviso('Los avisos del descanso están apagados: actívalos arriba y vuelve a probar.', { tipo: 'error', ms: 10000 });
+          return;
+        }
         aviso('Comprobando…', { ms: 2000 });
-        const r = await probarServidor(30);
+        const r = await probarServidor(20);
         aviso(r.texto, { tipo: r.ok ? 'info' : 'error', ms: 15000 });
-      } }, 'Probar con la app cerrada (30 s)'),
+      } }, 'Probar con el móvil bloqueado (20 s)'),
       h('small', { class: 'nota' }, 'Suena y vibra al tocar y, con los avisos puestos, otra vez a los 10 s (bloquea el móvil para ver la notificación). '
         + 'Con la app delante suena el sonido propio de la app; con el móvil bloqueado, el de las notificaciones, que se cambia en los ajustes del móvil (Notificaciones → la app → sonido). '
         + 'Si no vibra, es cosa del móvil: en sus Ajustes → Notificaciones → la app (o Chrome), que las notificaciones vibren; '
