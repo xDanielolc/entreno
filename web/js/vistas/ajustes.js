@@ -235,6 +235,7 @@ export function vistaAjustes(contenedor) {
       } }, 'Probar con el móvil bloqueado (20 s)'),
       h('small', { class: 'nota' }, 'Suena y vibra al tocar y, con los avisos puestos, otra vez a los 10 s (bloquea el móvil para ver la notificación). '
         + 'Con la app delante suena el sonido propio de la app; con el móvil bloqueado, el de las notificaciones, que se cambia en los ajustes del móvil (Notificaciones → la app → sonido). '
+        + 'Para que suene con el móvil bloqueado, pon sus notificaciones en importancia alta («Alertar»): Ajustes del móvil → Notificaciones → la app (o Chrome). '
         + 'Si no vibra, es cosa del móvil: en sus Ajustes → Notificaciones → la app (o Chrome), que las notificaciones vibren; '
         + 'y en Sonido y vibración, que la vibración de notificaciones y de toques no esté a cero.'),
       h('div', { class: 'fila-campos' },

@@ -116,7 +116,7 @@ export async function probarServidor(segundos = 30) {
   sinServidorHasta = 0;
   try {
     const ok = await hablarConElServidor(todos(grupos));
-    return ok ? { ok: true, texto: `Apuntado. Bloquea el móvil YA: en ${segundos} s debe sonar «¡Descanso terminado!». Si no suena con la pantalla apagada, el móvil retiene los avisos de Chrome: Ajustes del móvil → Batería → Límites de uso en segundo plano → quita Chrome de «Aplicaciones en suspensión»; y Aplicaciones → Chrome → Batería → «Sin restricciones».` }
+    return ok ? { ok: true, texto: `Apuntado. Bloquea el móvil YA: en ${segundos} s debe sonar «¡Descanso terminado!». Si no suena con la pantalla apagada, pon los avisos de la app en importancia alta: Ajustes del móvil → Notificaciones → Chrome (o la app) → los avisos de esta web → «Alertar» o «Alta». Si aun así no suena: Batería → quita Chrome de las aplicaciones en suspensión.` }
       : { ok: false, texto: 'El servidor de avisos no ha aceptado el aviso. Vuelve a probar en un rato.' };
   } catch (e) {
     return { ok: false, texto: `No se ha podido apuntar el aviso (${e?.message || e}). Sin conexión no funciona; si tienes conexión, puede que este navegador no admita avisos con la app cerrada.` };

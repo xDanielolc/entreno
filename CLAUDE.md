@@ -2124,3 +2124,6 @@ Luego, y las estadísticas son un cuadrante de cuánto ha hecho y cuánto no.
 - 0.94.7 (26-11-2026): lo que dura el entreno en curso (`relojDesde(inicio)` en ui.js): cuenta desde `sesion.inicio`,
   así que sigue bien aunque salgas de la app, hasta terminar. Sale en la fila de la fecha del entreno, en la banda de
   arriba en las demás pantallas («En curso 43:16 · Volver») y en «Continuar entrenamiento · 42:10» de Entrenar.
+- 0.94.8 (26-11-2026): resuelto lo del aviso con la app cerrada. Era el móvil: con las notificaciones de la app en
+  importancia alta, suena con la pantalla apagada (lo comprobó Dan). Dicho en Ajustes → Descansos y en el resultado
+  de la prueba de 20 s.
