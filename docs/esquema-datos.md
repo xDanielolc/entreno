@@ -502,6 +502,10 @@ El paso 3 no es opcional. Es la red de seguridad.
   fecha para que dos dispositivos escriban en el mismo registro y la fusión junte las respuestas una a una.
   Las dos listas están en `COLECCIONES` de `fusion.js`. El día de los hábitos cambia a las 5:00
   (`HORA_CAMBIO_DIA` en `habitos.js`).
+- **v42 (0.94.2).** `rutina.cuentaDesde` (opcional, 'AAAA-MM-DD'): desde qué día se cuentan las semanas de la
+  rutina («semana 6»). Sin él, desde el primer entreno terminado con ella (sin contar lo importado de los Excel). A
+  partir de la semana 7 (`SEMANAS_REVISAR` = 6 semanas cumplidas), Entrenar avisa de revisarla; «Ya la he revisado»
+  pone `cuentaDesde` en hoy.
 
 ---
 

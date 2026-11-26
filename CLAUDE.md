@@ -2098,3 +2098,9 @@ Luego, y las estadísticas son un cuadrante de cuánto ha hecho y cuánto no.
   costaban más de 100 ms cada una al abrir Entrenar).
 - Entreno: «⋯ → Cambiar o reordenar ejercicios» (`ordenarEjercicios` en sesion.js): subir, bajar, cambiar por otro (de
   los tuyos o de la lista general, con Deshacer) y quitar. Solo para hoy; la rutina no cambia.
+- 0.94.2 (26-11-2026): esquema v42. «Hoy te toca» sigue rotando (lo eligió Dan entre tres maquetas: fuerza arriba, dos
+  tarjetas o rotar). Semanas de la rutina (su nota «que cuente el ciclo desde el día en que empiezo»: eran las 6-8
+  semanas de la rutina, no el ciclo Bilbo): `semanasDeRutina()` en rutinas.js cuenta desde `rutina.cuentaDesde` o, sin
+  él, desde el primer entreno terminado con ella; Entrenar dice «semana N» y, cumplidas 6 (`SEMANAS_REVISAR`), avisa de
+  revisarla (récords y medidas) con «Ya la he revisado», que vuelve a contar desde hoy (con Deshacer). La fecha se
+  cambia en la rutina → Opciones. «Si te cuesta, empieza con algo menos de peso» ya no sale en las rutinas de estirar.

@@ -2569,3 +2569,6 @@ details.como-llegas:not([open]) > summary { font-weight: 500; font-size: .92rem;
 .fila-ordenar .crece { flex: 1 0 100%; min-width: 0; }
 .fila-ordenar .boton-paso { width: 2.75rem; height: 2.75rem; padding: 0; }
 .fila-ordenar .boton.secundario { padding: .4rem .9rem; min-width: 0; }
+/* Aviso de revisar la rutina en Entrenar (0.94.2) */
+.aviso-revisar { margin: .6rem 0; padding: .6rem; border-radius: var(--radio-pequeno); background: var(--aviso-fondo); text-align: center; }
+.aviso-revisar .aviso-texto { margin: 0 0 .5rem; }

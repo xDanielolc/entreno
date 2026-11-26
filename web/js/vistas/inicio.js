@@ -39,7 +39,7 @@ function avisosDeHoy(d, { sinPeso = false } = {}) {
 }
 
 let preguntandoTutorial = false;
-import { avisoPlantillaNueva, empezarDia, enPuntos, queToca, rutinasActivas } from './rutinas.js';
+import { avisoPlantillaNueva, empezarDia, enPuntos, queToca, rutinasActivas, semanasDeRutina } from './rutinas.js';
 
 // ¿Toca de verdad entrenar hoy? Mira los músculos del día que toca y, si
 // alguno sigue tocado, dice cuándo estará listo. Y si llevas más días parado
@@ -68,12 +68,35 @@ function avisoCuandoToca(d, rutina, dia) {
   if (fechas.length) {
     const desdeUltima = Math.round((new Date(hoyISO()) - new Date(fechas.at(-1))) / 86_400_000);
     if (desdeUltima >= 4) {
+      // Lo del peso, solo en las rutinas con ejercicios que cansan (no en las de estirar).
       lineas.push(`Llevas ${desdeUltima} días sin esta rutina: toca ya.`
-        + (desdeUltima >= 10 ? ' Si te cuesta, empieza con algo menos de peso.' : ''));
+        + (desdeUltima >= 10 && musculos.size ? ' Si te cuesta, empieza con algo menos de peso.' : ''));
     }
   }
   if (!lineas.length) return null;
   return h('p', { class: 'aviso-texto' }, lineas.join(' '));
+}
+
+// Cumplidas las semanas de revisar una rutina con ejercicios de fuerza: compara y ajusta (su rutina se revisa a las
+// 6-8 semanas: la serie máxima de cada básico y los perímetros, frente a los del principio).
+function avisoRevisarRutina(d, rutina, semanas) {
+  if (!semanas?.revisar) return null;
+  const conFuerza = rutina.dias.some((dia) => dia.ejercicios.some((it) => {
+    const ej = d.ejercicios.find((e) => e.id === it.ejercicioId);
+    return ej && cuentaParaFatiga(ej);
+  }));
+  if (!conFuerza) return null;
+  return h('div', { class: 'aviso-revisar' },
+    h('p', { class: 'aviso-texto' }, `Vas por la semana ${semanas.semana} de esta rutina: toca revisarla. `
+      + 'Compara tu serie máxima de cada básico y tus medidas con las del principio, y sube o baja series en lo que no avance.'),
+    h('div', { class: 'fila-botones' },
+      h('a', { class: 'boton secundario', href: '#/cuerpo/records' }, 'Ver mis récords'),
+      h('button', { type: 'button', class: 'boton secundario', onclick: () => {
+        const antes = rutina.cuentaDesde ?? null;
+        estado.cambiar((datos) => { const r = datos.rutinas.find((x) => x.id === rutina.id); if (r) r.cuentaDesde = hoyISO(); });
+        aviso('Revisada: las semanas vuelven a contar desde hoy.', { accion: { texto: 'Deshacer',
+          fn: () => estado.cambiar((datos) => { const r = datos.rutinas.find((x) => x.id === rutina.id); if (r) r.cuentaDesde = antes; }) } });
+      } }, 'Ya la he revisado')));
 }
 
 function cuandoTexto(fecha, ahora) {
@@ -210,11 +233,13 @@ export function vistaInicio(contenedor) {
           h('div', { class: 'antetitulo' }, toca.descansoHoy ? 'Lo siguiente' : 'Hoy te toca'),
           // «Día 1: Torso · 65-70 min»: la duración pasa a la línea de debajo.
           h('h2', {}, dia.nombre.replace(/\s*·\s*[\d-]+\s*min$/, '')),
-          h('p', { class: 'suave' }, [rutina.nombre, dia.nombre.match(/([\d-]+)\s*min$/)?.[1] && `unos ${dia.nombre.match(/([\d-]+)\s*min$/)[1]} min`,
+          h('p', { class: 'suave' }, [rutina.nombre, semanasDeRutina(d, rutina) && `semana ${semanasDeRutina(d, rutina).semana}`,
+            dia.nombre.match(/([\d-]+)\s*min$/)?.[1] && `unos ${dia.nombre.match(/([\d-]+)\s*min$/)[1]} min`,
             toca.motivo].filter(Boolean).join(' · ')),
           avisoPlantillaNueva(rutina),
           dia.ejercicios.length ? listaDelDia(d, dia) : h('p', { class: 'suave' }, 'Este día no tiene ejercicios todavía'),
           avisoCuandoToca(d, rutina, dia),
+          avisoRevisarRutina(d, rutina, semanasDeRutina(d, rutina)),
           h('button', { class: 'boton grande', onclick: () => empezarConRutina(dia) }, toca.descansoHoy ? 'Empezar igualmente' : 'Empezar'),
           h('button', { class: 'boton secundario', onclick: elegirDia }, 'Otro día de la rutina'),
           // Las explicaciones, en un cartel aparte.

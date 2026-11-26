@@ -82,6 +82,19 @@ export function queToca(datos, recuperacion = null, ahora = new Date()) {
   return { ...opcion(proxima.r, `hoy no toca según tus días; la siguiente es ${cuando}`), descansoHoy: true, alternativas };
 }
 
+// Semanas que llevas con una rutina: desde `rutina.cuentaDesde` (el día que digas) o, sin él, desde tu primer
+// entreno terminado con ella. Cumplidas 6 semanas, toca revisarla (Dan: «que cuente el ciclo desde el día en que
+// empiezo»; su rutina se revisa a las 6-8 semanas).
+export const SEMANAS_REVISAR = 6;
+export function semanasDeRutina(datos, rutina, hoy = hoyISO()) {
+  const desde = rutina.cuentaDesde ?? datos.sesiones
+    .filter((s) => !s.borrada && s.estado === 'terminada' && s.rutinaId === rutina.id && s.origen !== 'importado-excel')
+    .map((s) => s.fecha).sort()[0];
+  if (!desde) return null;
+  const dias = Math.max(0, Math.round((new Date(hoy) - new Date(desde)) / 86_400_000));
+  return { desde, dias, semana: Math.floor(dias / 7) + 1, revisar: dias >= SEMANAS_REVISAR * 7 };
+}
+
 // Día que toca: el siguiente al del último entrenamiento terminado de esa rutina.
 export function proximoDia(datos, rutina) {
   const hechas = datos.sesiones
@@ -395,6 +408,16 @@ export function vistaFormularioRutina(contenedor, { id }) {
             } }, letra))),
           h('small', { class: 'nota' }, 'Sin días fijos, la app propone esta rutina cuando sus músculos están recuperados. '
             + 'Con días fijos, solo esos días. Sirve para combinar dos rutinas activas: una con días fijos y otra libre, por ejemplo.')),
+
+        // Desde qué día se cuentan sus semanas (vacío: desde el primer entreno con ella).
+        existente && h('div', { class: 'campo' },
+          h('span', { class: 'etiqueta-campo' }, 'Semanas: desde qué día se cuentan'),
+          h('input', { type: 'date', value: borrador.cuentaDesde ?? semanasDeRutina(d, borrador)?.desde ?? '', max: hoyISO(),
+            'aria-label': 'Desde qué día se cuentan las semanas',
+            onchange: (e) => { borrador.cuentaDesde = e.target.value || null; repintar(); } }),
+          h('small', { class: 'nota' }, semanasDeRutina(d, borrador)
+            ? `Vas por la semana ${semanasDeRutina(d, borrador).semana}. A las ${SEMANAS_REVISAR} semanas, Entrenar te avisa de revisarla.`
+            : 'Empieza a contar el día de tu primer entreno con ella.')),
 
         sedesActivas(d).length > 0 && campo('Dónde se hace', selector([['', 'En cualquier sitio'],
           ...sedesActivas(d).map((s) => [s.id, nombreSede(d, s.id)])], borrador.sedeId ?? '',

@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 41;
+export const VERSION_ACTUAL = 42;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -795,6 +795,12 @@ const MIGRACIONES = {
     datos.habitos ??= [];
     datos.registroHabitos ??= [];
     datos.version = 41;
+    return datos;
+  },
+  // v42: `rutina.cuentaDesde` (opcional, 'AAAA-MM-DD'): desde qué día se cuentan las semanas de la rutina. Sin él,
+  // desde el primer entreno terminado con ella. No hay nada que convertir.
+  41: (datos) => {
+    datos.version = 42;
     return datos;
   },
 };
