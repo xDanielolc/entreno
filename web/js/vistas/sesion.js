@@ -13,7 +13,7 @@ import { guiaTrasPrueba, marcarVista, pintarGuia, pista } from './tutorial.js';
 import { queEs } from './glosario.js';
 import { relojEnMarcha, relojSerie } from './reloj-serie.js';
 import { duracionTexto } from './intervalos.js';
-import { ayuda, cerrarCarteles, modal, selector } from '../ui.js';
+import { ayuda, cerrarCarteles, modal, relojDesde, selector } from '../ui.js';
 import { PRESETS_CICLO, aplicarPreset } from '../ciclos.js';
 import { renovarAlTocar } from '../sincronizacion.js';
 import * as estado from '../estado.js';
@@ -179,6 +179,9 @@ export function vistaSesion(contenedor, { id }) {
 
     !enCurso && h('h1', {}, 'Entrenamiento'),
     h('div', { class: 'fila-cabecera-entreno' },
+      // Lo que llevas entrenando: cuenta desde la hora de empezar, aunque salgas de la app.
+      enCurso && sesion.inicio && h('span', { class: 'duracion-entreno', title: 'Tiempo de entrenamiento' },
+        icono('reloj'), relojDesde(sesion.inicio, { 'aria-label': 'Tiempo de entrenamiento' })),
       h('input', { type: 'date', class: 'fecha', value: sesion.fecha, 'aria-label': 'Fecha',
         onchange: (e) => e.target.value && cambiarSesion((s) => moverFecha(s, e.target.value)) }),
       sedesActivas(d).length > 0 && selector([['', 'Lugar sin indicar'], ...sedesActivas(d).map((s) => [s.id, nombreSede(d, s.id)])], sesion.sedeId ?? '',

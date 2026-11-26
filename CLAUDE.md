@@ -2121,3 +2121,6 @@ Luego, y las estadísticas son un cuadrante de cuánto ha hecho y cuánto no.
   min o más, así que no es eso. La prueba de Ajustes pasa a 20 s (el servidor la manda al momento, sin el cron) y exige
   los avisos del descanso activados: si con el móvil bloqueado no suena, es el móvil (ahorro de batería de Samsung con
   Chrome). Pendiente: el resultado de su prueba; si los de 25-60 s importan, pasar el almacén a un Durable Object.
+- 0.94.7 (26-11-2026): lo que dura el entreno en curso (`relojDesde(inicio)` en ui.js): cuenta desde `sesion.inicio`,
+  así que sigue bien aunque salgas de la app, hasta terminar. Sale en la fila de la fecha del entreno, en la banda de
+  arriba en las demás pantallas («En curso 43:16 · Volver») y en «Continuar entrenamiento · 42:10» de Entrenar.

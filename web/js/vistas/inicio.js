@@ -2,7 +2,7 @@ import * as estado from '../estado.js';
 import { sedeInicial } from '../sedes.js';
 import { barraModoPrueba } from '../modo-prueba.js';
 import { planesDeItem, resumenPlanes, seriesDesdePlan } from '../series.js';
-import { anadir, aviso, h, hoyISO, modal, nuevoId } from '../ui.js';
+import { anadir, aviso, h, hoyISO, modal, nuevoId, relojDesde } from '../ui.js';
 import { tarjetaRecuperacion, tarjetaSugerenciasAjuste } from './cuerpo.js';
 import { tarjetaInstalar } from './instalar.js';
 import { pista } from './tutorial.js';
@@ -227,7 +227,8 @@ export function vistaInicio(contenedor) {
           h('a', { class: 'boton', href: `#/sesion/${enCurso.id}` }, 'Seguir con la prueba'),
           h('button', { class: 'boton secundario', onclick: () => estado.cambiar((x) => { x.sesiones = x.sesiones.filter((s) => s.id !== enCurso.id); }) }, 'Borrar la prueba')))
       : enCurso
-      ? h('a', { class: 'boton grande', href: `#/sesion/${enCurso.id}` }, 'Continuar entrenamiento')
+      ? h('a', { class: 'boton grande', href: `#/sesion/${enCurso.id}` }, 'Continuar entrenamiento',
+        enCurso.inicio && [' · ', relojDesde(enCurso.inicio)])
       : dia
         ? h('section', { class: 'tarjeta tarjeta-hoy' },
           h('div', { class: 'antetitulo' }, toca.descansoHoy ? 'Lo siguiente' : 'Hoy te toca'),

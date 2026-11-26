@@ -7,7 +7,7 @@ import { PESTANAS_OPCIONALES } from './esquema.js';
 import { cargarCreditos, imagenDeEjercicio } from './imagenes.js';
 import { MUSCULOS, archivoCapa } from './musculos.js';
 import { sincronizar, situacionActual } from './sincronizacion.js';
-import { aviso, h } from './ui.js';
+import { aviso, h, relojDesde } from './ui.js';
 import { textoSituacion, vistaAjustes } from './vistas/ajustes.js';
 import { vistaBienvenida } from './vistas/bienvenida.js';
 import { vistaEjercicios, vistaFormularioEjercicio } from './vistas/ejercicios.js';
@@ -136,7 +136,8 @@ function pintarBandaEntreno() {
   const enCurso = d?.sesiones?.find((s) => s.estado === 'en-curso' && !s.borrada && !s.tutorial);
   if (!enCurso || location.hash === `#/sesion/${enCurso.id}`) return;
   const banda = h('a', { class: 'banda-entreno', href: `#/sesion/${enCurso.id}` },
-    h('span', { class: 'con-icono' }, icono('reloj'), 'Entrenamiento en curso'),
+    h('span', { class: 'con-icono' }, icono('reloj'), h('span', {}, 'En curso'),
+      enCurso.inicio && relojDesde(enCurso.inicio, { class: 'reloj-desde reloj-banda' })),
     h('strong', {}, 'Volver'));
   document.querySelector('.barra-superior').after(banda);
 }

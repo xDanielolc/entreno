@@ -2572,3 +2572,7 @@ details.como-llegas:not([open]) > summary { font-weight: 500; font-size: .92rem;
 /* Aviso de revisar la rutina en Entrenar (0.94.2) */
 .aviso-revisar { margin: .6rem 0; padding: .6rem; border-radius: var(--radio-pequeno); background: var(--aviso-fondo); text-align: center; }
 .aviso-revisar .aviso-texto { margin: 0 0 .5rem; }
+/* Lo que dura el entreno en curso (0.94.7) */
+.duracion-entreno { display: inline-flex; align-items: center; gap: .3rem; font-family: var(--fuente-numeros); font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
+.reloj-desde { font-variant-numeric: tabular-nums; }
+.reloj-banda { font-weight: 700; margin-left: .2rem; }

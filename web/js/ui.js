@@ -123,6 +123,26 @@ export function formatearTiempo(seg) {
   return h ? `${h}:${dos(m)}:${dos(r)}` : `${m}:${dos(r)}`;
 }
 
+// Un reloj que cuenta desde `inicio` (fecha ISO): sale de la hora a la que empezaste, así que sigue bien aunque
+// cierres la app o apagues la pantalla (Dan, 26-11-2026). «42:10», «1:05:30». Se para solo al quitarlo de la pantalla.
+export function relojDesde(inicio, atributos = {}) {
+  const el = h('span', { class: 'reloj-desde', ...atributos });
+  const desde = new Date(inicio).getTime();
+  const dos = (x) => String(x).padStart(2, '0');
+  const pintar = () => {
+    const s = Math.max(0, Math.floor((Date.now() - desde) / 1000));
+    const horas = Math.floor(s / 3600), min = Math.floor((s % 3600) / 60);
+    el.textContent = horas ? `${horas}:${dos(min)}:${dos(s % 60)}` : `${min}:${dos(s % 60)}`;
+  };
+  pintar();
+  let visto = false, sinVer = 0;
+  const reloj = setInterval(() => {
+    if (el.isConnected) { visto = true; pintar(); return; }
+    if (visto || ++sinVer > 5) clearInterval(reloj);
+  }, 1000);
+  return el;
+}
+
 // Número desde un campo de texto, admitiendo coma decimal.
 export function leerNumero(texto) {
   if (texto == null) return null;
