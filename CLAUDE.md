@@ -2127,3 +2127,9 @@ Luego, y las estadísticas son un cuadrante de cuánto ha hecho y cuánto no.
 - 0.94.8 (26-11-2026): resuelto lo del aviso con la app cerrada. Era el móvil: con las notificaciones de la app en
   importancia alta, suena con la pantalla apagada (lo comprobó Dan). Dicho en Ajustes → Descansos y en el resultado
   de la prueba de 20 s.
+- 0.94.9 (26-11-2026): esquema v43. Dan quería que el fin del descanso sonara y vibrara siempre, también en silencio;
+  con la app cerrada lo decide Android (canal de notificaciones de Chrome: en silencio solo vibra, y la vibración se
+  activa en Notificaciones → Chrome → la app). Eligió «pantalla encendida» frente a hacer una app de Android:
+  `web/js/pantalla.js` pide el Wake Lock mientras hay un entreno en curso y la app se ve (lo vuelve a pedir al volver
+  a la app y lo suelta al terminar), y así avisa la propia app, con su sonido (volumen multimedia) y vibración.
+  Ajustes → Descansos → «Pantalla encendida mientras entrenas» (`perfil.pantallaEncendida`, encendida si falta).

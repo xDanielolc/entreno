@@ -220,6 +220,16 @@ export function vistaAjustes(contenedor) {
       h('small', { class: 'nota' }, puedeNotificar()
         ? 'Con la app instalada: mientras dura el descanso, la notificación va diciendo cuánto queda; al acabar, suena y vibra aunque tengas la pantalla apagada.'
         : 'Este navegador no admite notificaciones; en el móvil, con la app instalada, sí.'),
+      // Con la app delante avisa ella, y ella sí suena y vibra con el móvil en silencio.
+      (() => {
+        const activo = d.perfil.pantallaEncendida !== false;
+        return [h('div', { class: 'fila-marcas compacta' },
+          h('button', { type: 'button', class: `boton-marca${activo ? ' activo' : ''}`, 'aria-pressed': String(activo),
+            onclick: () => estado.cambiar((x) => { x.perfil.pantallaEncendida = !activo; }) },
+          activo ? 'Pantalla encendida mientras entrenas' : 'La pantalla se apaga sola mientras entrenas')),
+        h('small', { class: 'nota' }, 'Con la app delante, el fin de cada descanso suena y vibra siempre, también con el móvil en silencio. '
+          + 'La pantalla vuelve a apagarse sola al terminar el entreno o al salir de la app. Gasta algo más de batería.')];
+      })(),
       h('button', { type: 'button', class: 'boton secundario', onclick: probarAviso }, 'Probar la vibración'),
       // La prueba que de verdad importa: con la app cerrada, el aviso llega del servidor.
       // 20 s: el servidor lo manda al momento, sin pasar por su reloj de cada minuto. Si así no suena con el móvil

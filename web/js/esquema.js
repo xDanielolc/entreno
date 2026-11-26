@@ -5,7 +5,7 @@
 // y se añade una función a MIGRACIONES que convierta de la versión anterior
 // a la nueva. Nunca se modifica una migración ya publicada.
 
-export const VERSION_ACTUAL = 42;
+export const VERSION_ACTUAL = 43;
 
 export const TIPOS_CARGA = {
   peso:         { etiqueta: 'Peso',            unidad: 'kg', descripcion: 'Kilos de barra, mancuernas o máquina' },
@@ -801,6 +801,12 @@ const MIGRACIONES = {
   // desde el primer entreno terminado con ella. No hay nada que convertir.
   41: (datos) => {
     datos.version = 42;
+    return datos;
+  },
+  // v43: `perfil.pantallaEncendida` (opcional, booleano): la pantalla no se apaga mientras entrenas con la app delante.
+  // Sin él, sí (encendida). No hay nada que convertir.
+  42: (datos) => {
+    datos.version = 43;
     return datos;
   },
 };

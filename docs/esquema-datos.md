@@ -506,6 +506,8 @@ El paso 3 no es opcional. Es la red de seguridad.
   rutina («semana 6»). Sin él, desde el primer entreno terminado con ella (sin contar lo importado de los Excel). A
   partir de la semana 7 (`SEMANAS_REVISAR` = 6 semanas cumplidas), Entrenar avisa de revisarla; «Ya la he revisado»
   pone `cuentaDesde` en hoy.
+- **v43 (0.94.9).** `perfil.pantallaEncendida` (opcional, booleano): con un entreno en curso y la app delante, la
+  pantalla no se apaga (Wake Lock, `pantalla.js`). Sin él, encendida; `false` la deja apagarse.
 
 ---
 
