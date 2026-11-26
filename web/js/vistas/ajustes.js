@@ -8,6 +8,7 @@ import { ADELANTO_SEMANAL_MIN, NECESIDAD_SUENO_POR_DEFECTO, SUENO_MINIMO_H, hora
 import { activarAvisoPvt, activarAvisoPvtTarde, programarAvisoPvt, quitarAvisoPvt, quitarAvisoPvtTarde } from './pvt.js';
 import { VERSION_APP } from '../version.js';
 import { anadir, aviso, confirmar, h, hoyISO, leerNumero } from '../ui.js';
+import { probarServidor } from '../avisos-push.js';
 import { DESCANSO_ESTIRAMIENTOS_POR_DEFECTO, DESCANSO_TRAMOS_POR_DEFECTO, RESPIRACION_POR_DEFECTO, activarNotificaciones, probarAviso, puedeNotificar } from './descanso.js';
 import { TIPOS_SEDE, nuevaSede, sedesActivas } from '../sedes.js';
 import { TEXTO_AVISO, guardarPruebaEnCuenta } from '../modo-prueba.js';
@@ -220,6 +221,12 @@ export function vistaAjustes(contenedor) {
         ? 'Con la app instalada: mientras dura el descanso, la notificación va diciendo cuánto queda; al acabar, suena y vibra aunque tengas la pantalla apagada.'
         : 'Este navegador no admite notificaciones; en el móvil, con la app instalada, sí.'),
       h('button', { type: 'button', class: 'boton secundario', onclick: probarAviso }, 'Probar la vibración'),
+      // La prueba que de verdad importa: con la app cerrada, el aviso llega del servidor.
+      h('button', { type: 'button', class: 'boton secundario', onclick: async () => {
+        aviso('Comprobando…', { ms: 2000 });
+        const r = await probarServidor(30);
+        aviso(r.texto, { tipo: r.ok ? 'info' : 'error', ms: 15000 });
+      } }, 'Probar con la app cerrada (30 s)'),
       h('small', { class: 'nota' }, 'Suena y vibra al tocar y, con los avisos puestos, otra vez a los 10 s (bloquea el móvil para ver la notificación). '
         + 'Con la app delante suena el sonido propio de la app; con el móvil bloqueado, el de las notificaciones, que se cambia en los ajustes del móvil (Notificaciones → la app → sonido). '
         + 'Si no vibra, es cosa del móvil: en sus Ajustes → Notificaciones → la app (o Chrome), que las notificaciones vibren; '

@@ -100,6 +100,29 @@ export function programarPush(avisos, grupo = 'pvt') {
   return esta.promesa;
 }
 
+// Prueba de punta a punta (Ajustes → Descansos): apunta un fin de descanso dentro de `segundos` en el servidor y dice
+// qué ha pasado, para saber si falla el permiso, el navegador o el servidor (Dan, 26-11-2026: «si salgo de la app no
+// pita»). Devuelve { ok, texto }.
+export async function probarServidor(segundos = 30) {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    return { ok: false, texto: 'Este navegador no admite avisos con la app cerrada. Instala la app desde Chrome y prueba ahí.' };
+  }
+  if (Notification.permission !== 'granted') return { ok: false, texto: 'Falta el permiso de notificaciones en este móvil: actívalo arriba y vuelve a probar.' };
+  if (!hayServidorDeAvisos()) return { ok: false, texto: 'La prueba solo funciona en la app publicada, no en la de pruebas.' };
+  const grupos = leerGrupos();
+  grupos.descanso = [{ tipo: 'descanso', cuando: Date.now() + segundos * 1000 }];
+  try { localStorage.setItem(CLAVE_GRUPOS, JSON.stringify(grupos)); } catch { /* sin almacén */ }
+  await apuntarParaElSW(grupos);
+  sinServidorHasta = 0;
+  try {
+    const ok = await hablarConElServidor(todos(grupos));
+    return ok ? { ok: true, texto: `Apuntado. Bloquea el móvil: en ${segundos} s debe sonar «¡Descanso terminado!». Si no suena, el móvil está frenando la app (ahorro de batería) o el navegador no entrega los avisos.` }
+      : { ok: false, texto: 'El servidor de avisos no ha aceptado el aviso. Vuelve a probar en un rato.' };
+  } catch (e) {
+    return { ok: false, texto: `No se ha podido apuntar el aviso (${e?.message || e}). Sin conexión no funciona; si tienes conexión, puede que este navegador no admita avisos con la app cerrada.` };
+  }
+}
+
 // Si el servidor no contesta (aún no existe, o no hay red), no se insiste hasta pasados diez minutos.
 let sinServidorHasta = 0;
 

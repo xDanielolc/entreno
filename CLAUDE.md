@@ -2108,3 +2108,7 @@ Luego, y las estadísticas son un cuadrante de cuánto ha hecho y cuánto no.
   (su 90 × 5 del 03-11). El gris de la máxima y de las bajadas es ahora su rango (`grisRepeticiones` en sesion.js), nunca
   lo de la última vez. El salto de 90 a 102,5 kg era correcto: 90 × 5 dejando 2 da un 1RM de unos 114 kg, y 1-2
   dejando 1-2 es en torno al 90 %.
+- 0.94.4 (26-11-2026): «si salgo de la app no pita». El código del aviso está bien si el push llega; para saber dónde
+  falla, Ajustes → Descansos → «Probar con la app cerrada (30 s)» (`probarServidor` en avisos-push.js): comprueba
+  navegador, permiso y servidor, apunta un fin de descanso a 30 s y dice qué ha pasado. Sospechas: el navegador (Dan
+  instaló la app desde Ecosia, que puede no entregar avisos con la app cerrada) o el ahorro de batería de Samsung.
