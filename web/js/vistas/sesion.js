@@ -1256,6 +1256,17 @@ export function vistaSesion(contenedor, { id }) {
     const v = s.objetivoSuperar ?? s.esfuerzoObjetivo;
     return v != null ? formatearNumero(v) : null;
   }
+  // El gris de la casilla de repeticiones. En la máxima y en las bajadas, su rango («1-2», «3-5»): nunca lo de la
+  // última vez (Dan, 26-11-2026: arriba decía 1-2 y en gris salía el 5 de su 90 × 5 del 03-11).
+  function grisRepeticiones(ej, serie) {
+    const plan = planDe(ej, serie);
+    if (plan && (esMaxima(plan) || esBajada(plan))) {
+      const r = plan.progresion?.objetivoEsfuerzo ?? plan.objetivoEsfuerzo;
+      if (r?.length) return r[0] === r[1] ? formatearNumero(r[0]) : `${formatearNumero(r[0])}-${formatearNumero(r[1])}`;
+    }
+    if (serie.objetivo != null) return formatearNumero(serie.objetivo);
+    return objetivoHoyDe(ej, serie) ?? ultimaDe(ej, serie)?.esfuerzo ?? '';
+  }
   // Lo que hiciste la última vez en esta serie (para el gris de las casillas vacías).
   function ultimaDe(ej, serie) {
     const plan = planDe(ej, serie);
@@ -2066,8 +2077,7 @@ export function vistaSesion(contenedor, { id }) {
           h('span', { class: 'et' }, unidadEsfuerzo(ej)),
           h('input', { type: 'text', inputmode: 'decimal', 'aria-label': TIPOS_ESFUERZO[ej.esfuerzo.tipo].etiqueta,
             value: serie.esfuerzo ?? '',
-            placeholder: serie.esfuerzo == null ? (serie.objetivo != null ? formatearNumero(serie.objetivo)
-              : objetivoHoyDe(ej, serie) ?? ultimaDe(ej, serie)?.esfuerzo ?? '') : '',
+            placeholder: serie.esfuerzo == null ? grisRepeticiones(ej, serie) : '',
             oninput: (e) => {
               actualizar((x) => {
                 const antes = serieCompleta(ej, x);

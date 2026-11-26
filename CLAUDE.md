@@ -2104,3 +2104,7 @@ Luego, y las estadísticas son un cuadrante de cuánto ha hecho y cuánto no.
   él, desde el primer entreno terminado con ella; Entrenar dice «semana N» y, cumplidas 6 (`SEMANAS_REVISAR`), avisa de
   revisarla (récords y medidas) con «Ya la he revisado», que vuelve a contar desde hoy (con Deshacer). La fecha se
   cambia en la rutina → Opciones. «Si te cuesta, empieza con algo menos de peso» ya no sale en las rutinas de estirar.
+- 0.94.3 (26-11-2026, desde el gimnasio): en la serie máxima, arriba decía «1-2» y el gris de las repeticiones decía 5
+  (su 90 × 5 del 03-11). El gris de la máxima y de las bajadas es ahora su rango (`grisRepeticiones` en sesion.js), nunca
+  lo de la última vez. El salto de 90 a 102,5 kg era correcto: 90 × 5 dejando 2 da un 1RM de unos 114 kg, y 1-2
+  dejando 1-2 es en torno al 90 %.
