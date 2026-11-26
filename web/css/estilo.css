@@ -2576,3 +2576,7 @@ details.como-llegas:not([open]) > summary { font-weight: 500; font-size: .92rem;
 .duracion-entreno { display: inline-flex; align-items: center; gap: .3rem; font-family: var(--fuente-numeros); font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
 .reloj-desde { font-variant-numeric: tabular-nums; }
 .reloj-banda { font-weight: 700; margin-left: .2rem; }
+
+/* Fases de los hábitos (0.95.0). */
+.habitos-subir { border-color: var(--acento); }
+.habitos-col-nombre .habitos-fase { color: var(--acento); font-weight: 700; }

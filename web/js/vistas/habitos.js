@@ -4,9 +4,10 @@
 // Al final, la lista de hábitos para editarla o pegar una entera.
 import * as estado from '../estado.js';
 import {
-  BLOQUES, DIAS_SEMANA, ENLACES, TODOS_LOS_DIAS, aplazar, cuenta, cuentas, delDia, diaDeHabitos, diaSemana, esEstrellas,
-  estadoDe, habitosActivos, leerLista, mediaEstrellas, pendientes, porcentaje, responder, siguienteTarjeta, sumarDias,
-  textoDias, toca, valorDe,
+  BLOQUES, DIAS_SEMANA, ENLACES, SUBIR_RACHA, SUBIR_TOTAL, TODOS_LOS_DIAS, aplazar, cuenta, cuentas, delDia,
+  diaDeHabitos, diaSemana, esEstrellas, estadoDe, faseActual, habitosActivos, leerLista, listoParaSubir, mediaEstrellas,
+  minimoDe, pendientes, ponerEscalera, ponerFase, porcentaje, progresoFase, responder, siguienteTarjeta, sumarDias,
+  textoDias, tieneFases, toca, valorDe,
 } from '../habitos.js';
 import { aviso, confirmar, fechaLarga, h, nuevoId } from '../ui.js';
 
@@ -30,10 +31,37 @@ const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', '
 export function vistaHabitos(contenedor) {
   const d = estado.datos();
   const hoy = diaDeHabitos();
+  const paraSubir = habitosActivos(d).find((x) => listoParaSubir(d, x, hoy));
   contenedor.append(
+    paraSubir ? tarjetaSubir(d, paraSubir, hoy) : '',
     habitosActivos(d).length ? tarjetaDelDia(d, hoy) : tarjetaPrimeraVez(),
     habitosActivos(d).length ? cuadrante(d, hoy) : '',
     editor(d, hoy));
+}
+
+// ---------------------------------------------------------------- subir de fase
+// Sale encima de la tarjeta del día cuando un hábito ha cumplido lo de su fase. No sube solo (lo pidió Dan).
+function tarjetaSubir(d, x, hoy) {
+  const n = faseActual(x);
+  const p = progresoFase(d, x, hoy);
+  const motivo = p.racha >= p.faltaRacha ? `${p.racha} días seguidos` : `${p.total} días hechos`;
+  return h('section', { class: 'tarjeta habitos-tarjeta habitos-subir centrado' },
+    h('p', { class: 'habitos-progreso' }, `${x.nombre} · ${motivo} en la fase ${n + 1}`),
+    h('h2', {}, `¿Subes a la fase ${n + 2}?`),
+    h('p', { class: 'habitos-minimo' }, x.fases[n + 1].minimo),
+    h('div', { class: 'habitos-botones' },
+      h('button', { type: 'button', class: 'boton grande habitos-si', onclick: () => estado.cambiar((y) => {
+        const z = y.habitos.find((w) => w.id === x.id); if (z) ponerFase(z, n + 1, hoy);
+      }) }, 'Subir'),
+      h('button', { type: 'button', class: 'boton grande secundario', onclick: () => estado.cambiar((y) => {
+        const z = y.habitos.find((w) => w.id === x.id); if (z) z.faseNoHasta = hoy;
+      }) }, 'Todavía no')));
+}
+
+function textoFase(d, x, hoy) {
+  if (!tieneFases(x)) return '';
+  const p = progresoFase(d, x, hoy);
+  return ` · Fase ${faseActual(x) + 1} de ${x.fases.length} (${p.racha}/${p.faltaRacha} seguidos, ${p.total}/${p.faltaTotal})`;
 }
 
 // ---------------------------------------------------------------- la tarjeta
@@ -81,9 +109,10 @@ function tarjetaDelDia(d, hoy) {
       h('button', { type: 'button', class: 'boton grande habitos-no', onclick: () => contestar('no') }, 'No'), botonLuego];
   }
   return h('section', { class: 'tarjeta habitos-tarjeta centrado' },
-    h('p', { class: 'habitos-progreso' }, `${hechas + 1} de ${total}` + (esEstrellas(actual) ? '' : ` · ${BLOQUES[actual.bloque] ?? ''}`)),
+    h('p', { class: 'habitos-progreso' }, `${hechas + 1} de ${total}` + (esEstrellas(actual) ? '' : ` · ${BLOQUES[actual.bloque] ?? ''}`)
+      + textoFase(d, actual, hoy)),
     h('h2', { class: 'habitos-nombre' }, actual.nombre),
-    actual.minimo ? h('p', { class: 'habitos-minimo' }, actual.minimo) : '',
+    minimoDe(actual) ? h('p', { class: 'habitos-minimo' }, minimoDe(actual)) : '',
     h('div', { class: `habitos-botones${enlace?.opciones ? ' tres' : ''}` }, ...botones),
     botonDeshacer());
 }
@@ -138,7 +167,8 @@ function cuadrante(d, hoy) {
       const media = mediaEstrellas(d, x, primero, ultimo, hoy);
       pie = media ? `${String(Math.round(media * 10) / 10).replace('.', ',')}★` : '—';
     }
-    return h('tr', {}, h('th', { class: 'habitos-col-nombre' }, x.nombre),
+    return h('tr', {}, h('th', { class: 'habitos-col-nombre' }, x.nombre,
+      tieneFases(x) ? h('small', { class: 'habitos-fase' }, ` F${faseActual(x) + 1}`) : ''),
       ...dias.map((f) => celda(d, x, f, hoy)),
       h('td', { class: 'habitos-pct' }, pie));
   });
@@ -196,6 +226,33 @@ function celda(d, x, f, hoy) {
     h('button', { type: 'button', 'aria-label': `${x.nombre}, ${f}: ${texto}`, onclick: tocar }));
 }
 
+// ---------------------------------------------------------------- las fases de un hábito
+// Una fase por línea, de la más fácil a la más difícil; cuándo se sube; y en qué fase estás (para corregirla a mano).
+// Si el hábito no tenía fases, su mínimo de siempre entra como fase 1 si no lo has escrito tú.
+function editorFases(d, x, hoy, cambiar) {
+  const escalera = h('textarea', { rows: String(Math.max(3, (x.fases?.length ?? 0) + 1)), 'aria-label': `Fases de ${x.nombre}`,
+    placeholder: 'Una fase por línea, de la más fácil a la más difícil.\nEj.: 2 minutos\n10 minutos\n20 minutos',
+    onchange: (e) => cambiar(x.id, (z) => {
+      let texto = e.target.value;
+      if (!tieneFases(z) && !texto.trim()) return;
+      if (!tieneFases(z) && z.minimo && !texto.includes(z.minimo)) texto = `${z.minimo}\n${texto}`;
+      ponerEscalera(z, texto, hoy);
+    }) });
+  escalera.value = (x.fases ?? []).map((f) => f.minimo).join('\n');
+  const numero = (campo, etiqueta, defecto) => h('label', { class: 'campo' }, h('span', { class: 'etiqueta-campo' }, etiqueta),
+    h('input', { type: 'text', inputmode: 'numeric', value: String(x[campo] ?? defecto),
+      onchange: (e) => cambiar(x.id, (z) => { const n = parseInt(e.target.value, 10); if (n > 0 && n < 400) z[campo] = n; }) }));
+  return h('details', { class: 'explicacion' },
+    h('summary', {}, tieneFases(x) ? `Fases: estás en la ${faseActual(x) + 1} de ${x.fases.length}` : 'Fases (opcional)'),
+    h('p', { class: 'suave' }, 'Sube cuando lleves los días seguidos O los días en total que digas aquí, contados desde que '
+      + 'empezaste la fase. La app te pregunta antes de subir.'),
+    escalera,
+    h('div', { class: 'fila-campos' }, numero('subirRacha', 'Días seguidos', SUBIR_RACHA), numero('subirTotal', 'o días en total', SUBIR_TOTAL)),
+    tieneFases(x) ? h('div', { class: 'fila-marcas compacta' }, x.fases.map((f, k) => h('button', { type: 'button',
+      class: `boton-marca${faseActual(x) === k ? ' activo' : ''}`, title: f.minimo,
+      onclick: () => cambiar(x.id, (z) => ponerFase(z, k, hoy)) }, `Fase ${k + 1}`))) : '');
+}
+
 // ---------------------------------------------------------------- la lista
 function editor(d, hoy) {
   const lista = habitosActivos(d);
@@ -215,8 +272,9 @@ function editor(d, hoy) {
     h('label', { class: 'campo' }, h('span', { class: 'etiqueta-campo' }, 'Nombre'),
       h('input', { type: 'text', value: x.nombre, oninput: (e) => cambiar(x.id, (z) => { z.nombre = e.target.value; }, { tecleo: true }),
         onchange: () => estado.emitir('vista') })),
-    h('label', { class: 'campo' }, h('span', { class: 'etiqueta-campo' }, 'Lo mínimo que cuenta'),
+    tieneFases(x) ? '' : h('label', { class: 'campo' }, h('span', { class: 'etiqueta-campo' }, 'Lo mínimo que cuenta'),
       h('input', { type: 'text', value: x.minimo ?? '', oninput: (e) => cambiar(x.id, (z) => { z.minimo = e.target.value; }, { tecleo: true }) })),
+    editorFases(d, x, hoy, cambiar),
     h('div', { class: 'fila-marcas compacta' }, DIAS_SEMANA.map((letra, k) => {
       const dias = x.dias?.length ? x.dias : TODOS_LOS_DIAS;
       const activo = dias.includes(k);
@@ -243,7 +301,8 @@ function editor(d, hoy) {
     let orden = habitosActivos(y).length;
     for (const n of nuevos) {
       y.habitos.push({ id: nuevoId('hab'), nombre: n.nombre, minimo: n.minimo ?? '', dias: n.dias ?? [...TODOS_LOS_DIAS],
-        bloque: n.bloque ?? 'mantenimiento', orden: orden++, desde: hoy });
+        bloque: n.bloque ?? 'mantenimiento', orden: orden++, desde: hoy,
+        ...(n.fases ? { fases: n.fases, fase: 0, faseDesde: hoy } : {}) });
     }
   });
   const nombreNuevo = h('input', { type: 'text', placeholder: 'Nombre del hábito', 'aria-label': 'Nombre del hábito nuevo' });
@@ -260,8 +319,9 @@ function editor(d, hoy) {
         anadir([{ nombre }]);
       } }, 'Añadir')),
     h('details', { class: 'explicacion' }, h('summary', {}, 'Pegar una lista entera'),
-      h('p', { class: 'suave' }, 'Una línea por hábito: nombre | lo mínimo | días | bloque. Días: «todos», letras sueltas '
-        + '(L M X J V S D) o un tramo («L-V», «V-L»). Bloque: «construcción» o «mantenimiento». Se añaden detrás de los que ya tienes.'),
+      h('p', { class: 'suave' }, 'Una línea por hábito: nombre | lo mínimo | días | bloque | fases. Días: «todos», letras sueltas '
+        + '(L M X J V S D) o un tramo («L-V», «V-L»). Bloque: «construcción» o «mantenimiento». Fases, opcionales, separadas '
+        + 'por « / ». Se añaden detrás de los que ya tienes.'),
       pegado,
       h('button', { type: 'button', class: 'boton', onclick: () => {
         const nuevos = leerLista(pegado.value);

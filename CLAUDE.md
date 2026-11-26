@@ -2133,3 +2133,16 @@ Luego, y las estadísticas son un cuadrante de cuánto ha hecho y cuánto no.
   `web/js/pantalla.js` pide el Wake Lock mientras hay un entreno en curso y la app se ve (lo vuelve a pedir al volver
   a la app y lo suelta al terminar), y así avisa la propia app, con su sonido (volumen multimedia) y vibración.
   Ajustes → Descansos → «Pantalla encendida mientras entrenas» (`perfil.pantallaEncendida`, encendida si falta).
+
+## Ronda 0.95.0 (26-11-2026): fases en los hábitos
+
+Desde la conversación de hábitos. Dan quiere las fases de sus hojas de papel en la app: cada hábito con una escalera de
+mínimos que sube tras X días seguidos **o** X días en total desde que empezó la fase (7 y 10 por defecto, editables
+por hábito), y que **pregunta** antes de subir (decisiones suyas del 26-11-2026).
+- Sin cambio de versión del esquema: son campos opcionales del hábito (como en la 0.12.0), y otra conversación tenía la v43 a medias. Lógica en `habitos.js`: `progresoFase` (un día que
+  tocaba en «no» o sin apuntar rompe la racha; hoy sin contestar no), `listoParaSubir`, `ponerFase`, `ponerEscalera`,
+  `minimoDe`. `minimo` se copia del de la fase actual para lo que no sepa de fases.
+- Pantalla: tarjeta «¿Subes a la fase N?» (Subir / Todavía no, que no vuelve a preguntar hasta el día siguiente)
+  encima de la del día; la tarjeta del día enseña «Fase 2 de 4 (3/7 seguidos, 5/10)» y el mínimo de la fase; el
+  cuadrante pone «F2» junto al nombre; en «Mis hábitos», cada hábito tiene «Fases»: una por línea, los dos números y
+  botones para corregir la fase a mano. La lista pegada admite un quinto campo con las fases separadas por « / ».

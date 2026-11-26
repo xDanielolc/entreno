@@ -147,19 +147,91 @@ export function mediaEstrellas(datos, habito, desde, hasta, hoy) {
 
 export const porcentaje = (c) => (c.posibles ? Math.round((100 * c.si) / c.posibles) : null);
 
+// ---------------------------------------------------------------- fases (0.95.0, sin cambio de esquema: campos opcionales)
+// Como en sus hojas de papel: cada hábito puede tener una escalera de fases, cada una con su mínimo. Se sube a la
+// siguiente cuando llevas X días seguidos hechos O X días hechos en total desde que empezaste la fase (lo eligió Dan
+// el 26-11-2026: 7 seguidos o 10 en total por defecto). La app no sube sola: pregunta en la tarjeta.
+// Campos del hábito (todos opcionales):
+//   fases: [{ minimo }]           la escalera; sin ella el hábito no tiene fases y vale `minimo`
+//   fase: 0                       la fase actual (índice en `fases`)
+//   faseDesde: 'AAAA-MM-DD'       desde qué día cuenta la fase actual
+//   subirRacha: 7, subirTotal: 10 cuántos seguidos o cuántos en total hacen falta para subir
+//   faseNoHasta: 'AAAA-MM-DD'     dijo «Todavía no» ese día: no se vuelve a preguntar hasta el siguiente
+//   historialFases: [{ fase, desde }]
+// `minimo` se mantiene igual al mínimo de la fase actual, para lo que lo lea sin saber de fases.
+export const SUBIR_RACHA = 7;
+export const SUBIR_TOTAL = 10;
+
+export const tieneFases = (habito) => Array.isArray(habito?.fases) && habito.fases.length > 0;
+export const faseActual = (habito) => (tieneFases(habito) ? Math.min(Math.max(habito.fase ?? 0, 0), habito.fases.length - 1) : 0);
+
+export function minimoDe(habito) {
+  return tieneFases(habito) ? habito.fases[faseActual(habito)]?.minimo ?? '' : habito?.minimo ?? '';
+}
+
+// Días seguidos y días en total hechos en la fase actual, hasta hoy. Un día que tocaba y se quedó en «no» o sin
+// apuntar rompe la racha; hoy, mientras no esté contestado, no la rompe.
+export function progresoFase(datos, habito, hoy) {
+  const desde = habito.faseDesde ?? habito.desde ?? hoy;
+  let racha = 0;
+  let total = 0;
+  for (let f = desde; f <= hoy; f = sumarDias(f, 1)) {
+    if (!toca(habito, f)) continue;
+    const v = estadoDe(datos, habito, f);
+    if (v === 'si') { racha++; total++; } else if (v === 'no' || f < hoy) racha = 0;
+  }
+  return { racha, total, faltaRacha: habito.subirRacha ?? SUBIR_RACHA, faltaTotal: habito.subirTotal ?? SUBIR_TOTAL };
+}
+
+export function listoParaSubir(datos, habito, hoy) {
+  if (!tieneFases(habito) || faseActual(habito) >= habito.fases.length - 1) return false;
+  if (habito.faseNoHasta && habito.faseNoHasta >= hoy) return false;
+  const p = progresoFase(datos, habito, hoy);
+  return p.racha >= p.faltaRacha || p.total >= p.faltaTotal;
+}
+
+// Pone el hábito en la fase `n` desde `hoy` (subir, bajar o corregir a mano).
+export function ponerFase(habito, n, hoy) {
+  if (!tieneFases(habito)) return;
+  const nueva = Math.min(Math.max(n, 0), habito.fases.length - 1);
+  habito.fase = nueva;
+  habito.faseDesde = hoy;
+  delete habito.faseNoHasta;
+  habito.minimo = habito.fases[nueva].minimo ?? '';
+  habito.historialFases = [...(habito.historialFases ?? []), { fase: nueva, desde: hoy }];
+}
+
+// Escribe la escalera a partir de un texto (una fase por línea). Si el hábito no tenía fases, el mínimo que tuviera
+// pasa a ser la primera si la lista empieza vacía.
+export function ponerEscalera(habito, texto, hoy) {
+  const lineas = String(texto).split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
+  if (!lineas.length) {
+    delete habito.fases; delete habito.fase; delete habito.faseDesde; delete habito.faseNoHasta;
+    return;
+  }
+  const antes = tieneFases(habito);
+  habito.fases = lineas.map((minimo) => ({ minimo }));
+  if (!antes) { habito.fase = 0; habito.faseDesde = hoy; }
+  habito.fase = faseActual(habito);
+  habito.minimo = habito.fases[habito.fase].minimo;
+}
+
 // Lista pegada: una línea por hábito, con los campos separados por «|»:
-//   Nombre | lo mínimo | días | bloque
+//   Nombre | lo mínimo | días | bloque | fases (opcional, separadas por « / »)
 // Días: «todos», letras sueltas («L X V») o un tramo («L-V», «V-L»). Bloque: «construcción» o «mantenimiento».
+// Con fases, la primera es el mínimo de partida.
 export function leerLista(texto) {
   const salida = [];
   for (const linea of String(texto).split(/\r?\n/)) {
     const partes = linea.split('|').map((s) => s.trim());
     if (!partes[0]) continue;
+    const fases = (partes[4] || '').split(' / ').map((s) => s.trim()).filter(Boolean);
     salida.push({
       nombre: partes[0],
-      minimo: partes[1] || '',
+      minimo: fases[0] || partes[1] || '',
       dias: leerDias(partes[2] || ''),
       bloque: /constru/i.test(partes[3] || '') ? 'construccion' : 'mantenimiento',
+      ...(fases.length ? { fases: fases.map((minimo) => ({ minimo })) } : {}),
     });
   }
   return salida;
