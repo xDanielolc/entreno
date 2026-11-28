@@ -2146,3 +2146,5 @@ por hábito), y que **pregunta** antes de subir (decisiones suyas del 26-11-2026
   encima de la del día; la tarjeta del día enseña «Fase 2 de 4 (3/7 seguidos, 5/10)» y el mínimo de la fase; el
   cuadrante pone «F2» junto al nombre; en «Mis hábitos», cada hábito tiene «Fases»: una por línea, los dos números y
   botones para corregir la fase a mano. La lista pegada admite un quinto campo con las fases separadas por « / ».
+
+- 0.95.1 (28-11-2026): enlace «melatonina» en los hábitos (`ENLACES.melatonina`): la tarjeta «Sin melatonina (anoche)» guarda en `diario.melatonina` ('si' la tomó / 'no'), como el alcohol, para comparar el sueño con y sin ella (Dan empieza a dejarla el 27-11 por la noche). Campo opcional del diario, sin cambio de esquema. `estadoDe` cuenta como hecho la primera opción de cualquier enlace con opciones.

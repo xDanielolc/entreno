@@ -45,8 +45,11 @@ export function toca(habito, fecha) {
   return (habito.dias?.length ? habito.dias : TODOS_LOS_DIAS).includes(diaSemana(fecha));
 }
 
+// melatonina (0.95.1, 28-11-2026): experimento de dejarla. Va al diario (`diario.melatonina`: 'si' la tomó, 'no' no
+// la tomó) para que la conversación del sueño compare las noches con y sin ella. Cuenta como hecho no tomarla.
 export const ENLACES = {
   alcohol: { campo: 'alcohol', opciones: [['no', 'Nada'], ['poco', ALCOHOL.poco], ['mucho', ALCOHOL.mucho]] },
+  melatonina: { campo: 'melatonina', opciones: [['no', 'No la tomé'], ['si', 'La tomé']] },
   sensacion: { campo: 'sensacion', estrellas: true, nombres: SENSACIONES },
 };
 const enlaceDe = (habito) => ENLACES[habito?.enlace] ?? null;
@@ -65,7 +68,9 @@ export function valorDe(datos, habito, fecha) {
 export function estadoDe(datos, habito, fecha) {
   const v = valorDe(datos, habito, fecha);
   if (v == null || esEstrellas(habito)) return null;
-  if (habito.enlace === 'alcohol') return v === 'no' ? 'si' : 'no';
+  // En los enlazados con opciones (alcohol, melatonina), cuenta como hecho la primera.
+  const opciones = enlaceDe(habito)?.opciones;
+  if (opciones) return v === opciones[0][0] ? 'si' : 'no';
   return v === 'si' ? 'si' : v === 'no' ? 'no' : null;
 }
 

@@ -113,7 +113,7 @@ function tarjetaDelDia(d, hoy) {
       + textoFase(d, actual, hoy)),
     h('h2', { class: 'habitos-nombre' }, actual.nombre),
     minimoDe(actual) ? h('p', { class: 'habitos-minimo' }, minimoDe(actual)) : '',
-    h('div', { class: `habitos-botones${enlace?.opciones ? ' tres' : ''}` }, ...botones),
+    h('div', { class: `habitos-botones${enlace?.opciones?.length === 3 ? ' tres' : ''}` }, ...botones),
     botonDeshacer());
 }
 
